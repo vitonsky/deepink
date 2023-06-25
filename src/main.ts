@@ -4,8 +4,8 @@ import url from 'url';
 
 const createWindow = async () => {
 	const win = new BrowserWindow({
-		width: 800,
-		height: 600,
+		width: 1300,
+		height: 800,
 		// show: false,
 		backgroundColor: '#fff', // required to enable sub pixel rendering, can't be in css
 		webPreferences: {

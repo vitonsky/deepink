@@ -15,6 +15,7 @@ module.exports = merge(commonConfig, {
 		new CopyPlugin({
 			patterns: [
 				{ from: "src/index.html" },
+				{ from: "src/index.css" },
 				{ from: "assets", to: 'assets' },
 				{
 					from: "assets/icons/app.svg",

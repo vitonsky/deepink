@@ -1,16 +1,7 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { notes } from './core/Note';
-
-const App: FC = () => {
-
-	return <div>
-		{notes.map((note, id) => {
-			return <li key={id}>{note.title ?? note.text.slice(0, 35)}</li>;
-		})}
-	</div>;
-};
+import { App } from './app/App';
 
 const rootNode = document.getElementById('appRoot');
 if (!rootNode) {
