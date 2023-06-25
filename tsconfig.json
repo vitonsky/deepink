@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"jsx": "react",
 		"module": "esnext",
 		"moduleResolution": "node",
 		"target": "esnext",
@@ -24,11 +25,19 @@
 		"preserveConstEnums": true,
 		"removeComments": false,
 		"sourceMap": true,
-		"lib": ["es2020", "dom"],
+		"lib": [
+			"es2020",
+			"dom"
+		],
 		"rootDir": ".",
 		"allowJs": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true
 	},
-	"include": ["src/*.ts", "src/*.tsx", "src/**/*.ts", "src/**/*.tsx"]
+	"include": [
+		"src/*.ts",
+		"src/*.tsx",
+		"src/**/*.ts",
+		"src/**/*.tsx"
+	]
 }

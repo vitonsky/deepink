@@ -15,6 +15,8 @@ const createWindow = async () => {
 		},
 	});
 
+	win.webContents.openDevTools();
+
 	const start = performance.now();
 	// win.addListener('ready-to-show', () => {
 	// 	console.log(performance.measure('ready to show', { start }));
