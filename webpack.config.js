@@ -2,6 +2,7 @@ const path = require('path');
 
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const sharp = require('sharp');
 
 console.log('Webpack run');
 
@@ -42,6 +43,14 @@ module.exports = {
 		new CopyPlugin({
 			patterns: [
 				{ from: "src/index.html" },
+				{ from: "assets", to: 'assets' },
+				{
+					from: "assets/icons/app.svg",
+					to: 'assets/icons/app.png',
+					transform(content) {
+						return sharp(content).resize(512, 512).toBuffer();
+					}
+				},
 			],
 		}),
 	],

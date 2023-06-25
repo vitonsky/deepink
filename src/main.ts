@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
 
@@ -30,6 +30,20 @@ const createWindow = async () => {
 	);
 
 	console.log(performance.measure('page loaded', { start }));
+
+	// win.addListener('close', (evt) => {
+	// 	evt.preventDefault();
+	// 	win.minimize();
+	// });
+
+	const tray = new Tray(path.join(__dirname, 'assets/icons/app.png'));
+	tray.setToolTip('Tooltip text');
+
+	tray.addListener('click', () => {
+		if (!win.isMinimized()) return;
+
+		win.minimize();
+	});
 };
 
 Menu.setApplicationMenu(null);
