@@ -59,10 +59,7 @@ module.exports = merge(commonConfig, {
 			},
 			{
 				test: /\.ttf$/,
-				loader: 'file-loader',
-				options: {
-					publicPath: '/',
-				},
+				type: 'asset/resource',
 			},
 			{
 				test: /\.svg$/,

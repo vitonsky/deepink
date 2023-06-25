@@ -13,4 +13,25 @@
 .App-ContentBlock {
 	width: 100%;
 	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+}
+
+.App-NoteEditors {
+	display: flex;
+	flex-grow: 100;
+}
+
+.App-NoteEditor:not(.App-NoteEditor_active) {
+	display: none;
+}
+
+.App-NoteEditor.App-NoteEditor_active {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 100;
+}
+
+.App-NoteEditor.App-NoteEditor_active > div {
+	flex-grow: 100;
 }
