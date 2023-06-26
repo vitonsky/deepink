@@ -1,0 +1,9 @@
+.NoteEditor {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.NoteEditor-Editor {
+	flex-grow: 100;
+}

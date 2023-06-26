@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useCallback, useEffect, useRef } from 'react';
+import React, { FC, HTMLAttributes, RefObject, useCallback, useEffect, useRef } from 'react';
 import { editor, languages } from 'monaco-editor-core';
 
 
@@ -20,7 +20,7 @@ export type EditorObject = {
 	updateDimensions: () => void;
 } | null;
 
-export type MonacoEditorProps = {
+export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	value: string;
 	setValue?: (value: string) => void;
 	editorObjectRef?: RefObject<EditorObject>;
@@ -33,6 +33,8 @@ export type MonacoEditorProps = {
 export const MonacoEditor: FC<MonacoEditorProps> = ({
 	value,
 	setValue,
+	editorObjectRef,
+	...props
 }) => {
 	const setValueRef = useRef(setValue);
 	setValueRef.current = setValue;
@@ -119,5 +121,5 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		}
 	});
 
-	return <div ref={editorContainerRef}></div>;
+	return <div ref={editorContainerRef} {...props}></div>;
 };
