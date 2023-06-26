@@ -14,7 +14,7 @@ import { NoteEditor } from './NoteEditor';
 
 export const cnApp = cn('App');
 
-export const getNoteTitle = (note: INote) => (note.title ?? note.text.slice(0, 35)) || 'Empty note';
+export const getNoteTitle = (note: INote) => (note.title ?? note.text).slice(0, 25) || 'Empty note';
 
 export const App: FC = () => {
 	const [tabs, setTabs] = useState<string[]>([]);
