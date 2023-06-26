@@ -7,27 +7,28 @@ import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
 import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
 
-import { IEditableNote, INote, notesRegistry } from '../../core/Note';
+import { INote, INoteData } from '../../core/Note';
+import { notesRegistry } from '../../app';
 
 import './App.css';
 import { NoteEditor } from './NoteEditor';
 
 export const cnApp = cn('App');
 
-export const getNoteTitle = (note: INote) => (note.title ?? note.text).slice(0, 25) || 'Empty note';
+export const getNoteTitle = (note: INoteData) => (note.title || note.text).slice(0, 25) || 'Empty note';
 
 export const App: FC = () => {
 	const [tabs, setTabs] = useState<string[]>([]);
 	const [tab, setTab] = useState<string | null>(null);
-	const [notes, setNotes] = useState<IEditableNote[]>([]);
+	const [notes, setNotes] = useState<INote[]>([]);
 
-	console.warn('Updated notes', notes);
+	// console.warn('Updated notes', notes);
 
 	const updateNotes = useCallback(async () => {
 		const notes = await notesRegistry.getNotes();
 		notes.sort((a, b) => {
-			const timeA = a.data.updatedTimestamp ?? a.data.createdTimestamp ?? 0;
-			const timeB = b.data.updatedTimestamp ?? b.data.createdTimestamp ?? 0;
+			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
+			const timeB = b.updatedTimestamp ?? b.createdTimestamp ?? 0;
 
 			if (timeA > timeB) return -1;
 			if (timeB > timeA) return 1;
@@ -67,8 +68,13 @@ export const App: FC = () => {
 	);
 
 	// Simulate note update
-	const updateNote = useCallback(async (note: IEditableNote) => {
-		await notesRegistry.updateNote(note);
+	const updateNote = useCallback(async (note: INote) => {
+		await notesRegistry.updateNote(note.id, note.data);
+		updateNotes();
+	}, []);
+
+	const createNote = useCallback(async () => {
+		await notesRegistry.addNote({ title: '', text: '' });
 		updateNotes();
 	}, []);
 
@@ -76,10 +82,7 @@ export const App: FC = () => {
 		<div className={cnApp({}, [cnTheme(theme)])}>
 			<div className={cnApp('SideBar')}>
 				<div className={cnApp('SideBarControls')}>
-					<Button view='action' onPress={async () => {
-						await notesRegistry.addNote({ text: '' });
-						updateNotes();
-					}}>New note</Button>
+					<Button view='action' onPress={createNote}>New note</Button>
 				</div>
 
 				<div className={cnApp('NotesList')}>
@@ -102,12 +105,12 @@ export const App: FC = () => {
 				</div>
 			</div>
 			<div className={cnApp('ContentBlock')}>
-				{/* TODO: fix bug - tabs cursor does not update when tabs updates */}
+				{/* TODO: improve tabs style */}
 				<TabsMenu
 					view="primitive"
 					layout="horizontal"
 					dir="horizontal"
-					activeTab={String(tab)}
+					activeTab={tab || undefined}
 					setActiveTab={setTab}
 					tabs={tabs.map((noteId) => {
 						// TODO: handle case when object not found
@@ -117,7 +120,7 @@ export const App: FC = () => {
 						}
 
 						return {
-							id: String(noteId),
+							id: noteId,
 							content: (
 								<span>
 									{getNoteTitle(note.data)}{' '}
@@ -146,7 +149,9 @@ export const App: FC = () => {
 								key={id}
 								className={cnApp('NoteEditor', { active: isActive })}
 							>
-								<NoteEditor note={noteObject} updateNote={updateNote} />
+								<NoteEditor note={noteObject.data} updateNote={(noteData) => {
+									updateNote({ ...noteObject, data: noteData })
+								}} />
 							</div>
 						);
 					})}
