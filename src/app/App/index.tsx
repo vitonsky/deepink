@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@bem-react/classname';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
@@ -42,6 +42,7 @@ export const App: FC = () => {
 		updateNotes();
 	}, []);
 
+	// TODO: focus on note input
 	const onNoteClick = useCallback((id: string) => {
 		setTabs((state) => (state.includes(id) ? state : [...state, id]));
 		setTab(id);
@@ -73,10 +74,24 @@ export const App: FC = () => {
 		updateNotes();
 	}, []);
 
+	const newNoteIdRef = useRef<null | string>(null);
 	const createNote = useCallback(async () => {
-		await notesRegistry.addNote({ title: '', text: '' });
+		const noteId = await notesRegistry.addNote({ title: '', text: '' });
+		newNoteIdRef.current = noteId;
 		updateNotes();
 	}, []);
+
+	// Focus on new note
+	useEffect(() => {
+		if (newNoteIdRef.current === null) return;
+
+		const newNoteId = newNoteIdRef.current;
+		const isNoteExists = notes.find((note) => note.id === newNoteId);
+		if (isNoteExists) {
+			newNoteIdRef.current = null;
+			onNoteClick(newNoteId)
+		}
+	}, [notes])
 
 	return (
 		<div className={cnApp({}, [cnTheme(theme)])}>
