@@ -42,7 +42,5 @@ export class MockNotesRegistry {
 
 		Object.assign(note.data, updatedNote);
 		note.updatedTimestamp = new Date().getTime();
-
-		console.warn('Updated notes', this.notes);
 	}
 }

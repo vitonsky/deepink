@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 
 import { INoteData } from '../../../core/Note';
@@ -19,7 +19,13 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const [title, setTitle] = useState(note.title);
 	const [text, setText] = useState(note.text);
 
+	const isFirstRenderRef = useRef(true);
 	useEffect(() => {
+		if (isFirstRenderRef.current) {
+			isFirstRenderRef.current = false;
+			return;
+		}
+
 		updateNote({ title, text });
 	}, [title, text]);
 
