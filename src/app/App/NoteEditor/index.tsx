@@ -16,15 +16,13 @@ export type NoteEditorProps = {
 };
 
 export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
-	const [title, setTitle] = useState(note.title);
-	const [text, setText] = useState(note.text);
+	const [title, setTitle] = useState(note.data.title);
+	const [text, setText] = useState(note.data.text);
 
-	// TODO: sync note state with DB
 	useEffect(() => {
 		updateNote({
 			id: note.id,
-			title,
-			text,
+			data: { title, text }
 		});
 	}, [title, text]);
 

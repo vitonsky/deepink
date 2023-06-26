@@ -1,28 +1,22 @@
-import { getNoteTitle } from '../app/App';
-
 export type INote = {
 	title?: string;
 	text: string;
-	date?: number;
+	createdTimestamp?: number;
+	updatedTimestamp?: number;
 };
 
 export type IEditableNote = {
 	id: string;
-	title: string;
-	text: string;
+	data: INote;
 };
 
 const delay = (time: number) => new Promise((res) => setTimeout(res, time));
 export class NotesRegistry {
-	private notes: { id: string; note: INote }[] = [];
+	private notes: IEditableNote[] = [];
 
 	public async getNotes(): Promise<IEditableNote[]> {
 		await delay(500);
-		return this.notes.map((note) => ({
-			id: note.id,
-			title: getNoteTitle(note.note),
-			...note.note,
-		}));
+		return structuredClone(this.notes);
 	}
 
 	private uidCounter = 0;
@@ -30,7 +24,7 @@ export class NotesRegistry {
 		await delay(30);
 		const id = ++this.uidCounter + '_note';
 
-		this.notes.push({ id, note });
+		this.notes.push({ id, data: { ...note, createdTimestamp: (new Date()).getTime() } });
 
 		return id;
 	}
@@ -40,9 +34,7 @@ export class NotesRegistry {
 
 		const note = this.notes.find((note) => note.id === updatedNote.id);
 		if (!note) return;
-
-		const { id, ...updatedData } = updatedNote;
-		Object.assign(note.note, updatedData);
+		Object.assign(note.data, updatedNote.data, { updatedTimestamp: (new Date()).getTime() });
 	}
 }
 

@@ -14,15 +14,25 @@ import { NoteEditor } from './NoteEditor';
 
 export const cnApp = cn('App');
 
-export const getNoteTitle = (note: INote) => note.title ?? note.text.slice(0, 35);
+export const getNoteTitle = (note: INote) => (note.title ?? note.text.slice(0, 35)) || 'Empty note';
 
 export const App: FC = () => {
 	const [tabs, setTabs] = useState<string[]>([]);
 	const [tab, setTab] = useState<string | null>(null);
 	const [notes, setNotes] = useState<IEditableNote[]>([]);
 
+	console.warn('Updated notes', notes);
+
 	const updateNotes = useCallback(async () => {
 		const notes = await notesRegistry.getNotes();
+		notes.sort((a, b) => {
+			const timeA = a.data.updatedTimestamp ?? a.data.createdTimestamp ?? 0;
+			const timeB = b.data.updatedTimestamp ?? b.data.createdTimestamp ?? 0;
+
+			if (timeA > timeB) return -1;
+			if (timeB > timeA) return 1;
+			return 0;
+		})
 		setNotes(notes);
 	}, []);
 
@@ -66,8 +76,8 @@ export const App: FC = () => {
 		<div className={cnApp({}, [cnTheme(theme)])}>
 			<div className={cnApp('SideBar')}>
 				<div className={cnApp('SideBarControls')}>
-					<Button view='action' onPress={() => {
-						notesRegistry.addNote({ text: '' });
+					<Button view='action' onPress={async () => {
+						await notesRegistry.addNote({ text: '' });
 						updateNotes();
 					}}>New note</Button>
 				</div>
@@ -79,7 +89,7 @@ export const App: FC = () => {
 						items={notes.map((note) => {
 							return {
 								id: note.id,
-								content: note.title || 'Unnamed note',
+								content: getNoteTitle(note.data),
 								addonProps: {
 									className: cnApp('NoteItem', {
 										active: note.id === tab,
@@ -110,7 +120,7 @@ export const App: FC = () => {
 							id: String(noteId),
 							content: (
 								<span>
-									{note.title}{' '}
+									{getNoteTitle(note.data)}{' '}
 									<span
 										onClick={(evt) => {
 											evt.stopPropagation();
@@ -130,19 +140,13 @@ export const App: FC = () => {
 						const noteObject = notes.find((note) => note.id === id);
 						if (!noteObject) return null;
 
-						const note = {
-							id,
-							title: getNoteTitle(noteObject),
-							text: noteObject.text
-						}
-
 						const isActive = id === tab;
 						return (
 							<div
 								key={id}
 								className={cnApp('NoteEditor', { active: isActive })}
 							>
-								<NoteEditor note={note} updateNote={updateNote} />
+								<NoteEditor note={noteObject} updateNote={updateNote} />
 							</div>
 						);
 					})}
