@@ -1,3 +1,36 @@
 body {
 	margin: 0;
 }
+
+/* TODO: set consistent colors from palette */
+
+/* Set webkit scrollbar style */
+:root {
+	--scroll-bar-color: #c5c5c5;
+	--scroll-bar-color-hover: #939393;
+	--scroll-bar-bg-color: #f6f6f6;
+	--scroll-bar-bg-color-hover: #eeeded;
+}
+
+*::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+	background: var(--scroll-bar-bg-color);
+}
+
+*::-webkit-scrollbar-track:hover {
+	background: var(--scroll-bar-bg-color-hover);
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: var(--scroll-bar-color);
+	border-radius: 20px;
+	border: 3px solid var(--scroll-bar-bg-color);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background-color: var(--scroll-bar-color-hover);
+}
