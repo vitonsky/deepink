@@ -1,6 +1,6 @@
 .App {
 	display: flex;
-	min-height: 100vh;
+	height: 100vh;
 	flex-direction: row;
 }
 
@@ -8,6 +8,7 @@
 	min-width: 250px;
 	border-right: 3px solid #fefe;
 	padding: 1rem;
+	overflow: auto;
 }
 
 .App-ContentBlock {
@@ -34,4 +35,21 @@
 
 .App-NoteEditor.App-NoteEditor_active > div {
 	flex-grow: 100;
+}
+
+.App-ContentBlock .TabsMenu_layout_horizontal .TabsMenu-Container {
+	flex-wrap: wrap;
+	max-height: 100px;
+	overflow-y: auto;
+
+	/* flex-direction: column; */
+	width: 100%;
+}
+
+.Menu-Item.App-NoteItem_opened {
+	color: #780000;
+}
+
+.Menu-Item.App-NoteItem_active {
+	background-color: #00000014;
 }

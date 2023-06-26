@@ -65,6 +65,7 @@
 		"@bem-react/classname": "^1.6.0",
 		"monaco-editor-core": "^0.39.0",
 		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react-dom": "^18.2.0",
+		"react-elegant-ui": "^0.3.3"
 	}
 }
