@@ -4,6 +4,12 @@ export type INote = {
 	date?: number;
 }
 
+export type IEditableNote = {
+	id: number;
+	title: string;
+	text: string;
+}
+
 export const notes: INote[] = [
 	{
 		text: `Nulla quia sunt vel ea est ea. Qui reprehenderit quibusdam et quia. Natus minima culpa dolor. Velit aliquid cum aut enim molestias voluptatem consequatur culpa. Voluptatem impedit tenetur quisquam et hic.
