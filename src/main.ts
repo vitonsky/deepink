@@ -9,7 +9,7 @@ const createWindow = async () => {
 		// show: false,
 		backgroundColor: '#fff', // required to enable sub pixel rendering, can't be in css
 		webPreferences: {
-			nodeIntegration: false,
+			nodeIntegration: true,
 			contextIsolation: false,
 			spellcheck: true,
 		},

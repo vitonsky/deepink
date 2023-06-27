@@ -7,11 +7,12 @@
 	"scripts": {
 		"test": "jest",
 		"test-fast": "TEST_FAST=true jest",
-		"clean": "rm -Rf dist",
+		"clean": "rm -Rf dist out",
 		"build:dev": "webpack -w",
 		"start": "electron-forge start",
 		"package": "electron-forge package",
 		"make": "electron-forge make",
+		"rebuild": "electron-rebuild -f -w sqlite3",
 		"prettify": "prettier --write \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint --fix \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint --fix \"{*,**/*}.css\"",
 		"packages:upgrade": "npm-check-updates -u",
 		"prepare": "husky install"
@@ -65,9 +66,14 @@
 	},
 	"dependencies": {
 		"@bem-react/classname": "^1.6.0",
+		"better-sqlite3": "^8.4.0",
+		"electron-prebuilt": "^1.4.13",
+		"electron-rebuild": "^3.2.9",
 		"monaco-editor-core": "^0.39.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
-		"react-elegant-ui": "^0.3.3"
+		"react-elegant-ui": "^0.3.3",
+		"sqlite": "^4.2.1",
+		"sqlite3": "^5.1.6"
 	}
 }

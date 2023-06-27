@@ -6,7 +6,7 @@ const { merge } = require('webpack-merge');
 const commonConfig = require('./webpack.common');
 
 module.exports = merge(commonConfig, {
-	target: 'web',
+	target: 'electron-renderer',
 	entry: {
 		app: './src/app.tsx',
 	},
@@ -24,6 +24,8 @@ module.exports = merge(commonConfig, {
 						return sharp(content).resize(512, 512).toBuffer();
 					}
 				},
+				// TODO: move to electron config
+				{ from: "sqliteExtensions", to: 'sqliteExtensions' },
 			],
 		}),
 	],
