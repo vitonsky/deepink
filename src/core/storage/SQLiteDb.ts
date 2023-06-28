@@ -19,6 +19,9 @@ const notesStatement = `CREATE TABLE "notes" (
 // TODO: change path to it works after packing
 const dbExtensionsDir = path.join(cwd(), 'dist/sqliteExtensions');
 
+// TODO: change path to user directory
+const profileDir = path.join(cwd(), 'tmp');
+
 export type SQLiteDb = {
 	/**
 	 * Configured database with extensions
@@ -31,14 +34,15 @@ export type SQLiteDb = {
 	sync: () => Promise<void>;
 };
 
+// TODO: make DB singletone
 export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
-	const profileDir = path.join(cwd(), 'tmp');
 	const dbPath = path.join(profileDir, dbName ?? 'deepink.db');
 	const verboseLog = false;
 
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
+	// Create DB
 	const db = await open({
 		filename: ':memory:',
 		driver: sqlite3.Database,
@@ -61,7 +65,7 @@ export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
 		return db;
 	});
 
-	// TODO: listen DB updates and automatically sync file
+	// Sync changes
 	let isRequiredSync = false;
 	let isSyncInProgress = false;
 	const sync = async () => {
