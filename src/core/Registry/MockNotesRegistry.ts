@@ -24,18 +24,18 @@ export class MockNotesRegistry implements INotesRegistry {
 		return id;
 	}
 
-	public async getNotes(): Promise<INote[]> {
+	public async get(): Promise<INote[]> {
 		await delay(500);
 		return structuredClone(this.notes);
 	}
 
 	private uidCounter = 0;
-	public async addNote(note: INoteData) {
+	public async add(note: INoteData) {
 		await delay(30);
 		return this._loadNote(note);
 	}
 
-	public async updateNote(id: string, updatedNote: INoteData) {
+	public async update(id: string, updatedNote: INoteData) {
 		await delay(100);
 
 		const note = this.notes.find((note) => note.id === id);

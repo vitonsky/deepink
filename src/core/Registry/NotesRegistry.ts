@@ -11,7 +11,7 @@ export class NotesRegistry implements INotesRegistry {
 		this.db = db;
 	}
 
-	public async getNotes(): Promise<INote[]> {
+	public async get(): Promise<INote[]> {
 		const { db } = this.db;
 
 		const notes: INote[] = [];
@@ -32,7 +32,7 @@ export class NotesRegistry implements INotesRegistry {
 		return notes;
 	}
 
-	public async addNote(note: INoteData) {
+	public async add(note: INoteData) {
 		const { db, sync } = this.db;
 
 		// TODO: use named placeholders
@@ -48,7 +48,7 @@ export class NotesRegistry implements INotesRegistry {
 		return id;
 	}
 
-	public async updateNote(id: string, updatedNote: INoteData) {
+	public async update(id: string, updatedNote: INoteData) {
 		const { db, sync } = this.db;
 
 		// TODO: use named placeholders

@@ -1,6 +1,7 @@
 import { INote, INoteData, NoteId } from "../Note";
 
-// TODO: eliminate "Note" word from names
+export type NotesRegistryFetchOptions = {};
+
 // TODO: add method `delete`
 /**
  * Notes controller interface
@@ -10,15 +11,15 @@ export interface INotesRegistry {
 	/**
 	 * Primary method to get notes filtered by parameters
 	 */
-	getNotes(): Promise<INote[]>;
+	get(options?: NotesRegistryFetchOptions): Promise<INote[]>;
 
 	/**
 	 * Create note and return unique id of new note
 	 */
-	addNote(note: INoteData): Promise<NoteId>;
+	add(note: INoteData): Promise<NoteId>;
 
 	/**
 	 * Update note by unique id
 	 */
-	updateNote(id: NoteId, updatedNote: INoteData): Promise<void>;
+	update(id: NoteId, updatedNote: INoteData): Promise<void>;
 }

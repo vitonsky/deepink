@@ -27,7 +27,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [notes, setNotes] = useState<INote[]>([]);
 
 	const updateNotes = useCallback(async () => {
-		const notes = await notesRegistry.getNotes();
+		const notes = await notesRegistry.get();
 		notes.sort((a, b) => {
 			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
 			const timeB = b.updatedTimestamp ?? b.createdTimestamp ?? 0;
@@ -72,13 +72,13 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 
 	// Simulate note update
 	const updateNote = useCallback(async (note: INote) => {
-		await notesRegistry.updateNote(note.id, note.data);
+		await notesRegistry.update(note.id, note.data);
 		updateNotes();
 	}, []);
 
 	const newNoteIdRef = useRef<NoteId | null>(null);
 	const createNote = useCallback(async () => {
-		const noteId = await notesRegistry.addNote({ title: '', text: '' });
+		const noteId = await notesRegistry.add({ title: '', text: '' });
 		newNoteIdRef.current = noteId;
 		updateNotes();
 	}, []);
