@@ -6,11 +6,13 @@ export type INoteData = {
 	text: string;
 };
 
+export type NoteId = string;
+
 /**
  * Full note data, include meta data
  */
 export type INote = {
-	id: string;
+	id: NoteId;
 	createdTimestamp?: number;
 	updatedTimestamp?: number;
 	data: INoteData;

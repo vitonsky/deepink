@@ -1,11 +1,11 @@
+import { INotesRegistry } from '.';
 import { INote, INoteData } from '../Note';
 import { SQLiteDb } from '../storage/SQLiteDb';
 
-// TODO: add registry interface and implement it
 /**
  * Synced notes registry
  */
-export class NotesRegistry {
+export class NotesRegistry implements INotesRegistry {
 	private db;
 	constructor(db: SQLiteDb) {
 		this.db = db;

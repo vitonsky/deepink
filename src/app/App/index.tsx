@@ -7,12 +7,13 @@ import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
 import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
 
-import { INote, INoteData } from '../../core/Note';
+import { INote, INoteData, NoteId } from '../../core/Note';
 
 import './App.css';
 import { NoteEditor } from './NoteEditor';
 import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { SQLiteDb, getDb } from '../../core/storage/SQLiteDb';
+import { INotesRegistry } from '../../core/Registry';
 
 export const cnApp = cn('App');
 
@@ -20,9 +21,9 @@ export const getNoteTitle = (note: INoteData) => (note.title || note.text).slice
 
 // TODO: move to other file
 export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
-	const [notesRegistry] = useState(() => new NotesRegistry(db));
-	const [tabs, setTabs] = useState<string[]>([]);
-	const [tab, setTab] = useState<string | null>(null);
+	const [notesRegistry] = useState<INotesRegistry>(() => new NotesRegistry(db));
+	const [tabs, setTabs] = useState<NoteId[]>([]);
+	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
 
 	const updateNotes = useCallback(async () => {
@@ -44,13 +45,13 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	}, []);
 
 	// TODO: focus on note input
-	const onNoteClick = useCallback((id: string) => {
+	const onNoteClick = useCallback((id: NoteId) => {
 		setTabs((state) => (state.includes(id) ? state : [...state, id]));
 		setTab(id);
 	}, []);
 
 	const closeNote = useCallback(
-		(id: string) => {
+		(id: NoteId) => {
 			const tabIndex = tabs.indexOf(id);
 
 			// Change tab if it is current tab
@@ -75,7 +76,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		updateNotes();
 	}, []);
 
-	const newNoteIdRef = useRef<null | string>(null);
+	const newNoteIdRef = useRef<NoteId | null>(null);
 	const createNote = useCallback(async () => {
 		const noteId = await notesRegistry.addNote({ title: '', text: '' });
 		newNoteIdRef.current = noteId;

@@ -1,3 +1,4 @@
+import { INotesRegistry } from '.';
 import { INote, INoteData } from '../Note';
 
 const delay = (time: number) => new Promise((res) => setTimeout(res, time));
@@ -5,7 +6,7 @@ const delay = (time: number) => new Promise((res) => setTimeout(res, time));
 /**
  * Fake registry for tests
  */
-export class MockNotesRegistry {
+export class MockNotesRegistry implements INotesRegistry {
 	private notes: INote[] = [];
 
 	/**
