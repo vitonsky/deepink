@@ -2,6 +2,12 @@ import { INotesRegistry } from '.';
 import { INote, INoteData } from '../Note';
 import { SQLiteDb } from '../storage/SQLiteDb';
 
+let uidCounter = 0;
+/**
+ * Return number unique for session
+ */
+const getUniqueIdForSession = () => ++uidCounter;
+
 /**
  * Synced notes registry
  */
@@ -40,9 +46,9 @@ export class NotesRegistry implements INotesRegistry {
 
 		const time = new Date().getTime();
 		// TODO: use UUID for primary key
-		const id = String(time);
+		const id = String(performance.now()) + getUniqueIdForSession();
 
-		await addNote.run(time, note.title, note.text, time, time);
+		await addNote.run(id, note.title, note.text, time, time);
 		await sync();
 
 		return id;
