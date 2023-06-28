@@ -2,9 +2,10 @@ import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
 import path from 'path';
 import { cwd } from 'process';
-import { readFile, rename, rm, writeFile } from 'fs/promises';
-import { existsSync, renameSync } from 'fs';
+import { readFile, writeFile } from 'fs/promises';
+import { existsSync } from 'fs';
 import lockfileUtils from 'proper-lockfile';
+import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
 const notesStatement = `CREATE TABLE "notes" (
 	"id"	TEXT NOT NULL UNIQUE,
@@ -28,44 +29,6 @@ export type SQLiteDb = {
 	 * Write database to file
 	 */
 	sync: () => Promise<void>;
-};
-
-/**
- * Write file with 3-step transaction
- * 
- * This util is not lock files, you have to implement it, to ensure conflict free
- */
-const writeFileAtomic = async (filename: string, content: Buffer | string) => {
-	// Write tmp file. This operation will rewrite file if exists
-	const tmpFile = filename + '.tmp';
-	await writeFile(tmpFile, content);
-
-	// Rename original file
-	const backupFile = filename + '.backup';
-	if (existsSync(backupFile)) {
-		throw new Error(`Temporary backup file "${backupFile}" already exists. Can't to continue, to avoid loose data`);
-	}
-	await rename(filename, backupFile);
-
-	// Rename temporary file, to original name
-	await rename(tmpFile, filename);
-
-	// Delete backup file, to commit transaction
-	await rm(backupFile);
-};
-
-const recoveryAtomicFile = (filename: string) => {
-	const backupFile = filename + '.backup';
-
-	if (existsSync(filename)) return false;
-
-	// Recovery data from intermediate file
-	if (existsSync(backupFile)) {
-		renameSync(backupFile, filename);
-		return true;
-	}
-
-	return false;
 };
 
 export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
