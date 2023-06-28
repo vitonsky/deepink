@@ -14,7 +14,7 @@ const mappers = {
 			updatedTimestamp: lastUpdateTime,
 			data: { title, text },
 		};
-	}
+	},
 };
 
 /**
@@ -39,7 +39,7 @@ export class NotesRegistry implements INotesRegistry {
 
 		const notes: INote[] = [];
 		// TODO: return with no limit
-		await db.each('select * from notes LIMIT 1000;', (_err, row) => {
+		await db.each('SELECT * FROM notes LIMIT 1000;', (_err, row) => {
 			// TODO: handle errors
 			// TODO: validate data for first note
 
@@ -52,17 +52,28 @@ export class NotesRegistry implements INotesRegistry {
 	public async add(note: INoteData) {
 		const { db, sync } = this.db;
 
-		// TODO: use named placeholders
-		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
-		const addNote = await db.prepare('INSERT INTO "main"."notes"("id","title","text","creationTime","lastUpdateTime") VALUES (uuid4(),?,?,?,?)');
+		const creationTime = new Date().getTime();
 
 		// Insert data
-		const time = new Date().getTime();
-		const insertResult = await addNote.run(note.title, note.text, time, time);
+		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
+		const insertResult = await db.run(
+			'INSERT INTO "main"."notes"("id","title","text","creationTime","lastUpdateTime") VALUES (uuid4(),:title,:text,:created,:updated)',
+			{
+				':title': note.title,
+				':text': note.text,
+				':created': creationTime,
+				':updated': creationTime,
+			},
+		);
+
 		await sync();
 
+		// TODO: Use `better-sqlite3` to insert and return id in one request
 		// Get generated id
-		const selectWithId = await db.get('SELECT `id` from notes WHERE rowid=?', insertResult.lastID);
+		const selectWithId = await db.get(
+			'SELECT `id` from notes WHERE rowid=?',
+			insertResult.lastID,
+		);
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
 		}
@@ -73,11 +84,17 @@ export class NotesRegistry implements INotesRegistry {
 	public async update(id: string, updatedNote: INoteData) {
 		const { db, sync } = this.db;
 
-		// TODO: use named placeholders
-		const updateNote = await db.prepare(`UPDATE "main"."notes" SET "title"=?, "text"=?, "lastUpdateTime"=? WHERE "id"=?`);
+		const updateTime = new Date().getTime();
+		await db.run(
+			'UPDATE "main"."notes" SET "title"=:title, "text"=:text, "lastUpdateTime"=:updateTime WHERE "id"=:id',
+			{
+				':title': updatedNote.title,
+				':text': updatedNote.text,
+				':updateTime': updateTime,
+				':id': id,
+			},
+		);
 
-		const time = new Date().getTime();
-		await updateNote.run(updatedNote.title, updatedNote.text, time, id);
 		await sync();
 	}
 }
