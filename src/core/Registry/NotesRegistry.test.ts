@@ -35,7 +35,7 @@ describe('CRUD operations', () => {
 		}));
 	});
 
-	test('update entry', async () => {
+	test('update entry and get by id', async () => {
 		const db = await dbPromise;
 		const registry = new NotesRegistry(db);
 
@@ -47,7 +47,7 @@ describe('CRUD operations', () => {
 		const modifiedData = { title: 'Modified title', text: 'Modified text' };
 		await registry.update(entryV1.id, modifiedData);
 
-		const entryV2 = await registry.get().then((entries) => entries.find((entry => entry.id === entryV1.id)));
+		const entryV2 = await registry.getById(entryV1.id);
 		expect(entryV2?.data).toMatchObject(modifiedData);
 		expect(entryV2?.createdTimestamp).toBe(entryV1.createdTimestamp);
 		expect(entryV2?.updatedTimestamp).not.toBe(entryV1.updatedTimestamp);
