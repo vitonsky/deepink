@@ -139,20 +139,40 @@ export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
 		await writeFileAtomic(dbPath, dump);
 
 		if (verboseLog) {
-			console.log('Saved dump')
-			console.log(dump);
+			console.info('DB saved')
+			console.debug({ dump });
 		}
 
 		await unlock();
 		isSyncInProgress = false;
-
-		console.log('DB synced');
 
 		// Run sync process again and do not await
 		if (isRequiredSync) {
 			sync();
 		}
 	};
+
+	// Auto sync changes
+	let isHaveChangesFromLastCommit = false;
+	db.on('trace', async (command: string) => {
+		if (verboseLog) {
+			console.debug(command);
+		}
+
+		// Track changes
+		const isMutableCommand = ['INSERT', "UPDATE", "DELETE", "DROP"].some((commandName) => command.startsWith(commandName));
+		if (isMutableCommand) {
+			isHaveChangesFromLastCommit = true;
+			await sync();
+		}
+
+		// Sync by transaction operations
+		const isCommit = command.endsWith('COMMIT');
+		if (isCommit && isHaveChangesFromLastCommit) {
+			isHaveChangesFromLastCommit = false;
+			await sync();
+		}
+	});
 
 	return {
 		db,
