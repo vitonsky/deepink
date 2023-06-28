@@ -2,12 +2,6 @@ import { INotesRegistry } from '.';
 import { INote, INoteData, NoteId } from '../Note';
 import { SQLiteDb } from '../storage/SQLiteDb';
 
-let uidCounter = 0;
-/**
- * Return number unique for session
- */
-const getUniqueIdForSession = () => ++uidCounter;
-
 /**
  * Data mappers between DB and objects
  */
@@ -59,16 +53,21 @@ export class NotesRegistry implements INotesRegistry {
 		const { db, sync } = this.db;
 
 		// TODO: use named placeholders
-		const addNote = await db.prepare('INSERT INTO "main"."notes"("id","title","text","creationTime","lastUpdateTime") VALUES (?,?,?,?,?);');
+		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
+		const addNote = await db.prepare('INSERT INTO "main"."notes"("id","title","text","creationTime","lastUpdateTime") VALUES (uuid4(),?,?,?,?)');
 
+		// Insert data
 		const time = new Date().getTime();
-		// TODO: use UUID for primary key
-		const id = String(performance.now()) + getUniqueIdForSession();
-
-		await addNote.run(id, note.title, note.text, time, time);
+		const insertResult = await addNote.run(note.title, note.text, time, time);
 		await sync();
 
-		return id;
+		// Get generated id
+		const selectWithId = await db.get('SELECT `id` from notes WHERE rowid=?', insertResult.lastID);
+		if (!selectWithId || !selectWithId.id) {
+			throw new Error("Can't get id of inserted row");
+		}
+
+		return selectWithId.id;
 	}
 
 	public async update(id: string, updatedNote: INoteData) {
