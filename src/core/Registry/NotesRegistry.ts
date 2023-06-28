@@ -1,5 +1,5 @@
 import { INotesRegistry } from '.';
-import { INote, INoteData } from '../Note';
+import { INote, INoteData, NoteId } from '../Note';
 import { SQLiteDb } from '../storage/SQLiteDb';
 
 let uidCounter = 0;
@@ -9,12 +9,35 @@ let uidCounter = 0;
 const getUniqueIdForSession = () => ++uidCounter;
 
 /**
+ * Data mappers between DB and objects
+ */
+const mappers = {
+	rowToNoteObject(row: any) {
+		const { id, title, text, creationTime, lastUpdateTime } = row;
+		return {
+			id,
+			createdTimestamp: creationTime,
+			updatedTimestamp: lastUpdateTime,
+			data: { title, text },
+		};
+	}
+};
+
+/**
  * Synced notes registry
  */
 export class NotesRegistry implements INotesRegistry {
 	private db;
 	constructor(db: SQLiteDb) {
 		this.db = db;
+	}
+
+	public async getById(id: NoteId): Promise<INote | null> {
+		const { db } = this.db;
+		const getById = await db.prepare('SELECT * FROM notes WHERE id=?');
+		const note = await getById.get(id);
+
+		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
 	public async get(): Promise<INote[]> {
@@ -26,13 +49,7 @@ export class NotesRegistry implements INotesRegistry {
 			// TODO: handle errors
 			// TODO: validate data for first note
 
-			const { id, title, text, creationTime, lastUpdateTime } = row;
-			notes.push({
-				id,
-				createdTimestamp: creationTime,
-				updatedTimestamp: lastUpdateTime,
-				data: { title, text },
-			});
+			notes.push(mappers.rowToNoteObject(row));
 		});
 
 		return notes;

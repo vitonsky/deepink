@@ -1,8 +1,9 @@
 import { INotesRegistry } from '.';
-import { INote, INoteData } from '../Note';
+import { INote, INoteData, NoteId } from '../Note';
 
 const delay = (time: number) => new Promise((res) => setTimeout(res, time));
 
+// TODO: remove if no more necessary
 /**
  * Fake registry for tests
  */
@@ -22,6 +23,10 @@ export class MockNotesRegistry implements INotesRegistry {
 		});
 
 		return id;
+	}
+
+	public async getById(id: NoteId): Promise<INote | null> {
+		return this.notes.find((note) => note.id === id) ?? null;
 	}
 
 	public async get(): Promise<INote[]> {

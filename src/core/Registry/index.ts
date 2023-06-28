@@ -7,6 +7,11 @@ export type NotesRegistryFetchOptions = {};
  * Notes controller interface
  */
 export interface INotesRegistry {
+	/**
+	 * Get entry by ID
+	 */
+	getById(id: NoteId): Promise<INote | null>;
+
 	// TODO: add options to set limit and offset
 	/**
 	 * Primary method to get notes filtered by parameters
