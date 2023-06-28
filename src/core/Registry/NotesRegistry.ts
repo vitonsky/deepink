@@ -1,22 +1,18 @@
 import { INote, INoteData } from '../Note';
-import { SQLiteDb, getDb } from '../storage/SQLiteDb';
+import { SQLiteDb } from '../storage/SQLiteDb';
 
 // TODO: add registry interface and implement it
 /**
  * Synced notes registry
  */
 export class NotesRegistry {
-	private db: null | Promise<SQLiteDb> = null;
-	private getDb() {
-		if (this.db === null) {
-			this.db = getDb();
-		}
-
-		return this.db;
+	private db;
+	constructor(db: SQLiteDb) {
+		this.db = db;
 	}
 
 	public async getNotes(): Promise<INote[]> {
-		const { db } = await this.getDb();
+		const { db } = this.db;
 
 		const notes: INote[] = [];
 		// TODO: return with no limit
@@ -37,7 +33,7 @@ export class NotesRegistry {
 	}
 
 	public async addNote(note: INoteData) {
-		const { db, sync } = await this.getDb();
+		const { db, sync } = this.db;
 
 		// TODO: use named placeholders
 		const addNote = await db.prepare('INSERT INTO "main"."notes"("id","title","text","creationTime","lastUpdateTime") VALUES (?,?,?,?,?);');
@@ -53,7 +49,7 @@ export class NotesRegistry {
 	}
 
 	public async updateNote(id: string, updatedNote: INoteData) {
-		const { db, sync } = await this.getDb();
+		const { db, sync } = this.db;
 
 		// TODO: use named placeholders
 		const updateNote = await db.prepare(`UPDATE "main"."notes" SET "title"=?, "text"=?, "lastUpdateTime"=? WHERE "id"=?`);

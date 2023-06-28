@@ -8,21 +8,22 @@ import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bund
 import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
 
 import { INote, INoteData } from '../../core/Note';
-import { notesRegistry } from '../../app';
 
 import './App.css';
 import { NoteEditor } from './NoteEditor';
+import { NotesRegistry } from '../../core/Registry/NotesRegistry';
+import { SQLiteDb, getDb } from '../../core/storage/SQLiteDb';
 
 export const cnApp = cn('App');
 
 export const getNoteTitle = (note: INoteData) => (note.title || note.text).slice(0, 25) || 'Empty note';
 
-export const App: FC = () => {
+// TODO: move to other file
+export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
+	const [notesRegistry] = useState(() => new NotesRegistry(db));
 	const [tabs, setTabs] = useState<string[]>([]);
 	const [tab, setTab] = useState<string | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
-
-	// console.warn('Updated notes', notes);
 
 	const updateNotes = useCallback(async () => {
 		const notes = await notesRegistry.getNotes();
@@ -175,3 +176,18 @@ export const App: FC = () => {
 		</div>
 	);
 };
+
+export const App: FC = () => {
+	// Load DB
+	const [db, setDb] = useState<null | SQLiteDb>(null);
+	useEffect(() => {
+		getDb().then(setDb);
+	}, []);
+
+	// TODO: implement splash screen
+	if (db === null) {
+		return <div>Loading...</div>;
+	}
+
+	return <MainScreen db={db} />;
+}
