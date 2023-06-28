@@ -1,26 +1,24 @@
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
 import path from 'path';
-import { cwd } from 'process';
 import { readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import lockfileUtils from 'proper-lockfile';
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
-const notesStatement = `CREATE TABLE "notes" (
-	"id"	TEXT NOT NULL UNIQUE,
-	"title"	TEXT NOT NULL,
-	"text"	TEXT NOT NULL,
-	"creationTime"	INTEGER NOT NULL DEFAULT 0,
-	"lastUpdateTime"	INTEGER NOT NULL DEFAULT 0,
-	PRIMARY KEY("id")
-)`;
-
-// TODO: change path to it works after packing
-const dbExtensionsDir = path.join(cwd(), 'dist/sqliteExtensions');
-
-// TODO: change path to user directory
-const profileDir = path.join(cwd(), 'tmp');
+/**
+ * Statements to create tables
+ */
+const schema = {
+	notes: `CREATE TABLE "notes" (
+		"id"	TEXT NOT NULL UNIQUE,
+		"title"	TEXT NOT NULL,
+		"text"	TEXT NOT NULL,
+		"creationTime"	INTEGER NOT NULL DEFAULT 0,
+		"lastUpdateTime"	INTEGER NOT NULL DEFAULT 0,
+		PRIMARY KEY("id")
+	)`
+} as const;
 
 export type SQLiteDb = {
 	/**
@@ -30,15 +28,23 @@ export type SQLiteDb = {
 
 	/**
 	 * Write database to file
+	 * 
+	 * DB automatically sync with updates, call this method to force sync
 	 */
 	sync: () => Promise<void>;
 };
 
-// TODO: make DB singletone
-export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
-	const dbPath = path.join(profileDir, dbName ?? 'deepink.db');
-	const verboseLog = false;
+type Options = {
+	dbPath: string;
+	dbExtensionsDir: string;
 
+	/**
+	 * Option to disable verbose logs
+	 */
+	verbose?: boolean;
+};
+
+export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = false }: Options): Promise<SQLiteDb> => {
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
@@ -59,7 +65,13 @@ export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
 			await db.exec(dumpSQL);
 		} else {
 			// Create DB
-			await db.exec(notesStatement);
+			const setupSQL = Object.values(schema).join(';\n');
+			if (verboseLog) {
+				console.info('Initialize DB');
+				console.debug(setupSQL);
+			}
+
+			await db.exec(setupSQL);
 		}
 
 		return db;
@@ -106,7 +118,7 @@ export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
 		await writeFileAtomic(dbPath, dump);
 
 		if (verboseLog) {
-			console.info('DB saved')
+			console.info('DB saved');
 			console.debug({ dump });
 		}
 
@@ -127,7 +139,9 @@ export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
 		}
 
 		// Track changes
-		const isMutableCommand = ['INSERT', "UPDATE", "DELETE", "DROP"].some((commandName) => command.startsWith(commandName));
+		const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
+			(commandName) => command.startsWith(commandName),
+		);
 		if (isMutableCommand) {
 			isHaveChangesFromLastCommit = true;
 			await sync();

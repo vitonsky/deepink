@@ -7,6 +7,9 @@ import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
 import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
 
+import { cwd } from 'process';
+import path from 'path';
+
 import { INote, INoteData, NoteId } from '../../core/Note';
 
 import './App.css';
@@ -182,7 +185,14 @@ export const App: FC = () => {
 	// Load DB
 	const [db, setDb] = useState<null | SQLiteDb>(null);
 	useEffect(() => {
-		getDb().then(setDb);
+		// TODO: change path to it works after packing
+		const dbExtensionsDir = path.join(cwd(), 'dist/sqliteExtensions');
+
+		// TODO: change path to user directory
+		const profileDir = path.join(cwd(), 'tmp');
+		const dbPath = path.join(profileDir, 'deepink.db');
+
+		getDb({ dbPath, dbExtensionsDir }).then(setDb);
 	}, []);
 
 	// TODO: implement splash screen
