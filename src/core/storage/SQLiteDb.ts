@@ -2,8 +2,9 @@ import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
 import path from 'path';
 import { cwd } from 'process';
-import { readFile, writeFile } from 'fs/promises';
-import { existsSync } from 'fs';
+import { readFile, rename, rm, writeFile } from 'fs/promises';
+import { existsSync, renameSync } from 'fs';
+import lockfileUtils from 'proper-lockfile';
 
 const notesStatement = `CREATE TABLE "notes" (
 	"id"	TEXT NOT NULL UNIQUE,
@@ -29,9 +30,51 @@ export type SQLiteDb = {
 	sync: () => Promise<void>;
 };
 
+/**
+ * Write file with 3-step transaction
+ * 
+ * This util is not lock files, you have to implement it, to ensure conflict free
+ */
+const writeFileAtomic = async (filename: string, content: Buffer | string) => {
+	// Write tmp file. This operation will rewrite file if exists
+	const tmpFile = filename + '.tmp';
+	await writeFile(tmpFile, content);
+
+	// Rename original file
+	const backupFile = filename + '.backup';
+	if (existsSync(backupFile)) {
+		throw new Error(`Temporary backup file "${backupFile}" already exists. Can't to continue, to avoid loose data`);
+	}
+	await rename(filename, backupFile);
+
+	// Rename temporary file, to original name
+	await rename(tmpFile, filename);
+
+	// Delete backup file, to commit transaction
+	await rm(backupFile);
+};
+
+const recoveryAtomicFile = (filename: string) => {
+	const backupFile = filename + '.backup';
+
+	if (existsSync(filename)) return false;
+
+	// Recovery data from intermediate file
+	if (existsSync(backupFile)) {
+		renameSync(backupFile, filename);
+		return true;
+	}
+
+	return false;
+};
+
 export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
-	const dbPath = path.join(cwd(), dbName ?? 'tmp/db.dump');
+	const profileDir = path.join(cwd(), 'tmp');
+	const dbPath = path.join(profileDir, dbName ?? 'deepink.db');
 	const verboseLog = false;
+
+	// Ensure changes applied for atomic file
+	recoveryAtomicFile(dbPath);
 
 	const db = await open({
 		filename: ':memory:',
@@ -56,7 +99,32 @@ export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
 	});
 
 	// TODO: listen DB updates and automatically sync file
+	let isRequiredSync = false;
+	let isSyncInProgress = false;
 	const sync = async () => {
+		if (isSyncInProgress) {
+			isRequiredSync = true;
+			return;
+		}
+
+		isSyncInProgress = true;
+
+		// Create empty file if not exists
+		// It needs to create proper lock file
+		if (!existsSync(dbPath)) {
+			await writeFile(dbPath, '');
+		}
+
+		// Exit if sync in progress
+		const isLocked = await lockfileUtils.check(dbPath);
+		if (isLocked) {
+			isRequiredSync = true;
+			return;
+		}
+
+		const unlock = await lockfileUtils.lock(dbPath);
+
+		isRequiredSync = false;
 		const response = await db.get(`select dbdump();`);
 		const dump = response['dbdump()'];
 
@@ -64,13 +132,25 @@ export const getDb = async (dbName?: string): Promise<SQLiteDb> => {
 			throw new Error('Dump are empty!');
 		}
 
-		// TODO: ensure file exists
+		// TODO: ensure dir exists
 		// TODO: implement encryption before write
-		await writeFile(dbPath, dump);
+
+		// Write tmp file
+		await writeFileAtomic(dbPath, dump);
 
 		if (verboseLog) {
 			console.log('Saved dump')
 			console.log(dump);
+		}
+
+		await unlock();
+		isSyncInProgress = false;
+
+		console.log('DB synced');
+
+		// Run sync process again and do not await
+		if (isRequiredSync) {
+			sync();
 		}
 	};
 
