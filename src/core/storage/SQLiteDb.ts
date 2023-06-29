@@ -58,7 +58,6 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 		filename: ':memory:',
 		driver: sqlite3.Database,
 	}).then(async (db) => {
-		// TODO: add extension files for all platforms
 		// Setup extensions
 		await db.loadExtension(path.join(dbExtensionsDir, 'uuid'));
 		await db.loadExtension(path.join(dbExtensionsDir, 'dbdump'));
@@ -127,7 +126,6 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 				break;
 			}
 
-			// TODO: ensure dir exists
 			// TODO: implement encryption before write
 
 			// Write tmp file
