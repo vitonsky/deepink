@@ -65,12 +65,6 @@ module.exports = {
 	externals: [
 		{
 			'sqlite3': 'commonjs2 sqlite3',
-			'node-pre-gyp': 'commonjs2 node-pre-gyp',
-			'node-gyp': 'commonjs2 node-gyp',
-			'nock': 'commonjs2 nock',
-			'mock-aws-s3': 'commonjs2 mock-aws-s3',
-			'aws-sdk': 'commonjs2 aws-sdk',
-			'npm': 'commonjs2 npm',
 		}
 	],
 };
