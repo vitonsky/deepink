@@ -48,7 +48,7 @@ export class NotesRegistry implements INotesRegistry {
 		return notes;
 	}
 
-	public async add(note: INoteData) {
+	public async add(note: INoteData): Promise<NoteId> {
 		const { db, sync } = this.db;
 
 		const creationTime = new Date().getTime();
