@@ -96,7 +96,6 @@ describe('multi instances', () => {
 		const registry1 = new NotesRegistry(db1);
 
 		const entryId = await registry1.add({ title: 'Title 1', text: 'Text 1' });
-		await db1.sync();
 
 		const db2 = await getDb({ dbPath, dbExtensionsDir });
 		const registry2 = new NotesRegistry(db2);
