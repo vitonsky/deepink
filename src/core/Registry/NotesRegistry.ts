@@ -28,8 +28,7 @@ export class NotesRegistry implements INotesRegistry {
 
 	public async getById(id: NoteId): Promise<INote | null> {
 		const { db } = this.db;
-		const getById = await db.prepare('SELECT * FROM notes WHERE id=?');
-		const note = await getById.get(id);
+		const note = await db.get('SELECT * FROM notes WHERE id=?', [id]);
 
 		return note ? mappers.rowToNoteObject(note) : null;
 	}

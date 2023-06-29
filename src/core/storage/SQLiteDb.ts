@@ -32,6 +32,7 @@ export type SQLiteDb = {
 	 * DB automatically sync with updates, call this method to force sync
 	 */
 	sync: () => Promise<void>;
+	close: () => Promise<void>;
 };
 
 type Options = {
@@ -161,8 +162,14 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 		}
 	});
 
+	const close = async () => {
+		await sync();
+		await db.close();
+	}
+
 	return {
 		db,
 		sync,
+		close
 	};
 };

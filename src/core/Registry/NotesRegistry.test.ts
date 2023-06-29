@@ -51,6 +51,7 @@ describe('CRUD operations', () => {
 		expect(entryV2?.data).toMatchObject(modifiedData);
 		expect(entryV2?.createdTimestamp).toBe(entryV1.createdTimestamp);
 		expect(entryV2?.updatedTimestamp).not.toBe(entryV1.updatedTimestamp);
+		db.close();
 	});
 });
 
