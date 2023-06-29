@@ -7,8 +7,8 @@ import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
 import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
 
-import { cwd } from 'process';
 import path from 'path';
+import { mkdirSync } from 'fs';
 
 import { INote, INoteData, NoteId } from '../../core/Note';
 
@@ -17,6 +17,7 @@ import { NoteEditor } from './NoteEditor';
 import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { SQLiteDb, getDb } from '../../core/storage/SQLiteDb';
 import { INotesRegistry } from '../../core/Registry';
+import { electronPaths } from '../../electron/requests/files';
 
 export const cnApp = cn('App');
 
@@ -185,14 +186,17 @@ export const App: FC = () => {
 	// Load DB
 	const [db, setDb] = useState<null | SQLiteDb>(null);
 	useEffect(() => {
-		// TODO: change path to it works after packing
-		const dbExtensionsDir = path.join(cwd(), 'dist/sqlite/extensions');
+		(async () => {
+			const profileDir = await electronPaths.getUserDataPath('defaultProfile');
 
-		// TODO: change path to user directory
-		const profileDir = path.join(cwd(), 'tmp');
-		const dbPath = path.join(profileDir, 'deepink.db');
+			// Ensure profile dir exists
+			mkdirSync(profileDir, { recursive: true });
 
-		getDb({ dbPath, dbExtensionsDir }).then(setDb);
+			const dbPath = path.join(profileDir, 'deepink.db');
+			const dbExtensionsDir = await electronPaths.getResourcesPath('sqlite/extensions');
+
+			getDb({ dbPath, dbExtensionsDir }).then(setDb);
+		})();
 	}, []);
 
 	// TODO: implement splash screen

@@ -1,6 +1,10 @@
 module.exports = {
   packagerConfig: {
     asar: true,
+    extraResource: [
+      './dist/assets',
+      './dist/sqlite',
+    ]
   },
   rebuildConfig: {},
   makers: [
