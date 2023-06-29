@@ -79,53 +79,59 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 
 	// Sync changes
 	let isRequiredSync = false;
-	let isSyncInProgress = false;
+	let currentSyncWorker: Promise<void> | null = null;
 	const sync = async () => {
-		if (isSyncInProgress) {
+		const syncWorker = async () => {
+			// Create empty file if not exists
+			// It needs to create proper lock file
+			if (!existsSync(dbPath)) {
+				await writeFile(dbPath, '');
+			}
+
+			// Exit if sync in progress
+			const isLocked = await lockfileUtils.check(dbPath);
+			if (isLocked) {
+				isRequiredSync = true;
+				return;
+			}
+
+			const unlock = await lockfileUtils.lock(dbPath);
+
+			isRequiredSync = false;
+			const response = await db.get(`select dbdump();`);
+			const dump = response['dbdump()'];
+
+			if (!dump) {
+				throw new Error('Dump are empty!');
+			}
+
+			// TODO: ensure dir exists
+			// TODO: implement encryption before write
+
+			// Write tmp file
+			await writeFileAtomic(dbPath, dump);
+
+			if (verboseLog) {
+				console.info('DB saved');
+				console.debug({ dump });
+			}
+
+			await unlock();
+		};
+
+		// Return worker
+		if (currentSyncWorker) {
 			isRequiredSync = true;
-			return;
+			return currentSyncWorker;
 		}
 
-		isSyncInProgress = true;
+		// Create worker and wait
+		currentSyncWorker = syncWorker();
 
-		// Create empty file if not exists
-		// It needs to create proper lock file
-		if (!existsSync(dbPath)) {
-			await writeFile(dbPath, '');
-		}
+		await currentSyncWorker;
+		currentSyncWorker = null;
 
-		// Exit if sync in progress
-		const isLocked = await lockfileUtils.check(dbPath);
-		if (isLocked) {
-			isRequiredSync = true;
-			return;
-		}
-
-		const unlock = await lockfileUtils.lock(dbPath);
-
-		isRequiredSync = false;
-		const response = await db.get(`select dbdump();`);
-		const dump = response['dbdump()'];
-
-		if (!dump) {
-			throw new Error('Dump are empty!');
-		}
-
-		// TODO: ensure dir exists
-		// TODO: implement encryption before write
-
-		// Write tmp file
-		await writeFileAtomic(dbPath, dump);
-
-		if (verboseLog) {
-			console.info('DB saved');
-			console.debug({ dump });
-		}
-
-		await unlock();
-		isSyncInProgress = false;
-
-		// Run sync process again and do not await
+		// Run other sync worker and do not await
 		if (isRequiredSync) {
 			sync();
 		}
