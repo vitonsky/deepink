@@ -32,6 +32,10 @@ export type SQLiteDb = {
 	 * DB automatically sync with updates, call this method to force sync
 	 */
 	sync: () => Promise<void>;
+
+	/**
+	 * Sync DB and close
+	 */
 	close: () => Promise<void>;
 };
 
@@ -78,11 +82,23 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 		return db;
 	});
 
-	// Sync changes
-	let isRequiredSync = false;
-	let currentSyncWorker: Promise<void> | null = null;
-	const sync = async () => {
-		const syncWorker = async () => {
+	type SyncRequest = {
+		resolve(): void;
+		reject(err: Error): void;
+	}
+
+	let syncRequests: SyncRequest[] = [];
+
+	let isSyncWorkerRunned = false;
+	const syncWorker = async () => {
+		if (isSyncWorkerRunned) return;
+
+		isSyncWorkerRunned = true;
+		while (syncRequests.length > 0) {
+			// Get requests to handle and flush array
+			const syncRequestsInProgress = syncRequests;
+			syncRequests = [];
+
 			// Create empty file if not exists
 			// It needs to create proper lock file
 			if (!existsSync(dbPath)) {
@@ -92,18 +108,22 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 			// Exit if sync in progress
 			const isLocked = await lockfileUtils.check(dbPath);
 			if (isLocked) {
-				isRequiredSync = true;
-				return;
+				// Reject requests
+				syncRequestsInProgress.forEach((syncRequest) => syncRequest.reject(new Error('DB file locked')));
+				break;
 			}
 
 			const unlock = await lockfileUtils.lock(dbPath);
 
-			isRequiredSync = false;
 			const response = await db.get(`select dbdump();`);
 			const dump = response['dbdump()'];
 
 			if (!dump) {
-				throw new Error('Dump are empty!');
+				const error = new Error('Dump are empty!');
+
+				// Reject requests
+				syncRequestsInProgress.forEach((syncRequest) => syncRequest.reject(error));
+				break;
 			}
 
 			// TODO: ensure dir exists
@@ -118,25 +138,24 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 			}
 
 			await unlock();
-		};
 
-		// Return worker
-		if (currentSyncWorker) {
-			isRequiredSync = true;
-			return currentSyncWorker;
+			// Resolve requests
+			syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
 		}
 
-		// Create worker and wait
-		currentSyncWorker = syncWorker();
-
-		await currentSyncWorker;
-		currentSyncWorker = null;
-
-		// Run other sync worker and do not await
-		if (isRequiredSync) {
-			sync();
-		}
+		isSyncWorkerRunned = false;
 	};
+
+	// Write changes to file
+	const sync = () => {
+		return new Promise<void>((resolve, reject) => {
+			// Add task
+			syncRequests.push({ resolve, reject });
+
+			// Run worker if not started
+			syncWorker();
+		})
+	}
 
 	// Auto sync changes
 	let isHaveChangesFromLastCommit = false;
@@ -163,6 +182,7 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 	});
 
 	const close = async () => {
+		// Sync latest changes
 		await sync();
 		await db.close();
 	}
