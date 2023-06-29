@@ -56,10 +56,6 @@ module.exports = {
 					},
 				},
 			},
-			{
-				test: /\.(html|cs|so)$/,
-				type: 'asset/resource',
-			},
 		],
 	},
 	externals: [
