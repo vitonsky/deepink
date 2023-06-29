@@ -115,11 +115,12 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 
 			const unlock = await lockfileUtils.lock(dbPath);
 
-			const response = await db.get(`select dbdump();`);
-			const dump = response['dbdump()'];
+			const response = await db.get(`SELECT dbdump() as dump;`);
+			const dump = response['dump'];
 
 			if (!dump) {
 				const error = new Error('Dump are empty!');
+				console.error(error);
 
 				// Reject requests
 				syncRequestsInProgress.forEach((syncRequest) => syncRequest.reject(error));
