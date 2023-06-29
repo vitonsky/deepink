@@ -186,7 +186,7 @@ export const App: FC = () => {
 	const [db, setDb] = useState<null | SQLiteDb>(null);
 	useEffect(() => {
 		// TODO: change path to it works after packing
-		const dbExtensionsDir = path.join(cwd(), 'dist/sqliteExtensions');
+		const dbExtensionsDir = path.join(cwd(), 'dist/sqlite/extensions');
 
 		// TODO: change path to user directory
 		const profileDir = path.join(cwd(), 'tmp');

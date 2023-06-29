@@ -20,7 +20,7 @@ module.exports = merge(commonConfig, {
 						return sharp(content).resize(512, 512).toBuffer();
 					}
 				},
-				{ from: "sqliteExtensions", to: 'sqliteExtensions' },
+				{ from: "sqlite/extensions/*.{so,dll,dylib}" },
 			],
 		}),
 	]

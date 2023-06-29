@@ -5,7 +5,7 @@ import path from 'path';
 import { NotesRegistry } from './NotesRegistry';
 
 // TODO: move extensions to dir with DB
-const dbExtensionsDir = path.join(__dirname, '../../../sqliteExtensions');
+const dbExtensionsDir = path.join(__dirname, '../../../sqlite/extensions');
 
 describe('CRUD operations', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
