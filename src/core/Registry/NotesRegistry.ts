@@ -67,7 +67,7 @@ export class NotesRegistry implements INotesRegistry {
 		// Insert data
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
 		const insertResult = await db.run(
-			'INSERT INTO "main"."notes"("id","title","text","creationTime","lastUpdateTime") VALUES (uuid4(),:title,:text,:created,:updated)',
+			'INSERT INTO notes ("id","title","text","creationTime","lastUpdateTime") VALUES (uuid4(),:title,:text,:created,:updated)',
 			{
 				':title': note.title,
 				':text': note.text,

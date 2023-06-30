@@ -18,7 +18,6 @@ export type NotesRegistryFetchOptions = {
 	page?: number;
 };
 
-// TODO: add method `delete`
 /**
  * Notes controller interface
  */
