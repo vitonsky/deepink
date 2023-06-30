@@ -80,7 +80,7 @@ export class NotesRegistry implements INotesRegistry {
 
 		// Get generated id
 		const selectWithId = await db.get(
-			'SELECT `id` from notes WHERE rowid=?',
+			'SELECT `id` FROM notes WHERE rowid=?',
 			insertResult.lastID,
 		);
 		if (!selectWithId || !selectWithId.id) {
@@ -94,8 +94,8 @@ export class NotesRegistry implements INotesRegistry {
 		const { db, sync } = this.db;
 
 		const updateTime = new Date().getTime();
-		await db.run(
-			'UPDATE "main"."notes" SET "title"=:title, "text"=:text, "lastUpdateTime"=:updateTime WHERE "id"=:id',
+		const result = await db.run(
+			'UPDATE notes SET "title"=:title, "text"=:text, "lastUpdateTime"=:updateTime WHERE "id"=:id',
 			{
 				':title': updatedNote.title,
 				':text': updatedNote.text,
@@ -103,6 +103,10 @@ export class NotesRegistry implements INotesRegistry {
 				':id': id,
 			},
 		);
+
+		if (!result.changes || result.changes < 1) {
+			throw new Error('Note did not updated');
+		}
 
 		await sync();
 	}
