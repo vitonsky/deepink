@@ -33,6 +33,14 @@ export class NotesRegistry implements INotesRegistry {
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
+	public async getLength(): Promise<number> {
+		const { db } = this.db;
+		const response = await db.get('SELECT COUNT(id) as length FROM notes');
+
+		const length = response?.length;
+		return length;
+	}
+
 	public async get({ limit = 100, page = 1 }: NotesRegistryFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 

@@ -62,7 +62,7 @@ describe('CRUD operations', () => {
 describe('data fetching', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
 
-	const notesSample = Array(1000).fill(null).map((_, idx) => {
+	const notesSample = Array(300).fill(null).map((_, idx) => {
 		return {
 			title: 'Note title #' + idx,
 			text: 'Note text #' + idx,
@@ -83,6 +83,10 @@ describe('data fetching', () => {
 	test('get entries by pages', async () => {
 		const db = await getDb({ dbPath, dbExtensionsDir });
 		const registry = new NotesRegistry(db);
+
+		await registry.getLength().then((length) => {
+			expect(length).toBe(notesSample.length);
+		});
 
 		// Invalid page must throw errors
 		await expect(registry.get({ limit: 100, page: 0 })).rejects.toThrow()

@@ -2,7 +2,7 @@ import { INote, INoteData, NoteId } from "../Note";
 
 export type NotesRegistryFetchOptions = {
 	/**
-	 * Limit entries
+	 * Limit notes
 	 * 
 	 * @default 100
 	 */
@@ -24,9 +24,15 @@ export type NotesRegistryFetchOptions = {
  */
 export interface INotesRegistry {
 	/**
-	 * Get entry by ID
+	 * Get note by ID
 	 */
 	getById(id: NoteId): Promise<INote | null>;
+
+
+	/**
+	 * Get number of notes
+	 */
+	getLength(): Promise<number>;
 
 	/**
 	 * Primary method to get notes filtered by parameters
