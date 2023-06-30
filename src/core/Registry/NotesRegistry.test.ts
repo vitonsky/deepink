@@ -59,6 +59,45 @@ describe('CRUD operations', () => {
 	});
 });
 
+describe('data fetching', () => {
+	const dbPath = tmpNameSync({ dir: tmpdir() });
+
+	const notesSample = Array(1000).fill(null).map((_, idx) => {
+		return {
+			title: 'Note title #' + idx,
+			text: 'Note text #' + idx,
+		};
+	});
+
+	test('insert sample entries', async () => {
+		const db = await getDb({ dbPath, dbExtensionsDir });
+		const registry = new NotesRegistry(db);
+
+		for (const note of notesSample) {
+			await registry.add(note);
+		}
+
+		await db.close();
+	});
+
+	test('get entries by pages', async () => {
+		const db = await getDb({ dbPath, dbExtensionsDir });
+		const registry = new NotesRegistry(db);
+
+		// Invalid page must throw errors
+		await expect(registry.get({ limit: 100, page: 0 })).rejects.toThrow()
+		await expect(registry.get({ limit: 100, page: -100 })).rejects.toThrow()
+
+		const page1 = await registry.get({ limit: 100, page: 1 });
+		expect(page1[0].data).toMatchObject(notesSample[0]);
+
+		const page2 = await registry.get({ limit: 100, page: 2 });
+		expect(page2[0].data).toMatchObject(notesSample[100]);
+
+		await db.close();
+	});
+})
+
 describe('multi instances', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
 

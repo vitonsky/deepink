@@ -1,6 +1,22 @@
 import { INote, INoteData, NoteId } from "../Note";
 
-export type NotesRegistryFetchOptions = {};
+export type NotesRegistryFetchOptions = {
+	/**
+	 * Limit entries
+	 * 
+	 * @default 100
+	 */
+	limit?: number;
+
+	/**
+	 * Page number start of 1
+	 * 
+	 * Implementations must thrown error for values less than 1
+	 * 
+	 * @default 1
+	 */
+	page?: number;
+};
 
 // TODO: add method `delete`
 /**
@@ -12,7 +28,6 @@ export interface INotesRegistry {
 	 */
 	getById(id: NoteId): Promise<INote | null>;
 
-	// TODO: add options to set limit and offset
 	/**
 	 * Primary method to get notes filtered by parameters
 	 */

@@ -1,4 +1,4 @@
-import { INotesRegistry } from '.';
+import { INotesRegistry, NotesRegistryFetchOptions } from '.';
 import { INote, INoteData, NoteId } from '../Note';
 import { SQLiteDb } from '../storage/SQLiteDb';
 
@@ -33,12 +33,15 @@ export class NotesRegistry implements INotesRegistry {
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
-	public async get(): Promise<INote[]> {
+	public async get({ limit = 100, page = 1 }: NotesRegistryFetchOptions = {}): Promise<INote[]> {
+		if (page < 1) throw new TypeError('Page value must not be less than 1');
+
 		const { db } = this.db;
 
 		const notes: INote[] = [];
-		// TODO: return with no limit
-		await db.each('SELECT * FROM notes LIMIT 1000;', (_err, row) => {
+
+		const offset = (page - 1) * limit;
+		await db.each('SELECT * FROM notes LIMIT ? OFFSET ?;', [limit, offset], (_err, row) => {
 			// TODO: handle errors
 			// TODO: validate data for first note
 
@@ -67,7 +70,6 @@ export class NotesRegistry implements INotesRegistry {
 
 		await sync();
 
-		// TODO: Use `better-sqlite3` to insert and return id in one request
 		// Get generated id
 		const selectWithId = await db.get(
 			'SELECT `id` from notes WHERE rowid=?',
