@@ -57,6 +57,41 @@ describe('CRUD operations', () => {
 		expect(entryV2?.createdTimestamp).toBe(entryV1.createdTimestamp);
 		expect(entryV2?.updatedTimestamp).not.toBe(entryV1.updatedTimestamp);
 	});
+
+	test('delete entries', async () => {
+		const dbPath = tmpNameSync({ dir: tmpdir() });
+		const db = await getDb({ dbPath, dbExtensionsDir });
+		const registry = new NotesRegistry(db);
+
+		// Insert entries to test
+		const notesSample = Array(300).fill(null).map((_, idx) => {
+			return {
+				title: 'Note title #' + idx,
+				text: 'Note text #' + idx,
+			};
+		});
+
+		await Promise.all(notesSample.map((note) => registry.add(note)));
+
+		// Delete notes
+		await registry.get({ limit: 100 }).then(async (notes) => {
+			const lengthBeforeDelete = await registry.getLength();
+			await registry.delete(notes.map((note) => note.id));
+			await registry.getLength().then((length) => {
+				expect(length).toBe(lengthBeforeDelete - 100);
+			});
+		});
+
+		await registry.get({ limit: 1 }).then(async (notes) => {
+			const lengthBeforeDelete = await registry.getLength();
+			await registry.delete([notes[0].id]);
+			await registry.getLength().then((length) => {
+				expect(length).toBe(lengthBeforeDelete - 1);
+			});
+		});
+
+		await db.close();
+	})
 });
 
 describe('data fetching', () => {

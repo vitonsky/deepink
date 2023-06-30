@@ -48,4 +48,9 @@ export interface INotesRegistry {
 	 * Update note by unique id
 	 */
 	update(id: NoteId, updatedNote: INoteData): Promise<void>;
+
+	/**
+	 * Deletes all notes with specified ids
+	 */
+	delete(ids: NoteId[]): Promise<void>;
 }

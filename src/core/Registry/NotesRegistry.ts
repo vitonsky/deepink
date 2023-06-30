@@ -106,4 +106,16 @@ export class NotesRegistry implements INotesRegistry {
 
 		await sync();
 	}
+
+	public async delete(ids: NoteId[]): Promise<void> {
+		const { db, sync } = this.db;
+
+		const placeholders = Array(ids.length).fill('?').join(',');
+		const result = await db.run(`DELETE FROM notes WHERE id IN (${placeholders})`, ids);
+		await sync();
+
+		if (result.changes !== ids.length) {
+			console.warn(`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${result.changes}`)
+		}
+	}
 }
