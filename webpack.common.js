@@ -1,7 +1,5 @@
 const path = require('path');
 
-console.log('Webpack run');
-
 const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
 const isProduction = mode === 'production';
 
@@ -9,6 +7,12 @@ const devtool = isProduction ? undefined : 'inline-source-map';
 const isFastBuild = !isProduction && process.env.FAST_BUILD === 'on';
 
 const outputPath = path.join(__dirname, 'dist');
+
+console.log('Webpack run', {
+	devtool,
+	isFastBuild,
+	outputPath
+});
 
 module.exports = {
 	mode,
@@ -54,4 +58,9 @@ module.exports = {
 			},
 		],
 	},
+	externals: [
+		{
+			'sqlite3': 'commonjs2 sqlite3',
+		}
+	],
 };

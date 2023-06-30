@@ -1,6 +1,19 @@
 import { app, BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
+import { getResourcesPath } from './electron/utils/files';
+import { isDevMode } from './electron/utils/app';
+import { handleFilesRequests } from './electron/requests/files';
+import { handleAppRequests } from './electron/requests/app';
+
+console.log({
+	isDev: isDevMode(),
+	appDir: app.getAppPath(),
+	resourcesPath: getResourcesPath(),
+})
+
+handleFilesRequests();
+handleAppRequests();
 
 const createWindow = async () => {
 	const win = new BrowserWindow({
@@ -9,7 +22,7 @@ const createWindow = async () => {
 		// show: false,
 		backgroundColor: '#fff', // required to enable sub pixel rendering, can't be in css
 		webPreferences: {
-			nodeIntegration: false,
+			nodeIntegration: true,
 			contextIsolation: false,
 			spellcheck: true,
 		},

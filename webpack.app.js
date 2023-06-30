@@ -1,12 +1,11 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const sharp = require('sharp');
 const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.common');
 
 module.exports = merge(commonConfig, {
-	target: 'web',
+	target: 'electron-renderer',
 	entry: {
 		app: './src/app.tsx',
 	},
@@ -16,14 +15,6 @@ module.exports = merge(commonConfig, {
 			patterns: [
 				{ from: "src/index.html" },
 				{ from: "src/index.css" },
-				{ from: "assets", to: 'assets' },
-				{
-					from: "assets/icons/app.svg",
-					to: 'assets/icons/app.png',
-					transform(content) {
-						return sharp(content).resize(512, 512).toBuffer();
-					}
-				},
 			],
 		}),
 	],
