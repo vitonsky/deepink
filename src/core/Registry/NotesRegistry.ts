@@ -49,8 +49,11 @@ export class NotesRegistry implements INotesRegistry {
 		const notes: INote[] = [];
 
 		const offset = (page - 1) * limit;
-		await db.each('SELECT * FROM notes LIMIT ? OFFSET ?;', [limit, offset], (_err, row) => {
-			// TODO: handle errors
+		await db.each('SELECT * FROM notes LIMIT ? OFFSET ?;', [limit, offset], (err, row) => {
+			if (err) {
+				throw new Error(err);
+			}
+
 			// TODO: validate data for first note
 
 			notes.push(mappers.rowToNoteObject(row));
