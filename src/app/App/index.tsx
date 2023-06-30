@@ -42,12 +42,12 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 			return 0;
 		});
 		setNotes(notes);
-	}, []);
+	}, [notesRegistry]);
 
 	// Init
 	useEffect(() => {
 		updateNotes();
-	}, []);
+	}, [updateNotes]);
 
 	// TODO: focus on note input
 	const onNoteClick = useCallback((id: NoteId) => {
@@ -72,21 +72,24 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 
 			setTabs((state) => state.filter((tabId) => tabId !== id));
 		},
-		[tabs],
+		[tab, tabs],
 	);
 
 	// Simulate note update
-	const updateNote = useCallback(async (note: INote) => {
-		await notesRegistry.update(note.id, note.data);
-		updateNotes();
-	}, []);
+	const updateNote = useCallback(
+		async (note: INote) => {
+			await notesRegistry.update(note.id, note.data);
+			updateNotes();
+		},
+		[notesRegistry, updateNotes],
+	);
 
 	const newNoteIdRef = useRef<NoteId | null>(null);
 	const createNote = useCallback(async () => {
 		const noteId = await notesRegistry.add({ title: '', text: '' });
 		newNoteIdRef.current = noteId;
 		updateNotes();
-	}, []);
+	}, [notesRegistry, updateNotes]);
 
 	// Focus on new note
 	useEffect(() => {
@@ -98,7 +101,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 			newNoteIdRef.current = null;
 			onNoteClick(newNoteId);
 		}
-	}, [notes]);
+	}, [notes, onNoteClick]);
 
 	return (
 		<div className={cnApp({}, [cnTheme(theme)])}>

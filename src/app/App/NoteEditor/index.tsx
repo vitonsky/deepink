@@ -27,7 +27,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		}
 
 		updateNote({ title, text });
-	}, [title, text]);
+	}, [title, text, updateNote]);
 
 	return (
 		<div className={cnNoteEditor()}>
