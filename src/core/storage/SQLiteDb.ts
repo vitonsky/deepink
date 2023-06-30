@@ -1,10 +1,12 @@
-import sqlite3 from 'sqlite3';
-import { Database, open } from 'sqlite';
-import path from 'path';
-import { readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
+import path from 'path';
 import lockfileUtils from 'proper-lockfile';
+import { Database, open } from 'sqlite';
+import sqlite3 from 'sqlite3';
+
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
+
+import { readFile, writeFile } from 'fs/promises';
 
 /**
  * Statements to create tables
@@ -17,7 +19,7 @@ const schema = {
 		"creationTime"	INTEGER NOT NULL DEFAULT 0,
 		"lastUpdateTime"	INTEGER NOT NULL DEFAULT 0,
 		PRIMARY KEY("id")
-	)`
+	)`,
 } as const;
 
 export type SQLiteDb = {
@@ -28,7 +30,7 @@ export type SQLiteDb = {
 
 	/**
 	 * Write database to file
-	 * 
+	 *
 	 * DB automatically sync with updates, call this method to force sync
 	 */
 	sync: () => Promise<void>;
@@ -49,7 +51,11 @@ type Options = {
 	verbose?: boolean;
 };
 
-export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = false }: Options): Promise<SQLiteDb> => {
+export const getDb = async ({
+	dbPath,
+	dbExtensionsDir,
+	verbose: verboseLog = false,
+}: Options): Promise<SQLiteDb> => {
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
@@ -84,7 +90,7 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 	type SyncRequest = {
 		resolve(): void;
 		reject(err: Error): void;
-	}
+	};
 
 	let syncRequests: SyncRequest[] = [];
 
@@ -108,7 +114,9 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 			const isLocked = await lockfileUtils.check(dbPath);
 			if (isLocked) {
 				// Reject requests
-				syncRequestsInProgress.forEach((syncRequest) => syncRequest.reject(new Error('DB file locked')));
+				syncRequestsInProgress.forEach((syncRequest) =>
+					syncRequest.reject(new Error('DB file locked')),
+				);
 				break;
 			}
 
@@ -122,7 +130,9 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 				console.error(error);
 
 				// Reject requests
-				syncRequestsInProgress.forEach((syncRequest) => syncRequest.reject(error));
+				syncRequestsInProgress.forEach((syncRequest) =>
+					syncRequest.reject(error),
+				);
 				break;
 			}
 
@@ -153,8 +163,8 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 
 			// Run worker if not started
 			syncWorker();
-		})
-	}
+		});
+	};
 
 	// Auto sync changes
 	let isHaveChangesFromLastCommit = false;
@@ -184,11 +194,11 @@ export const getDb = async ({ dbPath, dbExtensionsDir, verbose: verboseLog = fal
 		// Sync latest changes
 		await sync();
 		await db.close();
-	}
+	};
 
 	return {
 		db,
 		sync,
-		close
+		close,
 	};
 };

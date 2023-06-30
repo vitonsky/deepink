@@ -1,27 +1,28 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { cn } from '@bem-react/classname';
-import { cnTheme } from 'react-elegant-ui/esm/theme';
-import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
 import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
-import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
-
-import path from 'path';
+import { cnTheme } from 'react-elegant-ui/esm/theme';
+import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { mkdirSync } from 'fs';
+import path from 'path';
+import { cn } from '@bem-react/classname';
 
 import { INote, INoteData, NoteId } from '../../core/Note';
+import { INotesRegistry } from '../../core/Registry';
+import { NotesRegistry } from '../../core/Registry/NotesRegistry';
+import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
+import { electronPaths } from '../../electron/requests/files';
+
+import { NoteEditor } from './NoteEditor';
 
 import './App.css';
-import { NoteEditor } from './NoteEditor';
-import { NotesRegistry } from '../../core/Registry/NotesRegistry';
-import { SQLiteDb, getDb } from '../../core/storage/SQLiteDb';
-import { INotesRegistry } from '../../core/Registry';
-import { electronPaths } from '../../electron/requests/files';
 
 export const cnApp = cn('App');
 
-export const getNoteTitle = (note: INoteData) => (note.title || note.text).slice(0, 25) || 'Empty note';
+export const getNoteTitle = (note: INoteData) =>
+	(note.title || note.text).slice(0, 25) || 'Empty note';
 
 // TODO: move to other file
 export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
@@ -39,7 +40,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 			if (timeA > timeB) return -1;
 			if (timeB > timeA) return 1;
 			return 0;
-		})
+		});
 		setNotes(notes);
 	}, []);
 
@@ -95,15 +96,17 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		const isNoteExists = notes.find((note) => note.id === newNoteId);
 		if (isNoteExists) {
 			newNoteIdRef.current = null;
-			onNoteClick(newNoteId)
+			onNoteClick(newNoteId);
 		}
-	}, [notes])
+	}, [notes]);
 
 	return (
 		<div className={cnApp({}, [cnTheme(theme)])}>
 			<div className={cnApp('SideBar')}>
 				<div className={cnApp('SideBarControls')}>
-					<Button view='action' onPress={createNote}>New note</Button>
+					<Button view="action" onPress={createNote}>
+						New note
+					</Button>
 				</div>
 
 				<div className={cnApp('NotesList')}>
@@ -170,9 +173,12 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 								key={id}
 								className={cnApp('NoteEditor', { active: isActive })}
 							>
-								<NoteEditor note={noteObject.data} updateNote={(noteData) => {
-									updateNote({ ...noteObject, data: noteData })
-								}} />
+								<NoteEditor
+									note={noteObject.data}
+									updateNote={(noteData) => {
+										updateNote({ ...noteObject, data: noteData });
+									}}
+								/>
 							</div>
 						);
 					})}
@@ -193,7 +199,9 @@ export const App: FC = () => {
 			mkdirSync(profileDir, { recursive: true });
 
 			const dbPath = path.join(profileDir, 'deepink.db');
-			const dbExtensionsDir = await electronPaths.getResourcesPath('sqlite/extensions');
+			const dbExtensionsDir = await electronPaths.getResourcesPath(
+				'sqlite/extensions',
+			);
 
 			getDb({ dbPath, dbExtensionsDir }).then(setDb);
 		})();
@@ -205,4 +213,4 @@ export const App: FC = () => {
 	}
 
 	return <MainScreen db={db} />;
-}
+};

@@ -1,4 +1,5 @@
 import { ipcMain, ipcRenderer } from 'electron';
+
 import { getResourcesPath, getUserDataPath } from '../utils/files';
 
 export const handleFilesRequests = () => {

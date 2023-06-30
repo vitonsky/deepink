@@ -11,7 +11,7 @@ const outputPath = path.join(__dirname, 'dist');
 console.log('Webpack run', {
 	devtool,
 	isFastBuild,
-	outputPath
+	outputPath,
 });
 
 module.exports = {
@@ -60,7 +60,7 @@ module.exports = {
 	},
 	externals: [
 		{
-			'sqlite3': 'commonjs2 sqlite3',
-		}
+			sqlite3: 'commonjs2 sqlite3',
+		},
 	],
 };

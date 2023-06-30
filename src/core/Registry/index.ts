@@ -1,18 +1,18 @@
-import { INote, INoteData, NoteId } from "../Note";
+import { INote, INoteData, NoteId } from '../Note';
 
 export type NotesRegistryFetchOptions = {
 	/**
 	 * Limit notes
-	 * 
+	 *
 	 * @default 100
 	 */
 	limit?: number;
 
 	/**
 	 * Page number start of 1
-	 * 
+	 *
 	 * Implementations must thrown error for values less than 1
-	 * 
+	 *
 	 * @default 1
 	 */
 	page?: number;
@@ -26,7 +26,6 @@ export interface INotesRegistry {
 	 * Get note by ID
 	 */
 	getById(id: NoteId): Promise<INote | null>;
-
 
 	/**
 	 * Get number of notes

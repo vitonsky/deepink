@@ -12,16 +12,16 @@ module.exports = merge(commonConfig, {
 	plugins: [
 		new CopyPlugin({
 			patterns: [
-				{ from: "assets", to: 'assets' },
+				{ from: 'assets', to: 'assets' },
 				{
-					from: "assets/icons/app.svg",
+					from: 'assets/icons/app.svg',
 					to: 'assets/icons/app.png',
 					transform(content) {
 						return sharp(content).resize(512, 512).toBuffer();
-					}
+					},
 				},
-				{ from: "sqlite/extensions/*.{so,dll,dylib}" },
+				{ from: 'sqlite/extensions/*.{so,dll,dylib}' },
 			],
 		}),
-	]
+	],
 });

@@ -1,6 +1,12 @@
-import React, { FC, HTMLAttributes, RefObject, useCallback, useEffect, useRef } from 'react';
+import React, {
+	FC,
+	HTMLAttributes,
+	RefObject,
+	useCallback,
+	useEffect,
+	useRef,
+} from 'react';
 import { editor, languages } from 'monaco-editor-core';
-
 
 import { language as tslanguage } from './languages/typescript';
 
@@ -73,7 +79,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			value,
 			language: 'javascript',
 			automaticLayout: true,
-			wordWrap: 'on'
+			wordWrap: 'on',
 		});
 
 		editorRef.current = monacoEditor;

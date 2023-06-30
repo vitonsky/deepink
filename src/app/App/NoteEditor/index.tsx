@@ -1,10 +1,10 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
+import { cn } from '@bem-react/classname';
 
 import { INoteData } from '../../../core/Note';
+
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
-import React from 'react';
-import { cn } from '@bem-react/classname';
 
 import './NoteEditor.css';
 
@@ -31,7 +31,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	return (
 		<div className={cnNoteEditor()}>
-			<Textinput value={title} onInputText={setTitle} placeholder='Note title' />
+			<Textinput value={title} onInputText={setTitle} placeholder="Note title" />
 			<MonacoEditor
 				value={text}
 				setValue={setText}

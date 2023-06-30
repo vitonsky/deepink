@@ -1,16 +1,17 @@
 import { app, BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
-import { getResourcesPath } from './electron/utils/files';
-import { isDevMode } from './electron/utils/app';
-import { handleFilesRequests } from './electron/requests/files';
+
 import { handleAppRequests } from './electron/requests/app';
+import { handleFilesRequests } from './electron/requests/files';
+import { isDevMode } from './electron/utils/app';
+import { getResourcesPath } from './electron/utils/files';
 
 console.log({
 	isDev: isDevMode(),
 	appDir: app.getAppPath(),
 	resourcesPath: getResourcesPath(),
-})
+});
 
 handleFilesRequests();
 handleAppRequests();
@@ -41,7 +42,7 @@ const createWindow = async () => {
 			pathname: path.join(__dirname, 'index.html'),
 			protocol: 'file:',
 			slashes: true,
-		})
+		}),
 	);
 
 	console.log(performance.measure('page loaded', { start }));
