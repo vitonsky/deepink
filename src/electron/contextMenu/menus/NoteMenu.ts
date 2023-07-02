@@ -1,21 +1,23 @@
+import { NoteActions, noteMenuId } from "../../../app/ContextMenu/NoteContextMenu";
+
 import { ContextMenu } from "..";
 
 export const noteMenu: ContextMenu = {
-	id: 'noteMenu',
+	id: noteMenuId,
 	menu: [
+		// TODO: implement
+		// {
+		// 	id: 'copyMarkdownLink',
+		// 	label: 'Copy Markdown link',
+		// },
 		{
-			// TODO: implement
-			// id: 'copyMarkdownLink',
-			label: 'Copy Markdown link',
-		},
-		{
-			id: 'duplicate',
-			label: 'Duplicate',
+			id: NoteActions.DUPLICATE,
+			label: 'duplicate',
 		},
 		{ type: 'separator' },
 		{
-			id: 'delete',
-			label: 'Delete note',
+			id: NoteActions.DELETE,
+			label: 'delete',
 		},
 	],
 };

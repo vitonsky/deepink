@@ -13,10 +13,9 @@ import { INote, INoteData, NoteId } from '../../core/Note';
 import { INotesRegistry } from '../../core/Registry';
 import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
-import { noteMenu } from '../../electron/contextMenu/menus/NoteMenu';
-import { openContextMenu } from '../../electron/contextMenu/renderer';
 import { electronPaths } from '../../electron/requests/files';
 
+import { ElectronContextMenu, noteMenuId } from '../ContextMenu/NoteContextMenu';
 import { NoteEditor } from './NoteEditor';
 
 import './App.css';
@@ -32,6 +31,36 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [tabs, setTabs] = useState<NoteId[]>([]);
 	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
+
+	const [contextMenu] = useState(() => {
+		return new ElectronContextMenu(noteMenuId);
+	});
+
+	// TODO: move to hook
+	const contextMenuTargetRef = useRef<NoteId | null>(null);
+	const openNoteContextMenu = useCallback((id: NoteId, point: { x: number, y: number }) => {
+		contextMenu.open(point);
+		contextMenuTargetRef.current = id;
+	}, [contextMenu]);
+
+	useEffect(() => {
+		const unsubscribeOnClose = contextMenu.onClose(() => {
+			contextMenuTargetRef.current = null;
+		});
+
+		const unsubscribeOnClick = contextMenu.onClick((action) => {
+			const noteId = contextMenuTargetRef.current;
+			if (noteId === null) return;
+
+			// TODO: handle clicks
+			console.log('Note action', { action, noteId });
+		});
+
+		return () => {
+			unsubscribeOnClose();
+			unsubscribeOnClick();
+		};
+	}, [contextMenu]);
 
 	const updateNotes = useCallback(async () => {
 		const notes = await notesRegistry.get();
@@ -126,19 +155,9 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 								content: (
 									<div
 										onContextMenu={(evt) => {
-											// TODO: abstract context menu implementation
-											openContextMenu({
-												menuId: noteMenu.id,
+											openNoteContextMenu(note.id, {
 												x: evt.pageX,
 												y: evt.pageY,
-											}).then((action) => {
-												if (action === null) return;
-
-												// TODO: handle clicks
-												console.log('Action with context menu', {
-													action,
-													note: note.id,
-												});
 											});
 										}}
 									>
