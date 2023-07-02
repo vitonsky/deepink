@@ -16,7 +16,7 @@ import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
 
 import { NoteEditor } from './NoteEditor';
-import { useNoteContextMenu } from './useNoteContextMenu';
+import { NoteContextMenuCallback, useNoteContextMenu } from './useNoteContextMenu';
 
 import './App.css';
 
@@ -32,7 +32,15 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
 
-	const openNoteContextMenu = useNoteContextMenu();
+	const noteContextMenuCallback: NoteContextMenuCallback = useCallback(
+		({ noteId, action }) => {
+			// TODO: handle clicks
+			console.log('Note action', { action, noteId });
+		},
+		[],
+	);
+
+	const openNoteContextMenu = useNoteContextMenu(noteContextMenuCallback);
 
 	const updateNotes = useCallback(async () => {
 		const notes = await notesRegistry.get();

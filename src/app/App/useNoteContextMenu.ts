@@ -2,12 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { NoteId } from '../../core/Note';
 
-import { ElectronContextMenu, noteMenuId } from '../ContextMenu/NoteContextMenu';
+import { ElectronContextMenu, NoteActions, noteMenuId } from '../ContextMenu/NoteContextMenu';
+
+export type NoteContextMenuCallback = (event: { noteId: NoteId; action: NoteActions; }) => void;
 
 /**
  * Provide callback to trigger open note context menu
  */
-export const useNoteContextMenu = () => {
+export const useNoteContextMenu = (callback: NoteContextMenuCallback) => {
 	const [contextMenu] = useState(() => {
 		// TODO: provide constructor in react context
 		return new ElectronContextMenu(noteMenuId);
@@ -28,15 +30,14 @@ export const useNoteContextMenu = () => {
 			const noteId = contextMenuTargetRef.current;
 			if (noteId === null) return;
 
-			// TODO: handle clicks
-			console.log('Note action', { action, noteId });
+			callback({ action, noteId });
 		});
 
 		return () => {
 			unsubscribeOnClose();
 			unsubscribeOnClick();
 		};
-	}, [contextMenu]);
+	}, [callback, contextMenu]);
 
 	return show;
 };
