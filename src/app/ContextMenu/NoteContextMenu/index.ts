@@ -3,8 +3,6 @@ import { createEvent, Event } from 'effector';
 import { ContextMenu } from '../../../electron/contextMenu';
 import { openContextMenu } from '../../../electron/contextMenu/renderer';
 
-export const noteMenuId = 'note';
-
 export enum NoteActions {
 	DUPLICATE = 'duplicate',
 	DELETE = 'delete',

@@ -30,6 +30,7 @@ export const useNoteContextMenu = (callback: NoteContextMenuCallback) => {
 			const noteId = contextMenuTargetRef.current;
 			if (noteId === null) return;
 
+			contextMenuTargetRef.current = null;
 			callback({ action, noteId });
 		});
 
