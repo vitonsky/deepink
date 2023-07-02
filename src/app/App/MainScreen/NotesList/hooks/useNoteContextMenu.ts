@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { NoteId } from '../../core/Note';
+import { NoteId } from '../../../../../core/Note';
 
-import { ElectronContextMenu, NoteActions } from '../ContextMenu/NoteContextMenu';
+import { ElectronContextMenu, NoteActions } from '../NoteContextMenu';
 
-export type NoteContextMenuCallback = (event: { noteId: NoteId; action: NoteActions; }) => void;
+export type NoteContextMenuCallback = (event: {
+	noteId: NoteId;
+	action: NoteActions;
+}) => void;
 
 /**
  * Provide callback to trigger open note context menu
@@ -16,10 +19,13 @@ export const useNoteContextMenu = (callback: NoteContextMenuCallback) => {
 	});
 
 	const contextMenuTargetRef = useRef<NoteId | null>(null);
-	const show = useCallback((id: NoteId, point: { x: number, y: number }) => {
-		contextMenu.open(point);
-		contextMenuTargetRef.current = id;
-	}, [contextMenu]);
+	const show = useCallback(
+		(id: NoteId, point: { x: number; y: number }) => {
+			contextMenu.open(point);
+			contextMenuTargetRef.current = id;
+		},
+		[contextMenu],
+	);
 
 	useEffect(() => {
 		const unsubscribeOnClose = contextMenu.onClose(() => {

@@ -54,19 +54,3 @@
 	width: 100%;
 }
 
-.Menu-Item.App-NoteItem_opened {
-	color: #780000;
-}
-
-.Menu-Item.App-NoteItem_active {
-	background-color: #00000014;
-}
-
-.Menu-ItemText {
-	white-space: nowrap;
-}
-
-.Menu-Item {
-	overflow: hidden;
-	text-overflow: ellipsis;
-}

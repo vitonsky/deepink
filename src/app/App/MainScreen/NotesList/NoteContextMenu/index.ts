@@ -1,8 +1,8 @@
 import { createEvent, Event } from 'effector';
 
-import { ContextMenu } from '../../../electron/contextMenu';
-import { openContextMenu } from '../../../electron/contextMenu/renderer';
-import { isDictionaryValue } from '../../../utils/validation';
+import { ContextMenu } from '../../../../../electron/contextMenu';
+import { openContextMenu } from '../../../../../electron/contextMenu/renderer';
+import { isDictionaryValue } from '../../../../../utils/validation';
 
 export enum NoteActions {
 	DUPLICATE = 'duplicate',

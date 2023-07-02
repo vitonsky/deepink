@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
-import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
@@ -15,9 +14,8 @@ import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
 
-import { NoteActions } from '../ContextMenu/NoteContextMenu';
+import { NotesList } from './MainScreen/NotesList';
 import { NoteEditor } from './NoteEditor';
-import { NoteContextMenuCallback, useNoteContextMenu } from './useNoteContextMenu';
 
 import './App.css';
 
@@ -93,36 +91,6 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		updateNotes();
 	}, [notesRegistry, updateNotes]);
 
-	const noteContextMenuCallback: NoteContextMenuCallback = useCallback(
-		async ({ noteId, action }) => {
-			switch (action) {
-				case NoteActions.DELETE:
-					const isConfirmed = confirm("Are you sure to delete note?");
-					if (!isConfirmed) return;
-
-					closeNote(noteId);
-					await notesRegistry.delete([noteId]);
-					updateNotes();
-					break;
-				case NoteActions.DUPLICATE:
-					const note = await notesRegistry.getById(noteId);
-
-					if (!note) {
-						console.warn(`Not found note with id ${note}`);
-						return;
-					}
-
-					const { title, text } = note.data;
-					await notesRegistry.add({ title: 'DUPLICATE: ' + title, text });
-					updateNotes();
-					break;
-			}
-		},
-		[closeNote, notesRegistry, updateNotes],
-	);
-
-	const openNoteContextMenu = useNoteContextMenu(noteContextMenuCallback);
-
 	// Focus on new note
 	useEffect(() => {
 		if (newNoteIdRef.current === null) return;
@@ -146,33 +114,16 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 				</div>
 
 				<div className={cnApp('NotesList')}>
-					{/* TODO: implement dragging and moving items */}
-					<Menu
-						onPick={onNoteClick}
-						items={notes.map((note) => {
-							return {
-								id: note.id,
-								textContent: getNoteTitle(note.data),
-								content: (
-									<div
-										onContextMenu={(evt) => {
-											openNoteContextMenu(note.id, {
-												x: evt.pageX,
-												y: evt.pageY,
-											});
-										}}
-									>
-										{getNoteTitle(note.data)}
-									</div>
-								),
-								addonProps: {
-									className: cnApp('NoteItem', {
-										active: note.id === tab,
-										opened: tabs.indexOf(note.id) !== -1,
-									}),
-								},
-							};
-						})}
+					<NotesList
+						{...{
+							notesRegistry,
+							notes,
+							updateNotes,
+							onPick: onNoteClick,
+							closeNote,
+							openedNotes: tabs,
+							activeNote: tab,
+						}}
 					/>
 				</div>
 			</div>
@@ -184,31 +135,33 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 					dir="horizontal"
 					activeTab={tab || undefined}
 					setActiveTab={setTab}
-					tabs={tabs.filter((noteId) => notes.some((note) => note.id === noteId)).map((noteId) => {
-						// TODO: handle case when object not found
-						const note = notes.find((note) => note.id === noteId);
-						if (!note) {
-							throw new Error('Note not found');
-						}
+					tabs={tabs
+						.filter((noteId) => notes.some((note) => note.id === noteId))
+						.map((noteId) => {
+							// TODO: handle case when object not found
+							const note = notes.find((note) => note.id === noteId);
+							if (!note) {
+								throw new Error('Note not found');
+							}
 
-						return {
-							id: noteId,
-							content: (
-								<span>
-									{getNoteTitle(note.data)}{' '}
-									<span
-										onClick={(evt) => {
-											evt.stopPropagation();
-											console.log(noteId);
-											closeNote(noteId);
-										}}
-									>
-										<Icon glyph="cancel" size="s" />
+							return {
+								id: noteId,
+								content: (
+									<span>
+										{getNoteTitle(note.data)}{' '}
+										<span
+											onClick={(evt) => {
+												evt.stopPropagation();
+												console.log(noteId);
+												closeNote(noteId);
+											}}
+										>
+											<Icon glyph="cancel" size="s" />
+										</span>
 									</span>
-								</span>
-							),
-						};
-					})}
+								),
+							};
+						})}
 				/>
 				<div className={cnApp('NoteEditors')}>
 					{tabs.map((id) => {
