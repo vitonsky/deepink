@@ -15,8 +15,8 @@ import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
 
-import { ElectronContextMenu, noteMenuId } from '../ContextMenu/NoteContextMenu';
 import { NoteEditor } from './NoteEditor';
+import { useNoteContextMenu } from './useNoteContextMenu';
 
 import './App.css';
 
@@ -32,35 +32,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
 
-	const [contextMenu] = useState(() => {
-		return new ElectronContextMenu(noteMenuId);
-	});
-
-	// TODO: move to hook
-	const contextMenuTargetRef = useRef<NoteId | null>(null);
-	const openNoteContextMenu = useCallback((id: NoteId, point: { x: number, y: number }) => {
-		contextMenu.open(point);
-		contextMenuTargetRef.current = id;
-	}, [contextMenu]);
-
-	useEffect(() => {
-		const unsubscribeOnClose = contextMenu.onClose(() => {
-			contextMenuTargetRef.current = null;
-		});
-
-		const unsubscribeOnClick = contextMenu.onClick((action) => {
-			const noteId = contextMenuTargetRef.current;
-			if (noteId === null) return;
-
-			// TODO: handle clicks
-			console.log('Note action', { action, noteId });
-		});
-
-		return () => {
-			unsubscribeOnClose();
-			unsubscribeOnClick();
-		};
-	}, [contextMenu]);
+	const openNoteContextMenu = useNoteContextMenu();
 
 	const updateNotes = useCallback(async () => {
 		const notes = await notesRegistry.get();
