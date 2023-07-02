@@ -1,7 +1,5 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
-import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { mkdirSync } from 'fs';
@@ -15,6 +13,7 @@ import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
 
 import { NotesList } from './MainScreen/NotesList';
+import { TopBar } from './MainScreen/TopBar';
 import { NoteEditor } from './NoteEditor';
 
 import './App.css';
@@ -128,41 +127,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 				</div>
 			</div>
 			<div className={cnApp('ContentBlock')}>
-				{/* TODO: improve tabs style */}
-				<TabsMenu
-					view="primitive"
-					layout="horizontal"
-					dir="horizontal"
-					activeTab={tab || undefined}
-					setActiveTab={setTab}
-					tabs={tabs
-						.filter((noteId) => notes.some((note) => note.id === noteId))
-						.map((noteId) => {
-							// TODO: handle case when object not found
-							const note = notes.find((note) => note.id === noteId);
-							if (!note) {
-								throw new Error('Note not found');
-							}
-
-							return {
-								id: noteId,
-								content: (
-									<span>
-										{getNoteTitle(note.data)}{' '}
-										<span
-											onClick={(evt) => {
-												evt.stopPropagation();
-												console.log(noteId);
-												closeNote(noteId);
-											}}
-										>
-											<Icon glyph="cancel" size="s" />
-										</span>
-									</span>
-								),
-							};
-						})}
-				/>
+				<TopBar {...{ notes, tabs, activeTab: tab ?? null, onClose: closeNote, onPick: onNoteClick }} />
 				<div className={cnApp('NoteEditors')}>
 					{tabs.map((id) => {
 						const noteObject = notes.find((note) => note.id === id);

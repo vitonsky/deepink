@@ -44,13 +44,3 @@
 .App-NoteEditor.App-NoteEditor_active > div {
 	flex-grow: 100;
 }
-
-.App-ContentBlock .TabsMenu_layout_horizontal .TabsMenu-Container {
-	flex-wrap: wrap;
-	max-height: 100px;
-	overflow-y: auto;
-
-	/* flex-direction: column; */
-	width: 100%;
-}
-
