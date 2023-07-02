@@ -15,6 +15,7 @@ import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
 
+import { NoteActions } from '../ContextMenu/NoteContextMenu';
 import { NoteEditor } from './NoteEditor';
 import { NoteContextMenuCallback, useNoteContextMenu } from './useNoteContextMenu';
 
@@ -31,16 +32,6 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [tabs, setTabs] = useState<NoteId[]>([]);
 	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
-
-	const noteContextMenuCallback: NoteContextMenuCallback = useCallback(
-		({ noteId, action }) => {
-			// TODO: handle clicks
-			console.log('Note action', { action, noteId });
-		},
-		[],
-	);
-
-	const openNoteContextMenu = useNoteContextMenu(noteContextMenuCallback);
 
 	const updateNotes = useCallback(async () => {
 		const notes = await notesRegistry.get();
@@ -101,6 +92,36 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		newNoteIdRef.current = noteId;
 		updateNotes();
 	}, [notesRegistry, updateNotes]);
+
+	const noteContextMenuCallback: NoteContextMenuCallback = useCallback(
+		async ({ noteId, action }) => {
+			switch (action) {
+				case NoteActions.DELETE:
+					const isConfirmed = confirm("Are you sure to delete note?");
+					if (!isConfirmed) return;
+
+					closeNote(noteId);
+					await notesRegistry.delete([noteId]);
+					updateNotes();
+					break;
+				case NoteActions.DUPLICATE:
+					const note = await notesRegistry.getById(noteId);
+
+					if (!note) {
+						console.warn(`Not found note with id ${note}`);
+						return;
+					}
+
+					const { title, text } = note.data;
+					await notesRegistry.add({ title: 'DUPLICATE: ' + title, text });
+					updateNotes();
+					break;
+			}
+		},
+		[closeNote, notesRegistry, updateNotes],
+	);
+
+	const openNoteContextMenu = useNoteContextMenu(noteContextMenuCallback);
 
 	// Focus on new note
 	useEffect(() => {
@@ -163,7 +184,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 					dir="horizontal"
 					activeTab={tab || undefined}
 					setActiveTab={setTab}
-					tabs={tabs.map((noteId) => {
+					tabs={tabs.filter((noteId) => notes.some((note) => note.id === noteId)).map((noteId) => {
 						// TODO: handle case when object not found
 						const note = notes.find((note) => note.id === noteId);
 						if (!note) {
