@@ -1,0 +1,9 @@
+.SplashScreen {
+	margin: auto;
+	font-size: 2rem;
+	font-weight: bold;
+	/* stylelint-disable max-line-length */
+	/* stylelint-disable font-family-no-missing-generic-family-keyword */
+	/* stylelint-disable-next-line font-family-name-quotes */
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serifarial;
+}
