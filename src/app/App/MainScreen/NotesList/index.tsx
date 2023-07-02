@@ -6,8 +6,8 @@ import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
 
 import { getNoteTitle } from '../..';
-import { NoteContextMenuCallback, useNoteContextMenu } from './hooks/useNoteContextMenu';
 import { NoteActions } from './NoteContextMenu';
+import { NoteContextMenuCallback, useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
 import './NotesList.css';
 

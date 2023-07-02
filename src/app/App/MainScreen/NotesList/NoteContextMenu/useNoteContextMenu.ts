@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { NoteId } from '../../../../../core/Note';
 
-import { ElectronContextMenu, NoteActions } from '../NoteContextMenu';
+import { ElectronContextMenu } from './ElectronContextMenu';
+import { NoteActions } from '.';
 
 export type NoteContextMenuCallback = (event: {
 	noteId: NoteId;
