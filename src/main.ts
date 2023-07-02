@@ -2,6 +2,7 @@ import { app, BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
 
+import { enableContextMenu } from './electron/contextMenu/main';
 import { handleAppRequests } from './electron/requests/app';
 import { handleFilesRequests } from './electron/requests/files';
 import { isDevMode } from './electron/utils/app';
@@ -46,6 +47,8 @@ const createWindow = async () => {
 	);
 
 	console.log(performance.measure('page loaded', { start }));
+
+	enableContextMenu();
 
 	// win.addListener('close', (evt) => {
 	// 	evt.preventDefault();

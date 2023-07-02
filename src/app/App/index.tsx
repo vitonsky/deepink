@@ -13,6 +13,8 @@ import { INote, INoteData, NoteId } from '../../core/Note';
 import { INotesRegistry } from '../../core/Registry';
 import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
+import { noteMenu } from '../../electron/contextMenu/menus/NoteMenu';
+import { openContextMenu } from '../../electron/contextMenu/renderer';
 import { electronPaths } from '../../electron/requests/files';
 
 import { NoteEditor } from './NoteEditor';
@@ -119,7 +121,29 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 						items={notes.map((note) => {
 							return {
 								id: note.id,
-								content: getNoteTitle(note.data),
+								textContent: getNoteTitle(note.data),
+								content: (
+									<div
+										onContextMenu={(evt) => {
+											// TODO: abstract context menu implementation
+											openContextMenu({
+												menuId: noteMenu.id,
+												x: evt.pageX,
+												y: evt.pageY,
+											}).then((action) => {
+												if (action === null) return;
+
+												// TODO: handle clicks
+												console.log('Action with context menu', {
+													action,
+													note: note.id,
+												});
+											});
+										}}
+									>
+										{getNoteTitle(note.data)}
+									</div>
+								),
 								addonProps: {
 									className: cnApp('NoteItem', {
 										active: note.id === tab,
