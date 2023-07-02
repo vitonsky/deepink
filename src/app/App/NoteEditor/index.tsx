@@ -19,6 +19,9 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const [title, setTitle] = useState(note.title);
 	const [text, setText] = useState(note.text);
 
+	const updateNoteRef = useRef(updateNote);
+	updateNoteRef.current = updateNote;
+
 	const isFirstRenderRef = useRef(true);
 	useEffect(() => {
 		if (isFirstRenderRef.current) {
@@ -26,8 +29,8 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 			return;
 		}
 
-		updateNote({ title, text });
-	}, [title, text, updateNote]);
+		updateNoteRef.current({ title, text });
+	}, [title, text]);
 
 	return (
 		<div className={cnNoteEditor()}>

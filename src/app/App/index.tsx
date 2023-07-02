@@ -105,6 +105,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		}
 	}, [notes, onNoteClick]);
 
+	// TODO: add memoizing for tabs mapping
 	return (
 		<div className={cnApp({}, [cnTheme(theme)])}>
 			<div className={cnApp('SideBar')}>
