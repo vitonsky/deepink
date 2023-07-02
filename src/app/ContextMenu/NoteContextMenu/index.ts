@@ -2,6 +2,7 @@ import { createEvent, Event } from 'effector';
 
 import { ContextMenu } from '../../../electron/contextMenu';
 import { openContextMenu } from '../../../electron/contextMenu/renderer';
+import { isDictionaryValue } from '../../../utils/validation';
 
 export enum NoteActions {
 	DUPLICATE = 'duplicate',
@@ -9,11 +10,6 @@ export enum NoteActions {
 }
 
 type VoidCallback = () => void;
-
-const isDictionaryValue = <T extends Record<any, any>>(
-	dictionary: T,
-	value: unknown,
-): value is T[keyof T] => Object.values(dictionary).includes(value);
 
 export const noteMenu: ContextMenu = [
 	// TODO: implement
