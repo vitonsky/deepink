@@ -1,13 +1,13 @@
 import { ipcRenderer } from "electron";
 
-import { ipcChannelName } from ".";
+import { ContextMenu, ipcChannelName } from ".";
 
 export type ContextMenuRequestProps = {
-	menuId: string;
+	menu: ContextMenu;
 	x: number;
 	y: number;
 }
 
-export const openContextMenu = async ({ menuId, x, y }: ContextMenuRequestProps): Promise<string | null> => {
-	return ipcRenderer.invoke(ipcChannelName, { menuId, x, y });
+export const openContextMenu = async ({ menu, x, y }: ContextMenuRequestProps): Promise<string | null> => {
+	return ipcRenderer.invoke(ipcChannelName, { menu, x, y });
 };

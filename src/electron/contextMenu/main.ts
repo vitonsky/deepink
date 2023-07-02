@@ -1,21 +1,15 @@
 import { BrowserWindow, ipcMain, Menu } from 'electron';
 
-import { noteMenu } from './menus/NoteMenu';
-import { ContextMenu, ipcChannelName } from '.';
+import { ContextMenuRequestProps } from './renderer';
+import { ipcChannelName } from '.';
 
 export const enableContextMenu = () => {
-	const menus: ContextMenu[] = [noteMenu];
 
-	ipcMain.handle(ipcChannelName, (event, props = {}) => {
+	ipcMain.handle(ipcChannelName, (event, props: ContextMenuRequestProps) => {
 		const targetWindow = BrowserWindow.fromWebContents(event.sender);
 		if (!targetWindow) return;
 
-		const { menuId, x = 0, y = 0 } = props;
-
-		const menuTemplate = menus.find(({ id }) => id === menuId);
-		if (!menuTemplate) {
-			throw new Error(`Not found menu with id "${menuId}"`);
-		}
+		const { menu: menuTemplate, x = 0, y = 0 } = props ?? {};
 
 		// Handle click on menu
 		let onClick: (itemId: string | null) => void;
@@ -41,7 +35,7 @@ export const enableContextMenu = () => {
 			});
 		};
 
-		const menu = Menu.buildFromTemplate(prepareMenu(menuTemplate.menu));
+		const menu = Menu.buildFromTemplate(prepareMenu(menuTemplate));
 
 		menu.popup({ window: targetWindow, x, y });
 		menu.once('menu-will-close', () => {

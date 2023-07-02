@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { NoteId } from '../../core/Note';
 
-import { ElectronContextMenu, NoteActions, noteMenuId } from '../ContextMenu/NoteContextMenu';
+import { ElectronContextMenu, NoteActions } from '../ContextMenu/NoteContextMenu';
 
 export type NoteContextMenuCallback = (event: { noteId: NoteId; action: NoteActions; }) => void;
 
@@ -12,7 +12,7 @@ export type NoteContextMenuCallback = (event: { noteId: NoteId; action: NoteActi
 export const useNoteContextMenu = (callback: NoteContextMenuCallback) => {
 	const [contextMenu] = useState(() => {
 		// TODO: provide constructor in react context
-		return new ElectronContextMenu(noteMenuId);
+		return new ElectronContextMenu();
 	});
 
 	const contextMenuTargetRef = useRef<NoteId | null>(null);

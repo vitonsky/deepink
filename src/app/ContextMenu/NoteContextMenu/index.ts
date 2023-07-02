@@ -1,5 +1,6 @@
 import { createEvent, Event } from 'effector';
 
+import { ContextMenu } from '../../../electron/contextMenu';
 import { openContextMenu } from '../../../electron/contextMenu/renderer';
 
 export const noteMenuId = 'note';
@@ -16,20 +17,34 @@ const isDictionaryValue = <T extends Record<any, any>>(
 	value: unknown,
 ): value is T[keyof T] => Object.values(dictionary).includes(value);
 
+export const noteMenu: ContextMenu = [
+	// TODO: implement
+	// {
+	// 	id: 'copyMarkdownLink',
+	// 	label: 'Copy Markdown link',
+	// },
+	{
+		id: NoteActions.DUPLICATE,
+		label: 'Duplicate',
+	},
+	{ type: 'separator' },
+	{
+		id: NoteActions.DELETE,
+		label: 'Delete',
+	},
+];
+
 export class ElectronContextMenu {
-	private menuId: string;
 	private onClosed: Event<void>;
 	private onClicked: Event<NoteActions>;
-	constructor(menuId: string) {
-		this.menuId = menuId;
-
+	constructor() {
 		this.onClosed = createEvent();
 		this.onClicked = createEvent();
 	}
 
 	public open({ x, y }: { x: number; y: number }) {
 		openContextMenu({
-			menuId: this.menuId,
+			menu: noteMenu,
 			x,
 			y,
 		}).then((action) => {
