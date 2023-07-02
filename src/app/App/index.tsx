@@ -12,9 +12,9 @@ import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
 
+import { Notes } from './MainScreen/Notes';
 import { NotesList } from './MainScreen/NotesList';
 import { TopBar } from './MainScreen/TopBar';
-import { NoteEditor } from './NoteEditor';
 
 import './App.css';
 
@@ -127,27 +127,17 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 				</div>
 			</div>
 			<div className={cnApp('ContentBlock')}>
-				<TopBar {...{ notes, tabs, activeTab: tab ?? null, onClose: closeNote, onPick: onNoteClick }} />
+				<TopBar
+					{...{
+						notes,
+						tabs,
+						activeTab: tab ?? null,
+						onClose: closeNote,
+						onPick: onNoteClick,
+					}}
+				/>
 				<div className={cnApp('NoteEditors')}>
-					{tabs.map((id) => {
-						const noteObject = notes.find((note) => note.id === id);
-						if (!noteObject) return null;
-
-						const isActive = id === tab;
-						return (
-							<div
-								key={id}
-								className={cnApp('NoteEditor', { active: isActive })}
-							>
-								<NoteEditor
-									note={noteObject.data}
-									updateNote={(noteData) => {
-										updateNote({ ...noteObject, data: noteData });
-									}}
-								/>
-							</div>
-						);
-					})}
+					<Notes {...{ notes, tabs, activeTab: tab ?? null, updateNote }} />
 				</div>
 			</div>
 		</div>

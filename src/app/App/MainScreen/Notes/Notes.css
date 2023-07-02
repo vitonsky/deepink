@@ -1,0 +1,11 @@
+.Notes {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 100;
+}
+
+.Notes > .TabsPanes-Pane:not(.TabsPanes-Pane_hidden) {
+	display: flex;
+	flex-grow: 100;
+	width: 100%;
+}
