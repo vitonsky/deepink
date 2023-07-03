@@ -122,6 +122,8 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 			<div className={cnMainScreen('ContentBlock')}>
 				<TopBar
 					{...{
+						notesRegistry,
+						updateNotes,
 						notes,
 						tabs,
 						activeTab: tab ?? null,

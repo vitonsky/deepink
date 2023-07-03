@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
@@ -6,8 +6,7 @@ import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
 
 import { getNoteTitle } from '../..';
-import { NoteActions } from './NoteContextMenu';
-import { NoteContextMenuCallback, useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
+import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
 import './NotesList.css';
 
@@ -35,35 +34,7 @@ export const NotesList: FC<NotesListProps> = ({
 	openedNotes,
 	activeNote,
 }) => {
-	const noteContextMenuCallback: NoteContextMenuCallback = useCallback(
-		async ({ noteId, action }) => {
-			switch (action) {
-				case NoteActions.DELETE:
-					const isConfirmed = confirm('Are you sure to delete note?');
-					if (!isConfirmed) return;
-
-					closeNote(noteId);
-					await notesRegistry.delete([noteId]);
-					updateNotes();
-					break;
-				case NoteActions.DUPLICATE:
-					const note = await notesRegistry.getById(noteId);
-
-					if (!note) {
-						console.warn(`Not found note with id ${note}`);
-						return;
-					}
-
-					const { title, text } = note.data;
-					await notesRegistry.add({ title: 'DUPLICATE: ' + title, text });
-					updateNotes();
-					break;
-			}
-		},
-		[closeNote, notesRegistry, updateNotes],
-	);
-
-	const openNoteContextMenu = useNoteContextMenu(noteContextMenuCallback);
+	const openNoteContextMenu = useDefaultNoteContextMenu({ closeNote, notesRegistry, updateNotes });
 
 	// TODO: implement dragging and moving items
 	return (
