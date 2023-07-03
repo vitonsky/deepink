@@ -47,7 +47,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		setTab(id);
 	}, []);
 
-	const closeNote = useCallback(
+	const onNoteClose = useCallback(
 		(id: NoteId) => {
 			const tabIndex = tabs.indexOf(id);
 
@@ -112,7 +112,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 							notes,
 							updateNotes,
 							onPick: onNoteClick,
-							closeNote,
+							onClose: onNoteClose,
 							openedNotes: tabs,
 							activeNote: tab,
 						}}
@@ -127,7 +127,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 						notes,
 						tabs,
 						activeTab: tab ?? null,
-						onClose: closeNote,
+						onClose: onNoteClose,
 						onPick: onNoteClick,
 					}}
 				/>

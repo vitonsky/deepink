@@ -15,7 +15,7 @@ export const cnNotesList = cn('NotesList');
 export type NotesListProps = {
 	notes: INote[];
 	onPick: (id: NoteId) => void;
-	closeNote: (id: NoteId) => void;
+	onClose: (id: NoteId) => void;
 	updateNotes: () => void;
 
 	// TODO: receive with react context
@@ -28,13 +28,13 @@ export type NotesListProps = {
 export const NotesList: FC<NotesListProps> = ({
 	notes,
 	onPick,
-	closeNote,
+	onClose,
 	updateNotes,
 	notesRegistry,
 	openedNotes,
 	activeNote,
 }) => {
-	const openNoteContextMenu = useDefaultNoteContextMenu({ closeNote, notesRegistry, updateNotes });
+	const openNoteContextMenu = useDefaultNoteContextMenu({ closeNote: onClose, notesRegistry, updateNotes });
 
 	// TODO: implement dragging and moving items
 	return (
