@@ -12,10 +12,7 @@ module.exports = merge(commonConfig, {
 	plugins: [
 		new MiniCssExtractPlugin({}),
 		new CopyPlugin({
-			patterns: [
-				{ from: "src/index.html" },
-				{ from: "src/index.css" },
-			],
+			patterns: [{ from: 'src/index.html' }, { from: 'src/index.css' }],
 		}),
 	],
 	module: {
@@ -56,6 +53,6 @@ module.exports = merge(commonConfig, {
 				test: /\.svg$/,
 				use: ['@svgr/webpack'],
 			},
-		]
-	}
+		],
+	},
 });

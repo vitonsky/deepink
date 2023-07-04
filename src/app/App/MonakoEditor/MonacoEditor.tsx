@@ -1,7 +1,14 @@
-import React, { FC, HTMLAttributes, RefObject, useCallback, useEffect, useRef } from 'react';
+import React, {
+	FC,
+	HTMLAttributes,
+	RefObject,
+	useCallback,
+	useEffect,
+	useRef,
+} from 'react';
 import { editor, languages } from 'monaco-editor-core';
 
-
+import { language as mdlanguage } from './languages/markdown';
 import { language as tslanguage } from './languages/typescript';
 
 // Configure monako
@@ -15,6 +22,14 @@ languages.register({
 });
 
 languages.setMonarchTokensProvider('javascript', tslanguage);
+
+languages.register({
+	id: 'markdown',
+	extensions: ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn', '.mdtxt', '.mdtext'],
+	aliases: ['Markdown', 'markdown'],
+});
+
+languages.setMonarchTokensProvider('markdown', mdlanguage);
 
 export type EditorObject = {
 	updateDimensions: () => void;
@@ -71,9 +86,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 
 		const monacoEditor = editor.create(editorContainer, {
 			value,
-			language: 'javascript',
+			language: 'markdown',
 			automaticLayout: true,
-			wordWrap: 'on'
+			wordWrap: 'on',
 		});
 
 		editorRef.current = monacoEditor;

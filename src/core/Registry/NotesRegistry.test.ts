@@ -1,7 +1,8 @@
-import { getDb } from '../storage/SQLiteDb';
 import { tmpdir } from 'os';
-import { tmpNameSync } from 'tmp';
 import path from 'path';
+import { tmpNameSync } from 'tmp';
+
+import { getDb } from '../storage/SQLiteDb';
 import { NotesRegistry } from './NotesRegistry';
 
 // TODO: move extensions to dir with DB
@@ -30,14 +31,14 @@ describe('CRUD operations', () => {
 		expect(ids).toHaveLength(entries.length);
 
 		// Entries match data
-		await registry.get().then(((dbEntries) => {
+		await registry.get().then((dbEntries) => {
 			dbEntries.forEach((dbEntry) => {
 				const entryIndex = ids.indexOf(dbEntry.id);
 				const originalEntry = entries[entryIndex];
 
 				expect(dbEntry.data).toMatchObject(originalEntry);
-			})
-		}));
+			});
+		});
 	});
 
 	test('update entry and get by id', async () => {
@@ -64,12 +65,14 @@ describe('CRUD operations', () => {
 		const registry = new NotesRegistry(db);
 
 		// Insert entries to test
-		const notesSample = Array(300).fill(null).map((_, idx) => {
-			return {
-				title: 'Note title #' + idx,
-				text: 'Note text #' + idx,
-			};
-		});
+		const notesSample = Array(300)
+			.fill(null)
+			.map((_, idx) => {
+				return {
+					title: 'Note title #' + idx,
+					text: 'Note text #' + idx,
+				};
+			});
 
 		await Promise.all(notesSample.map((note) => registry.add(note)));
 
@@ -91,18 +94,20 @@ describe('CRUD operations', () => {
 		});
 
 		await db.close();
-	})
+	});
 });
 
 describe('data fetching', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
 
-	const notesSample = Array(300).fill(null).map((_, idx) => {
-		return {
-			title: 'Note title #' + idx,
-			text: 'Note text #' + idx,
-		};
-	});
+	const notesSample = Array(300)
+		.fill(null)
+		.map((_, idx) => {
+			return {
+				title: 'Note title #' + idx,
+				text: 'Note text #' + idx,
+			};
+		});
 
 	test('insert sample entries', async () => {
 		const db = await getDb({ dbPath, dbExtensionsDir });
@@ -124,8 +129,8 @@ describe('data fetching', () => {
 		});
 
 		// Invalid page must throw errors
-		await expect(registry.get({ limit: 100, page: 0 })).rejects.toThrow()
-		await expect(registry.get({ limit: 100, page: -100 })).rejects.toThrow()
+		await expect(registry.get({ limit: 100, page: 0 })).rejects.toThrow();
+		await expect(registry.get({ limit: 100, page: -100 })).rejects.toThrow();
 
 		const page1 = await registry.get({ limit: 100, page: 1 });
 		expect(page1[0].data).toMatchObject(notesSample[0]);
@@ -135,7 +140,7 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
-})
+});
 
 describe('multi instances', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
@@ -198,20 +203,22 @@ describe.skip('stress tests', () => {
 
 		// Insert entries
 		let iters = 0;
-		const textSample = "Some long text ".repeat(10000);
+		const textSample = 'Some long text '.repeat(10000);
 		for (let i = 0; i < 10000; i++) {
-			const promise = registry.add({
-				title: `Title #${i}`,
-				text: textSample
-			}).then((id) => {
-				iters++;
+			const promise = registry
+				.add({
+					title: `Title #${i}`,
+					text: textSample,
+				})
+				.then((id) => {
+					iters++;
 
-				if (iters % 100 === 0) {
-					console.log('Inserted entries: ', iters);
-				}
+					if (iters % 100 === 0) {
+						console.log('Inserted entries: ', iters);
+					}
 
-				return id;
-			});
+					return id;
+				});
 
 			requests.push(promise);
 		}
@@ -224,4 +231,4 @@ describe.skip('stress tests', () => {
 
 		await db.close();
 	}, 20000);
-})
+});

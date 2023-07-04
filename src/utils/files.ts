@@ -1,9 +1,10 @@
-import { rename, rm, writeFile } from 'fs/promises';
 import { existsSync, renameSync } from 'fs';
+
+import { rename, rm, writeFile } from 'fs/promises';
 
 /**
  * Write file with 3-step transaction
- * 
+ *
  * This util is not lock files, you have to implement it, to ensure conflict free
  */
 export const writeFileAtomic = async (filename: string, content: Buffer | string) => {
@@ -14,7 +15,9 @@ export const writeFileAtomic = async (filename: string, content: Buffer | string
 	// Rename original file
 	const backupFile = filename + '.backup';
 	if (existsSync(backupFile)) {
-		throw new Error(`Temporary backup file "${backupFile}" already exists. Can't to continue, to avoid loose data`);
+		throw new Error(
+			`Temporary backup file "${backupFile}" already exists. Can't to continue, to avoid loose data`,
+		);
 	}
 	await rename(filename, backupFile);
 
@@ -27,7 +30,7 @@ export const writeFileAtomic = async (filename: string, content: Buffer | string
 
 /**
  * Recovery data from intermediate file
- * 
+ *
  * Useful for cases when transaction been interrupted, to complete transaction
  */
 export const recoveryAtomicFile = (filename: string) => {

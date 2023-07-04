@@ -1,0 +1,16 @@
+.NotesList .Menu-Item.NotesList-Item_opened {
+	color: #780000;
+}
+
+.NotesList .Menu-Item.NotesList-Item_active {
+	background-color: #00000014;
+}
+
+.NotesList .Menu-ItemText {
+	white-space: nowrap;
+}
+
+.NotesList .Menu-Item {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

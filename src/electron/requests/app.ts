@@ -1,4 +1,5 @@
 import { ipcMain, ipcRenderer } from 'electron';
+
 import { isDevMode } from '../utils/app';
 
 export const handleAppRequests = () => {

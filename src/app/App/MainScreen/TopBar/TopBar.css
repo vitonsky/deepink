@@ -1,0 +1,6 @@
+.TopBar.TabsMenu_layout_horizontal .TabsMenu-Container {
+	flex-wrap: wrap;
+	max-height: 100px;
+	overflow-y: auto;
+	width: 100%;
+}

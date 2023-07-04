@@ -1,6 +1,6 @@
-import { INotesRegistry, NotesRegistryFetchOptions } from '.';
 import { INote, INoteData, NoteId } from '../Note';
 import { SQLiteDb } from '../storage/SQLiteDb';
+import { INotesRegistry, NotesRegistryFetchOptions } from '.';
 
 /**
  * Data mappers between DB and objects
@@ -41,7 +41,9 @@ export class NotesRegistry implements INotesRegistry {
 		return length;
 	}
 
-	public async get({ limit = 100, page = 1 }: NotesRegistryFetchOptions = {}): Promise<INote[]> {
+	public async get({ limit = 100, page = 1 }: NotesRegistryFetchOptions = {}): Promise<
+		INote[]
+	> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
 		const { db } = this.db;
@@ -49,15 +51,19 @@ export class NotesRegistry implements INotesRegistry {
 		const notes: INote[] = [];
 
 		const offset = (page - 1) * limit;
-		await db.each('SELECT * FROM notes LIMIT ? OFFSET ?;', [limit, offset], (err, row) => {
-			if (err) {
-				throw new Error(err);
-			}
+		await db.each(
+			'SELECT * FROM notes LIMIT ? OFFSET ?;',
+			[limit, offset],
+			(err, row) => {
+				if (err) {
+					throw new Error(err);
+				}
 
-			// TODO: validate data for first note
+				// TODO: validate data for first note
 
-			notes.push(mappers.rowToNoteObject(row));
-		});
+				notes.push(mappers.rowToNoteObject(row));
+			},
+		);
 
 		return notes;
 	}
@@ -118,11 +124,16 @@ export class NotesRegistry implements INotesRegistry {
 		const { db, sync } = this.db;
 
 		const placeholders = Array(ids.length).fill('?').join(',');
-		const result = await db.run(`DELETE FROM notes WHERE id IN (${placeholders})`, ids);
+		const result = await db.run(
+			`DELETE FROM notes WHERE id IN (${placeholders})`,
+			ids,
+		);
 		await sync();
 
 		if (result.changes !== ids.length) {
-			console.warn(`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${result.changes}`)
+			console.warn(
+				`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${result.changes}`,
+			);
 		}
 	}
 }
