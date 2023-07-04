@@ -5,8 +5,9 @@ import React, {
 	useCallback,
 	useEffect,
 	useRef,
+	useState,
 } from 'react';
-import { editor, languages } from 'monaco-editor-core';
+import { editor, languages, Position } from 'monaco-editor-core';
 
 import { language as mdlanguage } from './languages/markdown';
 import { language as tslanguage } from './languages/typescript';
@@ -25,7 +26,16 @@ languages.setMonarchTokensProvider('javascript', tslanguage);
 
 languages.register({
 	id: 'markdown',
-	extensions: ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn', '.mdtxt', '.mdtext'],
+	extensions: [
+		'.md',
+		'.markdown',
+		'.mdown',
+		'.mkdn',
+		'.mkd',
+		'.mdwn',
+		'.mdtxt',
+		'.mdtext',
+	],
 	aliases: ['Markdown', 'markdown'],
 });
 
@@ -57,6 +67,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	// Init
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+	const [editorObject, setEditorObject] = useState<editor.IStandaloneCodeEditor | null>(null);
 
 	const updateDimensions = useCallback(() => {
 		const editorContainer = editorContainerRef.current;
@@ -74,12 +85,6 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		});
 	}, []);
 
-	// const editorControls = useMemo(() => {
-	// 	return {
-	// 		updateDimensions,
-	// 	};
-	// }, [updateDimensions]);
-
 	useEffect(() => {
 		const editorContainer = editorContainerRef.current;
 		if (!editorContainer) return;
@@ -89,6 +94,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			language: 'markdown',
 			automaticLayout: true,
 			wordWrap: 'on',
+			// dropIntoEditor: { enabled: true },
 		});
 
 		editorRef.current = monacoEditor;
@@ -114,17 +120,81 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		// Handle window resize
 		window.addEventListener('resize', updateDimensions);
 
+		setEditorObject(monacoEditor);
+
 		return () => {
 			editorContainer.removeEventListener('keydown', onKeyPress);
 			editorContainer.removeEventListener('keyup', onKeyPress);
 			window.removeEventListener('resize', updateDimensions);
 
 			monacoEditor.dispose();
+
+			setEditorObject(null);
 		};
 
 		// Hook runs only once to initialize component
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	// Handle drop file
+	useEffect(() => {
+		if (editorObject === null) return;
+
+		const editorContainer = editorObject.getContainerDomNode();
+
+		const insertFiles = async (files: FileList, position: Position) => {
+			const { column, lineNumber } = position;
+
+			const urls = await Promise.all(
+				Array.from(files).map((file) =>
+					file.arrayBuffer().then((buffer) => {
+						// TODO: load buffer
+						return `[${file.name} with size ${buffer.byteLength} bytes](:someMagicUrl)`;
+					}),
+				),
+			);
+
+			editorObject.executeEdits('drop-files', [
+				{
+					text: urls.join(' '),
+					range: {
+						startColumn: column,
+						endColumn: column,
+						startLineNumber: lineNumber,
+						endLineNumber: lineNumber,
+					},
+				},
+			]);
+		};
+
+		let pointerPosition: Position | null = null;
+		const mouseMoveEvent = editorObject.onMouseMove((evt) => {
+			pointerPosition = evt.target.position;
+		});
+
+		const onDropFiles = (event: DragEvent) => {
+			if (event.dataTransfer === null) return;
+
+			const files = event.dataTransfer.files;
+			if (files.length === 0) return;
+
+			event.stopImmediatePropagation();
+
+			// console.log('file', { files, editor: editorObject });
+
+			if (pointerPosition) {
+				insertFiles(files, pointerPosition);
+			}
+			(editorObject as any).removeDropIndicator();
+		};
+
+		editorContainer.addEventListener('drop', onDropFiles, { capture: true });
+
+		return () => {
+			mouseMoveEvent.dispose();
+			editorContainer.removeEventListener('drop', onDropFiles, { capture: true });
+		};
+	});
 
 	// Update value
 	useEffect(() => {
