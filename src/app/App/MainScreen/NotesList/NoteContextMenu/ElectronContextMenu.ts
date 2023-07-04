@@ -8,34 +8,20 @@ import { NoteActions } from '.';
 
 type VoidCallback = () => void;
 
-export const noteMenu: ContextMenu = [
-	// TODO: implement
-	// {
-	// 	id: 'copyMarkdownLink',
-	// 	label: 'Copy Markdown link',
-	// },
-	{
-		id: NoteActions.DUPLICATE,
-		label: 'Duplicate',
-	},
-	{ type: 'separator' },
-	{
-		id: NoteActions.DELETE,
-		label: 'Delete',
-	},
-];
-
+// TODO: implement handle `onClick` events for menu items
 export class ElectronContextMenu {
+	private menu: ContextMenu;
 	private onClosed: Event<void>;
 	private onClicked: Event<NoteActions>;
-	constructor() {
+	constructor(menu: ContextMenu) {
+		this.menu = menu;
 		this.onClosed = createEvent();
 		this.onClicked = createEvent();
 	}
 
 	public open({ x, y }: { x: number; y: number }) {
 		openContextMenu({
-			menu: noteMenu,
+			menu: this.menu,
 			x,
 			y,
 		}).then((action) => {

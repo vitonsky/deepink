@@ -4,7 +4,6 @@ import { ContextMenuRequestProps } from './renderer';
 import { ipcChannelName } from '.';
 
 export const enableContextMenu = () => {
-
 	ipcMain.handle(ipcChannelName, (event, props: ContextMenuRequestProps) => {
 		const targetWindow = BrowserWindow.fromWebContents(event.sender);
 		if (!targetWindow) return;

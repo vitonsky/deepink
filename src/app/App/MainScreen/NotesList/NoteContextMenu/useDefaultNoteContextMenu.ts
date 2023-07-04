@@ -2,6 +2,7 @@ import { useCallback } from "react";
 
 import { NoteId } from "../../../../../core/Note";
 import { INotesRegistry } from "../../../../../core/Registry";
+import { ContextMenu } from "../../../../../electron/contextMenu";
 
 import { NoteContextMenuCallback, useNoteContextMenu } from "./useNoteContextMenu";
 import { NoteActions } from ".";
@@ -13,6 +14,23 @@ type DefaultContextMenuOptions = {
 	// TODO: receive with react context
 	notesRegistry: INotesRegistry;
 };
+
+export const noteMenu: ContextMenu = [
+	// TODO: implement
+	// {
+	// 	id: 'copyMarkdownLink',
+	// 	label: 'Copy Markdown link',
+	// },
+	{
+		id: NoteActions.DUPLICATE,
+		label: 'Duplicate',
+	},
+	{ type: 'separator' },
+	{
+		id: NoteActions.DELETE,
+		label: 'Delete',
+	},
+];
 
 export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistry }: DefaultContextMenuOptions) => {
 	const noteContextMenuCallback: NoteContextMenuCallback = useCallback(
@@ -43,5 +61,5 @@ export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistr
 		[closeNote, notesRegistry, updateNotes],
 	);
 
-	return useNoteContextMenu(noteContextMenuCallback);
+	return useNoteContextMenu(noteMenu, noteContextMenuCallback);
 };
