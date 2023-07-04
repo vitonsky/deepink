@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { editor, Position } from 'monaco-editor-core';
 
-export type FileUploader = (file: File) => Promise<void>;
+import { FileId } from '../../Providers';
+
+export type FileUploader = (file: File) => Promise<FileId>;
 
 type Props = {
 	editor: editor.IStandaloneCodeEditor | null;
@@ -22,8 +24,8 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 
 			const urls = await Promise.all(
 				Array.from(files).map((file) =>
-					uploadFile(file).then(() => {
-						return `[${file.name}](:someMagicUrl)`;
+					uploadFile(file).then((fileId) => {
+						return `[${file.name}](deepink://${fileId})`;
 					}),
 				),
 			);

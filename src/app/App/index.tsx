@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
@@ -8,6 +8,7 @@ import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
 
 import { MainScreen } from './MainScreen/MainScreen';
+import { FileGetter, FileUploader, Providers } from './Providers';
 import { SplashScreen } from './SplashScreen';
 
 import './App.css';
@@ -36,9 +37,15 @@ export const App: FC = () => {
 		})();
 	}, []);
 
+	// TODO: implement methods
+	const fileUploader: FileUploader = useCallback(async (_file) => { return 'none'; }, []);
+	const fileGetter: FileGetter = useCallback(async (_fileId) => { return null; }, []);
+
 	return (
 		<div className={cnApp()}>
-			{db === null ? <SplashScreen /> : <MainScreen db={db} />}
+			<Providers {...{ fileUploader, fileGetter }}>
+				{db === null ? <SplashScreen /> : <MainScreen db={db} />}
+			</Providers>
 		</div>
 	);
 };
