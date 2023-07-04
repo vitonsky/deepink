@@ -1,9 +1,10 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
 import { INoteData } from '../../../core/Note';
 
+import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 
 import './NoteEditor.css';
@@ -32,6 +33,11 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		updateNoteRef.current({ title, text });
 	}, [title, text]);
 
+	const uploadFile: FileUploader = useCallback(async (file) => {
+		// TODO: implement logic
+		console.log('Upload file...', file);
+	}, []);
+
 	return (
 		<div className={cnNoteEditor()}>
 			<Textinput value={title} onInputText={setTitle} placeholder="Note title" />
@@ -39,6 +45,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				value={text}
 				setValue={setText}
 				className={cnNoteEditor('Editor')}
+				uploadFile={uploadFile}
 			/>
 		</div>
 	);

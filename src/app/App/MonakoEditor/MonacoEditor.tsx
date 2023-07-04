@@ -7,8 +7,9 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { editor, languages, Position } from 'monaco-editor-core';
+import { editor, languages } from 'monaco-editor-core';
 
+import { FileUploader, useDropFiles } from './features/useDropFiles';
 import { language as mdlanguage } from './languages/markdown';
 import { language as tslanguage } from './languages/typescript';
 
@@ -49,6 +50,7 @@ export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	value: string;
 	setValue?: (value: string) => void;
 	editorObjectRef?: RefObject<EditorObject>;
+	uploadFile: FileUploader;
 };
 
 /**
@@ -59,6 +61,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	value,
 	setValue,
 	editorObjectRef,
+	uploadFile,
 	...props
 }) => {
 	const setValueRef = useRef(setValue);
@@ -136,66 +139,6 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	// Handle drop file
-	useEffect(() => {
-		if (editorObject === null) return;
-
-		const editorContainer = editorObject.getContainerDomNode();
-
-		const insertFiles = async (files: FileList, position: Position) => {
-			const { column, lineNumber } = position;
-
-			const urls = await Promise.all(
-				Array.from(files).map((file) =>
-					file.arrayBuffer().then((buffer) => {
-						// TODO: load buffer
-						return `[${file.name} with size ${buffer.byteLength} bytes](:someMagicUrl)`;
-					}),
-				),
-			);
-
-			editorObject.executeEdits('drop-files', [
-				{
-					text: urls.join(' '),
-					range: {
-						startColumn: column,
-						endColumn: column,
-						startLineNumber: lineNumber,
-						endLineNumber: lineNumber,
-					},
-				},
-			]);
-		};
-
-		let pointerPosition: Position | null = null;
-		const mouseMoveEvent = editorObject.onMouseMove((evt) => {
-			pointerPosition = evt.target.position;
-		});
-
-		const onDropFiles = (event: DragEvent) => {
-			if (event.dataTransfer === null) return;
-
-			const files = event.dataTransfer.files;
-			if (files.length === 0) return;
-
-			event.stopImmediatePropagation();
-
-			// console.log('file', { files, editor: editorObject });
-
-			if (pointerPosition) {
-				insertFiles(files, pointerPosition);
-			}
-			(editorObject as any).removeDropIndicator();
-		};
-
-		editorContainer.addEventListener('drop', onDropFiles, { capture: true });
-
-		return () => {
-			mouseMoveEvent.dispose();
-			editorContainer.removeEventListener('drop', onDropFiles, { capture: true });
-		};
-	});
-
 	// Update value
 	useEffect(() => {
 		const editor = editorRef.current;
@@ -205,6 +148,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			editor.setValue(value);
 		}
 	});
+
+	// Handle drop file
+	useDropFiles({ editor: editorObject, uploadFile });
 
 	return <div ref={editorContainerRef} {...props}></div>;
 };
