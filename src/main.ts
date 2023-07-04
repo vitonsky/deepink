@@ -5,6 +5,7 @@ import url from 'url';
 import { enableContextMenu } from './electron/contextMenu/main';
 import { handleAppRequests } from './electron/requests/app';
 import { handleFilesRequests } from './electron/requests/files';
+import { handleStorageRequests } from './electron/requests/storage/main';
 import { isDevMode } from './electron/utils/app';
 import { getResourcesPath } from './electron/utils/files';
 
@@ -49,6 +50,7 @@ const createWindow = async () => {
 	console.log(performance.measure('page loaded', { start }));
 
 	enableContextMenu();
+	handleStorageRequests.forEach((handler) => handler());
 
 	// win.addListener('close', (evt) => {
 	// 	evt.preventDefault();

@@ -6,6 +6,7 @@ import { cn } from '@bem-react/classname';
 import { INoteData } from '../../core/Note';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
+import { getFile, uploadFile } from '../../electron/requests/storage/renderer';
 
 import { MainScreen } from './MainScreen/MainScreen';
 import { FileGetter, FileUploader, Providers } from './Providers';
@@ -37,9 +38,13 @@ export const App: FC = () => {
 		})();
 	}, []);
 
-	// TODO: implement methods
-	const fileUploader: FileUploader = useCallback(async (_file) => { return 'none'; }, []);
-	const fileGetter: FileGetter = useCallback(async (_fileId) => { return null; }, []);
+	const fileUploader: FileUploader = useCallback(async (file) => {
+		return uploadFile(file);
+	}, []);
+
+	const fileGetter: FileGetter = useCallback(async (fileId) => {
+		return getFile(fileId);
+	}, []);
 
 	return (
 		<div className={cnApp()}>
