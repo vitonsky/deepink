@@ -17,6 +17,8 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 	useEffect(() => {
 		if (editorObject === null) return;
 
+		console.log('Editor', editorObject);
+
 		const editorContainer = editorObject.getContainerDomNode();
 
 		const insertFiles = async (files: FileList, position: Position) => {

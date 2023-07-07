@@ -7,7 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { editor, languages } from 'monaco-editor-core';
+import { CancellationToken, editor, languages } from 'monaco-editor-core';
 
 import { FileUploader, useDropFiles } from './features/useDropFiles';
 import { language as mdlanguage } from './languages/markdown';
@@ -41,6 +41,41 @@ languages.register({
 });
 
 languages.setMonarchTokensProvider('markdown', mdlanguage);
+
+languages.registerLinkProvider('markdown', {
+	provideLinks:
+		(model: editor.ITextModel, token: CancellationToken):
+			languages.ProviderResult<languages.ILinksList> => {
+			console.log('Link provider', { model, token });
+
+			return {
+				links: Array.from(model.getValue().matchAll(/deepink:\/\/[\d\a-z\-]+/gi)).map((match) => {
+					const index = match.index as number;
+					const matchString = match[0] as string;
+					const startPosition = model.getPositionAt(index);
+					const endPosition = model.getPositionAt(index + matchString.length);
+
+					return {
+						range: {
+							startLineNumber: startPosition.lineNumber,
+							startColumn: startPosition.column,
+							endLineNumber: endPosition.lineNumber,
+							endColumn: endPosition.column
+						},
+						url: matchString
+					};
+				})
+			};
+		},
+});
+
+editor.registerLinkOpener({
+	async open(resource) {
+		// TODO: create objectURL from buffer and open as URL
+		console.log('Link handled!!!', resource);
+		return true;
+	},
+});
 
 export type EditorObject = {
 	updateDimensions: () => void;
