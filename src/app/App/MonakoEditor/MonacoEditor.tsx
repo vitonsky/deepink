@@ -7,10 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { saveAs } from 'file-saver';
 import { CancellationToken, editor, languages } from 'monaco-editor-core';
-
-import { getFile } from '../../../electron/requests/storage/renderer';
 
 import { FileUploader, useDropFiles } from './features/useDropFiles';
 import { language as mdlanguage } from './languages/markdown';
@@ -70,19 +67,6 @@ languages.registerLinkProvider('markdown', {
 				})
 			};
 		},
-});
-
-editor.registerLinkOpener({
-	async open(resource) {
-		const fileId = resource.authority;
-		// const isConfirmed = confirm(`Download file "${fileId}"?`);
-		// if (!isConfirmed) return false;
-
-		const buffer = await getFile(fileId);
-
-		saveAs(new Blob([buffer]), fileId + '.png');
-		return true;
-	},
 });
 
 export type EditorObject = {

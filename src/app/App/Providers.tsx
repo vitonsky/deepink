@@ -1,39 +1,23 @@
 import React, { createContext, FC, useContext } from 'react';
 
+import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
+
 export type FileId = string;
 
-/**
- * Upload file and return file ID
- */
-export type FileUploader = (buffer: ArrayBuffer) => Promise<FileId>;
-export const fileUploaderContext = createContext<FileUploader>(null as any);
-export const useFileUploader = () => {
-	return useContext(fileUploaderContext);
-};
-
-/**
- * Get file by id
- *
- * Return file buffer or null if file not found
- */
-export type FileGetter = (fileId: FileId) => Promise<ArrayBuffer | null>;
-export const fileGetterContext = createContext<FileGetter>(null as any);
-export const useFileGetter = () => {
-	return useContext(fileGetterContext);
+export const filesRegistryContext = createContext<FilesRegistry>(null as any);
+export const useFilesRegistry = () => {
+	return useContext(filesRegistryContext);
 };
 
 type ProvidersProps = {
 	children: React.ReactNode;
-	fileUploader: FileUploader;
-	fileGetter: FileGetter;
+	filesRegistry: FilesRegistry;
 };
 
-export const Providers: FC<ProvidersProps> = ({ children, fileUploader, fileGetter }) => {
+export const Providers: FC<ProvidersProps> = ({ children, filesRegistry }) => {
 	return (
-		<fileUploaderContext.Provider value={fileUploader}>
-			<fileGetterContext.Provider value={fileGetter}>
-				{children}
-			</fileGetterContext.Provider>
-		</fileUploaderContext.Provider>
+		<filesRegistryContext.Provider value={filesRegistry}>
+			{children}
+		</filesRegistryContext.Provider>
 	);
 };

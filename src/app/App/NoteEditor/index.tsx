@@ -6,7 +6,7 @@ import { INoteData } from '../../../core/Note';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
-import { useFileUploader } from '../Providers';
+import { useFilesRegistry } from '../Providers';
 
 import './NoteEditor.css';
 
@@ -34,15 +34,11 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		updateNoteRef.current({ title, text });
 	}, [title, text]);
 
-	const uploadBuffer = useFileUploader();
+	const filesRegistry = useFilesRegistry();
 	const uploadFile: FileUploader = useCallback(async (file) => {
 		console.log('Upload file...', file);
-
-		// TODO: encrypt file
-		const buffer = await file.arrayBuffer();
-
-		return uploadBuffer(buffer);
-	}, [uploadBuffer]);
+		return filesRegistry.add(file);
+	}, [filesRegistry]);
 
 	return (
 		<div className={cnNoteEditor()}>
