@@ -38,6 +38,8 @@ export const App: FC = () => {
 		})();
 	}, []);
 
+	console.log('App DB', db);
+
 	const fileUploader: FileUploader = useCallback(async (file) => {
 		return uploadFile(file);
 	}, []);
