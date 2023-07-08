@@ -1,7 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import saveAs from 'file-saver';
 import { mkdirSync } from 'fs';
-import { CancellationToken, editor, languages } from 'monaco-editor-core';
 import path from 'path';
 import { cn } from '@bem-react/classname';
 
@@ -47,62 +45,6 @@ export const App: FC = () => {
 
 		setFilesRegistry(new FilesRegistry(db, { get: getFile, write: uploadFile }));
 	}, [db]);
-
-	// Register files opener
-	useEffect(() => {
-		if (filesRegistry === null) return;
-
-		languages.registerLinkProvider('markdown', {
-			provideLinks:
-				(model: editor.ITextModel, token: CancellationToken):
-					languages.ProviderResult<languages.ILinksList> => {
-					console.log('Link provider', { model, token });
-
-					return {
-						links: Array.from(model.getValue().matchAll(/deepink:\/\/(file)\/[\d\a-z\-]+/gi)).map((match) => {
-							const index = match.index as number;
-							const matchString = match[0] as string;
-							const startPosition = model.getPositionAt(index);
-							const endPosition = model.getPositionAt(index + matchString.length);
-
-							return {
-								range: {
-									startLineNumber: startPosition.lineNumber,
-									startColumn: startPosition.column,
-									endLineNumber: endPosition.lineNumber,
-									endColumn: endPosition.column
-								},
-								url: matchString
-							};
-						})
-					};
-				},
-		});
-
-		const opener = editor.registerLinkOpener({
-			async open(resource) {
-				console.log('Resource handler', resource);
-
-				if (resource.scheme !== 'deepink') return false;
-				if (resource.authority !== 'file') return false;
-
-				const fileId = resource.path.slice(1);
-				// const isConfirmed = confirm(`Download file "${fileId}"?`);
-				// if (!isConfirmed) return false;
-
-				const file = await filesRegistry.get(fileId);
-				if (!file) return false;
-
-				const buffer = await file.arrayBuffer();
-				saveAs(new Blob([buffer]), file.name);
-				return true;
-			},
-		});
-
-		return () => {
-			opener.dispose();
-		};
-	}, [filesRegistry]);
 
 	console.log('App DB', db);
 
