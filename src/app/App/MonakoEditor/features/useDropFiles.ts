@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { editor, Position } from 'monaco-editor-core';
+import prettyBytes from 'pretty-bytes';
 
 import { formatResourceLink } from '../../../../core/links';
 import { FileId } from '../../Providers';
@@ -9,6 +10,13 @@ export type FileUploader = (file: File) => Promise<FileId>;
 type Props = {
 	editor: editor.IStandaloneCodeEditor | null;
 	uploadFile: FileUploader;
+};
+
+const MEGABYTE_SIZE = 1024 ** 2;
+
+const alertLimits = {
+	filesSize: MEGABYTE_SIZE * 50,
+	filesLength: 10,
 };
 
 /**
@@ -23,6 +31,17 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 		const editorContainer = editorObject.getContainerDomNode();
 
 		const insertFiles = async (files: FileList, position: Position) => {
+			const filesSize = Array.from(files).reduce((acc, file) => acc + file.size, 0);
+
+			// Show confirmation dialog for unusual activity
+			if (files.length > alertLimits.filesLength || filesSize > alertLimits.filesSize) {
+				// May be replaced to Intl: https://stackoverflow.com/a/73974452/18680275
+				const humanReadableBytes = prettyBytes(filesSize);
+
+				const isConfirmed = confirm(`Are you sure to upload ${files.length} files with ${humanReadableBytes}?`);
+				if (!isConfirmed) return;
+			}
+
 			const { column, lineNumber } = position;
 
 			const urls = await Promise.all(
