@@ -27,7 +27,7 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 			const urls = await Promise.all(
 				Array.from(files).map((file) =>
 					uploadFile(file).then((fileId) => {
-						return `[${file.name}](deepink://${fileId})`;
+						return `[${file.name}](deepink://file/${fileId})`;
 					}),
 				),
 			);
