@@ -7,6 +7,7 @@ import sqlite3 from 'sqlite3';
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
 import { readFile, writeFile } from 'fs/promises';
+import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 
 /**
  * Statements to create tables
@@ -18,6 +19,12 @@ const schema = {
 		"text"	TEXT NOT NULL,
 		"creationTime"	INTEGER NOT NULL DEFAULT 0,
 		"lastUpdateTime"	INTEGER NOT NULL DEFAULT 0,
+		PRIMARY KEY("id")
+	)`,
+	files: `CREATE TABLE "files" (
+		"id"	TEXT NOT NULL UNIQUE,
+		"name"	TEXT NOT NULL,
+		"mimetype"	TEXT NOT NULL,
 		PRIMARY KEY("id")
 	)`,
 } as const;
@@ -73,7 +80,11 @@ export const getDb = async ({
 			// TODO: implement decryption
 			const dumpSQL = await readFile(dbPath, 'utf-8');
 			await db.exec(dumpSQL);
+			await migrateToLatestSchema(db);
 		} else {
+			// Setup pragma
+			await db.exec(`PRAGMA main.user_version = ${latestSchemaVersion};`);
+
 			// Create DB
 			const setupSQL = Object.values(schema).join(';\n');
 			if (verboseLog) {
@@ -122,10 +133,23 @@ export const getDb = async ({
 
 			const unlock = await lockfileUtils.lock(dbPath);
 
-			const response = await db.get(`SELECT dbdump() as dump;`);
-			const dump = response['dump'];
+			// Dump pragma
+			const pragmaNamesToDump = ['user_version'];
+			const pragmasList = await Promise.all(pragmaNamesToDump.map((pragmaName) => db.get(`PRAGMA main.${pragmaName}`).then((response) => {
+				if (!response) {
+					throw new TypeError("Can't fetch pragma value");
+				}
 
-			if (!dump) {
+				const pragmaValue = response[pragmaName];
+				return `PRAGMA main.${pragmaName} = ${pragmaValue};`;
+			})));
+			const pragmaDump = pragmasList.join('\n');
+
+			// Dump data
+			const dumpResponse = await db.get(`SELECT dbdump() as dump;`);
+			const dataDump = dumpResponse['dump'];
+
+			if (!dataDump) {
 				const error = new Error('Dump are empty!');
 				console.error(error);
 
@@ -136,14 +160,16 @@ export const getDb = async ({
 				break;
 			}
 
+			const dumpString = [pragmaDump, dataDump].join('\n');
+
 			// TODO: implement encryption before write
 
 			// Write tmp file
-			await writeFileAtomic(dbPath, dump);
+			await writeFileAtomic(dbPath, dumpString);
 
 			if (verboseLog) {
 				console.info('DB saved');
-				console.debug({ dump });
+				console.debug({ dumpString });
 			}
 
 			await unlock();
@@ -195,6 +221,8 @@ export const getDb = async ({
 		await sync();
 		await db.close();
 	};
+
+	await sync();
 
 	return {
 		db,
