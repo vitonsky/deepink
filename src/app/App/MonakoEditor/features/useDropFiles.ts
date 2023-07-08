@@ -28,7 +28,8 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 			const urls = await Promise.all(
 				Array.from(files).map((file) =>
 					uploadFile(file).then((fileId) => {
-						return `[${file.name}](${formatAppLink(fileId)})`;
+						const escapedFilename = file.name.replace(/(\[|\])/g, '\\$1');
+						return `[${escapedFilename}](${formatAppLink(fileId)})`;
 					}),
 				),
 			);
