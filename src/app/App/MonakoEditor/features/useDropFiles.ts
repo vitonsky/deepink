@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { editor, Position } from 'monaco-editor-core';
 
-import { formatAppLink } from '../../../../core/links';
+import { formatResourceLink } from '../../../../core/links';
 import { FileId } from '../../Providers';
 
 export type FileUploader = (file: File) => Promise<FileId>;
@@ -30,7 +30,7 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 					uploadFile(file).then((fileId) => {
 						const escapedFilename = file.name.replace(/(\[|\])/g, '\\$1');
 						const imagePrefix = file.type.startsWith('image/') ? '!' : '';
-						return `${imagePrefix}[${escapedFilename}](${formatAppLink(fileId)})`;
+						return `${imagePrefix}[${escapedFilename}](${formatResourceLink(fileId)})`;
 					}),
 				),
 			);

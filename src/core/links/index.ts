@@ -1,13 +1,18 @@
 import { Uri } from "monaco-editor-core";
 
-export const appLinkPrefix = 'deepink';
+export const resourceProtocolName = 'res';
 
-export const formatAppLink = (resourceId: string) => `${appLinkPrefix}://${resourceId}`;
+export const formatResourceLink = (resourceId: string) => `${resourceProtocolName}://${resourceId}`;
 
-export const findLinksInText = (text: string) => {
-	return Array.from(text.matchAll(/deepink:\/\/[\d\a-z\-]+/gi)).map((match) => {
-		const index = match.index as number;
-		const url = match[0] as string;
+export const findLinksInText = (text: string): Array<{
+	index: number;
+	url: string;
+}> => {
+	return Array.from(text.matchAll(new RegExp(`${resourceProtocolName}:\\/\\/[\\da-z\\-]+`, 'gi'))).map((match) => {
+		const index = match.index;
+		const url = match[0];
+
+		if (index === undefined) throw new TypeError('Substring index not found');
 
 		return { index, url };
 	});
@@ -15,10 +20,10 @@ export const findLinksInText = (text: string) => {
 
 export const getResourceIdInUrl = (url: URL | Uri) => {
 	if (url instanceof URL) {
-		if (url.protocol !== appLinkPrefix) return null;
+		if (url.protocol !== resourceProtocolName) return null;
 		return url.host || null;
 	}
 
-	if (url.scheme !== appLinkPrefix) return null;
+	if (url.scheme !== resourceProtocolName) return null;
 	return url.authority || null;
 };
