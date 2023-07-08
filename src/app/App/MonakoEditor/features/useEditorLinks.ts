@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import saveAs from 'file-saver';
 import { CancellationToken, editor, languages } from 'monaco-editor-core';
 
+import { findLinksInText, getResourceIdInUrl } from '../../../../core/links';
 import { useFilesRegistry } from '../../Providers';
 
 /**
@@ -24,20 +25,18 @@ export const useEditorLinks = () => {
 					console.log('Link provider', { model, token });
 
 					return {
-						links: Array.from(model.getValue().matchAll(/deepink:\/\/(file)\/[\d\a-z\-]+/gi)).map((match) => {
-							const index = match.index as number;
-							const matchString = match[0] as string;
+						links: findLinksInText(model.getValue()).map(({ index, url }) => {
 							const startPosition = model.getPositionAt(index);
-							const endPosition = model.getPositionAt(index + matchString.length);
+							const endPosition = model.getPositionAt(index + url.length);
 
 							return {
+								url,
 								range: {
 									startLineNumber: startPosition.lineNumber,
 									startColumn: startPosition.column,
 									endLineNumber: endPosition.lineNumber,
 									endColumn: endPosition.column
 								},
-								url: matchString
 							};
 						})
 					};
@@ -48,10 +47,9 @@ export const useEditorLinks = () => {
 			async open(resource) {
 				console.log('Resource handler', resource);
 
-				if (resource.scheme !== 'deepink') return false;
-				if (resource.authority !== 'file') return false;
+				const fileId = getResourceIdInUrl(resource);
+				if (fileId === null) return false;
 
-				const fileId = resource.path.slice(1);
 				// const isConfirmed = confirm(`Download file "${fileId}"?`);
 				// if (!isConfirmed) return false;
 
