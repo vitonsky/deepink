@@ -29,7 +29,8 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 				Array.from(files).map((file) =>
 					uploadFile(file).then((fileId) => {
 						const escapedFilename = file.name.replace(/(\[|\])/g, '\\$1');
-						return `[${escapedFilename}](${formatAppLink(fileId)})`;
+						const imagePrefix = file.type.startsWith('image/') ? '!' : '';
+						return `${imagePrefix}[${escapedFilename}](${formatAppLink(fileId)})`;
 					}),
 				),
 			);
