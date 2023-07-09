@@ -7,6 +7,7 @@ import sqlite3 from 'sqlite3';
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
 import { readFile, writeFile } from 'fs/promises';
+import { ExtendedSqliteDatabase } from './ExtendedSqliteDatabase';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 
 /**
@@ -27,13 +28,20 @@ const schema = {
 		"mimetype"	TEXT NOT NULL,
 		PRIMARY KEY("id")
 	)`,
+	attachments: `CREATE TABLE "attachments" (
+		"id"	TEXT NOT NULL UNIQUE,
+		"file"	TEXT NOT NULL,
+		"note"	TEXT NOT NULL,
+		PRIMARY KEY("id")
+		UNIQUE(file,note)
+	)`,
 } as const;
 
 export type SQLiteDb = {
 	/**
 	 * Configured database with extensions
 	 */
-	db: Database<sqlite3.Database, sqlite3.Statement>;
+	db: Database<ExtendedSqliteDatabase, sqlite3.Statement>;
 
 	/**
 	 * Write database to file
@@ -69,7 +77,7 @@ export const getDb = async ({
 	// Create DB
 	const db = await open({
 		filename: ':memory:',
-		driver: sqlite3.Database,
+		driver: ExtendedSqliteDatabase,
 	}).then(async (db) => {
 		// Setup extensions
 		await db.loadExtension(path.join(dbExtensionsDir, 'uuid'));
@@ -80,7 +88,7 @@ export const getDb = async ({
 			// TODO: implement decryption
 			const dumpSQL = await readFile(dbPath, 'utf-8');
 			await db.exec(dumpSQL);
-			await migrateToLatestSchema(db);
+			await migrateToLatestSchema(db as Database<ExtendedSqliteDatabase, sqlite3.Statement>);
 		} else {
 			// Setup pragma
 			await db.exec(`PRAGMA main.user_version = ${latestSchemaVersion};`);
@@ -95,7 +103,7 @@ export const getDb = async ({
 			await db.exec(setupSQL);
 		}
 
-		return db;
+		return db as Database<ExtendedSqliteDatabase, sqlite3.Statement>;
 	});
 
 	type SyncRequest = {

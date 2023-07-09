@@ -2,24 +2,25 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { INoteData } from '../../../core/Note';
+import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
+import { INote, INoteData } from '../../../core/Note';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
-import { useFilesRegistry } from '../Providers';
+import { useAttachmentsRegistry, useFilesRegistry } from '../Providers';
 
 import './NoteEditor.css';
 
 const cnNoteEditor = cn('NoteEditor');
 
 export type NoteEditorProps = {
-	note: INoteData;
+	note: INote;
 	updateNote: (note: INoteData) => void;
 };
 
 export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
-	const [title, setTitle] = useState(note.title);
-	const [text, setText] = useState(note.text);
+	const [title, setTitle] = useState(note.data.title);
+	const [text, setText] = useState(note.data.text);
 
 	const updateNoteRef = useRef(updateNote);
 	updateNoteRef.current = updateNote;
@@ -39,6 +40,31 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		console.log('Upload file...', file);
 		return filesRegistry.add(file);
 	}, [filesRegistry]);
+
+	const attachments = useAttachmentsRegistry();
+
+	// TODO: throttle calls and run in IDLE
+	const noteId = note.id;
+	const updateAttachments = useCallback((text: string) => {
+		// Find ids
+		const filesIdRaw = findLinksInText(text).map((link) => getResourceIdInUrl(link.url));
+
+		// Collect unique IDs
+		const filesId: string[] = [];
+		for (const fileId of filesIdRaw) {
+			if (fileId === null) continue;
+			if (filesId.includes(fileId)) continue;
+			filesId.push(fileId);
+		}
+
+		// TODO: remove debug prints
+		console.log('Files in note', filesId);
+		attachments.set(noteId, filesId);
+	}, [attachments, noteId]);
+
+	useEffect(() => {
+		updateAttachments(text);
+	}, [text, updateAttachments]);
 
 	return (
 		<div className={cnNoteEditor()}>

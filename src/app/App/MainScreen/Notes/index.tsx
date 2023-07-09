@@ -34,7 +34,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 						id: noteObject.id,
 						content: (
 							<NoteEditor
-								note={noteObject.data}
+								note={noteObject}
 								updateNote={(noteData) => {
 									updateNote({ ...noteObject, data: noteData });
 								}}

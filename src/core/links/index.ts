@@ -18,7 +18,13 @@ export const findLinksInText = (text: string): Array<{
 	});
 };
 
-export const getResourceIdInUrl = (url: URL | Uri) => {
+export const getResourceIdInUrl = (url: URL | Uri | string) => {
+	if (typeof url === 'string') {
+		const urlPrefix = resourceProtocolName + '://';
+		if (!url.startsWith(urlPrefix)) return null;
+		return url.slice(urlPrefix.length);
+	}
+
 	if (url instanceof URL) {
 		if (url.protocol !== resourceProtocolName) return null;
 		return url.host || null;

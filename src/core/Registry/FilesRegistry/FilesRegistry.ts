@@ -2,10 +2,10 @@ import { SQLiteDb } from "../../storage/SQLiteDb";
 
 import { FilesStorageController } from ".";
 
+// TODO: implement class to track resources references and implement garbage collector for this class
 // TODO: add runtime validation
 // TODO: write tests
 // TODO: implement interface and use interface instead of class
-// TODO: implement class to track resources references and implement garbage collector for this class
 
 /**
  * Files manager for local database
@@ -40,6 +40,7 @@ export class FilesRegistry {
 
 		const fileId = selectWithId.id;
 
+		// TODO: delete entry in DB if can't upload file. Or try to upload first and then add file to DB
 		// TODO: encrypt file
 		// Write file
 		const buffer = await file.arrayBuffer();

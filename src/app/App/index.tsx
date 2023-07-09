@@ -4,6 +4,7 @@ import path from 'path';
 import { cn } from '@bem-react/classname';
 
 import { INoteData } from '../../core/Note';
+import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
@@ -40,16 +41,20 @@ export const App: FC = () => {
 	}, []);
 
 	const [filesRegistry, setFilesRegistry] = useState<FilesRegistry | null>(null);
+	const [attachmentsRegistry, setAttachmentsRegistry] = useState<Attachments | null>(null);
 	useEffect(() => {
 		if (db === null) return;
 
-		setFilesRegistry(new FilesRegistry(db, { get: getFile, write: uploadFile }));
+		const filesRegistry = new FilesRegistry(db, { get: getFile, write: uploadFile });
+		setFilesRegistry(filesRegistry);
+
+		setAttachmentsRegistry(new Attachments(db, filesRegistry));
 	}, [db]);
 
 	console.log('App DB', db);
 
 	// Splash screen for loading state
-	if (db === null || filesRegistry === null) {
+	if (db === null || filesRegistry === null || attachmentsRegistry == null) {
 		return <div className={cnApp()}>
 			<SplashScreen />
 		</div>;
@@ -57,7 +62,7 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<Providers {...{ filesRegistry }}>
+			<Providers {...{ filesRegistry, attachmentsRegistry }}>
 				<MainScreen db={db} />
 			</Providers>
 		</div>

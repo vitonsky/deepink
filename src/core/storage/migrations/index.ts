@@ -1,7 +1,9 @@
 import { Database } from "sqlite";
 import sqlite3 from 'sqlite3';
 
-export type MigrationsTarget = Database<sqlite3.Database, sqlite3.Statement>;
+import { ExtendedSqliteDatabase } from "../ExtendedSqliteDatabase";
+
+export type MigrationsTarget = Database<ExtendedSqliteDatabase, sqlite3.Statement>;
 
 const migrations = [
 	{
@@ -14,7 +16,36 @@ const migrations = [
 				PRIMARY KEY("id")
 			)`);
 		}
-	}
+	},
+	{
+		version: 2,
+		up: async (db: MigrationsTarget) => {
+			await db.exec(`CREATE TABLE "attachments" (
+				"id"	TEXT NOT NULL UNIQUE,
+				"file"	TEXT NOT NULL,
+				"note"	TEXT NOT NULL,
+				PRIMARY KEY("id")
+			)`);
+		}
+	},
+	{
+		version: 3,
+		up: async (db: MigrationsTarget) => {
+			await db.getDatabaseInstance().runBatch([
+				{ sql: 'BEGIN TRANSACTION' },
+				{ sql: 'DROP TABLE "attachments"' },
+				{
+					sql: `CREATE TABLE "attachments" (
+						"id"	TEXT NOT NULL UNIQUE,
+						"file"	TEXT NOT NULL,
+						"note"	TEXT NOT NULL,
+						PRIMARY KEY("id")
+						UNIQUE(file,note)
+						)` },
+				{ sql: 'COMMIT' },
+			]);
+		}
+	},
 ] as const;
 
 export const latestSchemaVersion = migrations[migrations.length - 1].version;
