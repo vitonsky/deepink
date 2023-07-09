@@ -29,6 +29,7 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 		console.log('Editor', editorObject);
 
 		const editorContainer = editorObject.getContainerDomNode();
+		const rootElement = editorContainer.ownerDocument;
 
 		const insertFiles = async (files: FileList, position: Position) => {
 			const filesSize = Array.from(files).reduce((acc, file) => acc + file.size, 0);
@@ -80,19 +81,34 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 
 			event.stopImmediatePropagation();
 
-			// console.log('file', { files, editor: editorObject });
-
 			if (pointerPosition) {
 				insertFiles(files, pointerPosition);
 			}
 			(editorObject as any).removeDropIndicator();
 		};
-
 		editorContainer.addEventListener('drop', onDropFiles, { capture: true });
+
+		const onPaste = (event: ClipboardEvent) => {
+			const isEventOnEditor = event.target instanceof HTMLElement && editorContainer.contains(event.target);
+			if (!isEventOnEditor) return;
+
+			if (event.clipboardData === null) return;
+
+			const files = event.clipboardData.files;
+			if (files.length === 0) return;
+
+			event.stopImmediatePropagation();
+			event.preventDefault();
+
+			const position = editorObject.getPosition() || new Position(0, 0);
+			insertFiles(files, position);
+		};
+		rootElement.addEventListener('paste', onPaste, { capture: true });
 
 		return () => {
 			mouseMoveEvent.dispose();
 			editorContainer.removeEventListener('drop', onDropFiles, { capture: true });
+			rootElement.removeEventListener('paste', onPaste, { capture: true });
 		};
 	}, [editorObject, uploadFile]);
 };
