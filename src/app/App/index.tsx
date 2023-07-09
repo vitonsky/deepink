@@ -8,7 +8,7 @@ import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
-import { getFile, uploadFile } from '../../electron/requests/storage/renderer';
+import { deleteFiles, getFile, listFiles, uploadFile } from '../../electron/requests/storage/renderer';
 
 import { MainScreen } from './MainScreen/MainScreen';
 import { Providers } from './Providers';
@@ -45,10 +45,14 @@ export const App: FC = () => {
 	useEffect(() => {
 		if (db === null) return;
 
-		const filesRegistry = new FilesRegistry(db, { get: getFile, write: uploadFile });
+		const attachments = new Attachments(db);
+		setAttachmentsRegistry(attachments);
+
+		const filesRegistry = new FilesRegistry(db, { get: getFile, write: uploadFile, delete: deleteFiles, list: listFiles }, attachments);
 		setFilesRegistry(filesRegistry);
 
-		setAttachmentsRegistry(new Attachments(db, filesRegistry));
+		// TODO: schedule when to run method
+		filesRegistry.clearOrphaned();
 	}, [db]);
 
 	console.log('App DB', db);

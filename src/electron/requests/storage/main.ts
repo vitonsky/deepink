@@ -5,7 +5,7 @@ import path from 'path';
 import { writeFileAtomic } from '../../../utils/files';
 import { getUserDataPath } from '../../utils/files';
 
-import { mkdir, readFile } from 'fs/promises';
+import { mkdir, readdir, readFile, rm } from 'fs/promises';
 import { CHANNELS } from '.';
 
 const ensureValidFilePath = (filesDir: string, filePath: string) => {
@@ -42,4 +42,31 @@ function getFile() {
 	});
 };
 
-export const handleStorageRequests = [uploadFile, getFile] as const;
+function deleteFiles() {
+	ipcMain.handle(CHANNELS.deleteFiles, async (_evt, { ids }) => {
+		const filesDir = getUserDataPath('files');
+
+		for (const id of ids) {
+			const filePath = path.join(filesDir, id);
+
+			if (!existsSync(filePath)) {
+				console.debug('Not found file', filePath);
+				continue;
+			}
+
+			await rm(filePath);
+			console.debug('Removed file', filePath);
+		}
+	});
+};
+
+function listFiles() {
+	ipcMain.handle(CHANNELS.listFiles, async () => {
+		const filesDir = getUserDataPath('files');
+
+		const filenames = await readdir(filesDir, {});
+		return filenames;
+	});
+};
+
+export const handleStorageRequests = [uploadFile, getFile, deleteFiles, listFiles] as const;

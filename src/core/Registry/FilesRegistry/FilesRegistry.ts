@@ -1,5 +1,6 @@
 import { SQLiteDb } from "../../storage/SQLiteDb";
 
+import { Attachments } from "../Attachments/Attachments";
 import { FilesStorageController } from ".";
 
 // TODO: implement class to track resources references and implement garbage collector for this class
@@ -13,9 +14,11 @@ import { FilesStorageController } from ".";
 export class FilesRegistry {
 	private db;
 	private fileController;
-	constructor(db: SQLiteDb, fileController: FilesStorageController) {
+	private attachments;
+	constructor(db: SQLiteDb, fileController: FilesStorageController, attachments: Attachments) {
 		this.db = db;
 		this.fileController = fileController;
+		this.attachments = attachments;
 	}
 
 	public async add(file: File) {
@@ -69,5 +72,30 @@ export class FilesRegistry {
 
 		// TODO: decrypt file
 		return new File([buffer], name, { type: mimetype });
+	}
+
+	public async clearOrphaned() {
+		const { db } = this.db;
+
+		// Find orphaned files in DB
+		const files = await db.all('SELECT * FROM files');
+
+		const orphanedIds = await this.attachments.findOrphanedResources(files.map(({ id }) => id));
+		const orphanedFilesInDb = files.filter(({ id }) => orphanedIds.includes(id));
+
+		// Find orphaned files in FS
+		const filesInStorage = await this.fileController.list();
+		const orphanedFilesInFs = filesInStorage.filter((id) => {
+			const isFoundInDb = files.some((file) => file.id === id);
+			return !isFoundInDb;
+		});
+
+		// Remove files from DB
+		const orphanedFilesInDbIds = orphanedFilesInDb.map(({ id }) => id);
+		const placeholders = Array(orphanedFilesInDbIds.length).fill('?').join(',');
+		await db.run(`DELETE FROM files WHERE id IN (${placeholders})`, orphanedFilesInDbIds);
+
+		const filesToRemove = [...orphanedFilesInDbIds, ...orphanedFilesInFs];
+		await this.fileController.delete(filesToRemove);
 	}
 }

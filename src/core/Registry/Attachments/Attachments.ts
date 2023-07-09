@@ -1,20 +1,13 @@
 import { SQLiteDb } from "../../storage/SQLiteDb";
 
-import { FilesRegistry } from "../FilesRegistry/FilesRegistry";
-
 // TODO: implement search orphaned resources
 /**
  * Attachments manager, to track attachments usage and to keep consistency
  */
 export class Attachments {
 	private db;
-
-	// TODO: use or remove
-	// @ts-ignore
-	private filesRegistry;
-	constructor(db: SQLiteDb, filesRegistry: FilesRegistry) {
+	constructor(db: SQLiteDb) {
 		this.db = db;
-		this.filesRegistry = filesRegistry;
 	}
 
 	public async set(targetId: string, attachments: string[]) {
@@ -42,5 +35,17 @@ export class Attachments {
 		}
 
 		await sync();
+	}
+
+	/**
+	 * Return array with ids of resources that not in use
+	 */
+	public async findOrphanedResources(resources: string[]) {
+		const { db } = this.db;
+
+		const placeholders = Array(resources.length).fill('?').join(',');
+		const attached = await db.all(`SELECT file as id FROM attachments WHERE file IN (${placeholders})`, resources);
+
+		return resources.filter((id) => attached.every((attachment) => attachment.id !== id));
 	}
 };

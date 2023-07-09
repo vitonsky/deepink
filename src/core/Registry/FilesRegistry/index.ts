@@ -7,4 +7,6 @@
 export type FilesStorageController = {
 	write: (uuid: string, buffer: ArrayBuffer) => Promise<void>;
 	get: (uuid: string) => Promise<ArrayBuffer | null>;
+	delete: (uuid: string[]) => Promise<void>;
+	list: () => Promise<string[]>;
 }

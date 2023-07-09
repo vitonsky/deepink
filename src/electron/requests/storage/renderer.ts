@@ -11,3 +11,11 @@ export function uploadFile(id: string, buffer: ArrayBuffer): Promise<void> {
 export function getFile(id: string): Promise<ArrayBuffer | null> {
 	return ipcRenderer.invoke(CHANNELS.getFile, { id });
 };
+
+export function deleteFiles(ids: string[]): Promise<void> {
+	return ipcRenderer.invoke(CHANNELS.deleteFiles, { ids });
+};
+
+export function listFiles(): Promise<string[]> {
+	return ipcRenderer.invoke(CHANNELS.listFiles);
+};
