@@ -3,7 +3,6 @@ import { SQLiteDb } from "../../storage/SQLiteDb";
 import { Attachments } from "../Attachments/Attachments";
 import { FilesStorageController } from ".";
 
-// TODO: implement class to track resources references and implement garbage collector for this class
 // TODO: add runtime validation
 // TODO: write tests
 // TODO: implement interface and use interface instead of class
@@ -74,28 +73,35 @@ export class FilesRegistry {
 		return new File([buffer], name, { type: mimetype });
 	}
 
+	public async delete(filesId: string[]) {
+		const { db } = this.db;
+
+		// Delete in database
+		const placeholders = Array(filesId.length).fill('?').join(',');
+		await db.run(`DELETE FROM files WHERE id IN (${placeholders})`, filesId);
+
+		// Delete files
+		await this.fileController.delete(filesId);
+	}
+
 	public async clearOrphaned() {
 		const { db } = this.db;
 
-		// Find orphaned files in DB
-		const files = await db.all('SELECT * FROM files');
+		const files = await db.all('SELECT id FROM files');
 
-		const orphanedIds = await this.attachments.findOrphanedResources(files.map(({ id }) => id));
-		const orphanedFilesInDb = files.filter(({ id }) => orphanedIds.includes(id));
-
-		// Find orphaned files in FS
+		// Remove orphaned files in FS
 		const filesInStorage = await this.fileController.list();
 		const orphanedFilesInFs = filesInStorage.filter((id) => {
 			const isFoundInDb = files.some((file) => file.id === id);
 			return !isFoundInDb;
 		});
+		await this.fileController.delete(orphanedFilesInFs);
 
 		// Remove files from DB
-		const orphanedFilesInDbIds = orphanedFilesInDb.map(({ id }) => id);
-		const placeholders = Array(orphanedFilesInDbIds.length).fill('?').join(',');
-		await db.run(`DELETE FROM files WHERE id IN (${placeholders})`, orphanedFilesInDbIds);
+		const orphanedFilesInDatabase = await this.attachments.findOrphanedResources(files.map(({ id }) => id));
+		console.log({ orphanedFilesInDatabase });
+		await this.attachments.delete(orphanedFilesInDatabase);
+		await this.delete(orphanedFilesInDatabase);
 
-		const filesToRemove = [...orphanedFilesInDbIds, ...orphanedFilesInFs];
-		await this.fileController.delete(filesToRemove);
 	}
 }

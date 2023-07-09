@@ -37,6 +37,13 @@ export class Attachments {
 		await sync();
 	}
 
+	public async delete(resources: string[]) {
+		const { db } = this.db;
+
+		const placeholders = Array(resources.length).fill('?').join(',');
+		await db.run(`DELETE FROM attachments WHERE file IN (${placeholders})`, resources);
+	}
+
 	/**
 	 * Return array with ids of resources that not in use
 	 */
