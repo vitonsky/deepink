@@ -153,6 +153,9 @@ export const getDb = async ({
 			})));
 			const pragmaDump = pragmasList.join('\n');
 
+			// Wait next tick, to free DB lock before dump data for some cases
+			await new Promise((res) => setTimeout(res, 0));
+
 			// Dump data
 			const dumpResponse = await db.get(`SELECT dbdump() as dump;`);
 			const dataDump = dumpResponse['dump'];

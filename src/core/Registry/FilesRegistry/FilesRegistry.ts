@@ -102,6 +102,5 @@ export class FilesRegistry {
 		console.log({ orphanedFilesInDatabase });
 		await this.attachments.delete(orphanedFilesInDatabase);
 		await this.delete(orphanedFilesInDatabase);
-
 	}
 }
