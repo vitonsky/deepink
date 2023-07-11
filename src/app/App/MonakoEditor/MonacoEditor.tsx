@@ -97,7 +97,6 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			language: 'markdown',
 			automaticLayout: true,
 			wordWrap: 'on',
-			// dropIntoEditor: { enabled: true },
 		});
 
 		editorRef.current = monacoEditor;

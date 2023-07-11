@@ -3,9 +3,8 @@ import { editor, Position } from 'monaco-editor-core';
 import prettyBytes from 'pretty-bytes';
 
 import { formatResourceLink } from '../../../../core/links';
-import { FileId } from '../../Providers';
 
-export type FileUploader = (file: File) => Promise<FileId>;
+export type FileUploader = (file: File) => Promise<string>;
 
 type Props = {
 	editor: editor.IStandaloneCodeEditor | null;
@@ -25,8 +24,6 @@ const alertLimits = {
 export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 	useEffect(() => {
 		if (editorObject === null) return;
-
-		console.log('Editor', editorObject);
 
 		const editorContainer = editorObject.getContainerDomNode();
 		const rootElement = editorContainer.ownerDocument;

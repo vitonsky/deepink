@@ -4,7 +4,6 @@ import { Attachments } from "../Attachments/Attachments";
 import { FilesStorageController } from ".";
 
 // TODO: add runtime validation
-// TODO: write tests
 // TODO: implement interface and use interface instead of class
 
 /**
@@ -99,7 +98,6 @@ export class FilesRegistry {
 
 		// Remove files from DB
 		const orphanedFilesInDatabase = await this.attachments.findOrphanedResources(files.map(({ id }) => id));
-		console.log({ orphanedFilesInDatabase });
 		await this.attachments.delete(orphanedFilesInDatabase);
 		await this.delete(orphanedFilesInDatabase);
 	}

@@ -37,7 +37,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const filesRegistry = useFilesRegistry();
 	const uploadFile: FileUploader = useCallback(async (file) => {
-		console.log('Upload file...', file);
 		return filesRegistry.add(file);
 	}, [filesRegistry]);
 
@@ -57,8 +56,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 			filesId.push(fileId);
 		}
 
-		// TODO: remove debug prints
-		console.log('Files in note', filesId);
 		attachments.set(noteId, filesId);
 	}, [attachments, noteId]);
 

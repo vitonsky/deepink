@@ -55,8 +55,6 @@ export const App: FC = () => {
 		filesRegistry.clearOrphaned();
 	}, [db]);
 
-	console.log('App DB', db);
-
 	// Splash screen for loading state
 	if (db === null || filesRegistry === null || attachmentsRegistry == null) {
 		return <div className={cnApp()}>

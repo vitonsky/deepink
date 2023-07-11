@@ -1,6 +1,5 @@
 import { SQLiteDb } from "../../storage/SQLiteDb";
 
-// TODO: implement search orphaned resources
 /**
  * Attachments manager, to track attachments usage and to keep consistency
  */
@@ -11,7 +10,7 @@ export class Attachments {
 	}
 
 	public async set(targetId: string, attachments: string[]) {
-		const { db, sync } = this.db;
+		const { db } = this.db;
 
 		if (attachments.length === 0) {
 			await db.getDatabaseInstance().runBatch([
@@ -33,8 +32,6 @@ export class Attachments {
 				{ sql: 'COMMIT' },
 			]);
 		}
-
-		await sync();
 	}
 
 	public async delete(resources: string[]) {

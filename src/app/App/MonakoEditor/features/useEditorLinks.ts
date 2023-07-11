@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import saveAs from 'file-saver';
-import { CancellationToken, editor, languages } from 'monaco-editor-core';
+import { editor, languages } from 'monaco-editor-core';
 
 import { findLinksInText, getResourceIdInUrl } from '../../../../core/links';
 import { useFilesRegistry } from '../../Providers';
@@ -20,10 +20,8 @@ export const useEditorLinks = () => {
 
 		const mdLinkProvider = languages.registerLinkProvider('markdown', {
 			provideLinks:
-				(model: editor.ITextModel, token: CancellationToken):
+				(model: editor.ITextModel):
 					languages.ProviderResult<languages.ILinksList> => {
-					console.log('Link provider', { model, token });
-
 					return {
 						links: findLinksInText(model.getValue()).map(({ index, url }) => {
 							const startPosition = model.getPositionAt(index);
@@ -45,13 +43,8 @@ export const useEditorLinks = () => {
 
 		const appLinkOpener = editor.registerLinkOpener({
 			async open(resource) {
-				console.log('Resource handler', resource);
-
 				const fileId = getResourceIdInUrl(resource);
 				if (fileId === null) return false;
-
-				// const isConfirmed = confirm(`Download file "${fileId}"?`);
-				// if (!isConfirmed) return false;
 
 				const file = await filesRegistry.get(fileId);
 				if (!file) return false;
