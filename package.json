@@ -35,7 +35,6 @@
 		"@types/react": "^18.2.14",
 		"@types/react-dom": "^18.2.6",
 		"@types/tmp": "^0.2.3",
-		"@types/uuid": "^9.0.2",
 		"@typescript-eslint/eslint-plugin": "^5.25.0",
 		"@typescript-eslint/parser": "^5.25.0",
 		"babel-loader": "^9.1.2",
@@ -82,7 +81,6 @@
 		"react-dom": "^18.2.0",
 		"react-elegant-ui": "^0.3.3",
 		"sqlite": "^4.2.1",
-		"sqlite3": "^5.1.6",
-		"uuid": "^9.0.0"
+		"sqlite3": "^5.1.6"
 	}
 }
