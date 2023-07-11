@@ -9,33 +9,7 @@ import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 import { readFile, writeFile } from 'fs/promises';
 import { ExtendedSqliteDatabase } from './ExtendedSqliteDatabase';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
-
-/**
- * Statements to create tables
- */
-const schema = {
-	notes: `CREATE TABLE "notes" (
-		"id"	TEXT NOT NULL UNIQUE,
-		"title"	TEXT NOT NULL,
-		"text"	TEXT NOT NULL,
-		"creationTime"	INTEGER NOT NULL DEFAULT 0,
-		"lastUpdateTime"	INTEGER NOT NULL DEFAULT 0,
-		PRIMARY KEY("id")
-	)`,
-	files: `CREATE TABLE "files" (
-		"id"	TEXT NOT NULL UNIQUE,
-		"name"	TEXT NOT NULL,
-		"mimetype"	TEXT NOT NULL,
-		PRIMARY KEY("id")
-	)`,
-	attachments: `CREATE TABLE "attachments" (
-		"id"	TEXT NOT NULL UNIQUE,
-		"file"	TEXT NOT NULL,
-		"note"	TEXT NOT NULL,
-		PRIMARY KEY("id")
-		UNIQUE(file,note)
-	)`,
-} as const;
+import setupSQL from './setup.sql';
 
 export type SQLiteDb = {
 	/**
@@ -94,7 +68,6 @@ export const getDb = async ({
 			await db.exec(`PRAGMA main.user_version = ${latestSchemaVersion};`);
 
 			// Create DB
-			const setupSQL = Object.values(schema).join(';\n');
 			if (verboseLog) {
 				console.info('Initialize DB');
 				console.debug(setupSQL);

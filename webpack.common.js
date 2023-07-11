@@ -56,6 +56,10 @@ module.exports = {
 					},
 				},
 			},
+			{
+				test: /\.sql$/,
+				type: 'asset/source',
+			},
 		],
 	},
 	externals: [
