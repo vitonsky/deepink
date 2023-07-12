@@ -131,9 +131,9 @@ export const getDb = async ({
 				// Dump data
 				const retryDelay = 50;
 				const retryDeadline = 800;
-				const startTime = performance.now();
+				const startTime = new Date().getTime();
 				let dumpResponse: unknown | null = null;
-				while ((performance.now() - startTime) <= retryDeadline) {
+				while ((new Date().getTime() - startTime) <= retryDeadline) {
 					try {
 						dumpResponse = await db.get(`SELECT dbdump() as dump;`);
 						break;
