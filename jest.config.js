@@ -17,4 +17,7 @@ module.exports = {
 
 	resetMocks: true,
 	setupFiles: ['./scripts/jest/setupFiles/index.js'],
+	transform: {
+		"\\.sql$": "<rootDir>/scripts/jest/fileTransformer.js"
+	}
 };
