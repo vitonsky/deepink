@@ -4,10 +4,14 @@ import path from 'path';
 import { cn } from '@bem-react/classname';
 
 import { INoteData } from '../../core/Note';
+import { Attachments } from '../../core/Registry/Attachments/Attachments';
+import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { electronPaths } from '../../electron/requests/files';
+import { deleteFiles, getFile, listFiles, uploadFile } from '../../electron/requests/storage/renderer';
 
 import { MainScreen } from './MainScreen/MainScreen';
+import { Providers } from './Providers';
 import { SplashScreen } from './SplashScreen';
 
 import './App.css';
@@ -36,9 +40,33 @@ export const App: FC = () => {
 		})();
 	}, []);
 
+	const [filesRegistry, setFilesRegistry] = useState<FilesRegistry | null>(null);
+	const [attachmentsRegistry, setAttachmentsRegistry] = useState<Attachments | null>(null);
+	useEffect(() => {
+		if (db === null) return;
+
+		const attachments = new Attachments(db);
+		setAttachmentsRegistry(attachments);
+
+		const filesRegistry = new FilesRegistry(db, { get: getFile, write: uploadFile, delete: deleteFiles, list: listFiles }, attachments);
+		setFilesRegistry(filesRegistry);
+
+		// TODO: schedule when to run method
+		filesRegistry.clearOrphaned();
+	}, [db]);
+
+	// Splash screen for loading state
+	if (db === null || filesRegistry === null || attachmentsRegistry == null) {
+		return <div className={cnApp()}>
+			<SplashScreen />
+		</div>;
+	}
+
 	return (
 		<div className={cnApp()}>
-			{db === null ? <SplashScreen /> : <MainScreen db={db} />}
+			<Providers {...{ filesRegistry, attachmentsRegistry }}>
+				<MainScreen db={db} />
+			</Providers>
 		</div>
 	);
 };

@@ -5,9 +5,11 @@ import React, {
 	useCallback,
 	useEffect,
 	useRef,
+	useState,
 } from 'react';
 import { editor, languages } from 'monaco-editor-core';
 
+import { FileUploader, useDropFiles } from './features/useDropFiles';
 import { language as mdlanguage } from './languages/markdown';
 import { language as tslanguage } from './languages/typescript';
 
@@ -25,7 +27,16 @@ languages.setMonarchTokensProvider('javascript', tslanguage);
 
 languages.register({
 	id: 'markdown',
-	extensions: ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn', '.mdtxt', '.mdtext'],
+	extensions: [
+		'.md',
+		'.markdown',
+		'.mdown',
+		'.mkdn',
+		'.mkd',
+		'.mdwn',
+		'.mdtxt',
+		'.mdtext',
+	],
 	aliases: ['Markdown', 'markdown'],
 });
 
@@ -39,6 +50,7 @@ export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	value: string;
 	setValue?: (value: string) => void;
 	editorObjectRef?: RefObject<EditorObject>;
+	uploadFile: FileUploader;
 };
 
 /**
@@ -49,6 +61,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	value,
 	setValue,
 	editorObjectRef,
+	uploadFile,
 	...props
 }) => {
 	const setValueRef = useRef(setValue);
@@ -57,6 +70,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	// Init
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+	const [editorObject, setEditorObject] = useState<editor.IStandaloneCodeEditor | null>(null);
 
 	const updateDimensions = useCallback(() => {
 		const editorContainer = editorContainerRef.current;
@@ -73,12 +87,6 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			monacoEditor.layout({ width, height });
 		});
 	}, []);
-
-	// const editorControls = useMemo(() => {
-	// 	return {
-	// 		updateDimensions,
-	// 	};
-	// }, [updateDimensions]);
 
 	useEffect(() => {
 		const editorContainer = editorContainerRef.current;
@@ -114,12 +122,16 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		// Handle window resize
 		window.addEventListener('resize', updateDimensions);
 
+		setEditorObject(monacoEditor);
+
 		return () => {
 			editorContainer.removeEventListener('keydown', onKeyPress);
 			editorContainer.removeEventListener('keyup', onKeyPress);
 			window.removeEventListener('resize', updateDimensions);
 
 			monacoEditor.dispose();
+
+			setEditorObject(null);
 		};
 
 		// Hook runs only once to initialize component
@@ -135,6 +147,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			editor.setValue(value);
 		}
 	});
+
+	// Handle drop file
+	useDropFiles({ editor: editorObject, uploadFile });
 
 	return <div ref={editorContainerRef} {...props}></div>;
 };

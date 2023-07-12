@@ -7,26 +7,15 @@ import sqlite3 from 'sqlite3';
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
 import { readFile, writeFile } from 'fs/promises';
-
-/**
- * Statements to create tables
- */
-const schema = {
-	notes: `CREATE TABLE "notes" (
-		"id"	TEXT NOT NULL UNIQUE,
-		"title"	TEXT NOT NULL,
-		"text"	TEXT NOT NULL,
-		"creationTime"	INTEGER NOT NULL DEFAULT 0,
-		"lastUpdateTime"	INTEGER NOT NULL DEFAULT 0,
-		PRIMARY KEY("id")
-	)`,
-} as const;
+import { ExtendedSqliteDatabase } from './ExtendedSqliteDatabase';
+import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
+import setupSQL from './setup.sql';
 
 export type SQLiteDb = {
 	/**
 	 * Configured database with extensions
 	 */
-	db: Database<sqlite3.Database, sqlite3.Statement>;
+	db: Database<ExtendedSqliteDatabase, sqlite3.Statement>;
 
 	/**
 	 * Write database to file
@@ -62,7 +51,7 @@ export const getDb = async ({
 	// Create DB
 	const db = await open({
 		filename: ':memory:',
-		driver: sqlite3.Database,
+		driver: ExtendedSqliteDatabase,
 	}).then(async (db) => {
 		// Setup extensions
 		await db.loadExtension(path.join(dbExtensionsDir, 'uuid'));
@@ -73,9 +62,12 @@ export const getDb = async ({
 			// TODO: implement decryption
 			const dumpSQL = await readFile(dbPath, 'utf-8');
 			await db.exec(dumpSQL);
+			await migrateToLatestSchema(db as Database<ExtendedSqliteDatabase, sqlite3.Statement>);
 		} else {
+			// Setup pragma
+			await db.exec(`PRAGMA main.user_version = ${latestSchemaVersion};`);
+
 			// Create DB
-			const setupSQL = Object.values(schema).join(';\n');
 			if (verboseLog) {
 				console.info('Initialize DB');
 				console.debug(setupSQL);
@@ -84,7 +76,7 @@ export const getDb = async ({
 			await db.exec(setupSQL);
 		}
 
-		return db;
+		return db as Database<ExtendedSqliteDatabase, sqlite3.Statement>;
 	});
 
 	type SyncRequest = {
@@ -122,34 +114,71 @@ export const getDb = async ({
 
 			const unlock = await lockfileUtils.lock(dbPath);
 
-			const response = await db.get(`SELECT dbdump() as dump;`);
-			const dump = response['dump'];
+			// Wrap to allow throw exceptions for good control flow
+			try {
+				// Dump pragma
+				const pragmaNamesToDump = ['user_version'];
+				const pragmasList = await Promise.all(pragmaNamesToDump.map((pragmaName) => db.get(`PRAGMA main.${pragmaName}`).then((response) => {
+					if (!response) {
+						throw new TypeError("Can't fetch pragma value");
+					}
 
-			if (!dump) {
-				const error = new Error('Dump are empty!');
-				console.error(error);
+					const pragmaValue = response[pragmaName];
+					return `PRAGMA main.${pragmaName} = ${pragmaValue};`;
+				})));
+				const pragmaDump = pragmasList.join('\n');
 
-				// Reject requests
+				// Dump data
+				const retryDelay = 50;
+				const retryDeadline = 800;
+				const startTime = new Date().getTime();
+				let dumpResponse: unknown | null = null;
+				while ((new Date().getTime() - startTime) <= retryDeadline) {
+					try {
+						dumpResponse = await db.get(`SELECT dbdump() as dump;`);
+						break;
+					} catch (err) {
+						// Wait next tick, to free DB lock before dump data for some cases
+						await new Promise((res) => setTimeout(res, retryDelay));
+					}
+				}
+
+				if (!dumpResponse) {
+					throw new Error("Cannot to get DB dump");
+				}
+
+				const dataDump = (dumpResponse as any)['dump'];
+
+				if (!dataDump) {
+					const error = new Error('Dump are empty!');
+					console.error(error);
+					throw error;
+				}
+
+				const dumpString = [pragmaDump, dataDump].join('\n');
+
+				// TODO: implement encryption before write
+
+				// Write tmp file
+				await writeFileAtomic(dbPath, dumpString);
+
+				if (verboseLog) {
+					console.info('DB saved');
+					console.debug({ dumpString });
+				}
+
+				await unlock();
+
+				// Resolve requests
+				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
+			} catch (err) {
+				await unlock();
+
+				const errorToThrow = err instanceof Error ? err : new Error('Unknown error');
 				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(error),
+					syncRequest.reject(errorToThrow),
 				);
-				break;
 			}
-
-			// TODO: implement encryption before write
-
-			// Write tmp file
-			await writeFileAtomic(dbPath, dump);
-
-			if (verboseLog) {
-				console.info('DB saved');
-				console.debug({ dump });
-			}
-
-			await unlock();
-
-			// Resolve requests
-			syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
 		}
 
 		isSyncWorkerRunned = false;
@@ -195,6 +224,8 @@ export const getDb = async ({
 		await sync();
 		await db.close();
 	};
+
+	await sync();
 
 	return {
 		db,

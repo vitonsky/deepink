@@ -3,6 +3,7 @@ import { TabsPanes } from 'react-elegant-ui/esm/components/TabsPanes/TabsPanes.b
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../../core/Note';
+import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
 
 import './Notes.css';
@@ -18,6 +19,8 @@ export type NotesProps = {
 };
 
 export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) => {
+	useEditorLinks();
+
 	return (
 		<TabsPanes
 			className={cnNotes()}
@@ -31,7 +34,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 						id: noteObject.id,
 						content: (
 							<NoteEditor
-								note={noteObject.data}
+								note={noteObject}
 								updateNote={(noteData) => {
 									updateNote({ ...noteObject, data: noteData });
 								}}

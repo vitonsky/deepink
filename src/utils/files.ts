@@ -12,20 +12,26 @@ export const writeFileAtomic = async (filename: string, content: Buffer | string
 	const tmpFile = filename + '.tmp';
 	await writeFile(tmpFile, content);
 
-	// Rename original file
 	const backupFile = filename + '.backup';
-	if (existsSync(backupFile)) {
-		throw new Error(
-			`Temporary backup file "${backupFile}" already exists. Can't to continue, to avoid loose data`,
-		);
+
+	// Rename original file
+	if (existsSync(filename)) {
+		if (existsSync(backupFile)) {
+			throw new Error(
+				`Temporary backup file "${backupFile}" already exists. Can't to continue, to avoid loose data`,
+			);
+		}
+
+		await rename(filename, backupFile);
 	}
-	await rename(filename, backupFile);
 
 	// Rename temporary file, to original name
 	await rename(tmpFile, filename);
 
 	// Delete backup file, to commit transaction
-	await rm(backupFile);
+	if (existsSync(backupFile)) {
+		await rm(backupFile);
+	}
 };
 
 /**
