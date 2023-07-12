@@ -96,6 +96,13 @@ export const getDb = async ({
 			const syncRequestsInProgress = syncRequests;
 			syncRequests = [];
 
+			const rejectAll = (reason: Error) => {
+				console.log('syncRequestsInProgress', syncRequestsInProgress);
+				syncRequestsInProgress.forEach((syncRequest) =>
+					syncRequest.reject(reason),
+				);
+			};
+
 			// Create empty file if not exists
 			// It needs to create proper lock file
 			if (!existsSync(dbPath)) {
@@ -106,9 +113,7 @@ export const getDb = async ({
 			const isLocked = await lockfileUtils.check(dbPath);
 			if (isLocked) {
 				// Reject requests
-				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(new Error('DB file locked')),
-				);
+				rejectAll(new Error('DB file locked'));
 				break;
 			}
 
@@ -126,21 +131,33 @@ export const getDb = async ({
 			})));
 			const pragmaDump = pragmasList.join('\n');
 
-			// Wait next tick, to free DB lock before dump data for some cases
-			await new Promise((res) => setTimeout(res, 0));
-
 			// Dump data
-			const dumpResponse = await db.get(`SELECT dbdump() as dump;`);
-			const dataDump = dumpResponse['dump'];
+			const retryDelay = 300;
+			const retryDeadline = 1200;
+			const startTime = performance.now();
+			let dumpResponse: unknown | null = null;
+			while ((performance.now() - startTime) <= retryDeadline) {
+				try {
+					dumpResponse = await db.get(`SELECT dbdump() as dump;`);
+					break;
+				} catch (err) {
+					// Wait next tick, to free DB lock before dump data for some cases
+					await new Promise((res) => setTimeout(res, retryDelay));
+				}
+			}
+
+			if (!dumpResponse) {
+				rejectAll(new Error("Cannot to get DB dump"));
+				break;
+			}
+
+			const dataDump = (dumpResponse as any)['dump'];
 
 			if (!dataDump) {
 				const error = new Error('Dump are empty!');
 				console.error(error);
 
-				// Reject requests
-				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(error),
-				);
+				rejectAll(error);
 				break;
 			}
 
