@@ -96,13 +96,6 @@ export const getDb = async ({
 			const syncRequestsInProgress = syncRequests;
 			syncRequests = [];
 
-			const rejectAll = (reason: Error) => {
-				console.log('syncRequestsInProgress', syncRequestsInProgress);
-				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(reason),
-				);
-			};
-
 			// Create empty file if not exists
 			// It needs to create proper lock file
 			if (!existsSync(dbPath)) {
@@ -113,70 +106,79 @@ export const getDb = async ({
 			const isLocked = await lockfileUtils.check(dbPath);
 			if (isLocked) {
 				// Reject requests
-				rejectAll(new Error('DB file locked'));
+				syncRequestsInProgress.forEach((syncRequest) =>
+					syncRequest.reject(new Error('DB file locked')),
+				);
 				break;
 			}
 
 			const unlock = await lockfileUtils.lock(dbPath);
 
-			// Dump pragma
-			const pragmaNamesToDump = ['user_version'];
-			const pragmasList = await Promise.all(pragmaNamesToDump.map((pragmaName) => db.get(`PRAGMA main.${pragmaName}`).then((response) => {
-				if (!response) {
-					throw new TypeError("Can't fetch pragma value");
+			// Wrap to allow throw exceptions for good control flow
+			try {
+				// Dump pragma
+				const pragmaNamesToDump = ['user_version'];
+				const pragmasList = await Promise.all(pragmaNamesToDump.map((pragmaName) => db.get(`PRAGMA main.${pragmaName}`).then((response) => {
+					if (!response) {
+						throw new TypeError("Can't fetch pragma value");
+					}
+
+					const pragmaValue = response[pragmaName];
+					return `PRAGMA main.${pragmaName} = ${pragmaValue};`;
+				})));
+				const pragmaDump = pragmasList.join('\n');
+
+				// Dump data
+				const retryDelay = 50;
+				const retryDeadline = 800;
+				const startTime = performance.now();
+				let dumpResponse: unknown | null = null;
+				while ((performance.now() - startTime) <= retryDeadline) {
+					try {
+						dumpResponse = await db.get(`SELECT dbdump() as dump;`);
+						break;
+					} catch (err) {
+						// Wait next tick, to free DB lock before dump data for some cases
+						await new Promise((res) => setTimeout(res, retryDelay));
+					}
 				}
 
-				const pragmaValue = response[pragmaName];
-				return `PRAGMA main.${pragmaName} = ${pragmaValue};`;
-			})));
-			const pragmaDump = pragmasList.join('\n');
-
-			// Dump data
-			const retryDelay = 300;
-			const retryDeadline = 1200;
-			const startTime = performance.now();
-			let dumpResponse: unknown | null = null;
-			while ((performance.now() - startTime) <= retryDeadline) {
-				try {
-					dumpResponse = await db.get(`SELECT dbdump() as dump;`);
-					break;
-				} catch (err) {
-					// Wait next tick, to free DB lock before dump data for some cases
-					await new Promise((res) => setTimeout(res, retryDelay));
+				if (!dumpResponse) {
+					throw new Error("Cannot to get DB dump");
 				}
+
+				const dataDump = (dumpResponse as any)['dump'];
+
+				if (!dataDump) {
+					const error = new Error('Dump are empty!');
+					console.error(error);
+					throw error;
+				}
+
+				const dumpString = [pragmaDump, dataDump].join('\n');
+
+				// TODO: implement encryption before write
+
+				// Write tmp file
+				await writeFileAtomic(dbPath, dumpString);
+
+				if (verboseLog) {
+					console.info('DB saved');
+					console.debug({ dumpString });
+				}
+
+				await unlock();
+
+				// Resolve requests
+				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
+			} catch (err) {
+				await unlock();
+
+				const errorToThrow = err instanceof Error ? err : new Error('Unknown error');
+				syncRequestsInProgress.forEach((syncRequest) =>
+					syncRequest.reject(errorToThrow),
+				);
 			}
-
-			if (!dumpResponse) {
-				rejectAll(new Error("Cannot to get DB dump"));
-				break;
-			}
-
-			const dataDump = (dumpResponse as any)['dump'];
-
-			if (!dataDump) {
-				const error = new Error('Dump are empty!');
-				console.error(error);
-
-				rejectAll(error);
-				break;
-			}
-
-			const dumpString = [pragmaDump, dataDump].join('\n');
-
-			// TODO: implement encryption before write
-
-			// Write tmp file
-			await writeFileAtomic(dbPath, dumpString);
-
-			if (verboseLog) {
-				console.info('DB saved');
-				console.debug({ dumpString });
-			}
-
-			await unlock();
-
-			// Resolve requests
-			syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
 		}
 
 		isSyncWorkerRunned = false;
