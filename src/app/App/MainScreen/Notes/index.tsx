@@ -5,6 +5,7 @@ import { cn } from '@bem-react/classname';
 import { INote, NoteId } from '../../../../core/Note';
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
+import { NoteScreen } from '../../NoteScreen';
 
 import './Notes.css';
 
@@ -33,12 +34,15 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 					return {
 						id: noteObject.id,
 						content: (
-							<NoteEditor
-								note={noteObject}
-								updateNote={(noteData) => {
-									updateNote({ ...noteObject, data: noteData });
-								}}
-							/>
+							<div className={cnNotes('Note')}>
+								<NoteEditor
+									note={noteObject}
+									updateNote={(noteData) => {
+										updateNote({ ...noteObject, data: noteData });
+									}}
+								/>
+								<NoteScreen note={noteObject} />
+							</div>
 						),
 					};
 				})}

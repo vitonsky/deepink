@@ -4,8 +4,21 @@
 	flex-grow: 100;
 }
 
+.Notes-Note {
+	width: 100%;
+	display: grid;
+	gap: 1rem;
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .Notes > .TabsPanes-Pane:not(.TabsPanes-Pane_hidden) {
 	display: flex;
 	flex-grow: 100;
 	width: 100%;
+}
+
+.Notes > * {
+	overflow: auto;
+	max-height: 100%;
 }

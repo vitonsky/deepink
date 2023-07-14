@@ -1,0 +1,11 @@
+.NoteScreen {
+	width: 100%;
+	overflow: auto;
+}
+
+.NoteScreen-Placeholder {
+	overflow: auto;
+	white-space: break-spaces;
+	word-break: break-all;
+	word-wrap: break-word;
+}
