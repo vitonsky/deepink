@@ -7,6 +7,7 @@ import { INote, INoteData } from '../../../core/Note';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
+import { NoteScreen } from '../NoteScreen';
 import { useAttachmentsRegistry, useFilesRegistry } from '../Providers';
 
 import './NoteEditor.css';
@@ -66,12 +67,15 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	return (
 		<div className={cnNoteEditor()}>
 			<Textinput value={title} onInputText={setTitle} placeholder="Note title" />
-			<MonacoEditor
-				value={text}
-				setValue={setText}
-				className={cnNoteEditor('Editor')}
-				uploadFile={uploadFile}
-			/>
+			<div className={cnNoteEditor('SplitContainer')}>
+				<MonacoEditor
+					value={text}
+					setValue={setText}
+					className={cnNoteEditor('Editor')}
+					uploadFile={uploadFile}
+				/>
+				<NoteScreen note={note} />
+			</div>
 		</div>
 	);
 };
