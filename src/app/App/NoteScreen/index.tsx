@@ -1,4 +1,5 @@
 import React, { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/desktop';
 import ReactMarkdown from 'react-markdown';
 import { debounce } from 'lodash';
 import remarkGfm from 'remark-gfm';
@@ -43,45 +44,55 @@ const useFilesUrls = () => {
 
 			// Cleanup after loading
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-			Object.values(pendingResourcesRef.current).forEach((promise) => promise.then(cleanup));
+			Object.values(pendingResourcesRef.current).forEach((promise) =>
+				promise.then(cleanup),
+			);
 		};
 	}, []);
 
 	const filesRegistry = useFilesRegistry();
-	const getBlobResource = useCallback(async (id: string) => {
-		// Skip for loaded resources and resources in loading state
-		const resource = resourcesRef.current[id] || pendingResourcesRef.current[id];
-		if (resource) return resource;
+	const getBlobResource = useCallback(
+		async (id: string) => {
+			// Skip for loaded resources and resources in loading state
+			const resource = resourcesRef.current[id] || pendingResourcesRef.current[id];
+			if (resource) return resource;
 
-		// Start loading
-		const resourcePromise = filesRegistry.get(id).then(async (file) => {
-			// await new Promise((res) => setTimeout(res, 1200));
+			// Start loading
+			const resourcePromise = filesRegistry
+				.get(id)
+				.then(async (file) => {
+					// await new Promise((res) => setTimeout(res, 1200));
 
-			// TODO: maybe we should to skip too long files, to not keep it in memory?
-			if (!file) {
-				resourcesRef.current[id] = null;
-			} else {
-				const url = URL.createObjectURL(file);
-				resourcesRef.current[id] = {
-					url,
-					dispose: () => URL.revokeObjectURL(url),
-				};
-			}
+					// TODO: maybe we should to skip too long files, to not keep it in memory?
+					if (!file) {
+						resourcesRef.current[id] = null;
+					} else {
+						const url = URL.createObjectURL(file);
+						resourcesRef.current[id] = {
+							url,
+							dispose: () => URL.revokeObjectURL(url),
+						};
+					}
 
-			return resourcesRef.current[id];
-		}).finally(() => {
-			delete pendingResourcesRef.current[id];
-		});
+					return resourcesRef.current[id];
+				})
+				.finally(() => {
+					delete pendingResourcesRef.current[id];
+				});
 
-		pendingResourcesRef.current[id] = resourcePromise;
+			pendingResourcesRef.current[id] = resourcePromise;
 
-		return resourcePromise;
-	}, [filesRegistry]);
+			return resourcePromise;
+		},
+		[filesRegistry],
+	);
 
-
-	return useCallback((filesId: string[]) => {
-		return Promise.all(filesId.map((file) => getBlobResource(file)));
-	}, [getBlobResource]);
+	return useCallback(
+		(filesId: string[]) => {
+			return Promise.all(filesId.map((file) => getBlobResource(file)));
+		},
+		[getBlobResource],
+	);
 };
 
 export const NoteScreen: FC<NoteScreenProps> = ({ note }) => {
@@ -122,31 +133,44 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note }) => {
 			// Skip render, if text been updated while awaiting
 			if (renderSymbol !== renderContextSymbolRef.current) return;
 
-			setMarkdownContent(<ReactMarkdown
-				remarkPlugins={[remarkGfm]}
-				transformImageUri={(sourceUrl) => {
-					if (!sourceUrl) return sourceUrl;
+			setMarkdownContent(
+				<ReactMarkdown
+					remarkPlugins={[remarkGfm]}
+					transformImageUri={(sourceUrl) => {
+						if (!sourceUrl) return sourceUrl;
 
-					const resourceId = getResourceIdInUrl(sourceUrl);
-					if (!resourceId) return sourceUrl;
+						const resourceId = getResourceIdInUrl(sourceUrl);
+						if (!resourceId) return sourceUrl;
 
-					const file = filesMap[resourceId];
-					return file ? file.url : sourceUrl;
-				}}
-				components={{
-					a: Link,
-				}}
-			>
-				{text}
-			</ReactMarkdown>);
+						const file = filesMap[resourceId];
+						return file ? file.url : sourceUrl;
+					}}
+					components={{
+						a: Link,
+					}}
+				>
+					{text}
+				</ReactMarkdown>,
+			);
 		})();
 	}, [attachmentsRegistry, getFilesUrl, note.id, text]);
 
 	return (
 		<div className={cnNoteScreen()}>
-			<div className={cnNoteScreen('Content', ['markdown-body'])}>
-				{markdownContent ? markdownContent : 'Loading...'}
-			</div>
+			{markdownContent ? (
+				<div className={cnNoteScreen('Content', ['markdown-body'])}>
+					{markdownContent}
+				</div>
+			) : (
+				<div className={cnNoteScreen('SplashScreen')}>
+					<Spinner
+						className={cnNoteScreen('Spinner')}
+						view="primitive"
+						size="l"
+						progress
+					/>
+				</div>
+			)}
 		</div>
 	);
 };
