@@ -13,7 +13,8 @@
 	width: 100%;
 	display: grid;
 	overflow: hidden;
-	gap: 1rem;
+	gap: 0.3rem;
+	flex-grow: 100;
 	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 }

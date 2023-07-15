@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
+import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
 
 import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
@@ -26,6 +27,12 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const updateNoteRef = useRef(updateNote);
 	updateNoteRef.current = updateNote;
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const debouncedUpdateNote = useCallback(debounce((data: { title: string, text: string }) => {
+		console.log('Update note in DB');
+		updateNoteRef.current(data);
+	}, 800), []);
+
 	const isFirstRenderRef = useRef(true);
 	useEffect(() => {
 		if (isFirstRenderRef.current) {
@@ -33,8 +40,8 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 			return;
 		}
 
-		updateNoteRef.current({ title, text });
-	}, [title, text]);
+		debouncedUpdateNote({ title, text });
+	}, [title, text, debouncedUpdateNote]);
 
 	const filesRegistry = useFilesRegistry();
 	const uploadFile: FileUploader = useCallback(async (file) => {

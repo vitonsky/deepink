@@ -43,6 +43,8 @@ export const useEditorLinks = () => {
 
 		const appLinkOpener = editor.registerLinkOpener({
 			async open(resource) {
+				// TODO: implement open external resource
+
 				const fileId = getResourceIdInUrl(resource);
 				if (fileId === null) return false;
 
