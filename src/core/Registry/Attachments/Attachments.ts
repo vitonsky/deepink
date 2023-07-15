@@ -34,6 +34,13 @@ export class Attachments {
 		}
 	}
 
+	public async get(targetId: string): Promise<string[]> {
+		const { db } = this.db;
+
+		const rows = await db.all('SELECT file FROM attachments WHERE note=?', targetId);
+		return rows.map(({ file }) => file);
+	}
+
 	public async delete(resources: string[]) {
 		const { db } = this.db;
 
