@@ -145,6 +145,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note }) => {
 						const file = filesMap[resourceId];
 						return file ? file.url : sourceUrl;
 					}}
+					transformLinkUri={(uri) => uri}
 					components={{
 						a: Link,
 					}}

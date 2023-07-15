@@ -1,22 +1,53 @@
 import React, { useCallback } from 'react';
 import { Components } from 'react-markdown';
+import saveAs from 'file-saver';
 
+import { getResourceIdInUrl } from '../../../../core/links';
+import { useFilesRegistry } from '../../Providers';
 
-export const Link: Exclude<Components['a'], undefined> = (props) => {
-	const onClick = useCallback((evt: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-		if (props.onClick) {
-			props.onClick(evt);
-		}
+export const Link: Exclude<Components['a'], undefined> = ({ node, ...props }) => {
+	const filesRegistry = useFilesRegistry();
 
-		if (evt.isDefaultPrevented() || evt.isPropagationStopped()) return;
-		if (evt.type !== 'click' || !props.href || !(/^https?:\/\//).test(props.href)) return;
+	const onClick = useCallback(
+		(evt: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+			if (props.onClick) {
+				props.onClick(evt);
+			}
 
-		evt.preventDefault();
+			if (evt.isDefaultPrevented() || evt.isPropagationStopped()) return;
 
-		// TODO: implement open external resource
-		// require("shell").openExternal(props.href);
-		console.log('Open external resource', props.href);
-	}, [props]);
+			const url = props.href;
+			if (evt.type !== 'click' || !url) return;
+
+			// Save resources
+			const fileId = getResourceIdInUrl(url);
+			console.log({ fileId, url });
+			if (fileId !== null) {
+				evt.preventDefault();
+
+				filesRegistry.get(fileId).then(async (file) => {
+					if (!file) return;
+
+					const buffer = await file.arrayBuffer();
+					saveAs(new Blob([buffer]), file.name);
+				});
+
+				return;
+			}
+
+			// Open urls
+			if (/^https?:\/\//.test(url)) {
+				evt.preventDefault();
+
+				// TODO: implement open external resource
+				// require("shell").openExternal(props.href);
+				console.log('Open external resource', url);
+
+				return;
+			}
+		},
+		[filesRegistry, props],
+	);
 
 	return <a {...props} target={props.target ?? '_blank'} onClick={onClick} />;
 };
