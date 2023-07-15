@@ -10,8 +10,8 @@ import React, {
 import { editor, languages } from 'monaco-editor-core';
 
 import { FileUploader, useDropFiles } from './features/useDropFiles';
-import { language as mdlanguage } from './languages/markdown';
-import { language as tslanguage } from './languages/typescript';
+import * as markdown from './languages/markdown';
+import * as typescript from './languages/typescript';
 
 // Configure monako
 languages.register({
@@ -23,7 +23,8 @@ languages.register({
 	mimetypes: ['text/javascript'],
 });
 
-languages.setMonarchTokensProvider('javascript', tslanguage);
+languages.setMonarchTokensProvider('javascript', typescript.language);
+languages.setLanguageConfiguration('javascript', typescript.conf);
 
 languages.register({
 	id: 'markdown',
@@ -40,7 +41,8 @@ languages.register({
 	aliases: ['Markdown', 'markdown'],
 });
 
-languages.setMonarchTokensProvider('markdown', mdlanguage);
+languages.setMonarchTokensProvider('markdown', markdown.language);
+languages.setLanguageConfiguration('markdown', markdown.conf);
 
 export type EditorObject = {
 	updateDimensions: () => void;
