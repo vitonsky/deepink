@@ -7,8 +7,9 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { editor, IDisposable, languages } from 'monaco-editor-core';
+import { editor, languages } from 'monaco-editor-core';
 
+import { defaultExtensions } from './extensions';
 import { FileUploader, useDropFiles } from './features/useDropFiles';
 import * as markdown from './languages/markdown';
 import * as typescript from './languages/typescript';
@@ -104,110 +105,6 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			quickSuggestions: false,
 		});
 
-		const disposeList: IDisposable[] = [];
-
-		const model = monacoEditor.getModel();
-		if (model) {
-			const pointerRegEx = /^-( \[(\s|x)\])?/;
-			model.onDidChangeContent((evt) => {
-				// TODO: implement for all changes
-				const change = evt.changes[0];
-
-				const isNewLine = /^\n[\s\t]*$/.test(change.text);
-				if (!isNewLine) return;
-				if (change.range.startLineNumber !== change.range.endLineNumber) return;
-
-				const lineValue = model.getValueInRange({
-					...change.range,
-					startColumn: 0,
-				});
-				const pointMatch = lineValue.trim().match(pointerRegEx);
-				if (!pointMatch) return;
-
-				const lineWithChanges = change.range.startLineNumber + 1;
-
-				// 
-				// 
-				// 
-
-				const prevLineNumber = Math.max(1, lineWithChanges - 1);
-				const prevLineValue = model.getLineContent(prevLineNumber);
-				const prevPointMatch = prevLineValue.trim().match(pointerRegEx);
-				if (prevPointMatch) {
-					const startLineNumber = Math.max(1, prevLineNumber - 1);
-					const startLineLength = model.getLineLength(startLineNumber);
-
-					const prevLineWithRemovedPointerPrefix = prevLineValue
-						.trim()
-						.slice(prevPointMatch[0].length);
-
-					// Handle empty pointer before
-					if (!prevLineWithRemovedPointerPrefix) {
-						// TODO: set cursor at start of next line
-						monacoEditor.executeEdits('remove.prevBulletPoint', [
-							{
-								text: change.text,
-								range: {
-									startLineNumber: startLineNumber,
-									startColumn: startLineNumber === prevLineNumber ? 0 : startLineLength + 1,
-									endLineNumber: lineWithChanges,
-									endColumn: 0
-								},
-							},
-						]);
-
-						requestAnimationFrame(() => {
-							monacoEditor.setPosition({
-								lineNumber: lineWithChanges,
-								column: model.getLineLength(lineWithChanges) + 1,
-							});
-						});
-						return;
-					}
-				}
-
-				// 
-				// 
-				// 
-
-				const columnToInsert = change.text.length;
-
-				const isCheckboxType = Boolean(pointMatch[1]);
-				const textToInsert = '- ' + (isCheckboxType ? '[ ] ' : '');
-
-				monacoEditor.executeEdits('insert.bulletPoint', [
-					{
-						text: textToInsert,
-						range: {
-							startLineNumber: lineWithChanges,
-							endLineNumber: lineWithChanges,
-							startColumn: columnToInsert,
-							endColumn: columnToInsert,
-						},
-					},
-				]);
-
-				// TODO: use arguments of `executeEdits` method to change cursor position
-				// Set cursor
-				requestAnimationFrame(() => {
-					monacoEditor.setPosition({
-						lineNumber: lineWithChanges,
-						column: columnToInsert + textToInsert.length,
-					});
-				});
-			});
-		}
-
-		disposeList.push(
-			monacoEditor.addAction({
-				id: 'printEditorInstance',
-				label: 'Print current editor instance in console',
-				run(editor) {
-					console.log('Editor instance', editor);
-				},
-			}),
-		);
-
 		editorRef.current = monacoEditor;
 
 		// Update value
@@ -231,6 +128,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		// Handle window resize
 		window.addEventListener('resize', updateDimensions);
 
+		// Enable extensions
+		const extensionsCleanupCallbacks = defaultExtensions.map((extension) => extension(monacoEditor));
+
 		setEditorObject(monacoEditor);
 
 		return () => {
@@ -238,7 +138,12 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			editorContainer.removeEventListener('keyup', onKeyPress);
 			window.removeEventListener('resize', updateDimensions);
 
-			disposeList.forEach((item) => item.dispose());
+			extensionsCleanupCallbacks.forEach((callback) => {
+				if (callback) {
+					callback();
+				}
+			});
+
 			monacoEditor.dispose();
 
 			setEditorObject(null);
