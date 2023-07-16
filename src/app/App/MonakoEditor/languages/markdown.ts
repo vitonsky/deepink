@@ -20,6 +20,7 @@ export const conf: languages.LanguageConfiguration = {
 		{ open: '{', close: '}' },
 		{ open: '[', close: ']' },
 		{ open: '(', close: ')' },
+		{ open: '```', close: '```' },
 		{ open: '<', close: '>', notIn: ['string'] }
 	],
 	surroundingPairs: [
