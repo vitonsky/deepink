@@ -7,7 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { editor, languages } from 'monaco-editor-core';
+import { editor, IDisposable, languages } from 'monaco-editor-core';
 
 import { FileUploader, useDropFiles } from './features/useDropFiles';
 import * as markdown from './languages/markdown';
@@ -72,7 +72,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	// Init
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-	const [editorObject, setEditorObject] = useState<editor.IStandaloneCodeEditor | null>(null);
+	const [editorObject, setEditorObject] = useState<editor.IStandaloneCodeEditor | null>(
+		null,
+	);
 
 	const updateDimensions = useCallback(() => {
 		const editorContainer = editorContainerRef.current;
@@ -101,6 +103,71 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			wordWrap: 'on',
 			quickSuggestions: false,
 		});
+
+		const disposeList: IDisposable[] = [];
+
+		const model = monacoEditor.getModel();
+		if (model) {
+			const pointerRegEx = /^-( \[(\s|x)\])?/;
+			model.onDidChangeContent((evt) => {
+				// TODO: implement for all changes
+				const change = evt.changes[0];
+
+				console.warn('Change', change);
+
+				const isNewLine = /^\n[\s\t]*$/.test(change.text);
+				if (!isNewLine) return;
+				if (change.range.startLineNumber !== change.range.endLineNumber) return;
+
+				const lineValue = model.getValueInRange({
+					...change.range,
+					startColumn: 0,
+				});
+				const pointMatch = lineValue.trim().match(pointerRegEx);
+				if (!pointMatch) return;
+
+				const isCheckboxType = Boolean(pointMatch[1]);
+				console.log({ rangeValue: lineValue, isCheckboxType });
+
+				const lineWithChanges = change.range.startLineNumber + 1;
+				const columnStartsWithNonWhitespace = model.getLineFirstNonWhitespaceColumn(lineWithChanges);
+				const lineWithChangesLen = model.getLineLength(lineWithChanges);
+				const columnToInsert = columnStartsWithNonWhitespace > 0 ? columnStartsWithNonWhitespace : lineWithChangesLen + 1;
+
+				const textToInsert = '- ' + (isCheckboxType ? '[ ] ' : '');
+
+				monacoEditor.executeEdits('insert.bulletPoint', [
+					{
+						text: textToInsert,
+						range: {
+							startLineNumber: lineWithChanges,
+							endLineNumber: lineWithChanges,
+							startColumn: columnToInsert,
+							endColumn: columnToInsert,
+						},
+					},
+				]);
+
+				// TODO: use arguments of `executeEdits` method to change cursor position
+				// Set cursor
+				requestAnimationFrame(() => {
+					monacoEditor.setPosition({
+						lineNumber: lineWithChanges,
+						column: columnToInsert + textToInsert.length,
+					});
+				});
+			});
+		}
+
+		disposeList.push(
+			monacoEditor.addAction({
+				id: 'printEditorInstance',
+				label: 'Print current editor instance in console',
+				run(editor) {
+					console.log(editor);
+				},
+			}),
+		);
 
 		editorRef.current = monacoEditor;
 
@@ -132,6 +199,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			editorContainer.removeEventListener('keyup', onKeyPress);
 			window.removeEventListener('resize', updateDimensions);
 
+			disposeList.forEach((item) => item.dispose());
 			monacoEditor.dispose();
 
 			setEditorObject(null);
