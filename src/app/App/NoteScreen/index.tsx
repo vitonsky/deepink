@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState
 import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/desktop';
 import ReactMarkdown from 'react-markdown';
 import { debounce } from 'lodash';
+import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@bem-react/classname';
 
@@ -167,7 +168,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 
 			setMarkdownContent(
 				<ReactMarkdown
-					remarkPlugins={[remarkGfm]}
+					remarkPlugins={[remarkGfm, remarkBreaks]}
 					transformImageUri={(sourceUrl) => {
 						if (!sourceUrl) return sourceUrl;
 
