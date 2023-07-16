@@ -71,6 +71,13 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		updateAttachments(text);
 	}, [text, updateAttachments]);
 
+	// Immediate update a text
+	const onTextUpdate = useCallback((text: string) => {
+		debouncedUpdateNote({ title, text });
+		debouncedUpdateNote.flush();
+		setText(text);
+	}, [debouncedUpdateNote, title]);
+
 	return (
 		<div className={cnNoteEditor()}>
 			<Textinput value={title} onInputText={setTitle} placeholder="Note title" />
@@ -81,7 +88,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					className={cnNoteEditor('Editor')}
 					uploadFile={uploadFile}
 				/>
-				<NoteScreen note={note} />
+				<NoteScreen note={note} update={onTextUpdate} />
 			</div>
 		</div>
 	);

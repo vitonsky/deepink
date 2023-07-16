@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/desktop';
 import ReactMarkdown from 'react-markdown';
 import { debounce } from 'lodash';
@@ -9,6 +9,7 @@ import { getResourceIdInUrl } from '../../../core/links';
 import { INote } from '../../../core/Note';
 
 import { useAttachmentsRegistry, useFilesRegistry } from '../Providers';
+import { Checkbox, InputComponent, ListItem, RequestCheckboxUpdate } from './components/Checkbox';
 import { Link } from './components/Link';
 
 import 'github-markdown-css/github-markdown.css';
@@ -18,6 +19,7 @@ const cnNoteScreen = cn('NoteScreen');
 
 export type NoteScreenProps = {
 	note: INote;
+	update: (text: string) => void;
 };
 
 type BlobResource = { url: string; dispose: () => void };
@@ -95,7 +97,7 @@ const useFilesUrls = () => {
 	);
 };
 
-export const NoteScreen: FC<NoteScreenProps> = ({ note }) => {
+export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 	const [text, setText] = useState('');
 
 	const attachmentsRegistry = useAttachmentsRegistry();
@@ -109,10 +111,40 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note }) => {
 	);
 
 	// Update text with delay, to not render too frequently
+	const isImmediateRenderRef = useRef(false);
 	const currentText = note.data.text;
 	useEffect(() => {
 		debouncedSetText(currentText);
+
+		if (isImmediateRenderRef.current) {
+			isImmediateRenderRef.current = false;
+			debouncedSetText.flush();
+		}
 	}, [currentText, debouncedSetText]);
+
+	const Input = useMemo(() => {
+		const updateCheckbox: RequestCheckboxUpdate = (isChecked, sourcePosition) => {
+			const start = sourcePosition.start.offset;
+			const end = sourcePosition.end.offset;
+
+			if (start === undefined || end === undefined) return;
+
+			const nodeValue = text.slice(start, end);
+			const updatedValue = nodeValue.replace(/(\s*- \[)(x|\s)(\])/, `$1${isChecked ? 'x' : ' '}$3`);
+			if (updatedValue === nodeValue) return;
+
+			const updatedText = text.slice(0, start) + updatedValue + text.slice(end);
+
+			isImmediateRenderRef.current = true;
+			update(updatedText);
+		};
+
+		const WrappedComponent: InputComponent = (props) => {
+			return <Checkbox updateCheckbox={updateCheckbox} {...props} />;
+		};
+
+		return WrappedComponent;
+	}, [text, update]);
 
 	const [markdownContent, setMarkdownContent] = useState<ReactNode>(null);
 	const getFilesUrl = useFilesUrls();
@@ -146,15 +178,19 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note }) => {
 						return file ? file.url : sourceUrl;
 					}}
 					transformLinkUri={(uri) => uri}
+					sourcePos={true}
+					rawSourcePos={true}
 					components={{
 						a: Link,
+						li: ListItem,
+						input: Input
 					}}
 				>
 					{text}
 				</ReactMarkdown>,
 			);
 		})();
-	}, [attachmentsRegistry, getFilesUrl, note.id, text]);
+	}, [Input, attachmentsRegistry, getFilesUrl, note.id, text, update]);
 
 	return (
 		<div className={cnNoteScreen()}>

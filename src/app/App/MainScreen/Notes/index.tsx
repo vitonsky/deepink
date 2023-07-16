@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { TabsPanes } from 'react-elegant-ui/esm/components/TabsPanes/TabsPanes.bundle/desktop';
+import { isEqual } from 'lodash';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../../core/Note';
@@ -36,6 +37,11 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 							<NoteEditor
 								note={noteObject}
 								updateNote={(noteData) => {
+									// Skip updates with not changed data
+									if (isEqual(noteObject.data, noteData)) {
+										return;
+									}
+
 									updateNote({ ...noteObject, data: noteData });
 								}}
 							/>
