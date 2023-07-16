@@ -113,8 +113,6 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 				// TODO: implement for all changes
 				const change = evt.changes[0];
 
-				console.warn('Change', change);
-
 				const isNewLine = /^\n[\s\t]*$/.test(change.text);
 				if (!isNewLine) return;
 				if (change.range.startLineNumber !== change.range.endLineNumber) return;
@@ -126,14 +124,55 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 				const pointMatch = lineValue.trim().match(pointerRegEx);
 				if (!pointMatch) return;
 
-				const isCheckboxType = Boolean(pointMatch[1]);
-				console.log({ rangeValue: lineValue, isCheckboxType });
-
 				const lineWithChanges = change.range.startLineNumber + 1;
-				const columnStartsWithNonWhitespace = model.getLineFirstNonWhitespaceColumn(lineWithChanges);
-				const lineWithChangesLen = model.getLineLength(lineWithChanges);
-				const columnToInsert = columnStartsWithNonWhitespace > 0 ? columnStartsWithNonWhitespace : lineWithChangesLen + 1;
 
+				// 
+				// 
+				// 
+
+				const prevLineNumber = Math.max(1, lineWithChanges - 1);
+				const prevLineValue = model.getLineContent(prevLineNumber);
+				const prevPointMatch = prevLineValue.trim().match(pointerRegEx);
+				if (prevPointMatch) {
+					const startLineNumber = Math.max(1, prevLineNumber - 1);
+					const startLineLength = model.getLineLength(startLineNumber);
+
+					const prevLineWithRemovedPointerPrefix = prevLineValue
+						.trim()
+						.slice(prevPointMatch[0].length);
+
+					// Handle empty pointer before
+					if (!prevLineWithRemovedPointerPrefix) {
+						// TODO: set cursor at start of next line
+						monacoEditor.executeEdits('remove.prevBulletPoint', [
+							{
+								text: change.text,
+								range: {
+									startLineNumber: startLineNumber,
+									startColumn: startLineNumber === prevLineNumber ? 0 : startLineLength + 1,
+									endLineNumber: lineWithChanges,
+									endColumn: 0
+								},
+							},
+						]);
+
+						requestAnimationFrame(() => {
+							monacoEditor.setPosition({
+								lineNumber: lineWithChanges,
+								column: model.getLineLength(lineWithChanges) + 1,
+							});
+						});
+						return;
+					}
+				}
+
+				// 
+				// 
+				// 
+
+				const columnToInsert = change.text.length;
+
+				const isCheckboxType = Boolean(pointMatch[1]);
 				const textToInsert = '- ' + (isCheckboxType ? '[ ] ' : '');
 
 				monacoEditor.executeEdits('insert.bulletPoint', [
@@ -164,7 +203,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 				id: 'printEditorInstance',
 				label: 'Print current editor instance in console',
 				run(editor) {
-					console.log(editor);
+					console.log('Editor instance', editor);
 				},
 			}),
 		);
