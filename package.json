@@ -78,6 +78,7 @@
 		"github-markdown-css": "^5.2.0",
 		"lodash": "^4.17.21",
 		"monaco-editor-core": "^0.39.0",
+		"monaco-markdown": "^0.0.12",
 		"pretty-bytes": "^6.1.0",
 		"proper-lockfile": "^4.1.2",
 		"react": "^18.2.0",
