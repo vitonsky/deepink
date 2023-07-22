@@ -5,7 +5,7 @@ import saveAs from 'file-saver';
 import { getResourceIdInUrl } from '../../../../core/links';
 import { useFilesRegistry } from '../../Providers';
 
-export const Link: Exclude<Components['a'], undefined> = ({ node, ...props }) => {
+export const Link: Exclude<Components['a'], undefined> = ({ node, sourcePosition, ...props }) => {
 	const filesRegistry = useFilesRegistry();
 
 	const onClick = useCallback(
