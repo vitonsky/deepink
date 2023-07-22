@@ -21,8 +21,3 @@
 .NoteScreen-Spinner {
 	margin: auto;
 }
-
-.NoteScreen-Content input[type='checkbox']:checked,
-.NoteScreen-Content input[type='checkbox']:checked + * {
-	filter: brightness(0.8);
-}
