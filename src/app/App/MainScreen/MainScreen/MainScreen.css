@@ -30,4 +30,5 @@
 .MainScreen-NoteEditors {
 	display: flex;
 	flex-grow: 100;
+	overflow: auto;
 }

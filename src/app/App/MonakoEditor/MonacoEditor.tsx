@@ -9,9 +9,10 @@ import React, {
 } from 'react';
 import { editor, languages } from 'monaco-editor-core';
 
+import { defaultExtensions } from './extensions';
 import { FileUploader, useDropFiles } from './features/useDropFiles';
-import { language as mdlanguage } from './languages/markdown';
-import { language as tslanguage } from './languages/typescript';
+import * as markdown from './languages/markdown';
+import * as typescript from './languages/typescript';
 
 // Configure monako
 languages.register({
@@ -23,7 +24,8 @@ languages.register({
 	mimetypes: ['text/javascript'],
 });
 
-languages.setMonarchTokensProvider('javascript', tslanguage);
+languages.setMonarchTokensProvider('javascript', typescript.language);
+languages.setLanguageConfiguration('javascript', typescript.conf);
 
 languages.register({
 	id: 'markdown',
@@ -40,7 +42,8 @@ languages.register({
 	aliases: ['Markdown', 'markdown'],
 });
 
-languages.setMonarchTokensProvider('markdown', mdlanguage);
+languages.setMonarchTokensProvider('markdown', markdown.language);
+languages.setLanguageConfiguration('markdown', markdown.conf);
 
 export type EditorObject = {
 	updateDimensions: () => void;
@@ -70,7 +73,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	// Init
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-	const [editorObject, setEditorObject] = useState<editor.IStandaloneCodeEditor | null>(null);
+	const [editorObject, setEditorObject] = useState<editor.IStandaloneCodeEditor | null>(
+		null,
+	);
 
 	const updateDimensions = useCallback(() => {
 		const editorContainer = editorContainerRef.current;
@@ -97,6 +102,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			language: 'markdown',
 			automaticLayout: true,
 			wordWrap: 'on',
+			quickSuggestions: false,
+			unicodeHighlight: { ambiguousCharacters: false, invisibleCharacters: true },
+			folding: false,
 		});
 
 		editorRef.current = monacoEditor;
@@ -122,12 +130,21 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		// Handle window resize
 		window.addEventListener('resize', updateDimensions);
 
+		// Enable extensions
+		const extensionsCleanupCallbacks = defaultExtensions.map((extension) => extension(monacoEditor));
+
 		setEditorObject(monacoEditor);
 
 		return () => {
 			editorContainer.removeEventListener('keydown', onKeyPress);
 			editorContainer.removeEventListener('keyup', onKeyPress);
 			window.removeEventListener('resize', updateDimensions);
+
+			extensionsCleanupCallbacks.forEach((callback) => {
+				if (callback) {
+					callback();
+				}
+			});
 
 			monacoEditor.dispose();
 

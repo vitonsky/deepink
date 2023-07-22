@@ -4,6 +4,7 @@ import saveAs from 'file-saver';
 import { editor, languages } from 'monaco-editor-core';
 
 import { findLinksInText, getResourceIdInUrl } from '../../../../core/links';
+import { openLink } from '../../../../electron/requests/interactions/renderer';
 import { useFilesRegistry } from '../../Providers';
 
 /**
@@ -43,6 +44,11 @@ export const useEditorLinks = () => {
 
 		const appLinkOpener = editor.registerLinkOpener({
 			async open(resource) {
+				if (/^https?$/.test(resource.scheme)) {
+					openLink(resource.toString());
+					return true;
+				}
+
 				const fileId = getResourceIdInUrl(resource);
 				if (fileId === null) return false;
 

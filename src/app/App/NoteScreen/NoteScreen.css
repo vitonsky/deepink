@@ -1,0 +1,23 @@
+.NoteScreen {
+	width: 100%;
+	overflow: auto;
+}
+
+.NoteScreen-Content {
+	overflow: auto;
+	word-break: break-word;
+	word-wrap: break-word;
+	padding: 1rem;
+}
+
+.NoteScreen-SplashScreen {
+	display: flex;
+	height: 100%;
+	width: 100%;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.NoteScreen-Spinner {
+	margin: auto;
+}

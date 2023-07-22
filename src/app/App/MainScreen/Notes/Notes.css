@@ -9,3 +9,8 @@
 	flex-grow: 100;
 	width: 100%;
 }
+
+.Notes > * {
+	overflow: auto;
+	max-height: 100%;
+}
