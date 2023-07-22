@@ -131,7 +131,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 			if (start === undefined || end === undefined) return;
 
 			const nodeValue = text.slice(start, end);
-			const updatedValue = nodeValue.replace(/(?<start>\s*(-|\d+\.) \[)(x|\s)(?<end>\])/, `$<start>${isChecked ? 'x' : ' '}$<end>`);
+			const updatedValue = nodeValue.replace(/\[(x|\s)\]/, `[${isChecked ? 'x' : ' '}]`);
 			if (updatedValue === nodeValue) return;
 
 			const updatedText = text.slice(0, start) + updatedValue + text.slice(end);
