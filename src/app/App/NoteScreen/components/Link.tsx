@@ -3,6 +3,7 @@ import { Components } from 'react-markdown';
 import saveAs from 'file-saver';
 
 import { getResourceIdInUrl } from '../../../../core/links';
+import { openLink } from '../../../../electron/requests/interactions/renderer';
 import { useFilesRegistry } from '../../Providers';
 
 export const Link: Exclude<Components['a'], undefined> = ({ node, sourcePosition, ...props }) => {
@@ -39,9 +40,7 @@ export const Link: Exclude<Components['a'], undefined> = ({ node, sourcePosition
 			if (/^https?:\/\//.test(url)) {
 				evt.preventDefault();
 
-				// TODO: implement open external resource
-				// require("shell").openExternal(props.href);
-				console.log('Open external resource', url);
+				openLink(url);
 
 				return;
 			}
