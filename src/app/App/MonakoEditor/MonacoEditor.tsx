@@ -103,7 +103,8 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			automaticLayout: true,
 			wordWrap: 'on',
 			quickSuggestions: false,
-			unicodeHighlight: { ambiguousCharacters: false, invisibleCharacters: true }
+			unicodeHighlight: { ambiguousCharacters: false, invisibleCharacters: true },
+			folding: false,
 		});
 
 		editorRef.current = monacoEditor;
