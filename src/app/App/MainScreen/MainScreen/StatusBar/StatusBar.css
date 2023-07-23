@@ -1,0 +1,14 @@
+.StatusBar {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 10;
+	min-width: 100%;
+	max-height: 28px;
+	background: #fff7d9;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+.StatusBar > .Button {
+	--button-border-radius: 0;
+}

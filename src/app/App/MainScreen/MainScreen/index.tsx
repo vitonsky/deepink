@@ -12,6 +12,7 @@ import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
 import { Notes } from '../Notes';
 import { NotesList } from '../NotesList';
 import { TopBar } from '../TopBar';
+import { StatusBar } from './StatusBar';
 
 import './MainScreen.css';
 
@@ -98,43 +99,47 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	// TODO: add memoizing for tabs mapping
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
-			<div className={cnMainScreen('SideBar')}>
-				<div className={cnMainScreen('SideBarControls')}>
-					<Button view="action" onPress={createNote}>
-						New note
-					</Button>
-				</div>
+			<div className={cnMainScreen('Content')}>
+				<div className={cnMainScreen('SideBar')}>
+					<div className={cnMainScreen('SideBarControls')}>
+						<Button view="action" onPress={createNote}>
+							New note
+						</Button>
+					</div>
 
-				<div className={cnMainScreen('NotesList')}>
-					<NotesList
+					<div className={cnMainScreen('NotesList')}>
+						<NotesList
+							{...{
+								notesRegistry,
+								notes,
+								updateNotes,
+								onPick: onNoteClick,
+								onClose: onNoteClose,
+								openedNotes: tabs,
+								activeNote: tab,
+							}}
+						/>
+					</div>
+				</div>
+				<div className={cnMainScreen('ContentBlock')}>
+					<TopBar
 						{...{
 							notesRegistry,
-							notes,
 							updateNotes,
-							onPick: onNoteClick,
+							notes,
+							tabs,
+							activeTab: tab ?? null,
 							onClose: onNoteClose,
-							openedNotes: tabs,
-							activeNote: tab,
+							onPick: onNoteClick,
 						}}
 					/>
+					<div className={cnMainScreen('NoteEditors')}>
+						<Notes {...{ notes, tabs, activeTab: tab ?? null, updateNote }} />
+					</div>
 				</div>
 			</div>
-			<div className={cnMainScreen('ContentBlock')}>
-				<TopBar
-					{...{
-						notesRegistry,
-						updateNotes,
-						notes,
-						tabs,
-						activeTab: tab ?? null,
-						onClose: onNoteClose,
-						onPick: onNoteClick,
-					}}
-				/>
-				<div className={cnMainScreen('NoteEditors')}>
-					<Notes {...{ notes, tabs, activeTab: tab ?? null, updateNote }} />
-				</div>
-			</div>
+
+			<StatusBar />
 		</div>
 	);
 };

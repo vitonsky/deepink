@@ -8,6 +8,8 @@
 	word-break: break-word;
 	word-wrap: break-word;
 	padding: 1rem;
+	min-height: 100%;
+	box-sizing: border-box;
 }
 
 .NoteScreen-SplashScreen {
