@@ -4,6 +4,7 @@
 	flex-grow: 10;
 	min-width: 100%;
 	max-height: 28px;
+	min-height: 28px;
 	background: #fff7d9;
 	box-sizing: border-box;
 	overflow: hidden;
