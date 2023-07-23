@@ -7,7 +7,7 @@ import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
-import { electronPaths } from '../../electron/requests/files';
+import { getResourcesPath, getUserDataPath } from '../../electron/requests/files/renderer';
 import { deleteFiles, getFile, listFiles, uploadFile } from '../../electron/requests/storage/renderer';
 
 import { MainScreen } from './MainScreen/MainScreen';
@@ -26,13 +26,13 @@ export const App: FC = () => {
 	const [db, setDb] = useState<null | SQLiteDb>(null);
 	useEffect(() => {
 		(async () => {
-			const profileDir = await electronPaths.getUserDataPath('defaultProfile');
+			const profileDir = await getUserDataPath('defaultProfile');
 
 			// Ensure profile dir exists
 			mkdirSync(profileDir, { recursive: true });
 
 			const dbPath = path.join(profileDir, 'deepink.db');
-			const dbExtensionsDir = await electronPaths.getResourcesPath(
+			const dbExtensionsDir = await getResourcesPath(
 				'sqlite/extensions',
 			);
 
