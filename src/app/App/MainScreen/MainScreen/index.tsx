@@ -25,7 +25,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [notes, setNotes] = useState<INote[]>([]);
 
 	const updateNotes = useCallback(async () => {
-		const notes = await notesRegistry.get();
+		const notes = await notesRegistry.get({ limit: 10000 });
 		notes.sort((a, b) => {
 			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
 			const timeB = b.updatedTimestamp ?? b.createdTimestamp ?? 0;
@@ -139,7 +139,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 				</div>
 			</div>
 
-			<StatusBar />
+			<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
 		</div>
 	);
 };

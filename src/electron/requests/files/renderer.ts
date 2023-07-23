@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron';
 
 import { CHANNELS } from '.';
 
-export function exportNotes(): Promise<void> {
+export function exportNotes(): Promise<Record<string, ArrayBuffer>> {
 	return ipcRenderer.invoke(CHANNELS.exportNotes);
 };
 
