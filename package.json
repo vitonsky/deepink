@@ -78,6 +78,7 @@
 		"github-markdown-css": "^5.2.0",
 		"glob": "^10.3.3",
 		"lodash": "^4.17.21",
+		"mdast-util-from-markdown": "^2.0.0",
 		"monaco-editor-core": "^0.39.0",
 		"monaco-markdown": "^0.0.12",
 		"pretty-bytes": "^6.1.0",
@@ -88,7 +89,10 @@
 		"react-markdown": "^8.0.7",
 		"remark-breaks": "^3.0.3",
 		"remark-gfm": "^3.0.1",
+		"remark-stringify": "^10.0.3",
 		"sqlite": "^4.2.1",
-		"sqlite3": "^5.1.6"
+		"sqlite3": "^5.1.6",
+		"unified": "^10.1.2",
+		"unist-util-visit": "^5.0.0"
 	}
 }

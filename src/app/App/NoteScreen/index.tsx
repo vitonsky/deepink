@@ -168,6 +168,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 
 			setMarkdownContent(
 				<ReactMarkdown
+					// FIXME: errors occurs with some texts
 					remarkPlugins={[remarkGfm, remarkBreaks]}
 					transformImageUri={(sourceUrl) => {
 						if (!sourceUrl) return sourceUrl;

@@ -39,7 +39,7 @@ export class FilesRegistry {
 			throw new Error("Can't get id of inserted row");
 		}
 
-		const fileId = selectWithId.id;
+		const fileId: string = selectWithId.id;
 
 		// TODO: delete entry in DB if can't upload file. Or try to upload first and then add file to DB
 		// TODO: encrypt file
