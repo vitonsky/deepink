@@ -1,6 +1,7 @@
 import React, { FC, HTMLProps, useCallback } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import remarkFrontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
@@ -56,6 +57,7 @@ export const StatusBar: FC<StatusBarProps> = ({
 			// console.warn({ noteText });
 
 			const processor = unified()
+				.use(remarkGfm)
 				.use(remarkStringify)
 				.use(remarkParse)
 				.use(remarkParseFrontmatter)
