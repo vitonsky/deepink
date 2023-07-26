@@ -88,11 +88,15 @@
 		"react-elegant-ui": "^0.3.3",
 		"react-markdown": "^8.0.7",
 		"remark-breaks": "^3.0.3",
+		"remark-frontmatter": "^4.0.1",
 		"remark-gfm": "^3.0.1",
+		"remark-parse": "^10.0.2",
+		"remark-parse-frontmatter": "^1.0.3",
 		"remark-stringify": "^10.0.3",
 		"sqlite": "^4.2.1",
 		"sqlite3": "^5.1.6",
 		"unified": "^10.1.2",
+		"unist-util-remove": "^4.0.0",
 		"unist-util-visit": "^5.0.0"
 	}
 }
