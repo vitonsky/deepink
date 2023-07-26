@@ -60,11 +60,6 @@ export const StatusBar: FC<StatusBarProps> = ({ className, notesRegistry, update
 				urls.push(getRelativePath(filename, node.url));
 			});
 
-			// TODO: upload files and write to map
-			if (urls.length > 0) {
-				console.warn({ urls });
-			}
-
 			// Upload files
 			await Promise.all(urls.map(async (url) => {
 				const urlRealPath = decodeURI(url);
@@ -98,14 +93,6 @@ export const StatusBar: FC<StatusBarProps> = ({ className, notesRegistry, update
 
 			// TODO: do not change original note markup
 			const result = unified().use(remarkStringify).stringify(tree as any);
-			console.warn({ result });
-
-
-			// TODO: upload files and write to map
-			if (urls.length > 0) {
-				console.warn({ urls });
-			}
-
 			const noteNameWithExt = filename.split('/').slice(-1)[0];
 			const noteName = noteNameWithExt.slice(0, noteNameWithExt.length - fileExtension.length);
 			await notesRegistry.add({
