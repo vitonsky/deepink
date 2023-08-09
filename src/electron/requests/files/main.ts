@@ -25,7 +25,7 @@ function exportNotes() {
 		if (!window) return;
 
 		console.warn('Start export');
-		const { filePaths } = await dialog.showOpenDialog(window);
+		const { filePaths } = await dialog.showOpenDialog(window, { properties: ['openDirectory'] });
 		if (filePaths.length === 0) return;
 
 		const directoryToScan = filePaths[0];
