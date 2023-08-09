@@ -57,11 +57,11 @@ export const StatusBar: FC<StatusBarProps> = ({
 			// console.warn({ noteText });
 
 			const processor = unified()
-				.use(remarkGfm)
-				.use(remarkStringify)
 				.use(remarkParse)
 				.use(remarkParseFrontmatter)
 				.use(remarkFrontmatter, ['yaml', 'toml'])
+				.use(remarkGfm)
+				.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 				.freeze();
 
 			const tree = processor.parse(noteText);
