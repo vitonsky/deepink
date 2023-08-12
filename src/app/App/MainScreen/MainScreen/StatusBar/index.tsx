@@ -3,6 +3,7 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
+import { Root } from 'remark-parse/lib';
 import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
@@ -16,6 +17,24 @@ import { exportNotes } from '../../../../../electron/requests/files/renderer';
 import { useFilesRegistry } from '../../../Providers';
 
 import './StatusBar.css';
+
+export const replaceUrls = (tree: Root, callback: (url: string) => Promise<string>) => {
+	const promises: Promise<any>[] = [];
+
+	visit(tree, ['link', 'image'], (node) => {
+		if (node.type !== 'link' && node.type !== 'image') return;
+
+		// Skip not local urls
+		const urlRegEx = /^[a-z]+:\/\//;
+		if (urlRegEx.test(node.url)) return;
+
+		promises.push(callback(node.url).then((url) => {
+			node.url = url;
+		}));
+	});
+
+	return Promise.all(promises);
+};
 
 export const cnStatusBar = cn('StatusBar');
 
@@ -42,8 +61,6 @@ export const StatusBar: FC<StatusBarProps> = ({
 
 		console.warn('Files', files);
 
-		const uploadedFilesMap: Record<string, string> = {};
-
 		// TODO: attach tags with full hierarchy
 		// TODO: upload files and replace references
 		const enc = new TextDecoder('utf-8');
@@ -66,54 +83,33 @@ export const StatusBar: FC<StatusBarProps> = ({
 
 			const tree = processor.parse(noteText);
 
-			const urls: string[] = [];
-			visit(tree, ['link', 'image'], function (node) {
-				if (node.type !== 'link' && node.type !== 'image') return;
+			const uploadedFiles: Record<string, Promise<string | null>> = {};
+			const getUploadedFileId = async (url: string) => {
+				const urlRealPath = decodeURI(url);
 
-				// Skip not local urls
-				const urlRegEx = /^[a-z]+:\/\//;
-				if (urlRegEx.test(node.url)) return;
+				// Upload new files
+				if (!(urlRealPath in uploadedFiles)) {
+					uploadedFiles[urlRealPath] = (async () => {
+						const buffer = files[urlRealPath];
+						if (!buffer) return null;
 
-				urls.push(getRelativePath(filename, node.url));
+						const urlFilename = urlRealPath.split('/').slice(-1)[0];
+						const file = new File([buffer], urlFilename);
+
+						return filesRegistry.add(file);
+					})();
+				}
+
+				return uploadedFiles[urlRealPath];
+			};
+
+			await replaceUrls(tree, async (nodeUrl) => {
+				const url = getRelativePath(filename, nodeUrl);
+				const fileId = await getUploadedFileId(url);
+				return fileId ? formatResourceLink(fileId) : nodeUrl;
 			});
-
-			// Upload files
-			await Promise.all(
-				urls.map(async (url) => {
-					const urlRealPath = decodeURI(url);
-
-					// Skip uploaded files
-					if (uploadedFilesMap[urlRealPath]) return;
-
-					const buffer = files[urlRealPath];
-					if (!buffer) return;
-
-					const urlFilename = urlRealPath.split('/').slice(-1)[0];
-					const file = new File([buffer], urlFilename);
-
-					const fileId = await filesRegistry.add(file);
-					uploadedFilesMap[urlRealPath] = fileId;
-				}),
-			);
-
-			visit(tree, ['link', 'image'], function (node) {
-				if (node.type !== 'link' && node.type !== 'image') return;
-
-				// Skip not local urls
-				const urlRegEx = /^[a-z]+:\/\//;
-				if (urlRegEx.test(node.url)) return;
-
-				const url = decodeURI(getRelativePath(filename, node.url));
-				const fileId = uploadedFilesMap[url];
-				if (!fileId) return;
-
-				node.url = formatResourceLink(fileId);
-			});
-
 
 			const file = processor.processSync(noteText);
-
-
 			const noteData = file.data.frontmatter as any;
 
 			remove(tree, 'yaml');
