@@ -55,73 +55,78 @@ export const StatusBar: FC<StatusBarProps> = ({
 	updateNotes,
 	...props
 }) => {
+	// TODO: move import logic to hook
 	const filesRegistry = useFilesRegistry();
 	const onImportNotes = useCallback(async () => {
 		const files = await exportNotes();
 
 		console.warn('Files', files);
 
-		// TODO: attach tags with full hierarchy
-		// TODO: upload files and replace references
-		const enc = new TextDecoder('utf-8');
+		const uploadedFiles: Record<string, Promise<string | null>> = {};
+		const getUploadedFileId = async (url: string) => {
+			const urlRealPath = decodeURI(url);
+
+			// Upload new files
+			if (!(urlRealPath in uploadedFiles)) {
+				uploadedFiles[urlRealPath] = (async () => {
+					const buffer = files[urlRealPath];
+					if (!buffer) return null;
+
+					const urlFilename = urlRealPath.split('/').slice(-1)[0];
+					const file = new File([buffer], urlFilename);
+
+					return filesRegistry.add(file);
+				})();
+			}
+
+			return uploadedFiles[urlRealPath];
+		};
+
+		const textDecoder = new TextDecoder('utf-8');
+		const markdownProcessor = unified()
+			.use(remarkParse)
+			.use(remarkParseFrontmatter)
+			.use(remarkFrontmatter, ['yaml', 'toml'])
+			.use(remarkGfm)
+			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
+			.freeze();
+
+		// Handle markdown files
 		for (const filename in files) {
 			// Skip not markdown files
 			const fileExtension = '.md';
 			if (!filename.endsWith(fileExtension)) continue;
 
 			const fileBuffer = files[filename];
-			const noteText = enc.decode(fileBuffer);
-			// console.warn({ noteText });
+			const noteText = textDecoder.decode(fileBuffer);
 
-			const processor = unified()
-				.use(remarkParse)
-				.use(remarkParseFrontmatter)
-				.use(remarkFrontmatter, ['yaml', 'toml'])
-				.use(remarkGfm)
-				.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
-				.freeze();
+			const vFile = markdownProcessor.processSync(noteText);
+			const noteData = vFile.data.frontmatter as any;
 
-			const tree = processor.parse(noteText);
+			const tree = markdownProcessor.parse(noteText);
 
-			const uploadedFiles: Record<string, Promise<string | null>> = {};
-			const getUploadedFileId = async (url: string) => {
-				const urlRealPath = decodeURI(url);
+			// Remove header node with meta data parsed by frontmatter
+			remove(tree, 'yaml');
 
-				// Upload new files
-				if (!(urlRealPath in uploadedFiles)) {
-					uploadedFiles[urlRealPath] = (async () => {
-						const buffer = files[urlRealPath];
-						if (!buffer) return null;
-
-						const urlFilename = urlRealPath.split('/').slice(-1)[0];
-						const file = new File([buffer], urlFilename);
-
-						return filesRegistry.add(file);
-					})();
-				}
-
-				return uploadedFiles[urlRealPath];
-			};
-
+			// Replace URLs to uploaded entities
+			// TODO: update references to another md files
 			await replaceUrls(tree, async (nodeUrl) => {
 				const url = getRelativePath(filename, nodeUrl);
 				const fileId = await getUploadedFileId(url);
 				return fileId ? formatResourceLink(fileId) : nodeUrl;
 			});
 
-			const file = processor.processSync(noteText);
-			const noteData = file.data.frontmatter as any;
+			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
+			const compiledNoteText = markdownProcessor.stringify(tree);
+			console.warn({ tree, vFile, noteData, compiledNoteText });
 
-			remove(tree, 'yaml');
-			const result = processor.stringify(tree);
-			console.warn({ tree, file, noteData, result });
-
-			// TODO: do not change original note markup
 			const noteNameWithExt = filename.split('/').slice(-1)[0];
 			const noteName = noteNameWithExt.slice(0, noteNameWithExt.length - fileExtension.length);
+
+			// TODO: attach tags with full hierarchy
 			await notesRegistry.add({
 				title: noteData.title || noteName,
-				text: result,
+				text: compiledNoteText,
 			});
 
 			// TODO: add method to registry, to emit event by updates
