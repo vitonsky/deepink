@@ -29,15 +29,17 @@ export const TagsList: FC<ITagsListProps> = ({ tags, onTagClick }) => {
 				const tagId = tag.id;
 				const isGroupOpened = toggledTags.includes(tagId) !== invertOpenedTags;
 				return (
-					<>
-						<li
-							className={cnTagsList('Tag')}
-							onClick={() => {
-								if (onTagClick) {
-									onTagClick(tagId);
-								}
-							}}
-						>
+					<li
+						key={tagId}
+						className={cnTagsList('Tag')}
+						onClick={(evt) => {
+							if (onTagClick) {
+								evt.stopPropagation();
+								onTagClick(tagId);
+							}
+						}}
+					>
+						<div className={cnTagsList('TagBody')}>
 							<Icon glyph="tag" />
 							<span className={cnTagsList('TagContent')}>
 								{tag.content}
@@ -65,13 +67,14 @@ export const TagsList: FC<ITagsListProps> = ({ tags, onTagClick }) => {
 									/>
 								)}
 							</span>
-						</li>
+						</div>
+
 						{tag.childrens && isGroupOpened && (
 							<span className={cnTagsList('TagGroup')}>
 								<TagsList tags={tag.childrens} onTagClick={onTagClick} />
 							</span>
 						)}
-					</>
+					</li>
 				);
 			})}
 		</ul>

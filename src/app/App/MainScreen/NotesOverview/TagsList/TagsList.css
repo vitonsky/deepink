@@ -11,15 +11,19 @@
 }
 
 .TagsList-Tag {
-	display: flex;
 	margin-bottom: .5rem;
-	padding: .3rem .5rem;
 	line-height: 1.5rem;
+	
+}
+
+.TagsList-TagBody {
+	display: flex;
+	padding: .3rem .5rem;
 	gap: .3rem;
     border-radius: 4px;
 }
 
-.TagsList-Tag:hover {
+.TagsList-TagBody:hover {
 	background: #ff00ba;
     color: #ffffff;
 }
