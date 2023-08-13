@@ -2,13 +2,13 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
-import { useStore } from 'effector-react';
+import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
 import { NotesRegistry } from '../../../../core/Registry/NotesRegistry';
-import { $activeTag } from '../../../../core/state/notes';
+import { $activeTag, $openedNotes, openedNotesControls } from '../../../../core/state/notes';
 import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
 
 import { Notes } from '../Notes';
@@ -23,7 +23,6 @@ export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [notesRegistry] = useState<INotesRegistry>(() => new NotesRegistry(db));
-	const [tabs, setTabs] = useState<NoteId[]>([]);
 	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
 
@@ -49,33 +48,40 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 
 	// TODO: focus on note input
 	const onNoteClick = useCallback((id: NoteId) => {
-		setTabs((state) => (state.includes(id) ? state : [...state, id]));
-		setTab(id);
-	}, []);
+		const note = notes.find((note) => note.id === id);
+		if (note) {
+			openedNotesControls.add(note);
+		}
 
+		setTab(id);
+	}, [notes]);
+
+	const openedNotes = useStore($openedNotes);
+	const tabs = useStoreMap($openedNotes, (state) => state.map(({ id }) => id));
 	const onNoteClose = useCallback(
 		(id: NoteId) => {
-			const tabIndex = tabs.indexOf(id);
+			const tabIndex = openedNotes.findIndex((note) => note.id === id);
 
 			// Change tab if it is current tab
 			if (id === tab) {
 				let nextTab = null;
 				if (tabIndex > 0) {
-					nextTab = tabs[tabIndex - 1];
-				} else if (tabIndex === 0 && tabs.length > 1) {
-					tabs[1];
+					nextTab = openedNotes[tabIndex - 1].id;
+				} else if (tabIndex === 0 && openedNotes.length > 1) {
+					nextTab = openedNotes[1].id;
 				}
 				setTab(nextTab);
 			}
 
-			setTabs((state) => state.filter((tabId) => tabId !== id));
+			openedNotesControls.delete(id);
 		},
-		[tab, tabs],
+		[openedNotes, tab],
 	);
 
 	// Simulate note update
 	const updateNote = useCallback(
 		async (note: INote) => {
+			openedNotesControls.update(note);
 			await notesRegistry.update(note.id, note.data);
 			updateNotes();
 		},
@@ -135,7 +141,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 						{...{
 							notesRegistry,
 							updateNotes,
-							notes,
+							notes: openedNotes,
 							tabs,
 							activeTab: tab ?? null,
 							onClose: onNoteClose,
@@ -143,7 +149,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 						}}
 					/>
 					<div className={cnMainScreen('NoteEditors')}>
-						<Notes {...{ notes, tabs, activeTab: tab ?? null, updateNote }} />
+						<Notes {...{ notes: openedNotes, tabs, activeTab: tab ?? null, updateNote }} />
 					</div>
 				</div>
 			</div>
