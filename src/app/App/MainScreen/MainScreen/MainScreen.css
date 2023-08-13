@@ -12,7 +12,8 @@
 	min-width: 250px;
 	max-width: 250px;
 	border-right: 3px solid #fefe;
-	padding: 0.5rem;
+	padding: 4px;
+	/* padding: 0.5rem; */
 	overflow: auto;
 	display: flex;
 	flex-direction: column;

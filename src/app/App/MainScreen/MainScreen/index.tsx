@@ -11,6 +11,7 @@ import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
 
 import { Notes } from '../Notes';
 import { NotesList } from '../NotesList';
+import { NotesOverview } from '../NotesOverview';
 import { TopBar } from '../TopBar';
 import { StatusBar } from './StatusBar';
 
@@ -100,6 +101,10 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
 			<div className={cnMainScreen('Content')}>
+				<div className={cnMainScreen('SideBar')}>
+					<NotesOverview />
+				</div>
+
 				<div className={cnMainScreen('SideBar')}>
 					<div className={cnMainScreen('SideBarControls')}>
 						<Button view="action" onPress={createNote}>
