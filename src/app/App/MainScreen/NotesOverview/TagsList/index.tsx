@@ -9,6 +9,7 @@ const cnTagsList = cn('TagsList');
 
 // TODO: add id
 export type ListItem = {
+	id: string;
 	content: ReactNode;
 	childrens?: ListItem[];
 };
@@ -24,8 +25,8 @@ export const TagsList: FC<ITagsListProps> = ({ tags, onTagClick }) => {
 
 	return (
 		<ul className={cnTagsList()}>
-			{tags.map((tag, index) => {
-				const tagId = `${index}-${tag.content}`;
+			{tags.map((tag) => {
+				const tagId = tag.id;
 				const isGroupOpened = toggledTags.includes(tagId) !== invertOpenedTags;
 				return (
 					<>
@@ -67,7 +68,7 @@ export const TagsList: FC<ITagsListProps> = ({ tags, onTagClick }) => {
 						</li>
 						{tag.childrens && isGroupOpened && (
 							<span className={cnTagsList('TagGroup')}>
-								<TagsList tags={tag.childrens} />
+								<TagsList tags={tag.childrens} onTagClick={onTagClick} />
 							</span>
 						)}
 					</>
