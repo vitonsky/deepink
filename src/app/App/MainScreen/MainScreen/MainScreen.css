@@ -18,6 +18,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
+	background: #f1f1f1;
 }
 
 .MainScreen-NotesList {
