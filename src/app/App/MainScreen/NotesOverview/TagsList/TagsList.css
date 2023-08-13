@@ -28,6 +28,11 @@
     color: #ffffff;
 }
 
+.TagsList-Tag_active > .TagsList-TagBody {
+    background: #d7079e;
+    color: #fff;
+}
+
 .TagsList-TagControls {
     margin-left: auto;
 }

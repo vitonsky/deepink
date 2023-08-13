@@ -1,6 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useStore } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
+import { $activeTag, setActiveTag } from '../../../../core/state/notes';
 import { useTagsRegistry } from '../../Providers';
 
 import { ListItem, TagsList } from './TagsList';
@@ -13,6 +15,8 @@ export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const [tags, setTags] = useState<ListItem[]>([]);
+
+	const activeTag = useStore($activeTag);
 
 	const tagsRegistry = useTagsRegistry();
 	useEffect(() => {
@@ -66,9 +70,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	return (
 		<TagsList
 			tags={tags}
-			onTagClick={(tagId) => {
-				console.warn('Click item', tagId);
-			}}
+			activeTag={activeTag ?? undefined}
+			onTagClick={setActiveTag}
 		/>
 	);
 };

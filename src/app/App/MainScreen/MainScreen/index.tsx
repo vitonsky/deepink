@@ -2,11 +2,13 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
+import { useStore } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
 import { NotesRegistry } from '../../../../core/Registry/NotesRegistry';
+import { $activeTag } from '../../../../core/state/notes';
 import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
 
 import { Notes } from '../Notes';
@@ -25,8 +27,10 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
 
+	const activeTag = useStore($activeTag);
 	const updateNotes = useCallback(async () => {
-		const notes = await notesRegistry.get({ limit: 10000 });
+		const tags = activeTag === null ? [] : [activeTag];
+		const notes = await notesRegistry.get({ limit: 10000, tags });
 		notes.sort((a, b) => {
 			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
 			const timeB = b.updatedTimestamp ?? b.createdTimestamp ?? 0;
@@ -36,7 +40,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 			return 0;
 		});
 		setNotes(notes);
-	}, [notesRegistry]);
+	}, [activeTag, notesRegistry]);
 
 	// Init
 	useEffect(() => {

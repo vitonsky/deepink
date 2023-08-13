@@ -41,7 +41,7 @@ export class NotesRegistry implements INotesRegistry {
 		return length;
 	}
 
-	public async get({ limit = 100, page = 1 }: NotesRegistryFetchOptions = {}): Promise<
+	public async get({ limit = 100, page = 1, tags = [] }: NotesRegistryFetchOptions = {}): Promise<
 		INote[]
 	> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
@@ -50,10 +50,23 @@ export class NotesRegistry implements INotesRegistry {
 
 		const notes: INote[] = [];
 
+		const fetchQuery = ['SELECT * FROM notes'];
+		const fetchParams: (number | string)[] = [];
+
+		if (tags.length > 0) {
+			const placeholders = Array(tags.length).fill('?').join(',');
+
+			fetchQuery.push(`WHERE id IN (SELECT target FROM attachedTags WHERE source IN (${placeholders}))`);
+			fetchParams.push(...tags);
+		}
+
 		const offset = (page - 1) * limit;
+		fetchQuery.push(`LIMIT ? OFFSET ?`);
+		fetchParams.push(limit, offset);
+
 		await db.each(
-			'SELECT * FROM notes LIMIT ? OFFSET ?;',
-			[limit, offset],
+			fetchQuery.join(' '),
+			fetchParams,
 			(err, row) => {
 				if (err) {
 					throw new Error(err);

@@ -16,6 +16,11 @@ export type NotesRegistryFetchOptions = {
 	 * @default 1
 	 */
 	page?: number;
+
+	/**
+	 * Filter notes by tags
+	 */
+	tags?: string[]
 };
 
 /**

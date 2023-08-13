@@ -16,10 +16,11 @@ export type ListItem = {
 
 export type ITagsListProps = {
 	tags: ListItem[];
+	activeTag?: string;
 	onTagClick?: (id: string) => void;
 }
 
-export const TagsList: FC<ITagsListProps> = ({ tags, onTagClick }) => {
+export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, onTagClick }) => {
 	const [toggledTags, setToggledTags] = useState<string[]>([]);
 	const invertOpenedTags = true;
 
@@ -31,7 +32,7 @@ export const TagsList: FC<ITagsListProps> = ({ tags, onTagClick }) => {
 				return (
 					<li
 						key={tagId}
-						className={cnTagsList('Tag')}
+						className={cnTagsList('Tag', { active: activeTag === tagId })}
 						onClick={(evt) => {
 							if (onTagClick) {
 								evt.stopPropagation();
@@ -71,7 +72,7 @@ export const TagsList: FC<ITagsListProps> = ({ tags, onTagClick }) => {
 
 						{tag.childrens && isGroupOpened && (
 							<span className={cnTagsList('TagGroup')}>
-								<TagsList tags={tag.childrens} onTagClick={onTagClick} />
+								<TagsList tags={tag.childrens} activeTag={activeTag} onTagClick={onTagClick} />
 							</span>
 						)}
 					</li>
