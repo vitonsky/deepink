@@ -20,7 +20,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	const tagsRegistry = useTagsRegistry();
 	useEffect(() => {
-		tagsRegistry.get().then((flatTags) => {
+		tagsRegistry.getTags().then((flatTags) => {
 			const tagsMap: Record<string, ListItem> = {};
 			const tagToParentMap: Record<string, string> = {};
 
