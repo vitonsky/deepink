@@ -47,10 +47,24 @@ export class Tags {
 		this.db = db;
 	}
 
+	/**
+	 * Returns tags  list
+	 */
 	public async getTags(): Promise<ITag[]> {
 		const { db } = this.db;
 
 		const rows = await db.all(tagsQuery);
+		return rows.map(({ id, name, resolvedName, parent, }) => ({ id, name, resolvedName, parent: parent ?? null }));
+	}
+
+	/**
+	 * Returns tags attached to a entity
+	 */
+	public async getAttachedTags(target: string): Promise<ITag[]> {
+		const { db } = this.db;
+
+		const query = [tagsQuery, `WHERE t.id IN (SELECT source FROM attachedTags WHERE target = ?)`].join(' ');
+		const rows = await db.all(query, [target]);
 		return rows.map(({ id, name, resolvedName, parent, }) => ({ id, name, resolvedName, parent: parent ?? null }));
 	}
 };
