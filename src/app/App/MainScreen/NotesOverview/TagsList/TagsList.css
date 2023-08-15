@@ -1,45 +1,16 @@
-.TagsList {
-	margin: 0;
-	padding-left: 0;
-	list-style: none;
-	font-family: arial;
-	user-select: none;
-}
-
-.TagsList-TagGroup > .TagsList {
-	padding-left: 1rem;
-}
-
 .TagsList-Tag {
-	margin-bottom: .5rem;
-	line-height: 1.5rem;
-	
-}
-
-.TagsList-TagBody {
 	display: flex;
-	padding: .3rem .5rem;
-	gap: .3rem;
-    border-radius: 4px;
-}
-
-.TagsList-TagBody:hover {
-	background: #ff00ba;
-    color: #ffffff;
-}
-
-.TagsList-Tag_active > .TagsList-TagBody {
-    background: #d7079e;
-    color: #fff;
+	gap: 0.3rem;
+	width: 100%;
 }
 
 .TagsList-TagControls {
-    margin-left: auto;
+	margin-left: auto;
 }
 
 .TagsList-TagControls > *:hover {
 	background: #0000001c;
-    border-radius: 4px;
+	border-radius: 4px;
 }
 
 .TagsList-ExpandButton_opened {

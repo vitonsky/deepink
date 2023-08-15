@@ -5,7 +5,8 @@ import { cn } from '@bem-react/classname';
 import { $activeTag, setActiveTag } from '../../../../core/state/notes';
 import { useTagsRegistry } from '../../Providers';
 
-import { ListItem, TagsList } from './TagsList';
+import { List } from './List';
+import { TagItem, TagsList } from './TagsList';
 
 import './NotesOverview.css';
 
@@ -14,21 +15,21 @@ export const cnNotesOverview = cn('NotesOverview');
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
-	const [tags, setTags] = useState<ListItem[]>([]);
+	const [tags, setTags] = useState<TagItem[]>([]);
 
 	const activeTag = useStore($activeTag);
 
 	const tagsRegistry = useTagsRegistry();
 	useEffect(() => {
 		tagsRegistry.getTags().then((flatTags) => {
-			const tagsMap: Record<string, ListItem> = {};
+			const tagsMap: Record<string, TagItem> = {};
 			const tagToParentMap: Record<string, string> = {};
 
 			// Fill maps
 			flatTags.forEach(({ id, name, parent }) => {
 				tagsMap[id] = {
 					id,
-					content: name
+					content: name,
 				};
 
 				if (parent !== null) {
@@ -68,10 +69,19 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	// TODO: show spinner while loading tags
 	return (
-		<TagsList
-			tags={tags}
-			activeTag={activeTag ?? undefined}
-			onTagClick={setActiveTag}
-		/>
+		<>
+			<List
+				items={[{ id: 'all', content: 'All notes' }]}
+				activeItem={activeTag === null ? 'all' : undefined}
+				onPick={() => {
+					setActiveTag(null);
+				}}
+			/>
+			<TagsList
+				tags={tags}
+				activeTag={activeTag ?? undefined}
+				onTagClick={setActiveTag}
+			/>
+		</>
 	);
 };

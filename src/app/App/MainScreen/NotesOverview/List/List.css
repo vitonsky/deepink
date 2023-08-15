@@ -1,0 +1,33 @@
+.List {
+	margin: 0;
+	padding-left: 0;
+	list-style: none;
+	font-family: arial;
+	user-select: none;
+}
+
+.List-Group > .List {
+	padding-left: 1rem;
+}
+
+.List-Item:not(:last-child) {
+	margin-bottom: 0.5rem;
+	line-height: 1.5rem;
+}
+
+.List-ItemBody {
+	display: flex;
+	padding: 0.3rem 0.5rem;
+	gap: 0.3rem;
+	border-radius: 4px;
+}
+
+.List-ItemBody:hover {
+	background: #ff00ba;
+	color: #ffffff;
+}
+
+.List-Item_active > .List-ItemBody {
+	background: #d7079e;
+	color: #fff;
+}
