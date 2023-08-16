@@ -71,10 +71,15 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	return (
 		<>
 			<List
-				items={[{ id: 'all', content: 'All notes' }]}
+				classNameExtensions={{ ItemBody: cnNotesOverview('MenuItem') }}
+				items={[
+					{ id: 'all', content: 'All notes' },
+				]}
 				activeItem={activeTag === null ? 'all' : undefined}
-				onPick={() => {
-					setActiveTag(null);
+				onPick={(id) => {
+					if (id === 'all') {
+						setActiveTag(null);
+					}
 				}}
 			/>
 			<TagsList

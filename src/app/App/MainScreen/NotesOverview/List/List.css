@@ -10,9 +10,11 @@
 	padding-left: 1rem;
 }
 
+.List-Item {
+	line-height: 1.5rem;
+}
 .List-Item:not(:last-child) {
 	margin-bottom: 0.5rem;
-	line-height: 1.5rem;
 }
 
 .List-ItemBody {

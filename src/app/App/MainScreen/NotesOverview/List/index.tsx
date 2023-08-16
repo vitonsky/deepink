@@ -1,6 +1,8 @@
 import React, { FC, ReactNode } from 'react';
 import { cn } from '@bem-react/classname';
 
+import { ClassNameExtensions, extendClassName } from '../../../../../utils/className';
+
 import './List.css';
 
 const cnList = cn('List');
@@ -16,11 +18,15 @@ export type IListProps = {
 	items: ListItem[];
 	activeItem?: string;
 	onPick?: (id: string) => void;
+	classNameExtensions?: ClassNameExtensions;
 };
 
-export const List: FC<IListProps> = ({ items, activeItem, onPick }) => {
+export const List: FC<IListProps> = ({ items, ...props }) => {
+	const { activeItem, onPick, classNameExtensions = {} } = props;
+	const extendedListCn = extendClassName(cnList, classNameExtensions);
+
 	return (
-		<ul className={cnList()}>
+		<ul className={extendedListCn()}>
 			{items.map((item) => {
 				const tagId = item.id;
 				const isGroupCollapsed = Boolean(item.collapsed);
@@ -28,10 +34,12 @@ export const List: FC<IListProps> = ({ items, activeItem, onPick }) => {
 				return (
 					<li
 						key={tagId}
-						className={cnList('Item', { active: activeItem === tagId })}
+						className={extendedListCn('Item', {
+							active: activeItem === tagId,
+						})}
 					>
 						<div
-							className={cnList('ItemBody')}
+							className={extendedListCn('ItemBody')}
 							onClick={(evt) => {
 								if (onPick) {
 									evt.stopPropagation();
@@ -43,12 +51,8 @@ export const List: FC<IListProps> = ({ items, activeItem, onPick }) => {
 						</div>
 
 						{item.childrens && !isGroupCollapsed && (
-							<span className={cnList('Group')}>
-								<List
-									items={item.childrens}
-									activeItem={activeItem}
-									onPick={onPick}
-								/>
+							<span className={extendedListCn('Group')}>
+								<List items={item.childrens} {...props} />
 							</span>
 						)}
 					</li>
