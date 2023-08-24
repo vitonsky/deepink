@@ -1,7 +1,14 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
+import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import { LayerManager } from 'react-elegant-ui/esm/components/LayerManager/LayerManager';
+import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
+import { Modal } from 'react-elegant-ui/esm/components/Modal/Modal.bundle/desktop';
+import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
+import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { useStore } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
+import { ITag } from '../../../../core/Registry/Tags/Tags';
 import { $activeTag, setActiveTag } from '../../../../core/state/notes';
 import { useTagsRegistry } from '../../Providers';
 
@@ -12,16 +19,145 @@ import './NotesOverview.css';
 
 export const cnNotesOverview = cn('NotesOverview');
 
+type ITagEditorProps = {
+	tags: ITag[];
+	parentTag?: ITag;
+};
+
+const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag }) => {
+	const [parentTagId, setParentTagId] = useState<string | null>(
+		parentTag ? parentTag.id : null,
+	);
+	const [parentTagName, setParentTagName] = useState(
+		parentTag ? parentTag.resolvedName : '',
+	);
+	const [tagName, setTagName] = useState('');
+	const [isTagsListVisible, setIsTagsListVisible] = useState(false);
+
+	const parentTagInputRef = useRef<HTMLInputElement>(null);
+	const modalRef = useRef<HTMLDivElement>(null);
+
+	const tagsItems = tags
+		.filter(
+			({ resolvedName }) =>
+				parentTagName.trim().length === 0 || resolvedName.includes(parentTagName),
+		)
+		.map(({ id, resolvedName }) => ({ id, content: resolvedName }));
+
+	useEffect(() => {
+		const isEmptyValue = parentTagName.trim().length === 0;
+		if (isEmptyValue) {
+			setParentTagId(null);
+		}
+	}, [parentTagName]);
+
+	useEffect(() => {
+		const parentTag = tags.find(({ id }) => id === parentTagId);
+		setParentTagName(parentTag ? parentTag.resolvedName : '');
+	}, [parentTagId, tags]);
+
+	useEffect(() => {
+		if (!parentTag) return;
+
+		setParentTagId(parentTag.id);
+		setParentTagName(parentTag.resolvedName);
+	}, [parentTag]);
+
+	return (
+		<LayerManager essentialRefs={[]}>
+			<Modal
+				visible
+				view="default"
+				className={cnNotesOverview('TagEditor')}
+				innerRef={modalRef}
+			>
+				<Textinput
+					placeholder="Parent tag"
+					value={parentTagName}
+					onChange={(evt) => {
+						console.log('change');
+						setParentTagName(evt.target.value);
+					}}
+					controlProps={{
+						innerRef: parentTagInputRef,
+						onFocus: () => {
+							setIsTagsListVisible(true);
+						},
+						onBlur: () => {
+							setIsTagsListVisible(false);
+							// setTimeout(() => {
+							// 	setIsTagsListVisible(false);
+							// }, 200);
+						},
+						onKeyDown: () => {
+							setIsTagsListVisible(true);
+						},
+						onClick: () => {
+							setIsTagsListVisible(true);
+						},
+					}}
+				/>
+				<Textinput
+					placeholder="Tag name"
+					value={tagName}
+					onChange={(evt) => {
+						setTagName(evt.target.value);
+					}}
+				/>
+				<div className={cnNotesOverview('TagEditorControls')}>
+					<Button
+						view="action"
+						onPress={() => {
+							console.warn('Create tag', {
+								tagName,
+								parent: parentTagId,
+							});
+						}}
+					>
+						Add
+					</Button>
+					<Button>Cancel</Button>
+				</div>
+				{tagsItems.length > 0 && isTagsListVisible && (
+					<Popup
+						target="anchor"
+						anchor={parentTagInputRef}
+						view="default"
+						visible
+						direction={['bottom-start', 'bottom', 'bottom-end']}
+						boundary={modalRef}
+					>
+						{/* {tags.map((tag) => <div key={tag.id}>{tag.resolvedName}</div>)} */}
+						<Menu
+							items={tagsItems}
+							onMouseDown={(e) => {
+								e.preventDefault();
+								e.stopPropagation();
+							}}
+							onPick={(id) => {
+								setParentTagId(id);
+								setIsTagsListVisible(false);
+							}}
+						/>
+					</Popup>
+				)}
+			</Modal>
+		</LayerManager>
+	);
+};
+
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
-	const [tags, setTags] = useState<TagItem[]>([]);
+	const [tagsTree, setTagsTree] = useState<TagItem[]>([]);
+	const [tags, setTags] = useState<ITag[]>([]);
 
 	const activeTag = useStore($activeTag);
 
 	const tagsRegistry = useTagsRegistry();
 	useEffect(() => {
 		tagsRegistry.getTags().then((flatTags) => {
+			setTags(flatTags);
 			const tagsMap: Record<string, TagItem> = {};
 			const tagToParentMap: Record<string, string> = {};
 
@@ -60,7 +196,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 			// Collect tags array from a map
 			const nestedTags = Object.values(tagsMap);
-			setTags(nestedTags);
+			setTagsTree(nestedTags);
 		});
 
 		// Run once for init state
@@ -72,9 +208,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		<>
 			<List
 				classNameExtensions={{ ItemBody: cnNotesOverview('MenuItem') }}
-				items={[
-					{ id: 'all', content: 'All notes' },
-				]}
+				items={[{ id: 'all', content: 'All notes' }]}
 				activeItem={activeTag === null ? 'all' : undefined}
 				onPick={(id) => {
 					if (id === 'all') {
@@ -82,11 +216,22 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					}
 				}}
 			/>
-			<TagsList
-				tags={tags}
-				activeTag={activeTag ?? undefined}
-				onTagClick={setActiveTag}
-			/>
+
+			<div className={cnNotesOverview('Tags')}>
+				<div className={cnNotesOverview('TagsControls')}>
+					<h2>Tags</h2>
+
+					<Button view="clear">+</Button>
+				</div>
+
+				<TagsList
+					tags={tagsTree}
+					activeTag={activeTag ?? undefined}
+					onTagClick={setActiveTag}
+				/>
+			</div>
+
+			<TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} />
 		</>
 	);
 };

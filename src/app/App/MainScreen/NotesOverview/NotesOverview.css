@@ -1,3 +1,35 @@
 .NotesOverview-MenuItem {
-	padding: .3rem 1rem;
+	padding: 0.3rem 1rem;
+}
+
+.NotesOverview-TagsControls h2 {
+	margin: 0;
+	display: inline-block;
+	font-size: 1.2rem;
+	font-weight: bolder;
+}
+
+.NotesOverview-TagsControls {
+	font-family: arial;
+	display: flex;
+	justify-content: space-between;
+	line-height: 1.5rem;
+}
+
+.NotesOverview-Tags {
+	margin-top: 0.5rem;
+}
+
+.NotesOverview-TagEditor .Modal-Content {
+	display: flex;
+	flex-direction: column;
+	padding: 1.5rem 1rem;
+	min-width: 500px;
+	gap: 1rem;
+}
+
+.NotesOverview-TagEditorControls {
+	display: flex;
+	gap: 0.5rem;
+	justify-content: end;
 }
