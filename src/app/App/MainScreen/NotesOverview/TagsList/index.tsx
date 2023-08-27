@@ -4,6 +4,7 @@ import { cn } from '@bem-react/classname';
 import { Icon } from '../../../../components/Icon/Icon.bundle/common';
 
 import { List, ListItem } from '../List';
+import { useTagContextMenu } from './useTagContextMenu';
 
 import './TagsList.css';
 
@@ -40,6 +41,15 @@ const convertTagToListItem = (
 export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, onTagClick }) => {
 	const [toggledTags, setToggledTags] = useState<string[]>([]);
 
+	const onTagMenu = useTagContextMenu({
+		onDelete(id) {
+			console.log('Delete tag', id);
+		},
+		onEdit(id) {
+			console.log('Edit tag', id);
+		},
+	});
+
 	const items: ListItem[] = useMemo(() => {
 		return convertTagToListItem(tags, ({ id, content, childrens }) => {
 			const isToggledGroup = toggledTags.includes(id);
@@ -48,7 +58,9 @@ export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, onTagClick }) =>
 			return {
 				id,
 				content: (
-					<div className={cnTagsList('Tag')}>
+					<div className={cnTagsList('Tag')} onContextMenu={(evt) => {
+						onTagMenu(id, { x: evt.clientX, y: evt.clientY });
+					}}>
 						<Icon glyph="tag" />
 
 						<span className={cnTagsList('TagContent')}>{content}</span>

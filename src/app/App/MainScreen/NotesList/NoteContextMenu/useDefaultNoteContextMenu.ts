@@ -33,7 +33,7 @@ export const noteMenu: ContextMenu = [
 ];
 
 export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistry }: DefaultContextMenuOptions) => {
-	const noteContextMenuCallback: NoteContextMenuCallback = useCallback(
+	const noteContextMenuCallback: NoteContextMenuCallback<NoteActions> = useCallback(
 		async ({ noteId, action }) => {
 			switch (action) {
 				case NoteActions.DELETE:

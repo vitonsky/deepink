@@ -4,21 +4,20 @@ import { NoteId } from '../../../../../core/Note';
 import { ContextMenu } from '../../../../../electron/contextMenu';
 
 import { ElectronContextMenu } from './ElectronContextMenu';
-import { NoteActions } from '.';
 
-export type NoteContextMenuCallback = (event: {
+export type NoteContextMenuCallback<T extends string> = (event: {
 	noteId: NoteId;
-	action: NoteActions;
+	action: T;
 }) => void;
 
 // TODO: implement context menu on web technologies
 /**
  * Provide callback to trigger open note context menu
  */
-export const useNoteContextMenu = (menu: ContextMenu, callback: NoteContextMenuCallback) => {
+export const useNoteContextMenu = <T extends string>(menu: ContextMenu, callback: NoteContextMenuCallback<T>) => {
 	const [contextMenu, setContextMenu] = useState(() => {
 		// TODO: provide constructor in react context
-		return new ElectronContextMenu(menu);
+		return new ElectronContextMenu<T>(menu);
 	});
 
 	// Update menu
