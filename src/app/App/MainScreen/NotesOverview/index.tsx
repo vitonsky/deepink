@@ -30,32 +30,47 @@ type ITagEditorProps = {
 	onSave: (tagData: TagEditorData) => void;
 };
 
+function findSubstr(src: string, search: string, reverse = false) {
+	const reverseString = (str: string) => str.split('').reverse().join('');
+
+	if (reverse) {
+		src = reverseString(src);
+		search = reverseString(search);
+	}
+
+	let substr = '';
+	for (let i = 0; src.length > i && search.length > i && src[i] === search[i]; i++) {
+		substr += src[i];
+	}
+
+	if (reverse) {
+		return reverseString(substr);
+	}
+
+	return substr;
+}
+
 const getSortIndex = (a: string, b: string, value: string) => {
 	const left = -1;
 	const right = 1;
 
-	const isAStartsWithSearchValue = a.startsWith(value);
-	const isAEndsWithSearchValue = a.endsWith(value);
-	const isAFullMatch = isAStartsWithSearchValue && isAEndsWithSearchValue;
+	const aMatchFromStart = findSubstr(a, value);
+	const aMatchFromEnd = findSubstr(a, value, true);
+	const isAFullMatch = aMatchFromStart.length === a.length;
+	const aBestMatch = Math.max(aMatchFromStart.length, aMatchFromEnd.length);
 
-	const isBStartsWithSearchValue = b.startsWith(value);
-	const isBEndsWithSearchValue = b.endsWith(value);
-	const isBFullMatch = isBStartsWithSearchValue && isBEndsWithSearchValue;
+	const bMatchFromStart = findSubstr(b, value);
+	const bMatchFromEnd = findSubstr(b, value, true);
+	const isBFullMatch = bMatchFromStart.length === b.length;
+	const bBestMatch = Math.max(bMatchFromStart.length, bMatchFromEnd.length);
 
 	// Prefer full match
 	if (isAFullMatch && isBFullMatch) return 0;
 	if (isAFullMatch) return left;
 	if (isBFullMatch) return right;
 
-	// Prefer started with
-	if (isAStartsWithSearchValue && isBStartsWithSearchValue) return 0;
-	if (isAStartsWithSearchValue) return left;
-	if (isBStartsWithSearchValue) return right;
-
-	// Prefer ended with
-	if (isAEndsWithSearchValue && isBEndsWithSearchValue) return 0;
-	if (isAEndsWithSearchValue) return left;
-	if (isBEndsWithSearchValue) return right;
+	if (aBestMatch > bBestMatch) return left;
+	if (aBestMatch < bBestMatch) return right;
 
 	return 0;
 };
