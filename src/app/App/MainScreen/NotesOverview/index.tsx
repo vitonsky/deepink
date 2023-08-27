@@ -54,11 +54,13 @@ const getSortIndex = (a: string, b: string, value: string) => {
 	const left = -1;
 	const right = 1;
 
+	const isASubstringMatch = a.search(value);
 	const aMatchFromStart = findSubstr(a, value);
 	const aMatchFromEnd = findSubstr(a, value, true);
 	const isAFullMatch = aMatchFromStart.length === a.length;
 	const aBestMatch = Math.max(aMatchFromStart.length, aMatchFromEnd.length);
 
+	const isBSubstringMatch = b.search(value);
 	const bMatchFromStart = findSubstr(b, value);
 	const bMatchFromEnd = findSubstr(b, value, true);
 	const isBFullMatch = bMatchFromStart.length === b.length;
@@ -69,6 +71,13 @@ const getSortIndex = (a: string, b: string, value: string) => {
 	if (isAFullMatch) return left;
 	if (isBFullMatch) return right;
 
+	// Prefer substring match
+	if (isASubstringMatch !== isBSubstringMatch) {
+		if (isASubstringMatch) return left;
+		if (isBSubstringMatch) return right;
+	}
+
+	// Prefer a string with most large match chars from start or from end
 	if (aBestMatch > bBestMatch) return left;
 	if (aBestMatch < bBestMatch) return right;
 
