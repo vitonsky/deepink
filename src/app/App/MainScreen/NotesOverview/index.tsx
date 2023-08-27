@@ -30,6 +30,36 @@ type ITagEditorProps = {
 	onSave: (tagData: TagEditorData) => void;
 };
 
+const getSortIndex = (a: string, b: string, value: string) => {
+	const left = -1;
+	const right = 1;
+
+	const isAStartsWithSearchValue = a.startsWith(value);
+	const isAEndsWithSearchValue = a.endsWith(value);
+	const isAFullMatch = isAStartsWithSearchValue && isAEndsWithSearchValue;
+
+	const isBStartsWithSearchValue = b.startsWith(value);
+	const isBEndsWithSearchValue = b.endsWith(value);
+	const isBFullMatch = isBStartsWithSearchValue && isBEndsWithSearchValue;
+
+	// Prefer full match
+	if (isAFullMatch && isBFullMatch) return 0;
+	if (isAFullMatch) return left;
+	if (isBFullMatch) return right;
+
+	// Prefer started with
+	if (isAStartsWithSearchValue && isBStartsWithSearchValue) return 0;
+	if (isAStartsWithSearchValue) return left;
+	if (isBStartsWithSearchValue) return right;
+
+	// Prefer ended with
+	if (isAEndsWithSearchValue && isBEndsWithSearchValue) return 0;
+	if (isAEndsWithSearchValue) return left;
+	if (isBEndsWithSearchValue) return right;
+
+	return 0;
+};
+
 const TagEditor: FC<ITagEditorProps> = ({ tags, onSave, parentTag }) => {
 	const [parentTagId, setParentTagId] = useState<string | null>(
 		parentTag ? parentTag.id : null,
@@ -56,11 +86,21 @@ const TagEditor: FC<ITagEditorProps> = ({ tags, onSave, parentTag }) => {
 	const parentTagInputRef = useRef<HTMLInputElement>(null);
 	const modalRef = useRef<HTMLDivElement>(null);
 
-	const tagsItems = tags
+	const tagsItems = [...tags]
 		.filter(
 			({ resolvedName }) =>
 				parentTagName.trim().length === 0 || resolvedName.includes(parentTagName),
 		)
+		.sort((a, b) => {
+			const segments = parentTagName.split('/');
+			if (segments.length > 1) {
+				return getSortIndex(a.resolvedName, b.resolvedName, parentTagName);
+			}
+
+			const aLastSegment = a.resolvedName.split('/').slice(-1)[0];
+			const bLastSegment = b.resolvedName.split('/').slice(-1)[0];
+			return getSortIndex(aLastSegment, bLastSegment, parentTagName);
+		})
 		.map(({ id, resolvedName }) => ({ id, content: resolvedName }));
 
 	useEffect(() => {
