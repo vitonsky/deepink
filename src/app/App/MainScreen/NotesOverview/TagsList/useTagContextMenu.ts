@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 import { ContextMenu } from "../../../../../electron/contextMenu";
-import { NoteContextMenuCallback, useNoteContextMenu } from "../../NotesList/NoteContextMenu/useNoteContextMenu";
+import { ContextMenuCallback, useContextMenu } from "../../../../components/hooks/useContextMenu";
 
 
 export enum TagContextMenu {
@@ -27,19 +27,19 @@ type DefaultContextMenuOptions = {
 };
 
 export const useTagContextMenu = ({ onEdit, onDelete }: DefaultContextMenuOptions) => {
-	const noteContextMenuCallback: NoteContextMenuCallback<TagContextMenu> = useCallback(
-		async ({ noteId, action }) => {
+	const noteContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
+		async ({ id, action }) => {
 			const actionsMap = {
 				[TagContextMenu.EDIT]: onEdit,
 				[TagContextMenu.DELETE]: onDelete,
 			};
 
 			if (action in actionsMap) {
-				actionsMap[action](noteId);
+				actionsMap[action](id);
 			}
 		},
 		[onDelete, onEdit],
 	);
 
-	return useNoteContextMenu(tagMenu, noteContextMenuCallback);
+	return useContextMenu(tagMenu, noteContextMenuCallback);
 };
