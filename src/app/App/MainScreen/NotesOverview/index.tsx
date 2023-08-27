@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { useStore } from 'effector-react';
 import { cn } from '@bem-react/classname';
@@ -77,7 +77,15 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const parentTagForNewTagRef = useRef<ITag | null>(null);
 	const [isAddTagPopupOpened, setIsAddTagPopupOpened] = useState(false);
+
+	useEffect(() => {
+		if (!isAddTagPopupOpened) {
+			parentTagForNewTagRef.current = null;
+		}
+	}, [isAddTagPopupOpened]);
+
 
 	const [editedTag, setEditedTag] = useState<TagEditorData | null>(null);
 	const tagEditor = useMemo(() => {
@@ -98,7 +106,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 		if (!isAddTagPopupOpened) return null;
 
-		return <TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} onSave={async (data) => {
+		return <TagEditor tags={tags} parentTag={parentTagForNewTagRef.current ?? undefined} onSave={async (data) => {
 			console.warn('Create tag', data);
 			await tagsRegistry.add(data.name, data.parent);
 			await updateTags();
@@ -137,6 +145,14 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					activeTag={activeTag ?? undefined}
 					onTagClick={setActiveTag}
 					contextMenu={{
+						onAdd(id) {
+							const tag = tags.find((tag) => id === tag.id);
+							if (tag) {
+								parentTagForNewTagRef.current = tag;
+							}
+
+							setIsAddTagPopupOpened(true);
+						},
 						async onDelete(id) {
 							console.log('Delete tag', id);
 							await tagsRegistry.delete(id);

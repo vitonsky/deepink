@@ -5,11 +5,16 @@ import { ContextMenuCallback, useContextMenu } from "../../../../components/hook
 
 
 export enum TagContextMenu {
+	ADD = 'add',
 	EDIT = 'edit',
 	DELETE = 'delete',
 }
 
 export const tagMenu: ContextMenu = [
+	{
+		id: TagContextMenu.ADD,
+		label: 'Add',
+	},
 	{
 		id: TagContextMenu.EDIT,
 		label: 'Edit',
@@ -22,14 +27,16 @@ export const tagMenu: ContextMenu = [
 ];
 
 export type TagContextMenuCallbacks = {
+	onAdd: (id: string) => void;
 	onEdit: (id: string) => void;
 	onDelete: (id: string) => void;
 };
 
-export const useTagContextMenu = ({ onEdit, onDelete }: TagContextMenuCallbacks) => {
+export const useTagContextMenu = ({ onAdd, onEdit, onDelete }: TagContextMenuCallbacks) => {
 	const noteContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
 		async ({ id, action }) => {
 			const actionsMap = {
+				[TagContextMenu.ADD]: onAdd,
 				[TagContextMenu.EDIT]: onEdit,
 				[TagContextMenu.DELETE]: onDelete,
 			};
@@ -38,7 +45,7 @@ export const useTagContextMenu = ({ onEdit, onDelete }: TagContextMenuCallbacks)
 				actionsMap[action](id);
 			}
 		},
-		[onDelete, onEdit],
+		[onAdd, onEdit, onDelete],
 	);
 
 	return useContextMenu(tagMenu, noteContextMenuCallback);
