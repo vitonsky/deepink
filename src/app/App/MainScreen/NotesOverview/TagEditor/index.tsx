@@ -16,6 +16,7 @@ import './TagEditor.css';
 export const cnTagEditor = cn('TagEditor');
 
 export type TagEditorData = {
+	id?: string;
 	name: string;
 	parent: string | null;
 };
@@ -149,21 +150,36 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onS
 								return;
 							}
 
-							if (!isEditingMode) {
-								const parentTag = tags.find(({ id }) => id === parentTagId);
-								const fullName = [parentTag?.resolvedName, name].filter(Boolean).join('/');
-
-								const isTagExists = tags.some(({ resolvedName }) => resolvedName === fullName);
-								if (isTagExists) {
-									setTagNameError('Tag already exists');
+							if (isEditingMode) {
+								const isHaveSeparatorChar = name.includes('/');
+								if (isHaveSeparatorChar) {
+									setTagNameError('Name of tag for editing cannot create sub tags');
 									return;
 								}
 							}
 
-							onSave({
+							const parentTag = tags.find(({ id }) => id === parentTagId);
+							const fullName = [parentTag?.resolvedName, name].filter(Boolean).join('/');
+
+							const isTagExists = tags.some(({ id, resolvedName }) => {
+								const isItEditedTag = editedTag && editedTag.id === id;
+								return resolvedName === fullName && !isItEditedTag;
+							});
+							if (isTagExists) {
+								setTagNameError('Tag already exists');
+								return;
+							}
+
+							const editedData: TagEditorData = {
 								name,
 								parent: parentTagId,
-							});
+							};
+
+							if (isEditingMode && editedTag.id) {
+								editedData.id = editedTag.id;
+							}
+
+							onSave(editedData);
 						}}
 					>
 						{isEditingMode ? 'Save' : 'Add'}

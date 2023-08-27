@@ -48,7 +48,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		for (const tagId in tagToParentMap) {
 			const parentId = tagToParentMap[tagId];
 
-			const tag = { ...tagsMap[tagId] };
+			const tag = tagsMap[tagId];
 			const parentTag = tagsMap[parentId];
 
 			// Create array
@@ -85,6 +85,10 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 			const parent = tags.find(({ id }) => id === editedTag.parent);
 			return <TagEditor tags={tags} parentTag={parent} editedTag={editedTag} onSave={async (data) => {
 				console.warn('Update tag', data);
+
+				if (data.id === undefined) return;
+
+				await tagsRegistry.update({ id: data.id, ...data });
 				await updateTags();
 				setEditedTag(null);
 			}} onCancel={() => {
@@ -144,7 +148,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 							if (!tag) return;
 
 							const { name, parent } = tag;
-							setEditedTag({ name, parent });
+							setEditedTag({ id, name, parent });
 						},
 					}}
 				/>

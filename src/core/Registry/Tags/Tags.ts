@@ -102,6 +102,12 @@ export class Tags {
 		return selectWithId.id;
 	}
 
+	public async update(tag: { id: string; name: string; parent: null | string }): Promise<void> {
+		const { db } = this.db;
+
+		await db.run('UPDATE tags SET name=?, parent=? WHERE id=?', [tag.name, tag.parent, tag.id]);
+	}
+
 	/**
 	 * Returns tags attached to a entity
 	 */
