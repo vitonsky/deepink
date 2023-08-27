@@ -15,12 +15,12 @@ import './TagEditor.css';
 
 export const cnTagEditor = cn('TagEditor');
 
-type TagEditorData = {
+export type TagEditorData = {
 	name: string;
 	parent: string | null;
 };
 
-type ITagEditorProps = {
+export type ITagEditorProps = {
 	/**
 	 * Available tags
 	 */

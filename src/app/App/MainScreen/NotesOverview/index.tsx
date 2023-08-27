@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { useStore } from 'effector-react';
 import { cn } from '@bem-react/classname';
@@ -9,7 +9,7 @@ import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { useTagsRegistry } from '../../Providers';
 
 import { List } from './List';
-import { TagEditor } from './TagEditor';
+import { TagEditor, TagEditorData } from './TagEditor';
 import { TagItem, TagsList } from './TagsList';
 
 import './NotesOverview.css';
@@ -79,6 +79,32 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	const [isAddTagPopupOpened, setIsAddTagPopupOpened] = useState(false);
 
+	const [editedTag, setEditedTag] = useState<TagEditorData | null>(null);
+	const tagEditor = useMemo(() => {
+		if (editedTag) {
+			const parent = tags.find(({ id }) => id === editedTag.parent);
+			return <TagEditor tags={tags} parentTag={parent} editedTag={editedTag} onSave={async (data) => {
+				console.warn('Update tag', data);
+				await updateTags();
+				setEditedTag(null);
+			}} onCancel={() => {
+				setEditedTag(null);
+			}} />;
+		}
+
+		if (!isAddTagPopupOpened) return null;
+
+		return <TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} onSave={async (data) => {
+			console.warn('Create tag', data);
+			await tagsRegistry.add(data.name, data.parent);
+			await updateTags();
+			setIsAddTagPopupOpened(false);
+		}} onCancel={() => {
+			setIsAddTagPopupOpened(false);
+
+		}} />;
+	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry, updateTags]);
+
 	// TODO: show spinner while loading tags
 	return (
 		<>
@@ -112,20 +138,19 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						},
 						onEdit(id) {
 							console.log('Edit tag', id);
+
+							const tag = tags.find((tag) => id === tag.id);
+
+							if (!tag) return;
+
+							const { name, parent } = tag;
+							setEditedTag({ name, parent });
 						},
 					}}
 				/>
 			</div>
 
-			{isAddTagPopupOpened && <TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} onSave={async (data) => {
-				console.warn('Create tag', data);
-				await tagsRegistry.add(data.name, data.parent);
-				await updateTags();
-				setIsAddTagPopupOpened(false);
-			}} onCancel={() => {
-				setIsAddTagPopupOpened(false);
-
-			}} />}
+			{tagEditor}
 		</>
 	);
 };

@@ -85,7 +85,7 @@ export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, contextMenu, onT
 				collapsed: !isOpenedGroup,
 			};
 		});
-	}, [tags, toggledTags]);
+	}, [onTagMenu, tags, toggledTags]);
 
 	return (
 		<div className={cnTagsList()}>
