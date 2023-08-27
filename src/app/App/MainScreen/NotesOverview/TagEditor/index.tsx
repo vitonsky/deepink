@@ -21,32 +21,38 @@ type TagEditorData = {
 };
 
 type ITagEditorProps = {
+	/**
+	 * Available tags
+	 */
 	tags: ITag[];
 	parentTag?: ITag;
 	onSave: (tagData: TagEditorData) => void;
 	onCancel: () => void;
+	editedTag?: TagEditorData;
 };
 
-export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, onSave, onCancel }) => {
+export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onSave, onCancel }) => {
 	const [parentTagId, setParentTagId] = useState<string | null>(
 		parentTag ? parentTag.id : null,
 	);
 	const [parentTagName, setParentTagName] = useState(
 		parentTag ? parentTag.resolvedName : '',
 	);
-	const [tagName, setTagName] = useState('');
+
+	const [tagName, setTagName] = useState(editedTag ? editedTag.name : '');
 	const [tagNameError, setTagNameError] = useState<string | null>(null);
 	const [isTagsListVisible, setIsTagsListVisible] = useState(false);
 
+	const isEditingMode = editedTag !== undefined;
+
 	useEffect(() => {
 		setTagNameError(null);
-	}, [tagName, parentTagId]);
+	}, [tagName, parentTagId, isEditingMode]);
 
 	useEffect(() => {
 		if (isTagsListVisible) return;
 
 		const parentTag = tags.find(({ id }) => id === parentTagId);
-
 		setParentTagName(parentTag ? parentTag.resolvedName : '');
 	}, [isTagsListVisible, parentTagId, tags]);
 
@@ -138,18 +144,20 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, onSave, onCanc
 						onPress={() => {
 							const name = tagName.trim();
 
-							const parentTag = tags.find(({ id }) => id === parentTagId);
-							const fullName = [parentTag?.resolvedName, name].filter(Boolean).join('/');
-
-							const isTagExists = tags.some(({ resolvedName }) => resolvedName === fullName);
-							if (isTagExists) {
-								setTagNameError('Tag already exists');
-								return;
-							}
-
 							if (name.length === 0) {
 								setTagNameError('Name must not be empty');
 								return;
+							}
+
+							if (!isEditingMode) {
+								const parentTag = tags.find(({ id }) => id === parentTagId);
+								const fullName = [parentTag?.resolvedName, name].filter(Boolean).join('/');
+
+								const isTagExists = tags.some(({ resolvedName }) => resolvedName === fullName);
+								if (isTagExists) {
+									setTagNameError('Tag already exists');
+									return;
+								}
 							}
 
 							onSave({
@@ -158,7 +166,7 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, onSave, onCanc
 							});
 						}}
 					>
-						Add
+						{isEditingMode ? 'Save' : 'Add'}
 					</Button>
 					<Button onPress={onCancel}>Cancel</Button>
 				</div>
