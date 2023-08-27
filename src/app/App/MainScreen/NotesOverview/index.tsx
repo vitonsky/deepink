@@ -10,6 +10,7 @@ import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../../core/Registry/Tags/Tags';
 import { $activeTag, setActiveTag } from '../../../../core/state/notes';
+import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { useTagsRegistry } from '../../Providers';
 
 import { List } from './List';
@@ -281,7 +282,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		for (const tagId in tagToParentMap) {
 			const parentId = tagToParentMap[tagId];
 
-			const tag = tagsMap[tagId];
+			const tag = { ...tagsMap[tagId] };
 			const parentTag = tagsMap[parentId];
 
 			// Create array
@@ -332,7 +333,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 					<Button view="clear" onPress={() => {
 						setIsAddTagPopupOpened(true);
-					}}>+</Button>
+					}}><Icon glyph="add" /></Button>
 				</div>
 
 				<TagsList
