@@ -166,6 +166,7 @@ const TagEditor: FC<ITagEditorProps> = ({ tags, onSave, parentTag }) => {
 					>
 						{/* {tags.map((tag) => <div key={tag.id}>{tag.resolvedName}</div>)} */}
 						<Menu
+							className={cnNotesOverview('TagsListInPopup')}
 							items={tagsItems}
 							onMouseDown={(e) => {
 								e.preventDefault();
