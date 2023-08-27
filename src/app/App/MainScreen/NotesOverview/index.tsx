@@ -43,7 +43,15 @@ const TagEditor: FC<ITagEditorProps> = ({ tags, onSave, parentTag }) => {
 
 	useEffect(() => {
 		setTagNameError(null);
-	}, [tagName]);
+	}, [tagName, parentTagId]);
+
+	useEffect(() => {
+		if (isTagsListVisible) return;
+
+		const parentTag = tags.find(({ id }) => id === parentTagId);
+
+		setParentTagName(parentTag ? parentTag.resolvedName : '');
+	}, [isTagsListVisible, parentTagId, tags]);
 
 	const parentTagInputRef = useRef<HTMLInputElement>(null);
 	const modalRef = useRef<HTMLDivElement>(null);
