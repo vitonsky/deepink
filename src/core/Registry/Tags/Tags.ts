@@ -111,6 +111,7 @@ export class Tags {
 	public async delete(id: string): Promise<void> {
 		const { db } = this.db;
 
+		// TODO: remove associations
 		await db.run(`
 			WITH RECURSIVE tagTree AS (
 				SELECT
