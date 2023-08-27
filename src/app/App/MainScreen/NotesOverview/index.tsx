@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { LayerManager } from 'react-elegant-ui/esm/components/LayerManager/LayerManager';
 import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
@@ -19,12 +19,18 @@ import './NotesOverview.css';
 
 export const cnNotesOverview = cn('NotesOverview');
 
+type TagEditorData = {
+	name: string;
+	parent: string | null;
+};
+
 type ITagEditorProps = {
 	tags: ITag[];
 	parentTag?: ITag;
+	onSave: (tagData: TagEditorData) => void;
 };
 
-const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag }) => {
+const TagEditor: FC<ITagEditorProps> = ({ tags, onSave, parentTag }) => {
 	const [parentTagId, setParentTagId] = useState<string | null>(
 		parentTag ? parentTag.id : null,
 	);
@@ -32,7 +38,12 @@ const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag }) => {
 		parentTag ? parentTag.resolvedName : '',
 	);
 	const [tagName, setTagName] = useState('');
+	const [tagNameError, setTagNameError] = useState<string | null>(null);
 	const [isTagsListVisible, setIsTagsListVisible] = useState(false);
+
+	useEffect(() => {
+		setTagNameError(null);
+	}, [tagName]);
 
 	const parentTagInputRef = useRef<HTMLInputElement>(null);
 	const modalRef = useRef<HTMLDivElement>(null);
@@ -103,13 +114,31 @@ const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag }) => {
 					onChange={(evt) => {
 						setTagName(evt.target.value);
 					}}
+					hint={tagNameError ?? undefined}
+					state={tagNameError ? 'error' : undefined}
 				/>
 				<div className={cnNotesOverview('TagEditorControls')}>
 					<Button
 						view="action"
 						onPress={() => {
-							console.warn('Create tag', {
-								tagName,
+							const name = tagName.trim();
+
+							const parentTag = tags.find(({ id }) => id === parentTagId);
+							const fullName = [parentTag?.resolvedName, name].filter(Boolean).join('/');
+
+							const isTagExists = tags.some(({ resolvedName }) => resolvedName === fullName);
+							if (isTagExists) {
+								setTagNameError('Tag already exists');
+								return;
+							}
+
+							if (name.length === 0) {
+								setTagNameError('Name must not be empty');
+								return;
+							}
+
+							onSave({
+								name,
 								parent: parentTagId,
 							});
 						}}
@@ -155,49 +184,53 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const activeTag = useStore($activeTag);
 
 	const tagsRegistry = useTagsRegistry();
-	useEffect(() => {
-		tagsRegistry.getTags().then((flatTags) => {
-			setTags(flatTags);
-			const tagsMap: Record<string, TagItem> = {};
-			const tagToParentMap: Record<string, string> = {};
+	const updateTags = useCallback(async () => {
+		const flatTags = await tagsRegistry.getTags();
 
-			// Fill maps
-			flatTags.forEach(({ id, name, parent }) => {
-				tagsMap[id] = {
-					id,
-					content: name,
-				};
+		setTags(flatTags);
+		const tagsMap: Record<string, TagItem> = {};
+		const tagToParentMap: Record<string, string> = {};
 
-				if (parent !== null) {
-					tagToParentMap[id] = parent;
-				}
-			});
+		// Fill maps
+		flatTags.forEach(({ id, name, parent }) => {
+			tagsMap[id] = {
+				id,
+				content: name,
+			};
 
-			// Attach tags to parents
-			for (const tagId in tagToParentMap) {
-				const parentId = tagToParentMap[tagId];
+			if (parent !== null) {
+				tagToParentMap[id] = parent;
+			}
+		});
 
-				const tag = tagsMap[tagId];
-				const parentTag = tagsMap[parentId];
+		// Attach tags to parents
+		for (const tagId in tagToParentMap) {
+			const parentId = tagToParentMap[tagId];
 
-				// Create array
-				if (!parentTag.childrens) {
-					parentTag.childrens = [];
-				}
+			const tag = tagsMap[tagId];
+			const parentTag = tagsMap[parentId];
 
-				// Attach tag to another tag
-				parentTag.childrens.push(tag);
+			// Create array
+			if (!parentTag.childrens) {
+				parentTag.childrens = [];
 			}
 
-			// Delete nested tags from tags map
-			Object.keys(tagToParentMap).forEach((nestedTagId) => {
-				delete tagsMap[nestedTagId];
-			});
+			// Attach tag to another tag
+			parentTag.childrens.push(tag);
+		}
 
-			// Collect tags array from a map
-			const nestedTags = Object.values(tagsMap);
-			setTagsTree(nestedTags);
+		// Delete nested tags from tags map
+		Object.keys(tagToParentMap).forEach((nestedTagId) => {
+			delete tagsMap[nestedTagId];
 		});
+
+		// Collect tags array from a map
+		const nestedTags = Object.values(tagsMap);
+		setTagsTree(nestedTags);
+	}, [tagsRegistry]);
+
+	useEffect(() => {
+		updateTags();
 
 		// Run once for init state
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -231,7 +264,11 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				/>
 			</div>
 
-			<TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} />
+			<TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} onSave={async (data) => {
+				console.warn('Create tag', data);
+				await tagsRegistry.add(data.name, data.parent);
+				await updateTags();
+			}} />
 		</>
 	);
 };

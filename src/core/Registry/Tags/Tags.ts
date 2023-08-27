@@ -57,6 +57,23 @@ export class Tags {
 		return rows.map(({ id, name, resolvedName, parent, }) => ({ id, name, resolvedName, parent: parent ?? null }));
 	}
 
+	public async add(name: string, parent: null | string): Promise<string> {
+		const { db } = this.db;
+
+		const insertResult = await db.run('INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, ?)', [name, parent]);
+
+		// Get generated id
+		const selectWithId = await db.get(
+			'SELECT `id` FROM tags WHERE rowid=?',
+			insertResult.lastID,
+		);
+		if (!selectWithId || !selectWithId.id) {
+			throw new Error("Can't get id of inserted row");
+		}
+
+		return selectWithId.id;
+	}
+
 	/**
 	 * Returns tags attached to a entity
 	 */
