@@ -137,8 +137,10 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					activeTag={activeTag ?? undefined}
 					onTagClick={setActiveTag}
 					contextMenu={{
-						onDelete(id) {
+						async onDelete(id) {
 							console.log('Delete tag', id);
+							await tagsRegistry.delete(id);
+							updateTags();
 						},
 						onEdit(id) {
 							console.log('Edit tag', id);

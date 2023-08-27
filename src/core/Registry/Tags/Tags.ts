@@ -108,6 +108,25 @@ export class Tags {
 		await db.run('UPDATE tags SET name=?, parent=? WHERE id=?', [tag.name, tag.parent, tag.id]);
 	}
 
+	public async delete(id: string): Promise<void> {
+		const { db } = this.db;
+
+		await db.run(`
+			WITH RECURSIVE tagTree AS (
+				SELECT
+					id, parent, name, id AS root
+				FROM tags
+				UNION ALL
+				SELECT
+					t.id, t.parent, t.name, t2.root
+				FROM tags t
+				INNER JOIN tagTree t2
+				ON t.parent = t2.id
+			)
+			DELETE FROM tags WHERE id IN (SELECT id FROM tagTree WHERE root IN (?) GROUP BY id)
+		`, [id]);
+	}
+
 	/**
 	 * Returns tags attached to a entity
 	 */
