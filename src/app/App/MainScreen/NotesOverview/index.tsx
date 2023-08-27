@@ -340,6 +340,14 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					tags={tagsTree}
 					activeTag={activeTag ?? undefined}
 					onTagClick={setActiveTag}
+					contextMenu={{
+						onDelete(id) {
+							console.log('Delete tag', id);
+						},
+						onEdit(id) {
+							console.log('Edit tag', id);
+						},
+					}}
 				/>
 			</div>
 

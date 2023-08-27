@@ -21,12 +21,12 @@ export const tagMenu: ContextMenu = [
 	},
 ];
 
-type DefaultContextMenuOptions = {
+export type TagContextMenuCallbacks = {
 	onEdit: (id: string) => void;
 	onDelete: (id: string) => void;
 };
 
-export const useTagContextMenu = ({ onEdit, onDelete }: DefaultContextMenuOptions) => {
+export const useTagContextMenu = ({ onEdit, onDelete }: TagContextMenuCallbacks) => {
 	const noteContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
 		async ({ id, action }) => {
 			const actionsMap = {

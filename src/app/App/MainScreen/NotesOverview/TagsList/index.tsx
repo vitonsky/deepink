@@ -4,7 +4,7 @@ import { cn } from '@bem-react/classname';
 import { Icon } from '../../../../components/Icon/Icon.bundle/common';
 
 import { List, ListItem } from '../List';
-import { useTagContextMenu } from './useTagContextMenu';
+import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
 
 import './TagsList.css';
 
@@ -20,6 +20,7 @@ export type ITagsListProps = {
 	tags: TagItem[];
 	activeTag?: string;
 	onTagClick?: (id: string) => void;
+	contextMenu: TagContextMenuCallbacks;
 };
 
 const convertTagToListItem = (
@@ -38,17 +39,10 @@ const convertTagToListItem = (
 		return listItem;
 	});
 
-export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, onTagClick }) => {
+export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, contextMenu, onTagClick }) => {
 	const [toggledTags, setToggledTags] = useState<string[]>([]);
 
-	const onTagMenu = useTagContextMenu({
-		onDelete(id) {
-			console.log('Delete tag', id);
-		},
-		onEdit(id) {
-			console.log('Edit tag', id);
-		},
-	});
+	const onTagMenu = useTagContextMenu(contextMenu);
 
 	const items: ListItem[] = useMemo(() => {
 		return convertTagToListItem(tags, ({ id, content, childrens }) => {
