@@ -60,12 +60,40 @@ export class Tags {
 	public async add(name: string, parent: null | string): Promise<string> {
 		const { db } = this.db;
 
-		const insertResult = await db.run('INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, ?)', [name, parent]);
+		let lastId: number;
+
+		const segments = name.split('/');
+		if (segments.length > 1) {
+			const results = await db.getDatabaseInstance().runBatch(segments.map((name, idx) => {
+				const isFirstItem = idx === 0;
+
+				if (isFirstItem) {
+					return {
+						sql: 'INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, ?)',
+						params: [name, parent]
+					};
+				}
+
+				return {
+					sql: 'INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, (SELECT id FROM tags WHERE ROWID=last_insert_rowid()))',
+					params: [name]
+				};
+			}));
+
+			lastId = results[0].lastID;
+		} else {
+			const insertResult = await db.run('INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, ?)', [name, parent]);
+			if (insertResult.lastID === undefined) {
+				throw new Error("Last insert id not found");
+			}
+
+			lastId = insertResult.lastID;
+		}
 
 		// Get generated id
 		const selectWithId = await db.get(
 			'SELECT `id` FROM tags WHERE rowid=?',
-			insertResult.lastID,
+			lastId,
 		);
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");

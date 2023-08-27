@@ -2,7 +2,7 @@ import sqlite3 from 'sqlite3';
 
 export type DeclarativeStatement = {
 	sql: string;
-	params?: (string | number)[];
+	params?: (string | number | null)[];
 };
 
 export class ExtendedSqliteDatabase extends sqlite3.Database {
