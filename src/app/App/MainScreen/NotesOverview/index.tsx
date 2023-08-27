@@ -17,19 +17,6 @@ import { TagItem, TagsList } from './TagsList';
 
 import './NotesOverview.css';
 
-export const cnNotesOverview = cn('NotesOverview');
-
-type TagEditorData = {
-	name: string;
-	parent: string | null;
-};
-
-type ITagEditorProps = {
-	tags: ITag[];
-	parentTag?: ITag;
-	onSave: (tagData: TagEditorData) => void;
-};
-
 function findSubstr(src: string, search: string, reverse = false) {
 	const reverseString = (str: string) => str.split('').reverse().join('');
 
@@ -84,7 +71,21 @@ const getSortIndex = (a: string, b: string, value: string) => {
 	return 0;
 };
 
-const TagEditor: FC<ITagEditorProps> = ({ tags, onSave, parentTag }) => {
+export const cnNotesOverview = cn('NotesOverview');
+
+type TagEditorData = {
+	name: string;
+	parent: string | null;
+};
+
+type ITagEditorProps = {
+	tags: ITag[];
+	parentTag?: ITag;
+	onSave: (tagData: TagEditorData) => void;
+	onCancel: () => void;
+};
+
+const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, onSave, onCancel }) => {
 	const [parentTagId, setParentTagId] = useState<string | null>(
 		parentTag ? parentTag.id : null,
 	);
@@ -217,7 +218,7 @@ const TagEditor: FC<ITagEditorProps> = ({ tags, onSave, parentTag }) => {
 					>
 						Add
 					</Button>
-					<Button>Cancel</Button>
+					<Button onPress={onCancel}>Cancel</Button>
 				</div>
 				{tagsItems.length > 0 && isTagsListVisible && (
 					<Popup
@@ -309,6 +310,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const [isAddTagPopupOpened, setIsAddTagPopupOpened] = useState(false);
+
 	// TODO: show spinner while loading tags
 	return (
 		<>
@@ -327,7 +330,9 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				<div className={cnNotesOverview('TagsControls')}>
 					<h2>Tags</h2>
 
-					<Button view="clear">+</Button>
+					<Button view="clear" onPress={() => {
+						setIsAddTagPopupOpened(true);
+					}}>+</Button>
 				</div>
 
 				<TagsList
@@ -337,11 +342,15 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				/>
 			</div>
 
-			<TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} onSave={async (data) => {
+			{isAddTagPopupOpened && <TagEditor tags={tags} parentTag={tags.length > 0 ? tags[0] : undefined} onSave={async (data) => {
 				console.warn('Create tag', data);
 				await tagsRegistry.add(data.name, data.parent);
 				await updateTags();
-			}} />
+				setIsAddTagPopupOpened(false);
+			}} onCancel={() => {
+				setIsAddTagPopupOpened(false);
+
+			}} />}
 		</>
 	);
 };
