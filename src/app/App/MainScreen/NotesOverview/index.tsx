@@ -155,6 +155,13 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						},
 						async onDelete(id) {
 							console.log('Delete tag', id);
+
+							const tag = tags.find((tag) => id === tag.id);
+							if (!tag) return;
+
+							const isConfirmed = confirm(`Really want to delete tag "${tag.resolvedName}" and all sub tags?`);
+							if (!isConfirmed) return;
+
 							await tagsRegistry.delete(id);
 							updateTags();
 						},
