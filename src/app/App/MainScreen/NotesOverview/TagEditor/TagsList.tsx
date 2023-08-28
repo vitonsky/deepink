@@ -20,11 +20,15 @@ export type ITagsListProps = Omit<IMenuDesktopProps, 'items'> & {
 
 	onPickTag?: (id: string) => void;
 
+	hasTagName?: (tagName: string) => boolean;
+
 	onCreateTag?: (tagName: string) => void;
 };
 
 // TODO: move to standalone component
-export const TagsList: FC<ITagsListProps> = ({ tags, tagName, onPickTag, onCreateTag, ...props }) => {
+export const TagsList: FC<ITagsListProps> = ({ tags, tagName, onPickTag, onCreateTag, hasTagName, ...props }) => {
+	const fixedTagName = tagName.trim().replace(/\/{2,}/g, '/').split('/').filter(Boolean).join('/');
+
 	const tagsItems = useMemo(() => {
 		const filteredTags = [...tags]
 			.filter(
@@ -44,18 +48,20 @@ export const TagsList: FC<ITagsListProps> = ({ tags, tagName, onPickTag, onCreat
 			.map(({ id, resolvedName }) => ({ id, content: resolvedName }));
 
 		// Add button to create new tag
-		if (onCreateTag && tagName.length > 0 && !filteredTags.some((tag) => tag.content === tagName)) {
-			return [
-				{
-					id: 'createNew',
-					content: `Create tag ${tagName}`
-				},
-				...filteredTags
-			];
+		if (onCreateTag && fixedTagName.length > 0 && !filteredTags.some((tag) => tag.content === fixedTagName)) {
+			if (!hasTagName || !hasTagName(fixedTagName)) {
+				return [
+					{
+						id: 'createNew',
+						content: `Create tag ${fixedTagName}`
+					},
+					...filteredTags
+				];
+			}
 		}
 
 		return filteredTags;
-	}, [onCreateTag, tagName, tags]);
+	}, [fixedTagName, hasTagName, onCreateTag, tagName, tags]);
 
 	return (
 		<Menu
@@ -65,7 +71,7 @@ export const TagsList: FC<ITagsListProps> = ({ tags, tagName, onPickTag, onCreat
 			onPick={(id, index) => {
 				if (id === 'createNew') {
 					if (onCreateTag) {
-						onCreateTag(tagName);
+						onCreateTag(fixedTagName);
 					}
 				} else if (onPickTag) {
 					onPickTag(id);

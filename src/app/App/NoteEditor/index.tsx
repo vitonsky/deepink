@@ -32,15 +32,17 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const tagsRegistry = useTagsRegistry();
 
 	const [tags, setTags] = useState<ITag[]>([]);
+	const [notAttachedTags, setNotAttachedTags] = useState<ITag[]>([]);
 	const [attachedTags, setAttachedTags] = useState<ITag[]>([]);
 	const updateTags = useCallback(async () => {
 		const attachedTags = await tagsRegistry.getAttachedTags(note.id);
 		const allTags = await tagsRegistry.getTags();
 
+		setTags(allTags);
 		setAttachedTags(attachedTags);
 
 		const filteredAttachedTags = allTags.filter(({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id));
-		setTags(filteredAttachedTags);
+		setNotAttachedTags(filteredAttachedTags);
 	}, [note.id, tagsRegistry]);
 	useEffect(() => {
 		updateTags();
@@ -184,14 +186,35 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				// boundary={modalRef}
 				>
 					<TagsList
-						tags={tags}
+						tags={notAttachedTags}
 						tagName={attachTagName}
+						hasTagName={(tagName) => tags.some(({ resolvedName }) => resolvedName === tagName)}
 						onPickTag={async (id) => {
 							// tagInputRef.current?.blur();
+							setAttachTagName('');
 							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), id]);
 							await updateTags();
 						}}
-						onCreateTag={console.warn}
+						onCreateTag={async (tagName) => {
+							setAttachTagName('');
+
+							let cuttedTagName = tagName;
+							let parentTagId: string | null = null;
+							const tagSegments = tagName.split('/');
+							for (let segmentsNum = tagSegments.length - 1; segmentsNum > 0; segmentsNum--) {
+								const resolvedParentTag = tagSegments.slice(0, segmentsNum).join('/');
+								const foundTag = tags.find(({ resolvedName }) => resolvedName === resolvedParentTag);
+								if (foundTag) {
+									parentTagId = foundTag.id;
+									cuttedTagName = tagSegments.slice(segmentsNum).join('/');
+									break;
+								}
+							}
+
+							const tagId = await tagsRegistry.add(cuttedTagName, parentTagId);
+							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), tagId]);
+							await updateTags();
+						}}
 						onMouseDownCapture={(evt) => {
 							evt.preventDefault();
 							evt.stopPropagation();
