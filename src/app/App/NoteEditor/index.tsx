@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
@@ -9,6 +10,7 @@ import { ITag } from '../../../core/Registry/Tags/Tags';
 import { setActiveTag } from '../../../core/state/notes';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 
+import { TagsList } from '../MainScreen/NotesOverview/TagEditor/TagsList';
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
@@ -30,7 +32,16 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const tagsRegistry = useTagsRegistry();
 
 	const [tags, setTags] = useState<ITag[]>([]);
-	const updateTags = useCallback(() => tagsRegistry.getAttachedTags(note.id).then(setTags), [note.id, tagsRegistry]);
+	const [attachedTags, setAttachedTags] = useState<ITag[]>([]);
+	const updateTags = useCallback(async () => {
+		const attachedTags = await tagsRegistry.getAttachedTags(note.id);
+		const allTags = await tagsRegistry.getTags();
+
+		setAttachedTags(attachedTags);
+
+		const filteredAttachedTags = allTags.filter(({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id));
+		setTags(filteredAttachedTags);
+	}, [note.id, tagsRegistry]);
 	useEffect(() => {
 		updateTags();
 	}, [note.id, tagsRegistry, updateTags]);
@@ -103,11 +114,15 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		[debouncedUpdateNote, title],
 	);
 
+	const [attachTagName, setAttachTagName] = useState('');
+	const [isShowTagsList, setIsShowTagsList] = useState(false);
+	const tagInputRef = useRef<HTMLInputElement | null>(null);
+
 	return (
 		<div className={cnNoteEditor()}>
 			<Textinput value={title} onInputText={setTitle} placeholder="Note title" />
 			<div className={cnNoteEditor('Attachments')}>
-				{tags.map((tag) => (
+				{attachedTags.map((tag) => (
 					<div
 						className={cnNoteEditor('Attachment')}
 						key={tag.id}
@@ -122,13 +137,33 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								evt.stopPropagation();
 								console.warn('Remove attached tag', tag.resolvedName);
 
-								const updatedTags = tags.filter(({ id }) => id !== tag.id).map(({ id }) => id);
+								const updatedTags = attachedTags
+									.filter(({ id }) => id !== tag.id)
+									.map(({ id }) => id);
 								await tagsRegistry.setAttachedTags(noteId, updatedTags);
 								await updateTags();
 							}}
 						/>
 					</div>
 				))}
+
+				<input
+					type="text"
+					ref={tagInputRef}
+					className={cnNoteEditor('AttachmentInput')}
+					placeholder="Add some tags..."
+					value={attachTagName}
+					onChange={(evt) => {
+						setAttachTagName(evt.target.value);
+					}}
+					onFocus={() => {
+						setIsShowTagsList(true);
+					}}
+					onBlur={() => {
+						setIsShowTagsList(false);
+						setAttachTagName('');
+					}}
+				/>
 			</div>
 			<div className={cnNoteEditor('SplitContainer')}>
 				<MonacoEditor
@@ -139,6 +174,31 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				/>
 				<NoteScreen note={note} update={onTextUpdate} />
 			</div>
+			{isShowTagsList && (
+				<Popup
+					target="anchor"
+					anchor={tagInputRef}
+					view="default"
+					visible
+					direction={['bottom-start', 'bottom', 'bottom-end']}
+				// boundary={modalRef}
+				>
+					<TagsList
+						tags={tags}
+						tagName={attachTagName}
+						onPickTag={async (id) => {
+							// tagInputRef.current?.blur();
+							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), id]);
+							await updateTags();
+						}}
+						onCreateTag={console.warn}
+						onMouseDownCapture={(evt) => {
+							evt.preventDefault();
+							evt.stopPropagation();
+						}}
+					/>
+				</Popup>
+			)}
 		</div>
 	);
 };
