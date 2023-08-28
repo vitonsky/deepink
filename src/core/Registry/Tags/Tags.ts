@@ -1,3 +1,4 @@
+import { DeclarativeStatement } from "../../storage/ExtendedSqliteDatabase";
 import { SQLiteDb } from "../../storage/SQLiteDb";
 
 export type ITag = {
@@ -142,15 +143,20 @@ export class Tags {
 	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
 		const { db } = this.db;
 
-		await db.getDatabaseInstance().runBatch([
+		const query: DeclarativeStatement[] = [
 			{
 				sql: `DELETE FROM attachedTags WHERE target=?`,
 				params: [target]
-			},
-			{
+			}
+		];
+
+		if (tags.length > 0) {
+			query.push({
 				sql: `INSERT INTO attachedTags(id,source,target) VALUES ${Array(tags.length).fill('(uuid4(), ?, ?)').join(',')}`,
 				params: tags.map((tagId) => [tagId, target]).flat()
-			},
-		]);
+			});
+		}
+
+		await db.getDatabaseInstance().runBatch(query);
 	}
 };
