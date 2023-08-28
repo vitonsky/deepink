@@ -138,4 +138,19 @@ export class Tags {
 		const rows = await db.all(query, [target]);
 		return rows.map(({ id, name, resolvedName, parent, }) => ({ id, name, resolvedName, parent: parent ?? null }));
 	}
+
+	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
+		const { db } = this.db;
+
+		await db.getDatabaseInstance().runBatch([
+			{
+				sql: `DELETE FROM attachedTags WHERE target=?`,
+				params: [target]
+			},
+			{
+				sql: `INSERT INTO attachedTags(id,source,target) VALUES ${Array(tags.length).fill('(uuid4(), ?, ?)').join(',')}`,
+				params: tags.map((tagId) => [tagId, target]).flat()
+			},
+		]);
+	}
 };
