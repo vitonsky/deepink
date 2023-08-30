@@ -4,8 +4,7 @@ import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../../core/Registry/Tags/Tags';
-import { $activeTag, setActiveTag } from '../../../../core/state/notes';
-import { $tags, tagsChanged } from '../../../../core/state/tags';
+import { $activeTag, $tags, setActiveTag, tagsChanged } from '../../../../core/state/tags';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { useTagsRegistry } from '../../Providers';
 

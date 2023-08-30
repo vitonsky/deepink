@@ -8,8 +8,8 @@ import { cn } from '@bem-react/classname';
 import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
 import { NotesRegistry } from '../../../../core/Registry/NotesRegistry';
-import { $activeTag, $openedNotes, openedNotesControls } from '../../../../core/state/notes';
-import { tagAttachmentChanged } from '../../../../core/state/tags';
+import { $openedNotes, openedNotesControls } from '../../../../core/state/notes';
+import { $activeTag, tagAttachmentChanged } from '../../../../core/state/tags';
 import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
 import { useTagsRegistry } from '../../Providers';
 

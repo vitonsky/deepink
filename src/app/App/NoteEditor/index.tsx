@@ -8,8 +8,7 @@ import { cn } from '@bem-react/classname';
 import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
 import { INote, INoteData } from '../../../core/Note';
 import { ITag } from '../../../core/Registry/Tags/Tags';
-import { setActiveTag } from '../../../core/state/notes';
-import { $tags, tagAttachmentChanged, tagsChanged } from '../../../core/state/tags';
+import { $tags, setActiveTag, tagAttachmentChanged, tagsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 
 import { TagsList } from '../MainScreen/NotesOverview/TagEditor/TagsList';
