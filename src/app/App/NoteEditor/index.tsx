@@ -9,7 +9,7 @@ import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
 import { INote, INoteData } from '../../../core/Note';
 import { ITag } from '../../../core/Registry/Tags/Tags';
 import { setActiveTag } from '../../../core/state/notes';
-import { $tags, tagsChanged } from '../../../core/state/tags';
+import { $tags, tagAttachmentChanged, tagsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 
 import { TagsList } from '../MainScreen/NotesOverview/TagEditor/TagsList';
@@ -142,6 +142,11 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 									.filter(({ id }) => id !== tag.id)
 									.map(({ id }) => id);
 								await tagsRegistry.setAttachedTags(noteId, updatedTags);
+								tagAttachmentChanged({
+									tagId: tag.id,
+									target: noteId,
+									state: 'delete'
+								});
 								await updateTags();
 							}}
 						/>
@@ -192,6 +197,12 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							// tagInputRef.current?.blur();
 							setAttachTagName('');
 							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), id]);
+							tagAttachmentChanged({
+								tagId: id,
+								target: noteId,
+								state: 'add'
+							});
+
 							await updateTags();
 						}}
 						onCreateTag={async (tagName) => {
@@ -213,6 +224,12 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							const tagId = await tagsRegistry.add(cuttedTagName, parentTagId);
 							tagsChanged();
 							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), tagId]);
+							tagAttachmentChanged({
+								tagId: tagId,
+								target: noteId,
+								state: 'add'
+							});
+
 							await updateTags();
 						}}
 						onMouseDownCapture={(evt) => {

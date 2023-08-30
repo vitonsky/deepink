@@ -9,6 +9,7 @@ import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
 import { NotesRegistry } from '../../../../core/Registry/NotesRegistry';
 import { $activeTag, $openedNotes, openedNotesControls } from '../../../../core/state/notes';
+import { tagAttachmentChanged } from '../../../../core/state/tags';
 import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
 
 import { Notes } from '../Notes';
@@ -40,6 +41,8 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		});
 		setNotes(notes);
 	}, [activeTag, notesRegistry]);
+
+	useEffect(() => tagAttachmentChanged.watch(updateNotes), [updateNotes]);
 
 	// Init
 	useEffect(() => {
