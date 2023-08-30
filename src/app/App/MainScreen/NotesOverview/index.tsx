@@ -1,10 +1,11 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { useStore } from 'effector-react';
+import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../../core/Registry/Tags/Tags';
 import { $activeTag, setActiveTag } from '../../../../core/state/notes';
+import { $tags, tagsChanged } from '../../../../core/state/tags';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { useTagsRegistry } from '../../Providers';
 
@@ -19,16 +20,10 @@ export const cnNotesOverview = cn('NotesOverview');
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
-	const [tagsTree, setTagsTree] = useState<TagItem[]>([]);
-	const [tags, setTags] = useState<ITag[]>([]);
-
 	const activeTag = useStore($activeTag);
 
-	const tagsRegistry = useTagsRegistry();
-	const updateTags = useCallback(async () => {
-		const flatTags = await tagsRegistry.getTags();
-
-		setTags(flatTags);
+	const tags = useStore($tags);
+	const tagsTree = useStoreMap($tags, (flatTags) => {
 		const tagsMap: Record<string, TagItem> = {};
 		const tagToParentMap: Record<string, string> = {};
 
@@ -66,9 +61,11 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		});
 
 		// Collect tags array from a map
-		const nestedTags = Object.values(tagsMap);
-		setTagsTree(nestedTags);
-	}, [tagsRegistry]);
+		return Object.values(tagsMap);
+	});
+
+	const tagsRegistry = useTagsRegistry();
+	const updateTags = tagsChanged;
 
 	useEffect(() => {
 		updateTags();

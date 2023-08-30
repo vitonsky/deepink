@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
+import { useStore } from 'effector-react';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
 
@@ -8,6 +9,7 @@ import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
 import { INote, INoteData } from '../../../core/Note';
 import { ITag } from '../../../core/Registry/Tags/Tags';
 import { setActiveTag } from '../../../core/state/notes';
+import { $tags, tagsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 
 import { TagsList } from '../MainScreen/NotesOverview/TagEditor/TagsList';
@@ -31,19 +33,16 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const tagsRegistry = useTagsRegistry();
 
-	const [tags, setTags] = useState<ITag[]>([]);
+	const tags = useStore($tags);
 	const [notAttachedTags, setNotAttachedTags] = useState<ITag[]>([]);
 	const [attachedTags, setAttachedTags] = useState<ITag[]>([]);
 	const updateTags = useCallback(async () => {
 		const attachedTags = await tagsRegistry.getAttachedTags(note.id);
-		const allTags = await tagsRegistry.getTags();
-
-		setTags(allTags);
 		setAttachedTags(attachedTags);
 
-		const filteredAttachedTags = allTags.filter(({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id));
+		const filteredAttachedTags = tags.filter(({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id));
 		setNotAttachedTags(filteredAttachedTags);
-	}, [note.id, tagsRegistry]);
+	}, [note.id, tags, tagsRegistry]);
 	useEffect(() => {
 		updateTags();
 	}, [note.id, tagsRegistry, updateTags]);
@@ -212,6 +211,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							}
 
 							const tagId = await tagsRegistry.add(cuttedTagName, parentTagId);
+							tagsChanged();
 							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), tagId]);
 							await updateTags();
 						}}

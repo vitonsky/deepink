@@ -7,6 +7,7 @@ import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { Tags } from '../../core/Registry/Tags/Tags';
+import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { getResourcesPath, getUserDataPath } from '../../electron/requests/files/renderer';
 import { deleteFiles, getFile, listFiles, uploadFile } from '../../electron/requests/storage/renderer';
@@ -58,6 +59,17 @@ export const App: FC = () => {
 
 		setTagsRegistry(new Tags(db));
 	}, [db]);
+
+	useEffect(() => {
+		if (!tagsRegistry) return;
+
+		const updateTags = () => tagsRegistry.getTags().then(tagsUpdated);
+
+		const cleanup = tagsChanged.watch(updateTags);
+		updateTags();
+
+		return cleanup;
+	});
 
 	// Splash screen for loading state
 	if (db === null || filesRegistry === null || attachmentsRegistry == null || tagsRegistry === null) {
