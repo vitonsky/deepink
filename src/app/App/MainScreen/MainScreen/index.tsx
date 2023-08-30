@@ -42,7 +42,10 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		setNotes(notes);
 	}, [activeTag, notesRegistry]);
 
-	useEffect(() => tagAttachmentChanged.watch(updateNotes), [updateNotes]);
+	useEffect(() => tagAttachmentChanged.watch(({ tagId }) => {
+		if (activeTag === null || activeTag !== tagId) return;
+		updateNotes();
+	}), [activeTag, updateNotes]);
 
 	// Init
 	useEffect(() => {
