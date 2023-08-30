@@ -112,8 +112,7 @@ export class Tags {
 	public async delete(id: string): Promise<void> {
 		const { db } = this.db;
 
-		// TODO: remove associations
-		await db.run(`
+		const tagsIdForRemove = await db.all(`
 			WITH RECURSIVE tagTree AS (
 				SELECT
 					id, parent, name, id AS root
@@ -125,8 +124,19 @@ export class Tags {
 				INNER JOIN tagTree t2
 				ON t.parent = t2.id
 			)
-			DELETE FROM tags WHERE id IN (SELECT id FROM tagTree WHERE root IN (?) GROUP BY id)
-		`, [id]);
+			SELECT id FROM tagTree WHERE root IN (?) GROUP BY id
+		`, [id]).then((rows) => rows.map(({ id }) => id));
+
+		await db.getDatabaseInstance().runBatch([
+			{
+				sql: `DELETE FROM tags WHERE id IN (${Array(tagsIdForRemove.length).fill('?').join(',')})`,
+				params: tagsIdForRemove
+			},
+			{
+				sql: `DELETE FROM attachedTags WHERE source IN (${Array(tagsIdForRemove.length).fill('?').join(',')})`,
+				params: tagsIdForRemove
+			},
+		]);
 	}
 
 	/**
