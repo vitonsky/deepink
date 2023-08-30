@@ -11,6 +11,7 @@ import { NotesRegistry } from '../../../../core/Registry/NotesRegistry';
 import { $activeTag, $openedNotes, openedNotesControls } from '../../../../core/state/notes';
 import { tagAttachmentChanged } from '../../../../core/state/tags';
 import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
+import { useTagsRegistry } from '../../Providers';
 
 import { Notes } from '../Notes';
 import { NotesList } from '../NotesList';
@@ -94,12 +95,23 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		[notesRegistry, updateNotes],
 	);
 
+	const tagsRegistry = useTagsRegistry();
 	const newNoteIdRef = useRef<NoteId | null>(null);
 	const createNote = useCallback(async () => {
 		const noteId = await notesRegistry.add({ title: '', text: '' });
+
+		if (activeTag) {
+			await tagsRegistry.setAttachedTags(noteId, [activeTag]);
+			tagAttachmentChanged({
+				tagId: activeTag,
+				target: noteId,
+				state: 'add'
+			});
+		}
+
 		newNoteIdRef.current = noteId;
 		updateNotes();
-	}, [notesRegistry, updateNotes]);
+	}, [activeTag, notesRegistry, tagsRegistry, updateNotes]);
 
 	// Focus on new note
 	useEffect(() => {
