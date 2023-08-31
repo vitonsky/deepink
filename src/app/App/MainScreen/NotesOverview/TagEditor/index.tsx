@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { LayerManager } from 'react-elegant-ui/esm/components/LayerManager/LayerManager';
-import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { Modal } from 'react-elegant-ui/esm/components/Modal/Modal.bundle/desktop';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
@@ -9,7 +8,7 @@ import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../../../core/Registry/Tags/Tags';
 
-import { getSortIndex } from './utils';
+import { TagsList } from './TagsList';
 
 import './TagEditor.css';
 
@@ -32,7 +31,15 @@ export type ITagEditorProps = {
 	editedTag?: TagEditorData;
 };
 
-export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onSave, onCancel }) => {
+export const TagEditor: FC<ITagEditorProps> = ({
+	tags,
+	parentTag,
+	editedTag,
+	onSave,
+	onCancel,
+}) => {
+	const isEditingMode = editedTag !== undefined;
+
 	const [parentTagId, setParentTagId] = useState<string | null>(
 		parentTag ? parentTag.id : null,
 	);
@@ -44,51 +51,12 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onS
 	const [tagNameError, setTagNameError] = useState<string | null>(null);
 	const [isTagsListVisible, setIsTagsListVisible] = useState(false);
 
-	const isEditingMode = editedTag !== undefined;
-
+	// Reset errors
 	useEffect(() => {
 		setTagNameError(null);
 	}, [tagName, parentTagId, isEditingMode]);
 
-	useEffect(() => {
-		if (isTagsListVisible) return;
-
-		const parentTag = tags.find(({ id }) => id === parentTagId);
-		setParentTagName(parentTag ? parentTag.resolvedName : '');
-	}, [isTagsListVisible, parentTagId, tags]);
-
-	const parentTagInputRef = useRef<HTMLInputElement>(null);
-	const modalRef = useRef<HTMLDivElement>(null);
-
-	const tagsItems = [...tags]
-		.filter(
-			({ resolvedName }) =>
-				parentTagName.trim().length === 0 || resolvedName.includes(parentTagName),
-		)
-		.sort((a, b) => {
-			const segments = parentTagName.split('/');
-			if (segments.length > 1) {
-				return getSortIndex(a.resolvedName, b.resolvedName, parentTagName);
-			}
-
-			const aLastSegment = a.resolvedName.split('/').slice(-1)[0];
-			const bLastSegment = b.resolvedName.split('/').slice(-1)[0];
-			return getSortIndex(aLastSegment, bLastSegment, parentTagName);
-		})
-		.map(({ id, resolvedName }) => ({ id, content: resolvedName }));
-
-	useEffect(() => {
-		const isEmptyValue = parentTagName.trim().length === 0;
-		if (isEmptyValue) {
-			setParentTagId(null);
-		}
-	}, [parentTagName]);
-
-	useEffect(() => {
-		const parentTag = tags.find(({ id }) => id === parentTagId);
-		setParentTagName(parentTag ? parentTag.resolvedName : '');
-	}, [parentTagId, tags]);
-
+	// Reset parent tag
 	useEffect(() => {
 		if (!parentTag) return;
 
@@ -96,14 +64,34 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onS
 		setParentTagName(parentTag.resolvedName);
 	}, [parentTag]);
 
+	// Remove parent tag
+	useEffect(() => {
+		const isEmptyValue = parentTagName.trim().length === 0;
+		if (isEmptyValue) {
+			setParentTagId(null);
+		}
+	}, [parentTagName]);
+
+	// Reset parent tag name
+	useEffect(() => {
+		if (isTagsListVisible) return;
+
+		const parentTag = tags.find(({ id }) => id === parentTagId);
+		setParentTagName(parentTag ? parentTag.resolvedName : '');
+	}, [isTagsListVisible, parentTagId, tags]);
+
+	// Set parent tag name
+	useEffect(() => {
+		const parentTag = tags.find(({ id }) => id === parentTagId);
+		setParentTagName(parentTag ? parentTag.resolvedName : '');
+	}, [parentTagId, tags]);
+
+	const parentTagInputRef = useRef<HTMLInputElement>(null);
+	const modalRef = useRef<HTMLDivElement>(null);
+
 	return (
 		<LayerManager essentialRefs={[]}>
-			<Modal
-				visible
-				view="default"
-				className={cnTagEditor()}
-				innerRef={modalRef}
-			>
+			<Modal visible view="default" className={cnTagEditor()} innerRef={modalRef}>
 				<Textinput
 					placeholder="Parent tag"
 					value={parentTagName}
@@ -118,9 +106,6 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onS
 						},
 						onBlur: () => {
 							setIsTagsListVisible(false);
-							// setTimeout(() => {
-							// 	setIsTagsListVisible(false);
-							// }, 200);
 						},
 						onKeyDown: () => {
 							setIsTagsListVisible(true);
@@ -153,13 +138,17 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onS
 							if (isEditingMode) {
 								const isHaveSeparatorChar = name.includes('/');
 								if (isHaveSeparatorChar) {
-									setTagNameError('Name of tag for editing cannot create sub tags');
+									setTagNameError(
+										'Name of tag for editing cannot create sub tags',
+									);
 									return;
 								}
 							}
 
 							const parentTag = tags.find(({ id }) => id === parentTagId);
-							const fullName = [parentTag?.resolvedName, name].filter(Boolean).join('/');
+							const fullName = [parentTag?.resolvedName, name]
+								.filter(Boolean)
+								.join('/');
 
 							const isTagExists = tags.some(({ id, resolvedName }) => {
 								const isItEditedTag = editedTag && editedTag.id === id;
@@ -186,7 +175,7 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onS
 					</Button>
 					<Button onPress={onCancel}>Cancel</Button>
 				</div>
-				{tagsItems.length > 0 && isTagsListVisible && (
+				{isTagsListVisible && (
 					<Popup
 						target="anchor"
 						anchor={parentTagInputRef}
@@ -195,10 +184,9 @@ export const TagEditor: FC<ITagEditorProps> = ({ tags, parentTag, editedTag, onS
 						direction={['bottom-start', 'bottom', 'bottom-end']}
 						boundary={modalRef}
 					>
-						{/* {tags.map((tag) => <div key={tag.id}>{tag.resolvedName}</div>)} */}
-						<Menu
-							className={cnTagEditor('TagsListInPopup')}
-							items={tagsItems}
+						<TagsList
+							tags={tags}
+							tagName={parentTagName}
 							onMouseDown={(e) => {
 								e.preventDefault();
 								e.stopPropagation();
