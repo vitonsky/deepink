@@ -1,20 +1,23 @@
 import { DeclarativeStatement } from "../../storage/ExtendedSqliteDatabase";
 import { SQLiteDb } from "../../storage/SQLiteDb";
 
-export type ITag = {
+export type ITagData = {
 	id: string;
 	/**
 	 * Tag name
 	 */
 	name: string;
 	/**
-	 * Tag name with full path like `foo/bar/baz`
-	 */
-	resolvedName: string;
-	/**
 	 * Id of parent tag
 	 */
 	parent: string | null;
+};
+
+export type ITag = ITagData & {
+	/**
+	 * Tag name with full path like `foo/bar/baz`
+	 */
+	resolvedName: string;
 };
 
 /**
@@ -105,7 +108,7 @@ export class Tags {
 		return selectWithId.id;
 	}
 
-	public async update(tag: { id: string; name: string; parent: null | string }): Promise<void> {
+	public async update(tag: ITagData): Promise<void> {
 		const { db } = this.db;
 
 		await db.run('UPDATE tags SET name=?, parent=? WHERE id=?', [tag.name, tag.parent, tag.id]);
