@@ -83,7 +83,7 @@ export class Tags {
 				};
 			}));
 
-			lastId = results[0].lastID;
+			lastId = results[results.length - 1].lastID;
 		} else {
 			const insertResult = await db.run('INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, ?)', [name, parent]);
 			if (insertResult.lastID === undefined) {
