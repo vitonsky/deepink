@@ -17,6 +17,9 @@ export type ITag = {
 	parent: string | null;
 };
 
+/**
+ * Query to select tags with resolved name (like `foo/bar/baz`)
+ */
 const tagsQuery = `
 WITH RECURSIVE tagTree AS (
 	SELECT
@@ -54,8 +57,7 @@ export class Tags {
 	public async getTags(): Promise<ITag[]> {
 		const { db } = this.db;
 
-		const rows = await db.all(tagsQuery);
-		return rows.map(({ id, name, resolvedName, parent, }) => ({ id, name, resolvedName, parent: parent ?? null }));
+		return db.all(tagsQuery).then((rows) => rows.map(({ id, name, resolvedName, parent, }) => ({ id, name, resolvedName, parent: parent ?? null })));
 	}
 
 	public async add(name: string, parent: null | string): Promise<string> {
