@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { NoteId } from "../../../../../core/Note";
 import { INotesRegistry } from "../../../../../core/Registry";
-import { tagAttachmentChanged } from "../../../../../core/state/tags";
+import { tagAttachmentsChanged } from "../../../../../core/state/tags";
 import { ContextMenu } from "../../../../../electron/contextMenu";
 import { ContextMenuCallback, useContextMenu } from "../../../../components/hooks/useContextMenu";
 import { useTagsRegistry } from "../../../Providers";
@@ -48,11 +48,11 @@ export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistr
 
 					const attachedTags = await tagsRegistry.getAttachedTags(id);
 					await tagsRegistry.setAttachedTags(id, []);
-					attachedTags.forEach(({ id: tagId }) => tagAttachmentChanged({
+					attachedTags.forEach(({ id: tagId }) => tagAttachmentsChanged([{
 						tagId,
 						target: id,
 						state: 'delete'
-					}));
+					}]));
 
 					updateNotes();
 					break;
@@ -72,11 +72,11 @@ export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistr
 					const attachedTagsIds = attachedTags.map(({ id }) => id);
 
 					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
-					attachedTagsIds.forEach((tagId) => tagAttachmentChanged({
+					tagAttachmentsChanged(attachedTagsIds.map((tagId) => ({
 						tagId,
 						target: newNoteId,
 						state: 'add'
-					}));
+					})));
 
 					updateNotes();
 					break;

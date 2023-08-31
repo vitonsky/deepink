@@ -9,7 +9,7 @@ import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
 import { NotesRegistry } from '../../../../core/Registry/NotesRegistry';
 import { $openedNotes, openedNotesControls } from '../../../../core/state/notes';
-import { $activeTag, tagAttachmentChanged } from '../../../../core/state/tags';
+import { $activeTag, tagAttachmentsChanged } from '../../../../core/state/tags';
 import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
 import { useTagsRegistry } from '../../Providers';
 
@@ -43,10 +43,16 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		setNotes(notes);
 	}, [activeTag, notesRegistry]);
 
-	useEffect(() => tagAttachmentChanged.watch(({ tagId }) => {
-		if (activeTag === null || activeTag !== tagId) return;
-		updateNotes();
-	}), [activeTag, updateNotes]);
+	useEffect(() => {
+		if (activeTag === null) return;
+
+		return tagAttachmentsChanged.watch((ops) => {
+			const isHaveUpdates = ops.some(({ tagId }) => activeTag === tagId);
+			if (isHaveUpdates) {
+				updateNotes();
+			}
+		});
+	}, [activeTag, updateNotes]);
 
 	// Init
 	useEffect(() => {
@@ -102,11 +108,11 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 
 		if (activeTag) {
 			await tagsRegistry.setAttachedTags(noteId, [activeTag]);
-			tagAttachmentChanged({
+			tagAttachmentsChanged([{
 				tagId: activeTag,
 				target: noteId,
 				state: 'add'
-			});
+			}]);
 		}
 
 		newNoteIdRef.current = noteId;

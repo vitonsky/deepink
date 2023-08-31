@@ -8,11 +8,11 @@ export const tagsChanged = createEvent();
 
 $tags.on(tagsUpdated, (_, payload) => payload);
 
-export const tagAttachmentChanged = createEvent<{
+export const tagAttachmentsChanged = createEvent<{
 	target: string;
 	tagId: string;
 	state: 'add' | 'delete'
-}>();
+}[]>();
 
 export const $activeTag = createStore<string | null>(null);
 export const setActiveTag = createEvent<string | null>();
