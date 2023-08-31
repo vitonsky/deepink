@@ -2,15 +2,15 @@ import React, { FC, useMemo } from 'react';
 import { IMenuDesktopProps, IMenuProps, Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { ITag } from '../../../../../core/Registry/Tags/Tags';
+import { ITag } from '../../../../../../core/Registry/Tags/Tags';
 
 import { getSortIndex } from './utils';
 
-import './TagEditor.css';
+import './SuggestedTagsList.css';
 
-export const cnTagEditor = cn('TagEditor');
+export const cnSuggestedTagsList = cn('SuggestedTagsList');
 
-export type ITagsListProps = Omit<IMenuDesktopProps, 'items'> & {
+export type ISuggestedTagsListProps = Omit<IMenuDesktopProps, 'items'> & {
 	/**
 	 * Available tags
 	 */
@@ -25,8 +25,7 @@ export type ITagsListProps = Omit<IMenuDesktopProps, 'items'> & {
 	onCreateTag?: (tagName: string) => void;
 };
 
-// TODO: move to standalone component
-export const TagsList: FC<ITagsListProps> = ({ tags, tagName, onPickTag, onCreateTag, hasTagName, ...props }) => {
+export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({ tags, tagName, onPickTag, onCreateTag, hasTagName, ...props }) => {
 	const fixedTagName = tagName.trim().replace(/\/{2,}/g, '/').split('/').filter(Boolean).join('/');
 
 	const tagsItems = useMemo(() => {
@@ -66,7 +65,7 @@ export const TagsList: FC<ITagsListProps> = ({ tags, tagName, onPickTag, onCreat
 	return (
 		<Menu
 			{...props as IMenuProps}
-			className={cnTagEditor('TagsListInPopup', [props.className])}
+			className={cnSuggestedTagsList({}, [props.className])}
 			items={tagsItems}
 			onPick={(id, index) => {
 				if (id === 'createNew') {

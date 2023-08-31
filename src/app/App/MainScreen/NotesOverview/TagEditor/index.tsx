@@ -8,7 +8,7 @@ import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../../../core/Registry/Tags/Tags';
 
-import { TagsList } from './TagsList';
+import { SuggestedTagsList } from './SuggestedTagsList';
 
 import './TagEditor.css';
 
@@ -184,7 +184,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 						direction={['bottom-start', 'bottom', 'bottom-end']}
 						boundary={modalRef}
 					>
-						<TagsList
+						<SuggestedTagsList
 							tags={tags}
 							tagName={parentTagName}
 							onMouseDown={(e) => {

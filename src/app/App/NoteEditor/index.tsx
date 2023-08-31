@@ -11,7 +11,7 @@ import { ITag } from '../../../core/Registry/Tags/Tags';
 import { $tags, setActiveTag, tagAttachmentsChanged, tagsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 
-import { TagsList } from '../MainScreen/NotesOverview/TagEditor/TagsList';
+import { SuggestedTagsList } from '../MainScreen/NotesOverview/TagEditor/SuggestedTagsList';
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
@@ -188,7 +188,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					direction={['bottom-start', 'bottom', 'bottom-end']}
 				// boundary={modalRef}
 				>
-					<TagsList
+					<SuggestedTagsList
 						tags={notAttachedTags}
 						tagName={attachTagName}
 						hasTagName={(tagName) => tags.some(({ resolvedName }) => resolvedName === tagName)}
