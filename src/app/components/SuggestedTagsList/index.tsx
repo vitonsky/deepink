@@ -2,7 +2,7 @@ import React, { FC, useMemo } from 'react';
 import { IMenuDesktopProps, IMenuProps, Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { ITag } from '../../../../../../core/Registry/Tags/Tags';
+import { ITag } from '../../../core/Registry/Tags/Tags';
 
 import { getSortIndex } from './utils';
 

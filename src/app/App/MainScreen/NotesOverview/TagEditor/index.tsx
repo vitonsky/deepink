@@ -8,7 +8,7 @@ import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../../../core/Registry/Tags/Tags';
 
-import { SuggestedTagsList } from './SuggestedTagsList';
+import { SuggestedTagsList } from '../../../../components/SuggestedTagsList';
 
 import './TagEditor.css';
 
