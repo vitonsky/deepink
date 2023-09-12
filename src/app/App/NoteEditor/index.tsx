@@ -10,8 +10,8 @@ import { INote, INoteData } from '../../../core/Note';
 import { ITag } from '../../../core/Registry/Tags/Tags';
 import { $tags, setActiveTag, tagAttachmentsChanged, tagsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
-
 import { SuggestedTagsList } from '../../components/SuggestedTagsList';
+
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';

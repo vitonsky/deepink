@@ -9,11 +9,11 @@ import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
-import { formatResourceLink } from '../../../../../../core/links';
-import { INotesRegistry } from '../../../../../../core/Registry';
-import { tagsChanged } from '../../../../../../core/state/tags';
-import { exportNotes } from '../../../../../../electron/requests/files/renderer';
-import { useFilesRegistry, useTagsRegistry } from '../../../../Providers';
+import { formatResourceLink } from '../../../../../core/links';
+import { INotesRegistry } from '../../../../../core/Registry';
+import { tagsChanged } from '../../../../../core/state/tags';
+import { exportNotes } from '../../../../../electron/requests/files/renderer';
+import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
 
 export const replaceUrls = (tree: Root, callback: (url: string) => Promise<string>) => {
 	const promises: Promise<any>[] = [];

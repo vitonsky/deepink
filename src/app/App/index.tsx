@@ -12,7 +12,7 @@ import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { getResourcesPath, getUserDataPath } from '../../electron/requests/files/renderer';
 import { deleteFiles, getFile, listFiles, uploadFile } from '../../electron/requests/storage/renderer';
 
-import { MainScreen } from './MainScreen/MainScreen';
+import { MainScreen } from './MainScreen';
 import { Providers } from './Providers';
 import { SplashScreen } from './SplashScreen';
 

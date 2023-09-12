@@ -5,19 +5,19 @@ import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
-import { INote, NoteId } from '../../../../core/Note';
-import { INotesRegistry } from '../../../../core/Registry';
-import { NotesRegistry } from '../../../../core/Registry/NotesRegistry';
-import { $openedNotes, openedNotesControls } from '../../../../core/state/notes';
-import { $activeTag, tagAttachmentsChanged } from '../../../../core/state/tags';
-import { SQLiteDb } from '../../../../core/storage/SQLiteDb';
-import { useTagsRegistry } from '../../Providers';
+import { INote, NoteId } from '../../../core/Note';
+import { INotesRegistry } from '../../../core/Registry';
+import { NotesRegistry } from '../../../core/Registry/NotesRegistry';
+import { $openedNotes, openedNotesControls } from '../../../core/state/notes';
+import { $activeTag, tagAttachmentsChanged } from '../../../core/state/tags';
+import { SQLiteDb } from '../../../core/storage/SQLiteDb';
 
-import { Notes } from '../Notes';
-import { NotesList } from '../NotesList';
-import { NotesOverview } from '../NotesOverview';
-import { TopBar } from '../TopBar';
+import { useTagsRegistry } from '../Providers';
+import { Notes } from './Notes';
+import { NotesList } from './NotesList';
+import { NotesOverview } from './NotesOverview';
 import { StatusBar } from './StatusBar';
+import { TopBar } from './TopBar';
 
 import './MainScreen.css';
 

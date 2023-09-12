@@ -3,7 +3,7 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { INotesRegistry } from '../../../../../core/Registry';
+import { INotesRegistry } from '../../../../core/Registry';
 
 import { useImportNotes } from './buttons/useImportNotes';
 
