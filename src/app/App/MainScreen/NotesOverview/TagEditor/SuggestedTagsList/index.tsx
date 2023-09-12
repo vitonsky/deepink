@@ -29,20 +29,21 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({ tags, tagName, 
 	const fixedTagName = tagName.trim().replace(/\/{2,}/g, '/').split('/').filter(Boolean).join('/');
 
 	const tagsItems = useMemo(() => {
+		const lowerCasedTagName = tagName.toLowerCase();
 		const filteredTags = [...tags]
 			.filter(
 				({ resolvedName }) =>
-					tagName.trim().length === 0 || resolvedName.includes(tagName),
+					lowerCasedTagName.trim().length === 0 || resolvedName.toLowerCase().includes(lowerCasedTagName),
 			)
 			.sort((a, b) => {
-				const segments = tagName.split('/');
+				const segments = lowerCasedTagName.split('/');
 				if (segments.length > 1) {
-					return getSortIndex(a.resolvedName, b.resolvedName, tagName);
+					return getSortIndex(a.resolvedName, b.resolvedName, lowerCasedTagName);
 				}
 
 				const aLastSegment = a.resolvedName.split('/').slice(-1)[0];
 				const bLastSegment = b.resolvedName.split('/').slice(-1)[0];
-				return getSortIndex(aLastSegment, bLastSegment, tagName);
+				return getSortIndex(aLastSegment, bLastSegment, lowerCasedTagName);
 			})
 			.map(({ id, resolvedName }) => ({ id, content: resolvedName }));
 
