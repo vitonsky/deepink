@@ -13,7 +13,7 @@ import { formatResourceLink } from '../../../../../core/links';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagsChanged } from '../../../../../core/state/tags';
 import { exportNotes } from '../../../../../electron/requests/files/renderer';
-import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
+import { useAttachmentsRegistry, useFilesRegistry, useTagsRegistry } from '../../../Providers';
 
 export const replaceUrls = (tree: Root, callback: (url: string) => Promise<string>) => {
 	const promises: Promise<any>[] = [];
@@ -43,6 +43,8 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 	updateNotes: () => void;
 }) => {
 	const tagsRegistry = useTagsRegistry();
+
+	const attachmentsRegistry = useAttachmentsRegistry();
 
 	const filesRegistry = useFilesRegistry();
 	return useCallback(async () => {
@@ -98,10 +100,16 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 
 			// Replace URLs to uploaded entities
 			// TODO: update references to another md files
+			const attachedFilesIds: string[] = [];
 			await replaceUrls(tree, async (nodeUrl) => {
 				const url = getRelativePath(filename, nodeUrl);
 				const fileId = await getUploadedFileId(url);
-				return fileId ? formatResourceLink(fileId) : nodeUrl;
+
+				if (fileId) {
+					attachedFilesIds.push(fileId);
+					return formatResourceLink(fileId);
+				}
+				return nodeUrl;
 			});
 
 			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
@@ -142,6 +150,7 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 				text: compiledNoteText,
 			});
 
+			await attachmentsRegistry.set(noteId, attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)));
 			await tagsRegistry.setAttachedTags(noteId, tagId ? [tagId] : []);
 
 			// TODO: add method to registry, to emit event by updates
@@ -149,5 +158,5 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 		}
 
 		updateNotes();
-	}, [filesRegistry, notesRegistry, tagsRegistry, updateNotes]);
+	}, [attachmentsRegistry, filesRegistry, notesRegistry, tagsRegistry, updateNotes]);
 };
