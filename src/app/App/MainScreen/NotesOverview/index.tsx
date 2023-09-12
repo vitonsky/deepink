@@ -7,9 +7,9 @@ import { ITag } from '../../../../core/Registry/Tags/Tags';
 import { $activeTag, $tags, setActiveTag, tagsChanged } from '../../../../core/state/tags';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { List } from '../../../components/List';
+import { TagEditor, TagEditorData } from '../../../components/TagEditor';
 import { useTagsRegistry } from '../../Providers';
 
-import { TagEditor, TagEditorData } from './TagEditor';
 import { TagItem, TagsList } from './TagsList';
 
 import './NotesOverview.css';

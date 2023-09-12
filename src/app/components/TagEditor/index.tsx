@@ -6,9 +6,9 @@ import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/deskto
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { ITag } from '../../../../../core/Registry/Tags/Tags';
+import { ITag } from '../../../core/Registry/Tags/Tags';
 
-import { SuggestedTagsList } from '../../../../components/SuggestedTagsList';
+import { SuggestedTagsList } from '../SuggestedTagsList';
 
 import './TagEditor.css';
 
