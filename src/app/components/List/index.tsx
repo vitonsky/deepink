@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { ClassNameExtensions, extendClassName } from '../../../../../utils/className';
+import { ClassNameExtensions, extendClassName } from '../../../utils/className';
 
 import './List.css';
 

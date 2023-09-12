@@ -2,8 +2,8 @@ import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { cn } from '@bem-react/classname';
 
 import { Icon } from '../../../../components/Icon/Icon.bundle/common';
+import { List, ListItem } from '../../../../components/List';
 
-import { List, ListItem } from '../List';
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
 
 import './TagsList.css';
