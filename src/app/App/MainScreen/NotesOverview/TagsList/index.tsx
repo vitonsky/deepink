@@ -39,7 +39,12 @@ const convertTagToListItem = (
 		return listItem;
 	});
 
-export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, contextMenu, onTagClick }) => {
+export const TagsList: FC<ITagsListProps> = ({
+	tags,
+	activeTag,
+	contextMenu,
+	onTagClick,
+}) => {
 	const [toggledTags, setToggledTags] = useState<string[]>([]);
 
 	const onTagMenu = useTagContextMenu(contextMenu);
@@ -53,16 +58,23 @@ export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, contextMenu, onT
 			return {
 				id,
 				content: (
-					<div className={cnTagsList('Tag')} onContextMenu={(evt) => {
-						onTagMenu(id, { x: evt.clientX, y: evt.clientY });
-					}}>
+					<div
+						className={cnTagsList('Tag')}
+						onContextMenu={(evt) => {
+							onTagMenu(id, { x: evt.clientX, y: evt.clientY });
+						}}
+					>
 						<Icon
-							glyph={isHaveChilds ? "expand-more" : undefined}
+							glyph={isHaveChilds ? 'expand-more' : undefined}
 							scalable
-							className={cnTagsList('ExpandButton', {
-								opened: isOpenedGroup,
-								visible: isHaveChilds,
-							})}
+							className={cnTagsList(
+								'ExpandButton',
+								{
+									opened: isOpenedGroup,
+									visible: isHaveChilds,
+								},
+								[cnTagsList('Icon')],
+							)}
 							onClick={(evt) => {
 								evt.stopPropagation();
 								setToggledTags((tags) => {
@@ -71,6 +83,8 @@ export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, contextMenu, onT
 								});
 							}}
 						/>
+
+						<Icon glyph="tag" scalable className={cnTagsList('Icon')} />
 
 						<span className={cnTagsList('TagContent')}>{content}</span>
 					</div>

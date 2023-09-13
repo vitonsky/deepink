@@ -5,19 +5,25 @@
 	align-items: center;
 }
 
-.TagsList-ExpandButton {
+.TagsList-Icon {
 	--icon-size: 18px;
     width: var(--icon-size);
     height: var(--icon-size);
-	min-width: auto;
-	min-height: auto;
+	min-width: var(--icon-size);
+	min-height: var(--icon-size);
 }
 
 .TagsList-ExpandButton_visible:hover {
-	background: #0000001c;
+	backdrop-filter: contrast(0.7);
 	border-radius: 4px;
 }
 
 .TagsList-ExpandButton:not(.TagsList-ExpandButton_opened) {
 	transform: rotate(-90deg);
+}
+
+.TagsList-TagContent {
+	overflow: hidden;
+    text-overflow: ellipsis;
+    /* white-space: nowrap; */
 }

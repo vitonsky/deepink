@@ -12,7 +12,7 @@
 }
 
 .List-Group > .List {
-	padding-left: 1rem;
+	padding-left: 0.75rem;
 }
 
 .List-Item {
@@ -24,17 +24,17 @@
 
 .List-ItemBody {
 	display: flex;
-	padding: 4px 8px;
+	padding: 3px 8px 3px 4px;
 	gap: 0.3rem;
 	border-radius: 4px;
 }
 
 .List-ItemBody:hover {
-	background: #ff00ba;
-	color: #ffffff;
+	background: #e1e1e1;
+    color: #000;
 }
 
 .List-Item_active > .List-ItemBody {
-	background: #d7079e;
-	color: #fff;
+	background: #565656;
+    color: #fff;
 }
