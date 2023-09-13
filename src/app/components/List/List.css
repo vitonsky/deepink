@@ -30,11 +30,11 @@
 }
 
 .List-ItemBody:hover {
-	background: #e1e1e1;
-    color: #000;
+	background: var(--color-control-type-default-fill-color-base);
+    color: var(--color-control-type-default-typo-base);
 }
 
 .List-Item_active > .List-ItemBody {
-	background: #565656;
-    color: #fff;
+	background: var(--color-control-type-action-fill-color-base);
+    color: var(--color-control-type-action-typo-base);
 }
