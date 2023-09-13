@@ -6,6 +6,11 @@
 	user-select: none;
 }
 
+.List-Group {
+	display: block;
+    margin-top: 0.25rem;
+}
+
 .List-Group > .List {
 	padding-left: 1rem;
 }
@@ -14,7 +19,7 @@
 	line-height: 1.5rem;
 }
 .List-Item:not(:last-child) {
-	margin-bottom: 0.5rem;
+	margin-bottom: 0.25rem;
 }
 
 .List-ItemBody {

@@ -51,9 +51,9 @@ export const List: FC<IListProps> = ({ items, ...props }) => {
 						</div>
 
 						{item.childrens && !isGroupCollapsed && (
-							<span className={extendedListCn('Group')}>
+							<div className={extendedListCn('Group')}>
 								<List items={item.childrens} {...props} />
-							</span>
+							</div>
 						)}
 					</li>
 				);
