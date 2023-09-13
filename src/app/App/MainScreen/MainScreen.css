@@ -6,19 +6,21 @@
 	height: 100vh;
 	max-width: 100%;
 	max-height: 100%;
+    background: var(--color-fill-color-default);
+	color: var(--color-typo-primary);
 }
 
 .MainScreen-SideBar {
 	min-width: 250px;
 	max-width: 250px;
-	border-right: 3px solid #fefe;
+	border-right: 3px solid var(--color-fill-color-border);
 	padding: 4px;
 	/* padding: 0.5rem; */
 	overflow: auto;
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	background: #f1f1f1;
+	background: var(--color-fill-color-soft);
 }
 
 .MainScreen-NotesList {
@@ -61,11 +63,35 @@
 .MainScreen-NotesListSelectedTagName {
     padding: 4.8px;
     border-radius: 4px;
-    color: #585858;
-    background: #e3e3e3;
+    color: var(--color-control-type-default-typo-base);
+    background: var(--color-control-type-default-fill-color-disabled);
     font-size: .8rem;
     display: inline-block;
     line-height: 140%;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* Scroll bar style for chromium */
+.MainScreen ::-webkit-scrollbar {
+    width: 7px;
+    height: 16px;
+}
+
+.MainScreen ::-webkit-scrollbar-thumb {
+    color: var(--color-control-type-default-border-color-base);
+    background: currentColor;
+    border-radius: 0px;
+    border-color: currentColor;
+}
+
+.MainScreen ::-webkit-scrollbar-thumb:hover {
+    color: var(--color-control-type-default-border-color-hover);
+    background: currentColor;
+    border-color: currentColor;
+}
+
+.MainScreen ::-webkit-scrollbar-track, .MainScreen ::-webkit-scrollbar-track:hover {
+    background: var(--color-fill-color-stripe);
+}
+
