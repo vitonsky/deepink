@@ -44,3 +44,28 @@
 	flex-direction: row;
 	min-height: 300px;
 }
+
+.MainScreen-NotesListSelectedTag {
+	font-family: arial;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    line-height: 160%;
+    font-size: .9rem;
+    display: flex;
+    white-space: nowrap;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.MainScreen-NotesListSelectedTagName {
+    padding: 4.8px;
+    border-radius: 4px;
+    color: #585858;
+    background: #e3e3e3;
+    font-size: .8rem;
+    display: inline-block;
+    line-height: 140%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

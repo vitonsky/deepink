@@ -9,7 +9,7 @@ import { INote, NoteId } from '../../../core/Note';
 import { INotesRegistry } from '../../../core/Registry';
 import { NotesRegistry } from '../../../core/Registry/NotesRegistry';
 import { $openedNotes, openedNotesControls } from '../../../core/state/notes';
-import { $activeTag, tagAttachmentsChanged } from '../../../core/state/tags';
+import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
 import { SQLiteDb } from '../../../core/storage/SQLiteDb';
 
 import { useTagsRegistry } from '../Providers';
@@ -42,6 +42,15 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 		});
 		setNotes(notes);
 	}, [activeTag, notesRegistry]);
+
+	const activeTagName = useStoreMap({
+		store: $tags,
+		fn(state, [activeTag]) {
+			if (activeTag === null) return null;
+			return state.find((tag) => tag.id === activeTag)?.name ?? null;
+		},
+		keys: [activeTag]
+	});
 
 	useEffect(() => {
 		if (activeTag === null) return;
@@ -147,6 +156,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 					</div>
 
 					<div className={cnMainScreen('NotesList')}>
+						{activeTagName && <div className={cnMainScreen('NotesListSelectedTag')}>With tag <span className={cnMainScreen('NotesListSelectedTagName')}>{activeTagName}</span></div>}
 						<NotesList
 							{...{
 								notesRegistry,
