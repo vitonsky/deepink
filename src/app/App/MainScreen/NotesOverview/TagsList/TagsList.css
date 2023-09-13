@@ -2,17 +2,22 @@
 	display: flex;
 	gap: 0.3rem;
 	width: 100%;
+	align-items: center;
 }
 
-.TagsList-TagControls {
-	margin-left: auto;
+.TagsList-ExpandButton {
+	--icon-size: 18px;
+    width: var(--icon-size);
+    height: var(--icon-size);
+	min-width: auto;
+	min-height: auto;
 }
 
-.TagsList-TagControls > *:hover {
+.TagsList-ExpandButton_visible:hover {
 	background: #0000001c;
 	border-radius: 4px;
 }
 
-.TagsList-ExpandButton_opened {
-	transform: rotate(180deg);
+.TagsList-ExpandButton:not(.TagsList-ExpandButton_opened) {
+	transform: rotate(-90deg);
 }

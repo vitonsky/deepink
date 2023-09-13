@@ -48,6 +48,7 @@ export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, contextMenu, onT
 		return convertTagToListItem(tags, ({ id, content, childrens }) => {
 			const isToggledGroup = toggledTags.includes(id);
 			const isOpenedGroup = !isToggledGroup;
+			const isHaveChilds = childrens !== undefined && childrens.length > 0;
 
 			return {
 				id,
@@ -55,31 +56,23 @@ export const TagsList: FC<ITagsListProps> = ({ tags, activeTag, contextMenu, onT
 					<div className={cnTagsList('Tag')} onContextMenu={(evt) => {
 						onTagMenu(id, { x: evt.clientX, y: evt.clientY });
 					}}>
-						<Icon glyph="tag" />
-
-						<span className={cnTagsList('TagContent')}>{content}</span>
-
-						<span
-							className={cnTagsList('TagControls')}
+						<Icon
+							glyph={isHaveChilds ? "expand-more" : undefined}
+							scalable
+							className={cnTagsList('ExpandButton', {
+								opened: isOpenedGroup,
+								visible: isHaveChilds,
+							})}
 							onClick={(evt) => {
 								evt.stopPropagation();
+								setToggledTags((tags) => {
+									if (isOpenedGroup) return [...tags, id];
+									return tags.filter((tag) => tag !== id);
+								});
 							}}
-						>
-							{childrens && childrens.length > 0 && (
-								<Icon
-									glyph="expand-more"
-									className={cnTagsList('ExpandButton', {
-										opened: isOpenedGroup,
-									})}
-									onClick={() => {
-										setToggledTags((tags) => {
-											if (isOpenedGroup) return [...tags, id];
-											return tags.filter((tag) => tag !== id);
-										});
-									}}
-								/>
-							)}
-						</span>
+						/>
+
+						<span className={cnTagsList('TagContent')}>{content}</span>
 					</div>
 				),
 				collapsed: !isOpenedGroup,

@@ -7,7 +7,7 @@
 }
 
 .List-Group > .List {
-	padding-left: .5rem;
+	padding-left: 1rem;
 }
 
 .List-Item {
@@ -19,7 +19,7 @@
 
 .List-ItemBody {
 	display: flex;
-	padding: 0.3rem 0.25rem;
+	padding: 4px 8px;
 	gap: 0.3rem;
 	border-radius: 4px;
 }
