@@ -14,8 +14,17 @@
 	display: flex;
 	justify-content: space-between;
 	line-height: 1.5rem;
+    padding-left: 0.5rem;
+
 }
 
 .NotesOverview-Tags {
 	margin-top: 0.5rem;
+	overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.NotesOverview-TagsList {
+    overflow: auto;
 }

@@ -136,43 +136,45 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					}}><Icon glyph="add" /></Button>
 				</div>
 
-				<TagsList
-					tags={tagsTree}
-					activeTag={activeTag ?? undefined}
-					onTagClick={setActiveTag}
-					contextMenu={{
-						onAdd(id) {
-							const tag = tags.find((tag) => id === tag.id);
-							if (tag) {
-								parentTagForNewTagRef.current = tag;
-							}
+				<div className={cnNotesOverview('TagsList')}>
+					<TagsList
+						tags={tagsTree}
+						activeTag={activeTag ?? undefined}
+						onTagClick={setActiveTag}
+						contextMenu={{
+							onAdd(id) {
+								const tag = tags.find((tag) => id === tag.id);
+								if (tag) {
+									parentTagForNewTagRef.current = tag;
+								}
 
-							setIsAddTagPopupOpened(true);
-						},
-						async onDelete(id) {
-							console.log('Delete tag', id);
+								setIsAddTagPopupOpened(true);
+							},
+							async onDelete(id) {
+								console.log('Delete tag', id);
 
-							const tag = tags.find((tag) => id === tag.id);
-							if (!tag) return;
+								const tag = tags.find((tag) => id === tag.id);
+								if (!tag) return;
 
-							const isConfirmed = confirm(`Really want to delete tag "${tag.resolvedName}" and all sub tags?`);
-							if (!isConfirmed) return;
+								const isConfirmed = confirm(`Really want to delete tag "${tag.resolvedName}" and all sub tags?`);
+								if (!isConfirmed) return;
 
-							await tagsRegistry.delete(id);
-							updateTags();
-						},
-						onEdit(id) {
-							console.log('Edit tag', id);
+								await tagsRegistry.delete(id);
+								updateTags();
+							},
+							onEdit(id) {
+								console.log('Edit tag', id);
 
-							const tag = tags.find((tag) => id === tag.id);
+								const tag = tags.find((tag) => id === tag.id);
 
-							if (!tag) return;
+								if (!tag) return;
 
-							const { name, parent } = tag;
-							setEditedTag({ id, name, parent });
-						},
-					}}
-				/>
+								const { name, parent } = tag;
+								setEditedTag({ id, name, parent });
+							},
+						}}
+					/>
+				</div>
 			</div>
 
 			{tagEditor}
