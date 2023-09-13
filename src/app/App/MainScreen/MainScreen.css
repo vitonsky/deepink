@@ -20,7 +20,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	background: var(--color-fill-color-soft);
+	background: var(--color-fill-color-stripe);
 }
 
 .MainScreen-NotesList {

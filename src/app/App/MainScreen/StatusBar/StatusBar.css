@@ -3,14 +3,15 @@
 	flex-direction: row;
 	flex-grow: 10;
 	min-width: 100%;
-	max-height: 28px;
-	min-height: 28px;
+	max-height: 31px;
+	min-height: 31px;
 	font-size: .9em;
 	background: var(--color-fill-color-stripe);
     color: var(--color-typo-secondary);
 	box-sizing: border-box;
 	overflow: hidden;
 	font-family: arial;
+	border-top: 3px solid var(--color-fill-color-border);
 }
 
 .StatusBar .Button {
