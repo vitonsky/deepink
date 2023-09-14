@@ -18,3 +18,15 @@ CREATE TABLE "attachments" (
 	"note" TEXT NOT NULL,
 	PRIMARY KEY("id") UNIQUE(file, note)
 );
+CREATE TABLE "tags" (
+	"id" TEXT NOT NULL UNIQUE,
+	"name" TEXT NOT NULL,
+	"parent" TEXT,
+	PRIMARY KEY("id") UNIQUE(name, parent)
+);
+CREATE TABLE "attachedTags" (
+	"id" TEXT NOT NULL UNIQUE,
+	"source" TEXT NOT NULL,
+	"target" TEXT NOT NULL,
+	PRIMARY KEY("id") UNIQUE(source, target)
+);

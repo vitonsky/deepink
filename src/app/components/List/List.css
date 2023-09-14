@@ -1,0 +1,40 @@
+.List {
+	margin: 0;
+	padding-left: 0;
+	list-style: none;
+	font-family: arial;
+	user-select: none;
+}
+
+.List-Group {
+	display: block;
+    margin-top: 0.25rem;
+}
+
+.List-Group > .List {
+	padding-left: 0.75rem;
+}
+
+.List-Item {
+	line-height: 1.5rem;
+}
+.List-Item:not(:last-child) {
+	margin-bottom: 0.25rem;
+}
+
+.List-ItemBody {
+	display: flex;
+	padding: 3px 8px 3px 4px;
+	gap: 0.3rem;
+	border-radius: 4px;
+}
+
+.List-ItemBody:hover {
+	background: var(--color-control-type-default-fill-color-base);
+    color: var(--color-control-type-default-typo-base);
+}
+
+.List-Item_active > .List-ItemBody {
+	background: var(--color-control-type-action-fill-color-base);
+    color: var(--color-control-type-action-typo-base);
+}

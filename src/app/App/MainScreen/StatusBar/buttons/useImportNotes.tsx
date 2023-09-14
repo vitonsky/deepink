@@ -9,10 +9,11 @@ import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
-import { formatResourceLink } from '../../../../../../core/links';
-import { INotesRegistry } from '../../../../../../core/Registry';
-import { exportNotes } from '../../../../../../electron/requests/files/renderer';
-import { useFilesRegistry } from '../../../../Providers';
+import { formatResourceLink } from '../../../../../core/links';
+import { INotesRegistry } from '../../../../../core/Registry';
+import { tagsChanged } from '../../../../../core/state/tags';
+import { exportNotes } from '../../../../../electron/requests/files/renderer';
+import { useAttachmentsRegistry, useFilesRegistry, useTagsRegistry } from '../../../Providers';
 
 export const replaceUrls = (tree: Root, callback: (url: string) => Promise<string>) => {
 	const promises: Promise<any>[] = [];
@@ -41,6 +42,10 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 	notesRegistry: INotesRegistry;
 	updateNotes: () => void;
 }) => {
+	const tagsRegistry = useTagsRegistry();
+
+	const attachmentsRegistry = useAttachmentsRegistry();
+
 	const filesRegistry = useFilesRegistry();
 	return useCallback(async () => {
 		const files = await exportNotes();
@@ -95,29 +100,63 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 
 			// Replace URLs to uploaded entities
 			// TODO: update references to another md files
+			const attachedFilesIds: string[] = [];
 			await replaceUrls(tree, async (nodeUrl) => {
 				const url = getRelativePath(filename, nodeUrl);
 				const fileId = await getUploadedFileId(url);
-				return fileId ? formatResourceLink(fileId) : nodeUrl;
+
+				if (fileId) {
+					attachedFilesIds.push(fileId);
+					return formatResourceLink(fileId);
+				}
+				return nodeUrl;
 			});
 
 			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
 			const compiledNoteText = markdownProcessor.stringify(tree);
 			console.warn({ tree, vFile, noteData, compiledNoteText });
 
-			const noteNameWithExt = filename.split('/').slice(-1)[0];
+			const filenameSegments = filename.split('/');
+			const noteNameWithExt = filenameSegments.slice(-1)[0];
 			const noteName = noteNameWithExt.slice(0, noteNameWithExt.length - fileExtension.length);
 
-			// TODO: attach tags with full hierarchy
-			await notesRegistry.add({
+			let tagId: null | string = null;
+			const tags = await tagsRegistry.getTags();
+			const filenameBasePathSegments = filenameSegments.slice(0, -1);
+			for (let lastSegment = filenameBasePathSegments.length; lastSegment > 0; lastSegment--) {
+				const resolvedTagForSearch = filenameBasePathSegments.slice(0, lastSegment).join('/');
+
+				const tag = tags.find(({ resolvedName }) => resolvedName === resolvedTagForSearch);
+				if (tag) {
+					if (lastSegment !== filenameBasePathSegments.length) {
+						const tagNameToCreate = filenameBasePathSegments.slice(lastSegment).join('/');
+						tagId = await tagsRegistry.add(tagNameToCreate, tag.id);
+						tagsChanged();
+					} else {
+						tagId = tag.id;
+					}
+					break;
+				}
+			}
+
+			if (tagId === null && filenameBasePathSegments.length > 0) {
+				const tagNameToCreate = filenameBasePathSegments.join('/');
+				tagId = await tagsRegistry.add(tagNameToCreate, null);
+				tagsChanged();
+			}
+
+			const noteId = await notesRegistry.add({
 				title: noteData.title || noteName,
 				text: compiledNoteText,
 			});
+
+			await attachmentsRegistry.set(noteId, attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)));
+			await tagsRegistry.setAttachedTags(noteId, tagId ? [tagId] : []);
 
 			// TODO: add method to registry, to emit event by updates
 			updateNotes();
 		}
 
 		updateNotes();
-	}, [filesRegistry, notesRegistry, updateNotes]);
+	}, [attachmentsRegistry, filesRegistry, notesRegistry, tagsRegistry, updateNotes]);
 };

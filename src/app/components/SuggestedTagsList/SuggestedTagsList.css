@@ -1,0 +1,4 @@
+.SuggestedTagsList .Menu-Container {
+	max-height: 300px;
+    overflow: auto;
+}

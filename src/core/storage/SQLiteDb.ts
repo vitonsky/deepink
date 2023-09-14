@@ -204,7 +204,7 @@ export const getDb = async ({
 
 		// Track changes
 		const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
-			(commandName) => command.startsWith(commandName),
+			(commandName) => command.includes(commandName),
 		);
 		if (isMutableCommand) {
 			isHaveChangesFromLastCommit = true;

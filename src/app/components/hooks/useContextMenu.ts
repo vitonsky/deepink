@@ -1,24 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { NoteId } from '../../../../../core/Note';
-import { ContextMenu } from '../../../../../electron/contextMenu';
+import { ContextMenu } from '../../../electron/contextMenu';
+import { ElectronContextMenu } from '../../App/MainScreen/NotesList/NoteContextMenu/ElectronContextMenu';
 
-import { ElectronContextMenu } from './ElectronContextMenu';
-import { NoteActions } from '.';
-
-export type NoteContextMenuCallback = (event: {
-	noteId: NoteId;
-	action: NoteActions;
+export type ContextMenuCallback<T extends string> = (event: {
+	id: string;
+	action: T;
 }) => void;
 
 // TODO: implement context menu on web technologies
 /**
- * Provide callback to trigger open note context menu
+ * Provide callback for open context menu
  */
-export const useNoteContextMenu = (menu: ContextMenu, callback: NoteContextMenuCallback) => {
+export const useContextMenu = <T extends string>(menu: ContextMenu, callback: ContextMenuCallback<T>) => {
 	const [contextMenu, setContextMenu] = useState(() => {
 		// TODO: provide constructor in react context
-		return new ElectronContextMenu(menu);
+		return new ElectronContextMenu<T>(menu);
 	});
 
 	// Update menu
@@ -26,9 +23,9 @@ export const useNoteContextMenu = (menu: ContextMenu, callback: NoteContextMenuC
 		setContextMenu(new ElectronContextMenu(menu));
 	}, [menu]);
 
-	const contextMenuTargetRef = useRef<NoteId | null>(null);
+	const contextMenuTargetRef = useRef<string | null>(null);
 	const show = useCallback(
-		(id: NoteId, point: { x: number; y: number }) => {
+		(id: string, point: { x: number; y: number }) => {
 			contextMenu.open(point);
 			contextMenuTargetRef.current = id;
 		},
@@ -41,11 +38,11 @@ export const useNoteContextMenu = (menu: ContextMenu, callback: NoteContextMenuC
 		});
 
 		const unsubscribeOnClick = contextMenu.onClick((action) => {
-			const noteId = contextMenuTargetRef.current;
-			if (noteId === null) return;
+			const id = contextMenuTargetRef.current;
+			if (id === null) return;
 
 			contextMenuTargetRef.current = null;
-			callback({ action, noteId });
+			callback({ action, id });
 		});
 
 		return () => {

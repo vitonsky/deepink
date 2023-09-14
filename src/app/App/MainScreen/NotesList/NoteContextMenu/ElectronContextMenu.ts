@@ -2,17 +2,15 @@ import { createEvent, Event } from 'effector';
 
 import { ContextMenu } from '../../../../../electron/contextMenu';
 import { openContextMenu } from '../../../../../electron/contextMenu/renderer';
-import { isDictionaryValue } from '../../../../../utils/validation';
 
-import { NoteActions } from '.';
 
 type VoidCallback = () => void;
 
 // TODO: implement handle `onClick` events for menu items
-export class ElectronContextMenu {
+export class ElectronContextMenu<T extends string> {
 	private menu: ContextMenu;
 	private onClosed: Event<void>;
-	private onClicked: Event<NoteActions>;
+	private onClicked: Event<T>;
 	constructor(menu: ContextMenu) {
 		this.menu = menu;
 		this.onClosed = createEvent();
@@ -27,9 +25,9 @@ export class ElectronContextMenu {
 		}).then((action) => {
 			if (action === null) {
 				this.onClosed();
-			} else if (isDictionaryValue(NoteActions, action)) {
-				this.onClicked(action);
 			}
+
+			this.onClicked(action as T);
 		});
 	}
 
@@ -37,7 +35,7 @@ export class ElectronContextMenu {
 		return this.onClosed.watch(callback);
 	}
 
-	public onClick(callback: (action: NoteActions) => void) {
+	public onClick(callback: (action: T) => void) {
 		return this.onClicked.watch(callback);
 	}
 }

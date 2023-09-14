@@ -51,7 +51,30 @@ module.exports = merge(commonConfig, {
 			},
 			{
 				test: /\.svg$/,
-				use: ['@svgr/webpack'],
+				exclude: /node_modules/,
+				use: [
+					{
+						loader: '@svgr/webpack',
+						options: {
+							svgoConfig: {
+								plugins: [
+									{
+										name: 'preset-default',
+										params: {
+											overrides: {
+												// Option to prevent removing viewBox to svg can be resize
+												// Issue created in 2017 https://github.com/gregberge/svgr/issues/18
+												removeViewBox: false
+											},
+										},
+									},
+								],
+							},
+							// This features do not work
+							attributes: ['width', 'height'],
+						},
+					},
+				],
 			},
 		],
 	},

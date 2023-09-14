@@ -6,11 +6,13 @@ import { cn } from '@bem-react/classname';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
+import { Tags } from '../../core/Registry/Tags/Tags';
+import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { getResourcesPath, getUserDataPath } from '../../electron/requests/files/renderer';
 import { deleteFiles, getFile, listFiles, uploadFile } from '../../electron/requests/storage/renderer';
 
-import { MainScreen } from './MainScreen/MainScreen';
+import { MainScreen } from './MainScreen';
 import { Providers } from './Providers';
 import { SplashScreen } from './SplashScreen';
 
@@ -42,6 +44,7 @@ export const App: FC = () => {
 
 	const [filesRegistry, setFilesRegistry] = useState<FilesRegistry | null>(null);
 	const [attachmentsRegistry, setAttachmentsRegistry] = useState<Attachments | null>(null);
+	const [tagsRegistry, setTagsRegistry] = useState<Tags | null>(null);
 	useEffect(() => {
 		if (db === null) return;
 
@@ -53,10 +56,23 @@ export const App: FC = () => {
 
 		// TODO: schedule when to run method
 		filesRegistry.clearOrphaned();
+
+		setTagsRegistry(new Tags(db));
 	}, [db]);
 
+	useEffect(() => {
+		if (!tagsRegistry) return;
+
+		const updateTags = () => tagsRegistry.getTags().then(tagsUpdated);
+
+		const cleanup = tagsChanged.watch(updateTags);
+		updateTags();
+
+		return cleanup;
+	});
+
 	// Splash screen for loading state
-	if (db === null || filesRegistry === null || attachmentsRegistry == null) {
+	if (db === null || filesRegistry === null || attachmentsRegistry == null || tagsRegistry === null) {
 		return <div className={cnApp()}>
 			<SplashScreen />
 		</div>;
@@ -64,7 +80,7 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<Providers {...{ filesRegistry, attachmentsRegistry }}>
+			<Providers {...{ filesRegistry, attachmentsRegistry, tagsRegistry }}>
 				<MainScreen db={db} />
 			</Providers>
 		</div>
