@@ -4,28 +4,27 @@
 
 .NotesOverview-TagsControls h2 {
 	margin: 0;
-    display: inline-block;
-    font-size: .9rem;
-    color: var(--color-typo-secondary);
-    font-weight: bolder;
+	display: inline-block;
+	font-size: 0.9rem;
+	color: var(--color-typo-secondary);
+	font-weight: bolder;
 }
 
 .NotesOverview-TagsControls {
-	font-family: arial;
+	font-family: Arial, Helvetica, sans-serif;
 	display: flex;
 	justify-content: space-between;
 	line-height: 1.5rem;
-    padding-left: 0.5rem;
-
+	padding-left: 0.5rem;
 }
 
 .NotesOverview-Tags {
 	margin-top: 0.5rem;
 	overflow: auto;
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .NotesOverview-TagsList {
-    overflow: auto;
+	overflow: auto;
 }

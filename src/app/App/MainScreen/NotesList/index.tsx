@@ -34,7 +34,11 @@ export const NotesList: FC<NotesListProps> = ({
 	openedNotes,
 	activeNote,
 }) => {
-	const openNoteContextMenu = useDefaultNoteContextMenu({ closeNote: onClose, notesRegistry, updateNotes });
+	const openNoteContextMenu = useDefaultNoteContextMenu({
+		closeNote: onClose,
+		notesRegistry,
+		updateNotes,
+	});
 
 	// TODO: implement dragging and moving items
 	return (

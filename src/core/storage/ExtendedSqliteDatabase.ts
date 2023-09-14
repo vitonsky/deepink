@@ -9,7 +9,7 @@ export class ExtendedSqliteDatabase extends sqlite3.Database {
 	/**
 	 * Run statements list one by one, until first error
 	 * Supports transactions and executes `ROLLBACK` when any statement fails
-	 * 
+	 *
 	 * Inspired by https://stackoverflow.com/a/53321997/18680275
 	 */
 	public runBatch(statements: Array<DeclarativeStatement>) {
@@ -51,5 +51,5 @@ export class ExtendedSqliteDatabase extends sqlite3.Database {
 
 			runNextStatement();
 		});
-	};
+	}
 }

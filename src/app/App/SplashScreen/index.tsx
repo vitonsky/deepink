@@ -1,5 +1,5 @@
-import React from "react";
-import { cn } from "@bem-react/classname";
+import React from 'react';
+import { cn } from '@bem-react/classname';
 
 import './SplashScreen.css';
 

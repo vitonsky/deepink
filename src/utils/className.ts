@@ -2,10 +2,7 @@ import { ClassNameFormatter } from '@bem-react/classname';
 
 export type ClassNameExtensions = Record<string, string | string[]>;
 export const extendClassName =
-	(
-		cn: ClassNameFormatter,
-		extensions: ClassNameExtensions,
-	): ClassNameFormatter =>
+	(cn: ClassNameFormatter, extensions: ClassNameExtensions): ClassNameFormatter =>
 		(...args: any[]) => {
 			const className = [cn(...args)];
 

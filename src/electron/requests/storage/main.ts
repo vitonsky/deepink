@@ -26,7 +26,7 @@ function uploadFile() {
 
 		await writeFileAtomic(filePath, Buffer.from(buffer as ArrayBuffer));
 	});
-};
+}
 
 function getFile() {
 	ipcMain.handle(CHANNELS.getFile, async (_evt, { id }) => {
@@ -40,7 +40,7 @@ function getFile() {
 		const buffer = await readFile(filePath);
 		return buffer.buffer;
 	});
-};
+}
 
 function deleteFiles() {
 	ipcMain.handle(CHANNELS.deleteFiles, async (_evt, { ids }) => {
@@ -58,7 +58,7 @@ function deleteFiles() {
 			console.debug('Removed file', filePath);
 		}
 	});
-};
+}
 
 function listFiles() {
 	ipcMain.handle(CHANNELS.listFiles, async () => {
@@ -67,6 +67,11 @@ function listFiles() {
 		const filenames = await readdir(filesDir, {});
 		return filenames;
 	});
-};
+}
 
-export const handleStorageRequests = [uploadFile, getFile, deleteFiles, listFiles] as const;
+export const handleStorageRequests = [
+	uploadFile,
+	getFile,
+	deleteFiles,
+	listFiles,
+] as const;

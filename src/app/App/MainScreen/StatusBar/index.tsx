@@ -23,7 +23,7 @@ export const StatusBar: FC<StatusBarProps> = ({
 	updateNotes,
 	...props
 }) => {
-	const importNotes = useImportNotes({ notesRegistry, updateNotes, });
+	const importNotes = useImportNotes({ notesRegistry, updateNotes });
 
 	const [isNotesImportInProgress, setIsNotesImportInProgress] = useState(false);
 	const onImportNotes = useCallback(() => {
@@ -36,15 +36,22 @@ export const StatusBar: FC<StatusBarProps> = ({
 	return (
 		<div {...props} className={cnStatusBar({}, [className])}>
 			<div className={cnStatusBar('ActionContainer')}>
-				<Button size="s" view="action" onPress={onImportNotes} disabled={isNotesImportInProgress}>
+				<Button
+					size="s"
+					view="action"
+					onPress={onImportNotes}
+					disabled={isNotesImportInProgress}
+				>
 					Import
 				</Button>
 			</div>
 			<div className={cnStatusBar('StatusContainer')}>
-				{isNotesImportInProgress && <span className={cnStatusBar('ProgressIndicator')}>
-					<span>Importing notes</span>
-					<Spinner size="s" progress />
-				</span>}
+				{isNotesImportInProgress && (
+					<span className={cnStatusBar('ProgressIndicator')}>
+						<span>Importing notes</span>
+						<Spinner size="s" progress />
+					</span>
+				)}
 			</div>
 		</div>
 	);

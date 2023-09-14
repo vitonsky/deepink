@@ -13,13 +13,13 @@ export const conf: languages.LanguageConfiguration = {
 
 	comments: {
 		lineComment: '//',
-		blockComment: ['/*', '*/']
+		blockComment: ['/*', '*/'],
 	},
 
 	brackets: [
 		['{', '}'],
 		['[', ']'],
-		['(', ')']
+		['(', ')'],
 	],
 
 	onEnterRules: [
@@ -29,33 +29,33 @@ export const conf: languages.LanguageConfiguration = {
 			afterText: /^\s*\*\/$/,
 			action: {
 				indentAction: languages.IndentAction.IndentOutdent,
-				appendText: ' * '
-			}
+				appendText: ' * ',
+			},
 		},
 		{
 			// e.g. /** ...|
 			beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
 			action: {
 				indentAction: languages.IndentAction.None,
-				appendText: ' * '
-			}
+				appendText: ' * ',
+			},
 		},
 		{
 			// e.g.  * ...|
 			beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
 			action: {
 				indentAction: languages.IndentAction.None,
-				appendText: '* '
-			}
+				appendText: '* ',
+			},
 		},
 		{
 			// e.g.  */|
 			beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
 			action: {
 				indentAction: languages.IndentAction.None,
-				removeText: 1
-			}
-		}
+				removeText: 1,
+			},
+		},
 	],
 
 	autoClosingPairs: [
@@ -65,15 +65,15 @@ export const conf: languages.LanguageConfiguration = {
 		{ open: '"', close: '"', notIn: ['string'] },
 		{ open: "'", close: "'", notIn: ['string', 'comment'] },
 		{ open: '`', close: '`', notIn: ['string', 'comment'] },
-		{ open: '/**', close: ' */', notIn: ['string'] }
+		{ open: '/**', close: ' */', notIn: ['string'] },
 	],
 
 	folding: {
 		markers: {
 			start: new RegExp('^\\s*//\\s*#?region\\b'),
-			end: new RegExp('^\\s*//\\s*#?endregion\\b')
-		}
-	}
+			end: new RegExp('^\\s*//\\s*#?endregion\\b'),
+		},
+	},
 };
 
 /* eslint-disable camelcase */

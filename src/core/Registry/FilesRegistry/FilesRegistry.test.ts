@@ -36,9 +36,12 @@ const createFileManagerMock = (): FilesStorageController => {
 	};
 };
 
-const createTextFile = (text: string): File => new File([Buffer.from(text).buffer], 'test.txt', { type: 'text/txt' });
+const createTextFile = (text: string): File =>
+	new File([Buffer.from(text).buffer], 'test.txt', { type: 'text/txt' });
 
-const testFiles = Array(5).fill(null).map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
+const testFiles = Array(5)
+	.fill(null)
+	.map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
 
 test('clear orphaned files', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
@@ -56,17 +59,19 @@ test('clear orphaned files', async () => {
 	const filesId = await Promise.all(testFiles.map((file) => files.add(file)));
 
 	// Test files content are expected
-	await Promise.all(filesId.map(async (fileId, index) => {
-		const file = await files.get(fileId);
-		expect(file).not.toBeNull();
+	await Promise.all(
+		filesId.map(async (fileId, index) => {
+			const file = await files.get(fileId);
+			expect(file).not.toBeNull();
 
-		const fileBuffer = await (file as File).arrayBuffer();
-		const originalFileBuffer = await testFiles[index].arrayBuffer();
+			const fileBuffer = await (file as File).arrayBuffer();
+			const originalFileBuffer = await testFiles[index].arrayBuffer();
 
-		const fileString = Buffer.from(fileBuffer).toString('utf-8');
-		const originalString = Buffer.from(originalFileBuffer).toString('utf-8');
-		expect(fileString).toBe(originalString);
-	}));
+			const fileString = Buffer.from(fileBuffer).toString('utf-8');
+			const originalString = Buffer.from(originalFileBuffer).toString('utf-8');
+			expect(fileString).toBe(originalString);
+		}),
+	);
 
 	// Check files before cleanup
 	await files.get(attachedFileId).then((file) => {

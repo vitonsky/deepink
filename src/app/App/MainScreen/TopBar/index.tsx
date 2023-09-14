@@ -28,7 +28,15 @@ export type TopBarProps = {
 };
 
 // TODO: improve tabs style
-export const TopBar: FC<TopBarProps> = ({ notes, tabs, activeTab, onClose, onPick, updateNotes, notesRegistry }) => {
+export const TopBar: FC<TopBarProps> = ({
+	notes,
+	tabs,
+	activeTab,
+	onClose,
+	onPick,
+	updateNotes,
+	notesRegistry,
+}) => {
 	const openNoteContextMenu = useDefaultNoteContextMenu({
 		closeNote: onClose,
 		notesRegistry,

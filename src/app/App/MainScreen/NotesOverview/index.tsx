@@ -4,7 +4,12 @@ import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../../core/Registry/Tags/Tags';
-import { $activeTag, $tags, setActiveTag, tagsChanged } from '../../../../core/state/tags';
+import {
+	$activeTag,
+	$tags,
+	setActiveTag,
+	tagsChanged,
+} from '../../../../core/state/tags';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { List } from '../../../components/List';
 import { TagEditor, TagEditorData } from '../../../components/TagEditor';
@@ -82,35 +87,48 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		}
 	}, [isAddTagPopupOpened]);
 
-
 	const [editedTag, setEditedTag] = useState<TagEditorData | null>(null);
 	const tagEditor = useMemo(() => {
 		if (editedTag) {
 			const parent = tags.find(({ id }) => id === editedTag.parent);
-			return <TagEditor tags={tags} parentTag={parent} editedTag={editedTag} onSave={async (data) => {
-				console.warn('Update tag', data);
+			return (
+				<TagEditor
+					tags={tags}
+					parentTag={parent}
+					editedTag={editedTag}
+					onSave={async (data) => {
+						console.warn('Update tag', data);
 
-				if (data.id === undefined) return;
+						if (data.id === undefined) return;
 
-				await tagsRegistry.update({ id: data.id, ...data });
-				await updateTags();
-				setEditedTag(null);
-			}} onCancel={() => {
-				setEditedTag(null);
-			}} />;
+						await tagsRegistry.update({ id: data.id, ...data });
+						await updateTags();
+						setEditedTag(null);
+					}}
+					onCancel={() => {
+						setEditedTag(null);
+					}}
+				/>
+			);
 		}
 
 		if (!isAddTagPopupOpened) return null;
 
-		return <TagEditor tags={tags} parentTag={parentTagForNewTagRef.current ?? undefined} onSave={async (data) => {
-			console.warn('Create tag', data);
-			await tagsRegistry.add(data.name, data.parent);
-			await updateTags();
-			setIsAddTagPopupOpened(false);
-		}} onCancel={() => {
-			setIsAddTagPopupOpened(false);
-
-		}} />;
+		return (
+			<TagEditor
+				tags={tags}
+				parentTag={parentTagForNewTagRef.current ?? undefined}
+				onSave={async (data) => {
+					console.warn('Create tag', data);
+					await tagsRegistry.add(data.name, data.parent);
+					await updateTags();
+					setIsAddTagPopupOpened(false);
+				}}
+				onCancel={() => {
+					setIsAddTagPopupOpened(false);
+				}}
+			/>
+		);
 	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry, updateTags]);
 
 	// TODO: show spinner while loading tags
@@ -131,9 +149,15 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				<div className={cnNotesOverview('TagsControls')}>
 					<h2>Tags</h2>
 
-					<Button view="clear" onPress={() => {
-						setIsAddTagPopupOpened(true);
-					}} size='s'><Icon glyph="add" scalable /></Button>
+					<Button
+						view="clear"
+						onPress={() => {
+							setIsAddTagPopupOpened(true);
+						}}
+						size="s"
+					>
+						<Icon glyph="add" scalable />
+					</Button>
 				</div>
 
 				<div className={cnNotesOverview('TagsList')}>
@@ -156,7 +180,9 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								const tag = tags.find((tag) => id === tag.id);
 								if (!tag) return;
 
-								const isConfirmed = confirm(`Really want to delete tag "${tag.resolvedName}" and all sub tags?`);
+								const isConfirmed = confirm(
+									`Really want to delete tag "${tag.resolvedName}" and all sub tags?`,
+								);
 								if (!isConfirmed) return;
 
 								await tagsRegistry.delete(id);

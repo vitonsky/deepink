@@ -9,8 +9,16 @@ import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { Tags } from '../../core/Registry/Tags/Tags';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
-import { getResourcesPath, getUserDataPath } from '../../electron/requests/files/renderer';
-import { deleteFiles, getFile, listFiles, uploadFile } from '../../electron/requests/storage/renderer';
+import {
+	getResourcesPath,
+	getUserDataPath,
+} from '../../electron/requests/files/renderer';
+import {
+	deleteFiles,
+	getFile,
+	listFiles,
+	uploadFile,
+} from '../../electron/requests/storage/renderer';
 
 import { MainScreen } from './MainScreen';
 import { Providers } from './Providers';
@@ -34,16 +42,16 @@ export const App: FC = () => {
 			mkdirSync(profileDir, { recursive: true });
 
 			const dbPath = path.join(profileDir, 'deepink.db');
-			const dbExtensionsDir = await getResourcesPath(
-				'sqlite/extensions',
-			);
+			const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
 
 			getDb({ dbPath, dbExtensionsDir }).then(setDb);
 		})();
 	}, []);
 
 	const [filesRegistry, setFilesRegistry] = useState<FilesRegistry | null>(null);
-	const [attachmentsRegistry, setAttachmentsRegistry] = useState<Attachments | null>(null);
+	const [attachmentsRegistry, setAttachmentsRegistry] = useState<Attachments | null>(
+		null,
+	);
 	const [tagsRegistry, setTagsRegistry] = useState<Tags | null>(null);
 	useEffect(() => {
 		if (db === null) return;
@@ -51,7 +59,11 @@ export const App: FC = () => {
 		const attachments = new Attachments(db);
 		setAttachmentsRegistry(attachments);
 
-		const filesRegistry = new FilesRegistry(db, { get: getFile, write: uploadFile, delete: deleteFiles, list: listFiles }, attachments);
+		const filesRegistry = new FilesRegistry(
+			db,
+			{ get: getFile, write: uploadFile, delete: deleteFiles, list: listFiles },
+			attachments,
+		);
 		setFilesRegistry(filesRegistry);
 
 		// TODO: schedule when to run method
@@ -72,10 +84,17 @@ export const App: FC = () => {
 	});
 
 	// Splash screen for loading state
-	if (db === null || filesRegistry === null || attachmentsRegistry == null || tagsRegistry === null) {
-		return <div className={cnApp()}>
-			<SplashScreen />
-		</div>;
+	if (
+		db === null ||
+		filesRegistry === null ||
+		attachmentsRegistry == null ||
+		tagsRegistry === null
+	) {
+		return (
+			<div className={cnApp()}>
+				<SplashScreen />
+			</div>
+		);
 	}
 
 	return (

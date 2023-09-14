@@ -36,12 +36,18 @@ export const ListItem: Exclude<Components['li'], undefined> = ({
 export type RequestCheckboxUpdate = (state: boolean, sourcePosition: Position) => void;
 
 export type InputComponent = Exclude<Components['input'], undefined>;
-type CheckboxProps = ExtractProps<InputComponent> & { updateCheckbox: RequestCheckboxUpdate };
+type CheckboxProps = ExtractProps<InputComponent> & {
+	updateCheckbox: RequestCheckboxUpdate;
+};
 
 /**
  * Be sure this component used with `ListItem`
  */
-export const Checkbox: FC<CheckboxProps> = ({ sourcePosition: _sourcePosition, updateCheckbox, ...props }) => {
+export const Checkbox: FC<CheckboxProps> = ({
+	sourcePosition: _sourcePosition,
+	updateCheckbox,
+	...props
+}) => {
 	const sourcePosition = useContext(itemSourceContext);
 	const onChange = useCallback(
 		(evt: ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +59,10 @@ export const Checkbox: FC<CheckboxProps> = ({ sourcePosition: _sourcePosition, u
 		[sourcePosition, updateCheckbox],
 	);
 
-	const isCheckboxLocked = !sourcePosition || sourcePosition.start.offset === undefined || sourcePosition.end.offset === undefined;
+	const isCheckboxLocked =
+		!sourcePosition ||
+		sourcePosition.start.offset === undefined ||
+		sourcePosition.end.offset === undefined;
 
 	return (
 		<input

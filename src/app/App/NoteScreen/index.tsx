@@ -1,4 +1,12 @@
-import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+	FC,
+	ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/desktop';
 import ReactMarkdown from 'react-markdown';
 import { debounce } from 'lodash';
@@ -10,7 +18,12 @@ import { getResourceIdInUrl } from '../../../core/links';
 import { INote } from '../../../core/Note';
 
 import { useAttachmentsRegistry, useFilesRegistry } from '../Providers';
-import { Checkbox, InputComponent, ListItem, RequestCheckboxUpdate } from './components/Checkbox';
+import {
+	Checkbox,
+	InputComponent,
+	ListItem,
+	RequestCheckboxUpdate,
+} from './components/Checkbox';
 import { Link } from './components/Link';
 
 import 'github-markdown-css/github-markdown.css';
@@ -131,7 +144,10 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 			if (start === undefined || end === undefined) return;
 
 			const nodeValue = text.slice(start, end);
-			const updatedValue = nodeValue.replace(/\[(x|\s)\]/, `[${isChecked ? 'x' : ' '}]`);
+			const updatedValue = nodeValue.replace(
+				/\[(x|\s)\]/,
+				`[${isChecked ? 'x' : ' '}]`,
+			);
 			if (updatedValue === nodeValue) return;
 
 			const updatedText = text.slice(0, start) + updatedValue + text.slice(end);
@@ -185,7 +201,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 					components={{
 						a: Link,
 						li: ListItem,
-						input: Input
+						input: Input,
 					}}
 				>
 					{text}

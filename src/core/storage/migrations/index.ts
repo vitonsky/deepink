@@ -1,7 +1,7 @@
-import { Database } from "sqlite";
+import { Database } from 'sqlite';
 import sqlite3 from 'sqlite3';
 
-import { ExtendedSqliteDatabase } from "../ExtendedSqliteDatabase";
+import { ExtendedSqliteDatabase } from '../ExtendedSqliteDatabase';
 
 export type MigrationsTarget = Database<ExtendedSqliteDatabase, sqlite3.Statement>;
 
@@ -15,7 +15,7 @@ const migrations = [
 				"mimetype"	TEXT NOT NULL,
 				PRIMARY KEY("id")
 			)`);
-		}
+		},
 	},
 	{
 		version: 2,
@@ -26,7 +26,7 @@ const migrations = [
 				"note"	TEXT NOT NULL,
 				PRIMARY KEY("id")
 			)`);
-		}
+		},
 	},
 	{
 		version: 3,
@@ -41,10 +41,11 @@ const migrations = [
 						"note"	TEXT NOT NULL,
 						PRIMARY KEY("id")
 						UNIQUE(file,note)
-						)` },
+						)`,
+				},
 				{ sql: 'COMMIT' },
 			]);
-		}
+		},
 	},
 ] as const;
 

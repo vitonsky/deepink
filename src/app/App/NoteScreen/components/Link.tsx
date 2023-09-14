@@ -6,7 +6,11 @@ import { getResourceIdInUrl } from '../../../../core/links';
 import { openLink } from '../../../../electron/requests/interactions/renderer';
 import { useFilesRegistry } from '../../Providers';
 
-export const Link: Exclude<Components['a'], undefined> = ({ node, sourcePosition, ...props }) => {
+export const Link: Exclude<Components['a'], undefined> = ({
+	node,
+	sourcePosition,
+	...props
+}) => {
 	const filesRegistry = useFilesRegistry();
 
 	const onClick = useCallback(

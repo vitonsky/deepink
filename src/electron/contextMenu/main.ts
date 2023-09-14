@@ -20,15 +20,16 @@ export const enableContextMenu = () => {
 			return menu.map(({ id, click, ...props }) => {
 				// Decorate click handler, to resolve promise with menu id by click on menu
 				const clickHandler =
-					id === undefined ? click
+					id === undefined
+						? click
 						: (
 							menuItem: Electron.MenuItem,
 							browserWindow: Electron.BrowserWindow | undefined,
 							event: Electron.KeyboardEvent,
-						) => {
+						  ) => {
 							if (click) click(menuItem, browserWindow, event);
 							onClick(id);
-						};
+						  };
 
 				return { id, click: clickHandler, ...props };
 			});
