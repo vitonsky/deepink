@@ -133,7 +133,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 					<Button view="clear" onPress={() => {
 						setIsAddTagPopupOpened(true);
-					}}><Icon glyph="add" /></Button>
+					}} size='s'><Icon glyph="add" scalable /></Button>
 				</div>
 
 				<div className={cnNotesOverview('TagsList')}>

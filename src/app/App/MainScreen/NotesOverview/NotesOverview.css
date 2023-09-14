@@ -4,9 +4,10 @@
 
 .NotesOverview-TagsControls h2 {
 	margin: 0;
-	display: inline-block;
-	font-size: 1.2rem;
-	font-weight: bolder;
+    display: inline-block;
+    font-size: .9rem;
+    color: var(--color-typo-secondary);
+    font-weight: bolder;
 }
 
 .NotesOverview-TagsControls {
