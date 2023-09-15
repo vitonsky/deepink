@@ -1,9 +1,11 @@
 import { useCallback } from 'react';
 
+import { formatNoteLink } from '../../../../../core/links';
 import { NoteId } from '../../../../../core/Note';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
 import { ContextMenu } from '../../../../../electron/contextMenu';
+import { copyTextToClipboard } from '../../../../../utils/clipboard';
 import {
 	ContextMenuCallback,
 	useContextMenu,
@@ -29,6 +31,10 @@ export const noteMenu: ContextMenu = [
 	{
 		id: NoteActions.DUPLICATE,
 		label: 'Duplicate',
+	},
+	{
+		id: NoteActions.COPY_MARKDOWN_LINK,
+		label: 'Copy markdown link',
 	},
 	{ type: 'separator' },
 	{
@@ -95,6 +101,15 @@ export const useDefaultNoteContextMenu = ({
 					);
 
 					updateNotes();
+					break;
+				}
+				case NoteActions.COPY_MARKDOWN_LINK: {
+					// TODO: provide note name
+					const markdownLink = `[note #${id}](${formatNoteLink(id)})`;
+
+					console.log(`Copy markdown link ${markdownLink}`);
+
+					copyTextToClipboard(markdownLink);
 					break;
 				}
 			}
