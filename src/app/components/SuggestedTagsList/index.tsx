@@ -1,5 +1,9 @@
 import React, { FC, useMemo } from 'react';
-import { IMenuDesktopProps, IMenuProps, Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
+import {
+	IMenuDesktopProps,
+	IMenuProps,
+	Menu,
+} from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
 import { ITag } from '../../../core/Registry/Tags/Tags';
@@ -25,20 +29,37 @@ export type ISuggestedTagsListProps = Omit<IMenuDesktopProps, 'items'> & {
 	onCreateTag?: (tagName: string) => void;
 };
 
-export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({ tags, tagName, onPickTag, onCreateTag, hasTagName, ...props }) => {
-	const fixedTagName = tagName.trim().replace(/\/{2,}/g, '/').split('/').filter(Boolean).join('/');
+export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
+	tags,
+	tagName,
+	onPickTag,
+	onCreateTag,
+	hasTagName,
+	...props
+}) => {
+	const fixedTagName = tagName
+		.trim()
+		.replace(/\/{2,}/g, '/')
+		.split('/')
+		.filter(Boolean)
+		.join('/');
 
 	const tagsItems = useMemo(() => {
 		const lowerCasedTagName = tagName.toLowerCase();
 		const filteredTags = [...tags]
 			.filter(
 				({ resolvedName }) =>
-					lowerCasedTagName.trim().length === 0 || resolvedName.toLowerCase().includes(lowerCasedTagName),
+					lowerCasedTagName.trim().length === 0 ||
+					resolvedName.toLowerCase().includes(lowerCasedTagName),
 			)
 			.sort((a, b) => {
 				const segments = lowerCasedTagName.split('/');
 				if (segments.length > 1) {
-					return getSortIndex(a.resolvedName, b.resolvedName, lowerCasedTagName);
+					return getSortIndex(
+						a.resolvedName,
+						b.resolvedName,
+						lowerCasedTagName,
+					);
 				}
 
 				const aLastSegment = a.resolvedName.split('/').slice(-1)[0];
@@ -48,14 +69,18 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({ tags, tagName, 
 			.map(({ id, resolvedName }) => ({ id, content: resolvedName }));
 
 		// Add button to create new tag
-		if (onCreateTag && fixedTagName.length > 0 && !filteredTags.some((tag) => tag.content === fixedTagName)) {
+		if (
+			onCreateTag &&
+			fixedTagName.length > 0 &&
+			!filteredTags.some((tag) => tag.content === fixedTagName)
+		) {
 			if (!hasTagName || !hasTagName(fixedTagName)) {
 				return [
 					{
 						id: 'createNew',
-						content: `Create tag ${fixedTagName}`
+						content: `Create tag ${fixedTagName}`,
 					},
-					...filteredTags
+					...filteredTags,
 				];
 			}
 		}
@@ -65,7 +90,7 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({ tags, tagName, 
 
 	return (
 		<Menu
-			{...props as IMenuProps}
+			{...(props as IMenuProps)}
 			className={cnSuggestedTagsList({}, [props.className])}
 			items={tagsItems}
 			onPick={(id, index) => {

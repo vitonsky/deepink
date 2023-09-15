@@ -20,7 +20,7 @@ export type NotesRegistryFetchOptions = {
 	/**
 	 * Filter notes by tags
 	 */
-	tags?: string[]
+	tags?: string[];
 };
 
 /**

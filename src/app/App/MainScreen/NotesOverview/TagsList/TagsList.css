@@ -7,8 +7,9 @@
 
 .TagsList-Icon {
 	--icon-size: 18px;
-    width: var(--icon-size);
-    height: var(--icon-size);
+
+	width: var(--icon-size);
+	height: var(--icon-size);
 	min-width: var(--icon-size);
 	min-height: var(--icon-size);
 }
@@ -24,6 +25,7 @@
 
 .TagsList-TagContent {
 	overflow: hidden;
-    text-overflow: ellipsis;
-    /* white-space: nowrap; */
+	text-overflow: ellipsis;
+
+	/* white-space: nowrap; */
 }

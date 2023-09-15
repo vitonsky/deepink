@@ -3,7 +3,6 @@ import { createEvent, Event } from 'effector';
 import { ContextMenu } from '../../../../../electron/contextMenu';
 import { openContextMenu } from '../../../../../electron/contextMenu/renderer';
 
-
 type VoidCallback = () => void;
 
 // TODO: implement handle `onClick` events for menu items

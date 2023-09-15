@@ -1,14 +1,19 @@
-import { Uri } from "monaco-editor-core";
+import { Uri } from 'monaco-editor-core';
 
 export const resourceProtocolName = 'res';
 
-export const formatResourceLink = (resourceId: string) => `${resourceProtocolName}://${resourceId}`;
+export const formatResourceLink = (resourceId: string) =>
+	`${resourceProtocolName}://${resourceId}`;
 
-export const findLinksInText = (text: string): Array<{
+export const findLinksInText = (
+	text: string,
+): Array<{
 	index: number;
 	url: string;
 }> => {
-	return Array.from(text.matchAll(new RegExp(`${resourceProtocolName}:\\/\\/[\\da-z\\-]+`, 'gi'))).map((match) => {
+	return Array.from(
+		text.matchAll(new RegExp(`${resourceProtocolName}:\\/\\/[\\da-z\\-]+`, 'gi')),
+	).map((match) => {
 		const index = match.index;
 		const url = match[0];
 

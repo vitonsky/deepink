@@ -1,7 +1,7 @@
-import { SQLiteDb } from "../../storage/SQLiteDb";
+import { SQLiteDb } from '../../storage/SQLiteDb';
 
-import { Attachments } from "../Attachments/Attachments";
-import { FilesStorageController } from ".";
+import { Attachments } from '../Attachments/Attachments';
+import { FilesStorageController } from '.';
 
 // TODO: add runtime validation
 // TODO: implement interface and use interface instead of class
@@ -13,7 +13,11 @@ export class FilesRegistry {
 	private db;
 	private fileController;
 	private attachments;
-	constructor(db: SQLiteDb, fileController: FilesStorageController, attachments: Attachments) {
+	constructor(
+		db: SQLiteDb,
+		fileController: FilesStorageController,
+		attachments: Attachments,
+	) {
 		this.db = db;
 		this.fileController = fileController;
 		this.attachments = attachments;
@@ -54,12 +58,9 @@ export class FilesRegistry {
 		const { db } = this.db;
 
 		// Insert in DB
-		const fileEntry = await db.get(
-			'SELECT * FROM files WHERE id=:id',
-			{
-				':id': id,
-			},
-		);
+		const fileEntry = await db.get('SELECT * FROM files WHERE id=:id', {
+			':id': id,
+		});
 
 		if (!fileEntry) return null;
 
@@ -97,7 +98,9 @@ export class FilesRegistry {
 		await this.fileController.delete(orphanedFilesInFs);
 
 		// Remove files from DB
-		const orphanedFilesInDatabase = await this.attachments.findOrphanedResources(files.map(({ id }) => id));
+		const orphanedFilesInDatabase = await this.attachments.findOrphanedResources(
+			files.map(({ id }) => id),
+		);
 		await this.attachments.delete(orphanedFilesInDatabase);
 		await this.delete(orphanedFilesInDatabase);
 	}

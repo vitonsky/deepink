@@ -28,7 +28,12 @@ type ProvidersProps = {
 	tagsRegistry: Tags;
 };
 
-export const Providers: FC<ProvidersProps> = ({ children, filesRegistry, attachmentsRegistry, tagsRegistry }) => {
+export const Providers: FC<ProvidersProps> = ({
+	children,
+	filesRegistry,
+	attachmentsRegistry,
+	tagsRegistry,
+}) => {
 	return (
 		<filesRegistryContext.Provider value={filesRegistry}>
 			<attachmentsRegistryContext.Provider value={attachmentsRegistry}>

@@ -25,8 +25,12 @@ describe('migrations', () => {
 		// Test structure
 		const db = await getDb({ dbPath, dbExtensionsDir });
 
-		const tablesList = await db.db.all(`SELECT name FROM main.sqlite_master WHERE type='table'`);
-		expect(tablesList).toEqual(['notes', 'files', 'attachments'].map((name) => ({ name })));
+		const tablesList = await db.db.all(
+			`SELECT name FROM main.sqlite_master WHERE type='table'`,
+		);
+		expect(tablesList).toEqual(
+			['notes', 'files', 'attachments'].map((name) => ({ name })),
+		);
 
 		await db.close();
 	});

@@ -6,7 +6,7 @@
 	height: 100vh;
 	max-width: 100%;
 	max-height: 100%;
-    background: var(--color-fill-color-default);
+	background: var(--color-fill-color-default);
 	color: var(--color-typo-primary);
 }
 
@@ -15,6 +15,7 @@
 	max-width: 250px;
 	border-right: 3px solid var(--color-fill-color-border);
 	padding: 4px;
+
 	/* padding: 0.5rem; */
 	overflow: auto;
 	display: flex;
@@ -48,50 +49,51 @@
 }
 
 .MainScreen-NotesListSelectedTag {
-	font-family: arial;
-    padding: 0.5rem;
-    border-radius: 4px;
-    margin-bottom: 8px;
-    line-height: 160%;
-    font-size: .9rem;
-    display: flex;
-    white-space: nowrap;
-    gap: 0.5rem;
-    flex-wrap: nowrap;
+	font-family: Arial, Helvetica, sans-serif;
+	padding: 0.5rem;
+	border-radius: 4px;
+	margin-bottom: 8px;
+	line-height: 160%;
+	font-size: 0.9rem;
+	display: flex;
+	white-space: nowrap;
+	gap: 0.5rem;
+	flex-wrap: nowrap;
 }
 
 .MainScreen-NotesListSelectedTagName {
-    padding: 4.8px;
-    border-radius: 4px;
-    color: var(--color-control-type-default-typo-base);
-    background: var(--color-control-type-default-fill-color-disabled);
-    font-size: .8rem;
-    display: inline-block;
-    line-height: 140%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	padding: 4.8px;
+	border-radius: 4px;
+	color: var(--color-control-type-default-typo-base);
+	background: var(--color-control-type-default-fill-color-disabled);
+	font-size: 0.8rem;
+	display: inline-block;
+	line-height: 140%;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 /* Scroll bar style for chromium */
 .MainScreen ::-webkit-scrollbar {
-    width: 7px;
-    height: 16px;
+	width: 7px;
+	height: 16px;
 }
 
 .MainScreen ::-webkit-scrollbar-thumb {
-    color: var(--color-control-type-default-border-color-base);
-    background: currentColor;
-    border-radius: 0px;
-    border-color: currentColor;
+	color: var(--color-control-type-default-border-color-base);
+	background: currentcolor;
+	border-radius: 0;
+	border-color: currentcolor;
 }
 
 .MainScreen ::-webkit-scrollbar-thumb:hover {
-    color: var(--color-control-type-default-border-color-hover);
-    background: currentColor;
-    border-color: currentColor;
+	color: var(--color-control-type-default-border-color-hover);
+	background: currentcolor;
+	border-color: currentcolor;
 }
 
-.MainScreen ::-webkit-scrollbar-track, .MainScreen ::-webkit-scrollbar-track:hover {
-    background: var(--color-fill-color-stripe);
+.MainScreen ::-webkit-scrollbar-track,
+.MainScreen ::-webkit-scrollbar-track:hover {
+	background: var(--color-fill-color-stripe);
 }
 

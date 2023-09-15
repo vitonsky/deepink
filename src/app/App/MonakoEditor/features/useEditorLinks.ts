@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import saveAs from 'file-saver';
 import { editor, languages } from 'monaco-editor-core';
@@ -9,7 +8,7 @@ import { useFilesRegistry } from '../../Providers';
 
 /**
  * Hook to enable app links handling in monaco editor
- * 
+ *
  * WARNING: this hook are modify global objects, so must be used only once
  */
 export const useEditorLinks = () => {
@@ -20,26 +19,26 @@ export const useEditorLinks = () => {
 		if (filesRegistry === null) return;
 
 		const mdLinkProvider = languages.registerLinkProvider('markdown', {
-			provideLinks:
-				(model: editor.ITextModel):
-					languages.ProviderResult<languages.ILinksList> => {
-					return {
-						links: findLinksInText(model.getValue()).map(({ index, url }) => {
-							const startPosition = model.getPositionAt(index);
-							const endPosition = model.getPositionAt(index + url.length);
+			provideLinks: (
+				model: editor.ITextModel,
+			): languages.ProviderResult<languages.ILinksList> => {
+				return {
+					links: findLinksInText(model.getValue()).map(({ index, url }) => {
+						const startPosition = model.getPositionAt(index);
+						const endPosition = model.getPositionAt(index + url.length);
 
-							return {
-								url,
-								range: {
-									startLineNumber: startPosition.lineNumber,
-									startColumn: startPosition.column,
-									endLineNumber: endPosition.lineNumber,
-									endColumn: endPosition.column
-								},
-							};
-						})
-					};
-				},
+						return {
+							url,
+							range: {
+								startLineNumber: startPosition.lineNumber,
+								startColumn: startPosition.column,
+								endLineNumber: endPosition.lineNumber,
+								endColumn: endPosition.column,
+							},
+						};
+					}),
+				};
+			},
 		});
 
 		const appLinkOpener = editor.registerLinkOpener({

@@ -62,7 +62,9 @@ export const getDb = async ({
 			// TODO: implement decryption
 			const dumpSQL = await readFile(dbPath, 'utf-8');
 			await db.exec(dumpSQL);
-			await migrateToLatestSchema(db as Database<ExtendedSqliteDatabase, sqlite3.Statement>);
+			await migrateToLatestSchema(
+				db as Database<ExtendedSqliteDatabase, sqlite3.Statement>,
+			);
 		} else {
 			// Setup pragma
 			await db.exec(`PRAGMA main.user_version = ${latestSchemaVersion};`);
@@ -118,14 +120,18 @@ export const getDb = async ({
 			try {
 				// Dump pragma
 				const pragmaNamesToDump = ['user_version'];
-				const pragmasList = await Promise.all(pragmaNamesToDump.map((pragmaName) => db.get(`PRAGMA main.${pragmaName}`).then((response) => {
-					if (!response) {
-						throw new TypeError("Can't fetch pragma value");
-					}
+				const pragmasList = await Promise.all(
+					pragmaNamesToDump.map((pragmaName) =>
+						db.get(`PRAGMA main.${pragmaName}`).then((response) => {
+							if (!response) {
+								throw new TypeError("Can't fetch pragma value");
+							}
 
-					const pragmaValue = response[pragmaName];
-					return `PRAGMA main.${pragmaName} = ${pragmaValue};`;
-				})));
+							const pragmaValue = response[pragmaName];
+							return `PRAGMA main.${pragmaName} = ${pragmaValue};`;
+						}),
+					),
+				);
 				const pragmaDump = pragmasList.join('\n');
 
 				// Dump data
@@ -133,7 +139,7 @@ export const getDb = async ({
 				const retryDeadline = 800;
 				const startTime = new Date().getTime();
 				let dumpResponse: unknown | null = null;
-				while ((new Date().getTime() - startTime) <= retryDeadline) {
+				while (new Date().getTime() - startTime <= retryDeadline) {
 					try {
 						dumpResponse = await db.get(`SELECT dbdump() as dump;`);
 						break;
@@ -144,7 +150,7 @@ export const getDb = async ({
 				}
 
 				if (!dumpResponse) {
-					throw new Error("Cannot to get DB dump");
+					throw new Error('Cannot to get DB dump');
 				}
 
 				const dataDump = (dumpResponse as any)['dump'];
@@ -174,7 +180,8 @@ export const getDb = async ({
 			} catch (err) {
 				await unlock();
 
-				const errorToThrow = err instanceof Error ? err : new Error('Unknown error');
+				const errorToThrow =
+					err instanceof Error ? err : new Error('Unknown error');
 				syncRequestsInProgress.forEach((syncRequest) =>
 					syncRequest.reject(errorToThrow),
 				);

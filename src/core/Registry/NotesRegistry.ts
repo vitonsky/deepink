@@ -41,9 +41,11 @@ export class NotesRegistry implements INotesRegistry {
 		return length;
 	}
 
-	public async get({ limit = 100, page = 1, tags = [] }: NotesRegistryFetchOptions = {}): Promise<
-		INote[]
-	> {
+	public async get({
+		limit = 100,
+		page = 1,
+		tags = [],
+	}: NotesRegistryFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
 		const { db } = this.db;
@@ -56,7 +58,9 @@ export class NotesRegistry implements INotesRegistry {
 		if (tags.length > 0) {
 			const placeholders = Array(tags.length).fill('?').join(',');
 
-			fetchQuery.push(`WHERE id IN (SELECT target FROM attachedTags WHERE source IN (${placeholders}))`);
+			fetchQuery.push(
+				`WHERE id IN (SELECT target FROM attachedTags WHERE source IN (${placeholders}))`,
+			);
 			fetchParams.push(...tags);
 		}
 
@@ -64,19 +68,15 @@ export class NotesRegistry implements INotesRegistry {
 		fetchQuery.push(`LIMIT ? OFFSET ?`);
 		fetchParams.push(limit, offset);
 
-		await db.each(
-			fetchQuery.join(' '),
-			fetchParams,
-			(err, row) => {
-				if (err) {
-					throw new Error(err);
-				}
+		await db.each(fetchQuery.join(' '), fetchParams, (err, row) => {
+			if (err) {
+				throw new Error(err);
+			}
 
-				// TODO: validate data for first note
+			// TODO: validate data for first note
 
-				notes.push(mappers.rowToNoteObject(row));
-			},
-		);
+			notes.push(mappers.rowToNoteObject(row));
+		});
 
 		return notes;
 	}

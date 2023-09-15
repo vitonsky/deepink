@@ -32,11 +32,16 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 			const filesSize = Array.from(files).reduce((acc, file) => acc + file.size, 0);
 
 			// Show confirmation dialog for unusual activity
-			if (files.length > alertLimits.filesLength || filesSize > alertLimits.filesSize) {
+			if (
+				files.length > alertLimits.filesLength ||
+				filesSize > alertLimits.filesSize
+			) {
 				// May be replaced to Intl: https://stackoverflow.com/a/73974452/18680275
 				const humanReadableBytes = prettyBytes(filesSize);
 
-				const isConfirmed = confirm(`Are you sure to upload ${files.length} files with ${humanReadableBytes}?`);
+				const isConfirmed = confirm(
+					`Are you sure to upload ${files.length} files with ${humanReadableBytes}?`,
+				);
 				if (!isConfirmed) return;
 			}
 
@@ -47,7 +52,9 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 					uploadFile(file).then((fileId) => {
 						const escapedFilename = file.name.replace(/(\[|\])/g, '\\$1');
 						const imagePrefix = file.type.startsWith('image/') ? '!' : '';
-						return `${imagePrefix}[${escapedFilename}](${formatResourceLink(fileId)})`;
+						return `${imagePrefix}[${escapedFilename}](${formatResourceLink(
+							fileId,
+						)})`;
 					}),
 				),
 			);
@@ -86,7 +93,9 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 		editorContainer.addEventListener('drop', onDropFiles, { capture: true });
 
 		const onPaste = (event: ClipboardEvent) => {
-			const isEventOnEditor = event.target instanceof HTMLElement && editorContainer.contains(event.target);
+			const isEventOnEditor =
+				event.target instanceof HTMLElement &&
+				editorContainer.contains(event.target);
 			if (!isEventOnEditor) return;
 
 			if (event.clipboardData === null) return;

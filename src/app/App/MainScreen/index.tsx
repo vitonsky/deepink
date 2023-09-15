@@ -49,7 +49,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 			if (activeTag === null) return null;
 			return state.find((tag) => tag.id === activeTag)?.name ?? null;
 		},
-		keys: [activeTag]
+		keys: [activeTag],
 	});
 
 	useEffect(() => {
@@ -69,14 +69,17 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 	}, [updateNotes]);
 
 	// TODO: focus on note input
-	const onNoteClick = useCallback((id: NoteId) => {
-		const note = notes.find((note) => note.id === id);
-		if (note) {
-			openedNotesControls.add(note);
-		}
+	const onNoteClick = useCallback(
+		(id: NoteId) => {
+			const note = notes.find((note) => note.id === id);
+			if (note) {
+				openedNotesControls.add(note);
+			}
 
-		setTab(id);
-	}, [notes]);
+			setTab(id);
+		},
+		[notes],
+	);
 
 	const openedNotes = useStore($openedNotes);
 	const tabs = useStoreMap($openedNotes, (state) => state.map(({ id }) => id));
@@ -117,11 +120,13 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 
 		if (activeTag) {
 			await tagsRegistry.setAttachedTags(noteId, [activeTag]);
-			tagAttachmentsChanged([{
-				tagId: activeTag,
-				target: noteId,
-				state: 'add'
-			}]);
+			tagAttachmentsChanged([
+				{
+					tagId: activeTag,
+					target: noteId,
+					state: 'add',
+				},
+			]);
 		}
 
 		newNoteIdRef.current = noteId;
@@ -156,7 +161,16 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 					</div>
 
 					<div className={cnMainScreen('NotesList')}>
-						{activeTagName && <div className={cnMainScreen('NotesListSelectedTag')}>With tag <span className={cnMainScreen('NotesListSelectedTagName')}>{activeTagName}</span></div>}
+						{activeTagName && (
+							<div className={cnMainScreen('NotesListSelectedTag')}>
+								With tag{' '}
+								<span
+									className={cnMainScreen('NotesListSelectedTagName')}
+								>
+									{activeTagName}
+								</span>
+							</div>
+						)}
 						<NotesList
 							{...{
 								notesRegistry,
@@ -183,7 +197,14 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 						}}
 					/>
 					<div className={cnMainScreen('NoteEditors')}>
-						<Notes {...{ notes: openedNotes, tabs, activeTab: tab ?? null, updateNote }} />
+						<Notes
+							{...{
+								notes: openedNotes,
+								tabs,
+								activeTab: tab ?? null,
+								updateNote,
+							}}
+						/>
 					</div>
 				</div>
 			</div>

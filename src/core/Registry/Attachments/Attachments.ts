@@ -1,4 +1,4 @@
-import { SQLiteDb } from "../../storage/SQLiteDb";
+import { SQLiteDb } from '../../storage/SQLiteDb';
 
 /**
  * Attachments manager, to track attachments usage and to keep consistency
@@ -13,11 +13,15 @@ export class Attachments {
 		const { db } = this.db;
 
 		if (attachments.length === 0) {
-			await db.getDatabaseInstance().runBatch([
-				{ sql: 'DELETE FROM attachments WHERE note=?', params: [targetId] },
-			]);
+			await db
+				.getDatabaseInstance()
+				.runBatch([
+					{ sql: 'DELETE FROM attachments WHERE note=?', params: [targetId] },
+				]);
 		} else {
-			const valuesPlaceholders = attachments.map(() => `(uuid4(), ?, ?)`).join(', ');
+			const valuesPlaceholders = attachments
+				.map(() => `(uuid4(), ?, ?)`)
+				.join(', ');
 
 			const placeholdersData: string[] = [];
 			attachments.forEach((attachmentId) => {
@@ -28,7 +32,10 @@ export class Attachments {
 			await db.getDatabaseInstance().runBatch([
 				{ sql: 'BEGIN TRANSACTION' },
 				{ sql: 'DELETE FROM attachments WHERE note=?', params: [targetId] },
-				{ sql: `INSERT INTO attachments ("id", "note", "file") VALUES ${valuesPlaceholders};`, params: placeholdersData },
+				{
+					sql: `INSERT INTO attachments ("id", "note", "file") VALUES ${valuesPlaceholders};`,
+					params: placeholdersData,
+				},
 				{ sql: 'COMMIT' },
 			]);
 		}
@@ -45,7 +52,10 @@ export class Attachments {
 		const { db } = this.db;
 
 		const placeholders = Array(resources.length).fill('?').join(',');
-		await db.run(`DELETE FROM attachments WHERE file IN (${placeholders})`, resources);
+		await db.run(
+			`DELETE FROM attachments WHERE file IN (${placeholders})`,
+			resources,
+		);
 	}
 
 	/**
@@ -55,8 +65,13 @@ export class Attachments {
 		const { db } = this.db;
 
 		const placeholders = Array(resources.length).fill('?').join(',');
-		const attached = await db.all(`SELECT file as id FROM attachments WHERE file IN (${placeholders})`, resources);
+		const attached = await db.all(
+			`SELECT file as id FROM attachments WHERE file IN (${placeholders})`,
+			resources,
+		);
 
-		return resources.filter((id) => attached.every((attachment) => attachment.id !== id));
+		return resources.filter((id) =>
+			attached.every((attachment) => attachment.id !== id),
+		);
 	}
-};
+}

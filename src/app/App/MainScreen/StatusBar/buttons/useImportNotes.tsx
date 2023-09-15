@@ -13,7 +13,11 @@ import { formatResourceLink } from '../../../../../core/links';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagsChanged } from '../../../../../core/state/tags';
 import { exportNotes } from '../../../../../electron/requests/files/renderer';
-import { useAttachmentsRegistry, useFilesRegistry, useTagsRegistry } from '../../../Providers';
+import {
+	useAttachmentsRegistry,
+	useFilesRegistry,
+	useTagsRegistry,
+} from '../../../Providers';
 
 export const replaceUrls = (tree: Root, callback: (url: string) => Promise<string>) => {
 	const promises: Promise<any>[] = [];
@@ -25,9 +29,11 @@ export const replaceUrls = (tree: Root, callback: (url: string) => Promise<strin
 		const urlRegEx = /^[a-z]+:\/\//;
 		if (urlRegEx.test(node.url)) return;
 
-		promises.push(callback(node.url).then((url) => {
-			node.url = url;
-		}));
+		promises.push(
+			callback(node.url).then((url) => {
+				node.url = url;
+			}),
+		);
 	});
 
 	return Promise.all(promises);
@@ -38,7 +44,10 @@ const getRelativePath = (currentPath: string, relativePath: string) => {
 	return url.pathname.slice(1);
 };
 
-export const useImportNotes = ({ notesRegistry, updateNotes }: {
+export const useImportNotes = ({
+	notesRegistry,
+	updateNotes,
+}: {
 	notesRegistry: INotesRegistry;
 	updateNotes: () => void;
 }) => {
@@ -118,18 +127,31 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 
 			const filenameSegments = filename.split('/');
 			const noteNameWithExt = filenameSegments.slice(-1)[0];
-			const noteName = noteNameWithExt.slice(0, noteNameWithExt.length - fileExtension.length);
+			const noteName = noteNameWithExt.slice(
+				0,
+				noteNameWithExt.length - fileExtension.length,
+			);
 
 			let tagId: null | string = null;
 			const tags = await tagsRegistry.getTags();
 			const filenameBasePathSegments = filenameSegments.slice(0, -1);
-			for (let lastSegment = filenameBasePathSegments.length; lastSegment > 0; lastSegment--) {
-				const resolvedTagForSearch = filenameBasePathSegments.slice(0, lastSegment).join('/');
+			for (
+				let lastSegment = filenameBasePathSegments.length;
+				lastSegment > 0;
+				lastSegment--
+			) {
+				const resolvedTagForSearch = filenameBasePathSegments
+					.slice(0, lastSegment)
+					.join('/');
 
-				const tag = tags.find(({ resolvedName }) => resolvedName === resolvedTagForSearch);
+				const tag = tags.find(
+					({ resolvedName }) => resolvedName === resolvedTagForSearch,
+				);
 				if (tag) {
 					if (lastSegment !== filenameBasePathSegments.length) {
-						const tagNameToCreate = filenameBasePathSegments.slice(lastSegment).join('/');
+						const tagNameToCreate = filenameBasePathSegments
+							.slice(lastSegment)
+							.join('/');
 						tagId = await tagsRegistry.add(tagNameToCreate, tag.id);
 						tagsChanged();
 					} else {
@@ -150,7 +172,10 @@ export const useImportNotes = ({ notesRegistry, updateNotes }: {
 				text: compiledNoteText,
 			});
 
-			await attachmentsRegistry.set(noteId, attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)));
+			await attachmentsRegistry.set(
+				noteId,
+				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
+			);
 			await tagsRegistry.setAttachedTags(noteId, tagId ? [tagId] : []);
 
 			// TODO: add method to registry, to emit event by updates

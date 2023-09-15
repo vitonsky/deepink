@@ -1,13 +1,16 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
-import { NoteId } from "../../../../../core/Note";
-import { INotesRegistry } from "../../../../../core/Registry";
-import { tagAttachmentsChanged } from "../../../../../core/state/tags";
-import { ContextMenu } from "../../../../../electron/contextMenu";
-import { ContextMenuCallback, useContextMenu } from "../../../../components/hooks/useContextMenu";
-import { useTagsRegistry } from "../../../Providers";
+import { NoteId } from '../../../../../core/Note';
+import { INotesRegistry } from '../../../../../core/Registry';
+import { tagAttachmentsChanged } from '../../../../../core/state/tags';
+import { ContextMenu } from '../../../../../electron/contextMenu';
+import {
+	ContextMenuCallback,
+	useContextMenu,
+} from '../../../../components/hooks/useContextMenu';
+import { useTagsRegistry } from '../../../Providers';
 
-import { NoteActions } from ".";
+import { NoteActions } from '.';
 
 type DefaultContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
@@ -34,7 +37,11 @@ export const noteMenu: ContextMenu = [
 	},
 ];
 
-export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistry }: DefaultContextMenuOptions) => {
+export const useDefaultNoteContextMenu = ({
+	closeNote,
+	updateNotes,
+	notesRegistry,
+}: DefaultContextMenuOptions) => {
 	const tagsRegistry = useTagsRegistry();
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
@@ -48,11 +55,15 @@ export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistr
 
 					const attachedTags = await tagsRegistry.getAttachedTags(id);
 					await tagsRegistry.setAttachedTags(id, []);
-					attachedTags.forEach(({ id: tagId }) => tagAttachmentsChanged([{
-						tagId,
-						target: id,
-						state: 'delete'
-					}]));
+					attachedTags.forEach(({ id: tagId }) =>
+						tagAttachmentsChanged([
+							{
+								tagId,
+								target: id,
+								state: 'delete',
+							},
+						]),
+					);
 
 					updateNotes();
 					break;
@@ -66,17 +77,22 @@ export const useDefaultNoteContextMenu = ({ closeNote, updateNotes, notesRegistr
 					}
 
 					const { title, text } = sourceNote.data;
-					const newNoteId = await notesRegistry.add({ title: 'DUPLICATE: ' + title, text });
+					const newNoteId = await notesRegistry.add({
+						title: 'DUPLICATE: ' + title,
+						text,
+					});
 
 					const attachedTags = await tagsRegistry.getAttachedTags(id);
 					const attachedTagsIds = attachedTags.map(({ id }) => id);
 
 					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
-					tagAttachmentsChanged(attachedTagsIds.map((tagId) => ({
-						tagId,
-						target: newNoteId,
-						state: 'add'
-					})));
+					tagAttachmentsChanged(
+						attachedTagsIds.map((tagId) => ({
+							tagId,
+							target: newNoteId,
+							state: 'add',
+						})),
+					);
 
 					updateNotes();
 					break;

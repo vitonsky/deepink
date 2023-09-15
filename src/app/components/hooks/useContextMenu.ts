@@ -12,7 +12,10 @@ export type ContextMenuCallback<T extends string> = (event: {
 /**
  * Provide callback for open context menu
  */
-export const useContextMenu = <T extends string>(menu: ContextMenu, callback: ContextMenuCallback<T>) => {
+export const useContextMenu = <T extends string>(
+	menu: ContextMenu,
+	callback: ContextMenuCallback<T>,
+) => {
 	const [contextMenu, setContextMenu] = useState(() => {
 		// TODO: provide constructor in react context
 		return new ElectronContextMenu<T>(menu);

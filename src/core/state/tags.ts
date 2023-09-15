@@ -1,6 +1,6 @@
-import { createEvent, createStore } from "effector";
+import { createEvent, createStore } from 'effector';
 
-import { ITag } from "../Registry/Tags/Tags";
+import { ITag } from '../Registry/Tags/Tags';
 
 /**
  * Array of all exists tags
@@ -21,11 +21,13 @@ export const tagsChanged = createEvent();
 /**
  * Fired after tag been attached/detached
  */
-export const tagAttachmentsChanged = createEvent<{
-	target: string;
-	tagId: string;
-	state: 'add' | 'delete'
-}[]>();
+export const tagAttachmentsChanged = createEvent<
+	{
+		target: string;
+		tagId: string;
+		state: 'add' | 'delete';
+	}[]
+>();
 
 /**
  * Id of selected tag to filter notes

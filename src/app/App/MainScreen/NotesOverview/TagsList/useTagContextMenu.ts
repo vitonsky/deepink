@@ -1,8 +1,10 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
-import { ContextMenu } from "../../../../../electron/contextMenu";
-import { ContextMenuCallback, useContextMenu } from "../../../../components/hooks/useContextMenu";
-
+import { ContextMenu } from '../../../../../electron/contextMenu';
+import {
+	ContextMenuCallback,
+	useContextMenu,
+} from '../../../../components/hooks/useContextMenu';
 
 export enum TagContextMenu {
 	ADD = 'add',
@@ -32,7 +34,11 @@ export type TagContextMenuCallbacks = {
 	onDelete: (id: string) => void;
 };
 
-export const useTagContextMenu = ({ onAdd, onEdit, onDelete }: TagContextMenuCallbacks) => {
+export const useTagContextMenu = ({
+	onAdd,
+	onEdit,
+	onDelete,
+}: TagContextMenuCallbacks) => {
 	const noteContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
 		async ({ id, action }) => {
 			const actionsMap = {

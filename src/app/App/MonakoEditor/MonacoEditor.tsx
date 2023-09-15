@@ -131,7 +131,9 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		window.addEventListener('resize', updateDimensions);
 
 		// Enable extensions
-		const extensionsCleanupCallbacks = defaultExtensions.map((extension) => extension(monacoEditor));
+		const extensionsCleanupCallbacks = defaultExtensions.map((extension) =>
+			extension(monacoEditor),
+		);
 
 		setEditorObject(monacoEditor);
 

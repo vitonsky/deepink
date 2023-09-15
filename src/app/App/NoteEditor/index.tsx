@@ -8,7 +8,12 @@ import { cn } from '@bem-react/classname';
 import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
 import { INote, INoteData } from '../../../core/Note';
 import { ITag } from '../../../core/Registry/Tags/Tags';
-import { $tags, setActiveTag, tagAttachmentsChanged, tagsChanged } from '../../../core/state/tags';
+import {
+	$tags,
+	setActiveTag,
+	tagAttachmentsChanged,
+	tagsChanged,
+} from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { SuggestedTagsList } from '../../components/SuggestedTagsList';
 
@@ -39,7 +44,9 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		const attachedTags = await tagsRegistry.getAttachedTags(note.id);
 		setAttachedTags(attachedTags);
 
-		const filteredAttachedTags = tags.filter(({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id));
+		const filteredAttachedTags = tags.filter(
+			({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id),
+		);
 		setNotAttachedTags(filteredAttachedTags);
 	}, [note.id, tags, tagsRegistry]);
 	useEffect(() => {
@@ -141,11 +148,13 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 									.filter(({ id }) => id !== tag.id)
 									.map(({ id }) => id);
 								await tagsRegistry.setAttachedTags(noteId, updatedTags);
-								tagAttachmentsChanged([{
-									tagId: tag.id,
-									target: noteId,
-									state: 'delete'
-								}]);
+								tagAttachmentsChanged([
+									{
+										tagId: tag.id,
+										target: noteId,
+										state: 'delete',
+									},
+								]);
 								await updateTags();
 							}}
 						/>
@@ -186,21 +195,28 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					view="default"
 					visible
 					direction={['bottom-start', 'bottom', 'bottom-end']}
-				// boundary={modalRef}
+					// boundary={modalRef}
 				>
 					<SuggestedTagsList
 						tags={notAttachedTags}
 						tagName={attachTagName}
-						hasTagName={(tagName) => tags.some(({ resolvedName }) => resolvedName === tagName)}
+						hasTagName={(tagName) =>
+							tags.some(({ resolvedName }) => resolvedName === tagName)
+						}
 						onPickTag={async (id) => {
 							// tagInputRef.current?.blur();
 							setAttachTagName('');
-							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), id]);
-							tagAttachmentsChanged([{
-								tagId: id,
-								target: noteId,
-								state: 'add'
-							}]);
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								id,
+							]);
+							tagAttachmentsChanged([
+								{
+									tagId: id,
+									target: noteId,
+									state: 'add',
+								},
+							]);
 
 							await updateTags();
 						}}
@@ -210,24 +226,43 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							let cuttedTagName = tagName;
 							let parentTagId: string | null = null;
 							const tagSegments = tagName.split('/');
-							for (let segmentsNum = tagSegments.length - 1; segmentsNum > 0; segmentsNum--) {
-								const resolvedParentTag = tagSegments.slice(0, segmentsNum).join('/');
-								const foundTag = tags.find(({ resolvedName }) => resolvedName === resolvedParentTag);
+							for (
+								let segmentsNum = tagSegments.length - 1;
+								segmentsNum > 0;
+								segmentsNum--
+							) {
+								const resolvedParentTag = tagSegments
+									.slice(0, segmentsNum)
+									.join('/');
+								const foundTag = tags.find(
+									({ resolvedName }) =>
+										resolvedName === resolvedParentTag,
+								);
 								if (foundTag) {
 									parentTagId = foundTag.id;
-									cuttedTagName = tagSegments.slice(segmentsNum).join('/');
+									cuttedTagName = tagSegments
+										.slice(segmentsNum)
+										.join('/');
 									break;
 								}
 							}
 
-							const tagId = await tagsRegistry.add(cuttedTagName, parentTagId);
+							const tagId = await tagsRegistry.add(
+								cuttedTagName,
+								parentTagId,
+							);
 							tagsChanged();
-							await tagsRegistry.setAttachedTags(noteId, [...attachedTags.map(({ id }) => id), tagId]);
-							tagAttachmentsChanged([{
-								tagId: tagId,
-								target: noteId,
-								state: 'add'
-							}]);
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								tagId,
+							]);
+							tagAttachmentsChanged([
+								{
+									tagId: tagId,
+									target: noteId,
+									state: 'add',
+								},
+							]);
 
 							await updateTags();
 						}}

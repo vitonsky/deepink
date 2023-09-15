@@ -64,7 +64,7 @@ module.exports = merge(commonConfig, {
 											overrides: {
 												// Option to prevent removing viewBox to svg can be resize
 												// Issue created in 2017 https://github.com/gregberge/svgr/issues/18
-												removeViewBox: false
+												removeViewBox: false,
 											},
 										},
 									},
