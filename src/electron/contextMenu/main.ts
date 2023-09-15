@@ -23,12 +23,12 @@ export const enableContextMenu = () => {
 					id === undefined
 						? click
 						: (
-							menuItem: Electron.MenuItem,
-							browserWindow: Electron.BrowserWindow | undefined,
-							event: Electron.KeyboardEvent,
+								menuItem: Electron.MenuItem,
+								browserWindow: Electron.BrowserWindow | undefined,
+								event: Electron.KeyboardEvent,
 						  ) => {
-							if (click) click(menuItem, browserWindow, event);
-							onClick(id);
+								if (click) click(menuItem, browserWindow, event);
+								onClick(id);
 						  };
 
 				return { id, click: clickHandler, ...props };
