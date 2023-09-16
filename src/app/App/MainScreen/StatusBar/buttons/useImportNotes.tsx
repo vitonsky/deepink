@@ -63,18 +63,21 @@ export const useImportNotes = ({
 
 	// TODO: transparent encrypt files and upload to a temporary directory, instead of keep in memory
 	return useCallback(async () => {
-		const files = await importNotes();
-
-		console.warn('Files', files);
+		const filesBuffers = await importNotes();
 
 		const uploadedFiles: Record<string, Promise<string | null>> = {};
+
+		/**
+		 * Uploads a file and returns file id.
+		 * Returns file id instant, for already uploaded files in current import session
+		 */
 		const getUploadedFileId = async (url: string) => {
 			const urlRealPath = decodeURI(url);
 
 			// Upload new files
 			if (!(urlRealPath in uploadedFiles)) {
 				uploadedFiles[urlRealPath] = (async () => {
-					const buffer = files[urlRealPath];
+					const buffer = filesBuffers[urlRealPath];
 					if (!buffer) return null;
 
 					const urlFilename = urlRealPath.split('/').slice(-1)[0];
@@ -104,13 +107,13 @@ export const useImportNotes = ({
 		const fileUrlToIdMap: Record<string, string> = {};
 		const createdNoteIds: string[] = [];
 
-		// Handle notes
-		for (const filename in files) {
+		// Import notes
+		for (const filename in filesBuffers) {
 			// Handle only notes
 			if (!isNotePath(filename, resourcesDirectories)) continue;
 
 			const filenameSegments = filename.split('/');
-			const fileBuffer = files[filename];
+			const fileBuffer = filesBuffers[filename];
 			const sourceNoteData = textDecoder.decode(fileBuffer);
 
 			const mdTree = markdownProcessor.parse(sourceNoteData);
@@ -136,9 +139,6 @@ export const useImportNotes = ({
 			});
 
 			// Add note draft
-			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
-			const compiledNoteText = markdownProcessor.stringify(mdTree);
-
 			// TODO: validate data
 			const noteData = markdownProcessor.processSync(sourceNoteData).data
 				.frontmatter as Record<string, string>;
@@ -148,15 +148,16 @@ export const useImportNotes = ({
 				noteTitle = noteNameWithExt.replace(/\.md$/iu, '');
 			}
 
+			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
+			const noteText = markdownProcessor.stringify(mdTree);
+
 			const noteId = await notesRegistry.add({
 				title: noteTitle,
-				text: compiledNoteText,
+				text: noteText,
 			});
 
 			fileUrlToIdMap[filename] = noteId;
 			createdNoteIds.push(noteId);
-
-			console.warn({ tree: mdTree, noteData, compiledNoteText });
 
 			// Attach files
 			await attachmentsRegistry.set(
