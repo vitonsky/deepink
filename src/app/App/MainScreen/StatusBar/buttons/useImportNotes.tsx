@@ -9,10 +9,10 @@ import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
-import { formatResourceLink } from '../../../../../core/links';
+import { formatNoteLink, formatResourceLink } from '../../../../../core/links';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagsChanged } from '../../../../../core/state/tags';
-import { exportNotes } from '../../../../../electron/requests/files/renderer';
+import { importNotes } from '../../../../../electron/requests/files/renderer';
 import {
 	useAttachmentsRegistry,
 	useFilesRegistry,
@@ -39,10 +39,16 @@ export const replaceUrls = (tree: Root, callback: (url: string) => Promise<strin
 	return Promise.all(promises);
 };
 
-const getRelativePath = (currentPath: string, relativePath: string) => {
+const getAbsolutePathOfRelativePath = (currentPath: string, relativePath: string) => {
 	const url = new URL(relativePath, `https://root/${currentPath}`);
 	return url.pathname.slice(1);
 };
+
+const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
+	filePath.endsWith('.md') &&
+	resourcesDirs.every((dirPath) => !filePath.startsWith(dirPath));
+
+const resourcesDirectories = ['_resources'];
 
 export const useImportNotes = ({
 	notesRegistry,
@@ -51,24 +57,94 @@ export const useImportNotes = ({
 	notesRegistry: INotesRegistry;
 	updateNotes: () => void;
 }) => {
+	const filesRegistry = useFilesRegistry();
+	const attachmentsRegistry = useAttachmentsRegistry();
 	const tagsRegistry = useTagsRegistry();
 
-	const attachmentsRegistry = useAttachmentsRegistry();
-
-	const filesRegistry = useFilesRegistry();
+	// TODO: transparent encrypt files and upload to a temporary directory, instead of keep in memory
 	return useCallback(async () => {
-		const files = await exportNotes();
+		const filesBuffers = await importNotes();
 
-		console.warn('Files', files);
+		const textDecoder = new TextDecoder('utf-8');
+		const markdownProcessor = unified()
+			.use(remarkParse)
+			.use(remarkParseFrontmatter)
+			.use(remarkFrontmatter, ['yaml', 'toml'])
+			.use(remarkGfm)
+			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
+			.freeze();
 
+		const attachmentsToUpload: string[] = [];
+		const createdNotes: Record<string, { id: string; path: string }> = {};
+
+		// Extraction: On this step we just parse and format data
+		// Import notes
+		for (const filename in filesBuffers) {
+			// Handle only notes
+			if (!isNotePath(filename, resourcesDirectories)) continue;
+
+			const filenameSegments = filename.split('/');
+			const fileBuffer = filesBuffers[filename];
+			const sourceNoteData = textDecoder.decode(fileBuffer);
+
+			const mdTree = markdownProcessor.parse(sourceNoteData);
+
+			// Remove header node with meta data parsed by frontmatter
+			remove(mdTree, 'yaml');
+
+			// Update URLs in AST and collect attachments
+			await replaceUrls(mdTree, async (nodeUrl) => {
+				const absoluteUrl = getAbsolutePathOfRelativePath(filename, nodeUrl);
+
+				// Collect attachments URLs
+				if (!isNotePath(absoluteUrl, resourcesDirectories)) {
+					attachmentsToUpload.push(absoluteUrl);
+				}
+
+				return absoluteUrl;
+			});
+
+			// Add note draft
+			// TODO: validate data
+			const noteData = markdownProcessor.processSync(sourceNoteData).data
+				.frontmatter as Record<string, string>;
+			let noteTitle = noteData.title || null;
+			if (noteTitle === null) {
+				const noteNameWithExt = filenameSegments.slice(-1)[0];
+				noteTitle = noteNameWithExt.replace(/\.md$/iu, '');
+			}
+
+			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
+			const noteText = markdownProcessor.stringify(mdTree);
+
+			// TODO: mark as temporary and don't show for user
+			const noteId = await notesRegistry.add({
+				title: noteTitle,
+				text: noteText,
+			});
+
+			createdNotes[encodeURI(filename)] = {
+				id: noteId,
+				path: filenameSegments.slice(0, -1).join('/'),
+			};
+
+			// TODO: add method to registry, to emit event by updates
+			updateNotes();
+		}
+
+		// Uploading: On this stage we upload any files
 		const uploadedFiles: Record<string, Promise<string | null>> = {};
+		/**
+		 * Uploads a file and returns file id.
+		 * Returns file id instant, for already uploaded files in current import session
+		 */
 		const getUploadedFileId = async (url: string) => {
 			const urlRealPath = decodeURI(url);
 
 			// Upload new files
 			if (!(urlRealPath in uploadedFiles)) {
 				uploadedFiles[urlRealPath] = (async () => {
-					const buffer = files[urlRealPath];
+					const buffer = filesBuffers[urlRealPath];
 					if (!buffer) return null;
 
 					const urlFilename = urlRealPath.split('/').slice(-1)[0];
@@ -81,60 +157,66 @@ export const useImportNotes = ({
 			return uploadedFiles[urlRealPath];
 		};
 
-		const textDecoder = new TextDecoder('utf-8');
-		const markdownProcessor = unified()
-			.use(remarkParse)
-			.use(remarkParseFrontmatter)
-			.use(remarkFrontmatter, ['yaml', 'toml'])
-			.use(remarkGfm)
-			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
-			.freeze();
+		/**
+		 * Map structure: file URL => entity ID
+		 * We use file URL, not a path, because links in MD contains encoded URLs, not a paths,
+		 * So we have to decode URLs if needs to use it as paths.
+		 */
+		const fileUrlToIdMap: Record<string, string> = {};
 
-		// Handle markdown files
-		for (const filename in files) {
-			// Skip not markdown files
-			const fileExtension = '.md';
-			if (!filename.endsWith(fileExtension)) continue;
+		// Upload attached files
+		await Promise.all(
+			attachmentsToUpload
+				// Remove duplicates
+				.filter((url, index, arr) => index === arr.indexOf(url))
+				.map(async (absoluteUrl) => {
+					const fileId = await getUploadedFileId(absoluteUrl);
+					if (fileId) {
+						fileUrlToIdMap[absoluteUrl] = fileId;
+					}
+				}),
+		);
 
-			const fileBuffer = files[filename];
-			const noteText = textDecoder.decode(fileBuffer);
+		// Linking: On this stage all attachments (like files, other notes, etc) uploaded and ready to use
+		// Update notes
+		for (const [_fileUrl, noteData] of Object.entries(createdNotes)) {
+			const noteId = noteData.id;
+			const note = await notesRegistry.getById(noteId);
+			if (!note) continue;
 
-			const vFile = markdownProcessor.processSync(noteText);
-			const noteData = vFile.data.frontmatter as any;
+			const noteTree = markdownProcessor.parse(note.data.text);
 
-			const tree = markdownProcessor.parse(noteText);
-
-			// Remove header node with meta data parsed by frontmatter
-			remove(tree, 'yaml');
-
-			// Replace URLs to uploaded entities
-			// TODO: update references to another md files
+			// Update URLs
 			const attachedFilesIds: string[] = [];
-			await replaceUrls(tree, async (nodeUrl) => {
-				const url = getRelativePath(filename, nodeUrl);
-				const fileId = await getUploadedFileId(url);
+			await replaceUrls(noteTree, async (absoluteUrl) => {
+				const createdNote = createdNotes[absoluteUrl];
+				if (createdNote) {
+					return formatNoteLink(createdNote.id);
+				}
 
+				const fileId = fileUrlToIdMap[absoluteUrl];
 				if (fileId) {
 					attachedFilesIds.push(fileId);
 					return formatResourceLink(fileId);
 				}
-				return nodeUrl;
+
+				return absoluteUrl;
 			});
 
-			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
-			const compiledNoteText = markdownProcessor.stringify(tree);
-			console.warn({ tree, vFile, noteData, compiledNoteText });
+			// Update note text
+			const updatedText = markdownProcessor.stringify(noteTree);
+			await notesRegistry.update(note.id, { ...note.data, text: updatedText });
 
-			const filenameSegments = filename.split('/');
-			const noteNameWithExt = filenameSegments.slice(-1)[0];
-			const noteName = noteNameWithExt.slice(
-				0,
-				noteNameWithExt.length - fileExtension.length,
+			// Attach files
+			await attachmentsRegistry.set(
+				noteId,
+				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
 			);
 
+			// Find or create tags and attach
 			let tagId: null | string = null;
 			const tags = await tagsRegistry.getTags();
-			const filenameBasePathSegments = filenameSegments.slice(0, -1);
+			const filenameBasePathSegments = noteData.path.split('/');
 			for (
 				let lastSegment = filenameBasePathSegments.length;
 				lastSegment > 0;
@@ -147,18 +229,26 @@ export const useImportNotes = ({
 				const tag = tags.find(
 					({ resolvedName }) => resolvedName === resolvedTagForSearch,
 				);
-				if (tag) {
-					if (lastSegment !== filenameBasePathSegments.length) {
-						const tagNameToCreate = filenameBasePathSegments
-							.slice(lastSegment)
-							.join('/');
-						tagId = await tagsRegistry.add(tagNameToCreate, tag.id);
-						tagsChanged();
-					} else {
-						tagId = tag.id;
-					}
+
+				if (!tag) continue;
+
+				const isFullPathExists = lastSegment === filenameBasePathSegments.length;
+				if (isFullPathExists) {
+					// Tag found
+					tagId = tag.id;
 					break;
 				}
+
+				// Create nested tags
+				const parentTagId = tag.id;
+				const tagNameToCreate = filenameBasePathSegments
+					.slice(lastSegment)
+					.join('/');
+
+				tagId = await tagsRegistry.add(tagNameToCreate, parentTagId);
+				tagsChanged();
+
+				break;
 			}
 
 			if (tagId === null && filenameBasePathSegments.length > 0) {
@@ -167,19 +257,7 @@ export const useImportNotes = ({
 				tagsChanged();
 			}
 
-			const noteId = await notesRegistry.add({
-				title: noteData.title || noteName,
-				text: compiledNoteText,
-			});
-
-			await attachmentsRegistry.set(
-				noteId,
-				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
-			);
 			await tagsRegistry.setAttachedTags(noteId, tagId ? [tagId] : []);
-
-			// TODO: add method to registry, to emit event by updates
-			updateNotes();
 		}
 
 		updateNotes();

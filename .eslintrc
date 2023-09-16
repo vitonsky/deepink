@@ -139,7 +139,7 @@
 			"error",
 			{
 				"asyncArrow": "always",
-				"anonymous": "never",
+				"anonymous": "always",
 				"named": "never"
 			}
 		]

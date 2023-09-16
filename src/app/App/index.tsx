@@ -6,6 +6,7 @@ import { cn } from '@bem-react/classname';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
+import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { Tags } from '../../core/Registry/Tags/Tags';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
@@ -21,7 +22,7 @@ import {
 } from '../../electron/requests/storage/renderer';
 
 import { MainScreen } from './MainScreen';
-import { Providers } from './Providers';
+import { ProvidedAppContext, Providers } from './Providers';
 import { SplashScreen } from './SplashScreen';
 
 import './App.css';
@@ -48,34 +49,41 @@ export const App: FC = () => {
 		})();
 	}, []);
 
-	const [filesRegistry, setFilesRegistry] = useState<FilesRegistry | null>(null);
-	const [attachmentsRegistry, setAttachmentsRegistry] = useState<Attachments | null>(
-		null,
-	);
-	const [tagsRegistry, setTagsRegistry] = useState<Tags | null>(null);
+	const [providedAppContext, setProvidedAppContext] = useState<Omit<
+		ProvidedAppContext,
+		'db'
+	> | null>(null);
 	useEffect(() => {
 		if (db === null) return;
 
-		const attachments = new Attachments(db);
-		setAttachmentsRegistry(attachments);
+		const attachmentsRegistry = new Attachments(db);
 
 		const filesRegistry = new FilesRegistry(
 			db,
 			{ get: getFile, write: uploadFile, delete: deleteFiles, list: listFiles },
-			attachments,
+			attachmentsRegistry,
 		);
-		setFilesRegistry(filesRegistry);
 
 		// TODO: schedule when to run method
 		filesRegistry.clearOrphaned();
 
-		setTagsRegistry(new Tags(db));
+		const tagsRegistry = new Tags(db);
+
+		const notesRegistry = new NotesRegistry(db);
+
+		setProvidedAppContext({
+			attachmentsRegistry,
+			filesRegistry,
+			tagsRegistry,
+			notesRegistry,
+		});
 	}, [db]);
 
 	useEffect(() => {
-		if (!tagsRegistry) return;
+		if (!providedAppContext) return;
 
-		const updateTags = () => tagsRegistry.getTags().then(tagsUpdated);
+		const updateTags = () =>
+			providedAppContext.tagsRegistry.getTags().then(tagsUpdated);
 
 		const cleanup = tagsChanged.watch(updateTags);
 		updateTags();
@@ -84,12 +92,7 @@ export const App: FC = () => {
 	});
 
 	// Splash screen for loading state
-	if (
-		db === null ||
-		filesRegistry === null ||
-		attachmentsRegistry == null ||
-		tagsRegistry === null
-	) {
+	if (db === null || providedAppContext === null) {
 		return (
 			<div className={cnApp()}>
 				<SplashScreen />
@@ -99,8 +102,8 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<Providers {...{ filesRegistry, attachmentsRegistry, tagsRegistry }}>
-				<MainScreen db={db} />
+			<Providers {...providedAppContext} db={db}>
+				<MainScreen />
 			</Providers>
 		</div>
 	);

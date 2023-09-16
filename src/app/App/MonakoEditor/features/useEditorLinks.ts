@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import saveAs from 'file-saver';
 import { editor, languages } from 'monaco-editor-core';
 
-import { findLinksInText, getResourceIdInUrl } from '../../../../core/links';
+import { findLinksInText, getAppResourceDataInUrl } from '../../../../core/links';
 import { openLink } from '../../../../electron/requests/interactions/renderer';
+import { useNotesControl } from '../../MainScreen/useNotesControl';
 import { useFilesRegistry } from '../../Providers';
 
 /**
@@ -13,6 +14,7 @@ import { useFilesRegistry } from '../../Providers';
  */
 export const useEditorLinks = () => {
 	const filesRegistry = useFilesRegistry();
+	const notesControl = useNotesControl();
 
 	// Register files opener
 	useEffect(() => {
@@ -48,15 +50,23 @@ export const useEditorLinks = () => {
 					return true;
 				}
 
-				const fileId = getResourceIdInUrl(resource);
-				if (fileId === null) return false;
+				const resourceData = getAppResourceDataInUrl(resource);
+				if (!resourceData) return false;
 
-				const file = await filesRegistry.get(fileId);
-				if (!file) return false;
+				switch (resourceData.type) {
+					case 'resource': {
+						const file = await filesRegistry.get(resourceData.id);
+						if (!file) return false;
 
-				const buffer = await file.arrayBuffer();
-				saveAs(new Blob([buffer]), file.name);
-				return true;
+						const buffer = await file.arrayBuffer();
+						saveAs(new Blob([buffer]), file.name);
+						return true;
+					}
+					case 'note': {
+						notesControl.open(resourceData.id);
+						return true;
+					}
+				}
 			},
 		});
 
@@ -64,5 +74,5 @@ export const useEditorLinks = () => {
 			mdLinkProvider.dispose();
 			appLinkOpener.dispose();
 		};
-	}, [filesRegistry]);
+	}, [filesRegistry, notesControl]);
 };

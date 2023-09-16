@@ -2,8 +2,9 @@ import React, { useCallback } from 'react';
 import { Components } from 'react-markdown';
 import saveAs from 'file-saver';
 
-import { getResourceIdInUrl } from '../../../../core/links';
+import { getAppResourceDataInUrl } from '../../../../core/links';
 import { openLink } from '../../../../electron/requests/interactions/renderer';
+import { useNotesControl } from '../../MainScreen/useNotesControl';
 import { useFilesRegistry } from '../../Providers';
 
 export const Link: Exclude<Components['a'], undefined> = ({
@@ -12,6 +13,7 @@ export const Link: Exclude<Components['a'], undefined> = ({
 	...props
 }) => {
 	const filesRegistry = useFilesRegistry();
+	const notesControl = useNotesControl();
 
 	const onClick = useCallback(
 		(evt: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -24,20 +26,34 @@ export const Link: Exclude<Components['a'], undefined> = ({
 			const url = props.href;
 			if (evt.type !== 'click' || !url) return;
 
-			// Save resources
-			const fileId = getResourceIdInUrl(url);
-			console.log({ fileId, url });
-			if (fileId !== null) {
-				evt.preventDefault();
+			const resourceData = getAppResourceDataInUrl(url);
 
-				filesRegistry.get(fileId).then(async (file) => {
-					if (!file) return;
+			if (resourceData) {
+				switch (resourceData.type) {
+					case 'resource': {
+						// Save resources
+						const fileId = resourceData.id;
+						console.log({ fileId, url });
+						if (fileId !== null) {
+							evt.preventDefault();
 
-					const buffer = await file.arrayBuffer();
-					saveAs(new Blob([buffer]), file.name);
-				});
+							filesRegistry.get(fileId).then(async (file) => {
+								if (!file) return;
 
-				return;
+								const buffer = await file.arrayBuffer();
+								saveAs(new Blob([buffer]), file.name);
+							});
+
+							return;
+						}
+						break;
+					}
+					case 'note': {
+						evt.preventDefault();
+						notesControl.open(resourceData.id);
+						return;
+					}
+				}
 			}
 
 			// Open urls
@@ -49,7 +65,7 @@ export const Link: Exclude<Components['a'], undefined> = ({
 				return;
 			}
 		},
-		[filesRegistry, props],
+		[filesRegistry, notesControl, props],
 	);
 
 	return <a {...props} target={props.target ?? '_blank'} onClick={onClick} />;

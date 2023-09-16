@@ -1,9 +1,11 @@
 import { useCallback } from 'react';
 
+import { formatNoteLink } from '../../../../../core/links';
 import { NoteId } from '../../../../../core/Note';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
 import { ContextMenu } from '../../../../../electron/contextMenu';
+import { copyTextToClipboard } from '../../../../../utils/clipboard';
 import {
 	ContextMenuCallback,
 	useContextMenu,
@@ -30,12 +32,22 @@ export const noteMenu: ContextMenu = [
 		id: NoteActions.DUPLICATE,
 		label: 'Duplicate',
 	},
+	{
+		id: NoteActions.COPY_MARKDOWN_LINK,
+		label: 'Copy markdown link',
+	},
 	{ type: 'separator' },
 	{
 		id: NoteActions.DELETE,
 		label: 'Delete',
 	},
 ];
+
+const mdCharsForEscape = ['\\', '[', ']'];
+const mdCharsForEscapeRegEx = new RegExp(
+	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
+	'g',
+);
 
 export const useDefaultNoteContextMenu = ({
 	closeNote,
@@ -95,6 +107,24 @@ export const useDefaultNoteContextMenu = ({
 					);
 
 					updateNotes();
+					break;
+				}
+				case NoteActions.COPY_MARKDOWN_LINK: {
+					const note = await notesRegistry.getById(id);
+					if (!note) {
+						console.error(`Can't get data of note #${id}`);
+						return;
+					}
+
+					const { title, text } = note.data;
+					const noteTitle = (title || text.slice(0, 30))
+						.trim()
+						.replace(mdCharsForEscapeRegEx, '\\$1');
+					const markdownLink = `[${noteTitle}](${formatNoteLink(id)})`;
+
+					console.log(`Copy markdown link ${markdownLink}`);
+
+					copyTextToClipboard(markdownLink);
 					break;
 				}
 			}

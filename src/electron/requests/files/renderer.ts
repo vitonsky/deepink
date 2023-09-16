@@ -2,8 +2,8 @@ import { ipcRenderer } from 'electron';
 
 import { CHANNELS } from '.';
 
-export function exportNotes(): Promise<Record<string, ArrayBuffer>> {
-	return ipcRenderer.invoke(CHANNELS.exportNotes);
+export function importNotes(): Promise<Record<string, ArrayBuffer>> {
+	return ipcRenderer.invoke(CHANNELS.importNotes);
 }
 
 export function getUserDataPath(path: string): Promise<string> {

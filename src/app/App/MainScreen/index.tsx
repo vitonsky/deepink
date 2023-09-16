@@ -6,13 +6,15 @@ import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../core/Note';
-import { INotesRegistry } from '../../../core/Registry';
-import { NotesRegistry } from '../../../core/Registry/NotesRegistry';
-import { $openedNotes, openedNotesControls } from '../../../core/state/notes';
+import {
+	$activeNoteId,
+	$openedNotes,
+	activeNoteChanged,
+	openedNotesControls,
+} from '../../../core/state/notes';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
-import { SQLiteDb } from '../../../core/storage/SQLiteDb';
 
-import { useTagsRegistry } from '../Providers';
+import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
@@ -23,9 +25,9 @@ import './MainScreen.css';
 
 export const cnMainScreen = cn('MainScreen');
 
-export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
-	const [notesRegistry] = useState<INotesRegistry>(() => new NotesRegistry(db));
-	const [tab, setTab] = useState<NoteId | null>(null);
+export const MainScreen: FC = () => {
+	const notesRegistry = useNotesRegistry();
+	const activeNoteId = useStore($activeNoteId);
 	const [notes, setNotes] = useState<INote[]>([]);
 
 	const activeTag = useStore($activeTag);
@@ -76,7 +78,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 				openedNotesControls.add(note);
 			}
 
-			setTab(id);
+			activeNoteChanged(id);
 		},
 		[notes],
 	);
@@ -88,19 +90,19 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 			const tabIndex = openedNotes.findIndex((note) => note.id === id);
 
 			// Change tab if it is current tab
-			if (id === tab) {
+			if (id === activeNoteId) {
 				let nextTab = null;
 				if (tabIndex > 0) {
 					nextTab = openedNotes[tabIndex - 1].id;
 				} else if (tabIndex === 0 && openedNotes.length > 1) {
 					nextTab = openedNotes[1].id;
 				}
-				setTab(nextTab);
+				activeNoteChanged(nextTab);
 			}
 
 			openedNotesControls.delete(id);
 		},
-		[openedNotes, tab],
+		[openedNotes, activeNoteId],
 	);
 
 	// Simulate note update
@@ -179,7 +181,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 								onPick: onNoteClick,
 								onClose: onNoteClose,
 								openedNotes: tabs,
-								activeNote: tab,
+								activeNote: activeNoteId,
 							}}
 						/>
 					</div>
@@ -191,7 +193,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 							updateNotes,
 							notes: openedNotes,
 							tabs,
-							activeTab: tab ?? null,
+							activeTab: activeNoteId ?? null,
 							onClose: onNoteClose,
 							onPick: onNoteClick,
 						}}
@@ -201,7 +203,7 @@ export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
 							{...{
 								notes: openedNotes,
 								tabs,
-								activeTab: tab ?? null,
+								activeTab: activeNoteId ?? null,
 								updateNote,
 							}}
 						/>
