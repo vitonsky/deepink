@@ -1,6 +1,10 @@
-import { createApi, createStore } from 'effector';
+import { createApi, createEvent, createStore } from 'effector';
 
-import { INote } from '../Note';
+import { INote, NoteId } from '../Note';
+
+export const $activeNoteId = createStore<NoteId | null>(null);
+export const activeNoteChanged = createEvent<NoteId | null>();
+$activeNoteId.on(activeNoteChanged, (_, noteId) => noteId);
 
 export const $openedNotes = createStore<INote[]>([]);
 export const openedNotesControls = createApi($openedNotes, {
