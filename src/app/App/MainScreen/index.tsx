@@ -6,13 +6,10 @@ import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../core/Note';
-import { INotesRegistry } from '../../../core/Registry';
-import { NotesRegistry } from '../../../core/Registry/NotesRegistry';
 import { $openedNotes, openedNotesControls } from '../../../core/state/notes';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
-import { SQLiteDb } from '../../../core/storage/SQLiteDb';
 
-import { useTagsRegistry } from '../Providers';
+import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
@@ -23,8 +20,8 @@ import './MainScreen.css';
 
 export const cnMainScreen = cn('MainScreen');
 
-export const MainScreen: FC<{ db: SQLiteDb }> = ({ db }) => {
-	const [notesRegistry] = useState<INotesRegistry>(() => new NotesRegistry(db));
+export const MainScreen: FC = () => {
+	const notesRegistry = useNotesRegistry();
 	const [tab, setTab] = useState<NoteId | null>(null);
 	const [notes, setNotes] = useState<INote[]>([]);
 
