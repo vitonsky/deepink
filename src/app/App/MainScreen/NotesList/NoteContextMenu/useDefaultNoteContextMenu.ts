@@ -10,7 +10,6 @@ import {
 	ContextMenuCallback,
 	useContextMenu,
 } from '../../../../components/hooks/useContextMenu';
-import { getNoteTitle } from '../../..';
 import { useTagsRegistry } from '../../../Providers';
 
 import { NoteActions } from '.';
@@ -43,6 +42,12 @@ export const noteMenu: ContextMenu = [
 		label: 'Delete',
 	},
 ];
+
+const mdCharsForEscape = ['\\', '[', ']'];
+const mdCharsForEscapeRegEx = new RegExp(
+	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
+	'g',
+);
 
 export const useDefaultNoteContextMenu = ({
 	closeNote,
@@ -111,8 +116,10 @@ export const useDefaultNoteContextMenu = ({
 						return;
 					}
 
-					// TODO: escape chars like `[]`
-					const noteTitle = getNoteTitle(note.data);
+					const { title, text } = note.data;
+					const noteTitle = (title || text.slice(0, 30))
+						.trim()
+						.replace(mdCharsForEscapeRegEx, '\\$1');
 					const markdownLink = `[${noteTitle}](${formatNoteLink(id)})`;
 
 					console.log(`Copy markdown link ${markdownLink}`);
