@@ -39,10 +39,16 @@ export const replaceUrls = (tree: Root, callback: (url: string) => Promise<strin
 	return Promise.all(promises);
 };
 
-const getRelativePath = (currentPath: string, relativePath: string) => {
+const getAbsolutePathOfRelativePath = (currentPath: string, relativePath: string) => {
 	const url = new URL(relativePath, `https://root/${currentPath}`);
 	return url.pathname.slice(1);
 };
+
+const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
+	filePath.endsWith('.md') &&
+	resourcesDirs.every((dirPath) => !filePath.startsWith(dirPath));
+
+const resourcesDirectories = ['_resources'];
 
 export const useImportNotes = ({
 	notesRegistry,
@@ -55,6 +61,7 @@ export const useImportNotes = ({
 	const attachmentsRegistry = useAttachmentsRegistry();
 	const tagsRegistry = useTagsRegistry();
 
+	// TODO: transparent encrypt files and upload to a temporary directory, instead of keep in memory
 	return useCallback(async () => {
 		const files = await importNotes();
 
@@ -89,57 +96,75 @@ export const useImportNotes = ({
 			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 			.freeze();
 
-		const filePathToIdMap: Record<string, string> = {};
-		const createdNotes: string[] = [];
+		/**
+		 * Map structure: file URL => entity ID
+		 * We use file URL, not a path, because links in MD contains encoded URLs, not a paths,
+		 * So we have to decode URLs if needs to use it as paths.
+		 */
+		const fileUrlToIdMap: Record<string, string> = {};
+		const createdNoteIds: string[] = [];
 
-		// Handle markdown files
+		// Handle notes
 		for (const filename in files) {
-			// Skip not markdown files
-			const fileExtension = '.md';
-			if (!filename.endsWith(fileExtension)) continue;
-
-			const fileBuffer = files[filename];
-			const noteText = textDecoder.decode(fileBuffer);
-
-			const vFile = markdownProcessor.processSync(noteText);
-			const noteData = vFile.data.frontmatter as any;
-
-			const tree = markdownProcessor.parse(noteText);
-
-			// Remove header node with meta data parsed by frontmatter
-			remove(tree, 'yaml');
-
-			// Replace URLs to uploaded entities
-			// TODO: update references to another md files
-			const attachedFilesIds: string[] = [];
-			await replaceUrls(tree, async (nodeUrl) => {
-				const absoluteUrl = getRelativePath(filename, nodeUrl);
-
-				// Skip markdown files
-				if (absoluteUrl.endsWith('.md')) return absoluteUrl;
-
-				const fileId = await getUploadedFileId(absoluteUrl);
-				if (fileId) {
-					filePathToIdMap[absoluteUrl] = fileId;
-
-					attachedFilesIds.push(fileId);
-					return formatResourceLink(fileId);
-				}
-
-				return absoluteUrl;
-			});
-
-			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
-			const compiledNoteText = markdownProcessor.stringify(tree);
-			console.warn({ tree, vFile, noteData, compiledNoteText });
+			// Handle only notes
+			if (!isNotePath(filename, resourcesDirectories)) continue;
 
 			const filenameSegments = filename.split('/');
-			const noteNameWithExt = filenameSegments.slice(-1)[0];
-			const noteName = noteNameWithExt.slice(
-				0,
-				noteNameWithExt.length - fileExtension.length,
+			const fileBuffer = files[filename];
+			const sourceNoteData = textDecoder.decode(fileBuffer);
+
+			const mdTree = markdownProcessor.parse(sourceNoteData);
+
+			// Remove header node with meta data parsed by frontmatter
+			remove(mdTree, 'yaml');
+
+			// Upload attachments and update URLs in AST
+			const attachedFilesIds: string[] = [];
+			await replaceUrls(mdTree, async (nodeUrl) => {
+				const absoluteUrl = getAbsolutePathOfRelativePath(filename, nodeUrl);
+
+				// Skip notes, handle only attachments
+				if (isNotePath(absoluteUrl, resourcesDirectories)) return absoluteUrl;
+
+				const fileId = await getUploadedFileId(absoluteUrl);
+				if (!fileId) return absoluteUrl;
+
+				fileUrlToIdMap[absoluteUrl] = fileId;
+
+				attachedFilesIds.push(fileId);
+				return formatResourceLink(fileId);
+			});
+
+			// Add note draft
+			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
+			const compiledNoteText = markdownProcessor.stringify(mdTree);
+
+			// TODO: validate data
+			const noteData = markdownProcessor.processSync(sourceNoteData).data
+				.frontmatter as Record<string, string>;
+			let noteTitle = noteData.title || null;
+			if (noteTitle === null) {
+				const noteNameWithExt = filenameSegments.slice(-1)[0];
+				noteTitle = noteNameWithExt.replace(/\.md$/iu, '');
+			}
+
+			const noteId = await notesRegistry.add({
+				title: noteTitle,
+				text: compiledNoteText,
+			});
+
+			fileUrlToIdMap[filename] = noteId;
+			createdNoteIds.push(noteId);
+
+			console.warn({ tree: mdTree, noteData, compiledNoteText });
+
+			// Attach files
+			await attachmentsRegistry.set(
+				noteId,
+				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
 			);
 
+			// Find or create tags and attach
 			let tagId: null | string = null;
 			const tags = await tagsRegistry.getTags();
 			const filenameBasePathSegments = filenameSegments.slice(0, -1);
@@ -155,18 +180,26 @@ export const useImportNotes = ({
 				const tag = tags.find(
 					({ resolvedName }) => resolvedName === resolvedTagForSearch,
 				);
-				if (tag) {
-					if (lastSegment !== filenameBasePathSegments.length) {
-						const tagNameToCreate = filenameBasePathSegments
-							.slice(lastSegment)
-							.join('/');
-						tagId = await tagsRegistry.add(tagNameToCreate, tag.id);
-						tagsChanged();
-					} else {
-						tagId = tag.id;
-					}
+
+				if (!tag) continue;
+
+				const isFullPathExists = lastSegment === filenameBasePathSegments.length;
+				if (isFullPathExists) {
+					// Tag found
+					tagId = tag.id;
 					break;
 				}
+
+				// Create nested tags
+				const parentTagId = tag.id;
+				const tagNameToCreate = filenameBasePathSegments
+					.slice(lastSegment)
+					.join('/');
+
+				tagId = await tagsRegistry.add(tagNameToCreate, parentTagId);
+				tagsChanged();
+
+				break;
 			}
 
 			if (tagId === null && filenameBasePathSegments.length > 0) {
@@ -175,34 +208,21 @@ export const useImportNotes = ({
 				tagsChanged();
 			}
 
-			const noteId = await notesRegistry.add({
-				title: noteData.title || noteName,
-				text: compiledNoteText,
-			});
-
-			filePathToIdMap[filename] = noteId;
-			createdNotes.push(noteId);
-
-			await attachmentsRegistry.set(
-				noteId,
-				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
-			);
 			await tagsRegistry.setAttachedTags(noteId, tagId ? [tagId] : []);
 
 			// TODO: add method to registry, to emit event by updates
 			updateNotes();
 		}
 
-		console.warn('Files to ids map', filePathToIdMap);
-
-		for (const noteId of createdNotes) {
+		// Update notes
+		for (const noteId of createdNoteIds) {
 			const note = await notesRegistry.getById(noteId);
 			if (!note) continue;
 
 			const noteTree = markdownProcessor.parse(note.data.text);
 			await replaceUrls(noteTree, async (nodeUrl) => {
-				const itemId = filePathToIdMap[decodeURI(nodeUrl)];
-				if (!itemId || !createdNotes.includes(itemId)) return nodeUrl;
+				const itemId = fileUrlToIdMap[decodeURI(nodeUrl)];
+				if (!itemId || !createdNoteIds.includes(itemId)) return nodeUrl;
 
 				return formatNoteLink(itemId);
 			});
