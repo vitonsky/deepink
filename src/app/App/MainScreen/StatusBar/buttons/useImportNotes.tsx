@@ -65,31 +65,6 @@ export const useImportNotes = ({
 	return useCallback(async () => {
 		const filesBuffers = await importNotes();
 
-		const uploadedFiles: Record<string, Promise<string | null>> = {};
-
-		/**
-		 * Uploads a file and returns file id.
-		 * Returns file id instant, for already uploaded files in current import session
-		 */
-		const getUploadedFileId = async (url: string) => {
-			const urlRealPath = decodeURI(url);
-
-			// Upload new files
-			if (!(urlRealPath in uploadedFiles)) {
-				uploadedFiles[urlRealPath] = (async () => {
-					const buffer = filesBuffers[urlRealPath];
-					if (!buffer) return null;
-
-					const urlFilename = urlRealPath.split('/').slice(-1)[0];
-					const file = new File([buffer], urlFilename);
-
-					return filesRegistry.add(file);
-				})();
-			}
-
-			return uploadedFiles[urlRealPath];
-		};
-
 		const textDecoder = new TextDecoder('utf-8');
 		const markdownProcessor = unified()
 			.use(remarkParse)
@@ -106,7 +81,9 @@ export const useImportNotes = ({
 		 */
 		const fileUrlToIdMap: Record<string, string> = {};
 		const createdNoteIds: string[] = [];
+		const attachmentsToUpload: string[] = [];
 
+		// Extraction: On this step we just parse and format data
 		// Import notes
 		for (const filename in filesBuffers) {
 			// Handle only notes
@@ -121,21 +98,16 @@ export const useImportNotes = ({
 			// Remove header node with meta data parsed by frontmatter
 			remove(mdTree, 'yaml');
 
-			// Upload attachments and update URLs in AST
-			const attachedFilesIds: string[] = [];
+			// Update URLs in AST and collect attachments
 			await replaceUrls(mdTree, async (nodeUrl) => {
 				const absoluteUrl = getAbsolutePathOfRelativePath(filename, nodeUrl);
 
-				// Skip notes, handle only attachments
-				if (isNotePath(absoluteUrl, resourcesDirectories)) return absoluteUrl;
+				// Collect attachments URLs
+				if (!isNotePath(absoluteUrl, resourcesDirectories)) {
+					attachmentsToUpload.push(absoluteUrl);
+				}
 
-				const fileId = await getUploadedFileId(absoluteUrl);
-				if (!fileId) return absoluteUrl;
-
-				fileUrlToIdMap[absoluteUrl] = fileId;
-
-				attachedFilesIds.push(fileId);
-				return formatResourceLink(fileId);
+				return absoluteUrl;
 			});
 
 			// Add note draft
@@ -151,19 +123,14 @@ export const useImportNotes = ({
 			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
 			const noteText = markdownProcessor.stringify(mdTree);
 
+			// TODO: mark as temporary and don't show for user
 			const noteId = await notesRegistry.add({
 				title: noteTitle,
 				text: noteText,
 			});
 
-			fileUrlToIdMap[filename] = noteId;
+			fileUrlToIdMap[encodeURI(filename)] = noteId;
 			createdNoteIds.push(noteId);
-
-			// Attach files
-			await attachmentsRegistry.set(
-				noteId,
-				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
-			);
 
 			// Find or create tags and attach
 			let tagId: null | string = null;
@@ -215,21 +182,74 @@ export const useImportNotes = ({
 			updateNotes();
 		}
 
+		// Uploading: On this stage we upload any files
+		const uploadedFiles: Record<string, Promise<string | null>> = {};
+		/**
+		 * Uploads a file and returns file id.
+		 * Returns file id instant, for already uploaded files in current import session
+		 */
+		const getUploadedFileId = async (url: string) => {
+			const urlRealPath = decodeURI(url);
+
+			// Upload new files
+			if (!(urlRealPath in uploadedFiles)) {
+				uploadedFiles[urlRealPath] = (async () => {
+					const buffer = filesBuffers[urlRealPath];
+					if (!buffer) return null;
+
+					const urlFilename = urlRealPath.split('/').slice(-1)[0];
+					const file = new File([buffer], urlFilename);
+
+					return filesRegistry.add(file);
+				})();
+			}
+
+			return uploadedFiles[urlRealPath];
+		};
+
+		// Upload attached files
+		await Promise.all(
+			attachmentsToUpload
+				// Remove duplicates
+				.filter((url, index, arr) => index === arr.indexOf(url))
+				.map(async (absoluteUrl) => {
+					const fileId = await getUploadedFileId(absoluteUrl);
+					if (fileId) {
+						fileUrlToIdMap[absoluteUrl] = fileId;
+					}
+				}),
+		);
+
+		// Linking: On this stage all attachments (like files, other notes, etc) uploaded and ready to use
 		// Update notes
 		for (const noteId of createdNoteIds) {
 			const note = await notesRegistry.getById(noteId);
 			if (!note) continue;
 
 			const noteTree = markdownProcessor.parse(note.data.text);
-			await replaceUrls(noteTree, async (nodeUrl) => {
-				const itemId = fileUrlToIdMap[decodeURI(nodeUrl)];
-				if (!itemId || !createdNoteIds.includes(itemId)) return nodeUrl;
 
-				return formatNoteLink(itemId);
+			const attachedFilesIds: string[] = [];
+			await replaceUrls(noteTree, async (absoluteUrl) => {
+				const itemId = fileUrlToIdMap[absoluteUrl];
+				if (!itemId) return absoluteUrl;
+
+				if (createdNoteIds.includes(itemId)) {
+					return formatNoteLink(itemId);
+				} else {
+					attachedFilesIds.push(itemId);
+					return formatResourceLink(itemId);
+				}
 			});
 
+			// Update note text
 			const updatedText = markdownProcessor.stringify(noteTree);
 			await notesRegistry.update(note.id, { ...note.data, text: updatedText });
+
+			// Attach files
+			await attachmentsRegistry.set(
+				noteId,
+				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
+			);
 		}
 
 		updateNotes();
