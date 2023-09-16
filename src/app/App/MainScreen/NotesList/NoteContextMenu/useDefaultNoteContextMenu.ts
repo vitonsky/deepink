@@ -10,6 +10,7 @@ import {
 	ContextMenuCallback,
 	useContextMenu,
 } from '../../../../components/hooks/useContextMenu';
+import { getNoteTitle } from '../../..';
 import { useTagsRegistry } from '../../../Providers';
 
 import { NoteActions } from '.';
@@ -104,8 +105,15 @@ export const useDefaultNoteContextMenu = ({
 					break;
 				}
 				case NoteActions.COPY_MARKDOWN_LINK: {
-					// TODO: provide note name
-					const markdownLink = `[note #${id}](${formatNoteLink(id)})`;
+					const note = await notesRegistry.getById(id);
+					if (!note) {
+						console.error(`Can't get data of note #${id}`);
+						return;
+					}
+
+					// TODO: escape chars like `[]`
+					const noteTitle = getNoteTitle(note.data);
+					const markdownLink = `[${noteTitle}](${formatNoteLink(id)})`;
 
 					console.log(`Copy markdown link ${markdownLink}`);
 
