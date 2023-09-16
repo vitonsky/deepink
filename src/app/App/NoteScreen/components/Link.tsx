@@ -4,6 +4,7 @@ import saveAs from 'file-saver';
 
 import { getAppResourceDataInUrl } from '../../../../core/links';
 import { openLink } from '../../../../electron/requests/interactions/renderer';
+import { useNotesControl } from '../../MainScreen/useNotesControl';
 import { useFilesRegistry } from '../../Providers';
 
 export const Link: Exclude<Components['a'], undefined> = ({
@@ -12,6 +13,7 @@ export const Link: Exclude<Components['a'], undefined> = ({
 	...props
 }) => {
 	const filesRegistry = useFilesRegistry();
+	const notesControl = useNotesControl();
 
 	const onClick = useCallback(
 		(evt: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -48,9 +50,7 @@ export const Link: Exclude<Components['a'], undefined> = ({
 					}
 					case 'note': {
 						evt.preventDefault();
-
-						// TODO: implement logic to open note
-						console.warn(`Open note`, resourceData.id);
+						notesControl.open(resourceData.id);
 						return;
 					}
 				}
@@ -65,7 +65,7 @@ export const Link: Exclude<Components['a'], undefined> = ({
 				return;
 			}
 		},
-		[filesRegistry, props],
+		[filesRegistry, notesControl, props],
 	);
 
 	return <a {...props} target={props.target ?? '_blank'} onClick={onClick} />;

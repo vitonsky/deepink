@@ -4,6 +4,7 @@ import { editor, languages } from 'monaco-editor-core';
 
 import { findLinksInText, getAppResourceDataInUrl } from '../../../../core/links';
 import { openLink } from '../../../../electron/requests/interactions/renderer';
+import { useNotesControl } from '../../MainScreen/useNotesControl';
 import { useFilesRegistry } from '../../Providers';
 
 /**
@@ -13,6 +14,7 @@ import { useFilesRegistry } from '../../Providers';
  */
 export const useEditorLinks = () => {
 	const filesRegistry = useFilesRegistry();
+	const notesControl = useNotesControl();
 
 	// Register files opener
 	useEffect(() => {
@@ -61,8 +63,7 @@ export const useEditorLinks = () => {
 						return true;
 					}
 					case 'note': {
-						// TODO: implement logic to open note
-						console.log('Open note with id', resourceData.id);
+						notesControl.open(resourceData.id);
 						return true;
 					}
 				}
@@ -73,5 +74,5 @@ export const useEditorLinks = () => {
 			mdLinkProvider.dispose();
 			appLinkOpener.dispose();
 		};
-	}, [filesRegistry]);
+	}, [filesRegistry, notesControl]);
 };
