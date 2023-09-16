@@ -28,10 +28,10 @@ export function copyTextToClipboard(text: string) {
 		return;
 	}
 	navigator.clipboard.writeText(text).then(
-		function() {
+		function () {
 			console.log('Async: Copying to clipboard was successful!');
 		},
-		function(err) {
+		function (err) {
 			console.error('Async: Could not copy text: ', err);
 		},
 	);
