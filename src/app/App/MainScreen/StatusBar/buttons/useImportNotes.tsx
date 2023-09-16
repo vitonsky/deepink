@@ -9,7 +9,7 @@ import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
-import { formatResourceLink } from '../../../../../core/links';
+import { formatNoteLink, formatResourceLink } from '../../../../../core/links';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagsChanged } from '../../../../../core/state/tags';
 import { exportNotes } from '../../../../../electron/requests/files/renderer';
@@ -90,6 +90,9 @@ export const useImportNotes = ({
 			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 			.freeze();
 
+		const filePathToIdMap: Record<string, string> = {};
+		const createdNotes: string[] = [];
+
 		// Handle markdown files
 		for (const filename in files) {
 			// Skip not markdown files
@@ -111,14 +114,20 @@ export const useImportNotes = ({
 			// TODO: update references to another md files
 			const attachedFilesIds: string[] = [];
 			await replaceUrls(tree, async (nodeUrl) => {
-				const url = getRelativePath(filename, nodeUrl);
-				const fileId = await getUploadedFileId(url);
+				const absoluteUrl = getRelativePath(filename, nodeUrl);
 
+				// Skip markdown files
+				if (absoluteUrl.endsWith('.md')) return absoluteUrl;
+
+				const fileId = await getUploadedFileId(absoluteUrl);
 				if (fileId) {
+					filePathToIdMap[absoluteUrl] = fileId;
+
 					attachedFilesIds.push(fileId);
 					return formatResourceLink(fileId);
 				}
-				return nodeUrl;
+
+				return absoluteUrl;
 			});
 
 			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
@@ -172,6 +181,9 @@ export const useImportNotes = ({
 				text: compiledNoteText,
 			});
 
+			filePathToIdMap[filename] = noteId;
+			createdNotes.push(noteId);
+
 			await attachmentsRegistry.set(
 				noteId,
 				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
@@ -180,6 +192,24 @@ export const useImportNotes = ({
 
 			// TODO: add method to registry, to emit event by updates
 			updateNotes();
+		}
+
+		console.warn('Files to ids map', filePathToIdMap);
+
+		for (const noteId of createdNotes) {
+			const note = await notesRegistry.getById(noteId);
+			if (!note) continue;
+
+			const noteTree = markdownProcessor.parse(note.data.text);
+			await replaceUrls(noteTree, async (nodeUrl) => {
+				const itemId = filePathToIdMap[decodeURI(nodeUrl)];
+				if (!itemId || !createdNotes.includes(itemId)) return nodeUrl;
+
+				return formatNoteLink(itemId);
+			});
+
+			const updatedText = markdownProcessor.stringify(noteTree);
+			await notesRegistry.update(note.id, { ...note.data, text: updatedText });
 		}
 
 		updateNotes();
