@@ -20,7 +20,7 @@ function getResourcesPath() {
 }
 
 function exportNotes() {
-	ipcMain.handle(CHANNELS.exportNotes, async (evt) => {
+	ipcMain.handle(CHANNELS.importNotes, async (evt) => {
 		const window = BrowserWindow.getAllWindows().find(
 			(win) => win.webContents.id === evt.sender.id,
 		);

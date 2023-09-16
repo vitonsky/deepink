@@ -12,7 +12,7 @@ import { visit } from 'unist-util-visit';
 import { formatNoteLink, formatResourceLink } from '../../../../../core/links';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagsChanged } from '../../../../../core/state/tags';
-import { exportNotes } from '../../../../../electron/requests/files/renderer';
+import { importNotes } from '../../../../../electron/requests/files/renderer';
 import {
 	useAttachmentsRegistry,
 	useFilesRegistry,
@@ -51,13 +51,12 @@ export const useImportNotes = ({
 	notesRegistry: INotesRegistry;
 	updateNotes: () => void;
 }) => {
+	const filesRegistry = useFilesRegistry();
+	const attachmentsRegistry = useAttachmentsRegistry();
 	const tagsRegistry = useTagsRegistry();
 
-	const attachmentsRegistry = useAttachmentsRegistry();
-
-	const filesRegistry = useFilesRegistry();
 	return useCallback(async () => {
-		const files = await exportNotes();
+		const files = await importNotes();
 
 		console.warn('Files', files);
 

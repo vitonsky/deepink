@@ -1,5 +1,5 @@
 export const CHANNELS = {
-	exportNotes: 'files.exportNotes',
+	importNotes: 'files.importNotes',
 	getUserDataPath: 'files.getUserDataPath',
 	getResourcesPath: 'files.getResourcesPath',
 };
