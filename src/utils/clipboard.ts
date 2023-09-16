@@ -12,27 +12,19 @@ function fallbackCopyTextToClipboard(text: string) {
 	textArea.select();
 
 	try {
-		const successful = document.execCommand('copy');
-		const msg = successful ? 'successful' : 'unsuccessful';
-		console.log('Fallback: Copying text command was ' + msg);
+		document.execCommand('copy');
 	} catch (err) {
-		console.error('Fallback: Oops, unable to copy', err);
+		document.body.removeChild(textArea);
+		throw err;
 	}
 
 	document.body.removeChild(textArea);
 }
 
-export function copyTextToClipboard(text: string) {
+export async function copyTextToClipboard(text: string) {
 	if (!navigator.clipboard) {
-		fallbackCopyTextToClipboard(text);
-		return;
+		return fallbackCopyTextToClipboard(text);
 	}
-	navigator.clipboard.writeText(text).then(
-		function () {
-			console.log('Async: Copying to clipboard was successful!');
-		},
-		function (err) {
-			console.error('Async: Could not copy text: ', err);
-		},
-	);
+
+	return navigator.clipboard.writeText(text);
 }
