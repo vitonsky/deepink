@@ -74,14 +74,8 @@ export const useImportNotes = ({
 			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 			.freeze();
 
-		/**
-		 * Map structure: file URL => entity ID
-		 * We use file URL, not a path, because links in MD contains encoded URLs, not a paths,
-		 * So we have to decode URLs if needs to use it as paths.
-		 */
-		const fileUrlToIdMap: Record<string, string> = {};
-		const createdNoteIds: string[] = [];
 		const attachmentsToUpload: string[] = [];
+		const createdNotes: Record<string, { id: string; path: string }> = {};
 
 		// Extraction: On this step we just parse and format data
 		// Import notes
@@ -129,13 +123,100 @@ export const useImportNotes = ({
 				text: noteText,
 			});
 
-			fileUrlToIdMap[encodeURI(filename)] = noteId;
-			createdNoteIds.push(noteId);
+			createdNotes[encodeURI(filename)] = {
+				id: noteId,
+				path: filenameSegments.slice(0, -1).join('/'),
+			};
+
+			// TODO: add method to registry, to emit event by updates
+			updateNotes();
+		}
+
+		// Uploading: On this stage we upload any files
+		const uploadedFiles: Record<string, Promise<string | null>> = {};
+		/**
+		 * Uploads a file and returns file id.
+		 * Returns file id instant, for already uploaded files in current import session
+		 */
+		const getUploadedFileId = async (url: string) => {
+			const urlRealPath = decodeURI(url);
+
+			// Upload new files
+			if (!(urlRealPath in uploadedFiles)) {
+				uploadedFiles[urlRealPath] = (async () => {
+					const buffer = filesBuffers[urlRealPath];
+					if (!buffer) return null;
+
+					const urlFilename = urlRealPath.split('/').slice(-1)[0];
+					const file = new File([buffer], urlFilename);
+
+					return filesRegistry.add(file);
+				})();
+			}
+
+			return uploadedFiles[urlRealPath];
+		};
+
+		/**
+		 * Map structure: file URL => entity ID
+		 * We use file URL, not a path, because links in MD contains encoded URLs, not a paths,
+		 * So we have to decode URLs if needs to use it as paths.
+		 */
+		const fileUrlToIdMap: Record<string, string> = {};
+
+		// Upload attached files
+		await Promise.all(
+			attachmentsToUpload
+				// Remove duplicates
+				.filter((url, index, arr) => index === arr.indexOf(url))
+				.map(async (absoluteUrl) => {
+					const fileId = await getUploadedFileId(absoluteUrl);
+					if (fileId) {
+						fileUrlToIdMap[absoluteUrl] = fileId;
+					}
+				}),
+		);
+
+		// Linking: On this stage all attachments (like files, other notes, etc) uploaded and ready to use
+		// Update notes
+		for (const [_fileUrl, noteData] of Object.entries(createdNotes)) {
+			const noteId = noteData.id;
+			const note = await notesRegistry.getById(noteId);
+			if (!note) continue;
+
+			const noteTree = markdownProcessor.parse(note.data.text);
+
+			// Update URLs
+			const attachedFilesIds: string[] = [];
+			await replaceUrls(noteTree, async (absoluteUrl) => {
+				const createdNote = createdNotes[absoluteUrl];
+				if (createdNote) {
+					return formatNoteLink(createdNote.id);
+				}
+
+				const fileId = fileUrlToIdMap[absoluteUrl];
+				if (fileId) {
+					attachedFilesIds.push(fileId);
+					return formatResourceLink(fileId);
+				}
+
+				return absoluteUrl;
+			});
+
+			// Update note text
+			const updatedText = markdownProcessor.stringify(noteTree);
+			await notesRegistry.update(note.id, { ...note.data, text: updatedText });
+
+			// Attach files
+			await attachmentsRegistry.set(
+				noteId,
+				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
+			);
 
 			// Find or create tags and attach
 			let tagId: null | string = null;
 			const tags = await tagsRegistry.getTags();
-			const filenameBasePathSegments = filenameSegments.slice(0, -1);
+			const filenameBasePathSegments = noteData.path.split('/');
 			for (
 				let lastSegment = filenameBasePathSegments.length;
 				lastSegment > 0;
@@ -177,79 +258,6 @@ export const useImportNotes = ({
 			}
 
 			await tagsRegistry.setAttachedTags(noteId, tagId ? [tagId] : []);
-
-			// TODO: add method to registry, to emit event by updates
-			updateNotes();
-		}
-
-		// Uploading: On this stage we upload any files
-		const uploadedFiles: Record<string, Promise<string | null>> = {};
-		/**
-		 * Uploads a file and returns file id.
-		 * Returns file id instant, for already uploaded files in current import session
-		 */
-		const getUploadedFileId = async (url: string) => {
-			const urlRealPath = decodeURI(url);
-
-			// Upload new files
-			if (!(urlRealPath in uploadedFiles)) {
-				uploadedFiles[urlRealPath] = (async () => {
-					const buffer = filesBuffers[urlRealPath];
-					if (!buffer) return null;
-
-					const urlFilename = urlRealPath.split('/').slice(-1)[0];
-					const file = new File([buffer], urlFilename);
-
-					return filesRegistry.add(file);
-				})();
-			}
-
-			return uploadedFiles[urlRealPath];
-		};
-
-		// Upload attached files
-		await Promise.all(
-			attachmentsToUpload
-				// Remove duplicates
-				.filter((url, index, arr) => index === arr.indexOf(url))
-				.map(async (absoluteUrl) => {
-					const fileId = await getUploadedFileId(absoluteUrl);
-					if (fileId) {
-						fileUrlToIdMap[absoluteUrl] = fileId;
-					}
-				}),
-		);
-
-		// Linking: On this stage all attachments (like files, other notes, etc) uploaded and ready to use
-		// Update notes
-		for (const noteId of createdNoteIds) {
-			const note = await notesRegistry.getById(noteId);
-			if (!note) continue;
-
-			const noteTree = markdownProcessor.parse(note.data.text);
-
-			const attachedFilesIds: string[] = [];
-			await replaceUrls(noteTree, async (absoluteUrl) => {
-				const itemId = fileUrlToIdMap[absoluteUrl];
-				if (!itemId) return absoluteUrl;
-
-				if (createdNoteIds.includes(itemId)) {
-					return formatNoteLink(itemId);
-				} else {
-					attachedFilesIds.push(itemId);
-					return formatResourceLink(itemId);
-				}
-			});
-
-			// Update note text
-			const updatedText = markdownProcessor.stringify(noteTree);
-			await notesRegistry.update(note.id, { ...note.data, text: updatedText });
-
-			// Attach files
-			await attachmentsRegistry.set(
-				noteId,
-				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
-			);
 		}
 
 		updateNotes();
