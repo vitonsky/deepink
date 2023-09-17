@@ -64,7 +64,7 @@ export const getDb = async ({
 		if (existsSync(dbPath)) {
 			// Load DB
 			const rawDb = await readFile(dbPath, 'utf-8');
-			const sqlDump = await encryption.decrypt(rawDb);
+			const sqlDump = encryption ? await encryption.decrypt(rawDb) : rawDb;
 
 			await db.exec(sqlDump);
 			await migrateToLatestSchema(
@@ -169,7 +169,9 @@ export const getDb = async ({
 				const dumpString = [pragmaDump, dataDump].join('\n');
 
 				// Write tmp file
-				const dbDump = await encryption.encrypt(dumpString);
+				const dbDump = encryption
+					? await encryption.encrypt(dumpString)
+					: dumpString;
 				await writeFileAtomic(dbPath, dbDump);
 
 				if (verboseLog) {
