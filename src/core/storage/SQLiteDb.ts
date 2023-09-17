@@ -52,8 +52,6 @@ export const getDb = async ({
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
-	if (!encryption) throw new Error('Fuck');
-
 	// Create DB
 	const db = await open({
 		filename: ':memory:',
