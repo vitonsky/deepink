@@ -1,4 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
+import CryptoJs from 'crypto-js';
+import aes from 'crypto-js/aes';
 import { mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
@@ -24,6 +26,7 @@ import {
 import { MainScreen } from './MainScreen';
 import { ProvidedAppContext, Providers } from './Providers';
 import { SplashScreen } from './SplashScreen';
+import { WorkspaceManager } from './WorkspaceManager';
 
 import './App.css';
 
@@ -33,9 +36,20 @@ export const getNoteTitle = (note: INoteData) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
 
 export const App: FC = () => {
+	const [secretKey, setSecretKey] = useState<null | string>(null);
+	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
+
+	// Clear error by change secret key
+	useEffect(() => {
+		setWorkspaceError(null);
+	}, [secretKey]);
+
 	// Load DB
 	const [db, setDb] = useState<null | SQLiteDb>(null);
 	useEffect(() => {
+		if (db) return;
+		if (secretKey === null) return;
+
 		(async () => {
 			const profileDir = await getUserDataPath('defaultProfile');
 
@@ -45,9 +59,30 @@ export const App: FC = () => {
 			const dbPath = path.join(profileDir, 'deepink.db');
 			const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
 
-			getDb({ dbPath, dbExtensionsDir }).then(setDb);
+			await getDb({
+				dbPath,
+				dbExtensionsDir,
+				encryption: {
+					encrypt(rawData) {
+						return aes.encrypt(rawData, secretKey).toString();
+					},
+					decrypt(encryptedData) {
+						return aes
+							.decrypt(encryptedData, secretKey)
+							.toString(CryptoJs.enc.Utf8);
+					},
+				},
+			})
+				.then((db) => {
+					setSecretKey(null);
+					setDb(db);
+				})
+				.catch((err) => {
+					console.error(err);
+					setWorkspaceError('Wrong password');
+				});
 		})();
-	}, []);
+	}, [db, secretKey]);
 
 	const [providedAppContext, setProvidedAppContext] = useState<Omit<
 		ProvidedAppContext,
@@ -90,6 +125,18 @@ export const App: FC = () => {
 
 		return cleanup;
 	});
+
+	// TODO: show only if workspace requires password
+	if (db === null) {
+		return (
+			<WorkspaceManager
+				errorMessage={workspaceError}
+				onSubmit={({ key }) => {
+					setSecretKey(key);
+				}}
+			/>
+		);
+	}
 
 	// Splash screen for loading state
 	if (db === null || providedAppContext === null) {

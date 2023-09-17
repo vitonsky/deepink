@@ -30,6 +30,11 @@ export type SQLiteDb = {
 	close: () => Promise<void>;
 };
 
+export type EncryptionModule = {
+	encrypt: (rawData: string) => string;
+	decrypt: (encryptedData: string) => string;
+};
+
 type Options = {
 	dbPath: string;
 	dbExtensionsDir: string;
@@ -38,12 +43,15 @@ type Options = {
 	 * Option to disable verbose logs
 	 */
 	verbose?: boolean;
+
+	encryption?: EncryptionModule;
 };
 
 export const getDb = async ({
 	dbPath,
 	dbExtensionsDir,
 	verbose: verboseLog = false,
+	encryption,
 }: Options): Promise<SQLiteDb> => {
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
@@ -59,9 +67,10 @@ export const getDb = async ({
 
 		if (existsSync(dbPath)) {
 			// Load DB
-			// TODO: implement decryption
-			const dumpSQL = await readFile(dbPath, 'utf-8');
-			await db.exec(dumpSQL);
+			const rawDb = await readFile(dbPath, 'utf-8');
+			const sqlDump = encryption ? encryption.decrypt(rawDb) : rawDb;
+
+			await db.exec(sqlDump);
 			await migrateToLatestSchema(
 				db as Database<ExtendedSqliteDatabase, sqlite3.Statement>,
 			);
@@ -163,10 +172,9 @@ export const getDb = async ({
 
 				const dumpString = [pragmaDump, dataDump].join('\n');
 
-				// TODO: implement encryption before write
-
 				// Write tmp file
-				await writeFileAtomic(dbPath, dumpString);
+				const dbDump = encryption ? encryption.encrypt(dumpString) : dumpString;
+				await writeFileAtomic(dbPath, dbDump);
 
 				if (verboseLog) {
 					console.info('DB saved');
