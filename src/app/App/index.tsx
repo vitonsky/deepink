@@ -32,7 +32,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile22';
+	const workspaceName = 'defaultProfile23';
 
 	// Clear error by change secret key
 	useEffect(() => {

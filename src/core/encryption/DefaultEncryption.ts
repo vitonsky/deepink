@@ -1,5 +1,10 @@
 import { EncryptionModule } from '.';
 
+function getRandomBytes(length = 10) {
+	const array = new Uint8Array(length);
+	return self.crypto.getRandomValues(array).buffer;
+}
+
 async function importKey(passKey: string) {
 	const codec = new TextEncoder();
 
@@ -52,7 +57,7 @@ async function importKey(passKey: string) {
 	);
 }
 
-function encrypt(data: ArrayBuffer, key: any, iv: any) {
+function encrypt(data: ArrayBuffer, key: CryptoKey, iv: any) {
 	return window.crypto.subtle.encrypt(
 		{
 			name: 'AES-GCM',
@@ -73,7 +78,7 @@ function encrypt(data: ArrayBuffer, key: any, iv: any) {
 	);
 }
 
-function decrypt(data: ArrayBuffer, key: any, iv: any) {
+function decrypt(data: ArrayBuffer, key: CryptoKey, iv: any) {
 	return window.crypto.subtle
 		.decrypt(
 			{
@@ -91,9 +96,6 @@ function decrypt(data: ArrayBuffer, key: any, iv: any) {
 		});
 }
 
-// Example from https://gist.github.com/mpgn/2f990997b9aa5fad3f90ff94546fae1e
-const iv = new Uint8Array([188, 185, 57, 146, 246, 194, 114, 34, 12, 80, 198, 77]);
-
 function base64ToBytes(base64: string) {
 	const binString = atob(base64);
 	return Uint8Array.from(binString as any, (m) => (m as any).codePointAt(0));
@@ -106,7 +108,39 @@ function bytesToBase64(bytes: ArrayBuffer) {
 	return btoa(binString);
 }
 
+const joinArrayBuffers = (buffers: ArrayBuffer[]) => {
+	const bufferLen = buffers.reduce((len, buffer) => len + buffer.byteLength, 0);
+	const resultBuffer = new Uint8Array(bufferLen);
+
+	let offset = 0;
+	for (const buffer of buffers) {
+		resultBuffer.set(new Uint8Array(buffer), offset);
+		offset += buffer.byteLength;
+	}
+
+	return resultBuffer.buffer;
+};
+
+class AESCipher {
+	private readonly ivLen = 20;
+
+	public async encrypt(data: ArrayBuffer, key: CryptoKey) {
+		const iv = getRandomBytes(this.ivLen);
+		const encryptedDataBuffer = await encrypt(data, key, iv);
+
+		return joinArrayBuffers([iv, encryptedDataBuffer]);
+	}
+
+	public decrypt(data: ArrayBuffer, key: CryptoKey) {
+		const iv = data.slice(0, this.ivLen);
+		const encryptedDataBuffer = data.slice(this.ivLen);
+
+		return decrypt(encryptedDataBuffer, key, iv);
+	}
+}
+
 export class DefaultEncryption implements EncryptionModule {
+	private readonly cipher = new AESCipher();
 	private readonly secretKey;
 	constructor(secretKey: string) {
 		this.secretKey = secretKey;
@@ -119,12 +153,14 @@ export class DefaultEncryption implements EncryptionModule {
 			// Text encoder may corrupt a binary data, so we use Base64 to encode bytes
 			// Source: https://stackoverflow.com/questions/72528453/why-textencoder-encode-produces-different-result-from-file-arraybuffer#comment128121330_72528453
 			const encoder = new TextEncoder();
-			return encrypt(encoder.encode(rawData), keys, iv).then(
-				bytesToBase64,
-			) as Promise<T>;
+			return this.cipher
+				.encrypt(encoder.encode(rawData), keys)
+				.then((encryptedDataBuffer) =>
+					bytesToBase64(encryptedDataBuffer),
+				) as Promise<T>;
 		}
 
-		return encrypt(rawData, keys, iv) as Promise<T>;
+		return this.cipher.encrypt(rawData, keys) as Promise<T>;
 	};
 
 	public decrypt = async <T extends string | ArrayBuffer>(
@@ -135,11 +171,11 @@ export class DefaultEncryption implements EncryptionModule {
 		if (typeof encryptedData === 'string') {
 			// For text decoding we assume a text is Base64 encoded binary data
 			const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
-			return decrypt(base64ToBytes(encryptedData), keys, iv).then((buffer) =>
-				decoder.decode(buffer),
-			) as Promise<T>;
+			return this.cipher
+				.decrypt(base64ToBytes(encryptedData), keys)
+				.then((buffer) => decoder.decode(buffer)) as Promise<T>;
 		}
 
-		return decrypt(encryptedData, keys, iv) as Promise<T>;
+		return this.cipher.decrypt(encryptedData, keys) as Promise<T>;
 	};
 }
