@@ -1,21 +1,37 @@
 import { ipcRenderer } from 'electron';
 
+import { FilesStorageController } from '../../../core/Registry/FilesRegistry';
+
 import { CHANNELS } from '.';
 
 // TODO: ensure both renderer and main handlers match types
 
-export function uploadFile(id: string, buffer: ArrayBuffer): Promise<void> {
-	return ipcRenderer.invoke(CHANNELS.uploadFile, { id, buffer });
-}
+export class ElectronFilesController implements FilesStorageController {
+	private readonly subdirectory;
+	constructor(subdirectory: string) {
+		this.subdirectory = subdirectory;
+	}
 
-export function getFile(id: string): Promise<ArrayBuffer | null> {
-	return ipcRenderer.invoke(CHANNELS.getFile, { id });
-}
+	public async write(id: string, buffer: ArrayBuffer) {
+		return ipcRenderer.invoke(CHANNELS.uploadFile, {
+			id,
+			buffer,
+			subdir: this.subdirectory,
+		});
+	}
 
-export function deleteFiles(ids: string[]): Promise<void> {
-	return ipcRenderer.invoke(CHANNELS.deleteFiles, { ids });
-}
+	public async get(id: string) {
+		return ipcRenderer.invoke(CHANNELS.getFile, { id, subdir: this.subdirectory });
+	}
 
-export function listFiles(): Promise<string[]> {
-	return ipcRenderer.invoke(CHANNELS.listFiles);
+	public async delete(ids: string[]) {
+		return ipcRenderer.invoke(CHANNELS.deleteFiles, {
+			ids,
+			subdir: this.subdirectory,
+		});
+	}
+
+	public async list() {
+		return ipcRenderer.invoke(CHANNELS.listFiles, { subdir: this.subdirectory });
+	}
 }

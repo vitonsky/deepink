@@ -16,12 +16,7 @@ import {
 	getResourcesPath,
 	getUserDataPath,
 } from '../../electron/requests/files/renderer';
-import {
-	deleteFiles,
-	getFile,
-	listFiles,
-	uploadFile,
-} from '../../electron/requests/storage/renderer';
+import { ElectronFilesController } from '../../electron/requests/storage/renderer';
 
 import { MainScreen } from './MainScreen';
 import { ProvidedAppContext, Providers } from './Providers';
@@ -38,6 +33,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
+	const workspaceName = 'defaultProfile3';
 
 	// Clear error by change secret key
 	useEffect(() => {
@@ -51,7 +47,7 @@ export const App: FC = () => {
 		if (secretKey === null) return;
 
 		(async () => {
-			const profileDir = await getUserDataPath('defaultProfile');
+			const profileDir = await getUserDataPath(workspaceName);
 
 			// Ensure profile dir exists
 			mkdirSync(profileDir, { recursive: true });
@@ -93,11 +89,8 @@ export const App: FC = () => {
 
 		const attachmentsRegistry = new Attachments(db);
 
-		const filesRegistry = new FilesRegistry(
-			db,
-			{ get: getFile, write: uploadFile, delete: deleteFiles, list: listFiles },
-			attachmentsRegistry,
-		);
+		const filesController = new ElectronFilesController(workspaceName);
+		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
 
 		// TODO: schedule when to run method
 		filesRegistry.clearOrphaned();
