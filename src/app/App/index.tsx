@@ -41,16 +41,22 @@ export const App: FC = () => {
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
 	const workspaceName = 'defaultProfile23';
 
-	// Clear error by change secret key
+	const [encryption, setEncryption] = useState<DefaultEncryption | null>(null);
 	useEffect(() => {
+		// Clear error by change secret key
 		setWorkspaceError(null);
+
+		if (secretKey) {
+			setEncryption(new DefaultEncryption(new AESCipher(secretKey, salt)));
+			setSecretKey(null);
+		}
 	}, [secretKey]);
 
 	// Load DB
 	const [db, setDb] = useState<null | SQLiteDb>(null);
 	useEffect(() => {
 		if (db) return;
-		if (secretKey === null) return;
+		if (encryption === null) return;
 
 		(async () => {
 			const profileDir = await getUserDataPath(workspaceName);
@@ -64,7 +70,7 @@ export const App: FC = () => {
 			await getDb({
 				dbPath,
 				dbExtensionsDir,
-				encryption: new DefaultEncryption(new AESCipher(secretKey, salt)),
+				encryption: encryption,
 			})
 				.then((db) => {
 					// TODO: remove key of RAM after use. Use key only here
@@ -76,7 +82,7 @@ export const App: FC = () => {
 					setWorkspaceError('Wrong password');
 				});
 		})();
-	}, [db, secretKey]);
+	}, [db, encryption]);
 
 	const [providedAppContext, setProvidedAppContext] = useState<Omit<
 		ProvidedAppContext,
@@ -84,14 +90,11 @@ export const App: FC = () => {
 	> | null>(null);
 	useEffect(() => {
 		if (db === null) return;
-		if (secretKey === null) return;
+		if (encryption === null) return;
 
 		const attachmentsRegistry = new Attachments(db);
 
-		const filesController = new ElectronFilesController(
-			workspaceName,
-			new DefaultEncryption(new AESCipher(secretKey, salt)),
-		);
+		const filesController = new ElectronFilesController(workspaceName, encryption);
 		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
 
 		// TODO: schedule when to run method
@@ -107,7 +110,7 @@ export const App: FC = () => {
 			tagsRegistry,
 			notesRegistry,
 		});
-	}, [db, secretKey]);
+	}, [db, encryption]);
 
 	useEffect(() => {
 		if (!providedAppContext) return;
