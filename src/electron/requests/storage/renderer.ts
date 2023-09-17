@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron';
 
+import { EncryptionModule } from '../../../core/encryption';
 import { FilesStorageController } from '../../../core/Registry/FilesRegistry';
 
 import { CHANNELS } from '.';
@@ -8,20 +9,27 @@ import { CHANNELS } from '.';
 
 export class ElectronFilesController implements FilesStorageController {
 	private readonly subdirectory;
-	constructor(subdirectory: string) {
+	private readonly encryption;
+	constructor(subdirectory: string, encryption?: EncryptionModule) {
 		this.subdirectory = subdirectory;
+		this.encryption = encryption;
 	}
 
 	public async write(id: string, buffer: ArrayBuffer) {
 		return ipcRenderer.invoke(CHANNELS.uploadFile, {
 			id,
-			buffer,
+			buffer: this.encryption ? await this.encryption.encrypt(buffer) : buffer,
 			subdir: this.subdirectory,
 		});
 	}
 
 	public async get(id: string) {
-		return ipcRenderer.invoke(CHANNELS.getFile, { id, subdir: this.subdirectory });
+		return ipcRenderer
+			.invoke(CHANNELS.getFile, { id, subdir: this.subdirectory })
+			.then((buffer) => {
+				if (!this.encryption) return buffer;
+				return this.encryption.decrypt(buffer);
+			});
 	}
 
 	public async delete(ids: string[]) {

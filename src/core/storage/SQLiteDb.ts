@@ -6,6 +6,7 @@ import sqlite3 from 'sqlite3';
 
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
+import { EncryptionModule } from '../encryption';
 import { readFile, writeFile } from 'fs/promises';
 import { ExtendedSqliteDatabase } from './ExtendedSqliteDatabase';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
@@ -30,11 +31,6 @@ export type SQLiteDb = {
 	close: () => Promise<void>;
 };
 
-export type EncryptionModule = {
-	encrypt: (rawData: string) => string;
-	decrypt: (encryptedData: string) => string;
-};
-
 type Options = {
 	dbPath: string;
 	dbExtensionsDir: string;
@@ -56,6 +52,8 @@ export const getDb = async ({
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
+	if (!encryption) throw new Error('Fuck');
+
 	// Create DB
 	const db = await open({
 		filename: ':memory:',
@@ -68,7 +66,7 @@ export const getDb = async ({
 		if (existsSync(dbPath)) {
 			// Load DB
 			const rawDb = await readFile(dbPath, 'utf-8');
-			const sqlDump = encryption ? encryption.decrypt(rawDb) : rawDb;
+			const sqlDump = await encryption.decrypt(rawDb);
 
 			await db.exec(sqlDump);
 			await migrateToLatestSchema(
@@ -173,7 +171,7 @@ export const getDb = async ({
 				const dumpString = [pragmaDump, dataDump].join('\n');
 
 				// Write tmp file
-				const dbDump = encryption ? encryption.encrypt(dumpString) : dumpString;
+				const dbDump = await encryption.encrypt(dumpString);
 				await writeFileAtomic(dbPath, dbDump);
 
 				if (verboseLog) {

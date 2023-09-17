@@ -1,10 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
-import CryptoJs from 'crypto-js';
-import aes from 'crypto-js/aes';
 import { mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
 
+import { DefaultEncryption } from '../../core/encryption/DefaultEncryption';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
@@ -33,7 +32,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile3';
+	const workspaceName = 'defaultProfile22';
 
 	// Clear error by change secret key
 	useEffect(() => {
@@ -58,19 +57,11 @@ export const App: FC = () => {
 			await getDb({
 				dbPath,
 				dbExtensionsDir,
-				encryption: {
-					encrypt(rawData) {
-						return aes.encrypt(rawData, secretKey).toString();
-					},
-					decrypt(encryptedData) {
-						return aes
-							.decrypt(encryptedData, secretKey)
-							.toString(CryptoJs.enc.Utf8);
-					},
-				},
+				encryption: new DefaultEncryption(secretKey),
 			})
 				.then((db) => {
-					setSecretKey(null);
+					// TODO: remove key of RAM after use. Use key only here
+					// setSecretKey(null);
 					setDb(db);
 				})
 				.catch((err) => {
@@ -86,10 +77,14 @@ export const App: FC = () => {
 	> | null>(null);
 	useEffect(() => {
 		if (db === null) return;
+		if (secretKey === null) return;
 
 		const attachmentsRegistry = new Attachments(db);
 
-		const filesController = new ElectronFilesController(workspaceName);
+		const filesController = new ElectronFilesController(
+			workspaceName,
+			new DefaultEncryption(secretKey),
+		);
 		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
 
 		// TODO: schedule when to run method
@@ -105,7 +100,7 @@ export const App: FC = () => {
 			tagsRegistry,
 			notesRegistry,
 		});
-	}, [db]);
+	}, [db, secretKey]);
 
 	useEffect(() => {
 		if (!providedAppContext) return;
