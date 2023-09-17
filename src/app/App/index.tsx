@@ -3,6 +3,7 @@ import { mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
 
+import { AESCipher } from '../../core/encryption/ciphers/AES';
 import { DefaultEncryption } from '../../core/encryption/DefaultEncryption';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
@@ -23,6 +24,12 @@ import { SplashScreen } from './SplashScreen';
 import { WorkspaceManager } from './WorkspaceManager';
 
 import './App.css';
+
+// TODO: generate salt
+// TODO: keep salt in user profile directory
+
+const codec = new TextEncoder();
+const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
 
 export const cnApp = cn('App');
 
@@ -57,7 +64,7 @@ export const App: FC = () => {
 			await getDb({
 				dbPath,
 				dbExtensionsDir,
-				encryption: new DefaultEncryption(secretKey),
+				encryption: new DefaultEncryption(new AESCipher(secretKey, salt)),
 			})
 				.then((db) => {
 					// TODO: remove key of RAM after use. Use key only here
@@ -83,7 +90,7 @@ export const App: FC = () => {
 
 		const filesController = new ElectronFilesController(
 			workspaceName,
-			new DefaultEncryption(secretKey),
+			new DefaultEncryption(new AESCipher(secretKey, salt)),
 		);
 		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
 
