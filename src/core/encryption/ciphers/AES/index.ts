@@ -47,68 +47,62 @@ export async function getDerivedKey(passKey: string, salt: Uint8Array) {
 	);
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams
-function encrypt(data: ArrayBuffer, key: CryptoKey, iv: any) {
-	return window.crypto.subtle.encrypt(
-		{
-			name: 'AES-GCM',
-
-			// Don't re-use initialization vectors!
-			// Always generate a new iv every time your encrypt!
-			// Recommended to use 96 bytes length
-			iv,
-
-			// Tag length (optional)
-			// can be 32, 64, 96, 104, 112, 120 or 128 (default)
-			tagLength: 128,
-		},
-		key,
-		data,
-	);
-}
-
-function decrypt(data: ArrayBuffer, key: CryptoKey, iv: any) {
-	return window.crypto.subtle.decrypt(
-		{
-			name: 'AES-GCM',
-			//The initialization vector been used to encrypt
-			iv,
-
-			//The tagLength you used to encrypt (if any)
-			tagLength: 128,
-		},
-		key,
-		data,
-	);
-}
-
 /**
  * AES-GCM cipher
- * Recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+ * MDN: https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams
+ * Algorithm recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
  */
 export class AESCipher implements ICipher {
 	private readonly ivLen = 96;
 
-	private key: Promise<CryptoKey>;
+	private readonly key: Promise<CryptoKey>;
 	constructor(cipher: string, salt: Uint8Array) {
 		this.key = getDerivedKey(cipher, salt);
 	}
 
-	public async encrypt(data: ArrayBuffer) {
+	public async encrypt(buffer: ArrayBuffer) {
 		const key = await this.key;
 
 		const iv = getRandomBits(this.ivLen);
-		const encryptedDataBuffer = await encrypt(data, key, iv);
+		const encryptedBuffer = await window.crypto.subtle.encrypt(
+			{
+				name: 'AES-GCM',
 
-		return joinArrayBuffers([iv, encryptedDataBuffer]);
+				// Don't re-use initialization vectors!
+				// Always generate a new iv every time your encrypt!
+				// Recommended to use 96 bytes length
+				iv,
+
+				// Tag length (optional)
+				// can be 32, 64, 96, 104, 112, 120 or 128 (default)
+				tagLength: 128,
+			},
+			key,
+			buffer,
+		);
+
+		// Include public parameters to a cipher-buffer
+		return joinArrayBuffers([iv, encryptedBuffer]);
 	}
 
-	public async decrypt(data: ArrayBuffer) {
+	public async decrypt(buffer: ArrayBuffer) {
 		const key = await this.key;
 
-		const iv = data.slice(0, this.ivLen);
-		const encryptedDataBuffer = data.slice(this.ivLen);
+		// Extract data of cipher-buffer
+		const iv = buffer.slice(0, this.ivLen);
+		const encryptedBuffer = buffer.slice(this.ivLen);
 
-		return decrypt(encryptedDataBuffer, key, iv);
+		return window.crypto.subtle.decrypt(
+			{
+				name: 'AES-GCM',
+				//The initialization vector been used to encrypt
+				iv,
+
+				//The tagLength you used to encrypt (if any)
+				tagLength: 128,
+			},
+			key,
+			encryptedBuffer,
+		);
 	}
 }
