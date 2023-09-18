@@ -4,8 +4,6 @@ import path from 'path';
 import { cn } from '@bem-react/classname';
 
 import { AESCipher } from '../../core/encryption/ciphers/AES';
-import { CiphersComposer } from '../../core/encryption/ciphers/CiphersComposer';
-import { RabbitCipher } from '../../core/encryption/ciphers/Rabbit';
 import { EncryptionController } from '../../core/encryption/EncryptionController';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
@@ -41,7 +39,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile41';
+	const workspaceName = 'defaultProfile65';
 
 	const [encryption, setEncryption] = useState<EncryptionController | null>(null);
 	useEffect(() => {
@@ -51,14 +49,7 @@ export const App: FC = () => {
 		if (secretKey) {
 			// TODO: implement another cipher algorithms
 			// TODO: provide encryption cipher params to allow control a encryption time
-			setEncryption(
-				new EncryptionController(
-					new CiphersComposer([
-						new RabbitCipher(secretKey),
-						new AESCipher(secretKey, salt),
-					]),
-				),
-			);
+			setEncryption(new EncryptionController(new AESCipher(secretKey, salt)));
 			setSecretKey(null);
 		}
 	}, [secretKey]);
