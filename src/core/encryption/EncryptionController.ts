@@ -1,7 +1,12 @@
 import { base64ToBytes, bytesToBase64 } from './encoding';
-import { EncryptionModule, ICipher } from '.';
+import { ICipher, IEncryptionController } from '.';
 
-export class DefaultEncryption implements EncryptionModule {
+/**
+ * Module to encrypt/decrypt data with provided cipher
+ *
+ * Operates with `ArrayBuffer`, the strings will encoded as Base64 (about 30% overhead)
+ */
+export class EncryptionController implements IEncryptionController {
 	private readonly cipher;
 	constructor(cipher: ICipher) {
 		this.cipher = cipher;

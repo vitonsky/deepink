@@ -4,7 +4,7 @@ import path from 'path';
 import { cn } from '@bem-react/classname';
 
 import { AESCipher } from '../../core/encryption/ciphers/AES';
-import { DefaultEncryption } from '../../core/encryption/DefaultEncryption';
+import { EncryptionController } from '../../core/encryption/EncryptionController';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
@@ -41,13 +41,15 @@ export const App: FC = () => {
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
 	const workspaceName = 'defaultProfile24';
 
-	const [encryption, setEncryption] = useState<DefaultEncryption | null>(null);
+	const [encryption, setEncryption] = useState<EncryptionController | null>(null);
 	useEffect(() => {
 		// Clear error by change secret key
 		setWorkspaceError(null);
 
 		if (secretKey) {
-			setEncryption(new DefaultEncryption(new AESCipher(secretKey, salt)));
+			// TODO: implement another cipher algorithms
+			// TODO: provide encryption cipher params to allow control a encryption time
+			setEncryption(new EncryptionController(new AESCipher(secretKey, salt)));
 			setSecretKey(null);
 		}
 	}, [secretKey]);

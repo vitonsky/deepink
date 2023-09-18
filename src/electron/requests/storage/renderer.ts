@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 
-import { EncryptionModule } from '../../../core/encryption';
+import { IEncryptionController } from '../../../core/encryption';
 import { FilesStorageController } from '../../../core/Registry/FilesRegistry';
 
 import { CHANNELS } from '.';
@@ -10,7 +10,7 @@ import { CHANNELS } from '.';
 export class ElectronFilesController implements FilesStorageController {
 	private readonly subdirectory;
 	private readonly encryption;
-	constructor(subdirectory: string, encryption?: EncryptionModule) {
+	constructor(subdirectory: string, encryption?: IEncryptionController) {
 		this.subdirectory = subdirectory;
 		this.encryption = encryption;
 	}

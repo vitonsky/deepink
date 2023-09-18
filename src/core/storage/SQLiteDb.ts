@@ -6,7 +6,7 @@ import sqlite3 from 'sqlite3';
 
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
-import { EncryptionModule } from '../encryption';
+import { IEncryptionController } from '../encryption';
 import { readFile, writeFile } from 'fs/promises';
 import { ExtendedSqliteDatabase } from './ExtendedSqliteDatabase';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
@@ -40,7 +40,7 @@ type Options = {
 	 */
 	verbose?: boolean;
 
-	encryption?: EncryptionModule;
+	encryption?: IEncryptionController;
 };
 
 export const getDb = async ({
