@@ -39,7 +39,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile23';
+	const workspaceName = 'defaultProfile24';
 
 	const [encryption, setEncryption] = useState<DefaultEncryption | null>(null);
 	useEffect(() => {

@@ -1,31 +1,26 @@
 import { joinArrayBuffers } from '../../buffers';
-import { getRandomBytes } from '../../random';
+import { getRandomBits } from '../../random';
 
 import { ICipher } from '../..';
 
-export async function importKey(passKey: string, salt: Uint8Array) {
+export async function getDerivedKey(passKey: string, salt: Uint8Array) {
 	const codec = new TextEncoder();
+	const keyBytes = codec.encode(passKey);
 
 	const derivedKey = await window.crypto.subtle
-		.importKey('raw', codec.encode(passKey), { name: 'PBKDF2' }, false, [
+		.importKey('raw', keyBytes, { name: 'PBKDF2' }, false, [
 			'deriveBits',
 			'deriveKey',
 		])
-		.then(function (key) {
+		.then((key) => {
 			return window.crypto.subtle.deriveKey(
 				{
 					name: 'PBKDF2',
-
-					// don't get too ambitious, or at least remember
 					salt,
-					// that low-power phones will access your app
 					iterations: 100,
-					hash: 'SHA-256',
+					hash: 'SHA-512',
 				},
 				key,
-
-				// Note: for this demo we don't actually need a cipher suite,
-				// but the api requires that it must be specified.
 
 				// For AES the length required to be 128 or 256 bits (not bytes)
 				{ name: 'AES-CBC', length: 256 },
@@ -38,73 +33,71 @@ export async function importKey(passKey: string, salt: Uint8Array) {
 				['encrypt', 'decrypt'],
 			);
 		})
-		.then(function (webKey) {
-			return crypto.subtle.exportKey('raw', webKey);
-		});
+		.then((webKey) => crypto.subtle.exportKey('raw', webKey));
 
 	return window.crypto.subtle.importKey(
-		'raw', //can be "jwk" or "raw"
+		'raw',
 		derivedKey,
 		{
 			//this is the algorithm options
 			name: 'AES-GCM',
 		},
-		false, //whether the key is extractable (i.e. can be used in exportKey)
-		['encrypt', 'decrypt'], //can "encrypt", "decrypt", "wrapKey", or "unwrapKey"
+		false,
+		['encrypt', 'decrypt'],
 	);
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams
 function encrypt(data: ArrayBuffer, key: CryptoKey, iv: any) {
 	return window.crypto.subtle.encrypt(
 		{
 			name: 'AES-GCM',
 
-			//Don't re-use initialization vectors!
-			//Always generate a new iv every time your encrypt!
-			//Recommended to use 12 bytes length
-			iv: iv,
+			// Don't re-use initialization vectors!
+			// Always generate a new iv every time your encrypt!
+			// Recommended to use 96 bytes length
+			iv,
 
-			//Additional authentication data (optional)
-			// additionalData: ArrayBuffer,
-
-			//Tag length (optional)
-			tagLength: 128, //can be 32, 64, 96, 104, 112, 120 or 128 (default)
+			// Tag length (optional)
+			// can be 32, 64, 96, 104, 112, 120 or 128 (default)
+			tagLength: 128,
 		},
-		key, //from generateKey or importKey above
-		data, //ArrayBuffer of data you want to encrypt
+		key,
+		data,
 	);
 }
 
 function decrypt(data: ArrayBuffer, key: CryptoKey, iv: any) {
-	return window.crypto.subtle
-		.decrypt(
-			{
-				name: 'AES-GCM',
-				iv: iv, //The initialization vector you used to encrypt
-				//additionalData: ArrayBuffer, //The addtionalData you used to encrypt (if any)
-				tagLength: 128, //The tagLength you used to encrypt (if any)
-			},
-			key, //from generateKey or importKey above
-			data, //ArrayBuffer of the data
-		)
-		.catch((err) => {
-			console.warn('dbg1', err);
-			throw err;
-		});
+	return window.crypto.subtle.decrypt(
+		{
+			name: 'AES-GCM',
+			//The initialization vector been used to encrypt
+			iv,
+
+			//The tagLength you used to encrypt (if any)
+			tagLength: 128,
+		},
+		key,
+		data,
+	);
 }
 
+/**
+ * AES-GCM cipher
+ * Recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+ */
 export class AESCipher implements ICipher {
-	private readonly ivLen = 20;
+	private readonly ivLen = 96;
 
 	private key: Promise<CryptoKey>;
 	constructor(cipher: string, salt: Uint8Array) {
-		this.key = importKey(cipher, salt);
+		this.key = getDerivedKey(cipher, salt);
 	}
 
 	public async encrypt(data: ArrayBuffer) {
 		const key = await this.key;
 
-		const iv = getRandomBytes(this.ivLen);
+		const iv = getRandomBits(this.ivLen);
 		const encryptedDataBuffer = await encrypt(data, key, iv);
 
 		return joinArrayBuffers([iv, encryptedDataBuffer]);
