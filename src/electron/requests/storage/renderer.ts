@@ -27,6 +27,9 @@ export class ElectronFilesController implements FilesStorageController {
 		return ipcRenderer
 			.invoke(CHANNELS.getFile, { id, subdir: this.subdirectory })
 			.then((buffer) => {
+				// Don't handle empty data
+				if (!buffer) return buffer;
+
 				if (!this.encryption) return buffer;
 				return this.encryption.decrypt(buffer);
 			});
