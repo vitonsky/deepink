@@ -1,6 +1,6 @@
 export function base64ToBytes(base64: string) {
 	const binString = atob(base64);
-	return Uint8Array.from(binString as any, (m) => (m as any).codePointAt(0));
+	return Uint8Array.from(binString as any, (m) => (m as any).codePointAt(0)).buffer;
 }
 
 export function bytesToBase64(bytes: ArrayBuffer) {

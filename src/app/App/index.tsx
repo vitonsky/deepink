@@ -3,7 +3,7 @@ import { mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
 
-import { AESCipher } from '../../core/encryption/ciphers/AES';
+import { RabbitCipher } from '../../core/encryption/ciphers/Rabbit';
 import { EncryptionController } from '../../core/encryption/EncryptionController';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
@@ -28,8 +28,8 @@ import './App.css';
 // TODO: generate salt
 // TODO: keep salt in user profile directory
 
-const codec = new TextEncoder();
-const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
+// const codec = new TextEncoder();
+// const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
 
 export const cnApp = cn('App');
 
@@ -39,7 +39,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile24';
+	const workspaceName = 'defaultProfile30';
 
 	const [encryption, setEncryption] = useState<EncryptionController | null>(null);
 	useEffect(() => {
@@ -49,7 +49,7 @@ export const App: FC = () => {
 		if (secretKey) {
 			// TODO: implement another cipher algorithms
 			// TODO: provide encryption cipher params to allow control a encryption time
-			setEncryption(new EncryptionController(new AESCipher(secretKey, salt)));
+			setEncryption(new EncryptionController(new RabbitCipher(secretKey)));
 			setSecretKey(null);
 		}
 	}, [secretKey]);
