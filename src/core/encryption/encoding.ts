@@ -13,36 +13,41 @@ export function bytesToBase64(bytes: ArrayBuffer) {
 }
 
 /**
- * Convert a buffer to Base64 string with additional comma symbols
+ * Converter for buffers and Base64 string with additional comma symbols
  *
  * Useful for a really big buffers, to avoid `RangeError: invalid array length`
  */
-export function bytesToJoinedBase64(bytes: ArrayBuffer, sliceLen: number) {
-	const typedArray = new Uint8Array(bytes);
-	const binStrings: string[] = [];
-	for (let offset = 0; offset < typedArray.byteLength; offset += sliceLen) {
-		binStrings.push(
-			Array.from(typedArray.slice(offset, offset + sliceLen), (x) =>
-				String.fromCodePoint(x as any),
-			).join(''),
+export const joinedBase64 = {
+	/**
+	 * Convert a buffer to Base64 string with additional comma symbols
+	 */
+	encode(bytes: ArrayBuffer, bytesChunkSize: number) {
+		const typedArray = new Uint8Array(bytes);
+		const binStrings: string[] = [];
+		for (let offset = 0; offset < typedArray.byteLength; offset += bytesChunkSize) {
+			binStrings.push(
+				Array.from(typedArray.slice(offset, offset + bytesChunkSize), (x) =>
+					String.fromCodePoint(x as any),
+				).join(''),
+			);
+		}
+
+		return binStrings.map((chars) => btoa(chars)).join(',');
+	},
+
+	/**
+	 * Convert a Base64 string with additional comma symbols to buffer
+	 */
+	decode(string: string) {
+		const binStrings = string.split(',').map((enc) => atob(enc));
+
+		const buffers = binStrings.map(
+			(binString) =>
+				Uint8Array.from(
+					binString as any as string[],
+					(m) => m.codePointAt(0) as number,
+				).buffer,
 		);
-	}
-
-	return binStrings.map((chars) => btoa(chars)).join(',');
-}
-
-/**
- * Convert a Base64 string with additional comma symbols to buffer
- */
-export function joinedBase64ToBytes(string: string) {
-	const binStrings = string.split(',').map((enc) => atob(enc));
-
-	const buffers = binStrings.map(
-		(binString) =>
-			Uint8Array.from(
-				binString as any as string[],
-				(m) => m.codePointAt(0) as number,
-			).buffer,
-	);
-	return joinArrayBuffers(buffers);
-}
+		return joinArrayBuffers(buffers);
+	},
+} as const;
