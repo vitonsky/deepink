@@ -4,7 +4,10 @@ import path from 'path';
 import { cn } from '@bem-react/classname';
 
 import { IEncryptionController } from '../../core/encryption';
-import { PlaceholderEncryptionController } from '../../core/encryption/PlaceholderEncryptionController';
+import { AESCipher } from '../../core/encryption/ciphers/AES';
+import { CascadeCipher } from '../../core/encryption/ciphers/CascadeCipher';
+import { Twofish } from '../../core/encryption/ciphers/Twofish';
+import { EncryptionController } from '../../core/encryption/EncryptionController';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
@@ -28,8 +31,8 @@ import './App.css';
 // TODO: generate salt
 // TODO: keep salt in user profile directory
 
-// const codec = new TextEncoder();
-// const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
+const codec = new TextEncoder();
+const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
 
 export const cnApp = cn('App');
 
@@ -39,7 +42,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile80';
+	const workspaceName = 'defaultProfile81';
 
 	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
 	useEffect(() => {
@@ -49,7 +52,14 @@ export const App: FC = () => {
 		if (secretKey) {
 			// TODO: implement another cipher algorithms
 			// TODO: provide encryption cipher params to allow control a encryption time
-			setEncryption(new PlaceholderEncryptionController());
+			setEncryption(
+				new EncryptionController(
+					new CascadeCipher([
+						new Twofish(secretKey),
+						new AESCipher(secretKey, salt),
+					]),
+				),
+			);
 			setSecretKey(null);
 		}
 	}, [secretKey]);

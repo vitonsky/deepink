@@ -3,7 +3,7 @@ import { ICipher } from '../..';
 /**
  * Compose a new cipher from a multiple ciphers
  */
-export class CiphersComposer implements ICipher {
+export class CascadeCipher implements ICipher {
 	private ciphers;
 	constructor(ciphers: ICipher[]) {
 		this.ciphers = ciphers;
