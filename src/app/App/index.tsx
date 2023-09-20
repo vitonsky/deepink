@@ -3,10 +3,8 @@ import { mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
 
-import { AESCipher } from '../../core/encryption/ciphers/AES';
-import { CiphersComposer } from '../../core/encryption/ciphers/CiphersComposer';
-import { Twofish } from '../../core/encryption/ciphers/Twofish';
-import { EncryptionController } from '../../core/encryption/EncryptionController';
+import { IEncryptionController } from '../../core/encryption';
+import { PlaceholderEncryptionController } from '../../core/encryption/PlaceholderEncryptionController';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
@@ -30,8 +28,8 @@ import './App.css';
 // TODO: generate salt
 // TODO: keep salt in user profile directory
 
-const codec = new TextEncoder();
-const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
+// const codec = new TextEncoder();
+// const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
 
 export const cnApp = cn('App');
 
@@ -41,9 +39,9 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile79';
+	const workspaceName = 'defaultProfile80';
 
-	const [encryption, setEncryption] = useState<EncryptionController | null>(null);
+	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
 	useEffect(() => {
 		// Clear error by change secret key
 		setWorkspaceError(null);
@@ -51,14 +49,7 @@ export const App: FC = () => {
 		if (secretKey) {
 			// TODO: implement another cipher algorithms
 			// TODO: provide encryption cipher params to allow control a encryption time
-			setEncryption(
-				new EncryptionController(
-					new CiphersComposer([
-						new Twofish(secretKey),
-						new AESCipher(secretKey, salt),
-					]),
-				),
-			);
+			setEncryption(new PlaceholderEncryptionController());
 			setSecretKey(null);
 		}
 	}, [secretKey]);
