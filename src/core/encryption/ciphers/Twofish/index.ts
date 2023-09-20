@@ -35,9 +35,12 @@ function transformBuffer(
 	return out;
 }
 
-// TODO: improve meta data structure
+/**
+ * Twofish cipher implementation
+ */
 export class Twofish implements ICipher {
-	private readonly metaDataSize = 300;
+	private readonly headerSize = 32;
+	private readonly headerPaddingOffset = 0;
 	private readonly key;
 	constructor(cipher: string) {
 		this.key = makeSession(new TextEncoder().encode(cipher));
@@ -50,21 +53,21 @@ export class Twofish implements ICipher {
 			encrypt(input, offset, output, offset, this.key);
 		});
 
-		// Compose result buffer with meta data to decode
-		const outBuffer = new Uint8Array(this.metaDataSize + encryptedBuffer.length);
-		outBuffer.set(encryptedBuffer, this.metaDataSize);
+		// Compose out buffer with meta data to decode
+		const outBuffer = new Uint8Array(this.headerSize + encryptedBuffer.length);
+		outBuffer.set(encryptedBuffer, this.headerSize);
 
-		const meta = new TextEncoder().encode(padding.toString());
-		outBuffer.set(meta, 0);
+		const headerView = new DataView(outBuffer.buffer, 0, this.headerSize);
+		headerView.setUint8(this.headerPaddingOffset, padding);
 
 		return outBuffer.buffer;
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
-		const meta = new TextDecoder().decode(buffer.slice(0, this.metaDataSize));
-		const padding = parseInt(meta);
+		const headerView = new DataView(buffer, 0, this.headerSize);
+		const padding = headerView.getUint8(this.headerPaddingOffset);
 
-		const encryptedBuffer = new Uint8Array(buffer.slice(this.metaDataSize));
+		const encryptedBuffer = new Uint8Array(buffer.slice(this.headerSize));
 		const decryptedBufferWithPaddings = transformBuffer(
 			encryptedBuffer,
 			(offset, input, output) => {
