@@ -98,6 +98,7 @@
 		"remark-stringify": "^10.0.3",
 		"sqlite": "^4.2.1",
 		"sqlite3": "^5.1.6",
+		"twofish-ts": "^1.0.1",
 		"unified": "^10.1.2",
 		"unist-util-remove": "^4.0.0",
 		"unist-util-visit": "^5.0.0"
