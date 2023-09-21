@@ -8,13 +8,13 @@ export async function getDerivedKey(passKey: string, salt: Uint8Array) {
 	const codec = new TextEncoder();
 	const keyBytes = codec.encode(passKey);
 
-	const derivedKey = await window.crypto.subtle
+	const derivedKey = await self.crypto.subtle
 		.importKey('raw', keyBytes, { name: 'PBKDF2' }, false, [
 			'deriveBits',
 			'deriveKey',
 		])
 		.then((key) => {
-			return window.crypto.subtle.deriveKey(
+			return self.crypto.subtle.deriveKey(
 				{
 					name: 'PBKDF2',
 					salt,
@@ -36,7 +36,7 @@ export async function getDerivedKey(passKey: string, salt: Uint8Array) {
 		})
 		.then((webKey) => crypto.subtle.exportKey('raw', webKey));
 
-	return window.crypto.subtle.importKey(
+	return self.crypto.subtle.importKey(
 		'raw',
 		derivedKey,
 		{
@@ -65,7 +65,7 @@ export class AESCipher implements ICipher {
 		const key = await this.key;
 
 		const iv = getRandomBits(this.ivLen);
-		const encryptedBuffer = await window.crypto.subtle.encrypt(
+		const encryptedBuffer = await self.crypto.subtle.encrypt(
 			{
 				name: 'AES-GCM',
 
@@ -93,7 +93,7 @@ export class AESCipher implements ICipher {
 		const iv = buffer.slice(0, this.ivLen);
 		const encryptedBuffer = buffer.slice(this.ivLen);
 
-		return window.crypto.subtle
+		return self.crypto.subtle
 			.decrypt(
 				{
 					name: 'AES-GCM',

@@ -4,12 +4,8 @@ import path from 'path';
 import { cn } from '@bem-react/classname';
 
 import { IEncryptionController } from '../../core/encryption';
-import { BufferSizeObfuscator } from '../../core/encryption/BufferSizeObfuscator';
-import { AESCipher } from '../../core/encryption/ciphers/AES';
-import { CascadeCipher } from '../../core/encryption/ciphers/CascadeCipher';
-import { Twofish } from '../../core/encryption/ciphers/Twofish';
 import { EncryptionController } from '../../core/encryption/EncryptionController';
-import { EncryptionIntegrityCheck } from '../../core/encryption/EncryptionIntegrityCheck';
+import { WorkerEncryptionController } from '../../core/encryption/WorkerEncryptionController';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
@@ -43,7 +39,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile99';
+	const workspaceName = 'defaultProfile102';
 
 	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
 	useEffect(() => {
@@ -53,14 +49,7 @@ export const App: FC = () => {
 		if (secretKey) {
 			setEncryption(
 				new EncryptionController(
-					new EncryptionIntegrityCheck(
-						new BufferSizeObfuscator(
-							new CascadeCipher([
-								new AESCipher('secretKey', salt),
-								new Twofish(secretKey),
-							]),
-						),
-					),
+					new WorkerEncryptionController('secretKey', salt),
 				),
 			);
 			setSecretKey(null);

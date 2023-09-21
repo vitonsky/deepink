@@ -25,7 +25,7 @@ export class EncryptionController implements IEncryptionController {
 			// Source: https://stackoverflow.com/questions/72528453/why-textencoder-encode-produces-different-result-from-file-arraybuffer#comment128121330_72528453
 			const encoder = new TextEncoder();
 			return this.cipher
-				.encrypt(encoder.encode(rawData))
+				.encrypt(encoder.encode(rawData).buffer)
 				.then((encryptedDataBuffer) =>
 					joinedBase64.encode(
 						encryptedDataBuffer,

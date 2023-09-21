@@ -36,7 +36,7 @@ export function fillBufferWithRandomBytes(buffer: ArrayBufferView) {
 
 	// Fill if quote is not exceeded
 	if (buffer.byteLength <= bytesLimit) {
-		window.crypto.getRandomValues(buffer);
+		self.crypto.getRandomValues(buffer);
 		return;
 	}
 
@@ -47,7 +47,7 @@ export function fillBufferWithRandomBytes(buffer: ArrayBufferView) {
 		const bytesToFill = buffer.byteLength - offset;
 		const bytesToAdd = Math.min(bytesLimit, bytesToFill);
 		const blockBuffer = new Uint8Array(bytesToAdd);
-		window.crypto.getRandomValues(blockBuffer);
+		self.crypto.getRandomValues(blockBuffer);
 
 		// Fill with offset
 		bufferView.set(blockBuffer, offset);
