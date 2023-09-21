@@ -1,44 +1,51 @@
 let idCounter = 0;
 
+type PostMessageParams<D = any> = {
+	data: D;
+	transferObjects?: Transferable[];
+};
+
+// TODO: specify structure for data payload
+// TODO: implement method to register request handlers
+// TODO: reject requests with not registered handlers
 export class WorkerMessenger {
 	private readonly target;
 	constructor(target: Worker | Window) {
 		this.target = target;
 	}
 
-	// send request
-	public async sendMessage(
-		data: any,
-		transferObjects?: Transferable[],
-		respondId?: number,
+	private postMessage(
+		{ data, transferObjects }: PostMessageParams,
+		responseTo?: number,
 	) {
 		const messageId = ++idCounter;
-		return new Promise<any>((resolve) => {
-			// Send message
-			if (this.target instanceof Worker) {
-				this.target.postMessage(
-					{
-						id: respondId ?? messageId,
-						data,
-					},
-					transferObjects ?? [],
-				);
-			} else {
-				this.target.postMessage(
-					{
-						id: respondId ?? messageId,
-						data,
-					},
-					{
-						transfer: transferObjects,
-					},
-				);
-			}
+		const payload = {
+			id: responseTo ?? messageId,
+			data,
+		};
 
-			if (respondId !== undefined) {
-				(resolve as any)();
-				return;
-			}
+		// Send message
+		if (this.target instanceof Worker) {
+			this.target.postMessage(payload, transferObjects ?? []);
+		} else {
+			this.target.postMessage(payload, {
+				transfer: transferObjects,
+			});
+		}
+
+		return messageId;
+	}
+
+	public sendMessage(data: any, transferObjects?: Transferable[]) {
+		return this.postMessage({ data, transferObjects });
+	}
+
+	/**
+	 * Send message and wait a response
+	 */
+	public async sendRequest(data: any, transferObjects?: Transferable[]) {
+		return new Promise<any>((resolve) => {
+			const messageId = this.postMessage({ data, transferObjects });
 
 			const onMessage = (evt: MessageEvent) => {
 				const data = evt.data;
@@ -54,6 +61,9 @@ export class WorkerMessenger {
 		});
 	}
 
+	/**
+	 * Listen messages
+	 */
 	public async onMessage(
 		callback: (
 			data: any,
@@ -64,7 +74,8 @@ export class WorkerMessenger {
 			const data = evt.data;
 
 			callback(data.data, (data, transferObjects) => {
-				this.sendMessage(data, transferObjects, data.id);
+				const requestId = data.id;
+				this.postMessage({ data, transferObjects }, requestId);
 			});
 		});
 	}

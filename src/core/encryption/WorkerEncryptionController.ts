@@ -9,19 +9,19 @@ export class WorkerEncryptionController implements ICipher {
 
 		this.messanger = new WorkerMessenger(worker);
 		this.worker = this.messanger
-			.sendMessage({ method: 'init', secretKey, salt })
+			.sendRequest({ method: 'init', secretKey, salt })
 			.then(() => worker);
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
 		await this.worker;
 		// console.log('E', buffer);
-		return this.messanger.sendMessage({ method: 'encrypt', buffer }, [buffer]);
+		return this.messanger.sendRequest({ method: 'encrypt', buffer }, [buffer]);
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
 		await this.worker;
 		// console.log('D', buffer);
-		return this.messanger.sendMessage({ method: 'decrypt', buffer }, [buffer]);
+		return this.messanger.sendRequest({ method: 'decrypt', buffer }, [buffer]);
 	}
 }
