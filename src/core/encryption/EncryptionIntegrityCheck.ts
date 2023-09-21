@@ -30,6 +30,10 @@ function getHeader(buffer: ArrayBuffer): Header {
 	};
 }
 
+export class IntegrityError extends TypeError {
+	public readonly name = 'IntegrityError';
+}
+
 export class EncryptionIntegrityCheck implements ICipher {
 	private readonly cipher;
 	constructor(cipher: ICipher) {
@@ -53,7 +57,7 @@ export class EncryptionIntegrityCheck implements ICipher {
 
 		const bufferSum = crc32(new Uint8Array(data));
 		if (bufferSum !== header.crc32)
-			throw new Error('Decryption error. Check sum does not match');
+			throw new IntegrityError('Decryption error. Check sum does not match');
 
 		return data;
 	};
