@@ -75,6 +75,7 @@
 	},
 	"dependencies": {
 		"@bem-react/classname": "^1.6.0",
+		"crc": "^4.3.2",
 		"crypto-js": "^4.1.1",
 		"effector": "^22.8.6",
 		"effector-react": "^22.5.3",

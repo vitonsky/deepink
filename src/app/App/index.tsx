@@ -8,6 +8,7 @@ import { AESCipher } from '../../core/encryption/ciphers/AES';
 import { CascadeCipher } from '../../core/encryption/ciphers/CascadeCipher';
 import { Twofish } from '../../core/encryption/ciphers/Twofish';
 import { EncryptionController } from '../../core/encryption/EncryptionController';
+import { EncryptionIntegrityCheck } from '../../core/encryption/EncryptionIntegrityCheck';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
@@ -33,16 +34,16 @@ import './App.css';
 
 const codec = new TextEncoder();
 const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
+new AESCipher('secretKey', salt);
 
 export const cnApp = cn('App');
-
 export const getNoteTitle = (note: INoteData) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
 
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile81';
+	const workspaceName = 'defaultProfile88';
 
 	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
 	useEffect(() => {
@@ -54,10 +55,9 @@ export const App: FC = () => {
 			// TODO: provide encryption cipher params to allow control a encryption time
 			setEncryption(
 				new EncryptionController(
-					new CascadeCipher([
-						new Twofish(secretKey),
-						new AESCipher(secretKey, salt),
-					]),
+					new EncryptionIntegrityCheck(
+						new CascadeCipher([new Twofish(secretKey)]),
+					),
 				),
 			);
 			setSecretKey(null);
