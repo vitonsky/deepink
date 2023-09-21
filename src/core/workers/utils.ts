@@ -5,7 +5,12 @@ type PostMessageParams<D = any> = {
 	transferObjects?: Transferable[];
 };
 
-// TODO: specify structure for data payload
+type MessagePayload<T = any> = {
+	id: number;
+	data: T;
+	responseTarget?: number;
+};
+
 // TODO: implement method to register request handlers
 // TODO: reject requests with not registered handlers
 export class WorkerMessenger {
@@ -19,10 +24,14 @@ export class WorkerMessenger {
 		responseTo?: number,
 	) {
 		const messageId = ++idCounter;
-		const payload = {
-			id: responseTo ?? messageId,
+		const payload: MessagePayload = {
+			id: messageId,
 			data,
 		};
+
+		if (responseTo) {
+			payload.responseTarget = responseTo;
+		}
 
 		// Send message
 		if (this.target instanceof Worker) {
@@ -48,10 +57,11 @@ export class WorkerMessenger {
 			const messageId = this.postMessage({ data, transferObjects });
 
 			const onMessage = (evt: MessageEvent) => {
-				const data = evt.data;
+				// TODO: validate structure and skip other messages
+				const data = evt.data as MessagePayload;
 
 				// Handle only response on sent message
-				if (data.id === messageId) {
+				if (data.responseTarget === messageId) {
 					(this.target as Worker).removeEventListener('message', onMessage);
 					resolve(data.data);
 				}
@@ -71,10 +81,11 @@ export class WorkerMessenger {
 		) => void,
 	) {
 		(this.target as Worker).addEventListener('message', (evt) => {
-			const data = evt.data;
+			// TODO: validate structure and skip other messages
+			const data = evt.data as MessagePayload;
 
+			const requestId = data.id;
 			callback(data.data, (data, transferObjects) => {
-				const requestId = data.id;
 				this.postMessage({ data, transferObjects }, requestId);
 			});
 		});
