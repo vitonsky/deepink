@@ -1,4 +1,5 @@
 import { joinArrayBuffers } from '../../buffers';
+import { IntegrityError } from '../../EncryptionIntegrityCheck';
 import { getRandomBits } from '../../random';
 
 import { ICipher } from '../..';
@@ -92,17 +93,29 @@ export class AESCipher implements ICipher {
 		const iv = buffer.slice(0, this.ivLen);
 		const encryptedBuffer = buffer.slice(this.ivLen);
 
-		return window.crypto.subtle.decrypt(
-			{
-				name: 'AES-GCM',
-				//The initialization vector been used to encrypt
-				iv,
+		return window.crypto.subtle
+			.decrypt(
+				{
+					name: 'AES-GCM',
+					//The initialization vector been used to encrypt
+					iv,
 
-				//The tagLength you used to encrypt (if any)
-				tagLength: 128,
-			},
-			key,
-			encryptedBuffer,
-		);
+					//The tagLength you used to encrypt (if any)
+					tagLength: 128,
+				},
+				key,
+				encryptedBuffer,
+			)
+			.catch((err) => {
+				if (
+					err instanceof Error &&
+					err.name === 'OperationError' &&
+					err.message === ''
+				) {
+					throw new IntegrityError('Decryption error. Integrity checks fails');
+				}
+
+				throw err;
+			});
 	}
 }
