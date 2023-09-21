@@ -1,6 +1,37 @@
 import { decrypt, encrypt, makeSession } from 'twofish-ts';
 
-import { ICipher } from '../..';
+import { joinArrayBuffers } from '../../buffers';
+
+import { HeaderView, ICipher } from '../..';
+
+export type TwofishBufferHeaderStruct = {
+	padding: number;
+};
+
+export class TwofishBufferHeader implements HeaderView<TwofishBufferHeaderStruct> {
+	public readonly bufferSize = 32;
+	private readonly headerPaddingOffset = 0;
+
+	public createBuffer(data: TwofishBufferHeaderStruct): ArrayBuffer {
+		const buffer = new ArrayBuffer(this.bufferSize);
+		const view = new DataView(buffer, 0);
+
+		view.setUint8(this.headerPaddingOffset, data.padding);
+
+		return buffer;
+	}
+
+	public readBuffer(buffer: ArrayBuffer): TwofishBufferHeaderStruct {
+		if (buffer.byteLength < this.bufferSize)
+			throw new TypeError('Header buffer have too small size');
+
+		const view = new DataView(buffer, 0, this.bufferSize);
+
+		return {
+			padding: view.getUint8(this.headerPaddingOffset),
+		};
+	}
+}
 
 const blockSize = 16;
 
@@ -39,35 +70,29 @@ function transformBuffer(
  * Twofish cipher implementation
  */
 export class Twofish implements ICipher {
-	private readonly headerSize = 32;
-	private readonly headerPaddingOffset = 0;
 	private readonly key;
+	private readonly header;
 	constructor(cipher: string) {
 		this.key = makeSession(new TextEncoder().encode(cipher));
+		this.header = new TwofishBufferHeader();
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
 		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
 
+		const header = this.header.createBuffer({ padding });
+
 		const encryptedBuffer = transformBuffer(bufferView, (offset, input, output) => {
 			encrypt(input, offset, output, offset, this.key);
 		});
 
-		// Compose out buffer with meta data to decode
-		const outBuffer = new Uint8Array(this.headerSize + encryptedBuffer.length);
-		outBuffer.set(encryptedBuffer, this.headerSize);
-
-		const headerView = new DataView(outBuffer.buffer, 0, this.headerSize);
-		headerView.setUint8(this.headerPaddingOffset, padding);
-
-		return outBuffer.buffer;
+		return joinArrayBuffers([header, encryptedBuffer]);
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
-		const headerView = new DataView(buffer, 0, this.headerSize);
-		const padding = headerView.getUint8(this.headerPaddingOffset);
+		const { padding } = this.header.readBuffer(buffer);
 
-		const encryptedBuffer = new Uint8Array(buffer.slice(this.headerSize));
+		const encryptedBuffer = new Uint8Array(buffer.slice(this.header.bufferSize));
 		const decryptedBufferWithPaddings = transformBuffer(
 			encryptedBuffer,
 			(offset, input, output) => {
