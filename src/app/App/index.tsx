@@ -34,7 +34,6 @@ import './App.css';
 
 const codec = new TextEncoder();
 const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
-new AESCipher('secretKey', salt);
 
 export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteData) =>
@@ -43,7 +42,7 @@ export const getNoteTitle = (note: INoteData) =>
 export const App: FC = () => {
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile88';
+	const workspaceName = 'defaultProfile90';
 
 	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
 	useEffect(() => {
@@ -51,12 +50,13 @@ export const App: FC = () => {
 		setWorkspaceError(null);
 
 		if (secretKey) {
-			// TODO: implement another cipher algorithms
-			// TODO: provide encryption cipher params to allow control a encryption time
 			setEncryption(
 				new EncryptionController(
 					new EncryptionIntegrityCheck(
-						new CascadeCipher([new Twofish(secretKey)]),
+						new CascadeCipher([
+							new AESCipher('secretKey', salt),
+							new Twofish(secretKey),
+						]),
 					),
 				),
 			);
