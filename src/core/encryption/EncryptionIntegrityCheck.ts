@@ -2,32 +2,34 @@
 import crc32 from 'crc/calculators/crc32';
 
 import { joinArrayBuffers } from './buffers';
-import { ICipher } from '.';
+import { HeaderView, ICipher } from '.';
 
-type Header = {
+export type IntegrityHeaderStruct = {
 	crc32: number;
 };
 
-const headerSize = 8;
+export class IntegrityHeader implements HeaderView<IntegrityHeaderStruct> {
+	public readonly bufferSize = 8;
 
-function createHeader(data: Header) {
-	const buffer = new ArrayBuffer(headerSize);
-	const view = new DataView(buffer, 0);
+	public createBuffer(data: IntegrityHeaderStruct): ArrayBuffer {
+		const buffer = new ArrayBuffer(this.bufferSize);
+		const view = new DataView(buffer, 0);
 
-	view.setInt32(0, data.crc32);
+		view.setInt32(0, data.crc32);
 
-	return buffer;
-}
+		return buffer;
+	}
 
-function getHeader(buffer: ArrayBuffer): Header {
-	if (buffer.byteLength < headerSize)
-		throw new TypeError('Header buffer have too small size');
+	public readBuffer(buffer: ArrayBuffer): IntegrityHeaderStruct {
+		if (buffer.byteLength < this.bufferSize)
+			throw new TypeError('Header buffer have too small size');
 
-	const view = new DataView(buffer, 0, headerSize);
+		const view = new DataView(buffer, 0, this.bufferSize);
 
-	return {
-		crc32: view.getInt32(0),
-	};
+		return {
+			crc32: view.getInt32(0),
+		};
+	}
 }
 
 export class IntegrityError extends TypeError {
@@ -36,13 +38,15 @@ export class IntegrityError extends TypeError {
 
 export class EncryptionIntegrityCheck implements ICipher {
 	private readonly cipher;
+	private readonly integrityHeader;
 	constructor(cipher: ICipher) {
 		this.cipher = cipher;
+		this.integrityHeader = new IntegrityHeader();
 	}
 
 	public encrypt = async (data: ArrayBuffer) => {
 		const bufferSum = crc32(new Uint8Array(data));
-		const header = createHeader({
+		const header = this.integrityHeader.createBuffer({
 			crc32: bufferSum,
 		});
 
@@ -52,8 +56,8 @@ export class EncryptionIntegrityCheck implements ICipher {
 	public decrypt = async (encryptedBuffer: ArrayBuffer) => {
 		const decryptedBuffer = await this.cipher.decrypt(encryptedBuffer);
 
-		const header = getHeader(decryptedBuffer);
-		const data = decryptedBuffer.slice(headerSize);
+		const header = this.integrityHeader.readBuffer(decryptedBuffer);
+		const data = decryptedBuffer.slice(this.integrityHeader.bufferSize);
 
 		const bufferSum = crc32(new Uint8Array(data));
 		if (bufferSum !== header.crc32)
