@@ -11,6 +11,8 @@ type MessagePayload<T = any> = {
 	responseTarget?: number;
 };
 
+type ResponseCallback = (data: any, transferObjects?: Transferable[]) => void;
+
 // TODO: implement method to register request handlers
 // TODO: reject requests with not registered handlers
 export class WorkerMessenger {
@@ -74,13 +76,8 @@ export class WorkerMessenger {
 	/**
 	 * Listen messages
 	 */
-	public async onMessage(
-		callback: (
-			data: any,
-			response: (data: any, transferObjects?: Transferable[]) => void,
-		) => void,
-	) {
-		(this.target as Worker).addEventListener('message', (evt) => {
+	public onMessage(callback: (data: any, response: ResponseCallback) => void) {
+		const onMessage = (evt: MessageEvent) => {
 			// TODO: validate structure and skip other messages
 			const data = evt.data as MessagePayload;
 
@@ -88,6 +85,96 @@ export class WorkerMessenger {
 			callback(data.data, (data, transferObjects) => {
 				this.postMessage({ data, transferObjects }, requestId);
 			});
-		});
+		};
+
+		(this.target as Worker).addEventListener('message', onMessage);
+
+		const cleanup = () => {
+			(this.target as Worker).removeEventListener('message', onMessage);
+			this.cleanupCallbacks = this.cleanupCallbacks.filter((cb) => cb !== cleanup);
+		};
+
+		this.cleanupCallbacks.push(cleanup);
+
+		return cleanup;
+	}
+
+	private cleanupCallbacks: CleanupCallback[] = [];
+	public destroy() {
+		if (this.target instanceof Worker) {
+			console.warn('Terminate worker!!');
+			this.target.terminate();
+		}
+
+		this.cleanupCallbacks.forEach((cleanup) => cleanup());
+	}
+}
+
+type CleanupCallback = () => void;
+type RequestPayload<T = any> = {
+	type: 'request' | 'response';
+	channel: string;
+	data: T;
+};
+
+export class WorkerRequests {
+	readonly messenger;
+	constructor(messenger: WorkerMessenger) {
+		this.messenger = messenger;
+	}
+
+	public sendRequest(channel: string, data: any, transferObjects?: Transferable[]) {
+		const message: RequestPayload = {
+			type: 'request',
+			channel,
+			data,
+		};
+		return this.messenger
+			.sendRequest(message, transferObjects)
+			.then((message: RequestPayload) => {
+				if (message.type !== 'response') return;
+
+				return message.data;
+			});
+	}
+
+	public addHandler(
+		channel: string,
+		handler: (data: any, response: ResponseCallback) => any,
+	) {
+		const cleanup = this.messenger.onMessage(
+			async (data: RequestPayload, response) => {
+				if (typeof data !== 'object' || data.channel !== channel) return;
+
+				let isResponded = false;
+				const responseProxy: ResponseCallback = (payload, transferObjects) => {
+					const message: RequestPayload = {
+						type: 'response',
+						channel,
+						data: payload,
+					};
+
+					const result = response(message, transferObjects);
+
+					// Mark as responded in case function complete successful
+					isResponded = true;
+
+					return result;
+				};
+
+				try {
+					await handler(data.data, responseProxy);
+					if (!isResponded) {
+						responseProxy(undefined);
+					}
+				} catch (err) {
+					if (!isResponded) {
+						console.warn('Request did not responded', { channel });
+					}
+				}
+			},
+		);
+
+		return cleanup;
 	}
 }

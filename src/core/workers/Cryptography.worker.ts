@@ -4,18 +4,23 @@ import { CascadeCipher } from '../encryption/ciphers/CascadeCipher';
 import { Twofish } from '../encryption/ciphers/Twofish';
 import { EncryptionController } from '../encryption/EncryptionController';
 import { EncryptionIntegrityCheck } from '../encryption/EncryptionIntegrityCheck';
-import { WorkerMessenger } from './utils';
+import { WorkerMessenger, WorkerRequests } from './utils';
 
 console.log('Hello world from worker');
 
-let cryptor: EncryptionController | null = null;
-const messanger = new WorkerMessenger(self);
-messanger.onMessage((data, response) => {
-	if (typeof data !== 'object' || (data as any).method !== 'init') return;
+let encryptionController: EncryptionController | null = null;
+const messenger = new WorkerMessenger(self);
+const requests = new WorkerRequests(messenger);
 
-	const { secretKey, salt } = data as any;
+const workerId = performance.now();
+requests.addHandler('init', async ({ secretKey, salt }) => {
+	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
-	cryptor = new EncryptionController(
+	await new Promise((res) => setTimeout(res, 8000));
+
+	console.log('Loaded');
+
+	encryptionController = new EncryptionController(
 		new EncryptionIntegrityCheck(
 			new BufferSizeObfuscator(
 				new CascadeCipher([
@@ -25,24 +30,18 @@ messanger.onMessage((data, response) => {
 			),
 		),
 	);
-
-	response(true);
 });
 
-messanger.onMessage(async (data, response) => {
-	if (typeof data !== 'object' || (data as any).method !== 'encrypt') return;
-	if (!cryptor) return;
+requests.addHandler('encrypt', async (buffer, respond) => {
+	if (!encryptionController) return;
 
-	const result = await cryptor.encrypt(data.buffer);
-	// console.log('Respond e', result);
-	response(result, [result]);
+	const result = await encryptionController.encrypt(buffer);
+	respond(result, [result]);
 });
 
-messanger.onMessage(async (data, response) => {
-	if (typeof data !== 'object' || (data as any).method !== 'decrypt') return;
-	if (!cryptor) return;
+requests.addHandler('decrypt', async (buffer, respond) => {
+	if (!encryptionController) return;
 
-	const result = await cryptor.decrypt(data.buffer);
-	// console.log('Respond d', result);
-	response(result, [result]);
+	const result = await encryptionController.decrypt(buffer);
+	respond(result, [result]);
 });

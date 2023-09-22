@@ -36,7 +36,11 @@ export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteData) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
 
+// TODO: remove secrets of closure
+// TODO: all keys must be derived, never use primary key directly for encryption
+// TODO: implement profiles management
 export const App: FC = () => {
+	// TODO: key must be removed of memory after use
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
 	const workspaceName = 'defaultProfile102';
@@ -46,14 +50,17 @@ export const App: FC = () => {
 		// Clear error by change secret key
 		setWorkspaceError(null);
 
-		if (secretKey) {
-			setEncryption(
-				new EncryptionController(
-					new WorkerEncryptionController('secretKey', salt),
-				),
-			);
-			setSecretKey(null);
-		}
+		if (!secretKey) return;
+
+		const workerController = new WorkerEncryptionController(secretKey, salt);
+		const encryption = new EncryptionController(workerController);
+		setEncryption(encryption);
+		// setSecretKey(null);
+
+		return () => {
+			setEncryption(null);
+			workerController.terminate();
+		};
 	}, [secretKey]);
 
 	// Load DB
