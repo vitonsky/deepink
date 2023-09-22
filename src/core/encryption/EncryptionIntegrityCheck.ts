@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import crc32 from 'crc/calculators/crc32';
 
-import { joinArrayBuffers } from './utils/buffers';
+import { joinBuffers } from './utils/buffers';
 import { HeaderView, ICipher } from '.';
 
 export type IntegrityHeaderStruct = {
@@ -50,7 +50,7 @@ export class EncryptionIntegrityCheck implements ICipher {
 			crc32: bufferSum,
 		});
 
-		return this.cipher.encrypt(joinArrayBuffers([header, data]));
+		return this.cipher.encrypt(joinBuffers([header, data]));
 	};
 
 	public decrypt = async (encryptedBuffer: ArrayBuffer) => {

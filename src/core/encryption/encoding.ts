@@ -1,4 +1,4 @@
-import { joinArrayBuffers } from './utils/buffers';
+import { joinBuffers } from './utils/buffers';
 
 export function base64ToBytes(base64: string) {
 	const binString = atob(base64);
@@ -48,6 +48,6 @@ export const joinedBase64 = {
 					(m) => m.codePointAt(0) as number,
 				).buffer,
 		);
-		return joinArrayBuffers(buffers);
+		return joinBuffers(buffers);
 	},
 } as const;

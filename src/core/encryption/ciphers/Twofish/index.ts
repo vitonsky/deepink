@@ -1,8 +1,8 @@
 import { encrypt, makeSession } from 'twofish-ts';
 
 import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
-import { getRandomBits } from '../../random';
-import { BufferView, fillBuffer, joinArrayBuffers } from '../../utils/buffers';
+import { getRandomBytes } from '../../random';
+import { BufferView, fillBuffer, joinBuffers } from '../../utils/buffers';
 
 import { HeaderView, ICipher } from '../..';
 
@@ -83,11 +83,11 @@ export class Twofish implements ICipher {
 	public async encrypt(buffer: ArrayBuffer) {
 		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
 
-		const iv = getRandomBits(blockSize);
+		const iv = getRandomBytes(blockSize);
 		const encryptedBuffer = await this.ctr.encrypt(bufferView, iv);
 
 		const header = this.header.createBuffer({ padding, iv });
-		return joinArrayBuffers([header, encryptedBuffer]);
+		return joinBuffers([header, encryptedBuffer]);
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {

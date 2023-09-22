@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 
-import { joinArrayBuffers } from './utils/buffers';
+import { joinBuffers } from './utils/buffers';
 import { HeaderView, ICipher } from '.';
 
 export type SizeObfuscationHeaderStruct = {
@@ -100,7 +100,7 @@ export class BufferSizeObfuscator implements ICipher {
 			padding,
 		});
 
-		return this.cipher.encrypt(joinArrayBuffers([header, paddingBuffer, data]));
+		return this.cipher.encrypt(joinBuffers([header, paddingBuffer, data]));
 	};
 
 	public decrypt = async (encryptedBuffer: ArrayBuffer) => {

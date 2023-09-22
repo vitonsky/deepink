@@ -1,6 +1,6 @@
 import { IntegrityError } from '../../EncryptionIntegrityCheck';
-import { getRandomBits } from '../../random';
-import { joinArrayBuffers } from '../../utils/buffers';
+import { getRandomBytes } from '../../random';
+import { joinBuffers } from '../../utils/buffers';
 
 import { ICipher } from '../..';
 
@@ -64,7 +64,7 @@ export class AESCipher implements ICipher {
 	public async encrypt(buffer: ArrayBuffer) {
 		const key = await this.key;
 
-		const iv = getRandomBits(this.ivLen);
+		const iv = getRandomBytes(this.ivLen);
 		const encryptedBuffer = await self.crypto.subtle.encrypt(
 			{
 				name: 'AES-GCM',
@@ -83,7 +83,7 @@ export class AESCipher implements ICipher {
 		);
 
 		// Include public parameters to a cipher-buffer
-		return joinArrayBuffers([iv, encryptedBuffer]);
+		return joinBuffers([iv, encryptedBuffer]);
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {

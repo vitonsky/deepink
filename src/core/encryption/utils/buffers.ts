@@ -1,7 +1,7 @@
 /**
  * Join buffers into a new buffer
  */
-export const joinArrayBuffers = (buffers: ArrayBuffer[]) => {
+export const joinBuffers = (buffers: ArrayBuffer[]) => {
 	const bufferLen = buffers.reduce((len, buffer) => len + buffer.byteLength, 0);
 	const resultBuffer = new Uint8Array(bufferLen);
 
