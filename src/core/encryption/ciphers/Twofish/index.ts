@@ -17,7 +17,7 @@ export class TwofishBufferHeader implements HeaderView<TwofishBufferHeaderStruct
 	public readonly bufferSize = 32;
 	private readonly offsets = {
 		padding: 0,
-		iv: 12,
+		iv: 1,
 	};
 
 	public createBuffer(data: TwofishBufferHeaderStruct): ArrayBuffer {
