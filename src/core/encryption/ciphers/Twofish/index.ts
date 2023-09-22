@@ -8,6 +8,7 @@ export type TwofishBufferHeaderStruct = {
 	padding: number;
 };
 
+// TODO: use CTR encryption mode https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR)
 export class TwofishBufferHeader implements HeaderView<TwofishBufferHeaderStruct> {
 	public readonly bufferSize = 32;
 	private readonly headerPaddingOffset = 0;
