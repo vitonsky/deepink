@@ -1,4 +1,4 @@
-import { joinedBase64 } from './encoding';
+import { extendedBase64 } from './utils/encoding';
 import { ICipher, IEncryptionController } from '.';
 
 /**
@@ -27,7 +27,7 @@ export class EncryptionController implements IEncryptionController {
 			return this.cipher
 				.encrypt(encoder.encode(rawData).buffer)
 				.then((encryptedDataBuffer) =>
-					joinedBase64.encode(
+					extendedBase64.encode(
 						encryptedDataBuffer,
 						this.base64EncryptedChunkSize,
 					),
@@ -44,7 +44,7 @@ export class EncryptionController implements IEncryptionController {
 			// For text decoding we assume a text is Base64 encoded binary data
 			const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
 			return this.cipher
-				.decrypt(joinedBase64.decode(encryptedData))
+				.decrypt(extendedBase64.decode(encryptedData))
 				.then((buffer) => decoder.decode(buffer)) as Promise<T>;
 		}
 

@@ -1,6 +1,6 @@
 import { IntegrityError } from '../../EncryptionIntegrityCheck';
-import { getRandomBytes } from '../../random';
 import { joinBuffers } from '../../utils/buffers';
+import { getRandomBytes } from '../../utils/random';
 
 import { ICipher } from '../..';
 

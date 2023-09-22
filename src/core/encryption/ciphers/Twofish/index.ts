@@ -1,8 +1,8 @@
 import { encrypt, makeSession } from 'twofish-ts';
 
 import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
-import { getRandomBytes } from '../../random';
 import { BufferView, fillBuffer, joinBuffers } from '../../utils/buffers';
+import { getRandomBytes } from '../../utils/random';
 
 import { HeaderView, ICipher } from '../..';
 

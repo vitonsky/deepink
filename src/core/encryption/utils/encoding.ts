@@ -1,4 +1,4 @@
-import { joinBuffers } from './utils/buffers';
+import { joinBuffers } from './buffers';
 
 export function base64ToBytes(base64: string) {
 	const binString = atob(base64);
@@ -17,7 +17,7 @@ export function bytesToBase64(bytes: ArrayBuffer) {
  *
  * Useful for a really big buffers, to avoid `RangeError: invalid array length`
  */
-export const joinedBase64 = {
+export const extendedBase64 = {
 	/**
 	 * Convert a buffer to Base64 string with additional comma symbols
 	 */
