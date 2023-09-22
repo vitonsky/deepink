@@ -1,20 +1,31 @@
-let idCounter = 0;
+import { CleanupCallback } from '.';
 
-type PostMessageParams<D = any> = {
+export type PostMessageParams<D = any> = {
 	data: D;
 	transferObjects?: Transferable[];
 };
 
-type MessagePayload<T = any> = {
+export type MessagePayload<T = any> = {
+	/**
+	 * Message unique id
+	 */
 	id: number;
-	data: T;
-	responseTarget?: number;
+
+	/**
+	 * Id of message for response
+	 */
+	responseFor?: number;
+
+	/**
+	 * Message payload
+	 */
+	payload: T;
 };
 
-type ResponseCallback = (data: any, transferObjects?: Transferable[]) => void;
+export type ResponseCallback = (data: any, transferObjects?: Transferable[]) => void;
 
-// TODO: implement method to register request handlers
-// TODO: reject requests with not registered handlers
+let idCounter = 0;
+
 export class WorkerMessenger {
 	private readonly target;
 	constructor(target: Worker | Window) {
@@ -23,16 +34,17 @@ export class WorkerMessenger {
 
 	private postMessage(
 		{ data, transferObjects }: PostMessageParams,
-		responseTo?: number,
+		responseFor?: number,
 	) {
 		const messageId = ++idCounter;
 		const payload: MessagePayload = {
 			id: messageId,
-			data,
+			payload: data,
 		};
 
-		if (responseTo) {
-			payload.responseTarget = responseTo;
+		// Set only if exists
+		if (responseFor) {
+			payload.responseFor = responseFor;
 		}
 
 		// Send message
@@ -47,6 +59,9 @@ export class WorkerMessenger {
 		return messageId;
 	}
 
+	/**
+	 * Send message with no wait a response
+	 */
 	public sendMessage(data: any, transferObjects?: Transferable[]) {
 		return this.postMessage({ data, transferObjects });
 	}
@@ -63,9 +78,9 @@ export class WorkerMessenger {
 				const data = evt.data as MessagePayload;
 
 				// Handle only response on sent message
-				if (data.responseTarget === messageId) {
+				if (data.responseFor === messageId) {
 					(this.target as Worker).removeEventListener('message', onMessage);
-					resolve(data.data);
+					resolve(data.payload);
 				}
 			};
 
@@ -82,7 +97,7 @@ export class WorkerMessenger {
 			const data = evt.data as MessagePayload;
 
 			const requestId = data.id;
-			callback(data.data, (data, transferObjects) => {
+			callback(data.payload, (data, transferObjects) => {
 				this.postMessage({ data, transferObjects }, requestId);
 			});
 		};
@@ -100,81 +115,17 @@ export class WorkerMessenger {
 	}
 
 	private cleanupCallbacks: CleanupCallback[] = [];
+
+	/**
+	 * Terminate session
+	 *
+	 * Object must not be used after termination
+	 */
 	public destroy() {
 		if (this.target instanceof Worker) {
-			console.warn('Terminate worker!!');
 			this.target.terminate();
 		}
 
 		this.cleanupCallbacks.forEach((cleanup) => cleanup());
-	}
-}
-
-type CleanupCallback = () => void;
-type RequestPayload<T = any> = {
-	type: 'request' | 'response';
-	channel: string;
-	data: T;
-};
-
-export class WorkerRequests {
-	readonly messenger;
-	constructor(messenger: WorkerMessenger) {
-		this.messenger = messenger;
-	}
-
-	public sendRequest(channel: string, data: any, transferObjects?: Transferable[]) {
-		const message: RequestPayload = {
-			type: 'request',
-			channel,
-			data,
-		};
-		return this.messenger
-			.sendRequest(message, transferObjects)
-			.then((message: RequestPayload) => {
-				if (message.type !== 'response') return;
-
-				return message.data;
-			});
-	}
-
-	public addHandler(
-		channel: string,
-		handler: (data: any, response: ResponseCallback) => any,
-	) {
-		const cleanup = this.messenger.onMessage(
-			async (data: RequestPayload, response) => {
-				if (typeof data !== 'object' || data.channel !== channel) return;
-
-				let isResponded = false;
-				const responseProxy: ResponseCallback = (payload, transferObjects) => {
-					const message: RequestPayload = {
-						type: 'response',
-						channel,
-						data: payload,
-					};
-
-					const result = response(message, transferObjects);
-
-					// Mark as responded in case function complete successful
-					isResponded = true;
-
-					return result;
-				};
-
-				try {
-					await handler(data.data, responseProxy);
-					if (!isResponded) {
-						responseProxy(undefined);
-					}
-				} catch (err) {
-					if (!isResponded) {
-						console.warn('Request did not responded', { channel });
-					}
-				}
-			},
-		);
-
-		return cleanup;
 	}
 }

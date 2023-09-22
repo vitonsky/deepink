@@ -1,4 +1,6 @@
-import { WorkerMessenger, WorkerRequests } from '../workers/utils';
+import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
+import { WorkerRPC } from '../../utils/workers/WorkerRPC';
+
 import { ICipher } from '.';
 
 export class Terminable {
@@ -21,7 +23,7 @@ export class WorkerEncryptionController implements ICipher {
 	constructor(secretKey: string, salt: ArrayBuffer) {
 		const worker = new Worker('./cryptographyWorker.js');
 		this.messenger = new WorkerMessenger(worker);
-		this.requests = new WorkerRequests(this.messenger);
+		this.requests = new WorkerRPC(this.messenger);
 		this.worker = this.requests
 			.sendRequest('init', { secretKey, salt })
 			.then(() => worker);
