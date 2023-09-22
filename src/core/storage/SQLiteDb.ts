@@ -81,6 +81,8 @@ export const getDb = async ({
 			}
 
 			await db.exec(setupSQL);
+
+			// TODO: try to encrypt data. If does not work - fail
 		}
 
 		return db as Database<ExtendedSqliteDatabase, sqlite3.Statement>;
