@@ -1,6 +1,7 @@
 import { encrypt, makeSession } from 'twofish-ts';
 
 import { joinArrayBuffers } from '../../buffers';
+import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
 import { getRandomBits } from '../../random';
 
 import { HeaderView, ICipher } from '../..';
@@ -12,7 +13,7 @@ export type TwofishBufferHeaderStruct = {
 	iv: ArrayBuffer;
 };
 
-class BufferView {
+export class BufferView {
 	private readonly buffer;
 	constructor(buffer: ArrayBuffer) {
 		this.buffer = buffer;
@@ -101,7 +102,7 @@ function transformBuffer(
 	return out;
 }
 
-function xor(a: Uint8Array, b: Uint8Array) {
+export function xor(a: Uint8Array, b: Uint8Array) {
 	if (a.byteLength !== b.byteLength)
 		throw new TypeError('Buffers length are not equal');
 
@@ -114,62 +115,6 @@ function xor(a: Uint8Array, b: Uint8Array) {
 	return result;
 }
 
-export class CTRMode {
-	private readonly encryptBuffer;
-	private readonly blockSize;
-	constructor(
-		encryptBuffer: (buffer: ArrayBuffer) => Promise<ArrayBuffer>,
-		blockSize = 16,
-	) {
-		this.encryptBuffer = encryptBuffer;
-		this.blockSize = blockSize;
-	}
-
-	public async encrypt(buffer: ArrayBuffer, iv: ArrayBuffer) {
-		if (buffer.byteLength % this.blockSize !== 0)
-			throw new TypeError(`Buffer size is not multiple to ${this.blockSize}`);
-		if (iv.byteLength !== iv.byteLength)
-			throw new TypeError(
-				`Buffer size of initialization vector is not ${this.blockSize} bytes`,
-			);
-
-		const counterBuffer = new Uint8Array(this.blockSize);
-		const counterView = new DataView(counterBuffer.buffer);
-
-		const result = new Uint8Array(buffer.byteLength);
-		for (let offset = 0; offset < buffer.byteLength; offset += this.blockSize) {
-			// XOR a Nonce and Counter
-			const uniqueSequence = xor(new Uint8Array(iv), counterBuffer);
-
-			// Encrypt unique sequence
-			const encryptedSequence = await this.encryptBuffer(uniqueSequence.buffer);
-
-			// XOR unique sequence and block data,
-			// a data is a plain text for encryption and cipher text for decryption
-			const dataSlice = buffer.slice(offset, offset + this.blockSize);
-			const dataBlock = xor(
-				new Uint8Array(encryptedSequence),
-				new Uint8Array(dataSlice),
-			);
-
-			// Write block to a out buffer
-			result.set(dataBlock, offset);
-
-			// Increment counter
-			const nextCounter = counterView.getUint32(0) + 1;
-			counterView.setUint32(0, nextCounter);
-		}
-
-		return result.buffer;
-	}
-
-	public async decrypt(buffer: ArrayBuffer, iv: ArrayBuffer) {
-		// CTR mode do the same operation for decryption as for encryption,
-		// but instead of plain text it handles cipher text
-		return this.encrypt(buffer, iv);
-	}
-}
-
 /**
  * Twofish cipher implementation
  */
@@ -180,7 +125,7 @@ export class Twofish implements ICipher {
 	constructor(cipher: string) {
 		this.key = makeSession(new TextEncoder().encode(cipher));
 		this.header = new TwofishBufferHeader();
-		this.ctr = new CTRMode(this.encryptBuffer);
+		this.ctr = new CTRCipherMode(this.encryptBuffer);
 	}
 
 	private encryptBuffer = async (buffer: ArrayBuffer) => {
