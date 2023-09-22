@@ -65,13 +65,13 @@ function transformBuffer(
  * Twofish cipher implementation
  */
 export class Twofish implements ICipher {
-	private readonly header;
-	private readonly ctr;
 	private readonly key;
+	private readonly header;
+	private readonly ctrCipher;
 	constructor(cipher: string) {
 		this.key = makeSession(new TextEncoder().encode(cipher));
 		this.header = new TwofishBufferHeader();
-		this.ctr = new CTRCipherMode(this.encryptBuffer);
+		this.ctrCipher = new CTRCipherMode(this.encryptBuffer);
 	}
 
 	private encryptBuffer = async (buffer: ArrayBuffer) => {
@@ -84,7 +84,7 @@ export class Twofish implements ICipher {
 		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
 
 		const iv = getRandomBytes(blockSize);
-		const encryptedBuffer = await this.ctr.encrypt(bufferView, iv);
+		const encryptedBuffer = await this.ctrCipher.encrypt(bufferView, iv);
 
 		const header = this.header.createBuffer({ padding, iv });
 		return joinBuffers([header, encryptedBuffer]);
@@ -94,7 +94,10 @@ export class Twofish implements ICipher {
 		const { padding, iv } = this.header.readBuffer(buffer);
 
 		const encryptedBuffer = new Uint8Array(buffer.slice(this.header.bufferSize));
-		const decryptedBufferWithPaddings = await this.ctr.decrypt(encryptedBuffer, iv);
+		const decryptedBufferWithPaddings = await this.ctrCipher.decrypt(
+			encryptedBuffer,
+			iv,
+		);
 
 		const endOfDataOffset = decryptedBufferWithPaddings.byteLength - padding;
 		return decryptedBufferWithPaddings.slice(0, endOfDataOffset);
