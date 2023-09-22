@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 
-import { joinArrayBuffers } from './buffers';
+import { joinArrayBuffers } from './utils/buffers';
 import { HeaderView, ICipher } from '.';
 
 export type SizeObfuscationHeaderStruct = {

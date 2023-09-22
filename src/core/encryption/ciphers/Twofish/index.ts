@@ -1,8 +1,8 @@
 import { encrypt, makeSession } from 'twofish-ts';
 
-import { joinArrayBuffers } from '../../buffers';
 import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
 import { getRandomBits } from '../../random';
+import { BufferView, fillBuffer, joinArrayBuffers } from '../../utils/buffers';
 
 import { HeaderView, ICipher } from '../..';
 
@@ -12,32 +12,6 @@ export type TwofishBufferHeaderStruct = {
 	padding: number;
 	iv: ArrayBuffer;
 };
-
-export class BufferView {
-	private readonly buffer;
-	constructor(buffer: ArrayBuffer) {
-		this.buffer = buffer;
-	}
-
-	public getBytes(offset: number = 0, end?: number) {
-		return this.buffer.slice(offset, end);
-	}
-
-	public setBytes(buffer: ArrayBuffer, offset: number = 0) {
-		if (offset > this.buffer.byteLength)
-			throw new RangeError('Offset out of buffer size');
-		if (offset + buffer.byteLength > this.buffer.byteLength)
-			throw new RangeError(
-				'Buffer size with current offset will out of buffer size',
-			);
-
-		const srcBufferView = new Uint8Array(buffer);
-		const targetBufferView = new Uint8Array(this.buffer);
-		for (let srcOffset = 0; srcOffset < buffer.byteLength; srcOffset++) {
-			targetBufferView[offset + srcOffset] = srcBufferView[srcOffset];
-		}
-	}
-}
 
 export class TwofishBufferHeader implements HeaderView<TwofishBufferHeaderStruct> {
 	public readonly bufferSize = 32;
@@ -72,21 +46,6 @@ export class TwofishBufferHeader implements HeaderView<TwofishBufferHeaderStruct
 }
 
 /**
- * Fill buffer with paddings to ensure buffer size multiple 16
- * Before use original data you have to remove padding
- */
-function fillBuffer(buffer: Uint8Array): [Uint8Array, number] {
-	const padding = Math.ceil(buffer.length / blockSize) * blockSize - buffer.length;
-	if (padding === 0) return [buffer, 0];
-
-	// Create new buffer with padding
-	const out = new Uint8Array(buffer.length + padding);
-	out.set(buffer);
-
-	return [out, padding];
-}
-
-/**
  * Inner util to transform block with cipher
  * Util creates a new buffer instead of mutate original buffer.
  */
@@ -100,19 +59,6 @@ function transformBuffer(
 	}
 
 	return out;
-}
-
-export function xor(a: Uint8Array, b: Uint8Array) {
-	if (a.byteLength !== b.byteLength)
-		throw new TypeError('Buffers length are not equal');
-
-	const result = new Uint8Array(a.byteLength);
-	for (let offset = 0; offset < a.byteLength; offset += 1) {
-		// eslint-disable-next-line no-bitwise
-		result[offset] = a[offset] ^ b[offset];
-	}
-
-	return result;
 }
 
 /**

@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import crc32 from 'crc/calculators/crc32';
 
-import { joinArrayBuffers } from './buffers';
+import { joinArrayBuffers } from './utils/buffers';
 import { HeaderView, ICipher } from '.';
 
 export type IntegrityHeaderStruct = {

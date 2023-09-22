@@ -1,6 +1,6 @@
-import { joinArrayBuffers } from '../../buffers';
 import { IntegrityError } from '../../EncryptionIntegrityCheck';
 import { getRandomBits } from '../../random';
+import { joinArrayBuffers } from '../../utils/buffers';
 
 import { ICipher } from '../..';
 

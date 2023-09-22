@@ -1,4 +1,4 @@
-import { xor } from '../ciphers/Twofish';
+import { xor } from '../utils/xor';
 
 export class CTRCipherMode {
 	private readonly encryptBuffer;
