@@ -56,14 +56,12 @@ export async function getDerivedKey(passKey: string, salt: Uint8Array) {
 export class AESGCMCipher implements ICipher {
 	private readonly ivSize = 96;
 
-	private readonly key: Promise<CryptoKey>;
-	constructor(cipher: string, salt: Uint8Array) {
-		this.key = getDerivedKey(cipher, salt);
+	private readonly key;
+	constructor(key: CryptoKey) {
+		this.key = key;
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
-		const key = await this.key;
-
 		const iv = getRandomBytes(this.ivSize);
 		const encryptedBuffer = await self.crypto.subtle.encrypt(
 			{
@@ -78,7 +76,7 @@ export class AESGCMCipher implements ICipher {
 				// can be 32, 64, 96, 104, 112, 120 or 128 (default)
 				tagLength: 128,
 			},
-			key,
+			this.key,
 			buffer,
 		);
 
@@ -87,8 +85,6 @@ export class AESGCMCipher implements ICipher {
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
-		const key = await this.key;
-
 		// Extract data of cipher-buffer
 		const iv = buffer.slice(0, this.ivSize);
 		const encryptedBuffer = buffer.slice(this.ivSize);
@@ -103,7 +99,7 @@ export class AESGCMCipher implements ICipher {
 					//The tagLength you used to encrypt (if any)
 					tagLength: 128,
 				},
-				key,
+				this.key,
 				encryptedBuffer,
 			)
 			.catch((err) => {

@@ -2,7 +2,7 @@ import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
 import { WorkerRPC } from '../../utils/workers/WorkerRPC';
 
 import { BufferSizeObfuscator } from '../encryption/BufferSizeObfuscator';
-import { AESGCMCipher } from '../encryption/ciphers/AES';
+import { AESGCMCipher, getDerivedKey } from '../encryption/ciphers/AES';
 import { CascadeCipher } from '../encryption/ciphers/CascadeCipher';
 import { TwofishCTRCipher } from '../encryption/ciphers/Twofish';
 import { EncryptionController } from '../encryption/EncryptionController';
@@ -18,12 +18,15 @@ const workerId = performance.now();
 requests.addHandler('init', async ({ secretKey, salt }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
+	const aesKey = await getDerivedKey('secretKey', salt);
+	const twofishKey = new TextEncoder().encode(secretKey);
+
 	encryptionController = new EncryptionController(
 		new EncryptionIntegrityCheck(
 			new BufferSizeObfuscator(
 				new CascadeCipher([
-					new AESGCMCipher('secretKey', salt),
-					new TwofishCTRCipher(secretKey),
+					new AESGCMCipher(aesKey),
+					new TwofishCTRCipher(twofishKey),
 				]),
 			),
 		),

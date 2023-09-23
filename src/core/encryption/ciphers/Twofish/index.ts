@@ -76,8 +76,8 @@ export class TwofishCTRCipher implements ICipher {
 	private readonly key;
 	private readonly header;
 	private readonly ctrCipher;
-	constructor(cipher: string) {
-		this.key = makeSession(new TextEncoder().encode(cipher));
+	constructor(cipher: Uint8Array) {
+		this.key = makeSession(cipher);
 		this.header = new TwofishBufferHeader(this.ivSize);
 		this.ctrCipher = new CTRCipherMode(this.encryptBuffer);
 	}
