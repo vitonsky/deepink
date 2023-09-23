@@ -14,18 +14,23 @@ export class CTRCipherMode {
 	public async encrypt(buffer: ArrayBuffer, iv: ArrayBuffer) {
 		if (buffer.byteLength % this.blockSize !== 0)
 			throw new TypeError(`Buffer size is not multiple to ${this.blockSize}`);
-		if (iv.byteLength !== iv.byteLength)
+		if (iv.byteLength % this.blockSize !== 0)
 			throw new TypeError(
-				`Buffer size of initialization vector is not ${this.blockSize} bytes`,
+				`Initialization vector size is not multiple to ${this.blockSize} bytes`,
 			);
 
 		const counterBuffer = new Uint8Array(this.blockSize);
 		const counterView = new DataView(counterBuffer.buffer);
+		const ivView = new Uint8Array(iv);
 
-		const result = new Uint8Array(buffer.byteLength);
+		const out = new Uint8Array(buffer.byteLength);
 		for (let offset = 0; offset < buffer.byteLength; offset += this.blockSize) {
 			// XOR a Nonce and Counter
-			const uniqueSequence = xor(new Uint8Array(iv), counterBuffer);
+			const ivOffset = offset % ivView.byteLength;
+			const uniqueSequence = xor(
+				ivView.slice(ivOffset, ivOffset + this.blockSize),
+				counterBuffer,
+			);
 
 			// Encrypt unique sequence
 			const encryptedSequence = await this.encryptBuffer(uniqueSequence.buffer);
@@ -39,14 +44,14 @@ export class CTRCipherMode {
 			);
 
 			// Write block to a out buffer
-			result.set(dataBlock, offset);
+			out.set(dataBlock, offset);
 
 			// Increment counter
 			const nextCounter = counterView.getUint32(0) + 1;
 			counterView.setUint32(0, nextCounter);
 		}
 
-		return result.buffer;
+		return out.buffer;
 	}
 
 	public async decrypt(buffer: ArrayBuffer, iv: ArrayBuffer) {
