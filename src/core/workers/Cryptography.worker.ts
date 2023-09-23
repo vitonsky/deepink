@@ -2,11 +2,12 @@ import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
 import { WorkerRPC } from '../../utils/workers/WorkerRPC';
 
 import { BufferSizeObfuscator } from '../encryption/BufferSizeObfuscator';
-import { AESGCMCipher, getDerivedKey } from '../encryption/ciphers/AES';
+import { AESGCMCipher } from '../encryption/ciphers/AES';
 import { CascadeCipher } from '../encryption/ciphers/CascadeCipher';
 import { TwofishCTRCipher } from '../encryption/ciphers/Twofish';
 import { EncryptionController } from '../encryption/EncryptionController';
 import { EncryptionIntegrityCheck } from '../encryption/EncryptionIntegrityCheck';
+import { getDerivedKeysManager, getMasterKey } from '../encryption/utils/keys';
 
 console.log('Hello world from worker');
 
@@ -18,8 +19,17 @@ const workerId = performance.now();
 requests.addHandler('init', async ({ secretKey, salt }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
-	const aesKey = await getDerivedKey('secretKey', salt);
-	const twofishKey = new TextEncoder().encode(secretKey);
+	const derivedKeys = await getMasterKey(secretKey).then((masterKey) =>
+		getDerivedKeysManager(masterKey, salt),
+	);
+
+	const aesKey = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
+		name: 'AES-GCM',
+		length: 256,
+	});
+	const twofishKey = await derivedKeys
+		.getDerivedBytes('twofish-ctr-cipher', 256)
+		.then((buffer) => new Uint8Array(buffer));
 
 	encryptionController = new EncryptionController(
 		new EncryptionIntegrityCheck(

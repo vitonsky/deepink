@@ -4,50 +4,6 @@ import { getRandomBytes } from '../../utils/random';
 
 import { ICipher } from '../..';
 
-export async function getDerivedKey(passKey: string, salt: Uint8Array) {
-	const codec = new TextEncoder();
-	const keyBytes = codec.encode(passKey);
-
-	const derivedKey = await self.crypto.subtle
-		.importKey('raw', keyBytes, { name: 'PBKDF2' }, false, [
-			'deriveBits',
-			'deriveKey',
-		])
-		.then((key) => {
-			return self.crypto.subtle.deriveKey(
-				{
-					name: 'PBKDF2',
-					salt,
-					iterations: 100,
-					hash: 'SHA-512',
-				},
-				key,
-
-				// For AES the length required to be 128 or 256 bits (not bytes)
-				{ name: 'AES-CBC', length: 256 },
-
-				// Whether or not the key is extractable (less secure) or not (more secure)
-				// when false, the key can only be passed as a web crypto object, not inspected
-				true,
-
-				// this web crypto object will only be allowed for these functions
-				['encrypt', 'decrypt'],
-			);
-		})
-		.then((webKey) => crypto.subtle.exportKey('raw', webKey));
-
-	return self.crypto.subtle.importKey(
-		'raw',
-		derivedKey,
-		{
-			//this is the algorithm options
-			name: 'AES-GCM',
-		},
-		false,
-		['encrypt', 'decrypt'],
-	);
-}
-
 /**
  * AES-GCM cipher
  * MDN: https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams

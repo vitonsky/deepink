@@ -26,7 +26,7 @@ import { WorkspaceManager } from './WorkspaceManager';
 
 import './App.css';
 
-// TODO: generate salt
+// TODO: generate 32 bytes salt and then encode as base64
 // TODO: keep salt in user profile directory
 
 const codec = new TextEncoder();
@@ -43,7 +43,7 @@ export const App: FC = () => {
 	// TODO: key must be removed of memory after use
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile118';
+	const workspaceName = 'defaultProfile123';
 
 	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
 	useEffect(() => {
