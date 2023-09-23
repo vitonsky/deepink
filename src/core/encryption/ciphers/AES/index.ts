@@ -54,7 +54,7 @@ export async function getDerivedKey(passKey: string, salt: Uint8Array) {
  * Algorithm recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
  */
 export class AESCipher implements ICipher {
-	private readonly ivLen = 96;
+	private readonly ivSize = 96;
 
 	private readonly key: Promise<CryptoKey>;
 	constructor(cipher: string, salt: Uint8Array) {
@@ -64,7 +64,7 @@ export class AESCipher implements ICipher {
 	public async encrypt(buffer: ArrayBuffer) {
 		const key = await this.key;
 
-		const iv = getRandomBytes(this.ivLen);
+		const iv = getRandomBytes(this.ivSize);
 		const encryptedBuffer = await self.crypto.subtle.encrypt(
 			{
 				name: 'AES-GCM',
@@ -90,8 +90,8 @@ export class AESCipher implements ICipher {
 		const key = await this.key;
 
 		// Extract data of cipher-buffer
-		const iv = buffer.slice(0, this.ivLen);
-		const encryptedBuffer = buffer.slice(this.ivLen);
+		const iv = buffer.slice(0, this.ivSize);
+		const encryptedBuffer = buffer.slice(this.ivSize);
 
 		return self.crypto.subtle
 			.decrypt(

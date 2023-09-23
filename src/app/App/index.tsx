@@ -43,7 +43,7 @@ export const App: FC = () => {
 	// TODO: key must be removed of memory after use
 	const [secretKey, setSecretKey] = useState<null | string>(null);
 	const [workspaceError, setWorkspaceError] = useState<null | string>(null);
-	const workspaceName = 'defaultProfile116';
+	const workspaceName = 'defaultProfile118';
 
 	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
 	useEffect(() => {

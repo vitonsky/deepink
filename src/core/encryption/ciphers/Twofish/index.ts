@@ -14,11 +14,16 @@ export type TwofishBufferHeaderStruct = {
 };
 
 export class TwofishBufferHeader implements HeaderView<TwofishBufferHeaderStruct> {
-	public readonly bufferSize = 32;
+	public readonly bufferSize = 128;
 	private readonly offsets = {
 		padding: 0,
 		iv: 1,
 	};
+
+	private readonly ivSize;
+	constructor(ivSize: number) {
+		this.ivSize = ivSize;
+	}
 
 	public createBuffer(data: TwofishBufferHeaderStruct): ArrayBuffer {
 		const buffer = new ArrayBuffer(this.bufferSize);
@@ -40,7 +45,7 @@ export class TwofishBufferHeader implements HeaderView<TwofishBufferHeaderStruct
 
 		return {
 			padding: view.getUint8(this.offsets.padding),
-			iv: rawView.getBytes(this.offsets.iv, this.offsets.iv + blockSize),
+			iv: rawView.getBytes(this.offsets.iv, this.offsets.iv + this.ivSize),
 		};
 	}
 }
@@ -65,12 +70,14 @@ function transformBuffer(
  * Twofish cipher implementation
  */
 export class Twofish implements ICipher {
+	private readonly ivSize = 96;
+
 	private readonly key;
 	private readonly header;
 	private readonly ctrCipher;
 	constructor(cipher: string) {
 		this.key = makeSession(new TextEncoder().encode(cipher));
-		this.header = new TwofishBufferHeader();
+		this.header = new TwofishBufferHeader(this.ivSize);
 		this.ctrCipher = new CTRCipherMode(this.encryptBuffer);
 	}
 
@@ -83,7 +90,7 @@ export class Twofish implements ICipher {
 	public async encrypt(buffer: ArrayBuffer) {
 		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
 
-		const iv = getRandomBytes(blockSize);
+		const iv = getRandomBytes(this.ivSize);
 		const encryptedBuffer = await this.ctrCipher.encrypt(bufferView, iv);
 
 		const header = this.header.createBuffer({ padding, iv });
