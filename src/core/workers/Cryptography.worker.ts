@@ -19,7 +19,7 @@ const workerId = performance.now();
 requests.addHandler('init', async ({ secretKey, salt }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
-	const derivedKeys = await getMasterKey(secretKey).then((masterKey) =>
+	const derivedKeys = await getMasterKey(secretKey, salt).then((masterKey) =>
 		getDerivedKeysManager(masterKey, salt),
 	);
 

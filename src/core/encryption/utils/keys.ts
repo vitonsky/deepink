@@ -1,18 +1,48 @@
 import { joinBuffers } from './buffers';
 
 /**
- * Creates `CryptoKey` from master password
+ * Creates and return derived `CryptoKey` from a master password
  */
-export async function getMasterKey(masterPassword: string) {
+export async function getMasterKey(masterPassword: string, salt: ArrayBuffer) {
 	const codec = new TextEncoder();
 
-	return await self.crypto.subtle.importKey(
-		'raw',
-		codec.encode(masterPassword),
-		{ name: 'PBKDF2' },
-		false,
-		['deriveBits', 'deriveKey'],
-	);
+	return await self.crypto.subtle
+		.importKey('raw', codec.encode(masterPassword), { name: 'PBKDF2' }, false, [
+			'deriveBits',
+			'deriveKey',
+		])
+		// We don't want to use key from original password, only derived keys,
+		// so here we derive a new key based on password
+		.then((key) =>
+			self.crypto.subtle.deriveKey(
+				{
+					name: 'PBKDF2',
+					salt: new Uint8Array(salt),
+					iterations: 100000,
+					hash: 'SHA-512',
+				},
+				key,
+				{
+					name: 'AES-GCM',
+					length: 256,
+				},
+
+				// Whether or not the key is extractable
+				true,
+
+				// This usage limitations will be ignored, because we import and then export key with new permissions
+				['encrypt', 'decrypt'],
+			),
+		)
+		// Export and import of key is necessary, to bypass limitation about key can't be derived of derived key
+		// Otherwise generates error `DOMException: key.algorithm does not match that of operation`
+		.then((key) => self.crypto.subtle.exportKey('raw', key))
+		.then((key) =>
+			self.crypto.subtle.importKey('raw', key, { name: 'PBKDF2' }, false, [
+				'deriveBits',
+				'deriveKey',
+			]),
+		);
 }
 
 type KeyAlgorithm =
@@ -29,7 +59,7 @@ export async function getDerivedKeysManager(masterKey: CryptoKey, salt: Uint8Arr
 	const codec = new TextEncoder();
 
 	const getScopedSalt = (scope: string) =>
-		joinBuffers([salt.buffer, codec.encode(scope).buffer]);
+		joinBuffers([codec.encode(scope).buffer, salt.buffer]);
 
 	return {
 		async getDerivedKey(context: string, algorithm: KeyAlgorithm) {
