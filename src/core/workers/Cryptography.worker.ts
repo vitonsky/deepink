@@ -2,9 +2,9 @@ import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
 import { WorkerRPC } from '../../utils/workers/WorkerRPC';
 
 import { BufferSizeObfuscator } from '../encryption/BufferSizeObfuscator';
-import { AESCipher } from '../encryption/ciphers/AES';
+import { AESGCMCipher } from '../encryption/ciphers/AES';
 import { CascadeCipher } from '../encryption/ciphers/CascadeCipher';
-import { Twofish } from '../encryption/ciphers/Twofish';
+import { TwofishCTRCipher } from '../encryption/ciphers/Twofish';
 import { EncryptionController } from '../encryption/EncryptionController';
 import { EncryptionIntegrityCheck } from '../encryption/EncryptionIntegrityCheck';
 
@@ -22,8 +22,8 @@ requests.addHandler('init', async ({ secretKey, salt }) => {
 		new EncryptionIntegrityCheck(
 			new BufferSizeObfuscator(
 				new CascadeCipher([
-					new AESCipher('secretKey', salt),
-					new Twofish(secretKey),
+					new AESGCMCipher('secretKey', salt),
+					new TwofishCTRCipher(secretKey),
 				]),
 			),
 		),

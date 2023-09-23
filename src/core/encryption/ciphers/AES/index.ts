@@ -53,7 +53,7 @@ export async function getDerivedKey(passKey: string, salt: Uint8Array) {
  * MDN: https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams
  * Algorithm recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
  */
-export class AESCipher implements ICipher {
+export class AESGCMCipher implements ICipher {
 	private readonly ivSize = 96;
 
 	private readonly key: Promise<CryptoKey>;

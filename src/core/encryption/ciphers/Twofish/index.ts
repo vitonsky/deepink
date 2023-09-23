@@ -66,10 +66,11 @@ function transformBuffer(
 	return out;
 }
 
+// TODO: implement GCM mode https://en.wikipedia.org/wiki/Galois/Counter_Mode
 /**
  * Twofish cipher implementation
  */
-export class Twofish implements ICipher {
+export class TwofishCTRCipher implements ICipher {
 	private readonly ivSize = 96;
 
 	private readonly key;
