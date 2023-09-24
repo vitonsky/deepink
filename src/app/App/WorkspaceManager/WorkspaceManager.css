@@ -8,7 +8,7 @@
 }
 
 .WorkspaceManager-Container {
-	width: 350px;
+	width: 300px;
 	margin: auto;
 	display: flex;
 	flex-flow: column;

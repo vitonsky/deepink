@@ -31,12 +31,6 @@ import { NewProfile } from './WorkspaceManager/ProfileCreator';
 
 import './App.css';
 
-// TODO: generate 32 bytes salt and then encode as base64
-// TODO: keep salt in user profile directory
-
-const codec = new TextEncoder();
-const salt = codec.encode("=aG$<jPJQ}qqHh?iUB%]c(x'xp(ynZ");
-
 export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteData) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
@@ -44,8 +38,6 @@ export const getNoteTitle = (note: INoteData) =>
 const pm = new ProfilesManager();
 
 // TODO: remove secrets of closure
-// TODO: all keys must be derived, never use primary key directly for encryption
-// TODO: implement profiles management
 export const App: FC = () => {
 	const [profiles, setProfiles] = useState<null | ProfileObject[]>(null);
 	const updateProfiles = useCallback(() => {
