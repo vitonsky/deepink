@@ -226,6 +226,7 @@ export const App: FC = () => {
 
 	const [currentProfile, setCurrentProfile] = useState<null | string>(null);
 
+	// TODO: remember selected profile
 	// TODO: show only if workspace requires password
 	if (db === null) {
 		return (

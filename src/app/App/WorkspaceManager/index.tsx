@@ -88,6 +88,9 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							key={profile.id}
 							onClick={() => {
 								onChooseProfile(profile.id);
+								if (profile.encryption === null) {
+									onOpenProfile(profile.id);
+								}
 							}}
 						>
 							{profile.name}
