@@ -20,7 +20,7 @@ export class WorkerEncryptionController implements ICipher {
 	private readonly worker;
 	private readonly messenger;
 	private readonly requests;
-	constructor(secretKey: string, salt: ArrayBuffer) {
+	constructor(secretKey: string | ArrayBuffer, salt: ArrayBuffer) {
 		const worker = new Worker('./cryptographyWorker.js');
 		this.messenger = new WorkerMessenger(worker);
 		this.requests = new WorkerRPC(this.messenger);

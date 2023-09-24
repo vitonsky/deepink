@@ -19,6 +19,9 @@ const workerId = performance.now();
 requests.addHandler('init', async ({ secretKey, salt }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
+	if (!(salt instanceof Uint8Array))
+		throw new Error('Salt is not instance of Uint8Array');
+
 	const derivedKeys = await getMasterKey(secretKey, salt).then((masterKey) =>
 		getDerivedKeysManager(masterKey, salt),
 	);

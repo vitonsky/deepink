@@ -6,7 +6,7 @@ import { useFocusableRef } from '../../../components/hooks/useFocusableRef';
 
 import { cnWorkspaceManager } from '..';
 
-type NewProfile = {
+export type NewProfile = {
 	name: string;
 	password: string | null;
 };

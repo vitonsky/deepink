@@ -3,14 +3,19 @@ import { joinBuffers } from './buffers';
 /**
  * Creates and return derived `CryptoKey` from a master password
  */
-export async function getMasterKey(masterPassword: string, salt: ArrayBuffer) {
+export async function getMasterKey(
+	masterPassword: string | ArrayBuffer,
+	salt: ArrayBuffer,
+) {
 	const codec = new TextEncoder();
 
+	const key =
+		typeof masterPassword === 'string'
+			? codec.encode(masterPassword)
+			: masterPassword;
+
 	return await self.crypto.subtle
-		.importKey('raw', codec.encode(masterPassword), { name: 'PBKDF2' }, false, [
-			'deriveBits',
-			'deriveKey',
-		])
+		.importKey('raw', key, { name: 'PBKDF2' }, false, ['deriveBits', 'deriveKey'])
 		// We don't want to use key from original password, only derived keys,
 		// so here we derive a new key based on password
 		.then((key) =>
