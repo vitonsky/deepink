@@ -3,8 +3,6 @@ import path from 'path';
 
 import { getUserDataPath } from '../../electron/requests/files/renderer';
 
-import { bytesToBase64 } from '../encryption/utils/encoding';
-import { getRandomBytes } from '../encryption/utils/random';
 import { readFile, writeFile } from 'fs/promises';
 
 export type ProfileObject = {
@@ -16,6 +14,7 @@ export type ProfileObject = {
 	};
 };
 
+// TODO: abstract of node environment
 // TODO: implement delete method
 // TODO: implement update method
 export class ProfilesManager {
@@ -39,16 +38,14 @@ export class ProfilesManager {
 		}
 	}
 
-	public async add(profile: { name: string }): Promise<ProfileObject> {
+	public async add(
+		profileData: Pick<ProfileObject, 'name' | 'encryption'>,
+	): Promise<ProfileObject> {
 		const profiles = await this.getProfiles();
 
 		const newProfile: ProfileObject = {
+			...profileData,
 			id: self.crypto.randomUUID(),
-			name: profile.name,
-			encryption: {
-				algorithm: 'default',
-				salt: bytesToBase64(getRandomBytes(96)),
-			},
 		};
 
 		profiles.push(newProfile);

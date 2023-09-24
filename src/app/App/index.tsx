@@ -5,7 +5,8 @@ import { cn } from '@bem-react/classname';
 
 import { IEncryptionController } from '../../core/encryption';
 import { EncryptionController } from '../../core/encryption/EncryptionController';
-import { base64ToBytes } from '../../core/encryption/utils/encoding';
+import { PlaceholderEncryptionController } from '../../core/encryption/PlaceholderEncryptionController';
+import { base64ToBytes, bytesToBase64 } from '../../core/encryption/utils/encoding';
 import { getRandomBytes } from '../../core/encryption/utils/random';
 import { WorkerEncryptionController } from '../../core/encryption/WorkerEncryptionController';
 import { INoteData } from '../../core/Note';
@@ -35,59 +36,152 @@ export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteData) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
 
-const pm = new ProfilesManager();
-
 // TODO: remove secrets of closure
 export const App: FC = () => {
+	const [profilesManager] = useState(() => new ProfilesManager());
 	const [profiles, setProfiles] = useState<null | ProfileObject[]>(null);
 	const updateProfiles = useCallback(() => {
-		pm.getProfiles().then(setProfiles);
-	}, []);
+		profilesManager.getProfiles().then(setProfiles);
+	}, [profilesManager]);
 
+	// Load profiles
 	useEffect(() => {
 		updateProfiles();
 	}, [updateProfiles]);
 
 	const createProfile = useCallback(
 		async (profile: NewProfile) => {
-			if (profile.password === null)
-				return 'Profiles with no passwords does not supported';
+			if (profile.password === null) {
+				const newProfile = await profilesManager.add({
+					name: profile.name,
+					encryption: null,
+				});
 
-			const newProfile = await pm.add({ name: profile.name });
+				const profileDir = await getUserDataPath(newProfile.id);
 
-			const salt = base64ToBytes(newProfile.encryption!.salt);
-			const workerController = new WorkerEncryptionController(
-				profile.password,
-				new Uint8Array(salt),
-			);
-			const encryption = new EncryptionController(workerController);
+				// Ensure profile dir exists
+				mkdirSync(profileDir, { recursive: true });
+			} else {
+				const salt = getRandomBytes(96);
+				const newProfile = await profilesManager.add({
+					name: profile.name,
+					encryption: {
+						algorithm: 'default',
+						salt: bytesToBase64(salt),
+					},
+				});
 
-			const key = getRandomBytes(32);
-			const encryptedKey = await encryption.encrypt(key);
+				const workerController = new WorkerEncryptionController(
+					profile.password,
+					new Uint8Array(salt),
+				);
+				const encryption = new EncryptionController(workerController);
 
-			workerController.terminate();
+				const key = getRandomBytes(32);
+				const encryptedKey = await encryption.encrypt(key);
 
-			const profileDir = await getUserDataPath(newProfile.id);
+				workerController.terminate();
 
-			// Ensure profile dir exists
-			mkdirSync(profileDir, { recursive: true });
+				const profileDir = await getUserDataPath(newProfile.id);
 
-			// Write encrypted key
-			const keyPath = path.join(profileDir, 'key');
-			await writeFile(keyPath, new Uint8Array(encryptedKey));
+				// Ensure profile dir exists
+				mkdirSync(profileDir, { recursive: true });
+
+				// Write encrypted key
+				const keyPath = path.join(profileDir, 'key');
+				await writeFile(keyPath, new Uint8Array(encryptedKey));
+			}
 
 			updateProfiles();
 
 			return undefined;
 		},
-		[updateProfiles],
+		[profilesManager, updateProfiles],
 	);
-
-	const [db, setDb] = useState<null | SQLiteDb>(null);
-	const [profileDir, setProfileDir] = useState<null | string>(null);
 
 	// TODO: key must be removed of memory after use
 	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
+	const [db, setDb] = useState<null | SQLiteDb>(null);
+	const [profileDir, setProfileDir] = useState<null | string>(null);
+
+	// TODO: remove key of RAM. Set control with callback to remove key
+	const onOpenProfile: OnPickProfile = useCallback(
+		async (id: string, password?: string) => {
+			if (!profiles) return { status: 'error', message: 'Profile does not exists' };
+
+			const profile = profiles.find((profile) => profile.id === id);
+			if (!profile) return { status: 'error', message: 'Profile not exists' };
+
+			const profileDir = await getUserDataPath(profile.id);
+
+			// Ensure profile dir exists
+			mkdirSync(profileDir, { recursive: true });
+
+			const dbPath = path.join(profileDir, 'deepink.db');
+			const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
+
+			// Profiles with no password
+			if (!profile.encryption) {
+				const encryption = new EncryptionController(
+					new PlaceholderEncryptionController(),
+				);
+
+				await getDb({
+					dbPath,
+					dbExtensionsDir,
+					encryption: encryption,
+				}).then(setDb);
+
+				setEncryption(encryption);
+				setProfileDir(profile.id);
+
+				return { status: 'ok' };
+			}
+
+			// Decrypt key
+			if (password === undefined)
+				return { status: 'error', message: 'Enter password' };
+
+			const keyFilePath = path.join(profileDir, 'key');
+			if (!existsSync(keyFilePath)) {
+				return { status: 'error', message: 'Key file not found' };
+			}
+
+			const encryptedKeyFile = await readFile(keyFilePath);
+			const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
+
+			const workerEncryptionForKey = new WorkerEncryptionController(password, salt);
+			const encryptionForKey = new EncryptionController(workerEncryptionForKey);
+			const key = await encryptionForKey
+				.decrypt(encryptedKeyFile.buffer)
+				.finally(() => {
+					workerEncryptionForKey.terminate();
+				});
+
+			const workerController = new WorkerEncryptionController(key, salt);
+			const encryption = new EncryptionController(workerController);
+
+			try {
+				await getDb({
+					dbPath,
+					dbExtensionsDir,
+					encryption: encryption,
+				}).then(setDb);
+
+				setEncryption(encryption);
+				setProfileDir(profile.id);
+
+				return { status: 'ok' };
+			} catch (err) {
+				workerController.terminate();
+
+				console.error(err);
+
+				return { status: 'error', message: 'Invalid password' };
+			}
+		},
+		[profiles],
+	);
 
 	const [providedAppContext, setProvidedAppContext] = useState<Omit<
 		ProvidedAppContext,
@@ -131,80 +225,6 @@ export const App: FC = () => {
 	});
 
 	const [currentProfile, setCurrentProfile] = useState<null | string>(null);
-
-	const onOpenProfile: OnPickProfile = useCallback(
-		async (id: string, password?: string) => {
-			if (!profiles) return { status: 'error', message: 'Profile does not exists' };
-
-			const profile = profiles.find((profile) => profile.id === id);
-			if (!profile) return { status: 'error', message: 'Profile not exists' };
-			if (password === undefined) {
-				if (profile.encryption) {
-					return { status: 'error', message: 'Enter password' };
-				}
-
-				// TODO: implement immediate open not encrypted profiles
-				return { status: 'ok' };
-			}
-
-			const profileDir = await getUserDataPath(profile.id);
-
-			// Ensure profile dir exists
-			mkdirSync(profileDir, { recursive: true });
-
-			const keyFilePath = path.join(profileDir, 'key');
-			if (!existsSync(keyFilePath)) {
-				return { status: 'error', message: 'Key file not found' };
-			}
-
-			const encryptedKeyFile = await readFile(keyFilePath);
-			const salt = new Uint8Array(base64ToBytes(profile.encryption!.salt));
-
-			function toArrayBuffer(buffer: Buffer) {
-				const arrayBuffer = new ArrayBuffer(buffer.length);
-				const view = new Uint8Array(arrayBuffer);
-				for (let i = 0; i < buffer.length; ++i) {
-					view[i] = buffer[i];
-				}
-				return arrayBuffer;
-			}
-
-			const workerController0 = new WorkerEncryptionController(password, salt);
-			const encryption0 = new EncryptionController(workerController0);
-			const key = await encryption0.decrypt(toArrayBuffer(encryptedKeyFile));
-			workerController0.terminate();
-
-			const workerController = new WorkerEncryptionController(key, salt);
-			const encryption = new EncryptionController(workerController);
-
-			const dbPath = path.join(profileDir, 'deepink.db');
-			const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
-
-			try {
-				await getDb({
-					dbPath,
-					dbExtensionsDir,
-					encryption: encryption,
-				}).then((db) => {
-					// TODO: remove key of RAM after use. Use key only here
-					// setSecretKey(null);
-					setDb(db);
-				});
-
-				setEncryption(encryption);
-				setProfileDir(profile.id);
-
-				return { status: 'ok' };
-			} catch (err) {
-				workerController.terminate();
-
-				console.error(err);
-
-				return { status: 'error', message: 'Invalid password' };
-			}
-		},
-		[profiles],
-	);
 
 	// TODO: show only if workspace requires password
 	if (db === null) {
