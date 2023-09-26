@@ -1,6 +1,6 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
+import { globSync } from 'fast-glob';
 import { lstatSync } from 'fs';
-import { globSync } from 'glob';
 
 import * as filesUtils from '../../utils/files';
 
