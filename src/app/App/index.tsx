@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
@@ -15,6 +15,7 @@ import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { Tags } from '../../core/Registry/Tags/Tags';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
+import { ConfigStorage } from '../../core/storage/ConfigStorage';
 import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import {
@@ -31,6 +32,8 @@ import { OnPickProfile, WorkspaceManager } from './WorkspaceManager';
 import { NewProfile } from './WorkspaceManager/ProfileCreator';
 
 import './App.css';
+
+const config = new ConfigStorage();
 
 export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteData) =>
@@ -225,6 +228,36 @@ export const App: FC = () => {
 	});
 
 	const [currentProfile, setCurrentProfile] = useState<null | string>(null);
+	const isActiveProfileRestoredRef = useRef(false);
+	useEffect(() => {
+		if (profiles === null) return;
+		if (isActiveProfileRestoredRef.current) return;
+
+		config.get('activeProfile').then((activeProfile) => {
+			isActiveProfileRestoredRef.current = true;
+
+			if (activeProfile) {
+				setCurrentProfile(activeProfile);
+
+				if (!profiles) return;
+
+				const profile = profiles.find((profile) => profile.id === activeProfile);
+				if (!profile) return;
+
+				if (profile.encryption === null) {
+					onOpenProfile(profile.id);
+				}
+			}
+		});
+	}, [onOpenProfile, profiles]);
+
+	const onChooseProfile = useCallback((profileId: string | null) => {
+		if (profileId !== null) {
+			config.set('activeProfile', profileId);
+		}
+
+		setCurrentProfile(profileId);
+	}, []);
 
 	// TODO: remember selected profile
 	// TODO: show only if workspace requires password
@@ -233,7 +266,7 @@ export const App: FC = () => {
 			<WorkspaceManager
 				profiles={profiles ?? []}
 				currentProfile={currentProfile}
-				onChooseProfile={setCurrentProfile}
+				onChooseProfile={onChooseProfile}
 				onOpenProfile={onOpenProfile}
 				onCreateProfile={createProfile}
 			/>
