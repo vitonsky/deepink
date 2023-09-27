@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useStore } from 'effector-react';
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
@@ -14,6 +15,7 @@ import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { Tags } from '../../core/Registry/Tags/Tags';
+import { $activeProfile, changedActiveProfile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
 import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
@@ -137,6 +139,11 @@ export const App: FC = () => {
 
 				setEncryption(encryption);
 				setProfileDir(profile.id);
+				changedActiveProfile({
+					id: profile.id,
+					name: profile.name,
+					isEncrypted: false,
+				});
 
 				return { status: 'ok' };
 			}
@@ -173,6 +180,11 @@ export const App: FC = () => {
 
 				setEncryption(encryption);
 				setProfileDir(profile.id);
+				changedActiveProfile({
+					id: profile.id,
+					name: profile.name,
+					isEncrypted: true,
+				});
 
 				return { status: 'ok' };
 			} catch (err) {
@@ -214,6 +226,15 @@ export const App: FC = () => {
 			notesRegistry,
 		});
 	}, [db, encryption, profileDir]);
+
+	const activeProfile = useStore($activeProfile);
+	useEffect(() => {
+		if (activeProfile === null) {
+			// TODO: terminate all processes for previous active profile: db, encryption, files, etc
+			setProvidedAppContext(null);
+			setDb(null);
+		}
+	}, [activeProfile]);
 
 	useEffect(() => {
 		if (!providedAppContext) return;

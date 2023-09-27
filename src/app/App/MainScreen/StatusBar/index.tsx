@@ -4,6 +4,7 @@ import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/
 import { cn } from '@bem-react/classname';
 
 import { INotesRegistry } from '../../../../core/Registry';
+import { changedActiveProfile } from '../../../../core/state/profiles';
 
 import { useImportNotes } from './buttons/useImportNotes';
 
@@ -43,6 +44,13 @@ export const StatusBar: FC<StatusBarProps> = ({
 					disabled={isNotesImportInProgress}
 				>
 					Import
+				</Button>
+				<Button
+					size="s"
+					view="default"
+					onClick={() => changedActiveProfile(null)}
+				>
+					Change profile
 				</Button>
 			</div>
 			<div className={cnStatusBar('StatusContainer')}>
