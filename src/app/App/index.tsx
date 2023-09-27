@@ -4,7 +4,6 @@ import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
 
-import { IEncryptionController } from '../../core/encryption';
 import { EncryptionController } from '../../core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '../../core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes, bytesToBase64 } from '../../core/encryption/utils/encoding';
@@ -15,7 +14,7 @@ import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { NotesRegistry } from '../../core/Registry/NotesRegistry';
 import { Tags } from '../../core/Registry/Tags/Tags';
-import { $activeProfile, changedActiveProfile } from '../../core/state/profiles';
+import { $activeProfile, changedActiveProfile, Profile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
 import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
@@ -25,11 +24,11 @@ import {
 	getUserDataPath,
 } from '../../electron/requests/files/renderer';
 import { ElectronFilesController } from '../../electron/requests/storage/renderer';
+import { DisposableBox } from '../../utils/disposable';
 
 import { readFile, writeFile } from 'fs/promises';
 import { MainScreen } from './MainScreen';
-import { ProvidedAppContext, Providers } from './Providers';
-import { SplashScreen } from './SplashScreen';
+import { Providers } from './Providers';
 import { OnPickProfile, WorkspaceManager } from './WorkspaceManager';
 import { NewProfile } from './WorkspaceManager/ProfileCreator';
 
@@ -37,9 +36,31 @@ import './App.css';
 
 const config = new ConfigStorage();
 
+type AppContext = {
+	db: SQLiteDb;
+	attachmentsRegistry: Attachments;
+	filesController: ElectronFilesController;
+	filesRegistry: FilesRegistry;
+	tagsRegistry: Tags;
+	notesRegistry: NotesRegistry;
+	profile: Profile;
+};
+
 export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteData) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
+
+export const decryptKey = async (
+	encryptedKey: ArrayBuffer,
+	password: string,
+	salt: ArrayBuffer,
+) => {
+	const workerEncryptionForKey = new WorkerEncryptionController(password, salt);
+	const encryptionForKey = new EncryptionController(workerEncryptionForKey);
+	return encryptionForKey.decrypt(encryptedKey).finally(() => {
+		workerEncryptionForKey.terminate();
+	});
+};
 
 // TODO: remove secrets of closure
 export const App: FC = () => {
@@ -104,12 +125,78 @@ export const App: FC = () => {
 		[profilesManager, updateProfiles],
 	);
 
-	// TODO: key must be removed of memory after use
-	const [encryption, setEncryption] = useState<IEncryptionController | null>(null);
-	const [db, setDb] = useState<null | SQLiteDb>(null);
-	const [profileDir, setProfileDir] = useState<null | string>(null);
+	const [profileContext, setProfileContext] =
+		useState<null | DisposableBox<AppContext>>(null);
+	const runProfile = useCallback(async (profile: ProfileObject, password?: string) => {
+		const cleanups: Array<() => void> = [];
 
-	// TODO: remove key of RAM. Set control with callback to remove key
+		const profileDir = await getUserDataPath(profile.id);
+
+		// Setup encryption
+		let encryption: EncryptionController;
+		if (profile.encryption === null) {
+			encryption = new EncryptionController(new PlaceholderEncryptionController());
+		} else {
+			if (password === undefined)
+				throw new TypeError('Empty password for encrypted profile');
+
+			const keyFilePath = path.join(profileDir, 'key');
+			const encryptedKeyFile = await readFile(keyFilePath);
+			const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
+			const key = await decryptKey(encryptedKeyFile.buffer, password, salt);
+
+			const workerController = new WorkerEncryptionController(key, salt);
+			cleanups.push(() => workerController.terminate());
+
+			encryption = new EncryptionController(workerController);
+		}
+
+		// Setup DB
+		const dbPath = path.join(profileDir, 'deepink.db');
+		const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
+
+		const db = await getDb({
+			dbPath,
+			dbExtensionsDir,
+			encryption: encryption,
+		});
+
+		// TODO: close DB first and close encryption last
+		cleanups.push(() => db.close());
+
+		// Setup files
+		// TODO: implement methods to close the objects after use
+		const attachmentsRegistry = new Attachments(db);
+		const filesController = new ElectronFilesController(profileDir, encryption);
+		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
+		const tagsRegistry = new Tags(db);
+		const notesRegistry = new NotesRegistry(db);
+
+		const profileObject: Profile = {
+			id: profile.id,
+			name: profile.name,
+			isEncrypted: profile.encryption !== null,
+		};
+
+		setProfileContext(
+			new DisposableBox(
+				{
+					db,
+					attachmentsRegistry,
+					filesController,
+					filesRegistry,
+					tagsRegistry,
+					notesRegistry,
+					profile: profileObject,
+				},
+				() => {
+					// TODO: remove key of RAM. Set control with callback to remove key
+					cleanups.forEach((cleanup) => cleanup());
+				},
+			),
+		);
+	}, []);
+
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (id: string, password?: string) => {
 			if (!profiles) return { status: 'error', message: 'Profile does not exists' };
@@ -122,28 +209,9 @@ export const App: FC = () => {
 			// Ensure profile dir exists
 			mkdirSync(profileDir, { recursive: true });
 
-			const dbPath = path.join(profileDir, 'deepink.db');
-			const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
-
 			// Profiles with no password
 			if (!profile.encryption) {
-				const encryption = new EncryptionController(
-					new PlaceholderEncryptionController(),
-				);
-
-				await getDb({
-					dbPath,
-					dbExtensionsDir,
-					encryption: encryption,
-				}).then(setDb);
-
-				setEncryption(encryption);
-				setProfileDir(profile.id);
-				changedActiveProfile({
-					id: profile.id,
-					name: profile.name,
-					isEncrypted: false,
-				});
+				await runProfile(profile);
 
 				return { status: 'ok' };
 			}
@@ -157,90 +225,51 @@ export const App: FC = () => {
 				return { status: 'error', message: 'Key file not found' };
 			}
 
-			const encryptedKeyFile = await readFile(keyFilePath);
-			const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
-
-			const workerEncryptionForKey = new WorkerEncryptionController(password, salt);
-			const encryptionForKey = new EncryptionController(workerEncryptionForKey);
-			const key = await encryptionForKey
-				.decrypt(encryptedKeyFile.buffer)
-				.finally(() => {
-					workerEncryptionForKey.terminate();
-				});
-
-			const workerController = new WorkerEncryptionController(key, salt);
-			const encryption = new EncryptionController(workerController);
-
 			try {
-				await getDb({
-					dbPath,
-					dbExtensionsDir,
-					encryption: encryption,
-				}).then(setDb);
-
-				setEncryption(encryption);
-				setProfileDir(profile.id);
-				changedActiveProfile({
-					id: profile.id,
-					name: profile.name,
-					isEncrypted: true,
-				});
+				await runProfile(profile, password);
 
 				return { status: 'ok' };
 			} catch (err) {
-				workerController.terminate();
-
 				console.error(err);
 
 				return { status: 'error', message: 'Invalid password' };
 			}
 		},
-		[profiles],
+		[profiles, runProfile],
 	);
 
-	const [providedAppContext, setProvidedAppContext] = useState<Omit<
-		ProvidedAppContext,
-		'db'
-	> | null>(null);
 	useEffect(() => {
-		if (db === null) return;
-		if (encryption === null) return;
-		if (profileDir === null) return;
+		if (profileContext === null || profileContext.isDisposed()) return;
 
-		const attachmentsRegistry = new Attachments(db);
+		const { filesRegistry, profile } = profileContext.getContent();
 
-		const filesController = new ElectronFilesController(profileDir, encryption);
-		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
+		changedActiveProfile(profile);
 
 		// TODO: schedule when to run method
 		filesRegistry.clearOrphaned();
-
-		const tagsRegistry = new Tags(db);
-
-		const notesRegistry = new NotesRegistry(db);
-
-		setProvidedAppContext({
-			attachmentsRegistry,
-			filesRegistry,
-			tagsRegistry,
-			notesRegistry,
-		});
-	}, [db, encryption, profileDir]);
+	}, [profileContext]);
 
 	const activeProfile = useStore($activeProfile);
+
+	// terminate all processes for previous active profile: db, encryption, files, etc
+	const activeProfileRef = useRef(profileContext);
+	activeProfileRef.current = profileContext;
+
 	useEffect(() => {
-		if (activeProfile === null) {
-			// TODO: terminate all processes for previous active profile: db, encryption, files, etc
-			setProvidedAppContext(null);
-			setDb(null);
+		if (activeProfile !== null) return;
+
+		const profileContext = activeProfileRef.current;
+		if (profileContext && !profileContext.isDisposed()) {
+			profileContext.dispose();
 		}
+		setProfileContext(null);
 	}, [activeProfile]);
 
 	useEffect(() => {
-		if (!providedAppContext) return;
+		if (!profileContext || profileContext.isDisposed()) return;
 
-		const updateTags = () =>
-			providedAppContext.tagsRegistry.getTags().then(tagsUpdated);
+		const { tagsRegistry } = profileContext.getContent();
+		const updateTags = () => tagsRegistry.getTags().then(tagsUpdated);
 
 		const cleanup = tagsChanged.watch(updateTags);
 		updateTags();
@@ -280,9 +309,11 @@ export const App: FC = () => {
 		setCurrentProfile(profileId);
 	}, []);
 
-	// TODO: remember selected profile
+	const appContext = profileContext ? profileContext.getContent() : null;
+
+	// TODO: show `SplashScreen` component while loading
 	// TODO: show only if workspace requires password
-	if (db === null) {
+	if (appContext === null) {
 		return (
 			<WorkspaceManager
 				profiles={profiles ?? []}
@@ -294,18 +325,9 @@ export const App: FC = () => {
 		);
 	}
 
-	// Splash screen for loading state
-	if (db === null || providedAppContext === null) {
-		return (
-			<div className={cnApp()}>
-				<SplashScreen />
-			</div>
-		);
-	}
-
 	return (
 		<div className={cnApp()}>
-			<Providers {...providedAppContext} db={db}>
+			<Providers {...appContext}>
 				<MainScreen />
 			</Providers>
 		</div>

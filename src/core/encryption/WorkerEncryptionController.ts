@@ -4,15 +4,19 @@ import { WorkerRPC } from '../../utils/workers/WorkerRPC';
 import { ICipher } from '.';
 
 export class Terminable {
-	private isTerminated = false;
+	private isFinished = false;
+
 	public terminate() {
-		this.isTerminated = true;
+		this.isFinished = true;
+	}
+	public isTerminated() {
+		return this.isFinished;
 	}
 
 	public throwErrorIfTerminated(message?: string) {
 		const errorMessage =
 			message ?? "Object been terminated and can't be used anymore";
-		if (this.isTerminated) throw new Error(errorMessage);
+		if (this.isFinished) throw new Error(errorMessage);
 	}
 }
 
