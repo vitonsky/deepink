@@ -4,7 +4,7 @@ export class DisposableBox<T> {
 	private readonly data;
 	private readonly cleanup;
 	private readonly controller;
-	constructor(data: T, cleanup?: () => void) {
+	constructor(data: T, cleanup?: () => void | Promise<void>) {
 		this.data = data;
 		this.cleanup = cleanup;
 		this.controller = new Terminable();
@@ -15,9 +15,9 @@ export class DisposableBox<T> {
 		return this.data;
 	}
 
-	public dispose() {
+	public async dispose() {
 		if (this.cleanup) {
-			this.cleanup();
+			await this.cleanup();
 		}
 
 		this.controller.terminate();

@@ -134,6 +134,7 @@ export const App: FC = () => {
 
 		// Setup encryption
 		let encryption: EncryptionController;
+		let encryptionCleanup: null | (() => any) = null;
 		if (profile.encryption === null) {
 			encryption = new EncryptionController(new PlaceholderEncryptionController());
 		} else {
@@ -146,7 +147,7 @@ export const App: FC = () => {
 			const key = await decryptKey(encryptedKeyFile.buffer, password, salt);
 
 			const workerController = new WorkerEncryptionController(key, salt);
-			cleanups.push(() => workerController.terminate());
+			encryptionCleanup = () => workerController.terminate();
 
 			encryption = new EncryptionController(workerController);
 		}
@@ -189,9 +190,16 @@ export const App: FC = () => {
 					notesRegistry,
 					profile: profileObject,
 				},
-				() => {
+				async () => {
 					// TODO: remove key of RAM. Set control with callback to remove key
-					cleanups.forEach((cleanup) => cleanup());
+					for (const cleanup of cleanups) {
+						// TODO: set deadline for awaiting
+						await cleanup();
+					}
+
+					if (encryptionCleanup) {
+						encryptionCleanup();
+					}
 				},
 			),
 		);
