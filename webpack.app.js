@@ -8,6 +8,7 @@ module.exports = merge(commonConfig, {
 	target: 'electron-renderer',
 	entry: {
 		app: './src/app.tsx',
+		cryptographyWorker: './src/core/workers/Cryptography.worker.ts',
 	},
 	plugins: [
 		new MiniCssExtractPlugin({}),

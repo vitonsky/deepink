@@ -16,9 +16,12 @@ const ensureValidFilePath = (filesDir: string, filePath: string) => {
 	}
 };
 
+const getFilesDirPath = (subDirectory?: string) =>
+	subDirectory ? path.join(subDirectory, 'files') : 'files';
+
 function uploadFile() {
-	ipcMain.handle(CHANNELS.uploadFile, async (_evt, { id, buffer }) => {
-		const filesDir = getUserDataPath('files');
+	ipcMain.handle(CHANNELS.uploadFile, async (_evt, { subdir, id, buffer }) => {
+		const filesDir = getUserDataPath(getFilesDirPath(subdir));
 		await mkdir(filesDir, { recursive: true });
 
 		const filePath = path.resolve(path.join(filesDir, id));
@@ -29,8 +32,10 @@ function uploadFile() {
 }
 
 function getFile() {
-	ipcMain.handle(CHANNELS.getFile, async (_evt, { id }) => {
-		const filesDir = getUserDataPath('files');
+	ipcMain.handle(CHANNELS.getFile, async (_evt, { subdir, id }) => {
+		const filesDir = getUserDataPath(getFilesDirPath(subdir));
+		await mkdir(filesDir, { recursive: true });
+
 		const filePath = path.join(filesDir, id);
 
 		ensureValidFilePath(filesDir, filePath);
@@ -43,8 +48,9 @@ function getFile() {
 }
 
 function deleteFiles() {
-	ipcMain.handle(CHANNELS.deleteFiles, async (_evt, { ids }) => {
-		const filesDir = getUserDataPath('files');
+	ipcMain.handle(CHANNELS.deleteFiles, async (_evt, { subdir, ids }) => {
+		const filesDir = getUserDataPath(getFilesDirPath(subdir));
+		await mkdir(filesDir, { recursive: true });
 
 		for (const id of ids) {
 			const filePath = path.join(filesDir, id);
@@ -61,8 +67,9 @@ function deleteFiles() {
 }
 
 function listFiles() {
-	ipcMain.handle(CHANNELS.listFiles, async () => {
-		const filesDir = getUserDataPath('files');
+	ipcMain.handle(CHANNELS.listFiles, async (_evt, { subdir }) => {
+		const filesDir = getUserDataPath(getFilesDirPath(subdir));
+		await mkdir(filesDir, { recursive: true });
 
 		const filenames = await readdir(filesDir, {});
 		return filenames;

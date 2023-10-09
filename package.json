@@ -74,11 +74,12 @@
 	},
 	"dependencies": {
 		"@bem-react/classname": "^1.6.0",
+		"crc": "^4.3.2",
 		"effector": "^22.8.6",
 		"effector-react": "^22.5.3",
+		"fast-glob": "^3.3.1",
 		"file-saver": "^2.0.5",
 		"github-markdown-css": "^5.2.0",
-		"glob": "^10.3.3",
 		"lodash": "^4.17.21",
 		"monaco-editor-core": "^0.39.0",
 		"monaco-markdown": "^0.0.12",
@@ -96,6 +97,7 @@
 		"remark-stringify": "^10.0.3",
 		"sqlite": "^4.2.1",
 		"sqlite3": "^5.1.6",
+		"twofish-ts": "^1.0.2",
 		"unified": "^10.1.2",
 		"unist-util-remove": "^4.0.0",
 		"unist-util-visit": "^5.0.0"
