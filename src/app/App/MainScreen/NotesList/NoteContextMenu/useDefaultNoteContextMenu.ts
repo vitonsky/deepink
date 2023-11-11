@@ -16,11 +16,7 @@ import {
 	ContextMenuCallback,
 	useContextMenu,
 } from '../../../../components/hooks/useContextMenu';
-import {
-	useAttachmentsRegistry,
-	useFilesRegistry,
-	useTagsRegistry,
-} from '../../../Providers';
+import { useFilesRegistry, useNotesRegistry, useTagsRegistry } from '../../../Providers';
 import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
 import { NoteActions } from '.';
@@ -64,14 +60,87 @@ const mdCharsForEscapeRegEx = new RegExp(
 	'g',
 );
 
+export const useExportNotes = (saveFile: (file: File) => Promise<string>) => {
+	const notesRegistry = useNotesRegistry();
+	const files = useFilesRegistry();
+
+	const createFileUploader = useCallback(() => {
+		const fetchedFiles: Record<string, string | null> = {};
+		return async (id: string) => {
+			// Fetch file and upload
+			if (!(id in fetchedFiles)) {
+				const file = await files.get(id);
+				fetchedFiles[id] = file ? await saveFile(file) : null;
+			}
+
+			return fetchedFiles[id];
+		};
+	}, [files, saveFile]);
+
+	const exportNote = useCallback(
+		async (
+			noteId: string,
+			getUploadedFilePath: (id: string) => Promise<string | null>,
+		) => {
+			const note = await notesRegistry.getById(noteId);
+			if (!note) return;
+
+			const markdownProcessor = unified()
+				.use(remarkParse)
+				.use(remarkParseFrontmatter)
+				.use(remarkFrontmatter, ['yaml', 'toml'])
+				.use(remarkGfm)
+				.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
+				.freeze();
+
+			const mdTree = markdownProcessor.parse(note.data.text);
+
+			await replaceUrls(
+				mdTree,
+				async (nodeUrl) => {
+					const appResource = getAppResourceDataInUrl(nodeUrl);
+
+					// TODO: handle links on another notes
+					if (!appResource || appResource.type !== 'resource') return nodeUrl;
+
+					const filePath = await getUploadedFilePath(appResource.id);
+					return filePath ?? nodeUrl;
+				},
+				true,
+			);
+
+			// TODO: add meta data
+			return markdownProcessor.stringify(mdTree);
+		},
+		[notesRegistry],
+	);
+
+	const exportAllNotes = useCallback(async () => {
+		const notes = await notesRegistry.get();
+		const uploader = createFileUploader();
+
+		return Promise.all(notes.map((note) => exportNote(note.id, uploader)));
+	}, [createFileUploader, exportNote, notesRegistry]);
+
+	const exportNotePublic = useCallback(
+		(noteId: string) => exportNote(noteId, createFileUploader()),
+		[createFileUploader, exportNote],
+	);
+
+	return {
+		exportNote: exportNotePublic,
+		exportNotes: exportAllNotes,
+	};
+};
+
 export const useDefaultNoteContextMenu = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
 	const tagsRegistry = useTagsRegistry();
-	const attachments = useAttachmentsRegistry();
-	const files = useFilesRegistry();
+	const notesExport = useExportNotes(async () => '/foo/bar/fileId');
+
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
 			switch (action) {
@@ -145,73 +214,15 @@ export const useDefaultNoteContextMenu = ({
 					break;
 				}
 				case NoteActions.EXPORT: {
-					const note = await notesRegistry.getById(id);
-					if (!note) return;
-
-					const attachedFiles = await attachments
-						.get(note.id)
-						.then(async (ids) => {
-							const filesList: File[] = [];
-							for (const id of ids) {
-								const file = await files.get(id);
-								if (!file) continue;
-
-								filesList.push(file);
-							}
-
-							return filesList;
-						});
-
-					const fetchedFiles: Record<string, File | null> = {};
-					const getUploadedFilePath = async (id: string) => {
-						// Fetch file and upload
-						if (!(id in fetchedFiles)) {
-							const file = await files.get(id);
-							fetchedFiles[id] = file;
-
-							// TODO: save file to special directory
-						}
-
-						if (!fetchedFiles[id]) return null;
-
-						return `/foo/bar/baz/${id}`;
-					};
-
-					const markdownProcessor = unified()
-						.use(remarkParse)
-						.use(remarkParseFrontmatter)
-						.use(remarkFrontmatter, ['yaml', 'toml'])
-						.use(remarkGfm)
-						.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
-						.freeze();
-
-					const mdTree = markdownProcessor.parse(note.data.text);
-
-					await replaceUrls(
-						mdTree,
-						async (nodeUrl) => {
-							const appResource = getAppResourceDataInUrl(nodeUrl);
-
-							// TODO: handle links on another notes
-							if (!appResource || appResource.type !== 'resource')
-								return nodeUrl;
-
-							const filePath = await getUploadedFilePath(appResource.id);
-							return filePath ?? nodeUrl;
-						},
-						true,
-					);
+					const noteData = await notesExport.exportNote(id);
 
 					// TODO: save file
-					console.log('Export', {
-						attachedFiles,
-						text: markdownProcessor.stringify(mdTree),
-					});
+					console.log('Export', noteData);
 					break;
 				}
 			}
 		},
-		[attachments, closeNote, files, notesRegistry, tagsRegistry, updateNotes],
+		[closeNote, notesExport, notesRegistry, tagsRegistry, updateNotes],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);
