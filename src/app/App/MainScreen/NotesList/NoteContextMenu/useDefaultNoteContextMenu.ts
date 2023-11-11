@@ -12,6 +12,7 @@ import { INotesRegistry } from '../../../../../core/Registry';
 import { FilesRegistry } from '../../../../../core/Registry/FilesRegistry/FilesRegistry';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
 import { ContextMenu } from '../../../../../electron/contextMenu';
+import { selectDirectory } from '../../../../../electron/requests/files/renderer';
 import { copyTextToClipboard } from '../../../../../utils/clipboard';
 import {
 	ContextMenuCallback,
@@ -20,6 +21,7 @@ import {
 import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
 import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
+import { mkdir, writeFile } from 'fs/promises';
 import { NoteActions } from '.';
 
 type DefaultContextMenuOptions = {
@@ -56,7 +58,7 @@ const mdCharsForEscapeRegEx = new RegExp(
 	'g',
 );
 
-type SaveFileCallback = (file: File) => Promise<string>;
+type SaveFileCallback = (file: File, id: string) => Promise<string>;
 type FileUploader = (id: string) => Promise<string | null>;
 
 class NotesExporter {
@@ -83,7 +85,7 @@ class NotesExporter {
 			// Fetch file and upload
 			if (!(id in fetchedFiles)) {
 				const file = await this.filesRegistry.get(id);
-				fetchedFiles[id] = file ? await this.saveFile(file) : null;
+				fetchedFiles[id] = file ? await this.saveFile(file, id) : null;
 			}
 
 			return fetchedFiles[id];
@@ -215,15 +217,36 @@ export const useDefaultNoteContextMenu = ({
 					break;
 				}
 				case NoteActions.EXPORT: {
+					const directories = await selectDirectory();
+					if (!directories || directories.length !== 1) {
+						console.log('Must be selected one directory');
+						return;
+					}
+
+					const directory = directories[0];
+					const filesDirectoryName = `_files`;
+					const filesDirectory = [directory, filesDirectoryName].join('/');
+
+					// TODO: remove node usages in frontend code
+					await mkdir(filesDirectory, { recursive: true });
+
 					const notesExport = new NotesExporter({
-						saveFile: async () => '/foo/bar/fileId',
+						saveFile: async (file, id) => {
+							const filename = `${filesDirectory}/${id}-${file.name}`;
+
+							const buffer = await file.arrayBuffer();
+							await writeFile(filename, new Uint8Array(buffer));
+							return `./${filesDirectoryName}/${id}-${file.name}`;
+						},
 						notesRegistry,
 						filesRegistry,
 					});
+
 					const noteData = await notesExport.exportNote(id);
 
-					// TODO: save file
-					console.log('Export', noteData);
+					if (!noteData) return;
+
+					await writeFile(`${directory}/${id}.md`, noteData);
 					break;
 				}
 			}
