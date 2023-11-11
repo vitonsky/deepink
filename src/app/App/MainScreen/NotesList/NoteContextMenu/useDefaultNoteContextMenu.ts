@@ -11,6 +11,7 @@ import { formatNoteLink, getAppResourceDataInUrl } from '../../../../../core/lin
 import { NoteId } from '../../../../../core/Note';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { FilesRegistry } from '../../../../../core/Registry/FilesRegistry/FilesRegistry';
+import { Tags } from '../../../../../core/Registry/Tags/Tags';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
 import { ContextMenu } from '../../../../../electron/contextMenu';
 import { selectDirectory } from '../../../../../electron/requests/files/renderer';
@@ -63,21 +64,25 @@ type SaveFileCallback = (file: File, id: string) => Promise<string>;
 type FileUploader = (id: string) => Promise<string | null>;
 
 class NotesExporter {
-	private readonly saveFile: SaveFileCallback;
-	private readonly notesRegistry: INotesRegistry;
-	private readonly filesRegistry: FilesRegistry;
+	private readonly saveFile;
+	private readonly notesRegistry;
+	private readonly filesRegistry;
+	private readonly tagsRegistry;
 	constructor({
 		saveFile,
 		notesRegistry,
 		filesRegistry,
+		tagsRegistry,
 	}: {
 		saveFile: SaveFileCallback;
 		notesRegistry: INotesRegistry;
 		filesRegistry: FilesRegistry;
+		tagsRegistry: Tags;
 	}) {
 		this.saveFile = saveFile;
 		this.notesRegistry = notesRegistry;
 		this.filesRegistry = filesRegistry;
+		this.tagsRegistry = tagsRegistry;
 	}
 
 	private createFileUploader() {
@@ -107,13 +112,16 @@ class NotesExporter {
 
 		const mdTree = markdownProcessor.parse(note.data.text);
 
-		// TODO: add tags
+		const tags = await this.tagsRegistry
+			.getAttachedTags(note.id)
+			.then((tags) => tags.map((tag) => tag.resolvedName));
 		mdTree.children.unshift({
 			type: 'yaml',
 			value: stringifyYaml({
 				title: note.data.title,
 				created: note.createdTimestamp,
 				updated: note.updatedTimestamp,
+				tags,
 			}),
 		});
 
@@ -250,6 +258,7 @@ export const useDefaultNoteContextMenu = ({
 						},
 						notesRegistry,
 						filesRegistry,
+						tagsRegistry,
 					});
 
 					const noteData = await notesExport.exportNote(id);
