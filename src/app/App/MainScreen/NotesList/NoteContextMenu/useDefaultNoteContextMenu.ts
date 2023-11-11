@@ -111,8 +111,8 @@ class NotesExporter {
 			async (nodeUrl) => {
 				const appResource = getAppResourceDataInUrl(nodeUrl);
 
-				// TODO: handle links on another notes
-				if (!appResource || appResource.type !== 'resource') return nodeUrl;
+				if (!appResource) return nodeUrl;
+				if (appResource.type === 'note') return `./${appResource.id}.md`;
 
 				const filePath = await getUploadedFilePath(appResource.id);
 				return filePath ?? nodeUrl;
