@@ -1,6 +1,12 @@
 import { useCallback } from 'react';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import remarkParseFrontmatter from 'remark-parse-frontmatter';
+import remarkStringify from 'remark-stringify';
+import { unified } from 'unified';
 
-import { formatNoteLink } from '../../../../../core/links';
+import { formatNoteLink, getAppResourceDataInUrl } from '../../../../../core/links';
 import { NoteId } from '../../../../../core/Note';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
@@ -10,7 +16,12 @@ import {
 	ContextMenuCallback,
 	useContextMenu,
 } from '../../../../components/hooks/useContextMenu';
-import { useTagsRegistry } from '../../../Providers';
+import {
+	useAttachmentsRegistry,
+	useFilesRegistry,
+	useTagsRegistry,
+} from '../../../Providers';
+import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
 import { NoteActions } from '.';
 
@@ -36,6 +47,10 @@ export const noteMenu: ContextMenu = [
 		id: NoteActions.COPY_MARKDOWN_LINK,
 		label: 'Copy markdown link',
 	},
+	{
+		id: NoteActions.EXPORT,
+		label: 'Export',
+	},
 	{ type: 'separator' },
 	{
 		id: NoteActions.DELETE,
@@ -55,6 +70,8 @@ export const useDefaultNoteContextMenu = ({
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
 	const tagsRegistry = useTagsRegistry();
+	const attachments = useAttachmentsRegistry();
+	const files = useFilesRegistry();
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
 			switch (action) {
@@ -127,9 +144,74 @@ export const useDefaultNoteContextMenu = ({
 					copyTextToClipboard(markdownLink);
 					break;
 				}
+				case NoteActions.EXPORT: {
+					const note = await notesRegistry.getById(id);
+					if (!note) return;
+
+					const attachedFiles = await attachments
+						.get(note.id)
+						.then(async (ids) => {
+							const filesList: File[] = [];
+							for (const id of ids) {
+								const file = await files.get(id);
+								if (!file) continue;
+
+								filesList.push(file);
+							}
+
+							return filesList;
+						});
+
+					const fetchedFiles: Record<string, File | null> = {};
+					const getUploadedFilePath = async (id: string) => {
+						// Fetch file and upload
+						if (!(id in fetchedFiles)) {
+							const file = await files.get(id);
+							fetchedFiles[id] = file;
+
+							// TODO: save file to special directory
+						}
+
+						if (!fetchedFiles[id]) return null;
+
+						return `/foo/bar/baz/${id}`;
+					};
+
+					const markdownProcessor = unified()
+						.use(remarkParse)
+						.use(remarkParseFrontmatter)
+						.use(remarkFrontmatter, ['yaml', 'toml'])
+						.use(remarkGfm)
+						.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
+						.freeze();
+
+					const mdTree = markdownProcessor.parse(note.data.text);
+
+					await replaceUrls(
+						mdTree,
+						async (nodeUrl) => {
+							const appResource = getAppResourceDataInUrl(nodeUrl);
+
+							// TODO: handle links on another notes
+							if (!appResource || appResource.type !== 'resource')
+								return nodeUrl;
+
+							const filePath = await getUploadedFilePath(appResource.id);
+							return filePath ?? nodeUrl;
+						},
+						true,
+					);
+
+					// TODO: save file
+					console.log('Export', {
+						attachedFiles,
+						text: markdownProcessor.stringify(mdTree),
+					});
+					break;
+				}
 			}
 		},
-		[closeNote, notesRegistry, tagsRegistry, updateNotes],
+		[attachments, closeNote, files, notesRegistry, tagsRegistry, updateNotes],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);
