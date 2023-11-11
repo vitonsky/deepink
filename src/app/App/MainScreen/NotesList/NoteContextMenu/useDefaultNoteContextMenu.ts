@@ -5,6 +5,7 @@ import remarkParse from 'remark-parse';
 import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
+import { stringify as stringifyYaml } from 'yaml';
 
 import { formatNoteLink, getAppResourceDataInUrl } from '../../../../../core/links';
 import { NoteId } from '../../../../../core/Note';
@@ -106,6 +107,16 @@ class NotesExporter {
 
 		const mdTree = markdownProcessor.parse(note.data.text);
 
+		// TODO: add tags
+		mdTree.children.unshift({
+			type: 'yaml',
+			value: stringifyYaml({
+				title: note.data.title,
+				created: note.createdTimestamp,
+				updated: note.updatedTimestamp,
+			}),
+		});
+
 		await replaceUrls(
 			mdTree,
 			async (nodeUrl) => {
@@ -120,7 +131,6 @@ class NotesExporter {
 			true,
 		);
 
-		// TODO: add meta data
 		return markdownProcessor.stringify(mdTree);
 	}
 
