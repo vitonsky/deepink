@@ -9,6 +9,7 @@ import { unified } from 'unified';
 import { formatNoteLink, getAppResourceDataInUrl } from '../../../../../core/links';
 import { NoteId } from '../../../../../core/Note';
 import { INotesRegistry } from '../../../../../core/Registry';
+import { FilesRegistry } from '../../../../../core/Registry/FilesRegistry/FilesRegistry';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
 import { ContextMenu } from '../../../../../electron/contextMenu';
 import { copyTextToClipboard } from '../../../../../utils/clipboard';
@@ -16,7 +17,7 @@ import {
 	ContextMenuCallback,
 	useContextMenu,
 } from '../../../../components/hooks/useContextMenu';
-import { useFilesRegistry, useNotesRegistry, useTagsRegistry } from '../../../Providers';
+import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
 import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
 import { NoteActions } from '.';
@@ -30,11 +31,6 @@ type DefaultContextMenuOptions = {
 };
 
 export const noteMenu: ContextMenu = [
-	// TODO: implement
-	// {
-	// 	id: 'copyMarkdownLink',
-	// 	label: 'Copy Markdown link',
-	// },
 	{
 		id: NoteActions.DUPLICATE,
 		label: 'Duplicate',
@@ -60,86 +56,91 @@ const mdCharsForEscapeRegEx = new RegExp(
 	'g',
 );
 
-export const useExportNotes = (saveFile: (file: File) => Promise<string>) => {
-	const notesRegistry = useNotesRegistry();
-	const files = useFilesRegistry();
+type SaveFileCallback = (file: File) => Promise<string>;
+type FileUploader = (id: string) => Promise<string | null>;
 
-	const createFileUploader = useCallback(() => {
+class NotesExporter {
+	private readonly saveFile: SaveFileCallback;
+	private readonly notesRegistry: INotesRegistry;
+	private readonly filesRegistry: FilesRegistry;
+	constructor({
+		saveFile,
+		notesRegistry,
+		filesRegistry,
+	}: {
+		saveFile: SaveFileCallback;
+		notesRegistry: INotesRegistry;
+		filesRegistry: FilesRegistry;
+	}) {
+		this.saveFile = saveFile;
+		this.notesRegistry = notesRegistry;
+		this.filesRegistry = filesRegistry;
+	}
+
+	private createFileUploader() {
 		const fetchedFiles: Record<string, string | null> = {};
 		return async (id: string) => {
 			// Fetch file and upload
 			if (!(id in fetchedFiles)) {
-				const file = await files.get(id);
-				fetchedFiles[id] = file ? await saveFile(file) : null;
+				const file = await this.filesRegistry.get(id);
+				fetchedFiles[id] = file ? await this.saveFile(file) : null;
 			}
 
 			return fetchedFiles[id];
 		};
-	}, [files, saveFile]);
+	}
 
-	const exportNote = useCallback(
-		async (
-			noteId: string,
-			getUploadedFilePath: (id: string) => Promise<string | null>,
-		) => {
-			const note = await notesRegistry.getById(noteId);
-			if (!note) return;
+	private async exportSingleNote(noteId: string, getUploadedFilePath: FileUploader) {
+		const note = await this.notesRegistry.getById(noteId);
+		if (!note) return;
 
-			const markdownProcessor = unified()
-				.use(remarkParse)
-				.use(remarkParseFrontmatter)
-				.use(remarkFrontmatter, ['yaml', 'toml'])
-				.use(remarkGfm)
-				.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
-				.freeze();
+		const markdownProcessor = unified()
+			.use(remarkParse)
+			.use(remarkParseFrontmatter)
+			.use(remarkFrontmatter, ['yaml', 'toml'])
+			.use(remarkGfm)
+			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
+			.freeze();
 
-			const mdTree = markdownProcessor.parse(note.data.text);
+		const mdTree = markdownProcessor.parse(note.data.text);
 
-			await replaceUrls(
-				mdTree,
-				async (nodeUrl) => {
-					const appResource = getAppResourceDataInUrl(nodeUrl);
+		await replaceUrls(
+			mdTree,
+			async (nodeUrl) => {
+				const appResource = getAppResourceDataInUrl(nodeUrl);
 
-					// TODO: handle links on another notes
-					if (!appResource || appResource.type !== 'resource') return nodeUrl;
+				// TODO: handle links on another notes
+				if (!appResource || appResource.type !== 'resource') return nodeUrl;
 
-					const filePath = await getUploadedFilePath(appResource.id);
-					return filePath ?? nodeUrl;
-				},
-				true,
-			);
+				const filePath = await getUploadedFilePath(appResource.id);
+				return filePath ?? nodeUrl;
+			},
+			true,
+		);
 
-			// TODO: add meta data
-			return markdownProcessor.stringify(mdTree);
-		},
-		[notesRegistry],
-	);
+		// TODO: add meta data
+		return markdownProcessor.stringify(mdTree);
+	}
 
-	const exportAllNotes = useCallback(async () => {
-		const notes = await notesRegistry.get();
-		const uploader = createFileUploader();
+	public async exportNote(noteId: string) {
+		return this.exportSingleNote(noteId, this.createFileUploader());
+	}
 
-		return Promise.all(notes.map((note) => exportNote(note.id, uploader)));
-	}, [createFileUploader, exportNote, notesRegistry]);
+	public async exportNotes() {
+		const notes = await this.notesRegistry.get();
+		const uploader = this.createFileUploader();
 
-	const exportNotePublic = useCallback(
-		(noteId: string) => exportNote(noteId, createFileUploader()),
-		[createFileUploader, exportNote],
-	);
-
-	return {
-		exportNote: exportNotePublic,
-		exportNotes: exportAllNotes,
-	};
-};
+		return Promise.all(notes.map((note) => this.exportSingleNote(note.id, uploader)));
+	}
+}
 
 export const useDefaultNoteContextMenu = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
+	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
-	const notesExport = useExportNotes(async () => '/foo/bar/fileId');
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
@@ -214,6 +215,11 @@ export const useDefaultNoteContextMenu = ({
 					break;
 				}
 				case NoteActions.EXPORT: {
+					const notesExport = new NotesExporter({
+						saveFile: async () => '/foo/bar/fileId',
+						notesRegistry,
+						filesRegistry,
+					});
 					const noteData = await notesExport.exportNote(id);
 
 					// TODO: save file
@@ -222,7 +228,7 @@ export const useDefaultNoteContextMenu = ({
 				}
 			}
 		},
-		[closeNote, notesExport, notesRegistry, tagsRegistry, updateNotes],
+		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);
