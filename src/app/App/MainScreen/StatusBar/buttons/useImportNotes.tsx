@@ -11,6 +11,7 @@ import { visit } from 'unist-util-visit';
 
 import { formatNoteLink, formatResourceLink } from '../../../../../core/links';
 import { INotesRegistry } from '../../../../../core/Registry';
+import { ITag } from '../../../../../core/Registry/Tags/Tags';
 import { tagsChanged } from '../../../../../core/state/tags';
 import { importNotes } from '../../../../../electron/requests/files/renderer';
 import {
@@ -47,6 +48,23 @@ export const replaceUrls = (
 const getAbsolutePathOfRelativePath = (currentPath: string, relativePath: string) => {
 	const url = new URL(relativePath, `https://root/${currentPath}`);
 	return url.pathname.slice(1);
+};
+
+const isTagsArray = (data: unknown): data is string[] =>
+	Array.isArray(data) && data.every((item) => typeof item === 'string');
+
+const findParentTag = (resolvedTagName: string, tags: ITag[]) => {
+	let parent: ITag | null = null;
+	for (const tag of tags) {
+		if (!resolvedTagName.startsWith(tag.resolvedName)) continue;
+
+		// Remember only those parent who have more segments
+		if (parent === null || parent.resolvedName.length < tag.resolvedName.length) {
+			parent = tag;
+		}
+	}
+
+	return parent;
 };
 
 const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
@@ -127,6 +145,47 @@ export const useImportNotes = ({
 				title: noteTitle,
 				text: noteText,
 			});
+
+			// Attach tags
+			if (isTagsArray(noteData.tags) && noteData.tags.length > 0) {
+				const tagsToAttach: string[] = [];
+				for (const resolvedTagName of noteData.tags) {
+					const tags = await tagsRegistry.getTags();
+
+					// Find exists tag
+					const foundTag = tags.find(
+						(tag) => tag.resolvedName === resolvedTagName,
+					);
+					if (foundTag) {
+						tagsToAttach.push(foundTag.id);
+						continue;
+					}
+
+					// Find parent tag and create sub tag
+					const parentTag = findParentTag(resolvedTagName, tags);
+					if (parentTag) {
+						const tagNamePartToAdd = resolvedTagName.slice(
+							parentTag.resolvedName.length + 1,
+						);
+						const createdTagId = await tagsRegistry.add(
+							tagNamePartToAdd,
+							parentTag.id,
+						);
+						tagsChanged();
+						tagsToAttach.push(createdTagId);
+						continue;
+					}
+
+					// Create full resolved tag
+					const createdTagId = await tagsRegistry.add(resolvedTagName, null);
+					tagsChanged();
+					tagsToAttach.push(createdTagId);
+				}
+
+				if (tagsToAttach.length > 0) {
+					await tagsRegistry.setAttachedTags(noteId, tagsToAttach);
+				}
+			}
 
 			createdNotes[encodeURI(filename)] = {
 				id: noteId,
@@ -258,11 +317,20 @@ export const useImportNotes = ({
 
 			if (tagId === null && filenameBasePathSegments.length > 0) {
 				const tagNameToCreate = filenameBasePathSegments.join('/');
-				tagId = await tagsRegistry.add(tagNameToCreate, null);
-				tagsChanged();
+				if (tagNameToCreate.trim()) {
+					tagId = await tagsRegistry.add(tagNameToCreate, null);
+					tagsChanged();
+				}
 			}
 
-			await tagsRegistry.setAttachedTags(noteId, tagId ? [tagId] : []);
+			// Add tag based on path
+			const attachedTags = await tagsRegistry
+				.getAttachedTags(noteId)
+				.then((tags) => tags.map((tag) => tag.id));
+			if (tagId) {
+				attachedTags.push(tagId);
+			}
+			await tagsRegistry.setAttachedTags(noteId, attachedTags);
 		}
 
 		updateNotes();
