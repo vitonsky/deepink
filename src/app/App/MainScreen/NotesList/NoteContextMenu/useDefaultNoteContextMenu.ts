@@ -63,7 +63,7 @@ const mdCharsForEscapeRegEx = new RegExp(
 type SaveFileCallback = (file: File, id: string) => Promise<string>;
 type FileUploader = (id: string) => Promise<string | null>;
 
-class NotesExporter {
+export class NotesExporter {
 	private readonly saveFile;
 	private readonly notesRegistry;
 	private readonly filesRegistry;
@@ -150,7 +150,14 @@ class NotesExporter {
 		const notes = await this.notesRegistry.get();
 		const uploader = this.createFileUploader();
 
-		return Promise.all(notes.map((note) => this.exportSingleNote(note.id, uploader)));
+		return Promise.all(
+			notes.map(async (note) => {
+				const data = await this.exportSingleNote(note.id, uploader);
+				return { id: note.id, data };
+			}),
+		).then((notes) => notes.filter((note) => note.data !== undefined)) as Promise<
+			Array<{ id: string; data: string }>
+		>;
 	}
 }
 
