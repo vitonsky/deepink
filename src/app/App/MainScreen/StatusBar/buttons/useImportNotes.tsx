@@ -11,9 +11,9 @@ import { visit } from 'unist-util-visit';
 
 import { formatNoteLink, formatResourceLink } from '../../../../../core/links';
 import { INotesRegistry } from '../../../../../core/Registry';
-import { ITag } from '../../../../../core/Registry/Tags/Tags';
 import { tagsChanged } from '../../../../../core/state/tags';
 import { importNotes } from '../../../../../electron/requests/files/renderer';
+import { findParentTag, isTagsArray } from '../../../../../utils/tags';
 import {
 	useAttachmentsRegistry,
 	useFilesRegistry,
@@ -48,23 +48,6 @@ export const replaceUrls = (
 const getAbsolutePathOfRelativePath = (currentPath: string, relativePath: string) => {
 	const url = new URL(relativePath, `https://root/${currentPath}`);
 	return url.pathname.slice(1);
-};
-
-const isTagsArray = (data: unknown): data is string[] =>
-	Array.isArray(data) && data.every((item) => typeof item === 'string');
-
-const findParentTag = (resolvedTagName: string, tags: ITag[]) => {
-	let parent: ITag | null = null;
-	for (const tag of tags) {
-		if (!resolvedTagName.startsWith(tag.resolvedName)) continue;
-
-		// Remember only those parent who have more segments
-		if (parent === null || parent.resolvedName.length < tag.resolvedName.length) {
-			parent = tag;
-		}
-	}
-
-	return parent;
 };
 
 const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
