@@ -147,8 +147,10 @@ export const useImportNotes = ({
 					// Find parent tag and create sub tag
 					const parentTag = findParentTag(resolvedTagName, tags);
 					if (parentTag) {
+						const parentTagWithPrefixLength =
+							parentTag.resolvedName.length + 1;
 						const tagNamePartToAdd = resolvedTagName.slice(
-							parentTag.resolvedName.length + 1,
+							parentTagWithPrefixLength,
 						);
 						const createdTagId = await tagsRegistry.add(
 							tagNamePartToAdd,
@@ -299,8 +301,8 @@ export const useImportNotes = ({
 			}
 
 			if (tagId === null && filenameBasePathSegments.length > 0) {
-				const tagNameToCreate = filenameBasePathSegments.join('/');
-				if (tagNameToCreate.trim()) {
+				const tagNameToCreate = filenameBasePathSegments.join('/').trim();
+				if (tagNameToCreate) {
 					tagId = await tagsRegistry.add(tagNameToCreate, null);
 					tagsChanged();
 				}
