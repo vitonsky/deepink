@@ -8,7 +8,7 @@ import { changedActiveProfile } from '../../../../core/state/profiles';
 import { selectDirectory } from '../../../../electron/requests/files/renderer';
 import { useFilesRegistry, useTagsRegistry } from '../../Providers';
 
-import { NotesExporter } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
+import { NotesExporter } from '../NotesList/NoteContextMenu/NotesExporter';
 import { mkdir, writeFile } from 'fs/promises';
 import { useImportNotes } from './buttons/useImportNotes';
 
