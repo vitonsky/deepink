@@ -5,13 +5,16 @@ import { NoteId } from '../../../../../core/Note';
 import { INotesRegistry } from '../../../../../core/Registry';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
 import { ContextMenu } from '../../../../../electron/contextMenu';
+import { selectDirectory } from '../../../../../electron/requests/files/renderer';
 import { copyTextToClipboard } from '../../../../../utils/clipboard';
 import {
 	ContextMenuCallback,
 	useContextMenu,
 } from '../../../../components/hooks/useContextMenu';
-import { useTagsRegistry } from '../../../Providers';
+import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
 
+import { mkdir, writeFile } from 'fs/promises';
+import { NotesExporter } from './NotesExporter';
 import { NoteActions } from '.';
 
 type DefaultContextMenuOptions = {
@@ -23,11 +26,6 @@ type DefaultContextMenuOptions = {
 };
 
 export const noteMenu: ContextMenu = [
-	// TODO: implement
-	// {
-	// 	id: 'copyMarkdownLink',
-	// 	label: 'Copy Markdown link',
-	// },
 	{
 		id: NoteActions.DUPLICATE,
 		label: 'Duplicate',
@@ -35,6 +33,10 @@ export const noteMenu: ContextMenu = [
 	{
 		id: NoteActions.COPY_MARKDOWN_LINK,
 		label: 'Copy markdown link',
+	},
+	{
+		id: NoteActions.EXPORT,
+		label: 'Export',
 	},
 	{ type: 'separator' },
 	{
@@ -54,7 +56,9 @@ export const useDefaultNoteContextMenu = ({
 	updateNotes,
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
+	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
+
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
 			switch (action) {
@@ -127,9 +131,43 @@ export const useDefaultNoteContextMenu = ({
 					copyTextToClipboard(markdownLink);
 					break;
 				}
+				case NoteActions.EXPORT: {
+					const directories = await selectDirectory();
+					if (!directories || directories.length !== 1) {
+						console.log('Must be selected one directory');
+						return;
+					}
+
+					const directory = directories[0];
+					const filesDirectoryName = `_files`;
+					const filesDirectory = [directory, filesDirectoryName].join('/');
+
+					// TODO: remove node usages in frontend code
+					await mkdir(filesDirectory, { recursive: true });
+
+					const notesExport = new NotesExporter({
+						saveFile: async (file, id) => {
+							const filename = `${filesDirectory}/${id}-${file.name}`;
+
+							const buffer = await file.arrayBuffer();
+							await writeFile(filename, new Uint8Array(buffer));
+							return `./${filesDirectoryName}/${id}-${file.name}`;
+						},
+						notesRegistry,
+						filesRegistry,
+						tagsRegistry,
+					});
+
+					const noteData = await notesExport.exportNote(id);
+
+					if (!noteData) return;
+
+					await writeFile(`${directory}/${id}.md`, noteData);
+					break;
+				}
 			}
 		},
-		[closeNote, notesRegistry, tagsRegistry, updateNotes],
+		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);

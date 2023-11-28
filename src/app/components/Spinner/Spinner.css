@@ -1,0 +1,4 @@
+/* noinspection Stylelint */
+.Spinner_view_primitive.Spinner_progress {
+	--spinner-view-primitive-border-color-active: currentcolor;
+}

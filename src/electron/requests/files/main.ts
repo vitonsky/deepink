@@ -19,6 +19,21 @@ function getResourcesPath() {
 	});
 }
 
+function selectDirectory() {
+	ipcMain.handle(CHANNELS.selectDirectory, async (evt) => {
+		const window = BrowserWindow.getAllWindows().find(
+			(win) => win.webContents.id === evt.sender.id,
+		);
+		if (!window) return null;
+
+		const { filePaths } = await dialog.showOpenDialog(window, {
+			properties: ['openDirectory'],
+		});
+
+		return filePaths;
+	});
+}
+
 function exportNotes() {
 	ipcMain.handle(CHANNELS.importNotes, async (evt) => {
 		const window = BrowserWindow.getAllWindows().find(
@@ -55,6 +70,7 @@ function exportNotes() {
 }
 
 export const handleFilesRequests = [
+	selectDirectory,
 	getUserDataPath,
 	getResourcesPath,
 	exportNotes,
