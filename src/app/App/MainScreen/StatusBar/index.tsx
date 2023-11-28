@@ -1,15 +1,16 @@
 import React, { FC, HTMLProps, useCallback, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
 import { INotesRegistry } from '../../../../core/Registry';
 import { changedActiveProfile } from '../../../../core/state/profiles';
 import { selectDirectory } from '../../../../electron/requests/files/renderer';
+import { Spinner } from '../../../components/Spinner';
 import { useFilesRegistry, useTagsRegistry } from '../../Providers';
 
 import { NotesExporter } from '../NotesList/NoteContextMenu/NotesExporter';
 import { mkdir, writeFile } from 'fs/promises';
+import { ExportButton } from './buttons/ExportButton';
 import { useImportNotes } from './buttons/useImportNotes';
 
 import './StatusBar.css';
@@ -87,9 +88,7 @@ export const StatusBar: FC<StatusBarProps> = ({
 				>
 					Import
 				</Button>
-				<Button size="s" view="action" onPress={onExport}>
-					Export
-				</Button>
+				<ExportButton />
 				<Button
 					size="s"
 					view="default"
