@@ -45,11 +45,11 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	background: var(--color-fill-color-stripe);
 }
 
 .MainScreen-SideBar_view_main {
 	gap: 1rem;
+	background: var(--color-fill-color-stripe);
 }
 
 .MainScreen-NotesList {

@@ -1,17 +1,36 @@
-.NotesList .Menu-Item.NotesList-Item_opened {
-	color: var(--color-typo-secondary);
+.NotesList .NotesList-Note_opened {
+	border-color: var(--color-control-type-action-fill-color-base);
 }
 
-.NotesList .Menu-Item.NotesList-Item_active {
-	background-color: var(--color-control-type-action-fill-color-base);
-	color: var(--color-control-type-default-typo-base);
+.NotesList .NotesList-Note_active {
+	border-color: var(--color-control-type-action-fill-color-hovered);
 }
 
-.NotesList .Menu-ItemText {
-	white-space: nowrap;
-}
+.NotesList-Note {
+	cursor: pointer;
+	padding: 0.5rem;
+	background: #f9f9f9;
+	border-left: 2px solid transparent;
 
-.NotesList .Menu-Item {
+	/* white-space: nowrap; */
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.NotesList-Note:hover {
+	background: #efefef;
+}
+
+.NotesList-Title {
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.NotesList-TextPreview {
+	font-size: 14px;
+}
+
+.NotesList-Meta {
+	font-size: 14px;
+	color: var(--color-typo-secondary);
 }

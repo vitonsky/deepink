@@ -1,17 +1,5 @@
 .App {
-	display: flex;
-	width: 100%;
-	height: 100vh;
-}
-
-.App .MainScreen {
-	--button-size-m-line-height: 32px;
-	--button-size-m-indent-outer: 12px;
-	--button-size-m-font-size: 14px;
-	--button-size-s-line-height: 26px;
-	--button-size-s-indent-outer: 10px;
-	--button-size-s-font-size: 12px;
-	--button-font-family:
+	--app-font-family:
 		-apple-system,
 		blinkmacsystemfont,
 		'Segoe UI',
@@ -21,6 +9,21 @@
 		sans-serif,
 		'Apple Color Emoji',
 		'Segoe UI Emoji';
+
+	display: flex;
+	width: 100%;
+	height: 100vh;
+	font-family: var(--app-font-family);
+}
+
+.App .MainScreen {
+	--button-size-m-line-height: 32px;
+	--button-size-m-indent-outer: 12px;
+	--button-size-m-font-size: 14px;
+	--button-size-s-line-height: 26px;
+	--button-size-s-indent-outer: 10px;
+	--button-size-s-font-size: 12px;
+	--button-font-family: var(--app-font-family);
 
 	/* Source: https://mdigi.tools/color-shades/#2b31ff */
 	--button-view-action-fill-color-base: #2b31ff;
