@@ -1,9 +1,15 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
+import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
-import { FaGear } from 'react-icons/fa6';
+import {
+	FaArrowDownWideShort,
+	FaGear,
+	FaMagnifyingGlass,
+	FaPenToSquare,
+} from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
@@ -16,6 +22,7 @@ import {
 } from '../../../core/state/notes';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
+import { Stack } from '../../components/Stack/Stack';
 
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
@@ -155,6 +162,21 @@ export const MainScreen: FC = () => {
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
 			<div className={cnMainScreen('Content')}>
 				<div className={cnMainScreen('SideBar', { view: 'main' })}>
+					<Button
+						className={cnMainScreen('NewNoteButton')}
+						view="action"
+						onPress={createNote}
+						iconLeft={() => (
+							<Icon boxSize="1rem" hasGlyph>
+								<FaPenToSquare size="100%" />
+							</Icon>
+						)}
+					>
+						New note
+					</Button>
+
+					<NotesOverview />
+
 					<div className={cnMainScreen('Workspace')}>
 						<Select
 							className={cnMainScreen('WorkspacePicker')}
@@ -172,15 +194,35 @@ export const MainScreen: FC = () => {
 							</Icon>
 						</Button>
 					</div>
-					<NotesOverview />
 				</div>
 
 				<div className={cnMainScreen('SideBar')}>
-					<div className={cnMainScreen('SideBarControls')}>
-						<Button view="action" onPress={createNote}>
-							New note
+					<Stack direction="horizontal" spacing={1}>
+						<Textinput
+							placeholder="Search..."
+							size="s"
+							addonBeforeControl={
+								<Icon
+									boxSize="1rem"
+									hasGlyph
+									style={{
+										zIndex: 2,
+										marginInlineStart: '.5rem',
+										marginInlineEnd: '.3rem',
+										opacity: 0.7,
+									}}
+								>
+									<FaMagnifyingGlass size="100%" />
+								</Icon>
+							}
+						/>
+
+						<Button view="default">
+							<Icon boxSize="1rem" hasGlyph>
+								<FaArrowDownWideShort size="100%" />
+							</Icon>
 						</Button>
-					</div>
+					</Stack>
 
 					<div className={cnMainScreen('NotesList')}>
 						{activeTagName && (

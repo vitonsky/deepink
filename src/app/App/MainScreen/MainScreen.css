@@ -10,10 +10,24 @@
 	color: var(--color-typo-primary);
 }
 
+.MainScreen-NewNoteButton {
+	line-height: 2.5rem;
+	font-weight: bold;
+}
+
+.MainScreen-NewNoteButton .Button-Content {
+	justify-content: center;
+}
+
+.MainScreen-NewNoteButton .Button-Text {
+	width: auto;
+}
+
 .MainScreen-Workspace {
 	display: flex;
 	justify-content: space-between;
 	gap: 0.5rem;
+	margin-top: auto;
 }
 
 .MainScreen-WorkspacePicker {
