@@ -1,5 +1,13 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import {
+	FaBookmark,
+	FaBookOpen,
+	FaBoxArchive,
+	FaFile,
+	FaInbox,
+	FaTrash,
+} from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
@@ -136,7 +144,74 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		<>
 			<List
 				classNameExtensions={{ ItemBody: cnNotesOverview('MenuItem') }}
-				items={[{ id: 'all', content: 'All notes' }]}
+				items={[
+					{
+						id: 'inbox',
+						content: (
+							<>
+								<Icon hasGlyph boxSize=".9rem">
+									<FaInbox size="100%" />
+								</Icon>{' '}
+								<span>Inbox</span>
+							</>
+						),
+					},
+					{
+						id: 'all',
+						content: (
+							<>
+								<Icon hasGlyph boxSize=".9rem">
+									<FaBookOpen size="100%" />
+								</Icon>{' '}
+								<span>All notes</span>
+							</>
+						),
+					},
+					{
+						id: 'bookmarks',
+						content: (
+							<>
+								<Icon hasGlyph boxSize=".9rem">
+									<FaBookmark size="100%" />
+								</Icon>{' '}
+								<span>Bookmarks</span>
+							</>
+						),
+					},
+					{
+						id: 'archive',
+						content: (
+							<>
+								<Icon hasGlyph boxSize=".9rem">
+									<FaBoxArchive size="100%" />
+								</Icon>{' '}
+								<span>Archive</span>
+							</>
+						),
+					},
+					{
+						id: 'files',
+						content: (
+							<>
+								<Icon hasGlyph boxSize=".9rem">
+									<FaFile size="100%" />
+								</Icon>{' '}
+								<span>Files</span>
+							</>
+						),
+					},
+					{
+						id: 'bin',
+						content: (
+							<>
+								<Icon hasGlyph boxSize=".9rem">
+									<FaTrash size="100%" />
+								</Icon>{' '}
+								<span>Bin</span>
+							</>
+						),
+					},
+				]}
 				activeItem={activeTag === null ? 'all' : undefined}
 				onPick={(id) => {
 					if (id === 'all') {

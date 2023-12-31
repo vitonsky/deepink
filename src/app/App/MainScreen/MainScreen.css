@@ -10,10 +10,20 @@
 	color: var(--color-typo-primary);
 }
 
+.MainScreen-Workspace {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.MainScreen-WorkspacePicker {
+	width: 100%;
+}
+
 .MainScreen-SideBar {
 	min-width: 250px;
 	max-width: 250px;
-	border-right: 3px solid var(--color-fill-color-border);
+	border-right: var(--layout-divider-weight) solid var(--color-fill-color-border);
 	padding: 4px;
 
 	/* padding: 0.5rem; */
@@ -22,6 +32,10 @@
 	flex-direction: column;
 	gap: 0.5rem;
 	background: var(--color-fill-color-stripe);
+}
+
+.MainScreen-SideBar_view_main {
+	gap: 1rem;
 }
 
 .MainScreen-NotesList {

@@ -4,7 +4,7 @@
 
 .NotesList .Menu-Item.NotesList-Item_active {
 	background-color: var(--color-control-type-action-fill-color-base);
-	color: var(--color-control-type-action-typo-base);
+	color: var(--color-control-type-default-typo-base);
 }
 
 .NotesList .Menu-ItemText {

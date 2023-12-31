@@ -1,7 +1,9 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
+import { FaGear } from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
@@ -13,6 +15,7 @@ import {
 	openedNotesControls,
 } from '../../../core/state/notes';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
+import { Icon } from '../../components/Icon/Icon.bundle/common';
 
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
@@ -151,7 +154,24 @@ export const MainScreen: FC = () => {
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
 			<div className={cnMainScreen('Content')}>
-				<div className={cnMainScreen('SideBar')}>
+				<div className={cnMainScreen('SideBar', { view: 'main' })}>
+					<div className={cnMainScreen('Workspace')}>
+						<Select
+							className={cnMainScreen('WorkspacePicker')}
+							options={[
+								{
+									id: 'default',
+									content: 'Default',
+								},
+							]}
+							value="default"
+						></Select>
+						<Button>
+							<Icon boxSize="1rem" hasGlyph>
+								<FaGear size="100%" />
+							</Icon>
+						</Button>
+					</div>
 					<NotesOverview />
 				</div>
 
