@@ -33,6 +33,14 @@
 	--color-fill-color-stripe: #f6f6f6;
 	--color-control-type-action-fill-color-base: #dfe0ff;
 	--color-control-type-action-fill-color-hovered: #2923d7;
+
+	/* Token names examples: https://carbondesignsystem.com/guidelines/color/tokens */
+	--color-control-type-panel-fill-color-base: #fff;
+	--color-control-type-panel-fill-color-hovered: #efefef;
+	--color-control-type-panel-fill-color-selected: #ececec;
+	--color-control-type-list-fill-color-hover: #ececec;
+	--color-control-type-list-fill-color-selected: #e6e6e6;
+	--color-control-type-list-typo-base: #000;
 	--layout-divider-weight: 1px;
 	--stack-spacing: 4px;
 }

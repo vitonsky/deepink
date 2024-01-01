@@ -25,17 +25,17 @@
 
 .List-ItemBody {
 	display: flex;
-	padding: 3px 8px 3px 4px;
+	padding: 6px 8px 6px 4px;
 	gap: 0.3rem;
 	border-radius: 4px;
 }
 
 .List-ItemBody:hover {
-	background: var(--color-control-type-default-fill-color-base);
-	color: var(--color-control-type-default-typo-base);
+	background: var(--color-control-type-list-fill-color-hover);
+	color: var(--color-control-type-list-typo-base);
 }
 
 .List-Item_active > .List-ItemBody {
-	background: var(--color-control-type-action-fill-color-base);
-	color: var(--color-control-type-default-typo-base);
+	background: var(--color-control-type-list-fill-color-selected);
+	color: var(--color-control-type-list-typo-base);
 }

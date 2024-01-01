@@ -1,24 +1,21 @@
-.NotesList .NotesList-Note_opened {
-	border-color: var(--color-control-type-action-fill-color-base);
-}
-
-.NotesList .NotesList-Note_active {
-	border-color: var(--color-control-type-action-fill-color-hovered);
+.NotesList {
+	padding-inline: 0.3rem;
 }
 
 .NotesList-Note {
 	cursor: pointer;
 	padding: 0.5rem;
-	background: #f9f9f9;
-	border-left: 2px solid transparent;
-
-	/* white-space: nowrap; */
 	overflow: hidden;
 	text-overflow: ellipsis;
+	border-radius: 6px;
 }
 
 .NotesList-Note:hover {
-	background: #efefef;
+	background: var(--color-control-type-panel-fill-color-hovered);
+}
+
+.NotesList-Note_active.NotesList-Note_active {
+	background-color: var(--color-control-type-panel-fill-color-selected);
 }
 
 .NotesList-Title {
