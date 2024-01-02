@@ -254,7 +254,11 @@ export const MainScreen: FC = () => {
 						/>
 					</div>
 				</div>
-				<div className={cnMainScreen('ContentBlock')}>
+				<Stack
+					direction="vertical"
+					spacing={2}
+					className={cnMainScreen('ContentBlock')}
+				>
 					<TopBar
 						{...{
 							notesRegistry,
@@ -276,7 +280,7 @@ export const MainScreen: FC = () => {
 							}}
 						/>
 					</div>
-				</div>
+				</Stack>
 			</div>
 
 			<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
