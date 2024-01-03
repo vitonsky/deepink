@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
-import { Icon } from 'react-elegant-ui/esm/components/Icon/Icon.bundle/desktop';
-import { TabsMenu } from 'react-elegant-ui/esm/components/TabsMenu/TabsMenu.bundle/desktop';
+import { FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
+import { Icon } from '../../../components/Icon/Icon.bundle/common';
+import { TabsMenu } from '../../../components/TabsMenu';
 
 import { getNoteTitle } from '../..';
 import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
@@ -45,7 +46,7 @@ export const TopBar: FC<TopBarProps> = ({
 
 	return (
 		<TabsMenu
-			view="primitive"
+			view="primary"
 			layout="horizontal"
 			dir="horizontal"
 			className={cnTopBar()}
@@ -63,24 +64,29 @@ export const TopBar: FC<TopBarProps> = ({
 					return {
 						id: noteId,
 						content: (
-							<span
-								onContextMenu={(evt) => {
-									openNoteContextMenu(note.id, {
-										x: evt.pageX,
-										y: evt.pageY,
-									});
-								}}
-							>
-								{getNoteTitle(note.data)}{' '}
+							<>
 								<span
+									onContextMenu={(evt) => {
+										openNoteContextMenu(note.id, {
+											x: evt.pageX,
+											y: evt.pageY,
+										});
+									}}
+								>
+									{getNoteTitle(note.data)}{' '}
+								</span>
+								<span
+									className={cnTopBar('CloseButton')}
 									onClick={(evt) => {
 										evt.stopPropagation();
 										onClose(noteId);
 									}}
 								>
-									<Icon glyph="cancel" size="s" />
+									<Icon boxSize="1rem" hasGlyph>
+										<FaXmark size="100%" />
+									</Icon>
 								</span>
-							</span>
+							</>
 						),
 					};
 				})}

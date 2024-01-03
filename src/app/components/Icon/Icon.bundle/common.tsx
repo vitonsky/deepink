@@ -4,6 +4,8 @@ import { Icon as IconBase } from 'react-elegant-ui/esm/components/Icon/Icon';
 import { IconConstructor } from 'react-elegant-ui/esm/components/Icon/Icon.utils/IconConstructor';
 import { compose, composeU } from 'react-elegant-ui/esm/lib/compose';
 
+import { withModBoxSize } from '../_boxSize/Icon_boxSize';
+import { withModHasGlyph } from '../_hasGlyph/Icon_hasGlyph';
 import IconAdd from '../assets/add.svg';
 import IconClear from '../assets/clear.svg';
 import IconEdit from '../assets/edit.svg';
@@ -28,6 +30,8 @@ export const Icon = compose(
 		withModIconGlyphEdit,
 	),
 	composeU(withModIconSizeS, withModIconSizeM),
+	withModHasGlyph,
+	withModBoxSize,
 )(IconBase);
 
 Icon.defaultProps = {

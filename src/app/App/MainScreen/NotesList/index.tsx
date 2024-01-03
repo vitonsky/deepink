@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
-import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../../core/Note';
 import { INotesRegistry } from '../../../../core/Registry';
+import { Stack } from '../../../components/Stack/Stack';
 
 import { getNoteTitle } from '../..';
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
@@ -40,35 +40,46 @@ export const NotesList: FC<NotesListProps> = ({
 		updateNotes,
 	});
 
+	// TODO: get preview text from DB as prepared value
+	// TODO: show attachments
 	// TODO: implement dragging and moving items
 	return (
-		<Menu
-			className={cnNotesList()}
-			onPick={onPick}
-			items={notes.map((note) => {
-				return {
-					id: note.id,
-					textContent: getNoteTitle(note.data),
-					content: (
-						<div
-							onContextMenu={(evt) => {
-								openNoteContextMenu(note.id, {
-									x: evt.pageX,
-									y: evt.pageY,
-								});
-							}}
-						>
-							{getNoteTitle(note.data)}
-						</div>
-					),
-					addonProps: {
-						className: cnNotesList('Item', {
+		<Stack direction="vertical" className={cnNotesList()}>
+			{notes.map((note) => {
+				const date = note.createdTimestamp ?? note.updatedTimestamp;
+				return (
+					<Stack
+						key={note.id}
+						spacing={2}
+						direction="vertical"
+						className={cnNotesList('Note', {
 							active: note.id === activeNote,
 							opened: openedNotes && openedNotes.indexOf(note.id) !== -1,
-						}),
-					},
-				};
+						})}
+						onContextMenu={(evt) => {
+							openNoteContextMenu(note.id, {
+								x: evt.pageX,
+								y: evt.pageY,
+							});
+						}}
+						onClick={() => {
+							onPick(note.id);
+						}}
+					>
+						<div className={cnNotesList('Title')}>
+							{getNoteTitle(note.data)}
+						</div>
+						<div className={cnNotesList('TextPreview')}>
+							{note.data.text.slice(0, 80)}
+						</div>
+						{date && (
+							<div className={cnNotesList('Meta')}>
+								{new Date(date).toDateString()}
+							</div>
+						)}
+					</Stack>
+				);
 			})}
-		/>
+		</Stack>
 	);
 };
