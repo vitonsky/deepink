@@ -3,7 +3,7 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
-import { FaEllipsis } from 'react-icons/fa6';
+import { FaBookmark, FaEllipsis, FaFlag } from 'react-icons/fa6';
 import { useStore } from 'effector-react';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
@@ -144,7 +144,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				/>
 				<Button
 					view="default"
-					className={cnNoteEditor('NoteControlButton')}
 					innerRef={noteControlButtonRef}
 					onPress={() => setIsNoteMenuOpened((state) => !state)}
 				>
@@ -215,6 +214,19 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				</Popup>
 			</Stack>
 			<div className={cnNoteEditor('Attachments')}>
+				<Stack direction="horizontal">
+					<Button view="clear" size="s">
+						<Icon boxSize="1rem" hasGlyph>
+							<FaBookmark size="100%" />
+						</Icon>
+					</Button>
+					<Button view="clear" size="s">
+						<Icon boxSize="1rem" hasGlyph>
+							<FaFlag size="100%" />
+						</Icon>
+					</Button>
+				</Stack>
+
 				{attachedTags.map((tag) => (
 					<div
 						className={cnNoteEditor('Attachment')}
@@ -281,7 +293,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					view="default"
 					visible
 					direction={['bottom-start', 'bottom', 'bottom-end']}
-					// boundary={modalRef}
 				>
 					<SuggestedTagsList
 						tags={notAttachedTags}
