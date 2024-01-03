@@ -1,6 +1,9 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
+import { FaEllipsis } from 'react-icons/fa6';
 import { useStore } from 'effector-react';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
@@ -15,6 +18,7 @@ import {
 	tagsChanged,
 } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
+import { Stack } from '../../components/Stack/Stack';
 import { SuggestedTagsList } from '../../components/SuggestedTagsList';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
@@ -125,9 +129,91 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const [isShowTagsList, setIsShowTagsList] = useState(false);
 	const tagInputRef = useRef<HTMLInputElement | null>(null);
 
+	// TODO: create hook for boilerplate for trigger
+	const noteControlButtonRef = useRef<HTMLButtonElement | null>(null);
+	const [isNoteMenuOpened, setIsNoteMenuOpened] = useState(false);
+
 	return (
 		<div className={cnNoteEditor()}>
-			<Textinput value={title} onInputText={setTitle} placeholder="Note title" />
+			<Stack direction="horizontal">
+				<Textinput
+					className={cnNoteEditor('Title')}
+					value={title}
+					onInputText={setTitle}
+					placeholder="Note title"
+				/>
+				<Button
+					view="default"
+					className={cnNoteEditor('NoteControlButton')}
+					innerRef={noteControlButtonRef}
+					onPress={() => setIsNoteMenuOpened((state) => !state)}
+				>
+					<Icon boxSize="1rem" hasGlyph>
+						<FaEllipsis size="100%" />
+					</Icon>
+				</Button>
+
+				{/* TODO: close menu by click item or by click outside */}
+				{/* TODO: add options that may be toggled */}
+				{/* TODO: fix popup position. Currently it is 1 step behind the ideal position */}
+				{/* TODO: render popups in portal */}
+				<Popup
+					target="anchor"
+					anchor={noteControlButtonRef}
+					view="default"
+					visible={isNoteMenuOpened}
+					zIndex={99}
+				>
+					<Menu
+						items={[
+							{
+								id: 'id',
+								content: 'Copy reference on note',
+							},
+							{
+								id: 'id',
+								content: 'Remind me',
+							},
+							{
+								id: 'id',
+								content: 'History',
+							},
+							{
+								id: 'id',
+								content: 'Readonly mode',
+							},
+							{
+								id: 'id',
+								content: 'Download and convert a network media',
+							},
+							{
+								id: 'id',
+								content: 'Spellcheck',
+							},
+							{
+								id: 'id',
+								content: 'Export...',
+							},
+							{
+								id: 'id',
+								content: 'Password protection...',
+							},
+							{
+								id: 'id',
+								content: 'Disable sync',
+							},
+							{
+								id: 'id',
+								content: 'Archive',
+							},
+							{
+								id: 'id',
+								content: 'Delete',
+							},
+						]}
+					/>
+				</Popup>
+			</Stack>
 			<div className={cnNoteEditor('Attachments')}>
 				{attachedTags.map((tag) => (
 					<div

@@ -6,6 +6,14 @@
 	padding: 0 6px;
 }
 
+.NoteEditor-Title {
+	width: 100%;
+}
+
+.NoteEditor-NoteControlButton {
+	line-height: 1.4rem;
+}
+
 .NoteEditor-Editor {
 	flex-grow: 100;
 }
