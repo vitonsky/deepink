@@ -7,7 +7,6 @@ import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import {
 	FaArrowDownWideShort,
 	FaGear,
-	FaLock,
 	FaMagnifyingGlass,
 	FaPenToSquare,
 } from 'react-icons/fa6';
@@ -192,11 +191,6 @@ export const MainScreen: FC = () => {
 						<Button title="Workspace settings">
 							<Icon boxSize="1rem" hasGlyph>
 								<FaGear size="100%" />
-							</Icon>
-						</Button>
-						<Button title="Lock database">
-							<Icon boxSize="1rem" hasGlyph>
-								<FaLock size="100%" />
 							</Icon>
 						</Button>
 					</div>
