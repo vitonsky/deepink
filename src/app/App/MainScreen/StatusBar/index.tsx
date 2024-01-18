@@ -5,8 +5,9 @@ import {
 	FaBell,
 	FaClockRotateLeft,
 	FaCompress,
-	FaDatabase,
 	FaLock,
+	FaUserLarge,
+	FaWrench,
 } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
 
@@ -41,7 +42,7 @@ export const StatusBar: FC<StatusBarProps> = ({
 					onClick={() => changedActiveProfile(null)}
 				>
 					<Icon hasGlyph boxSize="1rem">
-						<FaDatabase />
+						<FaUserLarge />
 					</Icon>
 				</Button>
 				<Button size="s" view="clear" title="Lock database">
@@ -52,6 +53,11 @@ export const StatusBar: FC<StatusBarProps> = ({
 				<Button size="s" view="clear" title="Sync changes">
 					<Icon hasGlyph boxSize="1rem">
 						<FaArrowsRotate />
+					</Icon>
+				</Button>
+				<Button size="s" view="clear" title="Preferences">
+					<Icon hasGlyph boxSize="1rem">
+						<FaWrench />
 					</Icon>
 				</Button>
 			</div>
