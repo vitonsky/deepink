@@ -29,6 +29,7 @@ import {
 import { changedActiveProfile } from '../../../core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
 import { useButtonsManager } from '../../api/buttons/useButtonsManager';
+import { useFirstRender } from '../../components/hooks/useFirstRender';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../components/Stack/Stack';
 
@@ -43,32 +44,6 @@ import { TopBar } from './TopBar';
 import './MainScreen.css';
 
 export const cnMainScreen = cn('MainScreen');
-
-export const useFirstRender = (callback: () => void | (() => void)) => {
-	const isFirstRenderRef = useRef(true);
-
-	// Run callback on first render
-	const cleanupCallbackRef = useRef<null | (() => void)>(null);
-	if (isFirstRenderRef.current) {
-		const cleanupCallback = callback();
-
-		if (cleanupCallback) {
-			cleanupCallbackRef.current = cleanupCallback;
-		}
-	}
-
-	// Prevent run callback in future
-	isFirstRenderRef.current = false;
-
-	// Run cleanup function on unmount
-	useEffect(() => {
-		return () => {
-			if (cleanupCallbackRef.current) {
-				cleanupCallbackRef.current();
-			}
-		};
-	}, []);
-};
 
 export const MainScreen: FC = () => {
 	const notesRegistry = useNotesRegistry();
