@@ -1,11 +1,4 @@
-import React, {
-	createContext,
-	FC,
-	HTMLProps,
-	ReactNode,
-	useContext,
-	useMemo,
-} from 'react';
+import React, { createContext, FC, HTMLProps, ReactNode, useContext } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
@@ -18,7 +11,6 @@ import './StatusBar.css';
 export const cnStatusBar = cn('StatusBar');
 
 export type StatusBarButton = {
-	placement: 'left' | 'right';
 	onClick?: () => void;
 	title?: string;
 } & (
@@ -32,7 +24,13 @@ export type StatusBarButton = {
 	  }
 );
 
-export const StatusBarContext = createContext<StatusBarButton[]>([]);
+export const StatusBarContext = createContext<{
+	left: StatusBarButton[];
+	right: StatusBarButton[];
+}>({
+	left: [],
+	right: [],
+});
 
 export type StatusBarProps = HTMLProps<HTMLDivElement> & {
 	notesRegistry: INotesRegistry;
@@ -46,14 +44,7 @@ export const StatusBar: FC<StatusBarProps> = ({
 	updateNotes,
 	...props
 }) => {
-	const statusBarItems = useContext(StatusBarContext);
-	const { left, right } = useMemo(
-		() => ({
-			left: statusBarItems.filter((item) => item.placement === 'left'),
-			right: statusBarItems.filter((item) => item.placement === 'right'),
-		}),
-		[statusBarItems],
-	);
+	const { left, right } = useContext(StatusBarContext);
 
 	return (
 		<div {...props} className={cnStatusBar({}, [className])}>

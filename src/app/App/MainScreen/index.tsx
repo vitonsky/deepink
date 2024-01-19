@@ -286,46 +286,43 @@ export const MainScreen: FC = () => {
 			</div>
 
 			<StatusBarContext.Provider
-				value={[
-					{
-						placement: 'left',
-						title: 'Change database',
-						onClick: () => changedActiveProfile(null),
-						icon: <FaUserLarge />,
-					},
-					{
-						placement: 'left',
-						title: 'Lock database',
-						icon: <FaLock />,
-					},
-					{
-						placement: 'left',
-						title: 'Sync changes',
-						icon: <FaArrowsRotate />,
-					},
-					{
-						placement: 'left',
-						title: 'Preferences',
-						icon: <FaWrench />,
-					},
+				value={{
+					left: [
+						{
+							title: 'Change database',
+							onClick: () => changedActiveProfile(null),
+							icon: <FaUserLarge />,
+						},
+						{
+							title: 'Lock database',
+							icon: <FaLock />,
+						},
+						{
+							title: 'Sync changes',
+							icon: <FaArrowsRotate />,
+						},
+						{
+							title: 'Preferences',
+							icon: <FaWrench />,
+						},
+					],
 
-					{
-						placement: 'right',
-						title: 'History',
-						icon: <FaClockRotateLeft />,
-						text: new Date().toLocaleDateString(),
-					},
-					{
-						placement: 'right',
-						title: 'Focus mode',
-						icon: <FaCompress />,
-					},
-					{
-						placement: 'right',
-						title: 'Notifications',
-						icon: <FaBell />,
-					},
-				]}
+					right: [
+						{
+							title: 'History',
+							icon: <FaClockRotateLeft />,
+							text: new Date().toLocaleDateString(),
+						},
+						{
+							title: 'Focus mode',
+							icon: <FaCompress />,
+						},
+						{
+							title: 'Notifications',
+							icon: <FaBell />,
+						},
+					],
+				}}
 			>
 				<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
 			</StatusBarContext.Provider>
