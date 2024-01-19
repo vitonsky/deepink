@@ -18,7 +18,11 @@
 	vertical-align: middle;
 }
 
-.StatusBar-StatusContainer {
+.StatusBar > * {
+	display: flex;
+}
+
+.StatusBar-RightItems {
 	margin-left: auto;
 	line-height: 1.5rem;
 }
@@ -31,4 +35,8 @@
 
 .StatusBar-ProgressIndicator > * {
 	margin: auto;
+}
+
+.StatusBar .Button-Content:not(.Button-Content_raw) > *:last-child {
+	margin-inline: 5px;
 }

@@ -1,24 +1,38 @@
-import React, { FC, HTMLProps } from 'react';
+import React, {
+	createContext,
+	FC,
+	HTMLProps,
+	ReactNode,
+	useContext,
+	useMemo,
+} from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import {
-	FaArrowsRotate,
-	FaBell,
-	FaClockRotateLeft,
-	FaCompress,
-	FaLock,
-	FaUserLarge,
-	FaWrench,
-} from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
 
 import { INotesRegistry } from '../../../../core/Registry';
-import { changedActiveProfile } from '../../../../core/state/profiles';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../../components/Stack/Stack';
 
 import './StatusBar.css';
 
 export const cnStatusBar = cn('StatusBar');
+
+export type StatusBarButton = {
+	placement: 'left' | 'right';
+	onClick?: () => void;
+	title?: string;
+} & (
+	| {
+			icon: ReactNode;
+			text?: string;
+	  }
+	| {
+			icon?: ReactNode;
+			text: string;
+	  }
+);
+
+export const StatusBarContext = createContext<StatusBarButton[]>([]);
 
 export type StatusBarProps = HTMLProps<HTMLDivElement> & {
 	notesRegistry: INotesRegistry;
@@ -32,54 +46,57 @@ export const StatusBar: FC<StatusBarProps> = ({
 	updateNotes,
 	...props
 }) => {
+	const statusBarItems = useContext(StatusBarContext);
+	const { left, right } = useMemo(
+		() => ({
+			left: statusBarItems.filter((item) => item.placement === 'left'),
+			right: statusBarItems.filter((item) => item.placement === 'right'),
+		}),
+		[statusBarItems],
+	);
+
 	return (
 		<div {...props} className={cnStatusBar({}, [className])}>
-			<div className={cnStatusBar('ActionContainer')}>
-				<Button
-					size="s"
-					view="clear"
-					title="Change database"
-					onClick={() => changedActiveProfile(null)}
-				>
-					<Icon hasGlyph boxSize="1rem">
-						<FaUserLarge />
-					</Icon>
-				</Button>
-				<Button size="s" view="clear" title="Lock database">
-					<Icon hasGlyph boxSize="1rem">
-						<FaLock />
-					</Icon>
-				</Button>
-				<Button size="s" view="clear" title="Sync changes">
-					<Icon hasGlyph boxSize="1rem">
-						<FaArrowsRotate />
-					</Icon>
-				</Button>
-				<Button size="s" view="clear" title="Preferences">
-					<Icon hasGlyph boxSize="1rem">
-						<FaWrench />
-					</Icon>
-				</Button>
+			<div className={cnStatusBar('LeftItems')}>
+				{left.map((item, idx) => (
+					<Button
+						key={idx}
+						size="s"
+						view="clear"
+						title={item.title}
+						onClick={item.onClick}
+					>
+						<Stack direction="horizontal">
+							{item.icon && (
+								<Icon hasGlyph boxSize="1rem">
+									{item.icon}
+								</Icon>
+							)}
+							{item.text && <span>{item.text}</span>}
+						</Stack>
+					</Button>
+				))}
 			</div>
-			<div className={cnStatusBar('StatusContainer')}>
-				<Button size="s" view="clear" title="History">
-					<Stack direction="horizontal">
-						<Icon hasGlyph boxSize="1rem">
-							<FaClockRotateLeft />
-						</Icon>
-						<span>{new Date().toLocaleDateString()}</span>
-					</Stack>
-				</Button>
-				<Button size="s" view="clear" title="Focus mode">
-					<Icon hasGlyph boxSize="1rem">
-						<FaCompress />
-					</Icon>
-				</Button>
-				<Button size="s" view="clear" title="Notifications">
-					<Icon hasGlyph boxSize="1rem">
-						<FaBell />
-					</Icon>
-				</Button>
+
+			<div className={cnStatusBar('RightItems')}>
+				{right.map((item, idx) => (
+					<Button
+						key={idx}
+						size="s"
+						view="clear"
+						title={item.title}
+						onClick={item.onClick}
+					>
+						<Stack direction="horizontal">
+							{item.icon && (
+								<Icon hasGlyph boxSize="1rem">
+									{item.icon}
+								</Icon>
+							)}
+							{item.text && <span>{item.text}</span>}
+						</Stack>
+					</Button>
+				))}
 			</div>
 		</div>
 	);

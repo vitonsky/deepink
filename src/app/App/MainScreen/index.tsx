@@ -6,9 +6,16 @@ import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import {
 	FaArrowDownWideShort,
+	FaArrowsRotate,
+	FaBell,
+	FaClockRotateLeft,
+	FaCompress,
 	FaGear,
+	FaLock,
 	FaMagnifyingGlass,
 	FaPenToSquare,
+	FaUserLarge,
+	FaWrench,
 } from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
@@ -20,6 +27,7 @@ import {
 	activeNoteChanged,
 	openedNotesControls,
 } from '../../../core/state/notes';
+import { changedActiveProfile } from '../../../core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../components/Stack/Stack';
@@ -28,7 +36,7 @@ import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
-import { StatusBar } from './StatusBar';
+import { StatusBar, StatusBarContext } from './StatusBar';
 import { TopBar } from './TopBar';
 
 import './MainScreen.css';
@@ -277,7 +285,50 @@ export const MainScreen: FC = () => {
 				</Stack>
 			</div>
 
-			<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
+			<StatusBarContext.Provider
+				value={[
+					{
+						placement: 'left',
+						title: 'Change database',
+						onClick: () => changedActiveProfile(null),
+						icon: <FaUserLarge />,
+					},
+					{
+						placement: 'left',
+						title: 'Lock database',
+						icon: <FaLock />,
+					},
+					{
+						placement: 'left',
+						title: 'Sync changes',
+						icon: <FaArrowsRotate />,
+					},
+					{
+						placement: 'left',
+						title: 'Preferences',
+						icon: <FaWrench />,
+					},
+
+					{
+						placement: 'right',
+						title: 'History',
+						icon: <FaClockRotateLeft />,
+						text: new Date().toLocaleDateString(),
+					},
+					{
+						placement: 'right',
+						title: 'Focus mode',
+						icon: <FaCompress />,
+					},
+					{
+						placement: 'right',
+						title: 'Notifications',
+						icon: <FaBell />,
+					},
+				]}
+			>
+				<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
+			</StatusBarContext.Provider>
 		</div>
 	);
 };
