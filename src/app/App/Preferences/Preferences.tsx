@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { FaWrench } from 'react-icons/fa6';
 
-import { useBottomPanelButtonsManager } from '../../api/buttons/useButtonsManager';
 import { Modal } from '../../components/Modal/Modal.bundle/Modal.desktop';
 import { Stack } from '../../components/Stack/Stack';
+
+import { useBottomPanelManager } from '../MainScreen/StatusBar';
 
 export const Preferences = () => {
 	const [isOpened, setIsOpened] = useState(false);
 
-	const { manager } = useBottomPanelButtonsManager();
+	const { manager } = useBottomPanelManager();
 	useEffect(() => {
 		manager.register(
 			'preferences',

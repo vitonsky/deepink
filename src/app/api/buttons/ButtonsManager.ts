@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type ButtonObject = {
 	visible: boolean;
@@ -51,7 +51,7 @@ export class ButtonsManager {
 		return this.buttons;
 	}
 
-	public register(id: string, button: ButtonObject, placement: 'start' | 'end') {
+	public register(id: string, button: ButtonObject, placement: Placement) {
 		this.deleteIfExists(id);
 		this.buttons[placement].push({
 			id,

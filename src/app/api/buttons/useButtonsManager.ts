@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { ButtonObject, ButtonsManager } from '.';
+import { ButtonObject, ButtonsManager } from './ButtonsManager';
 
 export type ButtonsManagerObject = {
 	readonly manager: ButtonsManager;
