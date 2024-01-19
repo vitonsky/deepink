@@ -28,10 +28,7 @@ import {
 } from '../../../core/state/notes';
 import { changedActiveProfile } from '../../../core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
-import {
-	BottomPanelButtonsManagerContext,
-	useButtonsManager,
-} from '../../api/buttons/useButtonsManager';
+import { useButtonsManager } from '../../api/buttons/useButtonsManager';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../components/Stack/Stack';
 
@@ -40,7 +37,7 @@ import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
-import { StatusBar, StatusBarContext } from './StatusBar';
+import { BottomPanelManagerContext, StatusBar, StatusBarContext } from './StatusBar';
 import { TopBar } from './TopBar';
 
 import './MainScreen.css';
@@ -381,9 +378,9 @@ export const MainScreen: FC = () => {
 				<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
 			</StatusBarContext.Provider>
 
-			<BottomPanelButtonsManagerContext.Provider value={buttonsManager}>
+			<BottomPanelManagerContext.Provider value={buttonsManager}>
 				<Preferences />
-			</BottomPanelButtonsManagerContext.Provider>
+			</BottomPanelManagerContext.Provider>
 		</div>
 	);
 };
