@@ -1,8 +1,9 @@
-import React, { createContext, FC, HTMLProps, ReactNode, useContext } from 'react';
+import React, { createContext, FC, HTMLProps, useContext } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
 import { INotesRegistry } from '../../../../core/Registry';
+import { ButtonObject } from '../../../api/buttons';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../../components/Stack/Stack';
 
@@ -10,24 +11,9 @@ import './StatusBar.css';
 
 export const cnStatusBar = cn('StatusBar');
 
-export type StatusBarButton = {
-	visible: boolean;
-	onClick?: () => void;
-	title?: string;
-} & (
-	| {
-			icon: ReactNode;
-			text?: string;
-	  }
-	| {
-			icon?: ReactNode;
-			text: string;
-	  }
-);
-
 export const StatusBarContext = createContext<{
-	left: StatusBarButton[];
-	right: StatusBarButton[];
+	left: ButtonObject[];
+	right: ButtonObject[];
 }>({
 	left: [],
 	right: [],

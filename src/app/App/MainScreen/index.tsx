@@ -1,12 +1,4 @@
-import React, {
-	createContext,
-	FC,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
@@ -23,7 +15,6 @@ import {
 	FaMagnifyingGlass,
 	FaPenToSquare,
 	FaUserLarge,
-	FaWrench,
 } from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
@@ -37,128 +28,26 @@ import {
 } from '../../../core/state/notes';
 import { changedActiveProfile } from '../../../core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
+import {
+	BottomPanelButtonsManagerContext,
+	useButtonsManager,
+} from '../../api/buttons/useButtonsManager';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
-import { Modal } from '../../components/Modal/Modal.bundle/Modal.desktop';
 import { Stack } from '../../components/Stack/Stack';
 
+import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
-import { StatusBar, StatusBarButton, StatusBarContext } from './StatusBar';
+import { StatusBar, StatusBarContext } from './StatusBar';
 import { TopBar } from './TopBar';
 
 import './MainScreen.css';
 
 export const cnMainScreen = cn('MainScreen');
 
-type ManagedButton = {
-	id: string;
-	button: StatusBarButton;
-};
-
-type ManagedButtons = { start: ManagedButton[]; end: ManagedButton[] };
-
-type Placement = 'start' | 'end';
-
-class StatusBarButtonsManager {
-	private updateCallback: (state: ManagedButtons) => void;
-	constructor(updateCallback: (state: ManagedButtons) => void) {
-		this.updateCallback = updateCallback;
-	}
-
-	private readonly buttons: { start: ManagedButton[]; end: ManagedButton[] } = {
-		start: [],
-		end: [],
-	};
-
-	private deleteIfExists(id: string) {
-		for (const sideName in this.buttons) {
-			this.buttons[sideName as Placement] = this.buttons[
-				sideName as Placement
-			].filter((button) => button.id !== id);
-		}
-	}
-
-	private updateState() {
-		this.updateCallback(this.buttons);
-	}
-
-	public get() {
-		return this.buttons;
-	}
-
-	public register(id: string, button: StatusBarButton, placement: 'start' | 'end') {
-		this.deleteIfExists(id);
-		this.buttons[placement].push({
-			id,
-			button,
-		});
-
-		this.updateState();
-	}
-
-	public unregister(id: string) {
-		this.deleteIfExists(id);
-		this.updateState();
-	}
-
-	public update(id: string, button: StatusBarButton) {
-		// Find button
-		let existsButton: [Placement, number] | null = null;
-		for (const sideName in this.buttons) {
-			const buttonIndex = this.buttons[sideName as Placement].findIndex(
-				(button) => button.id === id,
-			);
-			if (buttonIndex !== -1) {
-				existsButton = [sideName as Placement, buttonIndex];
-				break;
-			}
-		}
-
-		if (existsButton === null) return;
-
-		const [placement, index] = existsButton;
-		this.buttons[placement][index] = {
-			id,
-			button,
-		};
-
-		this.updateState();
-	}
-}
-
-type ButtonsManager123 = {
-	readonly state: {
-		left: StatusBarButton[];
-		right: StatusBarButton[];
-	};
-	readonly manager: StatusBarButtonsManager;
-};
-
-const useButtonsManager = (): ButtonsManager123 => {
-	const [state, setState] = useState<{
-		left: StatusBarButton[];
-		right: StatusBarButton[];
-	}>({ left: [], right: [] });
-
-	const managerRef = useRef<StatusBarButtonsManager>(
-		null as unknown as StatusBarButtonsManager,
-	);
-	if (!managerRef.current) {
-		managerRef.current = new StatusBarButtonsManager((buttons) => {
-			console.log('Update 1', buttons);
-			setState({
-				left: buttons.start.map((button) => button.button),
-				right: buttons.end.map((button) => button.button),
-			});
-		});
-	}
-
-	return { state, manager: managerRef.current } as const;
-};
-
-const useFirstRender = (callback: () => void | (() => void)) => {
+export const useFirstRender = (callback: () => void | (() => void)) => {
 	const isFirstRenderRef = useRef(true);
 
 	// Run callback on first render
@@ -182,47 +71,6 @@ const useFirstRender = (callback: () => void | (() => void)) => {
 			}
 		};
 	}, []);
-};
-
-export const BottomPanelButtonsManagerContext = createContext<ButtonsManager123>(
-	null as unknown as ButtonsManager123,
-);
-export const useBottomPanelButtonsManager = () => {
-	return useContext(BottomPanelButtonsManagerContext);
-};
-
-// TODO: move component to another file
-export const Preferences = () => {
-	const [isOpened, setIsOpened] = useState(false);
-
-	const { manager } = useBottomPanelButtonsManager();
-	useEffect(() => {
-		manager.register(
-			'preferences',
-			{
-				visible: true,
-				title: 'Preferences',
-				icon: <FaWrench />,
-				onClick: () => setIsOpened(true),
-			},
-			'start',
-		);
-
-		return () => {
-			manager.unregister('preferences');
-		};
-	}, [manager]);
-
-	return (
-		<Modal
-			visible={isOpened}
-			onClose={() => setIsOpened(false)}
-			renderToStack
-			view="screen"
-		>
-			It's preferences window
-		</Modal>
-	);
 };
 
 export const MainScreen: FC = () => {
