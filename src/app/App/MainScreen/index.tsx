@@ -1,4 +1,12 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+	createContext,
+	FC,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
@@ -30,18 +38,166 @@ import {
 import { changedActiveProfile } from '../../../core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
+import { Modal } from '../../components/Modal/Modal.bundle/Modal.desktop';
 import { Stack } from '../../components/Stack/Stack';
 
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
-import { StatusBar, StatusBarContext } from './StatusBar';
+import { StatusBar, StatusBarButton, StatusBarContext } from './StatusBar';
 import { TopBar } from './TopBar';
 
 import './MainScreen.css';
 
 export const cnMainScreen = cn('MainScreen');
+
+type ManagedButton = {
+	id: string;
+	button: StatusBarButton;
+};
+
+type ManagedButtons = { start: ManagedButton[]; end: ManagedButton[] };
+
+type Placement = 'start' | 'end';
+
+class StatusBarButtonsManager {
+	private updateCallback: (state: ManagedButtons) => void;
+	constructor(updateCallback: (state: ManagedButtons) => void) {
+		this.updateCallback = updateCallback;
+	}
+
+	private readonly buttons: { start: ManagedButton[]; end: ManagedButton[] } = {
+		start: [],
+		end: [],
+	};
+
+	private deleteIfExists(id: string) {
+		for (const sideName in this.buttons) {
+			this.buttons[sideName as Placement] = this.buttons[
+				sideName as Placement
+			].filter((button) => button.id !== id);
+		}
+	}
+
+	private updateState() {
+		this.updateCallback(this.buttons);
+	}
+
+	public get() {
+		return this.buttons;
+	}
+
+	public register(id: string, button: StatusBarButton, placement: 'start' | 'end') {
+		this.deleteIfExists(id);
+		this.buttons[placement].push({
+			id,
+			button,
+		});
+
+		this.updateState();
+	}
+
+	public unregister(id: string) {
+		this.deleteIfExists(id);
+		this.updateState();
+	}
+
+	public update(id: string, button: StatusBarButton) {
+		// Find button
+		let existsButton: [Placement, number] | null = null;
+		for (const sideName in this.buttons) {
+			const buttonIndex = this.buttons[sideName as Placement].findIndex(
+				(button) => button.id === id,
+			);
+			if (buttonIndex !== -1) {
+				existsButton = [sideName as Placement, buttonIndex];
+				break;
+			}
+		}
+
+		if (existsButton === null) return;
+
+		const [placement, index] = existsButton;
+		this.buttons[placement][index] = {
+			id,
+			button,
+		};
+
+		this.updateState();
+	}
+}
+
+type ButtonsManager123 = {
+	readonly state: {
+		left: StatusBarButton[];
+		right: StatusBarButton[];
+	};
+	readonly manager: StatusBarButtonsManager;
+};
+
+const useButtonsManager = (): ButtonsManager123 => {
+	const [state, setState] = useState<{
+		left: StatusBarButton[];
+		right: StatusBarButton[];
+	}>({ left: [], right: [] });
+
+	const managerRef = useRef<StatusBarButtonsManager>(
+		null as unknown as StatusBarButtonsManager,
+	);
+	if (!managerRef.current) {
+		managerRef.current = new StatusBarButtonsManager((buttons) => {
+			console.log('Update 1', buttons);
+			setState({
+				left: buttons.start.map((button) => button.button),
+				right: buttons.end.map((button) => button.button),
+			});
+		});
+	}
+
+	return { state, manager: managerRef.current } as const;
+};
+
+export const BottomPanelButtonsManagerContext = createContext<ButtonsManager123>(
+	null as unknown as ButtonsManager123,
+);
+export const useBottomPanelButtonsManager = () => {
+	return useContext(BottomPanelButtonsManagerContext);
+};
+
+// TODO: move component to another file
+export const Preferences = () => {
+	const [isOpened, setIsOpened] = useState(false);
+
+	const { manager } = useBottomPanelButtonsManager();
+	useEffect(() => {
+		manager.register(
+			'preferences',
+			{
+				visible: true,
+				title: 'Preferences',
+				icon: <FaWrench />,
+				onClick: () => setIsOpened(true),
+			},
+			'start',
+		);
+
+		return () => {
+			manager.unregister('preferences');
+		};
+	}, [manager]);
+
+	return (
+		<Modal
+			visible={isOpened}
+			onClose={() => setIsOpened(false)}
+			renderToStack
+			view="screen"
+		>
+			It's preferences window
+		</Modal>
+	);
+};
 
 export const MainScreen: FC = () => {
 	const notesRegistry = useNotesRegistry();
@@ -165,6 +321,68 @@ export const MainScreen: FC = () => {
 		}
 	}, [notes, onNoteClick]);
 
+	const buttonsManager = useButtonsManager();
+
+	useEffect(() => {
+		buttonsManager.manager.register(
+			'dbChange',
+			{
+				visible: true,
+				title: 'Change database',
+				onClick: () => changedActiveProfile(null),
+				icon: <FaUserLarge />,
+			},
+			'start',
+		);
+		buttonsManager.manager.register(
+			'dbLock',
+			{
+				visible: true,
+				title: 'Lock database',
+				icon: <FaLock />,
+			},
+			'start',
+		);
+		buttonsManager.manager.register(
+			'sync',
+			{
+				visible: true,
+				title: 'Sync changes',
+				icon: <FaArrowsRotate />,
+			},
+			'start',
+		);
+
+		buttonsManager.manager.register(
+			'history',
+			{
+				visible: true,
+				title: 'History',
+				icon: <FaClockRotateLeft />,
+				text: new Date().toLocaleDateString(),
+			},
+			'end',
+		);
+		buttonsManager.manager.register(
+			'focusMode',
+			{
+				visible: true,
+				title: 'Focus mode',
+				icon: <FaCompress />,
+			},
+			'end',
+		);
+		buttonsManager.manager.register(
+			'notifications',
+			{
+				visible: true,
+				title: 'Notifications',
+				icon: <FaBell />,
+			},
+			'end',
+		);
+	}, [buttonsManager.manager]);
+
 	// TODO: add memoizing for tabs mapping
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
@@ -285,47 +503,13 @@ export const MainScreen: FC = () => {
 				</Stack>
 			</div>
 
-			<StatusBarContext.Provider
-				value={{
-					left: [
-						{
-							title: 'Change database',
-							onClick: () => changedActiveProfile(null),
-							icon: <FaUserLarge />,
-						},
-						{
-							title: 'Lock database',
-							icon: <FaLock />,
-						},
-						{
-							title: 'Sync changes',
-							icon: <FaArrowsRotate />,
-						},
-						{
-							title: 'Preferences',
-							icon: <FaWrench />,
-						},
-					],
-
-					right: [
-						{
-							title: 'History',
-							icon: <FaClockRotateLeft />,
-							text: new Date().toLocaleDateString(),
-						},
-						{
-							title: 'Focus mode',
-							icon: <FaCompress />,
-						},
-						{
-							title: 'Notifications',
-							icon: <FaBell />,
-						},
-					],
-				}}
-			>
+			<StatusBarContext.Provider value={buttonsManager.state}>
 				<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
 			</StatusBarContext.Provider>
+
+			<BottomPanelButtonsManagerContext.Provider value={buttonsManager}>
+				<Preferences />
+			</BottomPanelButtonsManagerContext.Provider>
 		</div>
 	);
 };

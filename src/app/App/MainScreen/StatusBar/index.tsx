@@ -11,6 +11,7 @@ import './StatusBar.css';
 export const cnStatusBar = cn('StatusBar');
 
 export type StatusBarButton = {
+	visible: boolean;
 	onClick?: () => void;
 	title?: string;
 } & (
@@ -49,45 +50,49 @@ export const StatusBar: FC<StatusBarProps> = ({
 	return (
 		<div {...props} className={cnStatusBar({}, [className])}>
 			<div className={cnStatusBar('LeftItems')}>
-				{left.map((item, idx) => (
-					<Button
-						key={idx}
-						size="s"
-						view="clear"
-						title={item.title}
-						onClick={item.onClick}
-					>
-						<Stack direction="horizontal">
-							{item.icon && (
-								<Icon hasGlyph boxSize="1rem">
-									{item.icon}
-								</Icon>
-							)}
-							{item.text && <span>{item.text}</span>}
-						</Stack>
-					</Button>
-				))}
+				{left.map((item, idx) =>
+					item.visible ? (
+						<Button
+							key={idx}
+							size="s"
+							view="clear"
+							title={item.title}
+							onClick={item.onClick}
+						>
+							<Stack direction="horizontal">
+								{item.icon && (
+									<Icon hasGlyph boxSize="1rem">
+										{item.icon}
+									</Icon>
+								)}
+								{item.text && <span>{item.text}</span>}
+							</Stack>
+						</Button>
+					) : undefined,
+				)}
 			</div>
 
 			<div className={cnStatusBar('RightItems')}>
-				{right.map((item, idx) => (
-					<Button
-						key={idx}
-						size="s"
-						view="clear"
-						title={item.title}
-						onClick={item.onClick}
-					>
-						<Stack direction="horizontal">
-							{item.icon && (
-								<Icon hasGlyph boxSize="1rem">
-									{item.icon}
-								</Icon>
-							)}
-							{item.text && <span>{item.text}</span>}
-						</Stack>
-					</Button>
-				))}
+				{right.map((item, idx) =>
+					item.visible ? (
+						<Button
+							key={idx}
+							size="s"
+							view="clear"
+							title={item.title}
+							onClick={item.onClick}
+						>
+							<Stack direction="horizontal">
+								{item.icon && (
+									<Icon hasGlyph boxSize="1rem">
+										{item.icon}
+									</Icon>
+								)}
+								{item.text && <span>{item.text}</span>}
+							</Stack>
+						</Button>
+					) : undefined,
+				)}
 			</div>
 		</div>
 	);

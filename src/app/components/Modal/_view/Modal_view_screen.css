@@ -1,0 +1,24 @@
+.Modal_view_screen .Modal-Content {
+	padding: var(--modal-size-m-content-indent);
+	background-color: var(--modal-view-default-fill-color);
+	border-radius: 0;
+}
+
+.Modal_view_screen .Modal-Overlay {
+	background-color: #fff;
+}
+
+.Modal_view_screen .Modal-Wrapper {
+	min-width: 100%;
+	min-height: 100%;
+	align-items: start;
+}
+
+.Modal_view_screen .Modal-Table,
+.Modal_view_screen .Modal-Cell,
+.Modal_view_screen .Modal-Content {
+	min-height: inherit;
+	min-width: inherit;
+	box-sizing: border-box;
+}
+
