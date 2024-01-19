@@ -158,6 +158,32 @@ const useButtonsManager = (): ButtonsManager123 => {
 	return { state, manager: managerRef.current } as const;
 };
 
+const useFirstRender = (callback: () => void | (() => void)) => {
+	const isFirstRenderRef = useRef(true);
+
+	// Run callback on first render
+	const cleanupCallbackRef = useRef<null | (() => void)>(null);
+	if (isFirstRenderRef.current) {
+		const cleanupCallback = callback();
+
+		if (cleanupCallback) {
+			cleanupCallbackRef.current = cleanupCallback;
+		}
+	}
+
+	// Prevent run callback in future
+	isFirstRenderRef.current = false;
+
+	// Run cleanup function on unmount
+	useEffect(() => {
+		return () => {
+			if (cleanupCallbackRef.current) {
+				cleanupCallbackRef.current();
+			}
+		};
+	}, []);
+};
+
 export const BottomPanelButtonsManagerContext = createContext<ButtonsManager123>(
 	null as unknown as ButtonsManager123,
 );
@@ -323,7 +349,7 @@ export const MainScreen: FC = () => {
 
 	const buttonsManager = useButtonsManager();
 
-	useEffect(() => {
+	useFirstRender(() => {
 		buttonsManager.manager.register(
 			'dbChange',
 			{
@@ -381,7 +407,7 @@ export const MainScreen: FC = () => {
 			},
 			'end',
 		);
-	}, [buttonsManager.manager]);
+	});
 
 	// TODO: add memoizing for tabs mapping
 	return (
