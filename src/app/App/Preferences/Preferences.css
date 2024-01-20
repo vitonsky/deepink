@@ -1,17 +1,36 @@
-.Preferences {
+.Preferences .Checkbox_view_default {
+	line-height: 100%;
+}
+
+.Preferences-Body {
 	max-width: 600px;
 	margin: auto;
 	padding: 2rem 1rem;
 }
 
-.Preferences .Checkbox_view_default {
-	line-height: 100%;
+.Preferences-Head,
+.Preferences-Footer {
+	display: flex;
+	padding: 0.5rem;
+	background: #f5f5f5;
+	z-index: 10;
+}
+
+.Preferences-Head {
+	position: sticky;
+	top: 0;
+}
+
+.Preferences-Footer {
+	position: sticky;
+	bottom: 0;
+}
+
+.Preferences-HeadEnd {
+	margin-left: auto;
 }
 
 .Preferences-CloseButton {
-	position: absolute;
-	top: 1rem;
-	right: 1rem;
 	text-align: center;
 }
 

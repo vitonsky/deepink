@@ -1,5 +1,5 @@
 .Modal_view_screen .Modal-Content {
-	padding: var(--modal-size-m-content-indent);
+	padding: 0;
 	background-color: var(--modal-view-default-fill-color);
 	border-radius: 0;
 }
@@ -14,6 +14,10 @@
 	align-items: start;
 }
 
+.Modal-Cell {
+	display: flex;
+}
+
 .Modal_view_screen .Modal-Table,
 .Modal_view_screen .Modal-Cell,
 .Modal_view_screen .Modal-Content {
@@ -21,4 +25,3 @@
 	min-width: inherit;
 	box-sizing: border-box;
 }
-
