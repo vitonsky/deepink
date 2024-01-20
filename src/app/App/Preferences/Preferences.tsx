@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Checkbox } from 'react-elegant-ui/esm/components/Checkbox/Checkbox.bundle/desktop';
 import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
@@ -6,6 +6,9 @@ import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.b
 import { FaRegCircleXmark, FaWrench } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
 
+import { Features } from '../../components/Features/Features';
+import { FeaturesHeader } from '../../components/Features/Header/FeaturesHeader';
+import { FeaturesOption } from '../../components/Features/Option/FeaturesOption';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { Modal } from '../../components/Modal/Modal.bundle/Modal.desktop';
 import { Stack } from '../../components/Stack/Stack';
@@ -15,35 +18,6 @@ import { useBottomPanelManager } from '../MainScreen/StatusBar';
 import './Preferences.css';
 
 export const cnPreferences = cn('Preferences');
-
-export type PreferencesOptionPrefs = PropsWithChildren<{
-	title?: string;
-	description?: string;
-}>;
-
-export const PreferencesOption: FC<PreferencesOptionPrefs> = ({
-	title,
-	description,
-	children,
-}) => {
-	return (
-		<Stack direction="vertical" spacing={2} className={cnPreferences('Option')}>
-			<div className={cnPreferences('OptionTitle')}>{title}</div>
-			<Stack
-				direction="vertical"
-				spacing={2}
-				className={cnPreferences('OptionContent')}
-			>
-				{children}
-				{description && (
-					<div className={cnPreferences('OptionDescription')}>
-						{description}
-					</div>
-				)}
-			</Stack>
-		</Stack>
-	);
-};
 
 export const Preferences = () => {
 	const [isOpened, setIsOpened] = useState(false);
@@ -70,7 +44,7 @@ export const Preferences = () => {
 
 	return (
 		<Modal visible={isOpened} onClose={onClose} renderToStack view="screen">
-			<Stack direction="vertical" className={cnPreferences('Content')} spacing={6}>
+			<div className={cnPreferences()}>
 				<Button
 					view="clear"
 					className={cnPreferences('CloseButton')}
@@ -81,91 +55,91 @@ export const Preferences = () => {
 					</Icon>
 				</Button>
 
-				<h2 className={cnPreferences('Header', { main: true })}>
-					Database settings
-				</h2>
+				<Features>
+					<FeaturesHeader view="primary">Database settings</FeaturesHeader>
 
-				<PreferencesOption title="Database name">
-					<Textinput placeholder="Enter database name" />
-				</PreferencesOption>
+					<FeaturesOption title="Database name">
+						<Textinput placeholder="Enter database name" />
+					</FeaturesOption>
 
-				<PreferencesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password">
-					<Checkbox label="Remember workspaces passwords" checked />
-				</PreferencesOption>
+					<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password">
+						<Checkbox label="Remember workspaces passwords" checked />
+					</FeaturesOption>
 
-				<h2 className={cnPreferences('Header')}>Encryption</h2>
+					<FeaturesHeader view="section">Encryption</FeaturesHeader>
 
-				<PreferencesOption title="Encryption algorithm">
-					<Select
-						options={[
-							{
-								id: 'none',
-								content: 'None',
-							},
-							{
-								id: 'aes',
-								content: 'AES',
-							},
-							{
-								id: 'twofish',
-								content: 'Twofish',
-							},
-						]}
-						value="aes"
-					/>
-				</PreferencesOption>
+					<FeaturesOption title="Encryption algorithm">
+						<Select
+							options={[
+								{
+									id: 'none',
+									content: 'None',
+								},
+								{
+									id: 'aes',
+									content: 'AES',
+								},
+								{
+									id: 'twofish',
+									content: 'Twofish',
+								},
+							]}
+							value="aes"
+						/>
+					</FeaturesOption>
 
-				<PreferencesOption title="Password">
-					<Button>Update password</Button>
-				</PreferencesOption>
+					<FeaturesOption title="Password">
+						<Button>Update password</Button>
+					</FeaturesOption>
 
-				<h2 className={cnPreferences('Header')}>Data</h2>
+					<FeaturesHeader view="section">Data</FeaturesHeader>
 
-				<PreferencesOption
-					title="Notes management"
-					description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app"
-				>
-					<Stack direction="horizontal" spacing={2}>
-						<Button>Import notes</Button>
-						<Button>Export notes</Button>
-					</Stack>
-				</PreferencesOption>
+					<FeaturesOption
+						title="Notes management"
+						description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app"
+					>
+						<Stack direction="horizontal" spacing={2}>
+							<Button>Import notes</Button>
+							<Button>Export notes</Button>
+						</Stack>
+					</FeaturesOption>
 
-				<PreferencesOption title="History">
-					<Stack direction="vertical" spacing={2}>
-						<Checkbox label="Enable history for notes" />
-						<Checkbox label="Use recycle bin" />
-					</Stack>
-				</PreferencesOption>
+					<FeaturesOption title="History">
+						<Stack direction="vertical" spacing={2}>
+							<Checkbox label="Enable history for notes" />
+							<Checkbox label="Use recycle bin" />
+						</Stack>
+					</FeaturesOption>
 
-				<h2 className={cnPreferences('Header')}>Synchronization</h2>
+					<FeaturesHeader view="section">Synchronization</FeaturesHeader>
 
-				<PreferencesOption description="Sync all data in database between your devices, to not loose it. All data are encrypted.">
-					<Checkbox label="Enable synchronization" checked />
-				</PreferencesOption>
-				<PreferencesOption title="Synchronization method">
-					<Select
-						options={[
-							{
-								id: 'fs',
-								content: 'File system',
-							},
-							{
-								id: 'server',
-								content: 'Server',
-							},
-						]}
-						value="fs"
-					/>
-				</PreferencesOption>
-				<PreferencesOption title="Synchronization directory">
-					<Textinput
-						placeholder="Enter path on directory"
-						value="/foo/bar"
-						disabled
-					/>
-				</PreferencesOption>
-			</Stack>
+					<FeaturesOption description="Sync all data in database between your devices, to not loose it. All data are encrypted.">
+						<Checkbox label="Enable synchronization" checked />
+					</FeaturesOption>
+					<FeaturesOption title="Synchronization method">
+						<Select
+							options={[
+								{
+									id: 'fs',
+									content: 'File system',
+								},
+								{
+									id: 'server',
+									content: 'Server',
+								},
+							]}
+							value="fs"
+						/>
+					</FeaturesOption>
+					<FeaturesOption title="Synchronization directory">
+						<Textinput
+							placeholder="Enter path on directory"
+							value="/foo/bar"
+							disabled
+						/>
+					</FeaturesOption>
+				</Features>
+			</div>
 		</Modal>
 	);
 };
