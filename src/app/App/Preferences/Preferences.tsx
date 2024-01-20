@@ -1,11 +1,12 @@
-import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
+import React, { FC, PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Checkbox } from 'react-elegant-ui/esm/components/Checkbox/Checkbox.bundle/desktop';
 import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
-import { FaWrench } from 'react-icons/fa6';
+import { FaRegCircleXmark, FaWrench } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
 
+import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { Modal } from '../../components/Modal/Modal.bundle/Modal.desktop';
 import { Stack } from '../../components/Stack/Stack';
 
@@ -65,14 +66,21 @@ export const Preferences = () => {
 		};
 	}, [manager]);
 
+	const onClose = useCallback(() => setIsOpened(false), []);
+
 	return (
-		<Modal
-			visible={isOpened}
-			onClose={() => setIsOpened(false)}
-			renderToStack
-			view="screen"
-		>
+		<Modal visible={isOpened} onClose={onClose} renderToStack view="screen">
 			<Stack direction="vertical" className={cnPreferences('Content')} spacing={6}>
+				<Button
+					view="clear"
+					className={cnPreferences('CloseButton')}
+					onPress={onClose}
+				>
+					<Icon hasGlyph scalable boxSize="2rem">
+						<FaRegCircleXmark />
+					</Icon>
+				</Button>
+
 				<h2 className={cnPreferences('Header', { main: true })}>
 					Database settings
 				</h2>

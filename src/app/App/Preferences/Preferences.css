@@ -1,5 +1,5 @@
 .Preferences-Content {
-	padding-block: 3rem;
+	padding-block: 1.5rem;
 	max-width: 600px;
 	margin: auto;
 }
@@ -33,4 +33,17 @@
 	font-size: 0.9rem;
 	color: var(--color-typo-secondary);
 	line-height: 140%;
+}
+
+.Preferences-CloseButton {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	text-align: center;
+}
+
+.Preferences-CloseButton .Button-Text {
+	margin: 5px !important;
+	text-align: center;
+	line-height: 100%;
 }
