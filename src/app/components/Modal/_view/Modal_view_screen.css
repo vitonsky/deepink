@@ -17,7 +17,7 @@
 .Modal_view_screen .Modal-Table,
 .Modal_view_screen .Modal-Cell,
 .Modal_view_screen .Modal-Content {
-	min-height: inherit;
+	min-height: 100vh;
 	min-width: inherit;
 	box-sizing: border-box;
 }

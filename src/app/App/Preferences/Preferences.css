@@ -1,0 +1,36 @@
+.Preferences-Content {
+	padding-block: 3rem;
+	max-width: 600px;
+	margin: auto;
+}
+
+.Preferences-Header {
+	margin: 0;
+}
+
+.Preferences-Option {
+	display: grid;
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	grid-template-columns: 40% auto;
+	grid-row-gap: 50rem;
+}
+
+.Preferences-Option .Checkbox_view_default {
+	line-height: 100%;
+}
+
+.Preferences-OptionTitle {
+	text-align: end;
+	line-height: 120%;
+	padding-inline-end: 0.5rem;
+}
+
+.Preferences-OptionContent {
+	align-items: baseline;
+}
+
+.Preferences-OptionDescription {
+	font-size: 0.9rem;
+	color: var(--color-typo-secondary);
+	line-height: 140%;
+}
