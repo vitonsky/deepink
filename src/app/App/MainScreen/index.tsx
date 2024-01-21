@@ -178,7 +178,10 @@ export const MainScreen: FC = () => {
 				onClick: () => changedActiveProfile(null),
 				icon: <FaUserLarge />,
 			},
-			'start',
+			{
+				placement: 'start',
+				priority: 1,
+			},
 		);
 		buttonsManager.manager.register(
 			'dbLock',
@@ -187,7 +190,10 @@ export const MainScreen: FC = () => {
 				title: 'Lock database',
 				icon: <FaLock />,
 			},
-			'start',
+			{
+				placement: 'start',
+				priority: 2,
+			},
 		);
 		buttonsManager.manager.register(
 			'sync',
@@ -196,7 +202,10 @@ export const MainScreen: FC = () => {
 				title: 'Sync changes',
 				icon: <FaArrowsRotate />,
 			},
-			'start',
+			{
+				placement: 'start',
+				priority: 3,
+			},
 		);
 
 		buttonsManager.manager.register(
@@ -206,7 +215,10 @@ export const MainScreen: FC = () => {
 				title: 'Notifications',
 				icon: <FaBell />,
 			},
-			'end',
+			{
+				placement: 'end',
+				priority: 100000,
+			},
 		);
 	});
 
@@ -228,7 +240,10 @@ export const MainScreen: FC = () => {
 				text: noteDate ?? '',
 				onClick: () => console.log('TODO: show note history'),
 			},
-			'end',
+			{
+				placement: 'end',
+				priority: 1000,
+			},
 		);
 
 		return () => {

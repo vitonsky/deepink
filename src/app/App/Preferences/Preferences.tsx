@@ -30,7 +30,10 @@ export const Preferences = () => {
 				icon: <FaWrench />,
 				onClick: () => setIsOpened(true),
 			},
-			'start',
+			{
+				placement: 'start',
+				priority: 5,
+			},
 		);
 
 		return () => {

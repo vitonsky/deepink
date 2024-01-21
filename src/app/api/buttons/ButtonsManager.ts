@@ -17,12 +17,18 @@ export type ButtonObject = {
 
 export type ManagedButton = {
 	id: string;
+	priority?: number;
 	button: ButtonObject;
 };
 
 export type ManagedButtons = { start: ManagedButton[]; end: ManagedButton[] };
 
 export type Placement = 'start' | 'end';
+
+export type ButtonOptions = {
+	placement: Placement;
+	priority?: number;
+};
 
 export class ButtonsManager {
 	private updateCallback: (state: ManagedButtons) => void;
@@ -44,6 +50,21 @@ export class ButtonsManager {
 	}
 
 	private updateState() {
+		const sortFn = (a: ManagedButton, b: ManagedButton) => {
+			if (a.priority === b.priority) return 0;
+
+			if (a.priority === undefined) return -1;
+			if (b.priority === undefined) return 1;
+
+			if (a.priority > b.priority) return 1;
+			if (a.priority < b.priority) return -1;
+
+			return 0;
+		};
+
+		this.buttons.start = [...this.buttons.start.sort(sortFn)];
+		this.buttons.end = [...this.buttons.end.sort(sortFn)];
+
 		this.updateCallback(this.buttons);
 	}
 
@@ -51,10 +72,15 @@ export class ButtonsManager {
 		return this.buttons;
 	}
 
-	public register(id: string, button: ButtonObject, placement: Placement) {
+	public register(
+		id: string,
+		button: ButtonObject,
+		{ placement, priority }: ButtonOptions,
+	) {
 		this.deleteIfExists(id);
 		this.buttons[placement].push({
 			id,
+			priority,
 			button,
 		});
 
@@ -66,7 +92,7 @@ export class ButtonsManager {
 		this.updateState();
 	}
 
-	public update(id: string, button: ButtonObject) {
+	public update(id: string, button: ButtonObject, { priority }: ButtonOptions) {
 		// Find button
 		let existsButton: [Placement, number] | null = null;
 		for (const sideName in this.buttons) {
@@ -83,6 +109,8 @@ export class ButtonsManager {
 
 		const [placement, index] = existsButton;
 		this.buttons[placement][index] = {
+			...this.buttons[placement][index],
+			...(priority === undefined ? {} : { priority }),
 			id,
 			button,
 		};
