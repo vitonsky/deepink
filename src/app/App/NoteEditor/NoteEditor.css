@@ -78,3 +78,17 @@
 .NoteEditor-AttachmentInput::placeholder {
 	color: var(--color-typo-secondary);
 }
+
+.NoteEditor-SideBar {
+	height: 300px;
+	border-top: 1px solid var(--color-fill-color-border);
+}
+
+.NoteEditor-SideBarHead {
+	padding: 0.5rem;
+	text-align: right;
+}
+
+.NoteEditor-SideBarBody {
+	padding: 0 0.5rem;
+}

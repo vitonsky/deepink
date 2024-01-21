@@ -15,10 +15,12 @@ import {
 	FaEye,
 	FaFileExport,
 	FaFlag,
+	FaLink,
 	FaRotate,
 	FaShield,
 	FaSpellCheck,
 	FaTrashCan,
+	FaXmark,
 } from 'react-icons/fa6';
 import { useStore } from 'effector-react';
 import { debounce } from 'lodash';
@@ -151,6 +153,8 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const ref = useDetectClickOutside({ onTriggered: () => setIsNoteMenuOpened(false) });
 
+	const [sidePanel, setSidePanel] = useState<string | null>(null);
+
 	return (
 		<div className={cnNoteEditor()}>
 			<Stack direction="horizontal">
@@ -218,6 +222,18 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 									</Stack>
 								),
 								textContent: 'History',
+							},
+							{
+								id: 'backlinks',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaLink />
+										</Icon>
+										<span>Back links</span>
+									</Stack>
+								),
+								textContent: 'Back links',
 							},
 							{
 								id: 'id',
@@ -316,6 +332,14 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								textContent: 'Delete',
 							},
 						]}
+						onPick={(id) => {
+							console.log('pick menu', id);
+							if (id === 'backlinks') {
+								setSidePanel('backlinks');
+							}
+
+							setIsNoteMenuOpened(false);
+						}}
 					/>
 				</Popup>
 			</Stack>
@@ -392,6 +416,21 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				/>
 				<NoteScreen note={note} update={onTextUpdate} />
 			</div>
+			{sidePanel === 'backlinks' && (
+				<div className={cnNoteEditor('SideBar')}>
+					<div className={cnNoteEditor('SideBarHead')}>
+						<Button view="clear" size="s" onPress={() => setSidePanel(null)}>
+							<Icon hasGlyph scalable boxSize=".8rem">
+								<FaXmark />
+							</Icon>
+						</Button>
+					</div>
+
+					<div className={cnNoteEditor('SideBarBody')}>
+						TODO: Note related data here
+					</div>
+				</div>
+			)}
 			{isShowTagsList && (
 				<Popup
 					target="anchor"
