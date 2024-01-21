@@ -9,7 +9,6 @@ import {
 	FaArrowsRotate,
 	FaBell,
 	FaClockRotateLeft,
-	FaCompress,
 	FaGear,
 	FaLock,
 	FaMagnifyingGlass,
@@ -201,25 +200,6 @@ export const MainScreen: FC = () => {
 		);
 
 		buttonsManager.manager.register(
-			'history',
-			{
-				visible: true,
-				title: 'History',
-				icon: <FaClockRotateLeft />,
-				text: new Date().toLocaleDateString(),
-			},
-			'end',
-		);
-		buttonsManager.manager.register(
-			'focusMode',
-			{
-				visible: true,
-				title: 'Focus mode',
-				icon: <FaCompress />,
-			},
-			'end',
-		);
-		buttonsManager.manager.register(
 			'notifications',
 			{
 				visible: true,
@@ -229,6 +209,32 @@ export const MainScreen: FC = () => {
 			'end',
 		);
 	});
+
+	useEffect(() => {
+		const note =
+			activeNoteId !== null && openedNotes.find((note) => note.id === activeNoteId);
+		if (!note) return;
+
+		const noteDate = note.updatedTimestamp
+			? new Date(note.updatedTimestamp).toLocaleDateString()
+			: null;
+
+		buttonsManager.manager.register(
+			'noteTime',
+			{
+				visible: noteDate !== null,
+				title: 'History',
+				icon: <FaClockRotateLeft />,
+				text: noteDate ?? '',
+				onClick: () => console.log('TODO: show note history'),
+			},
+			'end',
+		);
+
+		return () => {
+			buttonsManager.manager.unregister('noteTime');
+		};
+	}, [activeNoteId, buttonsManager.manager, openedNotes]);
 
 	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
 	const editWorkspace = useCallback(() => {
