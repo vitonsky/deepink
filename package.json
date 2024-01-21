@@ -86,6 +86,7 @@
 		"pretty-bytes": "^6.1.0",
 		"proper-lockfile": "^4.1.2",
 		"react": "^18.2.0",
+		"react-detect-click-outside": "^1.1.7",
 		"react-dom": "^18.2.0",
 		"react-elegant-ui": "^0.3.4",
 		"react-icons": "^4.12.0",

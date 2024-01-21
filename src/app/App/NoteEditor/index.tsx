@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useDetectClickOutside } from 'react-detect-click-outside';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
@@ -148,6 +149,8 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const noteControlButtonRef = useRef<HTMLButtonElement | null>(null);
 	const [isNoteMenuOpened, setIsNoteMenuOpened] = useState(false);
 
+	const ref = useDetectClickOutside({ onTriggered: () => setIsNoteMenuOpened(false) });
+
 	return (
 		<div className={cnNoteEditor()}>
 			<Stack direction="horizontal">
@@ -167,9 +170,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					</Icon>
 				</Button>
 
-				{/* TODO: close menu by click item or by click outside */}
 				{/* TODO: add options that may be toggled */}
-				{/* TODO: fix popup position. Currently it is 1 step behind the ideal position */}
 				{/* TODO: render popups in portal */}
 				<Popup
 					target="anchor"
@@ -178,6 +179,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					visible={isNoteMenuOpened}
 					zIndex={99}
 					boundary={{ current: document.body }}
+					innerRef={ref}
 				>
 					<Menu
 						items={[
