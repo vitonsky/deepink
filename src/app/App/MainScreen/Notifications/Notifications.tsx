@@ -36,7 +36,7 @@ export const Notifications = () => {
 		return () => {
 			manager.unregister('notifications');
 		};
-	});
+	}, [manager]);
 
 	const onClose = () => setIsVisible(false);
 
