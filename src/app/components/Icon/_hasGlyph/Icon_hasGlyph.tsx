@@ -2,8 +2,6 @@ import React from 'react';
 import { cnIcon, IIconProps } from 'react-elegant-ui/esm/components/Icon/Icon';
 import { withHOCConstructor } from 'react-elegant-ui/esm/lib/compose';
 
-import './Icon_hasGlyph.css';
-
 export type IIconModHasGlyph = {
 	hasGlyph?: boolean;
 };

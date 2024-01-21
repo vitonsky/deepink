@@ -1,4 +1,0 @@
-/* Fix to make icons size equal to a text size */
-.Icon_hasGlyph {
-	line-height: 1rem;
-}
