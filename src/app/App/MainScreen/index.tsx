@@ -7,7 +7,6 @@ import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import {
 	FaArrowDownWideShort,
 	FaArrowsRotate,
-	FaBell,
 	FaClockRotateLeft,
 	FaGear,
 	FaLock,
@@ -38,6 +37,7 @@ import { WorkspaceSettings } from '../WorkspaceSettings/WorkspaceSettings';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
+import { Notifications } from './Notifications/Notifications';
 import { BottomPanelManagerContext, StatusBar, StatusBarContext } from './StatusBar';
 import { TopBar } from './TopBar';
 
@@ -207,19 +207,6 @@ export const MainScreen: FC = () => {
 				priority: 3,
 			},
 		);
-
-		buttonsManager.manager.register(
-			'notifications',
-			{
-				visible: true,
-				title: 'Notifications',
-				icon: <FaBell />,
-			},
-			{
-				placement: 'end',
-				priority: 100000,
-			},
-		);
 	});
 
 	useEffect(() => {
@@ -381,6 +368,7 @@ export const MainScreen: FC = () => {
 			</StatusBarContext.Provider>
 
 			<BottomPanelManagerContext.Provider value={buttonsManager}>
+				<Notifications />
 				<Preferences />
 			</BottomPanelManagerContext.Provider>
 
