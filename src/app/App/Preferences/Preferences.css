@@ -7,35 +7,3 @@
 	margin: auto;
 	padding: 2rem 1rem;
 }
-
-.Preferences-Head,
-.Preferences-Footer {
-	display: flex;
-	padding: 0.5rem;
-	background: #f5f5f5;
-	z-index: 10;
-}
-
-.Preferences-Head {
-	position: sticky;
-	top: 0;
-}
-
-.Preferences-Footer {
-	position: sticky;
-	bottom: 0;
-}
-
-.Preferences-HeadEnd {
-	margin-left: auto;
-}
-
-.Preferences-CloseButton {
-	text-align: center;
-}
-
-.Preferences-CloseButton .Button-Text {
-	margin: 5px !important;
-	text-align: center;
-	line-height: 100%;
-}
