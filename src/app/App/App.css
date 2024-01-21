@@ -44,3 +44,8 @@
 	--layout-divider-weight: 1px;
 	--stack-spacing: 4px;
 }
+
+/* Patch UI elements */
+.Menu-ItemText {
+	white-space: nowrap;
+}

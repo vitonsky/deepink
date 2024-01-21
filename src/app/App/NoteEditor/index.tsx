@@ -3,7 +3,22 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
-import { FaBookmark, FaEllipsis, FaFlag } from 'react-icons/fa6';
+import {
+	FaBell,
+	FaBookmark,
+	FaBoxArchive,
+	FaClock,
+	FaCopy,
+	FaDownload,
+	FaEllipsis,
+	FaEye,
+	FaFileExport,
+	FaFlag,
+	FaRotate,
+	FaShield,
+	FaSpellCheck,
+	FaTrashCan,
+} from 'react-icons/fa6';
 import { useStore } from 'effector-react';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
@@ -162,52 +177,141 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					view="default"
 					visible={isNoteMenuOpened}
 					zIndex={99}
+					boundary={{ current: document.body }}
 				>
 					<Menu
 						items={[
 							{
 								id: 'id',
-								content: 'Copy reference on note',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaCopy />
+										</Icon>
+										<span>Copy reference on note</span>
+									</Stack>
+								),
+								textContent: 'Copy reference on note',
 							},
 							{
 								id: 'id',
-								content: 'Remind me',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaBell />
+										</Icon>
+										<span>Remind me</span>
+									</Stack>
+								),
+								textContent: 'Remind me',
 							},
 							{
 								id: 'id',
-								content: 'History',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaClock />
+										</Icon>
+										<span>History</span>
+									</Stack>
+								),
+								textContent: 'History',
 							},
 							{
 								id: 'id',
-								content: 'Readonly mode',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaEye />
+										</Icon>
+										<span>Readonly mode</span>
+									</Stack>
+								),
+								textContent: 'Readonly mode',
 							},
 							{
 								id: 'id',
-								content: 'Download and convert a network media',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaDownload />
+										</Icon>
+										<span>Download and convert a network media</span>
+									</Stack>
+								),
+								textContent: 'Download and convert a network media',
 							},
 							{
 								id: 'id',
-								content: 'Spellcheck',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaSpellCheck />
+										</Icon>
+										<span>Spellcheck</span>
+									</Stack>
+								),
+								textContent: 'Spellcheck',
 							},
 							{
 								id: 'id',
-								content: 'Export...',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaFileExport />
+										</Icon>
+										<span>Export...</span>
+									</Stack>
+								),
+								textContent: 'Export...',
 							},
 							{
 								id: 'id',
-								content: 'Password protection...',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaShield />
+										</Icon>
+										<span>Password protection...</span>
+									</Stack>
+								),
+								textContent: 'Password protection...',
 							},
 							{
 								id: 'id',
-								content: 'Disable sync',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaRotate />
+										</Icon>
+										<span>Disable sync</span>
+									</Stack>
+								),
+								textContent: 'Disable sync',
 							},
 							{
 								id: 'id',
-								content: 'Archive',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaBoxArchive />
+										</Icon>
+										<span>Archive</span>
+									</Stack>
+								),
+								textContent: 'Archive',
 							},
 							{
 								id: 'id',
-								content: 'Delete',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaTrashCan />
+										</Icon>
+										<span>Delete</span>
+									</Stack>
+								),
+								textContent: 'Delete',
 							},
 						]}
 					/>
