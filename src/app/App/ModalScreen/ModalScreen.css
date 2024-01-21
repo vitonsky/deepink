@@ -1,3 +1,14 @@
+.ModalScreen {
+	min-height: inherit;
+	display: flex;
+	flex-direction: column;
+}
+
+.ModalScreen-Body {
+	display: flex;
+	flex: 1;
+}
+
 .ModalScreen-Head,
 .ModalScreen-Footer {
 	display: flex;

@@ -35,6 +35,7 @@ import { Stack } from '../../components/Stack/Stack';
 
 import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
+import { WorkspaceSettings } from '../WorkspaceSettings/WorkspaceSettings';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
@@ -229,6 +230,11 @@ export const MainScreen: FC = () => {
 		);
 	});
 
+	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
+	const editWorkspace = useCallback(() => {
+		setIsWorkspaceEditing(true);
+	}, []);
+
 	// TODO: add memoizing for tabs mapping
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
@@ -260,7 +266,7 @@ export const MainScreen: FC = () => {
 							]}
 							value="default"
 						></Select>
-						<Button title="Workspace settings">
+						<Button title="Workspace settings" onPress={editWorkspace}>
 							<Icon boxSize="1rem" hasGlyph>
 								<FaGear size="100%" />
 							</Icon>
@@ -356,6 +362,11 @@ export const MainScreen: FC = () => {
 			<BottomPanelManagerContext.Provider value={buttonsManager}>
 				<Preferences />
 			</BottomPanelManagerContext.Provider>
+
+			<WorkspaceSettings
+				isVisible={isWorkspaceEditing}
+				onClose={() => setIsWorkspaceEditing(false)}
+			/>
 		</div>
 	);
 };

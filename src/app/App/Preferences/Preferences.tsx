@@ -9,7 +9,6 @@ import { cn } from '@bem-react/classname';
 import { Features } from '../../components/Features/Features';
 import { FeaturesHeader } from '../../components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '../../components/Features/Option/FeaturesOption';
-import { Stack } from '../../components/Stack/Stack';
 
 import { useBottomPanelManager } from '../MainScreen/StatusBar';
 import { ModalScreen } from '../ModalScreen/ModalScreen';
@@ -62,7 +61,10 @@ export const Preferences = () => {
 
 					<FeaturesHeader view="section">Encryption</FeaturesHeader>
 
-					<FeaturesOption title="Encryption algorithm">
+					<FeaturesOption
+						title="Encryption algorithm"
+						description="Choose best algorithm you trust"
+					>
 						<Select
 							options={[
 								{
@@ -84,25 +86,6 @@ export const Preferences = () => {
 
 					<FeaturesOption title="Password">
 						<Button>Update password</Button>
-					</FeaturesOption>
-
-					<FeaturesHeader view="section">Data</FeaturesHeader>
-
-					<FeaturesOption
-						title="Notes management"
-						description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app"
-					>
-						<Stack direction="horizontal" spacing={2}>
-							<Button>Import notes</Button>
-							<Button>Export notes</Button>
-						</Stack>
-					</FeaturesOption>
-
-					<FeaturesOption title="History">
-						<Stack direction="vertical" spacing={2}>
-							<Checkbox label="Enable history for notes" />
-							<Checkbox label="Use recycle bin" />
-						</Stack>
 					</FeaturesOption>
 
 					<FeaturesHeader view="section">Synchronization</FeaturesHeader>
