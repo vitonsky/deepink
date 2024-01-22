@@ -1,24 +1,28 @@
 .StatusBar {
 	display: flex;
 	flex-direction: row;
-	flex-grow: 10;
 	min-width: 100%;
-	max-height: 31px;
-	min-height: 31px;
 	font-size: 0.9em;
 	background: var(--color-fill-color-stripe);
 	color: var(--color-typo-secondary);
 	box-sizing: border-box;
-	overflow: hidden;
+
+	/* overflow: hidden; */
 	font-family: Arial, Helvetica, sans-serif;
-	border-top: 3px solid var(--color-fill-color-border);
+	border-top: var(--layout-divider-weight) solid var(--color-fill-color-border);
 }
 
 .StatusBar .Button {
 	--button-border-radius: 0;
+
+	vertical-align: middle;
 }
 
-.StatusBar-StatusContainer {
+.StatusBar > * {
+	display: flex;
+}
+
+.StatusBar-RightItems {
 	margin-left: auto;
 	line-height: 1.5rem;
 }
@@ -31,4 +35,8 @@
 
 .StatusBar-ProgressIndicator > * {
 	margin: auto;
+}
+
+.StatusBar .Button-Content:not(.Button-Content_raw) > *:last-child {
+	margin-inline: 5px;
 }

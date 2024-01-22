@@ -1,7 +1,19 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
+import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
+import {
+	FaArrowDownWideShort,
+	FaArrowsRotate,
+	FaClockRotateLeft,
+	FaGear,
+	FaLock,
+	FaMagnifyingGlass,
+	FaPenToSquare,
+	FaUserLarge,
+} from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
@@ -12,13 +24,21 @@ import {
 	activeNoteChanged,
 	openedNotesControls,
 } from '../../../core/state/notes';
+import { changedActiveProfile } from '../../../core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
+import { useButtonsManager } from '../../api/buttons/useButtonsManager';
+import { useFirstRender } from '../../components/hooks/useFirstRender';
+import { Icon } from '../../components/Icon/Icon.bundle/common';
+import { Stack } from '../../components/Stack/Stack';
 
+import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
+import { WorkspaceSettings } from '../WorkspaceSettings/WorkspaceSettings';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
-import { StatusBar } from './StatusBar';
+import { Notifications } from './Notifications/Notifications';
+import { BottomPanelManagerContext, StatusBar, StatusBarContext } from './StatusBar';
 import { TopBar } from './TopBar';
 
 import './MainScreen.css';
@@ -147,20 +167,148 @@ export const MainScreen: FC = () => {
 		}
 	}, [notes, onNoteClick]);
 
+	const buttonsManager = useButtonsManager();
+
+	useFirstRender(() => {
+		buttonsManager.manager.register(
+			'dbChange',
+			{
+				visible: true,
+				title: 'Change database',
+				onClick: () => changedActiveProfile(null),
+				icon: <FaUserLarge />,
+			},
+			{
+				placement: 'start',
+				priority: 1,
+			},
+		);
+		buttonsManager.manager.register(
+			'dbLock',
+			{
+				visible: true,
+				title: 'Lock database',
+				icon: <FaLock />,
+			},
+			{
+				placement: 'start',
+				priority: 2,
+			},
+		);
+		buttonsManager.manager.register(
+			'sync',
+			{
+				visible: true,
+				title: 'Sync changes',
+				icon: <FaArrowsRotate />,
+			},
+			{
+				placement: 'start',
+				priority: 3,
+			},
+		);
+	});
+
+	useEffect(() => {
+		const note =
+			activeNoteId !== null && openedNotes.find((note) => note.id === activeNoteId);
+		if (!note) return;
+
+		const noteDate = note.updatedTimestamp
+			? new Date(note.updatedTimestamp).toLocaleDateString()
+			: null;
+
+		buttonsManager.manager.register(
+			'noteTime',
+			{
+				visible: noteDate !== null,
+				title: 'History',
+				icon: <FaClockRotateLeft />,
+				text: noteDate ?? '',
+				onClick: () => console.log('TODO: show note history'),
+			},
+			{
+				placement: 'end',
+				priority: 1000,
+			},
+		);
+
+		return () => {
+			buttonsManager.manager.unregister('noteTime');
+		};
+	}, [activeNoteId, buttonsManager.manager, openedNotes]);
+
+	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
+	const editWorkspace = useCallback(() => {
+		setIsWorkspaceEditing(true);
+	}, []);
+
 	// TODO: add memoizing for tabs mapping
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
 			<div className={cnMainScreen('Content')}>
-				<div className={cnMainScreen('SideBar')}>
+				<div className={cnMainScreen('SideBar', { view: 'main' })}>
+					<Button
+						className={cnMainScreen('NewNoteButton')}
+						view="action"
+						onPress={createNote}
+						iconLeft={() => (
+							<Icon boxSize="1rem" hasGlyph>
+								<FaPenToSquare size="100%" />
+							</Icon>
+						)}
+					>
+						New note
+					</Button>
+
 					<NotesOverview />
+
+					<div className={cnMainScreen('Workspace')}>
+						<Select
+							className={cnMainScreen('WorkspacePicker')}
+							options={[
+								{
+									id: 'default',
+									content: 'Default',
+								},
+							]}
+							value="default"
+						></Select>
+						<Button title="Workspace settings" onPress={editWorkspace}>
+							<Icon boxSize="1rem" hasGlyph>
+								<FaGear size="100%" />
+							</Icon>
+						</Button>
+					</div>
 				</div>
 
 				<div className={cnMainScreen('SideBar')}>
-					<div className={cnMainScreen('SideBarControls')}>
-						<Button view="action" onPress={createNote}>
-							New note
+					<Stack direction="horizontal" spacing={1}>
+						<Textinput
+							placeholder="Search..."
+							size="s"
+							addonBeforeControl={
+								<Icon
+									boxSize="1rem"
+									hasGlyph
+									style={{
+										zIndex: 2,
+										marginInlineStart: '.5rem',
+										marginInlineEnd: '.3rem',
+										opacity: 0.7,
+									}}
+								>
+									<FaMagnifyingGlass size="100%" />
+								</Icon>
+							}
+						/>
+
+						<Button view="default">
+							<Icon boxSize="1rem" hasGlyph>
+								<FaArrowDownWideShort size="100%" />
+							</Icon>
 						</Button>
-					</div>
+					</Stack>
 
 					<div className={cnMainScreen('NotesList')}>
 						{activeTagName && (
@@ -186,7 +334,11 @@ export const MainScreen: FC = () => {
 						/>
 					</div>
 				</div>
-				<div className={cnMainScreen('ContentBlock')}>
+				<Stack
+					direction="vertical"
+					spacing={2}
+					className={cnMainScreen('ContentBlock')}
+				>
 					<TopBar
 						{...{
 							notesRegistry,
@@ -208,10 +360,22 @@ export const MainScreen: FC = () => {
 							}}
 						/>
 					</div>
-				</div>
+				</Stack>
 			</div>
 
-			<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
+			<StatusBarContext.Provider value={buttonsManager.state}>
+				<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
+			</StatusBarContext.Provider>
+
+			<BottomPanelManagerContext.Provider value={buttonsManager}>
+				<Notifications />
+				<Preferences />
+			</BottomPanelManagerContext.Provider>
+
+			<WorkspaceSettings
+				isVisible={isWorkspaceEditing}
+				onClose={() => setIsWorkspaceEditing(false)}
+			/>
 		</div>
 	);
 };

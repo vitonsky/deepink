@@ -1,6 +1,27 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useDetectClickOutside } from 'react-detect-click-outside';
+import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
+import {
+	FaBell,
+	FaBookmark,
+	FaBoxArchive,
+	FaClock,
+	FaCopy,
+	FaDownload,
+	FaEllipsis,
+	FaEye,
+	FaFileExport,
+	FaFlag,
+	FaLink,
+	FaRotate,
+	FaShield,
+	FaSpellCheck,
+	FaTrashCan,
+	FaXmark,
+} from 'react-icons/fa6';
 import { useStore } from 'effector-react';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
@@ -15,6 +36,7 @@ import {
 	tagsChanged,
 } from '../../../core/state/tags';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
+import { Stack } from '../../components/Stack/Stack';
 import { SuggestedTagsList } from '../../components/SuggestedTagsList';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
@@ -125,10 +147,216 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const [isShowTagsList, setIsShowTagsList] = useState(false);
 	const tagInputRef = useRef<HTMLInputElement | null>(null);
 
+	// TODO: create hook for boilerplate for trigger
+	const noteControlButtonRef = useRef<HTMLButtonElement | null>(null);
+	const [isNoteMenuOpened, setIsNoteMenuOpened] = useState(false);
+
+	const ref = useDetectClickOutside({ onTriggered: () => setIsNoteMenuOpened(false) });
+
+	const [sidePanel, setSidePanel] = useState<string | null>(null);
+
 	return (
 		<div className={cnNoteEditor()}>
-			<Textinput value={title} onInputText={setTitle} placeholder="Note title" />
+			<Stack direction="horizontal">
+				<Textinput
+					className={cnNoteEditor('Title')}
+					value={title}
+					onInputText={setTitle}
+					placeholder="Note title"
+				/>
+				<Button
+					view="default"
+					innerRef={noteControlButtonRef}
+					onPress={() => setIsNoteMenuOpened((state) => !state)}
+				>
+					<Icon boxSize="1rem" hasGlyph>
+						<FaEllipsis size="100%" />
+					</Icon>
+				</Button>
+
+				{/* TODO: add options that may be toggled */}
+				{/* TODO: render popups in portal */}
+				<Popup
+					target="anchor"
+					anchor={noteControlButtonRef}
+					view="default"
+					visible={isNoteMenuOpened}
+					zIndex={99}
+					boundary={{ current: document.body }}
+					innerRef={ref}
+				>
+					<Menu
+						items={[
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaCopy />
+										</Icon>
+										<span>Copy reference on note</span>
+									</Stack>
+								),
+								textContent: 'Copy reference on note',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaBell />
+										</Icon>
+										<span>Remind me</span>
+									</Stack>
+								),
+								textContent: 'Remind me',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaClock />
+										</Icon>
+										<span>History</span>
+									</Stack>
+								),
+								textContent: 'History',
+							},
+							{
+								id: 'backlinks',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaLink />
+										</Icon>
+										<span>Back links</span>
+									</Stack>
+								),
+								textContent: 'Back links',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaEye />
+										</Icon>
+										<span>Readonly mode</span>
+									</Stack>
+								),
+								textContent: 'Readonly mode',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaDownload />
+										</Icon>
+										<span>Download and convert a network media</span>
+									</Stack>
+								),
+								textContent: 'Download and convert a network media',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaSpellCheck />
+										</Icon>
+										<span>Spellcheck</span>
+									</Stack>
+								),
+								textContent: 'Spellcheck',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaFileExport />
+										</Icon>
+										<span>Export...</span>
+									</Stack>
+								),
+								textContent: 'Export...',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaShield />
+										</Icon>
+										<span>Password protection...</span>
+									</Stack>
+								),
+								textContent: 'Password protection...',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaRotate />
+										</Icon>
+										<span>Disable sync</span>
+									</Stack>
+								),
+								textContent: 'Disable sync',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaBoxArchive />
+										</Icon>
+										<span>Archive</span>
+									</Stack>
+								),
+								textContent: 'Archive',
+							},
+							{
+								id: 'id',
+								content: (
+									<Stack direction="horizontal" spacing={4}>
+										<Icon hasGlyph boxSize="1rem">
+											<FaTrashCan />
+										</Icon>
+										<span>Delete</span>
+									</Stack>
+								),
+								textContent: 'Delete',
+							},
+						]}
+						onPick={(id) => {
+							console.log('pick menu', id);
+							if (id === 'backlinks') {
+								setSidePanel('backlinks');
+							}
+
+							setIsNoteMenuOpened(false);
+						}}
+					/>
+				</Popup>
+			</Stack>
 			<div className={cnNoteEditor('Attachments')}>
+				<Stack direction="horizontal">
+					<Button view="clear" size="s">
+						<Icon boxSize="1rem" hasGlyph>
+							<FaBookmark size="100%" />
+						</Icon>
+					</Button>
+					<Button view="clear" size="s">
+						<Icon boxSize="1rem" hasGlyph>
+							<FaFlag size="100%" />
+						</Icon>
+					</Button>
+				</Stack>
+
 				{attachedTags.map((tag) => (
 					<div
 						className={cnNoteEditor('Attachment')}
@@ -188,6 +416,21 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				/>
 				<NoteScreen note={note} update={onTextUpdate} />
 			</div>
+			{sidePanel === 'backlinks' && (
+				<div className={cnNoteEditor('SideBar')}>
+					<div className={cnNoteEditor('SideBarHead')}>
+						<Button view="clear" size="s" onPress={() => setSidePanel(null)}>
+							<Icon hasGlyph scalable boxSize=".8rem">
+								<FaXmark />
+							</Icon>
+						</Button>
+					</div>
+
+					<div className={cnNoteEditor('SideBarBody')}>
+						TODO: Note related data here
+					</div>
+				</div>
+			)}
 			{isShowTagsList && (
 				<Popup
 					target="anchor"
@@ -195,7 +438,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					view="default"
 					visible
 					direction={['bottom-start', 'bottom', 'bottom-end']}
-					// boundary={modalRef}
 				>
 					<SuggestedTagsList
 						tags={notAttachedTags}

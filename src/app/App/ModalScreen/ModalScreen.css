@@ -1,0 +1,46 @@
+.ModalScreen {
+	min-height: inherit;
+	display: flex;
+	flex-direction: column;
+}
+
+.ModalScreen-Body {
+	display: flex;
+	flex: 1;
+}
+
+.ModalScreen-Head,
+.ModalScreen-Footer {
+	display: flex;
+	padding: 0.5rem;
+	background: #f5f5f5;
+	z-index: 10;
+}
+
+.ModalScreen-Head {
+	position: sticky;
+	top: 0;
+}
+
+.ModalScreen-Footer {
+	position: sticky;
+	bottom: 0;
+}
+
+.ModalScreen-HeadTitle {
+	width: 100%;
+	text-align: center;
+	font-weight: bold;
+	color: var(--color-typo-secondary);
+	user-select: none;
+}
+
+.ModalScreen-CloseButton {
+	margin-left: auto;
+}
+
+.ModalScreen-CloseButton .Button-Text {
+	margin: 5px !important;
+	text-align: center;
+	line-height: 100%;
+}
