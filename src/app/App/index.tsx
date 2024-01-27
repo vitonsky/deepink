@@ -163,7 +163,7 @@ export const App: FC = () => {
 		// Setup files
 		// TODO: implement methods to close the objects after use
 		const attachmentsRegistry = new Attachments(db);
-		const filesController = new ElectronFilesController(profileDir, encryption);
+		const filesController = new ElectronFilesController(profile.id, encryption);
 		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
 		const tagsRegistry = new Tags(db);
 		const notesRegistry = new NotesRegistry(db);
