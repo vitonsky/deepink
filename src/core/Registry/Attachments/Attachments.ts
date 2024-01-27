@@ -1,3 +1,5 @@
+import { v4 as uuid4 } from 'uuid';
+
 import { SQLiteDb } from '../../storage/SQLiteDb';
 
 /**
@@ -13,47 +15,40 @@ export class Attachments {
 		const { db } = this.db;
 
 		if (attachments.length === 0) {
-			await db
-				.getDatabaseInstance()
-				.runBatch([
-					{ sql: 'DELETE FROM attachments WHERE note=?', params: [targetId] },
-				]);
+			db.prepare('DELETE FROM attachments WHERE note=?').run(targetId);
 		} else {
-			const valuesPlaceholders = attachments
-				.map(() => `(uuid4(), ?, ?)`)
-				.join(', ');
+			const valuesPlaceholders = attachments.map(() => `(?, ?, ?)`).join(', ');
 
 			const placeholdersData: string[] = [];
 			attachments.forEach((attachmentId) => {
+				placeholdersData.push(uuid4());
 				placeholdersData.push(targetId);
 				placeholdersData.push(attachmentId);
 			});
 
-			await db.getDatabaseInstance().runBatch([
-				{ sql: 'BEGIN TRANSACTION' },
-				{ sql: 'DELETE FROM attachments WHERE note=?', params: [targetId] },
-				{
-					sql: `INSERT INTO attachments ("id", "note", "file") VALUES ${valuesPlaceholders};`,
-					params: placeholdersData,
-				},
-				{ sql: 'COMMIT' },
-			]);
+			db.transaction(() => {
+				db.prepare('DELETE FROM attachments WHERE note=?').run(targetId);
+				db.prepare(
+					`INSERT INTO attachments ("id", "note", "file") VALUES ${valuesPlaceholders};`,
+				).run(placeholdersData);
+			})();
 		}
 	}
 
 	public async get(targetId: string): Promise<string[]> {
 		const { db } = this.db;
 
-		const rows = await db.all('SELECT file FROM attachments WHERE note=?', targetId);
-		return rows.map(({ file }) => file);
+		return db
+			.prepare('SELECT file FROM attachments WHERE note=? ORDER BY rowid')
+			.all(targetId)
+			.map((row) => (row as { file: string }).file);
 	}
 
 	public async delete(resources: string[]) {
 		const { db } = this.db;
 
 		const placeholders = Array(resources.length).fill('?').join(',');
-		await db.run(
-			`DELETE FROM attachments WHERE file IN (${placeholders})`,
+		db.prepare(`DELETE FROM attachments WHERE file IN (${placeholders})`).run(
 			resources,
 		);
 	}
@@ -65,10 +60,9 @@ export class Attachments {
 		const { db } = this.db;
 
 		const placeholders = Array(resources.length).fill('?').join(',');
-		const attached = await db.all(
-			`SELECT file as id FROM attachments WHERE file IN (${placeholders})`,
-			resources,
-		);
+		const attached = db
+			.prepare(`SELECT file as id FROM attachments WHERE file IN (${placeholders})`)
+			.all(resources) as Array<{ id: string }>;
 
 		return resources.filter((id) =>
 			attached.every((attachment) => attachment.id !== id),

@@ -1,3 +1,5 @@
+import { v4 as uuid4 } from 'uuid';
+
 import { INote, INoteData, NoteId } from '../Note';
 import { SQLiteDb } from '../storage/SQLiteDb';
 import { INotesRegistry, NotesRegistryFetchOptions } from '.';
@@ -28,17 +30,16 @@ export class NotesRegistry implements INotesRegistry {
 
 	public async getById(id: NoteId): Promise<INote | null> {
 		const { db } = this.db;
-		const note = await db.get('SELECT * FROM notes WHERE id=?', [id]);
-
+		const note = db.prepare('SELECT * FROM notes WHERE id=?').get(id);
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
 	public async getLength(): Promise<number> {
 		const { db } = this.db;
-		const response = await db.get('SELECT COUNT(id) as length FROM notes');
-
-		const length = response?.length;
-		return length;
+		const { length } = db.prepare('SELECT COUNT(id) as length FROM notes').get() as {
+			length?: number;
+		};
+		return length ?? 0;
 	}
 
 	public async get({
@@ -68,15 +69,13 @@ export class NotesRegistry implements INotesRegistry {
 		fetchQuery.push(`LIMIT ? OFFSET ?`);
 		fetchParams.push(limit, offset);
 
-		await db.each(fetchQuery.join(' '), fetchParams, (err, row) => {
-			if (err) {
-				throw new Error(err);
-			}
+		db.prepare(fetchQuery.join(' '))
+			.all(fetchParams)
+			.map((row) => {
+				// TODO: validate data for first note
 
-			// TODO: validate data for first note
-
-			notes.push(mappers.rowToNoteObject(row));
-		});
+				notes.push(mappers.rowToNoteObject(row));
+			});
 
 		return notes;
 	}
@@ -88,23 +87,25 @@ export class NotesRegistry implements INotesRegistry {
 
 		// Insert data
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
-		const insertResult = await db.run(
-			'INSERT INTO notes ("id","title","text","creationTime","lastUpdateTime") VALUES (uuid4(),:title,:text,:created,:updated)',
-			{
-				':title': note.title,
-				':text': note.text,
-				':created': creationTime,
-				':updated': creationTime,
-			},
-		);
+		const insertResult = db
+			.prepare(
+				'INSERT INTO notes ("id","title","text","creationTime","lastUpdateTime") VALUES (@id,@title,@text,@created,@updated)',
+			)
+			.run({
+				id: uuid4(),
+				title: note.title,
+				text: note.text,
+				created: creationTime,
+				updated: creationTime,
+			});
 
 		await sync();
 
 		// Get generated id
-		const selectWithId = await db.get(
-			'SELECT `id` FROM notes WHERE rowid=?',
-			insertResult.lastID,
-		);
+		const selectWithId = (await db
+			.prepare('SELECT `id` FROM notes WHERE rowid=?')
+			.get(insertResult.lastInsertRowid)) as { id: string };
+
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
 		}
@@ -116,15 +117,16 @@ export class NotesRegistry implements INotesRegistry {
 		const { db, sync } = this.db;
 
 		const updateTime = new Date().getTime();
-		const result = await db.run(
-			'UPDATE notes SET "title"=:title, "text"=:text, "lastUpdateTime"=:updateTime WHERE "id"=:id',
-			{
-				':title': updatedNote.title,
-				':text': updatedNote.text,
-				':updateTime': updateTime,
-				':id': id,
-			},
-		);
+		const result = db
+			.prepare(
+				'UPDATE notes SET "title"=@title, "text"=@text, "lastUpdateTime"=@updateTime WHERE "id"=@id',
+			)
+			.run({
+				title: updatedNote.title,
+				text: updatedNote.text,
+				updateTime: updateTime,
+				id: id,
+			});
 
 		if (!result.changes || result.changes < 1) {
 			throw new Error('Note did not updated');
@@ -137,10 +139,10 @@ export class NotesRegistry implements INotesRegistry {
 		const { db, sync } = this.db;
 
 		const placeholders = Array(ids.length).fill('?').join(',');
-		const result = await db.run(
-			`DELETE FROM notes WHERE id IN (${placeholders})`,
-			ids,
-		);
+		const result = db
+			.prepare(`DELETE FROM notes WHERE id IN (${placeholders})`)
+			.run(ids);
+
 		await sync();
 
 		if (result.changes !== ids.length) {

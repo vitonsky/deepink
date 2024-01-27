@@ -19,10 +19,7 @@ import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
 import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
 import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
-import {
-	getResourcesPath,
-	getUserDataPath,
-} from '../../electron/requests/files/renderer';
+import { getUserDataPath } from '../../electron/requests/files/renderer';
 import { ElectronFilesController } from '../../electron/requests/storage/renderer';
 import { DisposableBox } from '../../utils/disposable';
 
@@ -154,11 +151,9 @@ export const App: FC = () => {
 
 		// Setup DB
 		const dbPath = path.join(profileDir, 'deepink.db');
-		const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
 
 		const db = await getDb({
 			dbPath,
-			dbExtensionsDir,
 			encryption: encryption,
 		});
 

@@ -1,6 +1,5 @@
 /** @jest-environment jsdom */
 import { tmpdir } from 'os';
-import path from 'path';
 import { tmpNameSync } from 'tmp';
 
 import { getDb } from '../../storage/SQLiteDb';
@@ -12,9 +11,6 @@ import { FilesStorageController } from '.';
 const File = require('blob-polyfill').File;
 
 globalThis.File = File;
-
-// TODO: move extensions to dir with DB
-const dbExtensionsDir = path.join(__dirname, '../../../../sqlite/extensions');
 
 const createFileManagerMock = (): FilesStorageController => {
 	const storage: Record<string, ArrayBuffer> = {};
@@ -45,7 +41,7 @@ const testFiles = Array(5)
 
 test('clear orphaned files', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const db = await getDb({ dbPath, dbExtensionsDir });
+	const db = await getDb({ dbPath });
 	const fileManager = createFileManagerMock();
 	const attachments = new Attachments(db);
 	const files = new FilesRegistry(db, fileManager, attachments);

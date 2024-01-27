@@ -1,12 +1,8 @@
 import { writeFileSync } from 'fs';
 import { tmpdir } from 'os';
-import path from 'path';
 import { tmpNameSync } from 'tmp';
 
 import { getDb } from './SQLiteDb';
-
-// TODO: move extensions to dir with DB
-const dbExtensionsDir = path.join(__dirname, '../../../sqlite/extensions');
 
 describe('migrations', () => {
 	test('from most old version to latest', async () => {
@@ -23,11 +19,11 @@ describe('migrations', () => {
 		writeFileSync(dbPath, setupSQL);
 
 		// Test structure
-		const db = await getDb({ dbPath, dbExtensionsDir });
+		const db = await getDb({ dbPath });
 
-		const tablesList = await db.db.all(
-			`SELECT name FROM main.sqlite_master WHERE type='table'`,
-		);
+		const tablesList = db.db
+			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
+			.all();
 		expect(tablesList).toEqual(
 			['notes', 'files', 'attachments'].map((name) => ({ name })),
 		);

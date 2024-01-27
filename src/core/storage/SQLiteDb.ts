@@ -1,14 +1,11 @@
+import DB, { Database } from 'better-sqlite3';
 import { existsSync } from 'fs';
-import path from 'path';
 import lockfileUtils from 'proper-lockfile';
-import { Database, open } from 'sqlite';
-import sqlite3 from 'sqlite3';
 
 import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
 
 import { IEncryptionController } from '../encryption';
 import { readFile, writeFile } from 'fs/promises';
-import { ExtendedSqliteDatabase } from './ExtendedSqliteDatabase';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 
@@ -16,7 +13,7 @@ export type SQLiteDb = {
 	/**
 	 * Configured database with extensions
 	 */
-	db: Database<ExtendedSqliteDatabase, sqlite3.Statement>;
+	db: Database;
 
 	/**
 	 * Write database to file
@@ -33,7 +30,6 @@ export type SQLiteDb = {
 
 type Options = {
 	dbPath: string;
-	dbExtensionsDir: string;
 
 	/**
 	 * Option to disable verbose logs
@@ -43,9 +39,9 @@ type Options = {
 	encryption?: IEncryptionController;
 };
 
+// TODO: add verbose logging
 export const getDb = async ({
 	dbPath,
-	dbExtensionsDir,
 	verbose: verboseLog = false,
 	encryption,
 }: Options): Promise<SQLiteDb> => {
@@ -53,40 +49,40 @@ export const getDb = async ({
 	recoveryAtomicFile(dbPath);
 
 	// Create DB
-	const db = await open({
-		filename: ':memory:',
-		driver: ExtendedSqliteDatabase,
-	}).then(async (db) => {
-		// Setup extensions
-		await db.loadExtension(path.join(dbExtensionsDir, 'uuid'));
-		await db.loadExtension(path.join(dbExtensionsDir, 'dbdump'));
+	let db: Database;
+	if (existsSync(dbPath)) {
+		// Load DB
+		const rawDb = await readFile(dbPath);
+		const sqlDump = encryption ? await encryption.decrypt(rawDb) : rawDb;
 
-		if (existsSync(dbPath)) {
-			// Load DB
-			const rawDb = await readFile(dbPath, 'utf-8');
-			const sqlDump = encryption ? await encryption.decrypt(rawDb) : rawDb;
-
-			await db.exec(sqlDump);
-			await migrateToLatestSchema(
-				db as Database<ExtendedSqliteDatabase, sqlite3.Statement>,
-			);
+		// Check header signature, to detect a database file https://www.sqlite.org/fileformat.html#the_database_header
+		const isDatabaseFile = sqlDump
+			.toString('utf8', 0, 16)
+			.startsWith(`SQLite format 3`);
+		if (isDatabaseFile) {
+			db = new DB(sqlDump);
 		} else {
-			// Setup pragma
-			await db.exec(`PRAGMA main.user_version = ${latestSchemaVersion};`);
-
-			// Create DB
-			if (verboseLog) {
-				console.info('Initialize DB');
-				console.debug(setupSQL);
-			}
-
-			await db.exec(setupSQL);
-
-			// TODO: try to encrypt data. If does not work - fail
+			// If no database file, load buffer as string with SQL commands
+			db = new DB(':memory:');
+			db.exec(sqlDump.toString());
 		}
 
-		return db as Database<ExtendedSqliteDatabase, sqlite3.Statement>;
-	});
+		await migrateToLatestSchema(db);
+	} else {
+		db = new DB(':memory:');
+		// Setup pragma
+		db.pragma(`main.user_version = ${latestSchemaVersion};`);
+
+		// Create DB
+		if (verboseLog) {
+			console.info('Initialize DB');
+			console.debug(setupSQL);
+		}
+
+		db.exec(setupSQL);
+
+		// TODO: try to encrypt data. If does not work - fail
+	}
 
 	type SyncRequest = {
 		resolve(): void;
@@ -125,60 +121,16 @@ export const getDb = async ({
 
 			// Wrap to allow throw exceptions for good control flow
 			try {
-				// Dump pragma
-				const pragmaNamesToDump = ['user_version'];
-				const pragmasList = await Promise.all(
-					pragmaNamesToDump.map((pragmaName) =>
-						db.get(`PRAGMA main.${pragmaName}`).then((response) => {
-							if (!response) {
-								throw new TypeError("Can't fetch pragma value");
-							}
-
-							const pragmaValue = response[pragmaName];
-							return `PRAGMA main.${pragmaName} = ${pragmaValue};`;
-						}),
-					),
-				);
-				const pragmaDump = pragmasList.join('\n');
-
 				// Dump data
-				const retryDelay = 50;
-				const retryDeadline = 800;
-				const startTime = new Date().getTime();
-				let dumpResponse: unknown | null = null;
-				while (new Date().getTime() - startTime <= retryDeadline) {
-					try {
-						dumpResponse = await db.get(`SELECT dbdump() as dump;`);
-						break;
-					} catch (err) {
-						// Wait next tick, to free DB lock before dump data for some cases
-						await new Promise((res) => setTimeout(res, retryDelay));
-					}
-				}
-
-				if (!dumpResponse) {
-					throw new Error('Cannot to get DB dump');
-				}
-
-				const dataDump = (dumpResponse as any)['dump'];
-
-				if (!dataDump) {
-					const error = new Error('Dump are empty!');
-					console.error(error);
-					throw error;
-				}
-
-				const dumpString = [pragmaDump, dataDump].join('\n');
+				const buffer = db.serialize();
 
 				// Write tmp file
-				const dbDump = encryption
-					? await encryption.encrypt(dumpString)
-					: dumpString;
+				const dbDump = encryption ? await encryption.encrypt(buffer) : buffer;
 				await writeFileAtomic(dbPath, dbDump);
 
 				if (verboseLog) {
 					console.info('DB saved');
-					console.debug({ dumpString });
+					console.debug({ dbDump });
 				}
 
 				await unlock();
@@ -210,34 +162,35 @@ export const getDb = async ({
 		});
 	};
 
+	// TODO: implement auto sync changes
 	// Auto sync changes
-	let isHaveChangesFromLastCommit = false;
-	db.on('trace', async (command: string) => {
-		if (verboseLog) {
-			console.debug(command);
-		}
+	// let isHaveChangesFromLastCommit = false;
+	// db.on('trace', async (command: string) => {
+	// 	if (verboseLog) {
+	// 		console.debug(command);
+	// 	}
 
-		// Track changes
-		const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
-			(commandName) => command.includes(commandName),
-		);
-		if (isMutableCommand) {
-			isHaveChangesFromLastCommit = true;
-			await sync();
-		}
+	// 	// Track changes
+	// 	const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
+	// 		(commandName) => command.includes(commandName),
+	// 	);
+	// 	if (isMutableCommand) {
+	// 		isHaveChangesFromLastCommit = true;
+	// 		await sync();
+	// 	}
 
-		// Sync by transaction operations
-		const isCommit = command.endsWith('COMMIT');
-		if (isCommit && isHaveChangesFromLastCommit) {
-			isHaveChangesFromLastCommit = false;
-			await sync();
-		}
-	});
+	// 	// Sync by transaction operations
+	// 	const isCommit = command.endsWith('COMMIT');
+	// 	if (isCommit && isHaveChangesFromLastCommit) {
+	// 		isHaveChangesFromLastCommit = false;
+	// 		await sync();
+	// 	}
+	// });
 
 	const close = async () => {
 		// Sync latest changes
 		await sync();
-		await db.close();
+		db.close();
 	};
 
 	await sync();

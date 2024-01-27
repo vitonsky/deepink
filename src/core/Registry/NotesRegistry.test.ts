@@ -1,16 +1,12 @@
 import { tmpdir } from 'os';
-import path from 'path';
 import { tmpNameSync } from 'tmp';
 
 import { getDb } from '../storage/SQLiteDb';
 import { NotesRegistry } from './NotesRegistry';
 
-// TODO: move extensions to dir with DB
-const dbExtensionsDir = path.join(__dirname, '../../../sqlite/extensions');
-
 describe('CRUD operations', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const dbPromise = getDb({ dbPath, dbExtensionsDir });
+	const dbPromise = getDb({ dbPath });
 
 	afterAll(async () => {
 		const db = await dbPromise;
@@ -61,7 +57,7 @@ describe('CRUD operations', () => {
 
 	test('delete entries', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await getDb({ dbPath, dbExtensionsDir });
+		const db = await getDb({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		// Insert entries to test
@@ -110,7 +106,7 @@ describe('data fetching', () => {
 		});
 
 	test('insert sample entries', async () => {
-		const db = await getDb({ dbPath, dbExtensionsDir });
+		const db = await getDb({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		for (const note of notesSample) {
@@ -121,7 +117,7 @@ describe('data fetching', () => {
 	});
 
 	test('get entries by pages', async () => {
-		const db = await getDb({ dbPath, dbExtensionsDir });
+		const db = await getDb({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		await registry.getLength().then((length) => {
@@ -146,7 +142,7 @@ describe('multi instances', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
 
 	test('insertion multiple entries and close with sync data', async () => {
-		const db = await getDb({ dbPath, dbExtensionsDir });
+		const db = await getDb({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		const notes = [
@@ -160,7 +156,7 @@ describe('multi instances', () => {
 	});
 
 	test('read entries from previous step', async () => {
-		const db = await getDb({ dbPath, dbExtensionsDir });
+		const db = await getDb({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		// Entries match data
@@ -175,12 +171,12 @@ describe('multi instances', () => {
 	test('sync and load', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db1 = await getDb({ dbPath, dbExtensionsDir });
+		const db1 = await getDb({ dbPath });
 		const registry1 = new NotesRegistry(db1);
 
 		const entryId = await registry1.add({ title: 'Title 1', text: 'Text 1' });
 
-		const db2 = await getDb({ dbPath, dbExtensionsDir });
+		const db2 = await getDb({ dbPath });
 		const registry2 = new NotesRegistry(db2);
 		const entryById = await registry2.getById(entryId);
 		expect(entryById).not.toBe(null);
@@ -196,7 +192,7 @@ describe.skip('stress tests', () => {
 	// Gzipped data takes ~800kb. We must to compress data
 	test('insert a lot of entries', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await getDb({ dbPath, dbExtensionsDir });
+		const db = await getDb({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		const requests: Promise<string>[] = [];

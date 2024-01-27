@@ -1,15 +1,12 @@
-import { Database } from 'sqlite';
-import sqlite3 from 'sqlite3';
+import { Database } from 'better-sqlite3';
 
-import { ExtendedSqliteDatabase } from '../ExtendedSqliteDatabase';
-
-export type MigrationsTarget = Database<ExtendedSqliteDatabase, sqlite3.Statement>;
+export type MigrationsTarget = Database;
 
 const migrations = [
 	{
 		version: 1,
 		up: async (db: MigrationsTarget) => {
-			await db.exec(`CREATE TABLE "files" (
+			db.exec(`CREATE TABLE "files" (
 				"id"	TEXT NOT NULL UNIQUE,
 				"name"	TEXT NOT NULL,
 				"mimetype"	TEXT NOT NULL,
@@ -20,7 +17,7 @@ const migrations = [
 	{
 		version: 2,
 		up: async (db: MigrationsTarget) => {
-			await db.exec(`CREATE TABLE "attachments" (
+			db.exec(`CREATE TABLE "attachments" (
 				"id"	TEXT NOT NULL UNIQUE,
 				"file"	TEXT NOT NULL,
 				"note"	TEXT NOT NULL,
@@ -31,20 +28,16 @@ const migrations = [
 	{
 		version: 3,
 		up: async (db: MigrationsTarget) => {
-			await db.getDatabaseInstance().runBatch([
-				{ sql: 'BEGIN TRANSACTION' },
-				{ sql: 'DROP TABLE "attachments"' },
-				{
-					sql: `CREATE TABLE "attachments" (
-						"id"	TEXT NOT NULL UNIQUE,
-						"file"	TEXT NOT NULL,
-						"note"	TEXT NOT NULL,
-						PRIMARY KEY("id")
-						UNIQUE(file,note)
-						)`,
-				},
-				{ sql: 'COMMIT' },
-			]);
+			db.transaction(() => {
+				db.exec('DROP TABLE "attachments"');
+				db.exec(`CREATE TABLE "attachments" (
+					"id"	TEXT NOT NULL UNIQUE,
+					"file"	TEXT NOT NULL,
+					"note"	TEXT NOT NULL,
+					PRIMARY KEY("id")
+					UNIQUE(file,note)
+					)`);
+			})();
 		},
 	},
 ] as const;
@@ -52,8 +45,7 @@ const migrations = [
 export const latestSchemaVersion = migrations[migrations.length - 1].version;
 
 export const migrateToLatestSchema = async (db: MigrationsTarget) => {
-	const response = await db.get('PRAGMA main.user_version');
-	let currentVersion = response['user_version'];
+	let currentVersion = Number(db.pragma('main.user_version', { simple: true }));
 
 	console.log('DB version', currentVersion);
 
@@ -64,7 +56,7 @@ export const migrateToLatestSchema = async (db: MigrationsTarget) => {
 		const nextVersion = migration.version;
 
 		await migration.up(db);
-		await db.exec(`PRAGMA main.user_version = ${nextVersion};`);
+		db.pragma(`main.user_version = ${nextVersion};`);
 
 		currentVersion = nextVersion;
 	}

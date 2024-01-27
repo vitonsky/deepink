@@ -64,7 +64,8 @@ module.exports = {
 	},
 	externals: [
 		{
-			sqlite3: 'commonjs2 sqlite3',
+			// TODO: review this solution. Should we use not external modules?
+			'better-sqlite3': 'commonjs2 better-sqlite3',
 		},
 	],
 };
