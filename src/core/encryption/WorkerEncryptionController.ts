@@ -20,6 +20,34 @@ export class Terminable {
 	}
 }
 
+/**
+ * Receive any buffer and returns a converted transferable buffer and codec for revert converting
+ *
+ * Useful to convert buffer for transfer and then convert received buffer back.
+ *
+ * @param buffer
+ * @returns [buffer, convertor]
+ */
+export const convertBufferToTransferable = (
+	buffer: ArrayBuffer,
+): [ArrayBuffer, (buffer: ArrayBuffer) => ArrayBuffer] => {
+	if (buffer instanceof Buffer) {
+		return [
+			buffer.buffer,
+			(buffer: ArrayBuffer) => {
+				return Buffer.from(buffer);
+			},
+		];
+	}
+
+	return [
+		buffer,
+		(buffer: ArrayBuffer) => {
+			return buffer;
+		},
+	];
+};
+
 export class WorkerEncryptionController implements ICipher {
 	private readonly worker;
 	private readonly messenger;
@@ -37,14 +65,24 @@ export class WorkerEncryptionController implements ICipher {
 		this.terminateStatus.throwErrorIfTerminated();
 
 		await this.worker;
-		return this.requests.sendRequest('encrypt', buffer, [buffer]);
+
+		const [transferableBuffer, convertBufferBack] =
+			convertBufferToTransferable(buffer);
+		return this.requests
+			.sendRequest('encrypt', transferableBuffer, [transferableBuffer])
+			.then(convertBufferBack);
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
 		this.terminateStatus.throwErrorIfTerminated();
 
 		await this.worker;
-		return this.requests.sendRequest('decrypt', buffer, [buffer]);
+
+		const [transferableBuffer, convertBufferBack] =
+			convertBufferToTransferable(buffer);
+		return this.requests
+			.sendRequest('decrypt', transferableBuffer, [transferableBuffer])
+			.then(convertBufferBack);
 	}
 
 	private readonly terminateStatus = new Terminable();
