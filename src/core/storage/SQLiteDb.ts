@@ -48,6 +48,14 @@ export const getDb = async ({
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
+	const tracingCallbacks: Array<(command: string) => void> = [];
+	const dbOptions = {
+		verbose: (message?: unknown, ..._additionalArgs: unknown[]) => {
+			if (typeof message !== 'string') return;
+			tracingCallbacks.forEach((cb) => cb(message));
+		},
+	};
+
 	// Create DB
 	let db: Database;
 	if (existsSync(dbPath)) {
@@ -60,16 +68,16 @@ export const getDb = async ({
 			.toString('utf8', 0, 16)
 			.startsWith(`SQLite format 3`);
 		if (isDatabaseFile) {
-			db = new DB(sqlDump);
+			db = new DB(sqlDump, dbOptions);
 		} else {
 			// If no database file, load buffer as string with SQL commands
-			db = new DB(':memory:');
+			db = new DB(':memory:', dbOptions);
 			db.exec(sqlDump.toString());
 		}
 
 		await migrateToLatestSchema(db);
 	} else {
-		db = new DB(':memory:');
+		db = new DB(':memory:', dbOptions);
 		// Setup pragma
 		db.pragma(`main.user_version = ${latestSchemaVersion};`);
 
@@ -162,30 +170,29 @@ export const getDb = async ({
 		});
 	};
 
-	// TODO: implement auto sync changes
 	// Auto sync changes
-	// let isHaveChangesFromLastCommit = false;
-	// db.on('trace', async (command: string) => {
-	// 	if (verboseLog) {
-	// 		console.debug(command);
-	// 	}
+	let isHaveChangesFromLastCommit = false;
+	tracingCallbacks.push(async (command: string) => {
+		if (verboseLog) {
+			console.debug(command);
+		}
 
-	// 	// Track changes
-	// 	const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
-	// 		(commandName) => command.includes(commandName),
-	// 	);
-	// 	if (isMutableCommand) {
-	// 		isHaveChangesFromLastCommit = true;
-	// 		await sync();
-	// 	}
+		// Track changes
+		const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
+			(commandName) => command.includes(commandName),
+		);
+		if (isMutableCommand) {
+			isHaveChangesFromLastCommit = true;
+			await sync();
+		}
 
-	// 	// Sync by transaction operations
-	// 	const isCommit = command.endsWith('COMMIT');
-	// 	if (isCommit && isHaveChangesFromLastCommit) {
-	// 		isHaveChangesFromLastCommit = false;
-	// 		await sync();
-	// 	}
-	// });
+		// Sync by transaction operations
+		const isCommit = command.endsWith('COMMIT');
+		if (isCommit && isHaveChangesFromLastCommit) {
+			isHaveChangesFromLastCommit = false;
+			await sync();
+		}
+	});
 
 	const close = async () => {
 		// Sync latest changes
