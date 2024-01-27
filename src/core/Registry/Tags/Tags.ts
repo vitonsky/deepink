@@ -167,7 +167,7 @@ export class Tags {
 					.fill('?')
 					.join(',')})`,
 			).run(tagsIdForRemove);
-		});
+		})();
 	}
 
 	/**
@@ -205,6 +205,6 @@ export class Tags {
 						.join(',')}`,
 				).run(tags.map((tagId) => [uuid4(), tagId, target]).flat());
 			}
-		});
+		})();
 	}
 }
