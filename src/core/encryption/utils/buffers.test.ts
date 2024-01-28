@@ -3,7 +3,7 @@ import { convertBufferToTransferable, joinBuffers } from './buffers';
 describe('convertBufferToTransferable', () => {
 	test('Buffer', () => {
 		const [buffer, convertBack] = convertBufferToTransferable(
-			new Buffer([10, 20, 30]),
+			Buffer.from([10, 20, 30]),
 		);
 
 		expect(buffer).toBeInstanceOf(ArrayBuffer);
