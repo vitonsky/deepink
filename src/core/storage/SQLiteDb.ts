@@ -42,12 +42,54 @@ type Options = {
 	encryption?: IEncryptionController;
 };
 
+const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
+	const startTime = performance.now();
+
+	return new Promise<T>((res, rej) => {
+		const tryExecute = () => {
+			try {
+				const result = callback();
+				res(result);
+				return;
+			} catch (error) {
+				if (
+					typeof error === 'object' &&
+					(error as Error).message ===
+						'This database connection is busy executing a query'
+				) {
+					if (performance.now() - startTime < timeout) {
+						setTimeout(tryExecute, 10);
+					} else {
+						rej(error);
+					}
+				} else {
+					rej(error);
+				}
+			}
+		};
+
+		tryExecute();
+	});
+};
+
 // TODO: add verbose logging
 export const getDb = async ({
 	dbPath,
 	verbose: verboseLog = false,
 	encryption,
 }: Options): Promise<SQLiteDb> => {
+	if (existsSync(dbPath)) {
+		const isLocked = await lockfileUtils.check(dbPath);
+		if (isLocked) {
+			throw new Error('Database file are locked');
+		}
+	} else {
+		await writeFile(dbPath, '');
+	}
+
+	// Get lock
+	const unlockDatabaseFile = await lockfileUtils.lock(dbPath);
+
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
@@ -62,9 +104,9 @@ export const getDb = async ({
 
 	// Create DB
 	let db: Database;
-	if (existsSync(dbPath)) {
+	const rawDb = await readFile(dbPath);
+	if (rawDb.byteLength > 0) {
 		// Load DB
-		const rawDb = await readFile(dbPath);
 		const sqlDump = encryption ? await encryption.decrypt(rawDb) : rawDb;
 
 		// Check header signature, to detect a database file https://www.sqlite.org/fileformat.html#the_database_header
@@ -119,24 +161,12 @@ export const getDb = async ({
 				await writeFile(dbPath, '');
 			}
 
-			// Exit if sync in progress
-			const isLocked = await lockfileUtils.check(dbPath);
-			if (isLocked) {
-				// Reject requests
-				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(new Error('DB file locked')),
-				);
-				break;
-			}
-
-			const unlock = await lockfileUtils.lock(dbPath);
-
 			// Wrap to allow throw exceptions for good control flow
 			try {
 				// Dump data
-				const buffer = db.serialize();
+				const buffer = await waitDatabaseLock(() => db.serialize());
 
-				// Write tmp file
+				// Write file
 				const dbDump = encryption ? await encryption.encrypt(buffer) : buffer;
 				await writeFileAtomic(dbPath, dbDump);
 
@@ -145,13 +175,9 @@ export const getDb = async ({
 					console.debug({ dbDump });
 				}
 
-				await unlock();
-
 				// Resolve requests
 				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
 			} catch (err) {
-				await unlock();
-
 				const errorToThrow =
 					err instanceof Error ? err : new Error('Unknown error');
 				syncRequestsInProgress.forEach((syncRequest) =>
@@ -202,6 +228,7 @@ export const getDb = async ({
 		// Sync latest changes
 		await sync();
 		db.close();
+		await unlockDatabaseFile();
 	};
 
 	await sync();
