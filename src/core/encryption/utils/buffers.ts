@@ -7,8 +7,10 @@ export const joinBuffers = (buffers: ArrayBuffer[]) => {
 
 	let offset = 0;
 	for (const buffer of buffers) {
-		resultBuffer.set(new Uint8Array(buffer), offset);
-		offset += buffer.byteLength;
+		// We may receive a TypedArray instead of ArrayBuffer, so we have to get a buffer
+		const rawBuffer = ArrayBuffer.isView(buffer) ? buffer.buffer : buffer;
+		resultBuffer.set(new Uint8Array(rawBuffer), offset);
+		offset += rawBuffer.byteLength;
 	}
 
 	return resultBuffer.buffer;
