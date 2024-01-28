@@ -43,7 +43,7 @@ type Options = {
 };
 
 const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
-	const startTime = performance.now();
+	const startTime = new Date().getTime();
 
 	return new Promise<T>((res, rej) => {
 		const tryExecute = () => {
@@ -57,7 +57,7 @@ const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => 
 					(error as Error).message ===
 						'This database connection is busy executing a query'
 				) {
-					if (performance.now() - startTime < timeout) {
+					if (new Date().getTime() - startTime < timeout) {
 						setTimeout(tryExecute, 10);
 					} else {
 						rej(error);
