@@ -167,22 +167,4 @@ describe('multi instances', () => {
 		expect(entries[1].data.text.length).toBeGreaterThan(0);
 		await db.close();
 	});
-
-	// TODO: enable test
-	test.skip('sync and load', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-
-		const db1 = await getDb({ dbPath });
-		const registry1 = new NotesRegistry(db1);
-
-		const entryId = await registry1.add({ title: 'Title 1', text: 'Text 1' });
-
-		const db2 = await getDb({ dbPath });
-		const registry2 = new NotesRegistry(db2);
-		const entryById = await registry2.getById(entryId);
-		expect(entryById).not.toBe(null);
-
-		await db1.close();
-		await db2.close();
-	});
 });

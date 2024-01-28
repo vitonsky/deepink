@@ -31,3 +31,16 @@ describe('migrations', () => {
 		await db.close();
 	});
 });
+
+describe('concurrency', () => {
+	test('throw exception for attempt to open DB that already opened and locked', async () => {
+		const dbPath = tmpNameSync({ dir: tmpdir() });
+
+		const db1 = await getDb({ dbPath });
+		await expect(async () => {
+			await getDb({ dbPath });
+		}).rejects.toThrow('Database file are locked');
+
+		await db1.close();
+	});
+});
