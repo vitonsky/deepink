@@ -9,6 +9,9 @@ import { readFile, writeFile } from 'fs/promises';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 
+const nativeBinding =
+	require('better-sqlite3/build/Release/better_sqlite3.node') as string;
+
 export type SQLiteDb = {
 	/**
 	 * Configured database with extensions
@@ -50,6 +53,7 @@ export const getDb = async ({
 
 	const tracingCallbacks: Array<(command: string) => void> = [];
 	const dbOptions = {
+		nativeBinding,
 		verbose: (message?: unknown, ..._additionalArgs: unknown[]) => {
 			if (typeof message !== 'string') return;
 			tracingCallbacks.forEach((cb) => cb(message));
