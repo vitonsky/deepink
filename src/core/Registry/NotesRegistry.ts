@@ -81,7 +81,7 @@ export class NotesRegistry implements INotesRegistry {
 	}
 
 	public async add(note: INoteData): Promise<NoteId> {
-		const { db, sync } = this.db;
+		const { db } = this.db;
 
 		const creationTime = new Date().getTime();
 
@@ -99,8 +99,6 @@ export class NotesRegistry implements INotesRegistry {
 				updated: creationTime,
 			});
 
-		await sync();
-
 		// Get generated id
 		const selectWithId = (await db
 			.prepare('SELECT `id` FROM notes WHERE rowid=?')
@@ -114,7 +112,7 @@ export class NotesRegistry implements INotesRegistry {
 	}
 
 	public async update(id: string, updatedNote: INoteData) {
-		const { db, sync } = this.db;
+		const { db } = this.db;
 
 		const updateTime = new Date().getTime();
 		const result = db
@@ -131,19 +129,15 @@ export class NotesRegistry implements INotesRegistry {
 		if (!result.changes || result.changes < 1) {
 			throw new Error('Note did not updated');
 		}
-
-		await sync();
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
-		const { db, sync } = this.db;
+		const { db } = this.db;
 
 		const placeholders = Array(ids.length).fill('?').join(',');
 		const result = db
 			.prepare(`DELETE FROM notes WHERE id IN (${placeholders})`)
 			.run(ids);
-
-		await sync();
 
 		if (result.changes !== ids.length) {
 			console.warn(
