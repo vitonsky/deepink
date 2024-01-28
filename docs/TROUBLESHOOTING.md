@@ -14,4 +14,11 @@ To resolve this problem, you can rebuild native modules for target you need:
 - Run `npm rebuild` to rebuild for your node environment
 - Run `npx electron-builder install-app-deps` to rebuild for electron's node version
 
-This problem occurs, because we use native modules as "external modules" in webpack config. We do it, because still cannot to setup build a native modules for electron while building application
+This problem occurs, because we use native modules as "external modules" in webpack config. We do it, because still cannot to setup binding a native modules for electron while building application, so if we disable this option, we will have errors like
+
+```
+Error: Could not locate the bindings file. Tried:
+ → /.../better_sqlite3.node
+```
+
+We should fix this problem
