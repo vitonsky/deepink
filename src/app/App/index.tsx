@@ -153,10 +153,7 @@ export const App: FC = () => {
 		}
 
 		// Setup DB
-		const dbPath = path.join(profileDir, 'deepink.db');
-
-		const db = await openDatabase({
-			dbPath,
+		const db = await openDatabase(path.join(profileDir, 'deepink.db'), {
 			encryption: encryption,
 		});
 

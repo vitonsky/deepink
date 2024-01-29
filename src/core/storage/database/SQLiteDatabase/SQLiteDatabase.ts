@@ -30,8 +30,6 @@ export type SQLiteDatabase = {
 };
 
 type Options = {
-	dbPath: string;
-
 	/**
 	 * Option to disable verbose logs
 	 */
@@ -70,11 +68,10 @@ export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 50
 	});
 };
 
-export const openDatabase = async ({
-	dbPath,
-	verbose: verboseLog = false,
-	encryption,
-}: Options): Promise<SQLiteDatabase> => {
+export const openDatabase = async (
+	dbPath: string,
+	{ verbose: verboseLog = false, encryption }: Options = {},
+): Promise<SQLiteDatabase> => {
 	// Check lock
 	if (existsSync(dbPath)) {
 		const isLocked = await lockfileUtils.check(dbPath);

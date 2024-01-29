@@ -41,7 +41,7 @@ const testFiles = Array(5)
 
 test('clear orphaned files', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const db = await openDatabase({ dbPath });
+	const db = await openDatabase(dbPath);
 	const fileManager = createFileManagerMock();
 	const attachments = new Attachments(db);
 	const files = new FilesRegistry(db, fileManager, attachments);

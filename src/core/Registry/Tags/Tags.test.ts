@@ -8,7 +8,7 @@ import { Tags } from './Tags';
 describe('manage tags', () => {
 	test('nested tags', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 
 		const tags = new Tags(db);
 
@@ -41,7 +41,7 @@ describe('manage tags', () => {
 
 	test('update tags', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 
 		const tags = new Tags(db);
 
@@ -89,7 +89,7 @@ describe('manage tags', () => {
 
 	test('delete tags', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 
 		const tags = new Tags(db);
 
@@ -116,7 +116,7 @@ describe('manage tags', () => {
 describe('manage attachments', () => {
 	test('set attached tags', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 
 		const tags = new Tags(db);
 
@@ -161,7 +161,7 @@ describe('manage attachments', () => {
 
 	test('deleted tag will not appears in tags list', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 
 		const tags = new Tags(db);
 

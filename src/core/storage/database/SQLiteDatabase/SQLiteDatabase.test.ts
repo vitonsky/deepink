@@ -19,7 +19,7 @@ describe('migrations', () => {
 		writeFileSync(dbPath, setupSQL);
 
 		// Test structure
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 
 		const tablesList = db.db
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
@@ -36,9 +36,9 @@ describe('concurrency', () => {
 	test('throw exception for attempt to open DB that already opened and locked', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 		await expect(async () => {
-			await openDatabase({ dbPath });
+			await openDatabase(dbPath);
 		}).rejects.toThrow('Database file are locked');
 
 		await db.close();
@@ -47,20 +47,20 @@ describe('concurrency', () => {
 	test('database file unlocked after close DB', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db1 = await openDatabase({ dbPath });
+		const db1 = await openDatabase(dbPath);
 		await db1.close();
 
-		const db2 = await openDatabase({ dbPath });
+		const db2 = await openDatabase(dbPath);
 		await db2.close();
 
-		const db3 = await openDatabase({ dbPath });
+		const db3 = await openDatabase(dbPath);
 		await db3.close();
 	});
 
 	test('throw exception for attempt to sync DB that been closed', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 		await expect(db.sync()).resolves.not.toThrow();
 		await expect(db.sync()).resolves.not.toThrow();
 
@@ -76,7 +76,7 @@ describe('consistency', () => {
 	test('preserve inode', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db = await openDatabase({ dbPath });
+		const db = await openDatabase(dbPath);
 		await db.sync();
 
 		const fileUniqueId = statSync(dbPath).ino;

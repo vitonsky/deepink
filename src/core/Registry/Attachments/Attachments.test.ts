@@ -7,7 +7,7 @@ import { Attachments } from './Attachments';
 
 test('basic usage', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const db = await openDatabase({ dbPath });
+	const db = await openDatabase(dbPath);
 
 	const attachments = new Attachments(db);
 	await attachments.set('target1', ['foo', 'bar']);
