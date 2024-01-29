@@ -32,6 +32,42 @@ describe('migrations', () => {
 	});
 });
 
+describe('options', () => {
+	test('database encryption applies to a data', async () => {
+		const createEncryption = (key: number) => {
+			const swapBits = async (rawData: string | ArrayBuffer) => {
+				if (typeof rawData === 'string')
+					return (
+						Array.from(rawData)
+							// eslint-disable-next-line no-bitwise
+							.map((e) => String.fromCharCode(e.charCodeAt(0) ^ key))
+							.join('') as any
+					);
+
+				// eslint-disable-next-line no-bitwise
+				return Buffer.from(rawData).map((e) => e ^ key);
+			};
+
+			return {
+				encrypt: swapBits,
+				decrypt: swapBits,
+			};
+		};
+
+		const dbPath = tmpNameSync({ dir: tmpdir() });
+
+		const db1 = await openDatabase(dbPath, { encryption: createEncryption(7) });
+		await db1.close();
+
+		const db2 = await openDatabase(dbPath, { encryption: createEncryption(7) });
+		await db2.close();
+
+		await expect(async () => {
+			await openDatabase(dbPath, { encryption: createEncryption(8) });
+		}).rejects.toThrow();
+	});
+});
+
 describe('concurrency', () => {
 	test('throw exception for attempt to open DB that already opened and locked', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
