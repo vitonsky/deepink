@@ -9,9 +9,6 @@ import { readFile, writeFile } from 'fs/promises';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 
-const nativeBinding =
-	require('better-sqlite3/build/Release/better_sqlite3.node') as string;
-
 export type SQLiteDb = {
 	/**
 	 * Configured database with extensions
@@ -78,52 +75,62 @@ export const getDb = async ({
 	verbose: verboseLog = false,
 	encryption,
 }: Options): Promise<SQLiteDb> => {
+	// Check lock
 	if (existsSync(dbPath)) {
 		const isLocked = await lockfileUtils.check(dbPath);
 		if (isLocked) {
 			throw new Error('Database file are locked');
 		}
-	} else {
+	}
+
+	// Ensure changes applied for atomic file
+	recoveryAtomicFile(dbPath);
+
+	// Create file if no exists, to be able to lock file
+	if (!existsSync(dbPath)) {
 		await writeFile(dbPath, '');
 	}
 
 	// Get lock
 	const unlockDatabaseFile = await lockfileUtils.lock(dbPath);
 
-	// Ensure changes applied for atomic file
-	recoveryAtomicFile(dbPath);
-
+	// Create DB
+	let db: Database;
 	const tracingCallbacks: Array<(command: string) => void> = [];
 	const dbOptions = {
-		nativeBinding,
+		// We use this way, because loader can't automatically find a native module
+		nativeBinding:
+			require('better-sqlite3/build/Release/better_sqlite3.node') as string,
 		verbose: (message?: unknown, ..._additionalArgs: unknown[]) => {
 			if (typeof message !== 'string') return;
 			tracingCallbacks.forEach((cb) => cb(message));
 		},
 	};
 
-	// Create DB
-	let db: Database;
-	const rawDb = await readFile(dbPath);
-	if (rawDb.byteLength > 0) {
+	const dbFileBuffer = await readFile(dbPath);
+	if (dbFileBuffer.byteLength > 0) {
 		// Load DB
-		const sqlDump = encryption ? await encryption.decrypt(rawDb) : rawDb;
+		const dumpBuffer = encryption
+			? await encryption.decrypt(dbFileBuffer)
+			: dbFileBuffer;
 
 		// Check header signature, to detect a database file https://www.sqlite.org/fileformat.html#the_database_header
-		const isDatabaseFile = sqlDump
+		const isDatabaseFile = dumpBuffer
 			.toString('utf8', 0, 16)
 			.startsWith(`SQLite format 3`);
 		if (isDatabaseFile) {
-			db = new DB(sqlDump, dbOptions);
+			db = new DB(dumpBuffer, dbOptions);
 		} else {
 			// If no database file, load buffer as string with SQL commands
 			db = new DB(':memory:', dbOptions);
-			db.exec(sqlDump.toString());
+			db.exec(dumpBuffer.toString());
 		}
 
+		// Migrate data
 		await migrateToLatestSchema(db);
 	} else {
 		db = new DB(':memory:', dbOptions);
+
 		// Setup pragma
 		db.pragma(`main.user_version = ${latestSchemaVersion};`);
 
@@ -134,8 +141,6 @@ export const getDb = async ({
 		}
 
 		db.exec(setupSQL);
-
-		// TODO: try to encrypt data. If does not work - fail
 	}
 
 	type SyncRequest = {
