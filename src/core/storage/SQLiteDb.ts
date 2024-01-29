@@ -229,7 +229,7 @@ export const getDb = async ({
 	const close = async () => {
 		// Sync latest changes
 		await sync();
-		db.close();
+		await waitDatabaseLock(() => db.close());
 		await unlockDatabaseFile();
 	};
 
