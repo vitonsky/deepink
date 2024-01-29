@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { SQLiteDb } from '../../storage/SQLiteDb';
+import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { Attachments } from '../Attachments/Attachments';
 import { FilesStorageController } from '.';
@@ -16,7 +16,7 @@ export class FilesRegistry {
 	private fileController;
 	private attachments;
 	constructor(
-		db: SQLiteDb,
+		db: SQLiteDatabase,
 		fileController: FilesStorageController,
 		attachments: Attachments,
 	) {

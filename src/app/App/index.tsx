@@ -17,8 +17,11 @@ import { Tags } from '../../core/Registry/Tags/Tags';
 import { $activeProfile, changedActiveProfile, Profile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
+import {
+	openDatabase,
+	SQLiteDatabase,
+} from '../../core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
-import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import { getUserDataPath } from '../../electron/requests/files/renderer';
 import { ElectronFilesController } from '../../electron/requests/storage/renderer';
 import { DisposableBox } from '../../utils/disposable';
@@ -34,7 +37,7 @@ import './App.css';
 const config = new ConfigStorage();
 
 type AppContext = {
-	db: SQLiteDb;
+	db: SQLiteDatabase;
 	attachmentsRegistry: Attachments;
 	filesController: ElectronFilesController;
 	filesRegistry: FilesRegistry;
@@ -152,7 +155,7 @@ export const App: FC = () => {
 		// Setup DB
 		const dbPath = path.join(profileDir, 'deepink.db');
 
-		const db = await getDb({
+		const db = await openDatabase({
 			dbPath,
 			encryption: encryption,
 		});

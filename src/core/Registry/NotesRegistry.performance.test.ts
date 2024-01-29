@@ -1,7 +1,7 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { getDb } from '../storage/SQLiteDb';
+import { openDatabase } from '../storage/database/SQLiteDatabase/SQLiteDatabase';
 import { rm } from 'fs/promises';
 import { NotesRegistry } from './NotesRegistry';
 
@@ -22,7 +22,7 @@ describe('stress tests', () => {
 	// With no compression this data takes 8Gb RAM
 	// Gzipped data takes ~800kb. We must to compress data
 	test('insert 10k notes contains 150k chars', async () => {
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		const requests: Promise<string>[] = [];
@@ -49,7 +49,7 @@ describe('stress tests', () => {
 	}, 60000);
 
 	test('update random notes 10k times', async () => {
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		const noteIds = await registry.get().then((notes) => notes.map(({ id }) => id));

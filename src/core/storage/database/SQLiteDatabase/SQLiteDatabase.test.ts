@@ -2,7 +2,7 @@ import { statSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { getDb } from './SQLiteDb';
+import { openDatabase } from './SQLiteDatabase';
 
 describe('migrations', () => {
 	test('from most old version to latest', async () => {
@@ -19,7 +19,7 @@ describe('migrations', () => {
 		writeFileSync(dbPath, setupSQL);
 
 		// Test structure
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 
 		const tablesList = db.db
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
@@ -36,9 +36,9 @@ describe('concurrency', () => {
 	test('throw exception for attempt to open DB that already opened and locked', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db1 = await getDb({ dbPath });
+		const db1 = await openDatabase({ dbPath });
 		await expect(async () => {
-			await getDb({ dbPath });
+			await openDatabase({ dbPath });
 		}).rejects.toThrow('Database file are locked');
 
 		await db1.close();
@@ -49,7 +49,7 @@ describe('consistency', () => {
 	test('preserve inode', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		await db.sync();
 
 		const fileUniqueId = statSync(dbPath).ino;

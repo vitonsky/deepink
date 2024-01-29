@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { SQLiteDb } from '../../storage/SQLiteDb';
+import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 export type ITagData = {
 	id: string;
@@ -51,7 +51,7 @@ ON t.id = x.id
 
 export class Tags {
 	private db;
-	constructor(db: SQLiteDb) {
+	constructor(db: SQLiteDatabase) {
 		this.db = db;
 	}
 

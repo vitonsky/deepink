@@ -1,12 +1,12 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { getDb } from '../storage/SQLiteDb';
+import { openDatabase } from '../storage/database/SQLiteDatabase/SQLiteDatabase';
 import { NotesRegistry } from './NotesRegistry';
 
 describe('CRUD operations', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const dbPromise = getDb({ dbPath });
+	const dbPromise = openDatabase({ dbPath });
 
 	afterAll(async () => {
 		const db = await dbPromise;
@@ -57,7 +57,7 @@ describe('CRUD operations', () => {
 
 	test('delete entries', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		// Insert entries to test
@@ -106,7 +106,7 @@ describe('data fetching', () => {
 		});
 
 	test('insert sample entries', async () => {
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		for (const note of notesSample) {
@@ -117,7 +117,7 @@ describe('data fetching', () => {
 	});
 
 	test('get entries by pages', async () => {
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		await registry.getLength().then((length) => {
@@ -142,7 +142,7 @@ describe('multi instances', () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
 
 	test('insertion multiple entries and close with sync data', async () => {
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		const notes = [
@@ -156,7 +156,7 @@ describe('multi instances', () => {
 	});
 
 	test('read entries from previous step', async () => {
-		const db = await getDb({ dbPath });
+		const db = await openDatabase({ dbPath });
 		const registry = new NotesRegistry(db);
 
 		// Entries match data

@@ -2,7 +2,7 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { getDb } from '../../storage/SQLiteDb';
+import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { Attachments } from '../Attachments/Attachments';
 import { FilesRegistry } from './FilesRegistry';
@@ -41,7 +41,7 @@ const testFiles = Array(5)
 
 test('clear orphaned files', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const db = await getDb({ dbPath });
+	const db = await openDatabase({ dbPath });
 	const fileManager = createFileManagerMock();
 	const attachments = new Attachments(db);
 	const files = new FilesRegistry(db, fileManager, attachments);

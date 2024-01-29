@@ -1,13 +1,13 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { getDb } from '../../storage/SQLiteDb';
+import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { Tags } from './Tags';
 
 test('basic usage', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const db = await getDb({ dbPath });
+	const db = await openDatabase({ dbPath });
 
 	const tags = new Tags(db);
 

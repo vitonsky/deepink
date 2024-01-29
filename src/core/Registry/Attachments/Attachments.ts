@@ -1,13 +1,13 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { SQLiteDb } from '../../storage/SQLiteDb';
+import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 /**
  * Attachments manager, to track attachments usage and to keep consistency
  */
 export class Attachments {
 	private db;
-	constructor(db: SQLiteDb) {
+	constructor(db: SQLiteDatabase) {
 		this.db = db;
 	}
 

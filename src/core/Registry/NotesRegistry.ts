@@ -1,7 +1,7 @@
 import { v4 as uuid4 } from 'uuid';
 
 import { INote, INoteData, NoteId } from '../Note';
-import { SQLiteDb } from '../storage/SQLiteDb';
+import { SQLiteDatabase } from '../storage/database/SQLiteDatabase/SQLiteDatabase';
 import { INotesRegistry, NotesRegistryFetchOptions } from '.';
 
 /**
@@ -24,7 +24,7 @@ const mappers = {
  */
 export class NotesRegistry implements INotesRegistry {
 	private db;
-	constructor(db: SQLiteDb) {
+	constructor(db: SQLiteDatabase) {
 		this.db = db;
 	}
 

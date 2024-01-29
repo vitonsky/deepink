@@ -4,12 +4,12 @@ import { INotesRegistry } from '../../core/Registry';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
 import { Tags } from '../../core/Registry/Tags/Tags';
-import { SQLiteDb } from '../../core/storage/SQLiteDb';
+import { SQLiteDatabase } from '../../core/storage/database/SQLiteDatabase/SQLiteDatabase';
 
 export type FileId = string;
 
 // TODO: remove DB from app context. We should never use DB directly, only business entities instead
-export const dbContext = createContext<SQLiteDb>(null as any);
+export const dbContext = createContext<SQLiteDatabase>(null as any);
 export const useDb = () => {
 	return useContext(dbContext);
 };
@@ -35,7 +35,7 @@ export const useNotesRegistry = () => {
 };
 
 export type ProvidedAppContext = {
-	db: SQLiteDb;
+	db: SQLiteDatabase;
 	filesRegistry: FilesRegistry;
 	attachmentsRegistry: Attachments;
 	tagsRegistry: Tags;

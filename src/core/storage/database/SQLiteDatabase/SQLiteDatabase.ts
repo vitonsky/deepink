@@ -3,14 +3,14 @@ import debounce from 'debounce';
 import { existsSync } from 'fs';
 import lockfileUtils from 'proper-lockfile';
 
-import { recoveryAtomicFile, writeFileAtomic } from '../../utils/files';
+import { recoveryAtomicFile, writeFileAtomic } from '../../../../utils/files';
+import { IEncryptionController } from '../../../encryption';
 
-import { IEncryptionController } from '../encryption';
 import { readFile, writeFile } from 'fs/promises';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 
-export type SQLiteDb = {
+export type SQLiteDatabase = {
 	/**
 	 * Configured database with extensions
 	 */
@@ -70,12 +70,11 @@ const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => 
 	});
 };
 
-// TODO: add verbose logging
-export const getDb = async ({
+export const openDatabase = async ({
 	dbPath,
 	verbose: verboseLog = false,
 	encryption,
-}: Options): Promise<SQLiteDb> => {
+}: Options): Promise<SQLiteDatabase> => {
 	// Check lock
 	if (existsSync(dbPath)) {
 		const isLocked = await lockfileUtils.check(dbPath);
