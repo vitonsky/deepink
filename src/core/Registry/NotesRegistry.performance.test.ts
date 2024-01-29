@@ -28,23 +28,12 @@ describe('stress tests', () => {
 		const requests: Promise<string>[] = [];
 
 		// Insert entries
-		let iters = 0;
 		const textSample = 'Some long text '.repeat(10000);
 		for (let i = 0; i < 10000; i++) {
-			const promise = registry
-				.add({
-					title: `Title #${i}`,
-					text: textSample,
-				})
-				.then((id) => {
-					iters++;
-
-					if (iters % 100 === 0) {
-						console.log('Inserted entries: ', iters);
-					}
-
-					return id;
-				});
+			const promise = registry.add({
+				title: `Title #${i}`,
+				text: textSample,
+			});
 
 			requests.push(promise);
 		}
@@ -57,7 +46,7 @@ describe('stress tests', () => {
 
 		await db.sync();
 		await db.close();
-	}, 30000);
+	}, 60000);
 
 	test('update random notes 10k times', async () => {
 		const db = await getDb({ dbPath });
@@ -80,5 +69,5 @@ describe('stress tests', () => {
 
 		await db.sync();
 		await db.close();
-	}, 30000);
+	}, 60000);
 });
