@@ -86,7 +86,8 @@ export const getDb = async ({
 	// Ensure changes applied for atomic file
 	recoveryAtomicFile(dbPath);
 
-	// Create file if no exists, to be able to lock file
+	// Create empty file if not exists
+	// It needs to create proper lock file
 	if (!existsSync(dbPath)) {
 		await writeFile(dbPath, '');
 	}
@@ -150,23 +151,17 @@ export const getDb = async ({
 
 	let syncRequests: SyncRequest[] = [];
 
-	let isSyncWorkerRunned = false;
+	let isSyncWorkerRun = false;
 	const syncWorker = async () => {
-		if (isSyncWorkerRunned) return;
+		if (isSyncWorkerRun) return;
 
-		isSyncWorkerRunned = true;
+		isSyncWorkerRun = true;
 		while (syncRequests.length > 0) {
 			// Get requests to handle and flush array
 			const syncRequestsInProgress = syncRequests;
 			syncRequests = [];
 
-			// Create empty file if not exists
-			// It needs to create proper lock file
-			if (!existsSync(dbPath)) {
-				await writeFile(dbPath, '');
-			}
-
-			// Wrap to allow throw exceptions for good control flow
+			// Control execution and forward exceptions to promises
 			try {
 				// Dump data
 				const buffer = await waitDatabaseLock(() => db.serialize());
@@ -191,10 +186,10 @@ export const getDb = async ({
 			}
 		}
 
-		isSyncWorkerRunned = false;
+		isSyncWorkerRun = false;
 	};
 
-	// Write changes to file
+	// Update database file
 	const sync = () => {
 		return new Promise<void>((resolve, reject) => {
 			// Add task
@@ -205,6 +200,7 @@ export const getDb = async ({
 		});
 	};
 
+	// TODO: debounce synchronization
 	// Auto sync changes
 	let isHaveChangesFromLastCommit = false;
 	tracingCallbacks.push(async (command: string) => {
@@ -229,6 +225,7 @@ export const getDb = async ({
 		}
 	});
 
+	// TODO: mark DB as  closed, to skip sync calls
 	const close = async () => {
 		// Sync latest changes
 		await sync();
