@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { statSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
@@ -42,5 +42,21 @@ describe('concurrency', () => {
 		}).rejects.toThrow('Database file are locked');
 
 		await db1.close();
+	});
+});
+
+describe('consistency', () => {
+	test('preserve inode', async () => {
+		const dbPath = tmpNameSync({ dir: tmpdir() });
+
+		const db = await getDb({ dbPath });
+		await db.sync();
+
+		const fileUniqueId = statSync(dbPath).ino;
+
+		await db.sync();
+		expect(statSync(dbPath).ino).toBe(fileUniqueId);
+
+		await db.close();
 	});
 });
