@@ -191,6 +191,8 @@ export const openDatabase = async ({
 
 	// Update database file
 	const sync = () => {
+		if (!db.open) throw new Error('Database are closed');
+
 		return new Promise<void>((resolve, reject) => {
 			// Add task
 			syncRequests.push({ resolve, reject });
@@ -204,6 +206,9 @@ export const openDatabase = async ({
 	const debouncedSync = debounce(sync, 10000);
 	let isHaveChangesFromLastCommit = false;
 	tracingCallbacks.push(async (command: string) => {
+		// Skip for closed DB
+		if (!db.open) return;
+
 		if (verboseLog) {
 			console.debug(command);
 		}
@@ -225,7 +230,6 @@ export const openDatabase = async ({
 		}
 	});
 
-	// TODO: mark DB as  closed, to skip sync calls
 	const close = async () => {
 		// Sync latest changes
 		debouncedSync.clear();
