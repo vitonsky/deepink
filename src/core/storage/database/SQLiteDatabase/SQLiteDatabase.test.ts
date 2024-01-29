@@ -36,12 +36,26 @@ describe('concurrency', () => {
 	test('throw exception for attempt to open DB that already opened and locked', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
-		const db1 = await openDatabase({ dbPath });
+		const db = await openDatabase({ dbPath });
 		await expect(async () => {
 			await openDatabase({ dbPath });
 		}).rejects.toThrow('Database file are locked');
 
-		await db1.close();
+		await db.close();
+	});
+
+	test('throw exception for attempt to sync DB that been closed', async () => {
+		const dbPath = tmpNameSync({ dir: tmpdir() });
+
+		const db = await openDatabase({ dbPath });
+		await expect(db.sync()).resolves.not.toThrow();
+		await expect(db.sync()).resolves.not.toThrow();
+
+		await db.close();
+
+		await expect(async () => {
+			await db.sync();
+		}).rejects.toThrow();
 	});
 });
 
