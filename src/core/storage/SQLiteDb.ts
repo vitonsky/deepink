@@ -1,4 +1,5 @@
 import DB, { Database } from 'better-sqlite3';
+import debounce from 'debounce';
 import { existsSync } from 'fs';
 import lockfileUtils from 'proper-lockfile';
 
@@ -200,8 +201,8 @@ export const getDb = async ({
 		});
 	};
 
-	// TODO: debounce synchronization
 	// Auto sync changes
+	const debouncedSync = debounce(sync, 10000);
 	let isHaveChangesFromLastCommit = false;
 	tracingCallbacks.push(async (command: string) => {
 		if (verboseLog) {
@@ -214,21 +215,23 @@ export const getDb = async ({
 		);
 		if (isMutableCommand) {
 			isHaveChangesFromLastCommit = true;
-			await sync();
+			await debouncedSync();
 		}
 
 		// Sync by transaction operations
 		const isCommit = command.endsWith('COMMIT');
 		if (isCommit && isHaveChangesFromLastCommit) {
 			isHaveChangesFromLastCommit = false;
-			await sync();
+			await debouncedSync();
 		}
 	});
 
 	// TODO: mark DB as  closed, to skip sync calls
 	const close = async () => {
 		// Sync latest changes
+		debouncedSync.clear();
 		await sync();
+
 		await waitDatabaseLock(() => db.close());
 		await unlockDatabaseFile();
 	};

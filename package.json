@@ -81,6 +81,7 @@
 		"@bem-react/classname": "^1.6.0",
 		"better-sqlite3": "^9.3.0",
 		"crc": "^4.3.2",
+		"debounce": "^2.0.0",
 		"effector": "^22.8.6",
 		"effector-react": "^22.5.3",
 		"fast-glob": "^3.3.1",
