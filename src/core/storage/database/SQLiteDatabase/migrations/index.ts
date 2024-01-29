@@ -44,10 +44,12 @@ const migrations = [
 
 export const latestSchemaVersion = migrations[migrations.length - 1].version;
 
-export const migrateToLatestSchema = async (db: MigrationsTarget) => {
+export const migrateToLatestSchema = async (db: MigrationsTarget, verbose = false) => {
 	let currentVersion = Number(db.pragma('main.user_version', { simple: true }));
 
-	console.log('DB version', currentVersion);
+	if (verbose) {
+		console.log('DB version', currentVersion);
+	}
 
 	// TODO: ensure sorted versions
 	for (const migration of migrations) {
@@ -59,5 +61,9 @@ export const migrateToLatestSchema = async (db: MigrationsTarget) => {
 		db.pragma(`main.user_version = ${nextVersion};`);
 
 		currentVersion = nextVersion;
+
+		if (verbose) {
+			console.log('DB version updated to', currentVersion);
+		}
 	}
 };

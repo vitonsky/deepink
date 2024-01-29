@@ -125,7 +125,7 @@ export const openDatabase = async (
 		}
 
 		// Migrate data
-		await migrateToLatestSchema(db);
+		await migrateToLatestSchema(db, verboseLog);
 	} else {
 		db = new DB(':memory:', dbOptions);
 
