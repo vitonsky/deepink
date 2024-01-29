@@ -40,7 +40,7 @@ export const recoveryAtomicFile = (filename: string) => {
 
 	if (!existsSync(backupFile)) return false;
 
-	// Preserve actual data from file to temporary file
+	// Save data to temporary file, to manual recovery
 	const tmpFile = filename + '.tmp';
 	if (existsSync(filename)) {
 		// Remove previous version
@@ -53,5 +53,9 @@ export const recoveryAtomicFile = (filename: string) => {
 
 	// Recovery data
 	renameSync(backupFile, filename);
+
+	// Remove temporary file
+	rmSync(tmpFile);
+
 	return true;
 };
