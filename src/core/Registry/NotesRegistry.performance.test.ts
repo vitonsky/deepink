@@ -44,7 +44,6 @@ describe('stress tests', () => {
 
 		expect(await registry.getLength()).toBe(requests.length);
 
-		await db.sync();
 		await db.close();
 	}, 60000);
 
@@ -67,7 +66,6 @@ describe('stress tests', () => {
 			});
 		}
 
-		await db.sync();
 		await db.close();
 	}, 60000);
 });
