@@ -1,6 +1,6 @@
-import { existsSync, renameSync } from 'fs';
+import { existsSync, renameSync, rmSync } from 'fs';
 
-import { rename, rm, writeFile } from 'fs/promises';
+import { copyFile, rm, writeFile } from 'fs/promises';
 
 /**
  * Write file with 3-step transaction
@@ -8,13 +8,9 @@ import { rename, rm, writeFile } from 'fs/promises';
  * This util is not lock files, you have to implement it, to ensure conflict free
  */
 export const writeFileAtomic = async (filename: string, content: Buffer | string) => {
-	// Write tmp file. This operation will rewrite file if exists
-	const tmpFile = filename + '.tmp';
-	await writeFile(tmpFile, content);
-
 	const backupFile = filename + '.backup';
 
-	// Rename original file
+	// Backup original file
 	if (existsSync(filename)) {
 		if (existsSync(backupFile)) {
 			throw new Error(
@@ -22,11 +18,11 @@ export const writeFileAtomic = async (filename: string, content: Buffer | string
 			);
 		}
 
-		await rename(filename, backupFile);
+		await copyFile(filename, backupFile);
 	}
 
-	// Rename temporary file, to original name
-	await rename(tmpFile, filename);
+	// Write data
+	await writeFile(filename, content);
 
 	// Delete backup file, to commit transaction
 	if (existsSync(backupFile)) {
@@ -42,13 +38,20 @@ export const writeFileAtomic = async (filename: string, content: Buffer | string
 export const recoveryAtomicFile = (filename: string) => {
 	const backupFile = filename + '.backup';
 
-	if (existsSync(filename)) return false;
+	if (!existsSync(backupFile)) return false;
 
-	// Recovery data
-	if (existsSync(backupFile)) {
-		renameSync(backupFile, filename);
-		return true;
+	// Preserve actual data from file to temporary file
+	const tmpFile = filename + '.tmp';
+	if (existsSync(filename)) {
+		// Remove previous version
+		if (existsSync(tmpFile)) {
+			rmSync(tmpFile);
+		}
+
+		renameSync(filename, tmpFile);
 	}
 
-	return false;
+	// Recovery data
+	renameSync(backupFile, filename);
+	return true;
 };
