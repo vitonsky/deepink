@@ -80,7 +80,6 @@ export const convertBufferToTransferable = (
 		];
 	}
 
-	// TODO: add tests
 	// Typed arrays
 	const typedArray = [
 		Int8Array,

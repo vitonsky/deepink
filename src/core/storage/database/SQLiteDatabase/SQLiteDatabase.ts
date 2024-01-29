@@ -40,7 +40,7 @@ type Options = {
 	encryption?: IEncryptionController;
 };
 
-const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
+export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
 	const startTime = new Date().getTime();
 
 	return new Promise<T>((res, rej) => {
