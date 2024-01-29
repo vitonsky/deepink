@@ -28,11 +28,15 @@ module.exports = {
 		cached: true,
 		cachedAssets: true,
 	},
+	node: {
+		__dirname: false,
+	},
 	resolve: {
 		extensions: ['.js', '.ts', '.tsx'],
 	},
 	output: {
 		path: outputPath,
+		publicPath: '',
 	},
 	module: {
 		rules: [
@@ -60,11 +64,10 @@ module.exports = {
 				test: /\.sql$/,
 				type: 'asset/source',
 			},
+			{
+				test: /\.node$/,
+				loader: 'node-loader',
+			},
 		],
 	},
-	externals: [
-		{
-			sqlite3: 'commonjs2 sqlite3',
-		},
-	],
 };

@@ -1,6 +1,7 @@
 import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
 import { WorkerRPC } from '../../utils/workers/WorkerRPC';
 
+import { convertBufferToTransferable } from './utils/buffers';
 import { ICipher } from '.';
 
 export class Terminable {
@@ -37,14 +38,24 @@ export class WorkerEncryptionController implements ICipher {
 		this.terminateStatus.throwErrorIfTerminated();
 
 		await this.worker;
-		return this.requests.sendRequest('encrypt', buffer, [buffer]);
+
+		const [transferableBuffer, convertBufferBack] =
+			convertBufferToTransferable(buffer);
+		return this.requests
+			.sendRequest('encrypt', transferableBuffer, [transferableBuffer])
+			.then(convertBufferBack);
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
 		this.terminateStatus.throwErrorIfTerminated();
 
 		await this.worker;
-		return this.requests.sendRequest('decrypt', buffer, [buffer]);
+
+		const [transferableBuffer, convertBufferBack] =
+			convertBufferToTransferable(buffer);
+		return this.requests
+			.sendRequest('decrypt', transferableBuffer, [transferableBuffer])
+			.then(convertBufferBack);
 	}
 
 	private readonly terminateStatus = new Terminable();

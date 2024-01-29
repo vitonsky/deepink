@@ -1,5 +1,6 @@
-import { DeclarativeStatement } from '../../storage/ExtendedSqliteDatabase';
-import { SQLiteDb } from '../../storage/SQLiteDb';
+import { v4 as uuid4 } from 'uuid';
+
+import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 export type ITagData = {
 	id: string;
@@ -39,7 +40,7 @@ SELECT
 	t.id, t.name, x.name as resolvedName, t.parent
 FROM tags t
 INNER JOIN (
-	SELECT id, group_concat(name, "/") AS name
+	SELECT id, group_concat(name, '/') AS name
 	FROM (
 		SELECT * FROM tagTree ORDER BY segmentId DESC
 	)
@@ -50,7 +51,7 @@ ON t.id = x.id
 
 export class Tags {
 	private db;
-	constructor(db: SQLiteDb) {
+	constructor(db: SQLiteDatabase) {
 		this.db = db;
 	}
 
@@ -60,13 +61,13 @@ export class Tags {
 	public async getTags(): Promise<ITag[]> {
 		const { db } = this.db;
 
-		return db.all(tagsQuery).then((rows) =>
-			rows.map(({ id, name, resolvedName, parent }) => ({
+		return (db.prepare(tagsQuery).all() as any[]).map(
+			({ id, name, resolvedName, parent }) => ({
 				id,
 				name,
 				resolvedName,
 				parent: parent ?? null,
-			})),
+			}),
 		);
 	}
 
@@ -77,39 +78,42 @@ export class Tags {
 
 		const segments = name.split('/');
 		if (segments.length > 1) {
-			const results = await db.getDatabaseInstance().runBatch(
+			const results = db.transaction(() =>
 				segments.map((name, idx) => {
 					const isFirstItem = idx === 0;
 
 					if (isFirstItem) {
-						return {
-							sql: 'INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, ?)',
-							params: [name, parent],
-						};
+						return db
+							.prepare(
+								'INSERT INTO tags ("id", "name", "parent") VALUES (?, ?, ?)',
+							)
+							.run(uuid4(), name, parent);
 					}
 
-					return {
-						sql: 'INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, (SELECT id FROM tags WHERE ROWID=last_insert_rowid()))',
-						params: [name],
-					};
+					return db
+						.prepare(
+							'INSERT INTO tags ("id", "name", "parent") VALUES (?, ?, (SELECT id FROM tags WHERE ROWID=last_insert_rowid()))',
+						)
+						.run(uuid4(), name);
 				}),
-			);
+			)();
 
-			lastId = results[results.length - 1].lastID;
+			lastId = Number(results[results.length - 1].lastInsertRowid);
 		} else {
-			const insertResult = await db.run(
-				'INSERT INTO tags ("id", "name", "parent") VALUES (uuid4(), ?, ?)',
-				[name, parent],
-			);
-			if (insertResult.lastID === undefined) {
+			const insertResult = db
+				.prepare('INSERT INTO tags ("id", "name", "parent") VALUES (?, ?, ?)')
+				.run(uuid4(), name, parent);
+			if (insertResult.lastInsertRowid === undefined) {
 				throw new Error('Last insert id not found');
 			}
 
-			lastId = insertResult.lastID;
+			lastId = Number(insertResult.lastInsertRowid);
 		}
 
 		// Get generated id
-		const selectWithId = await db.get('SELECT `id` FROM tags WHERE rowid=?', lastId);
+		const selectWithId = (await db
+			.prepare('SELECT `id` FROM tags WHERE rowid=?')
+			.get(lastId)) as any;
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
 		}
@@ -120,19 +124,20 @@ export class Tags {
 	public async update(tag: ITagData): Promise<void> {
 		const { db } = this.db;
 
-		await db.run('UPDATE tags SET name=?, parent=? WHERE id=?', [
+		db.prepare('UPDATE tags SET name=?, parent=? WHERE id=?').run(
 			tag.name,
 			tag.parent,
 			tag.id,
-		]);
+		);
 	}
 
 	public async delete(id: string): Promise<void> {
 		const { db } = this.db;
 
-		const tagsIdForRemove = await db
-			.all(
-				`
+		const tagsIdForRemove = (
+			db
+				.prepare(
+					`
 			WITH RECURSIVE tagTree AS (
 				SELECT
 					id, parent, name, id AS root
@@ -146,26 +151,23 @@ export class Tags {
 			)
 			SELECT id FROM tagTree WHERE root IN (?) GROUP BY id
 		`,
-				[id],
-			)
-			.then((rows) => rows.map(({ id }) => id));
-
-		await db.getDatabaseInstance().runBatch([
-			{
-				sql: `DELETE FROM tags WHERE id IN (${Array(tagsIdForRemove.length)
-					.fill('?')
-					.join(',')})`,
-				params: tagsIdForRemove,
-			},
-			{
-				sql: `DELETE FROM attachedTags WHERE source IN (${Array(
-					tagsIdForRemove.length,
 				)
+				.all(id) as { id: string }[]
+		).map(({ id }) => id);
+
+		db.transaction(() => {
+			db.prepare(
+				`DELETE FROM tags WHERE id IN (${Array(tagsIdForRemove.length)
 					.fill('?')
 					.join(',')})`,
-				params: tagsIdForRemove,
-			},
-		]);
+			).run(tagsIdForRemove);
+
+			db.prepare(
+				`DELETE FROM attachedTags WHERE source IN (${Array(tagsIdForRemove.length)
+					.fill('?')
+					.join(',')})`,
+			).run(tagsIdForRemove);
+		})();
 	}
 
 	/**
@@ -178,36 +180,31 @@ export class Tags {
 			tagsQuery,
 			`WHERE t.id IN (SELECT source FROM attachedTags WHERE target = ?)`,
 		].join(' ');
-		const rows = await db.all(query, [target]);
-		return rows.map(({ id, name, resolvedName, parent }) => ({
-			id,
-			name,
-			resolvedName,
-			parent: parent ?? null,
-		}));
+
+		return (db.prepare(query).all(target) as any[]).map(
+			({ id, name, resolvedName, parent }) => ({
+				id,
+				name,
+				resolvedName,
+				parent: parent ?? null,
+			}),
+		);
 	}
 
 	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
 		const { db } = this.db;
 
-		const query: DeclarativeStatement[] = [
-			{
-				sql: `DELETE FROM attachedTags WHERE target=?`,
-				params: [target],
-			},
-		];
-
-		if (tags.length > 0) {
-			query.push({
-				sql: `INSERT INTO attachedTags(id,source,target) VALUES ${Array(
-					tags.length,
-				)
-					.fill('(uuid4(), ?, ?)')
-					.join(',')}`,
-				params: tags.map((tagId) => [tagId, target]).flat(),
-			});
-		}
-
-		await db.getDatabaseInstance().runBatch(query);
+		db.transaction(() => {
+			db.prepare(`DELETE FROM attachedTags WHERE target=?`).run(target);
+			if (tags.length > 0) {
+				db.prepare(
+					`INSERT INTO attachedTags(id,source,target) VALUES ${Array(
+						tags.length,
+					)
+						.fill('(?, ?, ?)')
+						.join(',')}`,
+				).run(tags.map((tagId) => [uuid4(), tagId, target]).flat());
+			}
+		})();
 	}
 }

@@ -1,5 +1,7 @@
+import { v4 as uuid4 } from 'uuid';
+
 import { INote, INoteData, NoteId } from '../Note';
-import { SQLiteDb } from '../storage/SQLiteDb';
+import { SQLiteDatabase } from '../storage/database/SQLiteDatabase/SQLiteDatabase';
 import { INotesRegistry, NotesRegistryFetchOptions } from '.';
 
 /**
@@ -22,23 +24,22 @@ const mappers = {
  */
 export class NotesRegistry implements INotesRegistry {
 	private db;
-	constructor(db: SQLiteDb) {
+	constructor(db: SQLiteDatabase) {
 		this.db = db;
 	}
 
 	public async getById(id: NoteId): Promise<INote | null> {
 		const { db } = this.db;
-		const note = await db.get('SELECT * FROM notes WHERE id=?', [id]);
-
+		const note = db.prepare('SELECT * FROM notes WHERE id=?').get(id);
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
 	public async getLength(): Promise<number> {
 		const { db } = this.db;
-		const response = await db.get('SELECT COUNT(id) as length FROM notes');
-
-		const length = response?.length;
-		return length;
+		const { length } = db.prepare('SELECT COUNT(id) as length FROM notes').get() as {
+			length?: number;
+		};
+		return length ?? 0;
 	}
 
 	public async get({
@@ -68,43 +69,41 @@ export class NotesRegistry implements INotesRegistry {
 		fetchQuery.push(`LIMIT ? OFFSET ?`);
 		fetchParams.push(limit, offset);
 
-		await db.each(fetchQuery.join(' '), fetchParams, (err, row) => {
-			if (err) {
-				throw new Error(err);
-			}
+		db.prepare(fetchQuery.join(' '))
+			.all(fetchParams)
+			.map((row) => {
+				// TODO: validate data for first note
 
-			// TODO: validate data for first note
-
-			notes.push(mappers.rowToNoteObject(row));
-		});
+				notes.push(mappers.rowToNoteObject(row));
+			});
 
 		return notes;
 	}
 
 	public async add(note: INoteData): Promise<NoteId> {
-		const { db, sync } = this.db;
+		const { db } = this.db;
 
 		const creationTime = new Date().getTime();
 
 		// Insert data
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
-		const insertResult = await db.run(
-			'INSERT INTO notes ("id","title","text","creationTime","lastUpdateTime") VALUES (uuid4(),:title,:text,:created,:updated)',
-			{
-				':title': note.title,
-				':text': note.text,
-				':created': creationTime,
-				':updated': creationTime,
-			},
-		);
-
-		await sync();
+		const insertResult = db
+			.prepare(
+				'INSERT INTO notes ("id","title","text","creationTime","lastUpdateTime") VALUES (@id,@title,@text,@created,@updated)',
+			)
+			.run({
+				id: uuid4(),
+				title: note.title,
+				text: note.text,
+				created: creationTime,
+				updated: creationTime,
+			});
 
 		// Get generated id
-		const selectWithId = await db.get(
-			'SELECT `id` FROM notes WHERE rowid=?',
-			insertResult.lastID,
-		);
+		const selectWithId = (await db
+			.prepare('SELECT `id` FROM notes WHERE rowid=?')
+			.get(insertResult.lastInsertRowid)) as { id: string };
+
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
 		}
@@ -113,35 +112,32 @@ export class NotesRegistry implements INotesRegistry {
 	}
 
 	public async update(id: string, updatedNote: INoteData) {
-		const { db, sync } = this.db;
+		const { db } = this.db;
 
 		const updateTime = new Date().getTime();
-		const result = await db.run(
-			'UPDATE notes SET "title"=:title, "text"=:text, "lastUpdateTime"=:updateTime WHERE "id"=:id',
-			{
-				':title': updatedNote.title,
-				':text': updatedNote.text,
-				':updateTime': updateTime,
-				':id': id,
-			},
-		);
+		const result = db
+			.prepare(
+				'UPDATE notes SET "title"=@title, "text"=@text, "lastUpdateTime"=@updateTime WHERE "id"=@id',
+			)
+			.run({
+				title: updatedNote.title,
+				text: updatedNote.text,
+				updateTime: updateTime,
+				id: id,
+			});
 
 		if (!result.changes || result.changes < 1) {
 			throw new Error('Note did not updated');
 		}
-
-		await sync();
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
-		const { db, sync } = this.db;
+		const { db } = this.db;
 
 		const placeholders = Array(ids.length).fill('?').join(',');
-		const result = await db.run(
-			`DELETE FROM notes WHERE id IN (${placeholders})`,
-			ids,
-		);
-		await sync();
+		const result = db
+			.prepare(`DELETE FROM notes WHERE id IN (${placeholders})`)
+			.run(ids);
 
 		if (result.changes !== ids.length) {
 			console.warn(

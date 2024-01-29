@@ -1,4 +1,6 @@
-import { SQLiteDb } from '../../storage/SQLiteDb';
+import { v4 as uuid4 } from 'uuid';
+
+import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { Attachments } from '../Attachments/Attachments';
 import { FilesStorageController } from '.';
@@ -14,7 +16,7 @@ export class FilesRegistry {
 	private fileController;
 	private attachments;
 	constructor(
-		db: SQLiteDb,
+		db: SQLiteDatabase,
 		fileController: FilesStorageController,
 		attachments: Attachments,
 	) {
@@ -27,18 +29,20 @@ export class FilesRegistry {
 		const { db } = this.db;
 
 		// Insert in DB
-		const insertResult = await db.run(
-			'INSERT INTO files ("id","name","mimetype") VALUES (uuid4(),:name,:mimetype)',
-			{
-				':name': file.name,
-				':mimetype': file.type,
-			},
-		);
+		const insertResult = db
+			.prepare(
+				'INSERT INTO files ("id","name","mimetype") VALUES (@id,@name,@mimetype)',
+			)
+			.run({
+				id: uuid4(),
+				name: file.name,
+				mimetype: file.type,
+			});
 
-		const selectWithId = await db.get(
-			'SELECT `id` FROM files WHERE rowid=?',
-			insertResult.lastID,
-		);
+		const selectWithId = db
+			.prepare('SELECT `id` FROM files WHERE rowid=?')
+			.get(insertResult.lastInsertRowid) as any;
+
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
 		}
@@ -58,9 +62,7 @@ export class FilesRegistry {
 		const { db } = this.db;
 
 		// Insert in DB
-		const fileEntry = await db.get('SELECT * FROM files WHERE id=:id', {
-			':id': id,
-		});
+		const fileEntry = db.prepare('SELECT * FROM files WHERE id=?').get(id) as any;
 
 		if (!fileEntry) return null;
 
@@ -78,7 +80,7 @@ export class FilesRegistry {
 
 		// Delete in database
 		const placeholders = Array(filesId.length).fill('?').join(',');
-		await db.run(`DELETE FROM files WHERE id IN (${placeholders})`, filesId);
+		db.prepare(`DELETE FROM files WHERE id IN (${placeholders})`).run(filesId);
 
 		// Delete files
 		await this.fileController.delete(filesId);
@@ -87,7 +89,7 @@ export class FilesRegistry {
 	public async clearOrphaned() {
 		const { db } = this.db;
 
-		const files = await db.all('SELECT id FROM files');
+		const files = db.prepare('SELECT id FROM files').all() as Array<{ id: string }>;
 
 		// Remove orphaned files in FS
 		const filesInStorage = await this.fileController.list();

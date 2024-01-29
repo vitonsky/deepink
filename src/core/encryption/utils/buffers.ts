@@ -7,8 +7,10 @@ export const joinBuffers = (buffers: ArrayBuffer[]) => {
 
 	let offset = 0;
 	for (const buffer of buffers) {
-		resultBuffer.set(new Uint8Array(buffer), offset);
-		offset += buffer.byteLength;
+		// We may receive a TypedArray instead of ArrayBuffer, so we have to get a buffer
+		const rawBuffer = ArrayBuffer.isView(buffer) ? buffer.buffer : buffer;
+		resultBuffer.set(new Uint8Array(rawBuffer), offset);
+		offset += rawBuffer.byteLength;
 	}
 
 	return resultBuffer.buffer;
@@ -57,3 +59,54 @@ export class BufferView {
 		}
 	}
 }
+
+/**
+ * Receive any buffer and returns a converted transferable buffer and codec for revert converting
+ *
+ * Useful to convert buffer for transfer and then convert received buffer back.
+ *
+ * @param buffer
+ * @returns [buffer, convertor]
+ */
+export const convertBufferToTransferable = (
+	buffer: ArrayBuffer,
+): [ArrayBuffer, (buffer: ArrayBuffer) => ArrayBuffer] => {
+	if (buffer instanceof Buffer) {
+		return [
+			buffer.buffer,
+			(buffer: ArrayBuffer) => {
+				return Buffer.from(buffer);
+			},
+		];
+	}
+
+	// Typed arrays
+	const typedArray = [
+		Int8Array,
+		Uint8Array,
+		Uint8ClampedArray,
+		Int16Array,
+		Uint16Array,
+		Int32Array,
+		Uint32Array,
+		Float32Array,
+		Float64Array,
+		BigInt64Array,
+		BigUint64Array,
+	].find((proto) => buffer instanceof proto);
+	if (typedArray && buffer instanceof typedArray) {
+		return [
+			buffer.buffer,
+			(buffer: ArrayBuffer) => {
+				return new typedArray(buffer);
+			},
+		];
+	}
+
+	return [
+		buffer,
+		(buffer: ArrayBuffer) => {
+			return buffer;
+		},
+	];
+};

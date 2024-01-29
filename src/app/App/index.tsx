@@ -17,12 +17,12 @@ import { Tags } from '../../core/Registry/Tags/Tags';
 import { $activeProfile, changedActiveProfile, Profile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
-import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
-import { getDb, SQLiteDb } from '../../core/storage/SQLiteDb';
 import {
-	getResourcesPath,
-	getUserDataPath,
-} from '../../electron/requests/files/renderer';
+	openDatabase,
+	SQLiteDatabase,
+} from '../../core/storage/database/SQLiteDatabase/SQLiteDatabase';
+import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
+import { getUserDataPath } from '../../electron/requests/files/renderer';
 import { ElectronFilesController } from '../../electron/requests/storage/renderer';
 import { DisposableBox } from '../../utils/disposable';
 
@@ -37,7 +37,7 @@ import './App.css';
 const config = new ConfigStorage();
 
 type AppContext = {
-	db: SQLiteDb;
+	db: SQLiteDatabase;
 	attachmentsRegistry: Attachments;
 	filesController: ElectronFilesController;
 	filesRegistry: FilesRegistry;
@@ -153,12 +153,7 @@ export const App: FC = () => {
 		}
 
 		// Setup DB
-		const dbPath = path.join(profileDir, 'deepink.db');
-		const dbExtensionsDir = await getResourcesPath('sqlite/extensions');
-
-		const db = await getDb({
-			dbPath,
-			dbExtensionsDir,
+		const db = await openDatabase(path.join(profileDir, 'deepink.db'), {
 			encryption: encryption,
 		});
 
@@ -168,7 +163,7 @@ export const App: FC = () => {
 		// Setup files
 		// TODO: implement methods to close the objects after use
 		const attachmentsRegistry = new Attachments(db);
-		const filesController = new ElectronFilesController(profileDir, encryption);
+		const filesController = new ElectronFilesController(profile.id, encryption);
 		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
 		const tagsRegistry = new Tags(db);
 		const notesRegistry = new NotesRegistry(db);
