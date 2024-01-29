@@ -44,6 +44,19 @@ describe('concurrency', () => {
 		await db.close();
 	});
 
+	test('database file unlocked after close DB', async () => {
+		const dbPath = tmpNameSync({ dir: tmpdir() });
+
+		const db1 = await openDatabase({ dbPath });
+		await db1.close();
+
+		const db2 = await openDatabase({ dbPath });
+		await db2.close();
+
+		const db3 = await openDatabase({ dbPath });
+		await db3.close();
+	});
+
 	test('throw exception for attempt to sync DB that been closed', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 
