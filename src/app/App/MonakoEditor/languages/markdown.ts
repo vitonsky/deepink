@@ -1,3 +1,4 @@
+/* eslint-disable spellcheck/spell-checker */
 // File copied from https://github.com/microsoft/monaco-editor/blob/34f6c100735faff8a42e39fb6005ed029176025c/src/basic-languages/markdown/markdown.ts
 
 /*---------------------------------------------------------------------------------------------
