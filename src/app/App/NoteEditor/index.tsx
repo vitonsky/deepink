@@ -245,7 +245,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 										<span>Readonly mode</span>
 									</Stack>
 								),
-								textContent: 'Readonly mode',
+								textContent: 'Read-only mode',
 							},
 							{
 								id: 'id',
@@ -465,16 +465,16 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						onCreateTag={async (tagName) => {
 							setAttachTagName('');
 
-							let cuttedTagName = tagName;
+							let shortenedTagName = tagName;
 							let parentTagId: string | null = null;
 							const tagSegments = tagName.split('/');
 							for (
-								let segmentsNum = tagSegments.length - 1;
-								segmentsNum > 0;
-								segmentsNum--
+								let lastSegmentIndex = tagSegments.length - 1;
+								lastSegmentIndex > 0;
+								lastSegmentIndex--
 							) {
 								const resolvedParentTag = tagSegments
-									.slice(0, segmentsNum)
+									.slice(0, lastSegmentIndex)
 									.join('/');
 								const foundTag = tags.find(
 									({ resolvedName }) =>
@@ -482,15 +482,15 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								);
 								if (foundTag) {
 									parentTagId = foundTag.id;
-									cuttedTagName = tagSegments
-										.slice(segmentsNum)
+									shortenedTagName = tagSegments
+										.slice(lastSegmentIndex)
 										.join('/');
 									break;
 								}
 							}
 
 							const tagId = await tagsRegistry.add(
-								cuttedTagName,
+								shortenedTagName,
 								parentTagId,
 							);
 							tagsChanged();
