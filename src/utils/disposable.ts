@@ -1,4 +1,4 @@
-import { Terminable } from '../core/encryption/WorkerEncryptionController';
+import { Terminable } from '../core/encryption/processors/WorkerEncryptionProxyProcessor';
 
 export class DisposableBox<T> {
 	private readonly data;

@@ -1,8 +1,8 @@
-import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
-import { WorkerRPC } from '../../utils/workers/WorkerRPC';
+import { WorkerMessenger } from '../../../utils/workers/WorkerMessenger';
+import { WorkerRPC } from '../../../utils/workers/WorkerRPC';
 
-import { convertBufferToTransferable } from './utils/buffers';
-import { IEncryptionProcessor } from '.';
+import { convertBufferToTransferable } from '../utils/buffers';
+import { IEncryptionProcessor } from "..";
 
 export class Terminable {
 	private isFinished = false;
@@ -21,7 +21,7 @@ export class Terminable {
 	}
 }
 
-export class WorkerEncryptionController implements IEncryptionProcessor {
+export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly worker;
 	private readonly messenger;
 	private readonly requests;

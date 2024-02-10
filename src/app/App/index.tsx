@@ -6,9 +6,9 @@ import { cn } from '@bem-react/classname';
 
 import { EncryptionController } from '../../core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '../../core/encryption/PlaceholderEncryptionController';
+import { WorkerEncryptionProxyProcessor } from '../../core/encryption/processors/WorkerEncryptionProxyProcessor';
 import { base64ToBytes, bytesToBase64 } from '../../core/encryption/utils/encoding';
 import { getRandomBytes } from '../../core/encryption/utils/random';
-import { WorkerEncryptionController } from '../../core/encryption/WorkerEncryptionController';
 import { INoteData } from '../../core/Note';
 import { Attachments } from '../../core/Registry/Attachments/Attachments';
 import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
@@ -55,7 +55,7 @@ export const decryptKey = async (
 	password: string,
 	salt: ArrayBuffer,
 ) => {
-	const workerEncryptionForKey = new WorkerEncryptionController(password, salt);
+	const workerEncryptionForKey = new WorkerEncryptionProxyProcessor(password, salt);
 	const encryptionForKey = new EncryptionController(workerEncryptionForKey);
 	return encryptionForKey.decrypt(encryptedKey).finally(() => {
 		workerEncryptionForKey.terminate();
@@ -97,16 +97,16 @@ export const App: FC = () => {
 					},
 				});
 
-				const workerController = new WorkerEncryptionController(
+				const workerEncryption = new WorkerEncryptionProxyProcessor(
 					profile.password,
 					new Uint8Array(salt),
 				);
-				const encryption = new EncryptionController(workerController);
+				const encryption = new EncryptionController(workerEncryption);
 
 				const key = getRandomBytes(32);
 				const encryptedKey = await encryption.encrypt(key);
 
-				workerController.terminate();
+				workerEncryption.terminate();
 
 				const profileDir = await getUserDataPath(newProfile.id);
 
@@ -146,10 +146,10 @@ export const App: FC = () => {
 			const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
 			const key = await decryptKey(encryptedKeyFile.buffer, password, salt);
 
-			const workerController = new WorkerEncryptionController(key, salt);
-			encryptionCleanup = () => workerController.terminate();
+			const workerEncryption = new WorkerEncryptionProxyProcessor(key, salt);
+			encryptionCleanup = () => workerEncryption.terminate();
 
-			encryption = new EncryptionController(workerController);
+			encryption = new EncryptionController(workerEncryption);
 		}
 
 		// Setup DB
