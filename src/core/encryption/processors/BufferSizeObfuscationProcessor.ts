@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/no-unresolved
-
 import { joinBuffers } from '../utils/buffers';
+import { fillBufferWithRandomBytes } from '../utils/random';
 import { HeaderView, IEncryptionProcessor } from '..';
 
 export type SizeObfuscationHeaderStruct = {
@@ -28,29 +27,6 @@ export class SizeObfuscationHeader implements HeaderView<SizeObfuscationHeaderSt
 		return {
 			padding: view.getInt32(0),
 		};
-	}
-}
-
-export function fillBufferWithRandomBytes(buffer: ArrayBufferView) {
-	const bytesLimit = 65535;
-
-	// Fill if quote is not exceeded
-	if (buffer.byteLength <= bytesLimit) {
-		self.crypto.getRandomValues(buffer);
-		return;
-	}
-
-	// Fill buffer by blocks
-	const bufferView = new Uint8Array(buffer.buffer);
-	for (let offset = 0; offset < buffer.byteLength; offset += bytesLimit) {
-		// Generate block
-		const bytesToFill = buffer.byteLength - offset;
-		const bytesToAdd = Math.min(bytesLimit, bytesToFill);
-		const blockBuffer = new Uint8Array(bytesToAdd);
-		self.crypto.getRandomValues(blockBuffer);
-
-		// Fill with offset
-		bufferView.set(blockBuffer, offset);
 	}
 }
 
