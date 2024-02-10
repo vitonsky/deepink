@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 
-import { joinBuffers } from './utils/buffers';
-import { HeaderView, ICipher } from '.';
+import { joinBuffers } from '../utils/buffers';
+import { HeaderView, IEncryptionProcessor } from "..";
 
 export type SizeObfuscationHeaderStruct = {
 	padding: number;
@@ -57,11 +57,11 @@ export function fillBufferWithRandomBytes(buffer: ArrayBufferView) {
 const KB = 1024;
 const MB = KB * 1024;
 
-export class BufferSizeObfuscator implements ICipher {
+export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
 	private readonly cipher;
 	private readonly header;
 	private readonly paddingSizeLimit;
-	constructor(cipher: ICipher, paddingSizeLimit?: number) {
+	constructor(cipher: IEncryptionProcessor, paddingSizeLimit?: number) {
 		this.cipher = cipher;
 		this.header = new SizeObfuscationHeader();
 		this.paddingSizeLimit = paddingSizeLimit ? Math.max(0, paddingSizeLimit) : null;

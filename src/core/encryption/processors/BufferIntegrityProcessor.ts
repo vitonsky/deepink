@@ -1,8 +1,8 @@
 // eslint-disable-next-line import/no-unresolved
 import crc32 from 'crc/calculators/crc32';
 
-import { joinBuffers } from './utils/buffers';
-import { HeaderView, ICipher } from '.';
+import { joinBuffers } from '../utils/buffers';
+import { HeaderView, IEncryptionProcessor } from "..";
 
 export type IntegrityHeaderStruct = {
 	crc32: number;
@@ -36,10 +36,10 @@ export class IntegrityError extends TypeError {
 	public readonly name = 'IntegrityError';
 }
 
-export class EncryptionIntegrityCheck implements ICipher {
+export class BufferIntegrityProcessor implements IEncryptionProcessor {
 	private readonly cipher;
 	private readonly integrityHeader;
-	constructor(cipher: ICipher) {
+	constructor(cipher: IEncryptionProcessor) {
 		this.cipher = cipher;
 		this.integrityHeader = new IntegrityHeader();
 	}

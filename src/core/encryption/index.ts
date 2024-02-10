@@ -3,7 +3,7 @@ export interface IEncryptionController {
 	decrypt: <T extends string | ArrayBuffer>(encryptedData: T) => Promise<T>;
 }
 
-export interface ICipher {
+export interface IEncryptionProcessor {
 	encrypt: (rawData: ArrayBuffer) => Promise<ArrayBuffer>;
 	decrypt: (encryptedData: ArrayBuffer) => Promise<ArrayBuffer>;
 }

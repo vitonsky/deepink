@@ -2,7 +2,7 @@ import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
 import { WorkerRPC } from '../../utils/workers/WorkerRPC';
 
 import { convertBufferToTransferable } from './utils/buffers';
-import { ICipher } from '.';
+import { IEncryptionProcessor } from '.';
 
 export class Terminable {
 	private isFinished = false;
@@ -21,7 +21,7 @@ export class Terminable {
 	}
 }
 
-export class WorkerEncryptionController implements ICipher {
+export class WorkerEncryptionController implements IEncryptionProcessor {
 	private readonly worker;
 	private readonly messenger;
 	private readonly requests;

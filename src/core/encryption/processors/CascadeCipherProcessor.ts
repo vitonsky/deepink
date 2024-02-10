@@ -1,11 +1,11 @@
-import { ICipher } from '../..';
+import { IEncryptionProcessor } from "..";
 
 /**
  * Compose a new cipher from a multiple ciphers
  */
-export class CascadeCipher implements ICipher {
+export class CascadeCipherProcessor implements IEncryptionProcessor {
 	private ciphers;
-	constructor(ciphers: ICipher[]) {
+	constructor(ciphers: IEncryptionProcessor[]) {
 		this.ciphers = ciphers;
 	}
 

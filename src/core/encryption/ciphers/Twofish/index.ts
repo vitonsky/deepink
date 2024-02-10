@@ -4,7 +4,7 @@ import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
 import { BufferView, fillBuffer, joinBuffers } from '../../utils/buffers';
 import { getRandomBytes } from '../../utils/random';
 
-import { HeaderView, ICipher } from '../..';
+import { HeaderView, IEncryptionProcessor } from '../..';
 
 const blockSize = 16;
 
@@ -70,7 +70,7 @@ function transformBuffer(
 /**
  * Twofish cipher implementation
  */
-export class TwofishCTRCipher implements ICipher {
+export class TwofishCTRCipher implements IEncryptionProcessor {
 	private readonly ivSize = 96;
 
 	private readonly key;
