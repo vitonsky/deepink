@@ -1,25 +1,9 @@
+import { Terminable } from '../../../utils/disposable';
 import { WorkerMessenger } from '../../../utils/workers/WorkerMessenger';
 import { WorkerRPC } from '../../../utils/workers/WorkerRPC';
 
 import { convertBufferToTransferable } from '../utils/buffers';
-import { IEncryptionProcessor } from "..";
-
-export class Terminable {
-	private isFinished = false;
-
-	public terminate() {
-		this.isFinished = true;
-	}
-	public isTerminated() {
-		return this.isFinished;
-	}
-
-	public throwErrorIfTerminated(message?: string) {
-		const errorMessage =
-			message ?? "Object been terminated and can't be used anymore";
-		if (this.isFinished) throw new Error(errorMessage);
-	}
-}
+import { IEncryptionProcessor } from '..';
 
 export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly worker;
