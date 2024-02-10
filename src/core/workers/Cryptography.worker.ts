@@ -8,6 +8,7 @@ import { BufferIntegrityProcessor } from '../encryption/processors/BufferIntegri
 import { BufferSizeObfuscationProcessor } from '../encryption/processors/BufferSizeObfuscationProcessor';
 import { PipelineProcessor } from '../encryption/processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from '../encryption/utils/keys';
+import { getRandomBytes } from '../encryption/utils/random';
 
 console.log('Hello world from worker');
 
@@ -38,8 +39,8 @@ requests.addHandler('init', async ({ secretKey, salt }) => {
 		new PipelineProcessor([
 			new BufferIntegrityProcessor(),
 			new BufferSizeObfuscationProcessor(),
-			new AESGCMCipher(aesKey),
-			new TwofishCTRCipher(twofishKey),
+			new AESGCMCipher(aesKey, getRandomBytes),
+			new TwofishCTRCipher(twofishKey, getRandomBytes),
 		]),
 	);
 });

@@ -6,11 +6,8 @@ import { BufferIntegrityProcessor } from './processors/BufferIntegrityProcessor'
 import { PipelineProcessor } from './processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from './utils/keys';
 
-jest.mock('./utils/random', () => ({
-	// TODO: allow to provide generator in cipher constructor
-	// Return always the same data, to reproduce encryption output
-	getRandomBytes: (length: number = 16) => new Uint8Array(length).buffer,
-}));
+// Return always the same data, to reproduce encryption output
+const getRandomBytesMock = (length: number = 16) => new Uint8Array(length).buffer;
 
 const password = new TextEncoder().encode('SuperSecretPassword');
 const salt = new TextEncoder().encode('salt bytes');
@@ -45,8 +42,8 @@ test('composed processors returns persistent result', async () => {
 
 	const cipher = new PipelineProcessor([
 		new BufferIntegrityProcessor(),
-		new TwofishCTRCipher(keys.twofish),
-		new AESGCMCipher(keys.aes),
+		new TwofishCTRCipher(keys.twofish, getRandomBytesMock),
+		new AESGCMCipher(keys.aes, getRandomBytesMock),
 	]);
 
 	const textSample = 'Hello world! This is encryption example text';
