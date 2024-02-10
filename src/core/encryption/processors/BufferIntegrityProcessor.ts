@@ -2,7 +2,7 @@
 import crc32 from 'crc/calculators/crc32';
 
 import { joinBuffers } from '../utils/buffers';
-import { HeaderView, IEncryptionProcessor } from "..";
+import { HeaderView, IEncryptionProcessor } from '..';
 
 export type IntegrityHeaderStruct = {
 	crc32: number;
@@ -36,6 +36,10 @@ export class IntegrityError extends TypeError {
 	public readonly name = 'IntegrityError';
 }
 
+/**
+ * Processor prepend a header with source buffer checksum during encryption,
+ * and check the sum with actual buffer checksum during decryption.
+ */
 export class BufferIntegrityProcessor implements IEncryptionProcessor {
 	private readonly cipher;
 	private readonly integrityHeader;
@@ -53,6 +57,9 @@ export class BufferIntegrityProcessor implements IEncryptionProcessor {
 		return this.cipher.encrypt(joinBuffers([header, data]));
 	};
 
+	/**
+	 * @throws `IntegrityError` when check sum do not match
+	 */
 	public decrypt = async (encryptedBuffer: ArrayBuffer) => {
 		const decryptedBuffer = await this.cipher.decrypt(encryptedBuffer);
 

@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 
 import { joinBuffers } from '../utils/buffers';
-import { HeaderView, IEncryptionProcessor } from "..";
+import { HeaderView, IEncryptionProcessor } from '..';
 
 export type SizeObfuscationHeaderStruct = {
 	padding: number;
@@ -57,6 +57,9 @@ export function fillBufferWithRandomBytes(buffer: ArrayBufferView) {
 const KB = 1024;
 const MB = KB * 1024;
 
+/**
+ * Obfuscates a buffer size with adding to a buffer random number of bytes
+ */
 export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
 	private readonly cipher;
 	private readonly header;

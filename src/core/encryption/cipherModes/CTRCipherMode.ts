@@ -1,5 +1,10 @@
 import { xor } from '../utils/xor';
 
+/**
+ * Stream cipher with counter implementation
+ * Read more on https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR)
+ * RFC: https://datatracker.ietf.org/doc/html/rfc3686
+ */
 export class CTRCipherMode {
 	private readonly encryptBuffer;
 	private readonly blockSize;

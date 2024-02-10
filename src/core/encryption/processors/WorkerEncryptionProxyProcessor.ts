@@ -5,6 +5,11 @@ import { WorkerRPC } from '../../../utils/workers/WorkerRPC';
 import { convertBufferToTransferable } from '../utils/buffers';
 import { IEncryptionProcessor } from '..';
 
+// TODO: provide algorithm parameters
+/**
+ * Transparent proxy an encryption requests to a worker
+ * Useful to prevent main thread blocking for a long-term cryptographic operations
+ */
 export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly worker;
 	private readonly messenger;
