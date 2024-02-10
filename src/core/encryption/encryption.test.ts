@@ -3,7 +3,7 @@ import { webcrypto } from 'crypto';
 import { AESGCMCipher } from './ciphers/AES';
 import { TwofishCTRCipher } from './ciphers/Twofish';
 import { BufferIntegrityProcessor } from './processors/BufferIntegrityProcessor';
-import { CascadeCipherProcessor } from './processors/CascadeCipherProcessor';
+import { PipelineProcessor } from './processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from './utils/keys';
 
 jest.mock('./utils/random', () => ({
@@ -43,12 +43,11 @@ beforeEach(() => {
 test('composed processors returns persistent result', async () => {
 	const keys = await getKeys();
 
-	const cipher = new BufferIntegrityProcessor(
-		new CascadeCipherProcessor([
-			new TwofishCTRCipher(keys.twofish),
-			new AESGCMCipher(keys.aes),
-		]),
-	);
+	const cipher = new PipelineProcessor([
+		new BufferIntegrityProcessor(),
+		new TwofishCTRCipher(keys.twofish),
+		new AESGCMCipher(keys.aes),
+	]);
 
 	const textSample = 'Hello world! This is encryption example text';
 	const encryptedBytes = await cipher.encrypt(new TextEncoder().encode(textSample));

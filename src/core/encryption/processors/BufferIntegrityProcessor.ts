@@ -41,35 +41,31 @@ export class IntegrityError extends TypeError {
  * and check the sum with actual buffer checksum during decryption.
  */
 export class BufferIntegrityProcessor implements IEncryptionProcessor {
-	private readonly cipher;
 	private readonly integrityHeader;
-	constructor(cipher: IEncryptionProcessor) {
-		this.cipher = cipher;
+	constructor() {
 		this.integrityHeader = new IntegrityHeader();
 	}
 
-	public encrypt = async (data: ArrayBuffer) => {
-		const bufferSum = crc32(new Uint8Array(data));
+	public encrypt = async (buffer: ArrayBuffer) => {
+		const bufferSum = crc32(new Uint8Array(buffer));
 		const header = this.integrityHeader.createBuffer({
 			crc32: bufferSum,
 		});
 
-		return this.cipher.encrypt(joinBuffers([header, data]));
+		return joinBuffers([header, buffer]);
 	};
 
 	/**
 	 * @throws `IntegrityError` when check sum do not match
 	 */
-	public decrypt = async (encryptedBuffer: ArrayBuffer) => {
-		const decryptedBuffer = await this.cipher.decrypt(encryptedBuffer);
+	public decrypt = async (buffer: ArrayBuffer) => {
+		const header = this.integrityHeader.readBuffer(buffer);
+		const slicedBuffer = buffer.slice(this.integrityHeader.bufferSize);
 
-		const header = this.integrityHeader.readBuffer(decryptedBuffer);
-		const data = decryptedBuffer.slice(this.integrityHeader.bufferSize);
-
-		const bufferSum = crc32(new Uint8Array(data));
+		const bufferSum = crc32(new Uint8Array(slicedBuffer));
 		if (bufferSum !== header.crc32)
 			throw new IntegrityError('Decryption error. Check sum does not match');
 
-		return data;
+		return slicedBuffer;
 	};
 }

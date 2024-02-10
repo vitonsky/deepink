@@ -1,9 +1,9 @@
-import { IEncryptionProcessor } from "..";
+import { IEncryptionProcessor } from '..';
 
 /**
- * Compose a new cipher from a multiple ciphers
+ * Compose and execute a pipeline with provided processors
  */
-export class CascadeCipherProcessor implements IEncryptionProcessor {
+export class PipelineProcessor implements IEncryptionProcessor {
 	private ciphers;
 	constructor(ciphers: IEncryptionProcessor[]) {
 		this.ciphers = ciphers;

@@ -6,7 +6,7 @@ import { TwofishCTRCipher } from '../encryption/ciphers/Twofish';
 import { EncryptionController } from '../encryption/EncryptionController';
 import { BufferIntegrityProcessor } from '../encryption/processors/BufferIntegrityProcessor';
 import { BufferSizeObfuscationProcessor } from '../encryption/processors/BufferSizeObfuscationProcessor';
-import { CascadeCipherProcessor } from '../encryption/processors/CascadeCipherProcessor';
+import { PipelineProcessor } from '../encryption/processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from '../encryption/utils/keys';
 
 console.log('Hello world from worker');
@@ -35,14 +35,12 @@ requests.addHandler('init', async ({ secretKey, salt }) => {
 		.then((buffer) => new Uint8Array(buffer));
 
 	encryptionController = new EncryptionController(
-		new BufferIntegrityProcessor(
-			new BufferSizeObfuscationProcessor(
-				new CascadeCipherProcessor([
-					new AESGCMCipher(aesKey),
-					new TwofishCTRCipher(twofishKey),
-				]),
-			),
-		),
+		new PipelineProcessor([
+			new BufferIntegrityProcessor(),
+			new BufferSizeObfuscationProcessor(),
+			new AESGCMCipher(aesKey),
+			new TwofishCTRCipher(twofishKey),
+		]),
 	);
 });
 

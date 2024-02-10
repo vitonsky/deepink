@@ -61,11 +61,9 @@ const MB = KB * 1024;
  * Obfuscates a buffer size with adding to a buffer random number of bytes
  */
 export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
-	private readonly cipher;
 	private readonly header;
 	private readonly paddingSizeLimit;
-	constructor(cipher: IEncryptionProcessor, paddingSizeLimit?: number) {
-		this.cipher = cipher;
+	constructor(paddingSizeLimit?: number) {
 		this.header = new SizeObfuscationHeader();
 		this.paddingSizeLimit = paddingSizeLimit ? Math.max(0, paddingSizeLimit) : null;
 	}
@@ -83,13 +81,13 @@ export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
 		return MB * 300;
 	}
 
-	public encrypt = async (data: ArrayBuffer) => {
+	public encrypt = async (buffer: ArrayBuffer) => {
 		// Generate random padding size
 		const randomBytes = new Uint32Array(1);
 		fillBufferWithRandomBytes(randomBytes);
 
 		// Clamp number to a limit
-		const paddingSizeLimitForBuffer = this.getPaddingSizeLimit(data.byteLength);
+		const paddingSizeLimitForBuffer = this.getPaddingSizeLimit(buffer.byteLength);
 		const paddingSizeLimit = this.paddingSizeLimit
 			? Math.min(this.paddingSizeLimit, paddingSizeLimitForBuffer)
 			: paddingSizeLimitForBuffer;
@@ -103,15 +101,13 @@ export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
 			padding,
 		});
 
-		return this.cipher.encrypt(joinBuffers([header, paddingBuffer, data]));
+		return joinBuffers([header, paddingBuffer, buffer]);
 	};
 
-	public decrypt = async (encryptedBuffer: ArrayBuffer) => {
-		const decryptedBuffer = await this.cipher.decrypt(encryptedBuffer);
-
-		const header = this.header.readBuffer(decryptedBuffer);
+	public decrypt = async (buffer: ArrayBuffer) => {
+		const header = this.header.readBuffer(buffer);
 
 		const dataOffset = this.header.bufferSize + header.padding;
-		return decryptedBuffer.slice(dataOffset);
+		return buffer.slice(dataOffset);
 	};
 }
