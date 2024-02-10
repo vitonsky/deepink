@@ -3,11 +3,14 @@ import { webcrypto } from 'crypto';
 import { AESGCMCipher } from './ciphers/AES';
 import { TwofishCTRCipher } from './ciphers/Twofish';
 import { BufferIntegrityProcessor } from './processors/BufferIntegrityProcessor';
+import { BufferSizeObfuscationProcessor } from './processors/BufferSizeObfuscationProcessor';
 import { PipelineProcessor } from './processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from './utils/keys';
 
-// Return always the same data, to reproduce encryption output
-const getRandomBytesMock = (length: number = 16) => new Uint8Array(length).buffer;
+// Returns always the same output, to reproduce encryption output
+// Implementation generates a long sequence with no repeats, for transparent fingerprint analyzing
+const getRandomBytesMock = (length = 16) =>
+	new Uint8Array(length).map((_, idx) => idx + Math.max(0, idx + (idx % 255)));
 
 const password = new TextEncoder().encode('SuperSecretPassword');
 const salt = new TextEncoder().encode('salt bytes');
@@ -42,6 +45,7 @@ test('composed processors returns persistent result', async () => {
 
 	const cipher = new PipelineProcessor([
 		new BufferIntegrityProcessor(),
+		new BufferSizeObfuscationProcessor(getRandomBytesMock),
 		new TwofishCTRCipher(keys.twofish, getRandomBytesMock),
 		new AESGCMCipher(keys.aes, getRandomBytesMock),
 	]);
