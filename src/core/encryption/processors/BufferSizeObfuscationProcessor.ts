@@ -1,6 +1,5 @@
 import { joinBuffers } from '../utils/buffers';
-import { fillBufferWithRandomBytes } from '../utils/random';
-import { HeaderView, IEncryptionProcessor } from '..';
+import { HeaderView, IEncryptionProcessor, RandomBytesGenerator } from '..';
 
 export type SizeObfuscationHeaderStruct = {
 	padding: number;
@@ -38,9 +37,11 @@ const MB = KB * 1024;
  */
 export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
 	private readonly header;
+	private readonly randomBytesGenerator: RandomBytesGenerator;
 	private readonly paddingSizeLimit;
-	constructor(paddingSizeLimit?: number) {
+	constructor(randomBytesGenerator: RandomBytesGenerator, paddingSizeLimit?: number) {
 		this.header = new SizeObfuscationHeader();
+		this.randomBytesGenerator = randomBytesGenerator;
 		this.paddingSizeLimit = paddingSizeLimit ? Math.max(0, paddingSizeLimit) : null;
 	}
 
@@ -59,23 +60,22 @@ export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
 
 	public encrypt = async (buffer: ArrayBuffer) => {
 		// Generate random padding size
-		const randomBytes = new Uint32Array(1);
-		fillBufferWithRandomBytes(randomBytes);
+		// Here we create a buffer with random 4 byte which is 32 bits,
+		// then creates a typed array from a buffer and takes a first number
+		const [randomNumber] = new Uint32Array(this.randomBytesGenerator(4));
 
-		// Clamp number to a limit
+		// Clamp padding size to a limit
 		const paddingSizeLimitForBuffer = this.getPaddingSizeLimit(buffer.byteLength);
 		const paddingSizeLimit = this.paddingSizeLimit
 			? Math.min(this.paddingSizeLimit, paddingSizeLimitForBuffer)
 			: paddingSizeLimitForBuffer;
-		const padding = randomBytes[0] % (paddingSizeLimit + 1);
-
-		// Generate padding
-		const paddingBuffer = new Uint8Array(padding);
-		fillBufferWithRandomBytes(paddingBuffer);
+		const padding = randomNumber % (paddingSizeLimit + 1);
 
 		const header = this.header.createBuffer({
 			padding,
 		});
+
+		const paddingBuffer = this.randomBytesGenerator(padding);
 
 		return joinBuffers([header, paddingBuffer, buffer]);
 	};

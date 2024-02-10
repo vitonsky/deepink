@@ -16,3 +16,8 @@ export interface HeaderView<T> {
 	createBuffer(data: T): ArrayBuffer;
 	readBuffer(buffer: ArrayBuffer): T;
 }
+
+/**
+ * Creates buffer with random values
+ */
+export type RandomBytesGenerator = (bufferSize: number) => ArrayBuffer;

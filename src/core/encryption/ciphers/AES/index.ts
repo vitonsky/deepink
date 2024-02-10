@@ -1,7 +1,7 @@
 import { IntegrityError } from '../../processors/BufferIntegrityProcessor';
 import { joinBuffers } from '../../utils/buffers';
 
-import { IEncryptionProcessor } from '../..';
+import { IEncryptionProcessor, RandomBytesGenerator } from '../..';
 
 /**
  * AES-GCM cipher
@@ -12,8 +12,8 @@ export class AESGCMCipher implements IEncryptionProcessor {
 	private readonly ivSize = 96;
 
 	private readonly key;
-	private readonly randomBytesGenerator: (size: number) => ArrayBuffer;
-	constructor(key: CryptoKey, randomBytesGenerator: (size: number) => ArrayBuffer) {
+	private readonly randomBytesGenerator: RandomBytesGenerator;
+	constructor(key: CryptoKey, randomBytesGenerator: RandomBytesGenerator) {
 		this.key = key;
 		this.randomBytesGenerator = randomBytesGenerator;
 	}

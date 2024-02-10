@@ -3,7 +3,7 @@ import { encrypt, makeSession } from 'twofish-ts';
 import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
 import { BufferView, fillBuffer, joinBuffers } from '../../utils/buffers';
 
-import { HeaderView, IEncryptionProcessor } from '../..';
+import { HeaderView, IEncryptionProcessor, RandomBytesGenerator } from '../..';
 
 const blockSize = 16;
 
@@ -73,10 +73,10 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 	private readonly ivSize = 96;
 
 	private readonly key;
-	private readonly randomBytesGenerator: (size: number) => ArrayBuffer;
+	private readonly randomBytesGenerator: RandomBytesGenerator;
 	private readonly header;
 	private readonly ctrCipher;
-	constructor(cipher: Uint8Array, randomBytesGenerator: (size: number) => ArrayBuffer) {
+	constructor(cipher: Uint8Array, randomBytesGenerator: RandomBytesGenerator) {
 		this.randomBytesGenerator = randomBytesGenerator;
 
 		this.key = makeSession(cipher);

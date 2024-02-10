@@ -29,9 +29,9 @@ export function fillBufferWithRandomBytes<T extends ArrayBufferView>(buffer: T):
 /**
  * Creates and returns buffer with cryptographically strong random values
  *
- * @param bufferSize Set buffer size
+ * @param bytesLength buffer size in bytes
  */
-export function getRandomBytes(bufferSize = 16): ArrayBuffer {
-	const typedArray = new Uint8Array(bufferSize);
+export function getRandomBytes(bytesLength = 16): ArrayBuffer {
+	const typedArray = new Uint8Array(bytesLength);
 	return fillBufferWithRandomBytes(typedArray).buffer;
 }

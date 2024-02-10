@@ -38,7 +38,7 @@ requests.addHandler('init', async ({ secretKey, salt }) => {
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
 			new BufferIntegrityProcessor(),
-			new BufferSizeObfuscationProcessor(),
+			new BufferSizeObfuscationProcessor(getRandomBytes),
 			new AESGCMCipher(aesKey, getRandomBytes),
 			new TwofishCTRCipher(twofishKey, getRandomBytes),
 		]),
