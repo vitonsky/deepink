@@ -1,9 +1,9 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { INote, INoteData, NoteId } from '../../../Note';
+import { INote, INoteContent, NoteId } from '../../../../types/notes';
 import { SQLiteDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
-import { INotesController, NotesRegistryFetchOptions } from ".";
+import { INotesController, NotesRegistryFetchOptions } from '.';
 
 /**
  * Data mappers between DB and objects
@@ -81,7 +81,7 @@ export class NotesController implements INotesController {
 		return notes;
 	}
 
-	public async add(note: INoteData): Promise<NoteId> {
+	public async add(note: INoteContent): Promise<NoteId> {
 		const { db } = this.db;
 
 		const creationTime = new Date().getTime();
@@ -112,7 +112,7 @@ export class NotesController implements INotesController {
 		return selectWithId.id;
 	}
 
-	public async update(id: string, updatedNote: INoteData) {
+	public async update(id: string, updatedNote: INoteContent) {
 		const { db } = this.db;
 
 		const updateTime = new Date().getTime();

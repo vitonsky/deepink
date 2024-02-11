@@ -1,7 +1,7 @@
 /**
- * Primary note data
+ * Note content
  */
-export type INoteData = {
+export type INoteContent = {
 	title: string;
 	text: string;
 };
@@ -15,5 +15,5 @@ export type INote = {
 	id: NoteId;
 	createdTimestamp?: number;
 	updatedTimestamp?: number;
-	data: INoteData;
+	data: INoteContent;
 };

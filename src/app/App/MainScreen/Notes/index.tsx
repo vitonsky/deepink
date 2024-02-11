@@ -3,7 +3,7 @@ import { TabsPanes } from 'react-elegant-ui/esm/components/TabsPanes/TabsPanes.b
 import { isEqual } from 'lodash';
 import { cn } from '@bem-react/classname';
 
-import { INote, NoteId } from '../../../../core/Note';
+import { INote, NoteId } from '../../../../types/notes';
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
 

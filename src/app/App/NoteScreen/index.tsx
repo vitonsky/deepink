@@ -15,7 +15,7 @@ import remarkGfm from 'remark-gfm';
 import { cn } from '@bem-react/classname';
 
 import { getResourceIdInUrl } from '../../../core/links';
-import { INote } from '../../../core/Note';
+import { INote } from '../../../types/notes';
 
 import { useAttachmentsRegistry, useFilesRegistry } from '../Providers';
 import {

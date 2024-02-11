@@ -9,7 +9,6 @@ import { PlaceholderEncryptionController } from '../../core/encryption/Placehold
 import { WorkerEncryptionProxyProcessor } from '../../core/encryption/processors/WorkerEncryptionProxyProcessor';
 import { base64ToBytes, bytesToBase64 } from '../../core/encryption/utils/encoding';
 import { getRandomBytes } from '../../core/encryption/utils/random';
-import { INoteData } from '../../core/Note';
 import { $activeProfile, changedActiveProfile, Profile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
@@ -24,6 +23,7 @@ import {
 import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
 import { getUserDataPath } from '../../electron/requests/files/renderer';
 import { ElectronFilesController } from '../../electron/requests/storage/renderer';
+import { INoteContent } from '../../types/notes';
 import { DisposableBox } from '../../utils/disposable';
 
 import { readFile, writeFile } from 'fs/promises';
@@ -47,7 +47,7 @@ type AppContext = {
 };
 
 export const cnApp = cn('App');
-export const getNoteTitle = (note: INoteData) =>
+export const getNoteTitle = (note: INoteContent) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
 
 export const decryptKey = async (

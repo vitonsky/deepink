@@ -27,7 +27,6 @@ import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
 
 import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
-import { INote, INoteData } from '../../../core/Note';
 import {
 	$tags,
 	setActiveTag,
@@ -35,6 +34,7 @@ import {
 	tagsChanged,
 } from '../../../core/state/tags';
 import { ITag } from '../../../core/storage/controllers/tags/TagsController';
+import { INote, INoteContent } from '../../../types/notes';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../components/Stack/Stack';
 import { SuggestedTagsList } from '../../components/SuggestedTagsList';
@@ -50,7 +50,7 @@ const cnNoteEditor = cn('NoteEditor');
 
 export type NoteEditorProps = {
 	note: INote;
-	updateNote: (note: INoteData) => void;
+	updateNote: (note: INoteContent) => void;
 };
 
 export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {

@@ -1,4 +1,4 @@
-import { INote, INoteData, NoteId } from '../../../Note';
+import { INote, INoteContent, NoteId } from '../../../../types/notes';
 
 export type NotesRegistryFetchOptions = {
 	/**
@@ -45,12 +45,12 @@ export interface INotesController {
 	/**
 	 * Create note and return unique id of new note
 	 */
-	add(note: INoteData): Promise<NoteId>;
+	add(note: INoteContent): Promise<NoteId>;
 
 	/**
 	 * Update note by unique id
 	 */
-	update(id: NoteId, updatedNote: INoteData): Promise<void>;
+	update(id: NoteId, updatedNote: INoteContent): Promise<void>;
 
 	/**
 	 * Deletes all notes with specified ids

@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 
 import { formatNoteLink } from '../../../../../core/links';
-import { NoteId } from '../../../../../core/Note';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
 import { INotesController } from '../../../../../core/storage/controllers/notes';
 import { ContextMenu } from '../../../../../electron/contextMenu';
 import { selectDirectory } from '../../../../../electron/requests/files/renderer';
+import { NoteId } from '../../../../../types/notes';
 import { copyTextToClipboard } from '../../../../../utils/clipboard';
 import {
 	ContextMenuCallback,

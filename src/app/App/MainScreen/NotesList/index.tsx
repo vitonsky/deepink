@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { INote, NoteId } from '../../../../core/Note';
 import { INotesController } from '../../../../core/storage/controllers/notes';
+import { INote, NoteId } from '../../../../types/notes';
 import { Stack } from '../../../components/Stack/Stack';
 
 import { getNoteTitle } from '../..';
