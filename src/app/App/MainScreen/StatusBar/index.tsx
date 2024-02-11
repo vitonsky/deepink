@@ -2,7 +2,7 @@ import React, { createContext, FC, HTMLProps, useContext } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { INotesRegistry } from '../../../../core/Registry';
+import { INotesController } from '../../../../core/storage/controllers/notes';
 import { ButtonsManagerObject } from '../../../api/buttons/useButtonsManager';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../../components/Stack/Stack';
@@ -25,7 +25,7 @@ export const StatusBarContext = createContext<ButtonsManagerObject['state']>({
 });
 
 export type StatusBarProps = HTMLProps<HTMLDivElement> & {
-	notesRegistry: INotesRegistry;
+	notesRegistry: INotesController;
 	updateNotes: () => void;
 };
 

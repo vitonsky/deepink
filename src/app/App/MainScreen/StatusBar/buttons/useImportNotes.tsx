@@ -10,8 +10,8 @@ import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
 import { formatNoteLink, formatResourceLink } from '../../../../../core/links';
-import { INotesRegistry } from '../../../../../core/Registry';
 import { tagsChanged } from '../../../../../core/state/tags';
+import { INotesController } from '../../../../../core/storage/controllers/notes';
 import { importNotes } from '../../../../../electron/requests/files/renderer';
 import { findParentTag, isTagsArray } from '../../../../../utils/tags';
 import {
@@ -60,7 +60,7 @@ export const useImportNotes = ({
 	notesRegistry,
 	updateNotes,
 }: {
-	notesRegistry: INotesRegistry;
+	notesRegistry: INotesController;
 	updateNotes: () => void;
 }) => {
 	const filesRegistry = useFilesRegistry();

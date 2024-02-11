@@ -2,17 +2,17 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { openDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
-import { Attachments } from '../Attachments/Attachments';
-import { FilesRegistry } from './FilesRegistry';
-import { FilesStorageController } from '.';
+import { AttachmentsController } from '../attachments/AttachmentsController';
+import { FilesController } from './FilesController';
+import { IFilesStorage } from ".";
 
 const File = require('blob-polyfill').File;
 
 globalThis.File = File;
 
-const createFileManagerMock = (): FilesStorageController => {
+const createFileManagerMock = (): IFilesStorage => {
 	const storage: Record<string, ArrayBuffer> = {};
 	return {
 		async write(uuid, buffer) {
@@ -43,8 +43,8 @@ test('clear orphaned files', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
 	const db = await openDatabase(dbPath);
 	const fileManager = createFileManagerMock();
-	const attachments = new Attachments(db);
-	const files = new FilesRegistry(db, fileManager, attachments);
+	const attachments = new AttachmentsController(db);
+	const files = new FilesController(db, fileManager, attachments);
 
 	// Upload file and attach
 	const fileToAttach = createTextFile('Attached file');

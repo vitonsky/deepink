@@ -1,13 +1,13 @@
 import { ipcRenderer } from 'electron';
 
 import { IEncryptionController } from '../../../core/encryption';
-import { FilesStorageController } from '../../../core/Registry/FilesRegistry';
+import { IFilesStorage } from '../../../core/storage/controllers/files';
 
 import { CHANNELS } from '.';
 
 // TODO: ensure both renderer and main handlers match types
 
-export class ElectronFilesController implements FilesStorageController {
+export class ElectronFilesController implements IFilesStorage {
 	private readonly subdirectory;
 	private readonly encryption;
 	constructor(subdirectory: string, encryption?: IEncryptionController) {

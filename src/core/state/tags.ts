@@ -1,6 +1,6 @@
 import { createEvent, createStore } from 'effector';
 
-import { ITag } from '../Registry/Tags/Tags';
+import { ITag } from '../storage/controllers/tags/TagsController';
 
 /**
  * Array of all exists tags

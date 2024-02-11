@@ -4,7 +4,7 @@
  *
  * For desktop app it may be FS or cloud service, for web it may be API or indexedDB
  */
-export type FilesStorageController = {
+export type IFilesStorage = {
 	write: (uuid: string, buffer: ArrayBuffer) => Promise<void>;
 	get: (uuid: string) => Promise<ArrayBuffer | null>;
 	delete: (uuid: string[]) => Promise<void>;

@@ -1,4 +1,4 @@
-import { INote, INoteData, NoteId } from '../Note';
+import { INote, INoteData, NoteId } from '../../../Note';
 
 export type NotesRegistryFetchOptions = {
 	/**
@@ -26,7 +26,7 @@ export type NotesRegistryFetchOptions = {
 /**
  * Notes controller interface
  */
-export interface INotesRegistry {
+export interface INotesController {
 	/**
 	 * Get note by ID
 	 */

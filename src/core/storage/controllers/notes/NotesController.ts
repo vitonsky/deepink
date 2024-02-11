@@ -1,8 +1,9 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { INote, INoteData, NoteId } from '../Note';
-import { SQLiteDatabase } from '../storage/database/SQLiteDatabase/SQLiteDatabase';
-import { INotesRegistry, NotesRegistryFetchOptions } from '.';
+import { INote, INoteData, NoteId } from '../../../Note';
+import { SQLiteDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
+
+import { INotesController, NotesRegistryFetchOptions } from ".";
 
 /**
  * Data mappers between DB and objects
@@ -22,7 +23,7 @@ const mappers = {
 /**
  * Synced notes registry
  */
-export class NotesRegistry implements INotesRegistry {
+export class NotesController implements INotesController {
 	private db;
 	constructor(db: SQLiteDatabase) {
 		this.db = db;

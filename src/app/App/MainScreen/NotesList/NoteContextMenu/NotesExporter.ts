@@ -7,9 +7,9 @@ import { unified } from 'unified';
 import { stringify as stringifyYaml } from 'yaml';
 
 import { getAppResourceDataInUrl } from '../../../../../core/links';
-import { INotesRegistry } from '../../../../../core/Registry';
-import { FilesRegistry } from '../../../../../core/Registry/FilesRegistry/FilesRegistry';
-import { Tags } from '../../../../../core/Registry/Tags/Tags';
+import { FilesController } from '../../../../../core/storage/controllers/files/FilesController';
+import { INotesController } from '../../../../../core/storage/controllers/notes';
+import { TagsController } from '../../../../../core/storage/controllers/tags/TagsController';
 import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
 export type SaveFileCallback = (file: File, id: string) => Promise<string>;
@@ -28,9 +28,9 @@ export class NotesExporter {
 		tagsRegistry,
 	}: {
 		saveFile: SaveFileCallback;
-		notesRegistry: INotesRegistry;
-		filesRegistry: FilesRegistry;
-		tagsRegistry: Tags;
+		notesRegistry: INotesController;
+		filesRegistry: FilesController;
+		tagsRegistry: TagsController;
 	}) {
 		this.saveFile = saveFile;
 		this.notesRegistry = notesRegistry;

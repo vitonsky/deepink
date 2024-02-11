@@ -10,13 +10,13 @@ import { WorkerEncryptionProxyProcessor } from '../../core/encryption/processors
 import { base64ToBytes, bytesToBase64 } from '../../core/encryption/utils/encoding';
 import { getRandomBytes } from '../../core/encryption/utils/random';
 import { INoteData } from '../../core/Note';
-import { Attachments } from '../../core/Registry/Attachments/Attachments';
-import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
-import { NotesRegistry } from '../../core/Registry/NotesRegistry';
-import { Tags } from '../../core/Registry/Tags/Tags';
 import { $activeProfile, changedActiveProfile, Profile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
+import { AttachmentsController } from '../../core/storage/controllers/attachments/AttachmentsController';
+import { FilesController } from '../../core/storage/controllers/files/FilesController';
+import { NotesController } from '../../core/storage/controllers/notes/NotesController';
+import { TagsController } from '../../core/storage/controllers/tags/TagsController';
 import {
 	openDatabase,
 	SQLiteDatabase,
@@ -38,11 +38,11 @@ const config = new ConfigStorage();
 
 type AppContext = {
 	db: SQLiteDatabase;
-	attachmentsRegistry: Attachments;
+	attachmentsRegistry: AttachmentsController;
 	filesController: ElectronFilesController;
-	filesRegistry: FilesRegistry;
-	tagsRegistry: Tags;
-	notesRegistry: NotesRegistry;
+	filesRegistry: FilesController;
+	tagsRegistry: TagsController;
+	notesRegistry: NotesController;
 	profile: Profile;
 };
 
@@ -162,11 +162,15 @@ export const App: FC = () => {
 
 		// Setup files
 		// TODO: implement methods to close the objects after use
-		const attachmentsRegistry = new Attachments(db);
+		const attachmentsRegistry = new AttachmentsController(db);
 		const filesController = new ElectronFilesController(profile.id, encryption);
-		const filesRegistry = new FilesRegistry(db, filesController, attachmentsRegistry);
-		const tagsRegistry = new Tags(db);
-		const notesRegistry = new NotesRegistry(db);
+		const filesRegistry = new FilesController(
+			db,
+			filesController,
+			attachmentsRegistry,
+		);
+		const tagsRegistry = new TagsController(db);
+		const notesRegistry = new NotesController(db);
 
 		const profileObject: Profile = {
 			id: profile.id,

@@ -1,16 +1,16 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { openDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
-import { Tags } from './Tags';
+import { TagsController } from './TagsController';
 
 describe('manage tags', () => {
 	test('nested tags', async () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 		const db = await openDatabase(dbPath);
 
-		const tags = new Tags(db);
+		const tags = new TagsController(db);
 
 		await tags.add('foo', null);
 		await tags.add('bar', null).then((tagId) => tags.add('baz', tagId));
@@ -43,7 +43,7 @@ describe('manage tags', () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 		const db = await openDatabase(dbPath);
 
-		const tags = new Tags(db);
+		const tags = new TagsController(db);
 
 		await tags.add('foo', null).then(async (tagId) => {
 			await tags.update({
@@ -91,7 +91,7 @@ describe('manage tags', () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 		const db = await openDatabase(dbPath);
 
-		const tags = new Tags(db);
+		const tags = new TagsController(db);
 
 		await tags.add('foo', null);
 
@@ -118,7 +118,7 @@ describe('manage attachments', () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 		const db = await openDatabase(dbPath);
 
-		const tags = new Tags(db);
+		const tags = new TagsController(db);
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
@@ -163,7 +163,7 @@ describe('manage attachments', () => {
 		const dbPath = tmpNameSync({ dir: tmpdir() });
 		const db = await openDatabase(dbPath);
 
-		const tags = new Tags(db);
+		const tags = new TagsController(db);
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);

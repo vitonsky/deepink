@@ -1,9 +1,10 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { openDatabase } from '../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { openDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
+
 import { rm } from 'fs/promises';
-import { NotesRegistry } from './NotesRegistry';
+import { NotesController } from './NotesController';
 
 function getRandomNumber(min: number, max: number) {
 	min = Math.ceil(min);
@@ -23,7 +24,7 @@ describe('stress tests', () => {
 	// Gzipped data takes ~800kb. We must to compress data
 	test('insert 10k notes contains 150k chars', async () => {
 		const db = await openDatabase(dbPath);
-		const registry = new NotesRegistry(db);
+		const registry = new NotesController(db);
 
 		const requests: Promise<string>[] = [];
 
@@ -49,7 +50,7 @@ describe('stress tests', () => {
 
 	test('update random notes 10k times', async () => {
 		const db = await openDatabase(dbPath);
-		const registry = new NotesRegistry(db);
+		const registry = new NotesController(db);
 
 		const noteIds = await registry.get().then((notes) => notes.map(({ id }) => id));
 

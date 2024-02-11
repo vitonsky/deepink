@@ -1,15 +1,15 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { openDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
-import { Attachments } from './Attachments';
+import { AttachmentsController } from './AttachmentsController';
 
 test('basic usage', async () => {
 	const dbPath = tmpNameSync({ dir: tmpdir() });
 	const db = await openDatabase(dbPath);
 
-	const attachments = new Attachments(db);
+	const attachments = new AttachmentsController(db);
 	await attachments.set('target1', ['foo', 'bar']);
 	await attachments.set('target2', ['foo', 'bar', 'qux']);
 

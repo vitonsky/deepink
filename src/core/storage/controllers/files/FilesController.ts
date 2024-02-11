@@ -1,9 +1,9 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { SQLiteDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
-import { Attachments } from '../Attachments/Attachments';
-import { FilesStorageController } from '.';
+import { AttachmentsController } from '../attachments/AttachmentsController';
+import { IFilesStorage } from ".";
 
 // TODO: add runtime validation
 // TODO: implement interface and use interface instead of class
@@ -11,14 +11,14 @@ import { FilesStorageController } from '.';
 /**
  * Files manager for local database
  */
-export class FilesRegistry {
+export class FilesController {
 	private db;
 	private fileController;
 	private attachments;
 	constructor(
 		db: SQLiteDatabase,
-		fileController: FilesStorageController,
-		attachments: Attachments,
+		fileController: IFilesStorage,
+		attachments: AttachmentsController,
 	) {
 		this.db = db;
 		this.fileController = fileController;

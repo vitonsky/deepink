@@ -3,7 +3,7 @@ import { FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
 
 import { INote, NoteId } from '../../../../core/Note';
-import { INotesRegistry } from '../../../../core/Registry';
+import { INotesController } from '../../../../core/storage/controllers/notes';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { TabsMenu } from '../../../components/TabsMenu';
 
@@ -25,7 +25,7 @@ export type TopBarProps = {
 	updateNotes: () => void;
 
 	// TODO: receive with react context
-	notesRegistry: INotesRegistry;
+	notesRegistry: INotesController;
 };
 
 // TODO: improve tabs style

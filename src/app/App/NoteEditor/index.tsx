@@ -28,13 +28,13 @@ import { cn } from '@bem-react/classname';
 
 import { findLinksInText, getResourceIdInUrl } from '../../../core/links';
 import { INote, INoteData } from '../../../core/Note';
-import { ITag } from '../../../core/Registry/Tags/Tags';
 import {
 	$tags,
 	setActiveTag,
 	tagAttachmentsChanged,
 	tagsChanged,
 } from '../../../core/state/tags';
+import { ITag } from '../../../core/storage/controllers/tags/TagsController';
 import { Icon } from '../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../components/Stack/Stack';
 import { SuggestedTagsList } from '../../components/SuggestedTagsList';

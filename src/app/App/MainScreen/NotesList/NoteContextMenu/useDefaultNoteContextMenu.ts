@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 
 import { formatNoteLink } from '../../../../../core/links';
 import { NoteId } from '../../../../../core/Note';
-import { INotesRegistry } from '../../../../../core/Registry';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
+import { INotesController } from '../../../../../core/storage/controllers/notes';
 import { ContextMenu } from '../../../../../electron/contextMenu';
 import { selectDirectory } from '../../../../../electron/requests/files/renderer';
 import { copyTextToClipboard } from '../../../../../utils/clipboard';
@@ -22,7 +22,7 @@ type DefaultContextMenuOptions = {
 	updateNotes: () => void;
 
 	// TODO: receive with react context
-	notesRegistry: INotesRegistry;
+	notesRegistry: INotesController;
 };
 
 export const noteMenu: ContextMenu = [

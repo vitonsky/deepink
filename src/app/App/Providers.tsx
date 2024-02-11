@@ -1,9 +1,9 @@
 import React, { createContext, FC, useContext } from 'react';
 
-import { INotesRegistry } from '../../core/Registry';
-import { Attachments } from '../../core/Registry/Attachments/Attachments';
-import { FilesRegistry } from '../../core/Registry/FilesRegistry/FilesRegistry';
-import { Tags } from '../../core/Registry/Tags/Tags';
+import { AttachmentsController } from '../../core/storage/controllers/attachments/AttachmentsController';
+import { FilesController } from '../../core/storage/controllers/files/FilesController';
+import { INotesController } from '../../core/storage/controllers/notes';
+import { TagsController } from '../../core/storage/controllers/tags/TagsController';
 import { SQLiteDatabase } from '../../core/storage/database/SQLiteDatabase/SQLiteDatabase';
 
 export type FileId = string;
@@ -14,32 +14,34 @@ export const useDb = () => {
 	return useContext(dbContext);
 };
 
-export const filesRegistryContext = createContext<FilesRegistry>(null as any);
+export const filesRegistryContext = createContext<FilesController>(null as any);
 export const useFilesRegistry = () => {
 	return useContext(filesRegistryContext);
 };
 
-export const attachmentsRegistryContext = createContext<Attachments>(null as any);
+export const attachmentsRegistryContext = createContext<AttachmentsController>(
+	null as any,
+);
 export const useAttachmentsRegistry = () => {
 	return useContext(attachmentsRegistryContext);
 };
 
-export const tagsRegistryContext = createContext<Tags>(null as any);
+export const tagsRegistryContext = createContext<TagsController>(null as any);
 export const useTagsRegistry = () => {
 	return useContext(tagsRegistryContext);
 };
 
-export const notesRegistryContext = createContext<INotesRegistry>(null as any);
+export const notesRegistryContext = createContext<INotesController>(null as any);
 export const useNotesRegistry = () => {
 	return useContext(notesRegistryContext);
 };
 
 export type ProvidedAppContext = {
 	db: SQLiteDatabase;
-	filesRegistry: FilesRegistry;
-	attachmentsRegistry: Attachments;
-	tagsRegistry: Tags;
-	notesRegistry: INotesRegistry;
+	filesRegistry: FilesController;
+	attachmentsRegistry: AttachmentsController;
+	tagsRegistry: TagsController;
+	notesRegistry: INotesController;
 };
 
 type ProvidersProps = ProvidedAppContext & {

@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { SQLiteDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
 export type ITagData = {
 	id: string;
@@ -49,7 +49,7 @@ INNER JOIN (
 ON t.id = x.id
 `;
 
-export class Tags {
+export class TagsController {
 	private db;
 	constructor(db: SQLiteDatabase) {
 		this.db = db;
