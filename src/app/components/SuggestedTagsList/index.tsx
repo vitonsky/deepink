@@ -6,7 +6,7 @@ import {
 } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { ITag } from '../../../core/features/tags/TagsController';
+import { IResolvedTag } from '../../../core/features/tags';
 
 import { getSortIndex } from './utils';
 
@@ -18,7 +18,7 @@ export type ISuggestedTagsListProps = Omit<IMenuDesktopProps, 'items'> & {
 	/**
 	 * Available tags
 	 */
-	tags: ITag[];
+	tags: IResolvedTag[];
 
 	tagName: string;
 

@@ -11,7 +11,7 @@ import {
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
-import { ITag } from '../../../../core/features/tags/TagsController';
+import { IResolvedTag } from '../../../../core/features/tags';
 import {
 	$activeTag,
 	$tags,
@@ -86,7 +86,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const parentTagForNewTagRef = useRef<ITag | null>(null);
+	const parentTagForNewTagRef = useRef<IResolvedTag | null>(null);
 	const [isAddTagPopupOpened, setIsAddTagPopupOpened] = useState(false);
 
 	useEffect(() => {

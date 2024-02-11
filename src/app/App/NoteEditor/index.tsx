@@ -28,7 +28,7 @@ import { cn } from '@bem-react/classname';
 
 import { findLinksInText, getResourceIdInUrl } from '../../../core/features/links';
 import { INote, INoteContent } from '../../../core/features/notes';
-import { ITag } from '../../../core/features/tags/TagsController';
+import { IResolvedTag } from '../../../core/features/tags';
 import {
 	$tags,
 	setActiveTag,
@@ -60,8 +60,8 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const tagsRegistry = useTagsRegistry();
 
 	const tags = useStore($tags);
-	const [notAttachedTags, setNotAttachedTags] = useState<ITag[]>([]);
-	const [attachedTags, setAttachedTags] = useState<ITag[]>([]);
+	const [notAttachedTags, setNotAttachedTags] = useState<IResolvedTag[]>([]);
+	const [attachedTags, setAttachedTags] = useState<IResolvedTag[]>([]);
 	const updateTags = useCallback(async () => {
 		const attachedTags = await tagsRegistry.getAttachedTags(note.id);
 		setAttachedTags(attachedTags);

@@ -1,10 +1,10 @@
-import { ITag } from './TagsController';
+import { IResolvedTag } from ".";
 
 export const isTagsArray = (data: unknown): data is string[] =>
 	Array.isArray(data) && data.every((item) => typeof item === 'string');
 
-export const findParentTag = (resolvedTagName: string, tags: ITag[]) => {
-	let parent: ITag | null = null;
+export const findParentTag = (resolvedTagName: string, tags: IResolvedTag[]) => {
+	let parent: IResolvedTag | null = null;
 	for (const tag of tags) {
 		if (!resolvedTagName.startsWith(tag.resolvedName)) continue;
 

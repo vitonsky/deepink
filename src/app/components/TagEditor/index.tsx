@@ -6,7 +6,7 @@ import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/deskto
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { ITag } from '../../../core/features/tags/TagsController';
+import { IResolvedTag } from '../../../core/features/tags';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
 
@@ -24,8 +24,8 @@ export type ITagEditorProps = {
 	/**
 	 * Available tags
 	 */
-	tags: ITag[];
-	parentTag?: ITag;
+	tags: IResolvedTag[];
+	parentTag?: IResolvedTag;
 	onSave: (tagData: TagEditorData) => void;
 	onCancel: () => void;
 	editedTag?: TagEditorData;

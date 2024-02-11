@@ -1,25 +1,8 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
-export type ITagData = {
-	id: string;
-	/**
-	 * Tag name
-	 */
-	name: string;
-	/**
-	 * Id of parent tag
-	 */
-	parent: string | null;
-};
-
-export type ITag = ITagData & {
-	/**
-	 * Tag name with full path like `foo/bar/baz`
-	 */
-	resolvedName: string;
-};
+import { IResolvedTag, ITag } from "..";
 
 /**
  * Query to select tags with resolved name (like `foo/bar/baz`)
@@ -58,7 +41,7 @@ export class TagsController {
 	/**
 	 * Returns tags  list
 	 */
-	public async getTags(): Promise<ITag[]> {
+	public async getTags(): Promise<IResolvedTag[]> {
 		const { db } = this.db;
 
 		return (db.prepare(tagsQuery).all() as any[]).map(
@@ -121,7 +104,7 @@ export class TagsController {
 		return selectWithId.id;
 	}
 
-	public async update(tag: ITagData): Promise<void> {
+	public async update(tag: ITag): Promise<void> {
 		const { db } = this.db;
 
 		db.prepare('UPDATE tags SET name=?, parent=? WHERE id=?').run(
@@ -173,7 +156,7 @@ export class TagsController {
 	/**
 	 * Returns tags attached to a entity
 	 */
-	public async getAttachedTags(target: string): Promise<ITag[]> {
+	public async getAttachedTags(target: string): Promise<IResolvedTag[]> {
 		const { db } = this.db;
 
 		const query = [

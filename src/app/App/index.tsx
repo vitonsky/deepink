@@ -13,7 +13,7 @@ import { AttachmentsController } from '../../core/features/attachments/Attachmen
 import { FilesController } from '../../core/features/files/FilesController';
 import { INoteContent } from '../../core/features/notes';
 import { NotesController } from '../../core/features/notes/controller/NotesController';
-import { TagsController } from '../../core/features/tags/TagsController';
+import { TagsController } from '../../core/features/tags/controller/TagsController';
 import { $activeProfile, changedActiveProfile, Profile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';

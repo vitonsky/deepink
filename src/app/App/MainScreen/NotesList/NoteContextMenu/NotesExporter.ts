@@ -9,7 +9,7 @@ import { stringify as stringifyYaml } from 'yaml';
 import { FilesController } from '../../../../../core/features/files/FilesController';
 import { getAppResourceDataInUrl } from '../../../../../core/features/links';
 import { INotesController } from '../../../../../core/features/notes/controller';
-import { TagsController } from '../../../../../core/features/tags/TagsController';
+import { TagsController } from '../../../../../core/features/tags/controller/TagsController';
 import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
 export type SaveFileCallback = (file: File, id: string) => Promise<string>;
