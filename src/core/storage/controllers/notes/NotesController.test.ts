@@ -33,7 +33,7 @@ describe('CRUD operations', () => {
 				const entryIndex = ids.indexOf(dbEntry.id);
 				const originalEntry = entries[entryIndex];
 
-				expect(dbEntry.data).toMatchObject(originalEntry);
+				expect(dbEntry.content).toMatchObject(originalEntry);
 			});
 		});
 	});
@@ -51,7 +51,7 @@ describe('CRUD operations', () => {
 		await registry.update(entryV1.id, modifiedData);
 
 		const entryV2 = await registry.getById(entryV1.id);
-		expect(entryV2?.data).toMatchObject(modifiedData);
+		expect(entryV2?.content).toMatchObject(modifiedData);
 		expect(entryV2?.createdTimestamp).toBe(entryV1.createdTimestamp);
 		expect(entryV2?.updatedTimestamp).not.toBe(entryV1.updatedTimestamp);
 	});
@@ -130,10 +130,10 @@ describe('data fetching', () => {
 		await expect(registry.get({ limit: 100, page: -100 })).rejects.toThrow();
 
 		const page1 = await registry.get({ limit: 100, page: 1 });
-		expect(page1[0].data).toMatchObject(notesSample[0]);
+		expect(page1[0].content).toMatchObject(notesSample[0]);
 
 		const page2 = await registry.get({ limit: 100, page: 2 });
-		expect(page2[0].data).toMatchObject(notesSample[100]);
+		expect(page2[0].content).toMatchObject(notesSample[100]);
 
 		await db.close();
 	});
@@ -164,8 +164,8 @@ describe('multi instances', () => {
 		const entries = await registry.get();
 
 		expect(entries).toHaveLength(3);
-		expect(entries[1].data.title.length).toBeGreaterThan(0);
-		expect(entries[1].data.text.length).toBeGreaterThan(0);
+		expect(entries[1].content.title.length).toBeGreaterThan(0);
+		expect(entries[1].content.text.length).toBeGreaterThan(0);
 		await db.close();
 	});
 });

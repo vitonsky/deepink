@@ -129,7 +129,7 @@ export const MainScreen: FC = () => {
 	const updateNote = useCallback(
 		async (note: INote) => {
 			openedNotesControls.update(note);
-			await notesRegistry.update(note.id, note.data);
+			await notesRegistry.update(note.id, note.content);
 			updateNotes();
 		},
 		[notesRegistry, updateNotes],

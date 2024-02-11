@@ -63,7 +63,7 @@ describe('stress tests', () => {
 			};
 			await registry.update(randomId, updatedData);
 			await registry.getById(randomId).then((note) => {
-				expect(note?.data).toEqual(updatedData);
+				expect(note?.content).toEqual(updatedData);
 			});
 		}
 

@@ -15,5 +15,5 @@ export type INote = {
 	id: NoteId;
 	createdTimestamp?: number;
 	updatedTimestamp?: number;
-	data: INoteContent;
+	content: INoteContent;
 };

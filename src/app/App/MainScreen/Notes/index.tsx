@@ -30,19 +30,19 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 			panes={tabs
 				.filter((id) => notes.some((note) => note.id === id))
 				.map((id) => {
-					const noteObject = notes.find((note) => note.id === id) as INote;
+					const note = notes.find((note) => note.id === id) as INote;
 					return {
-						id: noteObject.id,
+						id: note.id,
 						content: (
 							<NoteEditor
-								note={noteObject}
-								updateNote={(noteData) => {
+								note={note}
+								updateNote={(content) => {
 									// Skip updates with not changed data
-									if (isEqual(noteObject.data, noteData)) {
+									if (isEqual(note.content, content)) {
 										return;
 									}
 
-									updateNote({ ...noteObject, data: noteData });
+									updateNote({ ...note, content });
 								}}
 							/>
 						),

@@ -233,7 +233,7 @@ export const useImportNotes = ({
 			const note = await notesRegistry.getById(noteId);
 			if (!note) continue;
 
-			const noteTree = markdownProcessor.parse(note.data.text);
+			const noteTree = markdownProcessor.parse(note.content.text);
 
 			// Update URLs
 			const attachedFilesIds: string[] = [];
@@ -254,7 +254,7 @@ export const useImportNotes = ({
 
 			// Update note text
 			const updatedText = markdownProcessor.stringify(noteTree);
-			await notesRegistry.update(note.id, { ...note.data, text: updatedText });
+			await notesRegistry.update(note.id, { ...note.content, text: updatedText });
 
 			// Attach files
 			await attachmentsRegistry.set(

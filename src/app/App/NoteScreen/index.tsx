@@ -126,7 +126,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 
 	// Update text with delay, to not render too frequently
 	const isImmediateRenderRef = useRef(false);
-	const currentText = note.data.text;
+	const currentText = note.content.text;
 	useEffect(() => {
 		debouncedSetText(currentText);
 

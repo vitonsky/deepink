@@ -54,8 +54,8 @@ export type NoteEditorProps = {
 };
 
 export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
-	const [title, setTitle] = useState(note.data.title);
-	const [text, setText] = useState(note.data.text);
+	const [title, setTitle] = useState(note.content.title);
+	const [text, setText] = useState(note.content.text);
 
 	const tagsRegistry = useTagsRegistry();
 

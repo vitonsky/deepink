@@ -73,7 +73,7 @@ export const TopBar: FC<TopBarProps> = ({
 										});
 									}}
 								>
-									{getNoteTitle(note.data)}{' '}
+									{getNoteTitle(note.content)}{' '}
 								</span>
 								<span
 									className={cnTopBar('CloseButton')}

@@ -63,7 +63,7 @@ export class NotesExporter {
 			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 			.freeze();
 
-		const mdTree = markdownProcessor.parse(note.data.text);
+		const mdTree = markdownProcessor.parse(note.content.text);
 
 		const tags = await this.tagsRegistry
 			.getAttachedTags(note.id)
@@ -71,7 +71,7 @@ export class NotesExporter {
 		mdTree.children.unshift({
 			type: 'yaml',
 			value: stringifyYaml({
-				title: note.data.title,
+				title: note.content.title,
 				created: note.createdTimestamp,
 				updated: note.updatedTimestamp,
 				tags,

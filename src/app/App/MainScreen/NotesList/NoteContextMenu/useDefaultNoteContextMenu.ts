@@ -92,7 +92,7 @@ export const useDefaultNoteContextMenu = ({
 						return;
 					}
 
-					const { title, text } = sourceNote.data;
+					const { title, text } = sourceNote.content;
 					const newNoteId = await notesRegistry.add({
 						title: 'DUPLICATE: ' + title,
 						text,
@@ -120,7 +120,7 @@ export const useDefaultNoteContextMenu = ({
 						return;
 					}
 
-					const { title, text } = note.data;
+					const { title, text } = note.content;
 					const noteTitle = (title || text.slice(0, 30))
 						.trim()
 						.replace(mdCharsForEscapeRegEx, '\\$1');

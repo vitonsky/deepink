@@ -67,10 +67,10 @@ export const NotesList: FC<NotesListProps> = ({
 						}}
 					>
 						<div className={cnNotesList('Title')}>
-							{getNoteTitle(note.data)}
+							{getNoteTitle(note.content)}
 						</div>
 						<div className={cnNotesList('TextPreview')}>
-							{note.data.text.slice(0, 80)}
+							{note.content.text.slice(0, 80)}
 						</div>
 						{date && (
 							<div className={cnNotesList('Meta')}>
