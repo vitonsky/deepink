@@ -9,11 +9,11 @@ import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
-import { formatNoteLink, formatResourceLink } from '../../../../../core/links';
+import { formatNoteLink, formatResourceLink } from '../../../../../core/features/links';
+import { INotesController } from '../../../../../core/features/notes/controller';
+import { findParentTag, isTagsArray } from '../../../../../core/features/tags/utils';
 import { tagsChanged } from '../../../../../core/state/tags';
-import { INotesController } from '../../../../../core/storage/controllers/notes';
 import { importNotes } from '../../../../../electron/requests/files/renderer';
-import { findParentTag, isTagsArray } from '../../../../../utils/tags';
 import {
 	useAttachmentsRegistry,
 	useFilesRegistry,

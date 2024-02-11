@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { editor, Position } from 'monaco-editor-core';
 import prettyBytes from 'pretty-bytes';
 
-import { formatResourceLink } from '../../../../core/links';
+import { formatResourceLink } from '../../../../core/features/links';
 
 export type FileUploader = (file: File) => Promise<string>;
 

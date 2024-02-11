@@ -2,7 +2,7 @@
 import { tmpdir } from 'os';
 import { tmpNameSync } from 'tmp';
 
-import { openDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
+import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { FilesController } from './FilesController';

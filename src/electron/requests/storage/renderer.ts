@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
 
 import { IEncryptionController } from '../../../core/encryption';
-import { IFilesStorage } from '../../../core/storage/controllers/files';
+import { IFilesStorage } from '../../../core/features/files';
 
 import { CHANNELS } from '.';
 

@@ -9,13 +9,14 @@ import { PlaceholderEncryptionController } from '../../core/encryption/Placehold
 import { WorkerEncryptionProxyProcessor } from '../../core/encryption/processors/WorkerEncryptionProxyProcessor';
 import { base64ToBytes, bytesToBase64 } from '../../core/encryption/utils/encoding';
 import { getRandomBytes } from '../../core/encryption/utils/random';
+import { AttachmentsController } from '../../core/features/attachments/AttachmentsController';
+import { FilesController } from '../../core/features/files/FilesController';
+import { INoteContent } from '../../core/features/notes';
+import { NotesController } from '../../core/features/notes/controller/NotesController';
+import { TagsController } from '../../core/features/tags/TagsController';
 import { $activeProfile, changedActiveProfile, Profile } from '../../core/state/profiles';
 import { tagsChanged, tagsUpdated } from '../../core/state/tags';
 import { ConfigStorage } from '../../core/storage/ConfigStorage';
-import { AttachmentsController } from '../../core/storage/controllers/attachments/AttachmentsController';
-import { FilesController } from '../../core/storage/controllers/files/FilesController';
-import { NotesController } from '../../core/storage/controllers/notes/NotesController';
-import { TagsController } from '../../core/storage/controllers/tags/TagsController';
 import {
 	openDatabase,
 	SQLiteDatabase,
@@ -23,7 +24,6 @@ import {
 import { ProfileObject, ProfilesManager } from '../../core/storage/ProfilesManager';
 import { getUserDataPath } from '../../electron/requests/files/renderer';
 import { ElectronFilesController } from '../../electron/requests/storage/renderer';
-import { INoteContent } from '../../types/notes';
 import { DisposableBox } from '../../utils/disposable';
 
 import { readFile, writeFile } from 'fs/promises';

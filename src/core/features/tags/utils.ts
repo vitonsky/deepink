@@ -1,4 +1,4 @@
-import { ITag } from '../core/storage/controllers/tags/TagsController';
+import { ITag } from './TagsController';
 
 export const isTagsArray = (data: unknown): data is string[] =>
 	Array.isArray(data) && data.every((item) => typeof item === 'string');

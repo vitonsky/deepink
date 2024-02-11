@@ -1,6 +1,6 @@
-import { INote, INoteContent, NoteId } from '../../../../types/notes';
+import { INote, INoteContent, NoteId } from "..";
 
-export type NotesRegistryFetchOptions = {
+export type NotesControllerFetchOptions = {
 	/**
 	 * Limit notes
 	 *
@@ -40,7 +40,7 @@ export interface INotesController {
 	/**
 	 * Primary method to get notes filtered by parameters
 	 */
-	get(options?: NotesRegistryFetchOptions): Promise<INote[]>;
+	get(options?: NotesControllerFetchOptions): Promise<INote[]>;
 
 	/**
 	 * Create note and return unique id of new note

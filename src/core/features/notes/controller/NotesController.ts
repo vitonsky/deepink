@@ -1,9 +1,9 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { INote, INoteContent, NoteId } from '../../../../types/notes';
-import { SQLiteDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
+import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
-import { INotesController, NotesRegistryFetchOptions } from '.';
+import { INote, INoteContent, NoteId } from "..";
+import { INotesController, NotesControllerFetchOptions } from ".";
 
 /**
  * Data mappers between DB and objects
@@ -47,7 +47,7 @@ export class NotesController implements INotesController {
 		limit = 100,
 		page = 1,
 		tags = [],
-	}: NotesRegistryFetchOptions = {}): Promise<INote[]> {
+	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
 		const { db } = this.db;

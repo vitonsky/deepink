@@ -6,10 +6,10 @@ import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { stringify as stringifyYaml } from 'yaml';
 
-import { getAppResourceDataInUrl } from '../../../../../core/links';
-import { FilesController } from '../../../../../core/storage/controllers/files/FilesController';
-import { INotesController } from '../../../../../core/storage/controllers/notes';
-import { TagsController } from '../../../../../core/storage/controllers/tags/TagsController';
+import { FilesController } from '../../../../../core/features/files/FilesController';
+import { getAppResourceDataInUrl } from '../../../../../core/features/links';
+import { INotesController } from '../../../../../core/features/notes/controller';
+import { TagsController } from '../../../../../core/features/tags/TagsController';
 import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
 export type SaveFileCallback = (file: File, id: string) => Promise<string>;

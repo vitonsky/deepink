@@ -2,7 +2,7 @@ import React, { createContext, FC, HTMLProps, useContext } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { INotesController } from '../../../../core/storage/controllers/notes';
+import { INotesController } from '../../../../core/features/notes/controller';
 import { ButtonsManagerObject } from '../../../api/buttons/useButtonsManager';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { Stack } from '../../../components/Stack/Stack';

@@ -17,6 +17,7 @@ import {
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
+import { INote, NoteId } from '../../../core/features/notes';
 import {
 	$activeNoteId,
 	$openedNotes,
@@ -25,7 +26,6 @@ import {
 } from '../../../core/state/notes';
 import { changedActiveProfile } from '../../../core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '../../../core/state/tags';
-import { INote, NoteId } from '../../../types/notes';
 import { useButtonsManager } from '../../api/buttons/useButtonsManager';
 import { useFirstRender } from '../../components/hooks/useFirstRender';
 import { Icon } from '../../components/Icon/Icon.bundle/common';

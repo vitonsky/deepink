@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from 'uuid';
 
-import { SQLiteDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
+import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { IFilesStorage } from ".";

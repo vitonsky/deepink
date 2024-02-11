@@ -11,13 +11,13 @@ import {
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 
+import { ITag } from '../../../../core/features/tags/TagsController';
 import {
 	$activeTag,
 	$tags,
 	setActiveTag,
 	tagsChanged,
 } from '../../../../core/state/tags';
-import { ITag } from '../../../../core/storage/controllers/tags/TagsController';
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { List } from '../../../components/List';
 import { TagEditor, TagEditorData } from '../../../components/TagEditor';

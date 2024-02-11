@@ -6,7 +6,7 @@ import {
 } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
 
-import { ITag } from '../../../core/storage/controllers/tags/TagsController';
+import { ITag } from '../../../core/features/tags/TagsController';
 
 import { getSortIndex } from './utils';
 
