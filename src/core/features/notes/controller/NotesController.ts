@@ -2,20 +2,20 @@ import { v4 as uuid4 } from 'uuid';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
-import { INote, INoteContent, NoteId } from "..";
-import { INotesController, NotesControllerFetchOptions } from ".";
+import { INote, INoteContent, NoteId } from '..';
+import { INotesController, NotesControllerFetchOptions } from '.';
 
 /**
  * Data mappers between DB and objects
  */
 const mappers = {
-	rowToNoteObject(row: any) {
+	rowToNoteObject(row: any): INote {
 		const { id, title, text, creationTime, lastUpdateTime } = row;
 		return {
 			id,
 			createdTimestamp: creationTime,
 			updatedTimestamp: lastUpdateTime,
-			data: { title, text },
+			content: { title, text },
 		};
 	},
 };
