@@ -1,5 +1,5 @@
 import { extendedBase64 } from './utils/encoding';
-import { IEncryptionController,IEncryptionProcessor } from '.';
+import { IEncryptionController, IEncryptionProcessor } from '.';
 
 /**
  * Module to encrypt/decrypt data with provided cipher

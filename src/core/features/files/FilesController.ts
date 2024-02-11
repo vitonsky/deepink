@@ -3,7 +3,7 @@ import { v4 as uuid4 } from 'uuid';
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
-import { IFilesStorage } from ".";
+import { IFilesStorage } from '.';
 
 // TODO: add runtime validation
 // TODO: implement interface and use interface instead of class

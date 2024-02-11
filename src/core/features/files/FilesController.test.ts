@@ -6,7 +6,7 @@ import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDataba
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { FilesController } from './FilesController';
-import { IFilesStorage } from ".";
+import { IFilesStorage } from '.';
 
 const File = require('blob-polyfill').File;
 

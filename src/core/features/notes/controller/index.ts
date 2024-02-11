@@ -1,4 +1,4 @@
-import { INote, INoteContent, NoteId } from "..";
+import { INote, INoteContent, NoteId } from '..';
 
 export type NotesControllerFetchOptions = {
 	/**
