@@ -3,7 +3,7 @@ import {
 	formatNoteLink,
 	formatResourceLink,
 	getAppResourceDataInUrl,
-} from ".";
+} from '.';
 
 test('formatters and parsers behavior are consistent', () => {
 	const link = formatNoteLink('foo-bar');

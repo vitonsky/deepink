@@ -2,7 +2,7 @@ import { shell } from 'electron';
 
 import { ipcMainHandler } from '../../utils/ipc/electronMain';
 
-import { interactionsChannel } from ".";
+import { interactionsChannel } from '.';
 
 export const enableInteractions = () =>
 	interactionsChannel.server(ipcMainHandler, {

@@ -6,7 +6,7 @@ import * as filesUtils from '../../utils/files';
 import { ipcMainHandler } from '../../utils/ipc/electronMain';
 
 import { readFile, realpath } from 'fs/promises';
-import { filesChannel } from ".";
+import { filesChannel } from '.';
 
 export const serveFiles = () =>
 	filesChannel.server(ipcMainHandler, {

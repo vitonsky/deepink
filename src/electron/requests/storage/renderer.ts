@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 import { IEncryptionController } from '../../../core/encryption';
 import { IFilesStorage } from '../../../core/features/files';
 
-import { storageChannel } from ".";
+import { storageChannel } from '.';
 
 export const storageApi = storageChannel.client({
 	async upload({ channelName, args }) {

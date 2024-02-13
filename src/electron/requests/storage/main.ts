@@ -6,7 +6,7 @@ import { getUserDataPath } from '../../utils/files';
 import { ipcMainHandler } from '../../utils/ipc/electronMain';
 
 import { mkdir, readdir, readFile, rm } from 'fs/promises';
-import { storageChannel } from ".";
+import { storageChannel } from '.';
 
 const ensureValidFilePath = (filesDir: string, filePath: string) => {
 	// Verify file path
