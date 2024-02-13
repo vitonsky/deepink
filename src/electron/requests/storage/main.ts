@@ -1,12 +1,12 @@
-import { ipcMain } from 'electron';
 import { existsSync } from 'fs';
 import path from 'path';
 
 import { writeFileAtomic } from '../../../utils/files';
 import { getUserDataPath } from '../../utils/files';
+import { ipcMainHandler } from '../../utils/ipc/electronMain';
 
 import { mkdir, readdir, readFile, rm } from 'fs/promises';
-import { CHANNELS } from '.';
+import { storageChannel } from ".";
 
 const ensureValidFilePath = (filesDir: string, filePath: string) => {
 	// Verify file path
@@ -19,66 +19,53 @@ const ensureValidFilePath = (filesDir: string, filePath: string) => {
 const getFilesDirPath = (subDirectory?: string) =>
 	subDirectory ? path.join(subDirectory, 'files') : 'files';
 
-function uploadFile() {
-	ipcMain.handle(CHANNELS.uploadFile, async (_evt, { subdir, id, buffer }) => {
-		const filesDir = getUserDataPath(getFilesDirPath(subdir));
-		await mkdir(filesDir, { recursive: true });
+export const enableStorage = () =>
+	storageChannel.server(ipcMainHandler, {
+		async upload({ req: [id, buffer, subdir] }) {
+			const filesDir = getUserDataPath(getFilesDirPath(subdir));
+			await mkdir(filesDir, { recursive: true });
 
-		const filePath = path.resolve(path.join(filesDir, id));
-		ensureValidFilePath(filesDir, filePath);
+			const filePath = path.resolve(path.join(filesDir, id));
+			ensureValidFilePath(filesDir, filePath);
 
-		await writeFileAtomic(filePath, Buffer.from(buffer as ArrayBuffer));
-	});
-}
+			await writeFileAtomic(filePath, Buffer.from(buffer as ArrayBuffer));
+		},
+		async get({ req: [id, subdir] }) {
+			const filesDir = getUserDataPath(getFilesDirPath(subdir));
+			await mkdir(filesDir, { recursive: true });
 
-function getFile() {
-	ipcMain.handle(CHANNELS.getFile, async (_evt, { subdir, id }) => {
-		const filesDir = getUserDataPath(getFilesDirPath(subdir));
-		await mkdir(filesDir, { recursive: true });
-
-		const filePath = path.join(filesDir, id);
-
-		ensureValidFilePath(filesDir, filePath);
-
-		if (!existsSync(filePath)) return null;
-
-		const buffer = await readFile(filePath);
-		return buffer.buffer;
-	});
-}
-
-function deleteFiles() {
-	ipcMain.handle(CHANNELS.deleteFiles, async (_evt, { subdir, ids }) => {
-		const filesDir = getUserDataPath(getFilesDirPath(subdir));
-		await mkdir(filesDir, { recursive: true });
-
-		for (const id of ids) {
 			const filePath = path.join(filesDir, id);
 
-			if (!existsSync(filePath)) {
-				console.debug('Not found file', filePath);
-				continue;
+			ensureValidFilePath(filesDir, filePath);
+
+			if (!existsSync(filePath)) return null;
+
+			const buffer = await readFile(filePath);
+			return buffer.buffer;
+		},
+
+		async delete({ req: [ids, subdir] }) {
+			const filesDir = getUserDataPath(getFilesDirPath(subdir));
+			await mkdir(filesDir, { recursive: true });
+
+			for (const id of ids) {
+				const filePath = path.join(filesDir, id);
+
+				if (!existsSync(filePath)) {
+					console.debug('Not found file', filePath);
+					continue;
+				}
+
+				await rm(filePath);
+				console.debug('Removed file', filePath);
 			}
+		},
 
-			await rm(filePath);
-			console.debug('Removed file', filePath);
-		}
+		async list({ req: [subdir] }) {
+			const filesDir = getUserDataPath(getFilesDirPath(subdir));
+			await mkdir(filesDir, { recursive: true });
+
+			const filenames = await readdir(filesDir, {});
+			return filenames;
+		},
 	});
-}
-
-function listFiles() {
-	ipcMain.handle(CHANNELS.listFiles, async (_evt, { subdir }) => {
-		const filesDir = getUserDataPath(getFilesDirPath(subdir));
-		await mkdir(filesDir, { recursive: true });
-
-		const filenames = await readdir(filesDir, {});
-		return filenames;
-	});
-}
-
-export const handleStorageRequests = [
-	uploadFile,
-	getFile,
-	deleteFiles,
-	listFiles,
-] as const;

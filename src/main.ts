@@ -5,7 +5,7 @@ import url from 'url';
 import { enableContextMenu } from './electron/requests/contextMenu/main';
 import { serveFiles } from './electron/requests/files/main';
 import { handleInteractionsRequests } from './electron/requests/interactions/main';
-import { handleStorageRequests } from './electron/requests/storage/main';
+import { enableStorage } from './electron/requests/storage/main';
 import { isDevMode } from './electron/utils/app';
 import { getResourcesPath } from './electron/utils/files';
 
@@ -49,7 +49,7 @@ const createWindow = async () => {
 	console.log(performance.measure('page loaded', { start }));
 
 	enableContextMenu();
-	handleStorageRequests.forEach((handler) => handler());
+	enableStorage();
 	handleInteractionsRequests.forEach((handler) => handler());
 
 	// win.addListener('close', (evt) => {
