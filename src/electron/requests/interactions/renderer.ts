@@ -1,7 +1,9 @@
 import { ipcRenderer } from 'electron';
 
-import { CHANNELS } from '.';
+import { interactionsChannel } from '.';
 
-export function openLink(url: string): Promise<void> {
-	return ipcRenderer.invoke(CHANNELS.openLink, { url });
-}
+export const { openLink } = interactionsChannel.client({
+	async openLink({ args, channelName }) {
+		return ipcRenderer.invoke(channelName, args);
+	},
+});
