@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { ContextMenu } from '../../../../../electron/contextMenu';
+import { ContextMenu } from '../../../../../electron/requests/contextMenu';
 import {
 	ContextMenuCallback,
 	useContextMenu,

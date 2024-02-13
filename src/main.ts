@@ -2,7 +2,7 @@ import { app, BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
 
-import { enableContextMenu } from './electron/contextMenu/main';
+import { enableContextMenu } from './electron/requests/contextMenu/main';
 import { serveFiles } from './electron/requests/files/main';
 import { handleInteractionsRequests } from './electron/requests/interactions/main';
 import { handleStorageRequests } from './electron/requests/storage/main';

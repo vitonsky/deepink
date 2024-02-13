@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 
-import { ContextMenu, contextMenuChannel } from '.';
+import { ContextMenu, contextMenuChannel } from ".";
 
 export type ContextMenuRequestProps = {
 	menu: ContextMenu;

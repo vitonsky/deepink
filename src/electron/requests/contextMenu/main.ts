@@ -1,7 +1,8 @@
 import { BrowserWindow, Menu } from 'electron';
 
-import { ipcMainHandler } from '../utils/ipc/electronMain';
-import { contextMenuChannel } from '.';
+import { ipcMainHandler } from '../../utils/ipc/electronMain';
+
+import { contextMenuChannel } from ".";
 
 export const enableContextMenu = () =>
 	contextMenuChannel.server(ipcMainHandler, {

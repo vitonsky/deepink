@@ -1,4 +1,5 @@
-import { createChannel } from '../utils/ipc';
+import { createChannel } from '../../utils/ipc';
+
 import { ContextMenuRequestProps } from './renderer';
 
 export const ipcChannelName = 'context-menu';

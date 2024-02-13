@@ -4,7 +4,7 @@ import { formatNoteLink } from '../../../../../core/features/links';
 import { NoteId } from '../../../../../core/features/notes';
 import { INotesController } from '../../../../../core/features/notes/controller';
 import { tagAttachmentsChanged } from '../../../../../core/state/tags';
-import { ContextMenu } from '../../../../../electron/contextMenu';
+import { ContextMenu } from '../../../../../electron/requests/contextMenu';
 import { selectDirectory } from '../../../../../electron/requests/files/renderer';
 import { copyTextToClipboard } from '../../../../../utils/clipboard';
 import {
