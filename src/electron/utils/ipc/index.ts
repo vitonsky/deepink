@@ -19,9 +19,9 @@ export type ApiToHandlers<
 	}) => ReturnType<T[K]> extends Promise<infer R> ? Promise<R | undefined> : never;
 };
 
-export type ServerRequestHandler = (
+export type ServerRequestHandler<Context = never> = (
 	endpoint: string,
-	callback: (parameters: { req: any; ctx: any }) => any,
+	callback: (parameters: { req: any; ctx: Context }) => any,
 ) => () => void;
 
 export const createChannel = <T extends Record<string, (...args: any[]) => Promise<any>>>(
@@ -41,9 +41,8 @@ export const createChannel = <T extends Record<string, (...args: any[]) => Promi
 				]),
 			) as T;
 		},
-		// TODO: bind context type from `requestsHandler`
 		server: <Context = never>(
-			requestsHandler: ServerRequestHandler,
+			requestsHandler: ServerRequestHandler<Context>,
 			callbacks: ApiToHandlers<T, Context>,
 		): (() => void) => {
 			const cleanups = Object.entries(callbacks).map(([methodName, callback]) =>

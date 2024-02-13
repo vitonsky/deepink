@@ -4,7 +4,7 @@ import { ipcMainHandler } from '../utils/ipc/electronMain';
 import { contextMenuChannel } from '.';
 
 export const enableContextMenu = () =>
-	contextMenuChannel.server<Electron.IpcMainInvokeEvent>(ipcMainHandler, {
+	contextMenuChannel.server(ipcMainHandler, {
 		async open({ req: [props], ctx: event }) {
 			const targetWindow = BrowserWindow.fromWebContents(event.sender);
 			if (!targetWindow) return;
