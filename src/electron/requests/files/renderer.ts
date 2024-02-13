@@ -1,18 +1,19 @@
 import { ipcRenderer } from 'electron';
 
-import { CHANNELS } from '.';
+import { filesChannel } from '.';
 
-export function importNotes(): Promise<Record<string, ArrayBuffer>> {
-	return ipcRenderer.invoke(CHANNELS.importNotes);
-}
-
-export function selectDirectory(): Promise<null | string[]> {
-	return ipcRenderer.invoke(CHANNELS.selectDirectory);
-}
-
-export function getUserDataPath(path?: string): Promise<string> {
-	return ipcRenderer.invoke(CHANNELS.getUserDataPath, path);
-}
-export function getResourcesPath(path: string): Promise<string> {
-	return ipcRenderer.invoke(CHANNELS.getResourcesPath, path);
-}
+export const { importNotes, selectDirectory, getUserDataPath, getResourcesPath } =
+	filesChannel.client({
+		async importNotes({ channelName }) {
+			return ipcRenderer.invoke(channelName);
+		},
+		async selectDirectory({ channelName }) {
+			return ipcRenderer.invoke(channelName);
+		},
+		async getUserDataPath({ channelName, args }) {
+			return ipcRenderer.invoke(channelName, args);
+		},
+		async getResourcesPath({ channelName, args }) {
+			return ipcRenderer.invoke(channelName, args);
+		},
+	});

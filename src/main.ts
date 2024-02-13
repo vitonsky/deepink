@@ -3,7 +3,7 @@ import path from 'path';
 import url from 'url';
 
 import { enableContextMenu } from './electron/contextMenu/main';
-import { handleFilesRequests } from './electron/requests/files/main';
+import { serveFiles } from './electron/requests/files/main';
 import { handleInteractionsRequests } from './electron/requests/interactions/main';
 import { handleStorageRequests } from './electron/requests/storage/main';
 import { isDevMode } from './electron/utils/app';
@@ -15,7 +15,7 @@ console.log({
 	resourcesPath: getResourcesPath(),
 });
 
-handleFilesRequests.forEach((handler) => handler());
+serveFiles();
 
 const createWindow = async () => {
 	const win = new BrowserWindow({
