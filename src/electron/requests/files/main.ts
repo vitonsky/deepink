@@ -3,7 +3,7 @@ import { globSync } from 'fast-glob';
 import { lstatSync } from 'fs';
 
 import * as filesUtils from '../../utils/files';
-import { ipcMainHandler } from '../../utils/ipc/electronMain';
+import { ipcMainHandler } from '../../utils/ipc/ipcMainHandler';
 
 import { readFile, realpath } from 'fs/promises';
 import { filesChannel } from '.';

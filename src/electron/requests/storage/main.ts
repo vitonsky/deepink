@@ -3,7 +3,7 @@ import path from 'path';
 
 import { writeFileAtomic } from '../../../utils/files';
 import { getUserDataPath } from '../../utils/files';
-import { ipcMainHandler } from '../../utils/ipc/electronMain';
+import { ipcMainHandler } from '../../utils/ipc/ipcMainHandler';
 
 import { mkdir, readdir, readFile, rm } from 'fs/promises';
 import { storageChannel } from '.';

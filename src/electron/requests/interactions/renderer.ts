@@ -1,9 +1,5 @@
-import { ipcRenderer } from 'electron';
+import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
 import { interactionsChannel } from '.';
 
-export const { openLink } = interactionsChannel.client({
-	async openLink({ args, channelName }) {
-		return ipcRenderer.invoke(channelName, args);
-	},
-});
+export const { openLink } = interactionsChannel.client(ipcRendererFetcher);

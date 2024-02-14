@@ -1,6 +1,6 @@
 import { BrowserWindow, Menu } from 'electron';
 
-import { ipcMainHandler } from '../../utils/ipc/electronMain';
+import { ipcMainHandler } from '../../utils/ipc/ipcMainHandler';
 
 import { contextMenuChannel } from '.';
 

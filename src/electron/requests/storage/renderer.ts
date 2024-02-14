@@ -1,24 +1,10 @@
-import { ipcRenderer } from 'electron';
-
 import { IEncryptionController } from '../../../core/encryption';
 import { IFilesStorage } from '../../../core/features/files';
+import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
 import { storageChannel } from '.';
 
-export const storageApi = storageChannel.client({
-	async upload({ channelName, args }) {
-		return ipcRenderer.invoke(channelName, args);
-	},
-	async get({ channelName, args }) {
-		return ipcRenderer.invoke(channelName, args);
-	},
-	async delete({ channelName, args }) {
-		return ipcRenderer.invoke(channelName, args);
-	},
-	async list({ channelName, args }) {
-		return ipcRenderer.invoke(channelName, args);
-	},
-});
+export const storageApi = storageChannel.client(ipcRendererFetcher);
 
 export class ElectronFilesController implements IFilesStorage {
 	private readonly subdirectory;

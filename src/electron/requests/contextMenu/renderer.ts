@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
 import { ContextMenu, contextMenuChannel } from '.';
 
@@ -8,8 +8,4 @@ export type ContextMenuRequestProps = {
 	y: number;
 };
 
-export const { open: openContextMenu } = contextMenuChannel.client({
-	open({ channelName, args }) {
-		return ipcRenderer.invoke(channelName, args);
-	},
-});
+export const { open: openContextMenu } = contextMenuChannel.client(ipcRendererFetcher);
