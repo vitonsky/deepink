@@ -6,8 +6,8 @@ type ApiSchema = Record<string, (...args: any[]) => Promise<any>>;
 
 export type ApiToMappers<T extends ApiSchema> = {
 	[K in keyof T]: (
-		rsp: T[K] extends Promise<infer R> ? R : never,
 		args: Parameters<T[K]>,
+		sendRequest: (args: Parameters<T[K]>) => ReturnType<T[K]>,
 	) => ReturnType<T[K]>;
 };
 
@@ -39,11 +39,17 @@ export const createChannel = <T extends ApiSchema>(options: ChannelOptions) => {
 			// Return proxy object with virtual callbacks
 			return new Proxy<T>({} as any, {
 				get: function (_target, methodName: string) {
-					const mapper = mappers[methodName];
-					return (...args: Parameters<T[keyof T]>) =>
-						fetcher(getResolvedEndpointName(methodName), args).then(
-							(response) => (mapper ? mapper(response, args) : response),
-						);
+					const endpoint = getResolvedEndpointName(methodName);
+					const mapper = mappers[methodName as keyof T];
+					return (...args: Parameters<T[keyof T]>) => {
+						if (mapper) {
+							return mapper(args, (mappedArgs) =>
+								fetcher(endpoint, mappedArgs),
+							);
+						}
+
+						return fetcher(endpoint, args);
+					};
 				},
 			});
 		},
