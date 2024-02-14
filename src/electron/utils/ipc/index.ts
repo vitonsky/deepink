@@ -18,7 +18,9 @@ export type ApiToHandlers<T extends ApiSchema, Context = never> = {
 	}) => ReturnType<T[K]> extends Promise<infer R> ? Promise<R | undefined> : never;
 };
 
-export type ClientFetcher = (endpoint: string, args: any[]) => Promise<any>;
+export type ClientFetcher<T extends ApiSchema = {}> = {
+	(endpoint: string, args: Parameters<T[keyof T]>): ReturnType<T[keyof T]>;
+};
 
 export type ServerRequestHandler<Context = never> = (
 	endpoint: string,
@@ -30,7 +32,10 @@ export const createChannel = <T extends ApiSchema>(options: ChannelOptions) => {
 		[options.name, methodName].join('.');
 
 	return {
-		client: (fetcher: ClientFetcher, mappers: Partial<ApiToMappers<T>> = {}): T => {
+		client: (
+			fetcher: ClientFetcher<T>,
+			mappers: Partial<ApiToMappers<T>> = {},
+		): T => {
 			// Return proxy object with virtual callbacks
 			return new Proxy<T>({} as any, {
 				get: function (_target, methodName: string) {
