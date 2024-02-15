@@ -38,6 +38,8 @@ const createWindow = async () => {
 	// 	win.show();
 	// });
 
+	enableStorage();
+
 	await win.loadURL(
 		url.format({
 			pathname: path.join(__dirname, 'index.html'),
@@ -49,7 +51,7 @@ const createWindow = async () => {
 	console.log(performance.measure('page loaded', { start }));
 
 	enableContextMenu();
-	enableStorage();
+
 	enableInteractions();
 
 	// win.addListener('close', (evt) => {

@@ -64,7 +64,9 @@ export const decryptKey = async (
 
 // TODO: remove secrets of closure
 export const App: FC = () => {
-	const [profilesManager] = useState(() => new ProfilesManager());
+	const [profilesManager] = useState(
+		() => new ProfilesManager(new ElectronFilesController('/')),
+	);
 	const [profiles, setProfiles] = useState<null | ProfileObject[]>(null);
 	const updateProfiles = useCallback(() => {
 		profilesManager.getProfiles().then(setProfiles);
@@ -163,7 +165,10 @@ export const App: FC = () => {
 		// Setup files
 		// TODO: implement methods to close the objects after use
 		const attachmentsRegistry = new AttachmentsController(db);
-		const filesController = new ElectronFilesController(profile.id, encryption);
+		const filesController = new ElectronFilesController(
+			[profile.id, 'files'].join('/'),
+			encryption,
+		);
 		const filesRegistry = new FilesController(
 			db,
 			filesController,
