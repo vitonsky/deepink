@@ -34,7 +34,7 @@ import { NewProfile } from './WorkspaceManager/ProfileCreator';
 
 import './App.css';
 
-const config = new ConfigStorage();
+const config = new ConfigStorage('config.json', new ElectronFilesController('/'));
 
 type AppContext = {
 	db: SQLiteDatabase;
