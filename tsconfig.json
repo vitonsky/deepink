@@ -25,19 +25,20 @@
 		"preserveConstEnums": true,
 		"removeComments": false,
 		"sourceMap": true,
-		"lib": [
-			"es2020",
-			"dom"
-		],
+		"lib": ["es2020", "dom"],
 		"rootDir": ".",
 		"allowJs": true,
 		"resolveJsonModule": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"@core/*": ["src/core/*"],
+			"@electron/*": ["src/electron/*"],
+			"@components/*": ["src/components/*"],
+			"@features/*": ["src/features/*"],
+			"@api/*": ["src/api/*"],
+			"@utils/*": ["src/utils/*"]
+		}
 	},
-	"include": [
-		"src/*.ts",
-		"src/*.tsx",
-		"src/**/*.ts",
-		"src/**/*.tsx"
-	]
+	"include": ["src/*.ts", "src/*.tsx", "src/**/*.ts", "src/**/*.tsx"]
 }

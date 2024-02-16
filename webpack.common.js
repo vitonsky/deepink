@@ -1,4 +1,5 @@
 const path = require('path');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
 const isProduction = mode === 'production';
@@ -33,6 +34,7 @@ module.exports = {
 	},
 	resolve: {
 		extensions: ['.js', '.ts', '.tsx'],
+		plugins: [new TsconfigPathsPlugin({})],
 	},
 	output: {
 		path: outputPath,
