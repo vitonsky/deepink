@@ -17,7 +17,8 @@
 		"simple-import-sort",
 		"react-hooks",
 		"spellcheck",
-		"import"
+		"import",
+		"eslint-plugin-local-rules"
 	],
 	"extends": [
 		"plugin:import/recommended",
@@ -28,6 +29,7 @@
 	],
 	"rules": {
 		// turn on errors for missing imports
+		"local-rules/proper-import-aliases": "error",
 		"import/no-unresolved": "error",
 		"spellcheck/spell-checker": [
 			"error",
