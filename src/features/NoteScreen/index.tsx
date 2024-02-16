@@ -13,9 +13,8 @@ import { debounce } from 'lodash';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@bem-react/classname';
-
-import { getResourceIdInUrl } from '../../core/features/links';
-import { INote } from '../../core/features/notes';
+import { getResourceIdInUrl } from '@core/features/links';
+import { INote } from '@core/features/notes';
 
 import { useAttachmentsRegistry, useFilesRegistry } from '../Providers';
 import {

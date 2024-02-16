@@ -5,11 +5,11 @@ import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { stringify as stringifyYaml } from 'yaml';
+import { FilesController } from '@core/features/files/FilesController';
+import { getAppResourceDataInUrl } from '@core/features/links';
+import { INotesController } from '@core/features/notes/controller';
+import { TagsController } from '@core/features/tags/controller/TagsController';
 
-import { FilesController } from '../../../../core/features/files/FilesController';
-import { getAppResourceDataInUrl } from '../../../../core/features/links';
-import { INotesController } from '../../../../core/features/notes/controller';
-import { TagsController } from '../../../../core/features/tags/controller/TagsController';
 import { replaceUrls } from '../../StatusBar/buttons/useImportNotes';
 
 export type SaveFileCallback = (file: File, id: string) => Promise<string>;

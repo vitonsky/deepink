@@ -10,12 +10,12 @@ import {
 } from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
+import { IResolvedTag } from '@core/features/tags';
+import { $activeTag, $tags, setActiveTag, tagsChanged } from '@core/state/tags';
 
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { List } from '../../../components/List';
 import { TagEditor, TagEditorData } from '../../../components/TagEditor';
-import { IResolvedTag } from '../../../core/features/tags';
-import { $activeTag, $tags, setActiveTag, tagsChanged } from '../../../core/state/tags';
 import { useTagsRegistry } from '../../Providers';
 
 import { TagItem, TagsList } from './TagsList';

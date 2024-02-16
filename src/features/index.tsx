@@ -3,25 +3,25 @@ import { useStore } from 'effector-react';
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import { cn } from '@bem-react/classname';
-
-import { EncryptionController } from '../core/encryption/EncryptionController';
-import { PlaceholderEncryptionController } from '../core/encryption/PlaceholderEncryptionController';
-import { WorkerEncryptionProxyProcessor } from '../core/encryption/processors/WorkerEncryptionProxyProcessor';
-import { base64ToBytes, bytesToBase64 } from '../core/encryption/utils/encoding';
-import { getRandomBytes } from '../core/encryption/utils/random';
-import { AttachmentsController } from '../core/features/attachments/AttachmentsController';
-import { FilesController } from '../core/features/files/FilesController';
-import { INoteContent } from '../core/features/notes';
-import { NotesController } from '../core/features/notes/controller/NotesController';
-import { TagsController } from '../core/features/tags/controller/TagsController';
-import { $activeProfile, changedActiveProfile, Profile } from '../core/state/profiles';
-import { tagsChanged, tagsUpdated } from '../core/state/tags';
-import { ConfigStorage } from '../core/storage/ConfigStorage';
+import { EncryptionController } from '@core/encryption/EncryptionController';
+import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
+import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
+import { base64ToBytes, bytesToBase64 } from '@core/encryption/utils/encoding';
+import { getRandomBytes } from '@core/encryption/utils/random';
+import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
+import { FilesController } from '@core/features/files/FilesController';
+import { INoteContent } from '@core/features/notes';
+import { NotesController } from '@core/features/notes/controller/NotesController';
+import { TagsController } from '@core/features/tags/controller/TagsController';
+import { $activeProfile, changedActiveProfile, Profile } from '@core/state/profiles';
+import { tagsChanged, tagsUpdated } from '@core/state/tags';
+import { ConfigStorage } from '@core/storage/ConfigStorage';
 import {
 	openDatabase,
 	SQLiteDatabase,
-} from '../core/storage/database/SQLiteDatabase/SQLiteDatabase';
-import { ProfileObject, ProfilesManager } from '../core/storage/ProfilesManager';
+} from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
+import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
+
 import { getUserDataPath } from '../electron/requests/files/renderer';
 import { ElectronFilesController } from '../electron/requests/storage/renderer';
 import { DisposableBox } from '../utils/disposable';

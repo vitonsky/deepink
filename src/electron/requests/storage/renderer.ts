@@ -1,5 +1,6 @@
+import { IFilesStorage } from '@core/features/files';
+
 import { IEncryptionController } from '../../../core/encryption';
-import { IFilesStorage } from '../../../core/features/files';
 import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
 import { storageChannel } from '.';

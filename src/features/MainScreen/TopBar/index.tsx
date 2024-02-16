@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import { FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
+import { INote, NoteId } from '@core/features/notes';
+import { INotesController } from '@core/features/notes/controller';
 
 import { Icon } from '../../../components/Icon/Icon.bundle/common';
 import { TabsMenu } from '../../../components/TabsMenu';
-import { INote, NoteId } from '../../../core/features/notes';
-import { INotesController } from '../../../core/features/notes/controller';
 
 import { getNoteTitle } from '../..';
 import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';

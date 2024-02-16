@@ -16,20 +16,20 @@ import {
 } from 'react-icons/fa6';
 import { useStore, useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
-
-import { useButtonsManager } from '../../api/buttons/useButtonsManager';
-import { useFirstRender } from '../../components/hooks/useFirstRender';
-import { Icon } from '../../components/Icon/Icon.bundle/common';
-import { Stack } from '../../components/Stack/Stack';
-import { INote, NoteId } from '../../core/features/notes';
+import { INote, NoteId } from '@core/features/notes';
 import {
 	$activeNoteId,
 	$openedNotes,
 	activeNoteChanged,
 	openedNotesControls,
-} from '../../core/state/notes';
-import { changedActiveProfile } from '../../core/state/profiles';
-import { $activeTag, $tags, tagAttachmentsChanged } from '../../core/state/tags';
+} from '@core/state/notes';
+import { changedActiveProfile } from '@core/state/profiles';
+import { $activeTag, $tags, tagAttachmentsChanged } from '@core/state/tags';
+
+import { useButtonsManager } from '../../api/buttons/useButtonsManager';
+import { useFirstRender } from '../../components/hooks/useFirstRender';
+import { Icon } from '../../components/Icon/Icon.bundle/common';
+import { Stack } from '../../components/Stack/Stack';
 
 import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';

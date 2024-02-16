@@ -8,11 +8,11 @@ import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
+import { formatNoteLink, formatResourceLink } from '@core/features/links';
+import { INotesController } from '@core/features/notes/controller';
+import { findParentTag, isTagsArray } from '@core/features/tags/utils';
+import { tagsChanged } from '@core/state/tags';
 
-import { formatNoteLink, formatResourceLink } from '../../../../core/features/links';
-import { INotesController } from '../../../../core/features/notes/controller';
-import { findParentTag, isTagsArray } from '../../../../core/features/tags/utils';
-import { tagsChanged } from '../../../../core/state/tags';
 import { importNotes } from '../../../../electron/requests/files/renderer';
 import {
 	useAttachmentsRegistry,

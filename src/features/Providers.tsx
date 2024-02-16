@@ -1,10 +1,9 @@
 import React, { createContext, FC, useContext } from 'react';
-
-import { AttachmentsController } from '../core/features/attachments/AttachmentsController';
-import { FilesController } from '../core/features/files/FilesController';
-import { INotesController } from '../core/features/notes/controller';
-import { TagsController } from '../core/features/tags/controller/TagsController';
-import { SQLiteDatabase } from '../core/storage/database/SQLiteDatabase/SQLiteDatabase';
+import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
+import { FilesController } from '@core/features/files/FilesController';
+import { INotesController } from '@core/features/notes/controller';
+import { TagsController } from '@core/features/tags/controller/TagsController';
+import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 
 export type FileId = string;
 

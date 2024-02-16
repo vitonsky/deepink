@@ -5,8 +5,7 @@ import {
 	Menu,
 } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { cn } from '@bem-react/classname';
-
-import { IResolvedTag } from '../../core/features/tags';
+import { IResolvedTag } from '@core/features/tags';
 
 import { getSortIndex } from './utils';
 

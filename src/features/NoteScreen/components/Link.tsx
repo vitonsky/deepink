@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { Components } from 'react-markdown';
 import saveAs from 'file-saver';
+import { getAppResourceDataInUrl } from '@core/features/links';
 
-import { getAppResourceDataInUrl } from '../../../core/features/links';
 import { openLink } from '../../../electron/requests/interactions/renderer';
 import { useNotesControl } from '../../MainScreen/useNotesControl';
 import { useFilesRegistry } from '../../Providers';

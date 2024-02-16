@@ -3,8 +3,7 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { cn } from '@bem-react/classname';
-
-import { ProfileObject } from '../../core/storage/ProfilesManager';
+import { ProfileObject } from '@core/storage/ProfilesManager';
 
 import { ProfileCreator, ProfileCreatorProps } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';

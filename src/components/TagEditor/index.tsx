@@ -5,8 +5,7 @@ import { Modal } from 'react-elegant-ui/esm/components/Modal/Modal.bundle/deskto
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cn } from '@bem-react/classname';
-
-import { IResolvedTag } from '../../core/features/tags';
+import { IResolvedTag } from '@core/features/tags';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
 

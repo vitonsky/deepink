@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 import { TabsPanes } from 'react-elegant-ui/esm/components/TabsPanes/TabsPanes.bundle/desktop';
 import { isEqual } from 'lodash';
 import { cn } from '@bem-react/classname';
+import { INote, NoteId } from '@core/features/notes';
 
-import { INote, NoteId } from '../../../core/features/notes';
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
 

@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-
-import { activeNoteChanged, openedNotesControls } from '../../core/state/notes';
+import { activeNoteChanged, openedNotesControls } from '@core/state/notes';
 
 import { useNotesRegistry } from '../Providers';
 
