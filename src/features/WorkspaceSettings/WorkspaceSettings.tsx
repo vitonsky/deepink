@@ -3,11 +3,10 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { Checkbox } from 'react-elegant-ui/esm/components/Checkbox/Checkbox.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cn } from '@bem-react/classname';
-
-import { Features } from '../../components/Features/Features';
-import { FeaturesHeader } from '../../components/Features/Header/FeaturesHeader';
-import { FeaturesOption } from '../../components/Features/Option/FeaturesOption';
-import { Stack } from '../../components/Stack/Stack';
+import { Features } from '@components/Features/Features';
+import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
+import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { Stack } from '@components/Stack/Stack';
 
 import { ModalScreen } from '../ModalScreen/ModalScreen';
 

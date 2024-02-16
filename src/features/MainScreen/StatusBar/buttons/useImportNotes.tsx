@@ -12,8 +12,8 @@ import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
 import { tagsChanged } from '@core/state/tags';
+import { importNotes } from '@electron/requests/files/renderer';
 
-import { importNotes } from '../../../../electron/requests/files/renderer';
 import {
 	useAttachmentsRegistry,
 	useFilesRegistry,

@@ -1,8 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
-
-import { useFocusableRef } from '../../../components/hooks/useFocusableRef';
+import { useFocusableRef } from '@components/hooks/useFocusableRef';
 
 import { cnWorkspaceManager } from '..';
 

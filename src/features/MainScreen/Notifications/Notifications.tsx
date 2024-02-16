@@ -3,9 +3,8 @@ import { useDetectClickOutside } from 'react-detect-click-outside';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { FaBell, FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-
-import { Icon } from '../../../components/Icon/Icon.bundle/common';
-import { Stack } from '../../../components/Stack/Stack';
+import { Icon } from '@components/Icon/Icon.bundle/common';
+import { Stack } from '@components/Stack/Stack';
 
 import { useBottomPanelManager } from '../StatusBar';
 

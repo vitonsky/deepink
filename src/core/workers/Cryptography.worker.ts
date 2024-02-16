@@ -1,5 +1,5 @@
-import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
-import { WorkerRPC } from '../../utils/workers/WorkerRPC';
+import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
+import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
 import { AESGCMCipher } from '../encryption/ciphers/AES';
 import { TwofishCTRCipher } from '../encryption/ciphers/Twofish';

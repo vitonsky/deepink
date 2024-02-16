@@ -1,7 +1,6 @@
 import { createEvent, Event } from 'effector';
-
-import { ContextMenu } from '../../../../electron/requests/contextMenu';
-import { openContextMenu } from '../../../../electron/requests/contextMenu/renderer';
+import { ContextMenu } from '@electron/requests/contextMenu';
+import { openContextMenu } from '@electron/requests/contextMenu/renderer';
 
 type VoidCallback = () => void;
 

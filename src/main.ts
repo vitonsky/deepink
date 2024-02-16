@@ -1,13 +1,12 @@
 import { app, BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
-
-import { enableContextMenu } from './electron/requests/contextMenu/main';
-import { serveFiles } from './electron/requests/files/main';
-import { enableInteractions } from './electron/requests/interactions/main';
-import { enableStorage } from './electron/requests/storage/main';
-import { isDevMode } from './electron/utils/app';
-import { getResourcesPath } from './electron/utils/files';
+import { enableContextMenu } from '@electron/requests/contextMenu/main';
+import { serveFiles } from '@electron/requests/files/main';
+import { enableInteractions } from '@electron/requests/interactions/main';
+import { enableStorage } from '@electron/requests/storage/main';
+import { isDevMode } from '@electron/utils/app';
+import { getResourcesPath } from '@electron/utils/files';
 
 console.log({
 	isDev: isDevMode(),

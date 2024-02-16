@@ -1,6 +1,7 @@
+import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
+import { WorkerRPC } from '@utils/workers/WorkerRPC';
+
 import { Terminable } from '../../../utils/disposable';
-import { WorkerMessenger } from '../../../utils/workers/WorkerMessenger';
-import { WorkerRPC } from '../../../utils/workers/WorkerRPC';
 
 import { convertBufferToTransferable } from '../utils/buffers';
 import { IEncryptionProcessor } from '..';

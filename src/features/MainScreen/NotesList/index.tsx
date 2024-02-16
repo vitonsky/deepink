@@ -1,9 +1,8 @@
 import React, { FC } from 'react';
 import { cn } from '@bem-react/classname';
+import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
-
-import { Stack } from '../../../components/Stack/Stack';
 
 import { getNoteTitle } from '../..';
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';

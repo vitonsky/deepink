@@ -21,9 +21,9 @@ import {
 	SQLiteDatabase,
 } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
+import { getUserDataPath } from '@electron/requests/files/renderer';
+import { ElectronFilesController } from '@electron/requests/storage/renderer';
 
-import { getUserDataPath } from '../electron/requests/files/renderer';
-import { ElectronFilesController } from '../electron/requests/storage/renderer';
 import { DisposableBox } from '../utils/disposable';
 import { readFile, writeFile } from 'fs/promises';
 import { MainScreen } from './MainScreen';

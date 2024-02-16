@@ -2,9 +2,8 @@ import React, { FC, HTMLAttributes, ReactNode } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-
-import { Icon } from '../../components/Icon/Icon.bundle/common';
-import { Modal } from '../../components/Modal/Modal.bundle/Modal.desktop';
+import { Icon } from '@components/Icon/Icon.bundle/common';
+import { Modal } from '@components/Modal/Modal.bundle/Modal.desktop';
 
 import './ModalScreen.css';
 

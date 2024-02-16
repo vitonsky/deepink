@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { cn } from '@bem-react/classname';
+import { Icon } from '@components/Icon/Icon.bundle/common';
 
-import { Icon } from '../../../../components/Icon/Icon.bundle/common';
 import { List, ListItem } from '../../../../components/List';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';

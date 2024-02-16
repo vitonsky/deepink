@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import saveAs from 'file-saver';
 import { editor, languages } from 'monaco-editor-core';
 import { findLinksInText, getAppResourceDataInUrl } from '@core/features/links';
+import { openLink } from '@electron/requests/interactions/renderer';
 
-import { openLink } from '../../../electron/requests/interactions/renderer';
 import { useNotesControl } from '../../MainScreen/useNotesControl';
 import { useFilesRegistry } from '../../Providers';
 

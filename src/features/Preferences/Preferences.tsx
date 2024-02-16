@@ -5,10 +5,9 @@ import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/des
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { FaWrench } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-
-import { Features } from '../../components/Features/Features';
-import { FeaturesHeader } from '../../components/Features/Header/FeaturesHeader';
-import { FeaturesOption } from '../../components/Features/Option/FeaturesOption';
+import { Features } from '@components/Features/Features';
+import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
+import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 
 import { useBottomPanelManager } from '../MainScreen/StatusBar';
 import { ModalScreen } from '../ModalScreen/ModalScreen';
