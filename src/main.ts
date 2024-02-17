@@ -1,7 +1,7 @@
 import { app, Menu } from 'electron';
+import { openMainWindow } from 'src/windows/main/main';
 import { isDevMode } from '@electron/utils/app';
 import { getResourcesPath } from '@electron/utils/files';
-import { openMainWindow } from '@electron/windows/main/main';
 
 console.log({
 	isDev: isDevMode(),

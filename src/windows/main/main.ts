@@ -33,7 +33,7 @@ export const openMainWindow = async () => {
 
 	await win.loadURL(
 		url.format({
-			pathname: path.join(__dirname, 'index.html'),
+			pathname: path.join(__dirname, 'window-main.html'),
 			protocol: 'file:',
 			slashes: true,
 		}),

@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset="UTF-8" />
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta charset="utf-8" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+	<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <!-- <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
@@ -12,11 +13,8 @@
       content="default-src 'self'; script-src 'self'"
     /> -->
     <link rel="stylesheet" href="index.css"/>
-    <link rel="stylesheet" href="app.css"/>
-    <title>Deepink</title>
   </head>
   <body>
     <div id="appRoot"></div>
-    <script src="app.js"></script>
   </body>
 </html>
