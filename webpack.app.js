@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { merge } = require('webpack-merge');
 const { readdirSync } = require('fs');
 
+const { isFastBuild } = require('./scripts/webpack');
 const commonConfig = require('./webpack.common');
 
 const windows = readdirSync('./src/windows', { withFileTypes: true })
@@ -19,7 +20,6 @@ module.exports = merge(commonConfig, {
 				`./src/windows/${name}/renderer.tsx`,
 			]),
 		),
-		cryptographyWorker: './src/core/workers/Cryptography.worker.ts',
 	},
 	plugins: [
 		...windows.map(
@@ -38,6 +38,24 @@ module.exports = merge(commonConfig, {
 	],
 	module: {
 		rules: [
+			{
+				test: /\.worker\.ts$/i,
+				use: [
+					{
+						loader: 'worker-loader',
+						options: {
+							worker: 'Worker',
+						},
+					},
+					{
+						loader: 'ts-loader',
+						options: {
+							allowTsInNodeModules: true,
+							transpileOnly: isFastBuild,
+						},
+					},
+				],
+			},
 			{
 				test: /\.css$/,
 				use: [

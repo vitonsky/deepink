@@ -9,6 +9,9 @@ import { BufferSizeObfuscationProcessor } from '../encryption/processors/BufferS
 import { PipelineProcessor } from '../encryption/processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from '../encryption/utils/keys';
 import { getRandomBytes } from '../encryption/utils/random';
+import { FakeWorkerObject } from '.';
+
+export default FakeWorkerObject;
 
 console.log('Hello world from worker');
 

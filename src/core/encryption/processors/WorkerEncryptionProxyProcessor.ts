@@ -2,6 +2,7 @@ import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
 import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
 import { Terminable } from '../../../utils/disposable';
+import EncryptionWorker from '../../workers/Cryptography.worker';
 
 import { convertBufferToTransferable } from '../utils/buffers';
 import { IEncryptionProcessor } from '..';
@@ -16,7 +17,7 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly messenger;
 	private readonly requests;
 	constructor(secretKey: string | ArrayBuffer, salt: ArrayBuffer) {
-		const worker = new Worker('./cryptographyWorker.js');
+		const worker = new EncryptionWorker();
 		this.messenger = new WorkerMessenger(worker);
 		this.requests = new WorkerRPC(this.messenger);
 		this.worker = this.requests
