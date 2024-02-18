@@ -102,6 +102,7 @@
 					"webpack",
 					"whitespace",
 					"Tsconfig",
+					"readdir",
 					"workspaces"
 				],
 				// Check if word contains numbers

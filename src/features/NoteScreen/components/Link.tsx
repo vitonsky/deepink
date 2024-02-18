@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Components } from 'react-markdown';
-import saveAs from 'file-saver';
+import { saveAs } from 'file-saver';
 import { getAppResourceDataInUrl } from '@core/features/links';
 import { openLink } from '@electron/requests/interactions/renderer';
 

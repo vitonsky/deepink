@@ -1,7 +1,7 @@
 import DB, { Database } from 'better-sqlite3';
 import debounce from 'debounce';
 import { existsSync } from 'fs';
-import lockfileUtils from 'proper-lockfile';
+import { check as checkFileLock, lock as LockFile } from 'proper-lockfile';
 
 import { recoveryAtomicFile, writeFileAtomic } from '../../../../utils/files';
 import { IEncryptionController } from '../../../encryption';
@@ -74,7 +74,7 @@ export const openDatabase = async (
 ): Promise<SQLiteDatabase> => {
 	// Check lock
 	if (existsSync(dbPath)) {
-		const isLocked = await lockfileUtils.check(dbPath);
+		const isLocked = await checkFileLock(dbPath);
 		if (isLocked) {
 			throw new Error('Database file are locked');
 		}
@@ -90,7 +90,7 @@ export const openDatabase = async (
 	}
 
 	// Get lock
-	const unlockDatabaseFile = await lockfileUtils.lock(dbPath);
+	const unlockDatabaseFile = await LockFile(dbPath);
 
 	// Create DB
 	let db: Database;
