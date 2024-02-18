@@ -45,6 +45,8 @@ module.exports = merge(commonConfig, {
 						loader: 'worker-loader',
 						options: {
 							worker: 'Worker',
+							// eslint-disable-next-line spellcheck/spell-checker
+							filename: '[name].[contenthash].js',
 						},
 					},
 					{
