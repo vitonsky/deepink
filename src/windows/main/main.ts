@@ -1,4 +1,5 @@
-import { BrowserWindow, Tray } from 'electron';
+import { createEvent, createStore } from 'effector';
+import { BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
@@ -7,11 +8,25 @@ import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
 
+type WindowState = {
+	hideByClose: boolean;
+	isForcedClosing: boolean;
+};
+
+const quitRequested = createEvent();
+
 export const openMainWindow = async () => {
 	serveFiles();
 	enableStorage();
 	enableContextMenu();
 	enableInteractions();
+
+	const $windowState = createStore<WindowState>({
+		hideByClose: true,
+		isForcedClosing: false,
+	});
+
+	$windowState.on(quitRequested, (state) => ({ ...state, isForcedClosing: true }));
 
 	const win = new BrowserWindow({
 		width: 1300,
@@ -41,17 +56,44 @@ export const openMainWindow = async () => {
 
 	console.log(performance.measure('page loaded', { start }));
 
-	// win.addListener('close', (evt) => {
-	// 	evt.preventDefault();
-	// 	win.minimize();
-	// });
+	// Hide instead of close
+	const $shouldBeClosed = $windowState.map(
+		({ hideByClose, isForcedClosing }) => !hideByClose || isForcedClosing,
+	);
+	win.addListener('close', (evt) => {
+		// Allow to close window
+		if ($shouldBeClosed.getState()) {
+			return;
+		}
+
+		evt.preventDefault();
+		win.hide();
+	});
 
 	const tray = new Tray(path.join(__dirname, 'assets/icons/app.png'));
 	tray.setToolTip('Tooltip text');
 
-	tray.addListener('click', () => {
-		if (!win.isMinimized()) return;
+	const openWindow = () => {
+		if (!win.isVisible()) {
+			win.show();
+		}
 
-		win.minimize();
-	});
+		if (!win.isFocused()) {
+			win.focus();
+		}
+	};
+
+	const quit = () => {
+		quitRequested();
+		win.close();
+	};
+
+	tray.addListener('click', openWindow);
+
+	const menu = Menu.buildFromTemplate([
+		{ label: 'Open Deepink', click: openWindow },
+		{ label: 'Quit', click: quit },
+	]);
+
+	tray.setContextMenu(menu);
 };
