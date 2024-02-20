@@ -1,18 +1,16 @@
 import { Store } from 'effector';
 
 export type CleanupFn = () => void;
-export type CallbackWithCleanup<T extends unknown[]> = (
-	...args: T
-) => void | (() => void);
+export type CallbackWithCleanup<T extends unknown[]> = (...args: T) => CleanupFn | void;
 
 /**
- * Creates updatable function, that call a callback by call itself.
- * Callback may return a cleanup function, that will be called before next call and when wrapper will be disposed.
+ * Wrap callback into object and run it by call a method `call`.
+ * Callback may return a cleanup function, that will be executed before next run a callback or by call a method `call`.
  */
 export const createCleanable = <T extends unknown[]>(
 	callback: CallbackWithCleanup<T>,
 ) => {
-	let cleanupFn: null | (() => void) = null;
+	let cleanupFn: CleanupFn | null = null;
 
 	const cleanup = () => {
 		if (!cleanupFn) return;
@@ -26,7 +24,7 @@ export const createCleanable = <T extends unknown[]>(
 		cleanupFn = callback(...args) ?? null;
 	};
 
-	return Object.assign(call, { cleanup });
+	return { call, cleanup } as const;
 };
 
 /**
@@ -39,7 +37,7 @@ export const createWatcher = <T extends unknown>(
 ) => {
 	const wrappedCallback = createCleanable(callback);
 
-	const subscribe = store.watch(wrappedCallback);
+	const subscribe = store.watch(wrappedCallback.call);
 
 	return () => {
 		subscribe.unsubscribe();
