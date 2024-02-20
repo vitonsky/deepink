@@ -1,5 +1,5 @@
 import { createEvent, createStore } from 'effector';
-import { BrowserWindow, Menu, nativeImage, Tray } from 'electron';
+import { app, BrowserWindow, Menu, nativeImage, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
@@ -71,6 +71,22 @@ export const openMainWindow = async () => {
 		win.hide();
 	});
 
+	// Dock
+	win.addListener('hide', () => {
+		if (win.isMinimized()) return;
+
+		if (isPlatform('darwin')) {
+			app.dock.hide();
+		}
+	});
+
+	win.addListener('show', () => {
+		if (isPlatform('darwin')) {
+			app.dock.show();
+		}
+	});
+
+	// Tray
 	const appIcon = nativeImage.createFromPath(
 		path.join(__dirname, 'assets/icons/app.png'),
 	);
