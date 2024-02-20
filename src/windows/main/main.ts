@@ -1,5 +1,5 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow, Menu, nativeImage, Tray } from 'electron';
+import { app, BrowserWindow, globalShortcut, Menu, nativeImage, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
@@ -44,6 +44,14 @@ export const openMainWindow = async () => {
 	if (isDevMode()) {
 		win.webContents.openDevTools();
 	}
+
+	// Toggle dev tools
+	// eslint-disable-next-line spellcheck/spell-checker
+	globalShortcut.register('CmdOrCtrl+Alt+Shift+I', () => {
+		if (!win.isFocused()) return;
+
+		win.webContents.toggleDevTools();
+	});
 
 	const start = performance.now();
 
