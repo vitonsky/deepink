@@ -111,11 +111,13 @@ export class AppTray {
 }
 
 export const openMainWindow = async () => {
+	// Requests handlers
 	serveFiles();
 	enableStorage();
 	enableContextMenu();
 	enableInteractions();
 
+	// State
 	const $windowState = createStore<WindowState>({
 		hideByClose: true,
 		isForcedClosing: false,
@@ -123,6 +125,7 @@ export const openMainWindow = async () => {
 
 	$windowState.on(quitRequested, (state) => ({ ...state, isForcedClosing: true }));
 
+	// Open window
 	const win = new BrowserWindow({
 		width: 1300,
 		height: 800,
@@ -147,8 +150,8 @@ export const openMainWindow = async () => {
 		win.webContents.toggleDevTools();
 	});
 
+	// Load page
 	const start = performance.now();
-
 	await win.loadURL(
 		url.format({
 			pathname: path.join(__dirname, 'window-main.html'),
@@ -156,7 +159,6 @@ export const openMainWindow = async () => {
 			slashes: true,
 		}),
 	);
-
 	console.log(performance.measure('page loaded', { start }));
 
 	// Hide instead of close
@@ -165,10 +167,7 @@ export const openMainWindow = async () => {
 	);
 
 	createWatcher($shouldBeClosed, (shouldBeClosed) => {
-		const onClose = (evt: {
-			preventDefault: () => void;
-			readonly defaultPrevented: boolean;
-		}) => {
+		const onClose = (evt: { preventDefault: () => void }) => {
 			// Allow to close window
 			if (shouldBeClosed) {
 				return;
