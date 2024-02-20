@@ -1,5 +1,5 @@
-import { createApi, createEvent, createStore, Store } from 'effector';
-import { app, BrowserWindow, globalShortcut, Menu, nativeImage, Tray } from 'electron';
+import { createEvent, createStore } from 'effector';
+import { app, BrowserWindow, globalShortcut, Menu } from 'electron';
 import path from 'path';
 import url from 'url';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
@@ -8,6 +8,9 @@ import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
 import { isPlatform } from '@electron/utils/platform';
+import { createWatcher } from '@utils/effector/watcher';
+
+import { AppTray } from './components/AppTray';
 
 type WindowState = {
 	hideByClose: boolean;
@@ -15,100 +18,6 @@ type WindowState = {
 };
 
 const quitRequested = createEvent();
-
-type CleanupFn = () => void;
-type CallbackWithCleanup<T extends unknown[]> = (...args: T) => void | (() => void);
-
-const createCleanable = <T extends unknown[]>(callback: CallbackWithCleanup<T>) => {
-	let cleanupFn: null | (() => void) = null;
-
-	const cleanup = () => {
-		if (!cleanupFn) return;
-
-		cleanupFn();
-		cleanupFn = null;
-	};
-
-	const call = (...args: T) => {
-		cleanup();
-		cleanupFn = callback(...args) ?? null;
-	};
-
-	return Object.assign(call, { cleanup });
-};
-
-const createWatcher = <T extends unknown>(
-	store: Store<T>,
-	callback: CallbackWithCleanup<[T]>,
-) => {
-	const wrappedCallback = createCleanable(callback);
-
-	const subscribe = store.watch(wrappedCallback);
-
-	return () => {
-		subscribe.unsubscribe();
-		wrappedCallback.cleanup();
-	};
-};
-
-type AppTrayProps = { openWindow: () => void };
-export class AppTray {
-	private readonly api;
-	private readonly $trayMenu;
-	constructor(api: AppTrayProps) {
-		this.api = api;
-
-		this.$trayMenu = createStore<Electron.Menu | null>(null);
-
-		const trayMenu = createApi(this.$trayMenu, {
-			update(_state, menu: Electron.Menu | null) {
-				return menu;
-			},
-		});
-
-		this.update = trayMenu.update;
-	}
-
-	public readonly update;
-
-	private trayCleanup: CleanupFn | null = null;
-	public enable() {
-		if (this.trayCleanup) throw new Error('Tray already enabled');
-
-		// Tray
-		const appIcon = nativeImage.createFromPath(
-			path.join(__dirname, 'assets/icons/app.png'),
-		);
-		const trayIcon = appIcon.resize({ width: 24 });
-		trayIcon.setTemplateImage(true);
-
-		const tray = new Tray(trayIcon);
-		tray.setToolTip('Deepink');
-
-		tray.addListener('click', () => {
-			// Prevent immediately open window for mac by click on tray menu
-			if (isPlatform('darwin')) return;
-
-			this.api.openWindow();
-		});
-
-		const menuCleanup = createWatcher(this.$trayMenu, (menu) => {
-			tray.setContextMenu(menu);
-		});
-
-		this.trayCleanup = () => {
-			menuCleanup();
-			tray.destroy();
-			this.$trayMenu.reset();
-		};
-	}
-
-	public disable() {
-		if (!this.trayCleanup) throw new Error('Tray is not enabled');
-
-		this.trayCleanup();
-	}
-}
 
 export const openMainWindow = async () => {
 	// Requests handlers
