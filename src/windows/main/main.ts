@@ -71,7 +71,7 @@ export const openMainWindow = async () => {
 	});
 
 	const tray = new Tray(path.join(__dirname, 'assets/icons/app.png'));
-	tray.setToolTip('Tooltip text');
+	tray.setToolTip('Deepink');
 
 	const openWindow = () => {
 		if (!win.isVisible()) {
