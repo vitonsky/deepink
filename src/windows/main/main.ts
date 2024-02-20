@@ -1,5 +1,5 @@
 import { createEvent, createStore } from 'effector';
-import { BrowserWindow, Menu, Tray } from 'electron';
+import { BrowserWindow, Menu, nativeImage, Tray } from 'electron';
 import path from 'path';
 import url from 'url';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
@@ -70,7 +70,13 @@ export const openMainWindow = async () => {
 		win.hide();
 	});
 
-	const tray = new Tray(path.join(__dirname, 'assets/icons/app.png'));
+	const appIcon = nativeImage.createFromPath(
+		path.join(__dirname, 'assets/icons/app.png'),
+	);
+	const trayIcon = appIcon.resize({ width: 24 });
+	trayIcon.setTemplateImage(true);
+
+	const tray = new Tray(trayIcon);
 	tray.setToolTip('Deepink');
 
 	const openWindow = () => {
