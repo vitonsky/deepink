@@ -7,6 +7,7 @@ import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
+import { isPlatform } from '@electron/utils/platform';
 
 type WindowState = {
 	hideByClose: boolean;
@@ -94,7 +95,12 @@ export const openMainWindow = async () => {
 		win.close();
 	};
 
-	tray.addListener('click', openWindow);
+	tray.addListener('click', () => {
+		// Prevent immediately open window for mac by click on tray menu
+		if (isPlatform('darwin')) return;
+
+		openWindow();
+	});
 
 	const menu = Menu.buildFromTemplate([
 		{ label: 'Open Deepink', click: openWindow },
