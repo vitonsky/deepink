@@ -1,3 +1,6 @@
+const { pathsToModuleNameMapper } = require('ts-jest');
+const { compilerOptions } = require('./tsconfig');
+
 const jestGlobals = {};
 
 const testPathIgnorePatterns = [];
@@ -28,4 +31,11 @@ module.exports = {
 	transform: {
 		'\\.sql$': '<rootDir>/scripts/jest/fileTransformer.js',
 	},
+
+	// Use paths in tsconfig: https://kulshekhar.github.io/ts-jest/docs/getting-started/paths-mapping/
+	roots: ['<rootDir>'],
+	modulePaths: [compilerOptions.baseUrl], // <-- This will be set to 'baseUrl' value
+	moduleNameMapper: pathsToModuleNameMapper(
+		compilerOptions.paths /*, { prefix: '<rootDir>/' } */,
+	),
 };
