@@ -1,9 +1,6 @@
-import { existsSync, mkdirSync } from 'fs';
-import path from 'path';
+import { TextEncoder } from 'node:util';
 
-import { getUserDataPath } from '../../electron/requests/files/renderer';
-
-import { readFile, writeFile } from 'fs/promises';
+import { IFilesStorage } from '../features/files';
 
 export type ProfileObject = {
 	id: string;
@@ -14,24 +11,21 @@ export type ProfileObject = {
 	};
 };
 
-// TODO: abstract of node environment
 // TODO: implement delete method
 // TODO: implement update method
 export class ProfilesManager {
+	private filesController: IFilesStorage;
+	constructor(filesController: IFilesStorage) {
+		this.filesController = filesController;
+	}
+
 	public async getProfiles(): Promise<ProfileObject[]> {
-		const userDataDir = await getUserDataPath();
+		const buffer = await this.filesController.get('profiles.json');
+		if (!buffer) return [];
 
-		// Ensure profile dir exists
-		mkdirSync(userDataDir, { recursive: true });
-
-		const profilesListPath = path.join(userDataDir, 'profiles.json');
-
-		if (!existsSync(profilesListPath)) return [];
-
-		const profilesFile = await readFile(profilesListPath);
 		try {
-			const profilesRaw = profilesFile.toString('utf8');
-			return JSON.parse(profilesRaw);
+			const profilesJson = new TextDecoder().decode(buffer);
+			return JSON.parse(profilesJson);
 		} catch (err) {
 			console.error(err);
 			return [];
@@ -50,10 +44,9 @@ export class ProfilesManager {
 
 		profiles.push(newProfile);
 
-		const stringifiedData = JSON.stringify(profiles);
-
-		const profilesListPath = await getUserDataPath('profiles.json');
-		await writeFile(profilesListPath, stringifiedData);
+		const serializedProfiles = JSON.stringify(profiles);
+		const buffer = new TextEncoder().encode(serializedProfiles);
+		await this.filesController.write('profiles.json', buffer);
 
 		return newProfile;
 	}

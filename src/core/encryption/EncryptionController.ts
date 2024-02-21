@@ -1,5 +1,5 @@
 import { extendedBase64 } from './utils/encoding';
-import { ICipher, IEncryptionController } from '.';
+import { IEncryptionController, IEncryptionProcessor } from '.';
 
 /**
  * Module to encrypt/decrypt data with provided cipher
@@ -15,7 +15,7 @@ export class EncryptionController implements IEncryptionController {
 	 */
 	private readonly base64EncryptedChunkSize = 31457280;
 	private readonly cipher;
-	constructor(cipher: ICipher) {
+	constructor(cipher: IEncryptionProcessor) {
 		this.cipher = cipher;
 	}
 

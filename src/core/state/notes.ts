@@ -1,6 +1,6 @@
 import { createApi, createEvent, createStore } from 'effector';
 
-import { INote, NoteId } from '../Note';
+import { INote, NoteId } from '../features/notes';
 
 export const $activeNoteId = createStore<NoteId | null>(null);
 export const activeNoteChanged = createEvent<NoteId | null>();

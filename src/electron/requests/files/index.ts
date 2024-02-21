@@ -1,6 +1,8 @@
-export const CHANNELS = {
-	importNotes: 'files.importNotes',
-	getUserDataPath: 'files.getUserDataPath',
-	getResourcesPath: 'files.getResourcesPath',
-	selectDirectory: 'files.selectDirectory',
-};
+import { createChannel } from '../../utils/ipc';
+
+export const filesChannel = createChannel<{
+	importNotes(): Promise<Record<string, ArrayBuffer>>;
+	selectDirectory(): Promise<null | string[]>;
+	getUserDataPath(path?: string): Promise<string>;
+	getResourcesPath(path: string): Promise<string>;
+}>({ name: 'files' });

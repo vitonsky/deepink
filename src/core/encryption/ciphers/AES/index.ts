@@ -1,24 +1,25 @@
-import { IntegrityError } from '../../EncryptionIntegrityCheck';
+import { IntegrityError } from '../../processors/BufferIntegrityProcessor';
 import { joinBuffers } from '../../utils/buffers';
-import { getRandomBytes } from '../../utils/random';
 
-import { ICipher } from '../..';
+import { IEncryptionProcessor, RandomBytesGenerator } from '../..';
 
 /**
  * AES-GCM cipher
  * MDN: https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams
  * Algorithm recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
  */
-export class AESGCMCipher implements ICipher {
+export class AESGCMCipher implements IEncryptionProcessor {
 	private readonly ivSize = 96;
 
 	private readonly key;
-	constructor(key: CryptoKey) {
+	private readonly randomBytesGenerator: RandomBytesGenerator;
+	constructor(key: CryptoKey, randomBytesGenerator: RandomBytesGenerator) {
 		this.key = key;
+		this.randomBytesGenerator = randomBytesGenerator;
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
-		const iv = getRandomBytes(this.ivSize);
+		const iv = this.randomBytesGenerator(this.ivSize);
 		const encryptedBuffer = await self.crypto.subtle.encrypt(
 			{
 				name: 'AES-GCM',

@@ -1,11 +1,12 @@
-import { ipcMain, shell } from 'electron';
+import { shell } from 'electron';
 
-import { CHANNELS } from '.';
+import { ipcMainHandler } from '../../utils/ipc/ipcMainHandler';
 
-function uploadFile() {
-	ipcMain.handle(CHANNELS.openLink, async (_evt, { url }) => {
-		shell.openExternal(url);
+import { interactionsChannel } from '.';
+
+export const enableInteractions = () =>
+	interactionsChannel.server(ipcMainHandler, {
+		async openLink({ req: [url] }) {
+			await shell.openExternal(url);
+		},
 	});
-}
-
-export const handleInteractionsRequests = [uploadFile] as const;

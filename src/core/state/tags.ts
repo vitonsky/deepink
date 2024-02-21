@@ -1,16 +1,16 @@
 import { createEvent, createStore } from 'effector';
 
-import { ITag } from '../Registry/Tags/Tags';
+import { IResolvedTag } from '../features/tags';
 
 /**
  * Array of all exists tags
  */
-export const $tags = createStore<ITag[]>([]);
+export const $tags = createStore<IResolvedTag[]>([]);
 
 /**
  * Event to set tags list
  */
-export const tagsUpdated = createEvent<ITag[]>();
+export const tagsUpdated = createEvent<IResolvedTag[]>();
 $tags.on(tagsUpdated, (_, payload) => payload);
 
 /**

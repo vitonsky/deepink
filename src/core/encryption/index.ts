@@ -3,7 +3,7 @@ export interface IEncryptionController {
 	decrypt: <T extends string | ArrayBuffer>(encryptedData: T) => Promise<T>;
 }
 
-export interface ICipher {
+export interface IEncryptionProcessor {
 	encrypt: (rawData: ArrayBuffer) => Promise<ArrayBuffer>;
 	decrypt: (encryptedData: ArrayBuffer) => Promise<ArrayBuffer>;
 }
@@ -16,3 +16,8 @@ export interface HeaderView<T> {
 	createBuffer(data: T): ArrayBuffer;
 	readBuffer(buffer: ArrayBuffer): T;
 }
+
+/**
+ * Creates buffer with random values
+ */
+export type RandomBytesGenerator = (bufferSize: number) => ArrayBuffer;

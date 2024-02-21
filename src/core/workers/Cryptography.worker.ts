@@ -1,13 +1,17 @@
-import { WorkerMessenger } from '../../utils/workers/WorkerMessenger';
-import { WorkerRPC } from '../../utils/workers/WorkerRPC';
+import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
+import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
-import { BufferSizeObfuscator } from '../encryption/BufferSizeObfuscator';
 import { AESGCMCipher } from '../encryption/ciphers/AES';
-import { CascadeCipher } from '../encryption/ciphers/CascadeCipher';
 import { TwofishCTRCipher } from '../encryption/ciphers/Twofish';
 import { EncryptionController } from '../encryption/EncryptionController';
-import { EncryptionIntegrityCheck } from '../encryption/EncryptionIntegrityCheck';
+import { BufferIntegrityProcessor } from '../encryption/processors/BufferIntegrityProcessor';
+import { BufferSizeObfuscationProcessor } from '../encryption/processors/BufferSizeObfuscationProcessor';
+import { PipelineProcessor } from '../encryption/processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from '../encryption/utils/keys';
+import { getRandomBytes } from '../encryption/utils/random';
+import { FakeWorkerObject } from '.';
+
+export default FakeWorkerObject;
 
 console.log('Hello world from worker');
 
@@ -35,14 +39,12 @@ requests.addHandler('init', async ({ secretKey, salt }) => {
 		.then((buffer) => new Uint8Array(buffer));
 
 	encryptionController = new EncryptionController(
-		new EncryptionIntegrityCheck(
-			new BufferSizeObfuscator(
-				new CascadeCipher([
-					new AESGCMCipher(aesKey),
-					new TwofishCTRCipher(twofishKey),
-				]),
-			),
-		),
+		new PipelineProcessor([
+			new BufferIntegrityProcessor(),
+			new BufferSizeObfuscationProcessor(getRandomBytes),
+			new AESGCMCipher(aesKey, getRandomBytes),
+			new TwofishCTRCipher(twofishKey, getRandomBytes),
+		]),
 	);
 });
 

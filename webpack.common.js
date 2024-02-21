@@ -1,10 +1,9 @@
 const path = require('path');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-const isProduction = mode === 'production';
+const { mode, isProduction, isFastBuild } = require('./scripts/webpack');
 
 const devtool = isProduction ? undefined : 'inline-source-map';
-const isFastBuild = !isProduction && process.env.FAST_BUILD === 'on';
 
 const outputPath = path.join(__dirname, 'dist');
 
@@ -33,6 +32,7 @@ module.exports = {
 	},
 	resolve: {
 		extensions: ['.js', '.ts', '.tsx'],
+		plugins: [new TsconfigPathsPlugin({})],
 	},
 	output: {
 		path: outputPath,
@@ -41,7 +41,7 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.tsx?$/,
+				test: /(?<!\.worker)\.tsx?$/,
 				use: {
 					loader: 'ts-loader',
 					options: {

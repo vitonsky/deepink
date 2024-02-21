@@ -1,13 +1,13 @@
-import { ipcRenderer } from 'electron';
+import { IEncryptionController } from '@core/encryption';
+import { IFilesStorage } from '@core/features/files';
 
-import { IEncryptionController } from '../../../core/encryption';
-import { FilesStorageController } from '../../../core/Registry/FilesRegistry';
+import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
-import { CHANNELS } from '.';
+import { storageChannel } from '.';
 
-// TODO: ensure both renderer and main handlers match types
+export const storageApi = storageChannel.client(ipcRendererFetcher);
 
-export class ElectronFilesController implements FilesStorageController {
+export class ElectronFilesController implements IFilesStorage {
 	private readonly subdirectory;
 	private readonly encryption;
 	constructor(subdirectory: string, encryption?: IEncryptionController) {
@@ -16,33 +16,27 @@ export class ElectronFilesController implements FilesStorageController {
 	}
 
 	public async write(id: string, buffer: ArrayBuffer) {
-		return ipcRenderer.invoke(CHANNELS.uploadFile, {
-			id,
-			buffer: this.encryption ? await this.encryption.encrypt(buffer) : buffer,
-			subdir: this.subdirectory,
-		});
+		const encryptedBuffer = this.encryption
+			? await this.encryption.encrypt(buffer)
+			: buffer;
+		return storageApi.upload(id, encryptedBuffer, this.subdirectory);
 	}
 
 	public async get(id: string) {
-		return ipcRenderer
-			.invoke(CHANNELS.getFile, { id, subdir: this.subdirectory })
-			.then((buffer) => {
-				// Don't handle empty data
-				if (!buffer) return buffer;
+		return storageApi.get(id, this.subdirectory).then((buffer) => {
+			// Don't handle empty data
+			if (!buffer) return buffer;
 
-				if (!this.encryption) return buffer;
-				return this.encryption.decrypt(buffer);
-			});
-	}
-
-	public async delete(ids: string[]) {
-		return ipcRenderer.invoke(CHANNELS.deleteFiles, {
-			ids,
-			subdir: this.subdirectory,
+			if (!this.encryption) return buffer;
+			return this.encryption.decrypt(buffer);
 		});
 	}
 
+	public async delete(ids: string[]) {
+		return storageApi.delete(ids, this.subdirectory);
+	}
+
 	public async list() {
-		return ipcRenderer.invoke(CHANNELS.listFiles, { subdir: this.subdirectory });
+		return storageApi.list(this.subdirectory);
 	}
 }

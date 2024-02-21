@@ -1,0 +1,105 @@
+/** @jest-environment jsdom */
+import { tmpdir } from 'os';
+import { tmpNameSync } from 'tmp';
+
+import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+
+import { AttachmentsController } from '../attachments/AttachmentsController';
+import { FilesController } from './FilesController';
+import { IFilesStorage } from '.';
+
+const File = require('blob-polyfill').File;
+
+globalThis.File = File;
+
+const createFileManagerMock = (): IFilesStorage => {
+	const storage: Record<string, ArrayBuffer> = {};
+	return {
+		async write(uuid, buffer) {
+			storage[uuid] = buffer;
+		},
+		async get(uuid) {
+			return storage[uuid];
+		},
+		async delete(uuids) {
+			uuids.forEach((uuid) => {
+				delete storage[uuid];
+			});
+		},
+		async list() {
+			return Object.keys(storage);
+		},
+	};
+};
+
+const createTextFile = (text: string): File =>
+	new File([Buffer.from(text).buffer], 'test.txt', { type: 'text/txt' });
+
+const testFiles = Array(5)
+	.fill(null)
+	.map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
+
+test('clear orphaned files', async () => {
+	const dbPath = tmpNameSync({ dir: tmpdir() });
+	const db = await openDatabase(dbPath);
+	const fileManager = createFileManagerMock();
+	const attachments = new AttachmentsController(db);
+	const files = new FilesController(db, fileManager, attachments);
+
+	// Upload file and attach
+	const fileToAttach = createTextFile('Attached file');
+	const attachedFileId = await files.add(fileToAttach);
+	await attachments.set('some-note-id', [attachedFileId]);
+
+	// Upload files with no attach
+	const filesId = await Promise.all(testFiles.map((file) => files.add(file)));
+
+	// Test files content are expected
+	await Promise.all(
+		filesId.map(async (fileId, index) => {
+			const file = await files.get(fileId);
+			expect(file).not.toBeNull();
+
+			const fileBuffer = await (file as File).arrayBuffer();
+			const originalFileBuffer = await testFiles[index].arrayBuffer();
+
+			const fileString = Buffer.from(fileBuffer).toString('utf-8');
+			const originalString = Buffer.from(originalFileBuffer).toString('utf-8');
+			expect(fileString).toBe(originalString);
+		}),
+	);
+
+	// Check files before cleanup
+	await files.get(attachedFileId).then((file) => {
+		expect(file).not.toBeNull();
+	});
+	await files.get(filesId[0]).then((file) => {
+		expect(file).not.toBeNull();
+	});
+
+	// Clear files and check again
+	await files.clearOrphaned();
+	await files.get(attachedFileId).then((file) => {
+		expect(file).not.toBeNull();
+	});
+	await files.get(filesId[0]).then((file) => {
+		expect(file).toBeNull();
+	});
+
+	// File is not orphaned when any resource use it
+	await attachments.set('some-note-id', []);
+	await attachments.set('some-note-id2', [attachedFileId]);
+	await files.clearOrphaned();
+	await files.get(attachedFileId).then((file) => {
+		expect(file).not.toBeNull();
+	});
+
+	// File orphaned when nothing to refer on file
+	await attachments.set('some-note-id2', []);
+	await files.clearOrphaned();
+	await files.get(attachedFileId).then((file) => {
+		expect(file).toBeNull();
+	});
+
+	await db.close();
+});
