@@ -49,26 +49,21 @@ function findAlias(baseDir, importPath, filePath, ignoredPaths = []) {
 
 			// Split import path
 			// Remove basedir and slash in start
-			const importPathSegments = importPath.slice(baseDir.length + 1).split('/');
-			const matchedPathSegments = matchedPath.split('/');
-
-			let slicedImportPath = null;
-			for (let i = 1; i < importPathSegments.length; i++) {
-				// Find segment that does not match
-				const isMatch =
-					importPathSegments.slice(0, i).join('/') ===
-					matchedPathSegments.slice(0, i).join('/');
-				if (!isMatch) {
-					// One step back
-					slicedImportPath = importPathSegments.slice(i - 1).join('/');
-					break;
-				}
-			}
-
-			if (!slicedImportPath) continue;
+			const slicedImportPath = importPath
+				.slice(baseDir.length + 1)
+				.slice(path.dirname(matchedPath).length + 1);
 
 			// Remove asterisk from end of alias
-			return path.join(alias.split('/').slice(0, -1).join('/'), slicedImportPath);
+			const replacedPathSegments = path
+				.join(path.dirname(alias), slicedImportPath)
+				.split('/');
+
+			// Add index in path
+			return (
+				replacedPathSegments.length === 1
+					? [...replacedPathSegments, 'index']
+					: replacedPathSegments
+			).join('/');
 		}
 	}
 
