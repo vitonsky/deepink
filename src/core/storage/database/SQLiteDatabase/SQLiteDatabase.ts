@@ -1,9 +1,9 @@
 import DB, { Database } from 'better-sqlite3';
 import debounce from 'debounce';
 import { existsSync } from 'fs';
-import { check as checkFileLock, lock as LockFile } from 'proper-lockfile';
+import { check as checkFileLock, lock as lockFile } from 'proper-lockfile';
+import { recoveryAtomicFile, writeFileAtomic } from '@utils/files';
 
-import { recoveryAtomicFile, writeFileAtomic } from '../../../../utils/files';
 import { IEncryptionController } from '../../../encryption';
 
 import { readFile, writeFile } from 'fs/promises';
@@ -90,7 +90,7 @@ export const openDatabase = async (
 	}
 
 	// Get lock
-	const unlockDatabaseFile = await LockFile(dbPath);
+	const unlockDatabaseFile = await lockFile(dbPath);
 
 	// Create DB
 	let db: Database;

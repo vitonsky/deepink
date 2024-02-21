@@ -6,8 +6,8 @@ import { INotesController } from '@core/features/notes/controller';
 import { tagAttachmentsChanged } from '@core/state/tags';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
+import { copyTextToClipboard } from '@utils/clipboard';
 
-import { copyTextToClipboard } from '../../../../utils/clipboard';
 import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
 
 import { mkdir, writeFile } from 'fs/promises';

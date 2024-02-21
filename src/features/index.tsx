@@ -23,8 +23,8 @@ import {
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { getUserDataPath } from '@electron/requests/files/renderer';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { DisposableBox } from '@utils/disposable';
 
-import { DisposableBox } from '../utils/disposable';
 import { readFile, writeFile } from 'fs/promises';
 import { MainScreen } from './MainScreen';
 import { Providers } from './Providers';

@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import { Spinner } from '@components/Spinner';
 import { selectDirectory } from '@electron/requests/files/renderer';
 
-import { Spinner } from '../../../../components/Spinner';
 import { useFilesRegistry, useNotesRegistry, useTagsRegistry } from '../../../Providers';
 import { NotesExporter } from '../../NotesList/NoteContextMenu/NotesExporter';
 

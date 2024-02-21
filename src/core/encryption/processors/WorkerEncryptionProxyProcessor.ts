@@ -1,7 +1,7 @@
+import { Terminable } from '@utils/disposable';
 import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
 import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
-import { Terminable } from '../../../utils/disposable';
 import EncryptionWorker from '../../workers/Cryptography.worker';
 
 import { convertBufferToTransferable } from '../utils/buffers';

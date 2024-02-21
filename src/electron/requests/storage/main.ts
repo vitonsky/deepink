@@ -1,7 +1,7 @@
 import { existsSync } from 'fs';
 import path from 'path';
+import { writeFileAtomic } from '@utils/files';
 
-import { writeFileAtomic } from '../../../utils/files';
 import { getUserDataPath, joinPath } from '../../utils/files';
 import { ipcMainHandler } from '../../utils/ipc/ipcMainHandler';
 
