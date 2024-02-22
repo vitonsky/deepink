@@ -25,11 +25,11 @@ import { getUserDataPath } from '@electron/requests/files/renderer';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { DisposableBox } from '@utils/disposable';
 
+import { MainScreen } from '../MainScreen';
+import { Providers } from '../Providers';
+import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
+import { NewProfile } from '../WorkspaceManager/ProfileCreator';
 import { readFile, writeFile } from 'fs/promises';
-import { MainScreen } from './MainScreen';
-import { Providers } from './Providers';
-import { OnPickProfile, WorkspaceManager } from './WorkspaceManager';
-import { NewProfile } from './WorkspaceManager/ProfileCreator';
 
 import './App.css';
 

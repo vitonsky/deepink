@@ -4,7 +4,8 @@ import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 
-import { getNoteTitle } from '../..';
+import { getNoteTitle } from '../../App';
+
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
 import './NotesList.css';
