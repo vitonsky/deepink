@@ -27,8 +27,8 @@ import {
 	activeNoteChanged,
 	openedNotesControls,
 } from '@core/state/notes';
-import { changedActiveProfile } from '@core/state/profiles';
 import { $activeTag, $tags, tagAttachmentsChanged } from '@core/state/tags';
+import { useProfilesContext } from '@features/App/utils/openedProfiles';
 
 import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
@@ -168,13 +168,16 @@ export const MainScreen: FC = () => {
 
 	const buttonsManager = useButtonsManager();
 
+	const {
+		events: { activeProfileCloseRequested },
+	} = useProfilesContext();
 	useFirstRender(() => {
 		buttonsManager.manager.register(
 			'dbChange',
 			{
 				visible: true,
 				title: 'Change database',
-				onClick: () => changedActiveProfile(null),
+				onClick: () => activeProfileCloseRequested(),
 				icon: <FaUserLarge />,
 			},
 			{

@@ -1,5 +1,4 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { useStore } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
@@ -8,7 +7,7 @@ import { FilesController } from '@core/features/files/FilesController';
 import { INoteContent } from '@core/features/notes';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { $activeProfile, changedActiveProfile, Profile } from '@core/state/profiles';
+import { Profile } from '@core/state/profiles';
 import { tagsChanged, tagsUpdated } from '@core/state/tags';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
@@ -17,7 +16,7 @@ import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
 import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
-import { useProfiles } from './utils/openedProfiles';
+import { profilesContext, useProfiles } from './utils/openedProfiles';
 import { useProfilesManager } from './utils/profilesManager';
 
 import './App.css';
@@ -52,21 +51,21 @@ export const decryptKey = async (
 
 // TODO: remove secrets of closure
 export const App: FC = () => {
-	const { profiles, createProfile } = useProfilesManager();
+	const profilesManager = useProfilesManager();
+	const profiles = useProfiles();
 
-	const openedProfiles = useProfiles();
-
-	// TODO: map store in hook
-	const profileContext = openedProfiles.profiles.at(-1) ?? null;
+	const activeProfile = profiles.activeProfile;
 
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (id: string, password?: string) => {
-			const profile = profiles && profiles.find((profile) => profile.id === id);
+			const profile =
+				profilesManager.profiles &&
+				profilesManager.profiles.find((profile) => profile.id === id);
 			if (!profile) return { status: 'error', message: 'Profile not exists' };
 
 			// Profiles with no password
 			if (!profile.encryption) {
-				await openedProfiles.openProfile({ profile });
+				await profiles.openProfile({ profile });
 				return { status: 'ok' };
 			}
 
@@ -75,7 +74,7 @@ export const App: FC = () => {
 				return { status: 'error', message: 'Enter password' };
 
 			try {
-				await openedProfiles.openProfile({ profile, password });
+				await profiles.openProfile({ profile, password });
 				return { status: 'ok' };
 			} catch (err) {
 				console.error(err);
@@ -83,43 +82,25 @@ export const App: FC = () => {
 				return { status: 'error', message: 'Invalid password' };
 			}
 		},
-		[profiles, openedProfiles],
+		[profilesManager.profiles, profiles],
 	);
 
+	// Run optional services for active profile
 	useEffect(() => {
-		if (profileContext === null || profileContext.isDisposed()) return;
+		if (activeProfile === null || activeProfile.isDisposed()) return;
 
-		const { filesRegistry, profile } = profileContext.getContent();
-
-		changedActiveProfile(profile);
+		const { filesRegistry } = activeProfile.getContent();
 
 		// TODO: schedule when to run method
 		filesRegistry.clearOrphaned();
-	}, [profileContext]);
+	}, [activeProfile]);
 
-	// TODO: refactor
-	const activeProfile = useStore($activeProfile);
-
-	// terminate all processes for previous active profile: db, encryption, files, etc
-	const activeProfileRef = useRef(profileContext);
-	activeProfileRef.current = profileContext;
-
-	const {
-		events: { profileClosed },
-	} = openedProfiles;
+	// TODO: replace to hook
+	// Load tags
 	useEffect(() => {
-		if (activeProfile !== null) return;
+		if (!activeProfile || activeProfile.isDisposed()) return;
 
-		const profileContext = activeProfileRef.current;
-		if (profileContext) {
-			profileClosed(profileContext);
-		}
-	}, [activeProfile, profileClosed]);
-
-	useEffect(() => {
-		if (!profileContext || profileContext.isDisposed()) return;
-
-		const { tagsRegistry } = profileContext.getContent();
+		const { tagsRegistry } = activeProfile.getContent();
 		const updateTags = () => tagsRegistry.getTags().then(tagsUpdated);
 
 		const cleanup = tagsChanged.watch(updateTags);
@@ -131,7 +112,7 @@ export const App: FC = () => {
 	const [currentProfile, setCurrentProfile] = useState<null | string>(null);
 	const isActiveProfileRestoredRef = useRef(false);
 	useEffect(() => {
-		if (profiles === null) return;
+		if (profilesManager.profiles === null) return;
 		if (isActiveProfileRestoredRef.current) return;
 
 		config.get('activeProfile').then((activeProfile) => {
@@ -140,9 +121,11 @@ export const App: FC = () => {
 			if (activeProfile) {
 				setCurrentProfile(activeProfile);
 
-				if (!profiles) return;
+				if (!profilesManager.profiles) return;
 
-				const profile = profiles.find((profile) => profile.id === activeProfile);
+				const profile = profilesManager.profiles.find(
+					(profile) => profile.id === activeProfile,
+				);
 				if (!profile) return;
 
 				if (profile.encryption === null) {
@@ -150,7 +133,7 @@ export const App: FC = () => {
 				}
 			}
 		});
-	}, [onOpenProfile, profiles]);
+	}, [onOpenProfile, profilesManager.profiles]);
 
 	const onChooseProfile = useCallback((profileId: string | null) => {
 		if (profileId !== null) {
@@ -160,27 +143,31 @@ export const App: FC = () => {
 		setCurrentProfile(profileId);
 	}, []);
 
-	const appContext = profileContext ? profileContext.getContent() : null;
+	const appContext = activeProfile ? activeProfile.getContent() : null;
 
 	// TODO: show `SplashScreen` component while loading
 	// TODO: show only if workspace requires password
 	if (appContext === null) {
 		return (
 			<WorkspaceManager
-				profiles={profiles ?? []}
+				profiles={profilesManager.profiles ?? []}
 				currentProfile={currentProfile}
 				onChooseProfile={onChooseProfile}
 				onOpenProfile={onOpenProfile}
-				onCreateProfile={createProfile}
+				onCreateProfile={profilesManager.createProfile}
 			/>
 		);
 	}
 
 	return (
 		<div className={cnApp()}>
-			<Providers {...appContext}>
-				<MainScreen />
-			</Providers>
+			<profilesContext.Provider value={profiles}>
+				<Providers {...appContext}>
+					<MainScreen
+						key={activeProfile?.getContent().profile.id ?? 'unknown'}
+					/>
+				</Providers>
+			</profilesContext.Provider>
 		</div>
 	);
 };
