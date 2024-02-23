@@ -1,6 +1,4 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { existsSync, mkdirSync } from 'fs';
-import path from 'path';
 import { cn } from '@bem-react/classname';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
@@ -13,7 +11,6 @@ import { changedActiveProfile, Profile } from '@core/state/profiles';
 import { tagsChanged, tagsUpdated } from '@core/state/tags';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
-import { getUserDataPath } from '@electron/requests/files/renderer';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 
 import { MainScreen } from '../MainScreen';
@@ -61,39 +58,23 @@ export const App: FC = () => {
 	// TODO: map store in hook
 	const profileContext = openedProfiles.profiles.at(-1) ?? null;
 
-	console.log({ profileContext, profiles: openedProfiles.profiles });
-
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (id: string, password?: string) => {
-			if (!profiles) return { status: 'error', message: 'Profile does not exists' };
-
-			const profile = profiles.find((profile) => profile.id === id);
+			const profile = profiles && profiles.find((profile) => profile.id === id);
 			if (!profile) return { status: 'error', message: 'Profile not exists' };
-
-			const profileDir = await getUserDataPath(profile.id);
-
-			// Ensure profile dir exists
-			mkdirSync(profileDir, { recursive: true });
 
 			// Profiles with no password
 			if (!profile.encryption) {
 				await openedProfiles.openProfile({ profile });
-
 				return { status: 'ok' };
 			}
 
-			// Decrypt key
+			// Profiles with password
 			if (password === undefined)
 				return { status: 'error', message: 'Enter password' };
 
-			const keyFilePath = path.join(profileDir, 'key');
-			if (!existsSync(keyFilePath)) {
-				return { status: 'error', message: 'Key file not found' };
-			}
-
 			try {
 				await openedProfiles.openProfile({ profile, password });
-
 				return { status: 'ok' };
 			} catch (err) {
 				console.error(err);
