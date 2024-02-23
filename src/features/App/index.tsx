@@ -17,8 +17,8 @@ import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
 import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
-import { useOpenedProfiles } from './utils/openedProfiles';
-import { useProfiles } from './utils/profiles';
+import { useProfiles } from './utils/openedProfiles';
+import { useProfilesManager } from './utils/profilesManager';
 
 import './App.css';
 
@@ -52,9 +52,9 @@ export const decryptKey = async (
 
 // TODO: remove secrets of closure
 export const App: FC = () => {
-	const { profiles, createProfile } = useProfiles();
+	const { profiles, createProfile } = useProfilesManager();
 
-	const openedProfiles = useOpenedProfiles();
+	const openedProfiles = useProfiles();
 
 	// TODO: map store in hook
 	const profileContext = openedProfiles.profiles.at(-1) ?? null;
@@ -104,15 +104,17 @@ export const App: FC = () => {
 	const activeProfileRef = useRef(profileContext);
 	activeProfileRef.current = profileContext;
 
-	const { closeProfile } = openedProfiles;
+	const {
+		events: { profileClosed },
+	} = openedProfiles;
 	useEffect(() => {
 		if (activeProfile !== null) return;
 
 		const profileContext = activeProfileRef.current;
 		if (profileContext) {
-			closeProfile(profileContext);
+			profileClosed(profileContext);
 		}
-	}, [activeProfile, closeProfile]);
+	}, [activeProfile, profileClosed]);
 
 	useEffect(() => {
 		if (!profileContext || profileContext.isDisposed()) return;

@@ -9,7 +9,7 @@ import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { NewProfile } from '@features/WorkspaceManager/ProfileCreator';
 
-export const createProfilesApi = (profilesManager: ProfilesManager) => {
+export const createProfilesManagerApi = (profilesManager: ProfilesManager) => {
 	const $profiles = createStore<null | ProfileObject[]>(null);
 	const profiles = createApi($profiles, {
 		update(_state, payload: null | ProfileObject[]) {
@@ -64,14 +64,17 @@ export const createProfilesApi = (profilesManager: ProfilesManager) => {
 	};
 };
 
-export const useProfiles = () => {
+/**
+ * Hook to manage profile accounts
+ */
+export const useProfilesManager = () => {
 	const [{ $profiles, createProfile }] = useState(() => {
 		const profilesManager = new ProfilesManager(
 			new ElectronFilesController('/'),
 			(profileName) => new ElectronFilesController(`/${profileName}`),
 		);
 
-		return createProfilesApi(profilesManager);
+		return createProfilesManagerApi(profilesManager);
 	});
 
 	const profiles = useStore($profiles);
