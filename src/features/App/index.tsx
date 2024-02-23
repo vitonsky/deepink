@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useStore } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
@@ -7,7 +8,7 @@ import { FilesController } from '@core/features/files/FilesController';
 import { INoteContent } from '@core/features/notes';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { changedActiveProfile, Profile } from '@core/state/profiles';
+import { $activeProfile, changedActiveProfile, Profile } from '@core/state/profiles';
 import { tagsChanged, tagsUpdated } from '@core/state/tags';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
@@ -96,21 +97,22 @@ export const App: FC = () => {
 		filesRegistry.clearOrphaned();
 	}, [profileContext]);
 
-	// TODO: reimplement
-	// const activeProfile = useStore($activeProfile);
+	// TODO: refactor
+	const activeProfile = useStore($activeProfile);
 
 	// terminate all processes for previous active profile: db, encryption, files, etc
-	// const activeProfileRef = useRef(profileContext);
-	// activeProfileRef.current = profileContext;
+	const activeProfileRef = useRef(profileContext);
+	activeProfileRef.current = profileContext;
 
-	// useEffect(() => {
-	// 	if (activeProfile !== null) return;
+	const { closeProfile } = openedProfiles;
+	useEffect(() => {
+		if (activeProfile !== null) return;
 
-	// 	const profileContext = activeProfileRef.current;
-	// 	if (profileContext) {
-	// 		openedProfiles.closeProfile(profileContext);
-	// 	}
-	// }, [activeProfile, openedProfiles]);
+		const profileContext = activeProfileRef.current;
+		if (profileContext) {
+			closeProfile(profileContext);
+		}
+	}, [activeProfile, closeProfile]);
 
 	useEffect(() => {
 		if (!profileContext || profileContext.isDisposed()) return;
