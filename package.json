@@ -88,7 +88,7 @@
 		"better-sqlite3": "^9.3.0",
 		"crc": "^4.3.2",
 		"debounce": "^2.0.0",
-		"effector": "^22.8.6",
+		"effector": "^23.2.0",
 		"effector-react": "^22.5.3",
 		"fast-glob": "^3.3.1",
 		"file-saver": "^2.0.5",
