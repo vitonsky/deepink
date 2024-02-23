@@ -6,8 +6,7 @@ import { cn } from '@bem-react/classname';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
-import { base64ToBytes, bytesToBase64 } from '@core/encryption/utils/encoding';
-import { getRandomBytes } from '@core/encryption/utils/random';
+import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { INoteContent } from '@core/features/notes';
@@ -20,7 +19,7 @@ import {
 	openDatabase,
 	SQLiteDatabase,
 } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
-import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
+import { ProfileObject } from '@core/storage/ProfilesManager';
 import { getUserDataPath } from '@electron/requests/files/renderer';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { DisposableBox } from '@utils/disposable';
@@ -28,8 +27,8 @@ import { DisposableBox } from '@utils/disposable';
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
 import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
-import { NewProfile } from '../WorkspaceManager/ProfileCreator';
-import { readFile, writeFile } from 'fs/promises';
+import { readFile } from 'fs/promises';
+import { useProfiles } from './utils/profiles';
 
 import './App.css';
 
@@ -63,68 +62,7 @@ export const decryptKey = async (
 
 // TODO: remove secrets of closure
 export const App: FC = () => {
-	const [profilesManager] = useState(
-		() => new ProfilesManager(new ElectronFilesController('/')),
-	);
-	const [profiles, setProfiles] = useState<null | ProfileObject[]>(null);
-	const updateProfiles = useCallback(() => {
-		profilesManager.getProfiles().then(setProfiles);
-	}, [profilesManager]);
-
-	// Load profiles
-	useEffect(() => {
-		updateProfiles();
-	}, [updateProfiles]);
-
-	const createProfile = useCallback(
-		async (profile: NewProfile) => {
-			if (profile.password === null) {
-				const newProfile = await profilesManager.add({
-					name: profile.name,
-					encryption: null,
-				});
-
-				const profileDir = await getUserDataPath(newProfile.id);
-
-				// Ensure profile dir exists
-				mkdirSync(profileDir, { recursive: true });
-			} else {
-				const salt = getRandomBytes(96);
-				const newProfile = await profilesManager.add({
-					name: profile.name,
-					encryption: {
-						algorithm: 'default',
-						salt: bytesToBase64(salt),
-					},
-				});
-
-				const workerEncryption = new WorkerEncryptionProxyProcessor(
-					profile.password,
-					new Uint8Array(salt),
-				);
-				const encryption = new EncryptionController(workerEncryption);
-
-				const key = getRandomBytes(32);
-				const encryptedKey = await encryption.encrypt(key);
-
-				workerEncryption.terminate();
-
-				const profileDir = await getUserDataPath(newProfile.id);
-
-				// Ensure profile dir exists
-				mkdirSync(profileDir, { recursive: true });
-
-				// Write encrypted key
-				const keyPath = path.join(profileDir, 'key');
-				await writeFile(keyPath, new Uint8Array(encryptedKey));
-			}
-
-			updateProfiles();
-
-			return undefined;
-		},
-		[profilesManager, updateProfiles],
-	);
+	const { profiles, createProfile } = useProfiles();
 
 	const [profileContext, setProfileContext] =
 		useState<null | DisposableBox<AppContext>>(null);
