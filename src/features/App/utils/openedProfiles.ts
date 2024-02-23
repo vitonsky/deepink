@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useState } from 'react';
 import { combine, createApi, createEvent, createStore, sample } from 'effector';
 import { useStore } from 'effector-react';
 import path from 'path';
@@ -16,6 +16,7 @@ import { ProfileObject } from '@core/storage/ProfilesManager';
 import { getUserDataPath } from '@electron/requests/files/renderer';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { DisposableBox } from '@utils/disposable';
+import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { readFile } from 'fs/promises';
 import { AppContext, decryptKey } from '..';
@@ -220,21 +221,6 @@ export const useProfiles = () => {
 		openProfile,
 	};
 };
-
-export const createContextGetterHook =
-	<T extends unknown>(context: React.Context<T>, errorMessage?: string) =>
-	(): Exclude<T, null> => {
-		const contextValue = useContext(context);
-		if (contextValue === null)
-			throw new TypeError(
-				errorMessage ??
-					`Did not provided value for context "${
-						context.displayName ?? 'Unknown'
-					}"`,
-			);
-
-		return contextValue as Exclude<T, null>;
-	};
 
 export type ProfilesApi = ReturnType<typeof useProfiles>;
 
