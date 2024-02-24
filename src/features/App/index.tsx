@@ -11,6 +11,7 @@ import { Profile } from '@core/state/profiles';
 import { tagsChanged, tagsUpdated } from '@core/state/tags';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
+import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 
 import { MainScreen } from '../MainScreen';
@@ -47,6 +48,44 @@ export const decryptKey = async (
 	return encryptionForKey.decrypt(encryptedKey).finally(() => {
 		workerEncryptionForKey.terminate();
 	});
+};
+
+// TODO: move to another file
+const useProfileSelector = (
+	profiles: ProfileObject[] | null,
+	onRestoreLastActiveProfile?: (profile: ProfileObject) => void,
+) => {
+	const state = useState<null | string>(null);
+
+	const [currentProfile, setCurrentProfile] = state;
+	const isActiveProfileRestoredRef = useRef(false);
+	useEffect(() => {
+		if (profiles === null) return;
+		if (isActiveProfileRestoredRef.current) return;
+
+		config.get('activeProfile').then((activeProfile) => {
+			isActiveProfileRestoredRef.current = true;
+
+			if (activeProfile) {
+				setCurrentProfile(activeProfile);
+
+				if (!onRestoreLastActiveProfile || !profiles) return;
+
+				const profile = profiles.find((profile) => profile.id === activeProfile);
+				if (profile) {
+					onRestoreLastActiveProfile(profile);
+				}
+			}
+		});
+	}, [onRestoreLastActiveProfile, profiles, setCurrentProfile]);
+
+	useEffect(() => {
+		if (currentProfile !== null) {
+			config.set('activeProfile', currentProfile);
+		}
+	}, [currentProfile]);
+
+	return state;
 };
 
 // TODO: remove secrets of closure
@@ -109,39 +148,17 @@ export const App: FC = () => {
 		return cleanup;
 	});
 
-	const [currentProfile, setCurrentProfile] = useState<null | string>(null);
-	const isActiveProfileRestoredRef = useRef(false);
-	useEffect(() => {
-		if (profilesManager.profiles === null) return;
-		if (isActiveProfileRestoredRef.current) return;
-
-		config.get('activeProfile').then((activeProfile) => {
-			isActiveProfileRestoredRef.current = true;
-
-			if (activeProfile) {
-				setCurrentProfile(activeProfile);
-
-				if (!profilesManager.profiles) return;
-
-				const profile = profilesManager.profiles.find(
-					(profile) => profile.id === activeProfile,
-				);
-				if (!profile) return;
-
-				if (profile.encryption === null) {
+	const [currentProfile, setCurrentProfile] = useProfileSelector(
+		profilesManager.profiles,
+		useCallback(
+			(profile: ProfileObject) => {
+				if (!profile.encryption) {
 					onOpenProfile(profile.id);
 				}
-			}
-		});
-	}, [onOpenProfile, profilesManager.profiles]);
-
-	const onChooseProfile = useCallback((profileId: string | null) => {
-		if (profileId !== null) {
-			config.set('activeProfile', profileId);
-		}
-
-		setCurrentProfile(profileId);
-	}, []);
+			},
+			[onOpenProfile],
+		),
+	);
 
 	const appContext = activeProfile ? activeProfile.getContent() : null;
 
@@ -152,7 +169,7 @@ export const App: FC = () => {
 			<WorkspaceManager
 				profiles={profilesManager.profiles ?? []}
 				currentProfile={currentProfile}
-				onChooseProfile={onChooseProfile}
+				onChooseProfile={setCurrentProfile}
 				onOpenProfile={onOpenProfile}
 				onCreateProfile={profilesManager.createProfile}
 			/>
