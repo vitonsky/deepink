@@ -18,12 +18,24 @@ import { DisposableBox } from '@utils/disposable';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { readFile } from 'fs/promises';
-import { AppContext, decryptKey } from '..';
+import { AppContext } from '..';
 
 export type Profile = {
 	id: string;
 	name: string;
 	isEncrypted: boolean;
+};
+
+const decryptKey = async (
+	encryptedKey: ArrayBuffer,
+	password: string,
+	salt: ArrayBuffer,
+) => {
+	const workerEncryptionForKey = new WorkerEncryptionProxyProcessor(password, salt);
+	const encryptionForKey = new EncryptionController(workerEncryptionForKey);
+	return encryptionForKey.decrypt(encryptedKey).finally(() => {
+		workerEncryptionForKey.terminate();
+	});
 };
 
 export const createProfilesApi = <T extends DisposableBox<unknown>>(

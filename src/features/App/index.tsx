@@ -1,7 +1,5 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
 import { cn } from '@bem-react/classname';
-import { EncryptionController } from '@core/encryption/EncryptionController';
-import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { INoteContent } from '@core/features/notes';
@@ -12,6 +10,7 @@ import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { useProfileSelector } from '@features/App/useProfileSelector';
 
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
@@ -36,56 +35,6 @@ export type AppContext = {
 export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteContent) =>
 	(note.title || note.text).slice(0, 25) || 'Empty note';
-
-export const decryptKey = async (
-	encryptedKey: ArrayBuffer,
-	password: string,
-	salt: ArrayBuffer,
-) => {
-	const workerEncryptionForKey = new WorkerEncryptionProxyProcessor(password, salt);
-	const encryptionForKey = new EncryptionController(workerEncryptionForKey);
-	return encryptionForKey.decrypt(encryptedKey).finally(() => {
-		workerEncryptionForKey.terminate();
-	});
-};
-
-// TODO: move to another file
-const useProfileSelector = (
-	profiles: ProfileObject[] | null,
-	onRestoreLastActiveProfile?: (profile: ProfileObject) => void,
-) => {
-	const state = useState<null | string>(null);
-
-	const [currentProfile, setCurrentProfile] = state;
-	const isActiveProfileRestoredRef = useRef(false);
-	useEffect(() => {
-		if (profiles === null) return;
-		if (isActiveProfileRestoredRef.current) return;
-
-		config.get('activeProfile').then((activeProfile) => {
-			isActiveProfileRestoredRef.current = true;
-
-			if (activeProfile) {
-				setCurrentProfile(activeProfile);
-
-				if (!onRestoreLastActiveProfile || !profiles) return;
-
-				const profile = profiles.find((profile) => profile.id === activeProfile);
-				if (profile) {
-					onRestoreLastActiveProfile(profile);
-				}
-			}
-		});
-	}, [onRestoreLastActiveProfile, profiles, setCurrentProfile]);
-
-	useEffect(() => {
-		if (currentProfile !== null) {
-			config.set('activeProfile', currentProfile);
-		}
-	}, [currentProfile]);
-
-	return state;
-};
 
 // TODO: remove secrets of closure
 export const App: FC = () => {
@@ -148,6 +97,7 @@ export const App: FC = () => {
 	});
 
 	const [currentProfile, setCurrentProfile] = useProfileSelector(
+		config,
 		profilesManager.profiles,
 		useCallback(
 			(profile: ProfileObject) => {
