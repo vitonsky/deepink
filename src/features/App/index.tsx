@@ -7,7 +7,6 @@ import { FilesController } from '@core/features/files/FilesController';
 import { INoteContent } from '@core/features/notes';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { Profile } from '@core/state/profiles';
 import { tagsChanged, tagsUpdated } from '@core/state/tags';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
@@ -17,7 +16,7 @@ import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
 import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
-import { profilesContext, useProfiles } from './utils/openedProfiles';
+import { Profile, profilesContext, useProfiles } from './utils/openedProfiles';
 import { useProfilesManager } from './utils/profilesManager';
 
 import './App.css';

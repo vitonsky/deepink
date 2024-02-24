@@ -10,7 +10,6 @@ import { AttachmentsController } from '@core/features/attachments/AttachmentsCon
 import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { Profile } from '@core/state/profiles';
 import { openDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { getUserDataPath } from '@electron/requests/files/renderer';
@@ -20,6 +19,12 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { readFile } from 'fs/promises';
 import { AppContext, decryptKey } from '..';
+
+export type Profile = {
+	id: string;
+	name: string;
+	isEncrypted: boolean;
+};
 
 export const createProfilesApi = <T extends DisposableBox<unknown>>(
 	autoChangeActiveProfile = true,
