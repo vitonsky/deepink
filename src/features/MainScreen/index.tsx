@@ -21,13 +21,8 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import {
-	$activeNoteId,
-	$openedNotes,
-	activeNoteChanged,
-	openedNotesControls,
-} from '@core/state/notes';
 import { $activeTag, $tags, tagAttachmentsChanged } from '@core/state/tags';
+import { useActiveNotesContext } from '@features/App/utils/activeNotes';
 import { useProfilesContext } from '@features/App/utils/openedProfiles';
 
 import { Preferences } from '../Preferences/Preferences';
@@ -46,7 +41,14 @@ export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
 	const notesRegistry = useNotesRegistry();
-	const activeNoteId = useStore($activeNoteId);
+	const activeNotesContext = useActiveNotesContext();
+	const { events: notesEvents } = activeNotesContext;
+
+	const activeNoteId = useStoreMap(
+		activeNotesContext.$notes,
+		({ activeNote }) => activeNote,
+	);
+
 	const [notes, setNotes] = useState<INote[]>([]);
 
 	const activeTag = useStore($activeTag);
@@ -89,49 +91,45 @@ export const MainScreen: FC = () => {
 		updateNotes();
 	}, [updateNotes]);
 
+	const openedNotes = useStoreMap(
+		activeNotesContext.$notes,
+		({ openedNotes }) => openedNotes,
+	);
+	const tabs = useStoreMap(activeNotesContext.$notes, ({ openedNotes }) =>
+		openedNotes.map((note) => note.id),
+	);
+
 	// TODO: focus on note input
 	const onNoteClick = useCallback(
 		(id: NoteId) => {
-			const note = notes.find((note) => note.id === id);
-			if (note) {
-				openedNotesControls.add(note);
+			const isNoteOpened = openedNotes.some((note) => note.id === id);
+			if (isNoteOpened) {
+				notesEvents.activeNoteChanged(id);
+			} else {
+				const note = notes.find((note) => note.id === id);
+				if (note) {
+					notesEvents.noteOpened(note);
+				}
 			}
-
-			activeNoteChanged(id);
 		},
-		[notes],
+		[notes, notesEvents, openedNotes],
 	);
 
-	const openedNotes = useStore($openedNotes);
-	const tabs = useStoreMap($openedNotes, (state) => state.map(({ id }) => id));
 	const onNoteClose = useCallback(
 		(id: NoteId) => {
-			const tabIndex = openedNotes.findIndex((note) => note.id === id);
-
-			// Change tab if it is current tab
-			if (id === activeNoteId) {
-				let nextTab = null;
-				if (tabIndex > 0) {
-					nextTab = openedNotes[tabIndex - 1].id;
-				} else if (tabIndex === 0 && openedNotes.length > 1) {
-					nextTab = openedNotes[1].id;
-				}
-				activeNoteChanged(nextTab);
-			}
-
-			openedNotesControls.delete(id);
+			notesEvents.noteClosed(id);
 		},
-		[openedNotes, activeNoteId],
+		[notesEvents],
 	);
 
 	// Simulate note update
 	const updateNote = useCallback(
 		async (note: INote) => {
-			openedNotesControls.update(note);
+			notesEvents.noteUpdated(note);
 			await notesRegistry.update(note.id, note.content);
-			updateNotes();
+			await updateNotes();
 		},
-		[notesRegistry, updateNotes],
+		[notesEvents, notesRegistry, updateNotes],
 	);
 
 	const tagsRegistry = useTagsRegistry();

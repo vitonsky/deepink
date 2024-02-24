@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { cn } from '@bem-react/classname';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
@@ -11,6 +11,10 @@ import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteData
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfileSelector } from '@features/App/useProfileSelector';
+import {
+	activeNotesContext,
+	createActiveNotesApi,
+} from '@features/App/utils/activeNotes';
 
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
@@ -109,6 +113,13 @@ export const App: FC = () => {
 		),
 	);
 
+	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
+
+	// TODO: move on profile level contexts
+	const [activeNotes] = useState(() => createActiveNotesApi());
+	useEffect(() => {
+		activeNotes.events.notesClosed();
+	}, [activeNotes.events, activeProfileId]);
 	const appContext = activeProfile ? activeProfile.getContent() : null;
 
 	// TODO: show `SplashScreen` component while loading
@@ -127,13 +138,13 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<profilesContext.Provider value={profiles}>
-				<Providers {...appContext}>
-					<MainScreen
-						key={activeProfile?.getContent().profile.id ?? 'unknown'}
-					/>
-				</Providers>
-			</profilesContext.Provider>
+			<activeNotesContext.Provider value={activeNotes}>
+				<profilesContext.Provider value={profiles}>
+					<Providers {...appContext}>
+						<MainScreen key={activeProfileId} />
+					</Providers>
+				</profilesContext.Provider>
+			</activeNotesContext.Provider>
 		</div>
 	);
 };
