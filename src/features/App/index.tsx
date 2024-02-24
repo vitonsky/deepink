@@ -5,7 +5,6 @@ import { FilesController } from '@core/features/files/FilesController';
 import { INoteContent } from '@core/features/notes';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { tagsChanged, tagsUpdated } from '@core/state/tags';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
@@ -15,6 +14,7 @@ import {
 	activeNotesContext,
 	createActiveNotesApi,
 } from '@features/App/utils/activeNotes';
+import { createTagsApi, tagsContext } from '@features/App/utils/tags';
 
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
@@ -46,6 +46,16 @@ export const App: FC = () => {
 	const profiles = useProfiles();
 
 	const activeProfile = profiles.activeProfile;
+
+	const [tags] = useState(createTagsApi);
+
+	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
+
+	// TODO: move on profile level contexts
+	const [activeNotes] = useState(createActiveNotesApi);
+	useEffect(() => {
+		activeNotes.events.notesClosed();
+	}, [activeNotes.events, activeProfileId]);
 
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (id: string, password?: string) => {
@@ -92,9 +102,9 @@ export const App: FC = () => {
 		if (!activeProfile || activeProfile.isDisposed()) return;
 
 		const { tagsRegistry } = activeProfile.getContent();
-		const updateTags = () => tagsRegistry.getTags().then(tagsUpdated);
+		const updateTags = () => tagsRegistry.getTags().then(tags.events.tagsUpdated);
 
-		const cleanup = tagsChanged.watch(updateTags);
+		const cleanup = tags.events.tagsUpdateRequested.watch(updateTags);
 		updateTags();
 
 		return cleanup;
@@ -113,13 +123,6 @@ export const App: FC = () => {
 		),
 	);
 
-	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
-
-	// TODO: move on profile level contexts
-	const [activeNotes] = useState(() => createActiveNotesApi());
-	useEffect(() => {
-		activeNotes.events.notesClosed();
-	}, [activeNotes.events, activeProfileId]);
 	const appContext = activeProfile ? activeProfile.getContent() : null;
 
 	// TODO: show `SplashScreen` component while loading
@@ -138,13 +141,15 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<activeNotesContext.Provider value={activeNotes}>
-				<profilesContext.Provider value={profiles}>
-					<Providers {...appContext}>
-						<MainScreen key={activeProfileId} />
-					</Providers>
-				</profilesContext.Provider>
-			</activeNotesContext.Provider>
+			<tagsContext.Provider value={tags}>
+				<activeNotesContext.Provider value={activeNotes}>
+					<profilesContext.Provider value={profiles}>
+						<Providers {...appContext}>
+							<MainScreen key={activeProfileId} />
+						</Providers>
+					</profilesContext.Provider>
+				</activeNotesContext.Provider>
+			</tagsContext.Provider>
 		</div>
 	);
 };

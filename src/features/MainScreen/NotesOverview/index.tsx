@@ -8,13 +8,13 @@ import {
 	FaInbox,
 	FaTrash,
 } from 'react-icons/fa6';
-import { useStore, useStoreMap } from 'effector-react';
+import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
-import { $activeTag, $tags, setActiveTag, tagsChanged } from '@core/state/tags';
+import { useTagsContext } from '@features/App/utils/tags';
 
 import { useTagsRegistry } from '../../Providers';
 
@@ -27,10 +27,12 @@ export const cnNotesOverview = cn('NotesOverview');
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
-	const activeTag = useStore($activeTag);
+	const { $tags, events: tagsEvents } = useTagsContext();
+	const activeTag = useStoreMap($tags, ({ selected }) => selected);
 
-	const tags = useStore($tags);
-	const tagsTree = useStoreMap($tags, (flatTags) => {
+	const tags = useStoreMap($tags, ({ list }) => list);
+
+	const tagsTree = useStoreMap($tags, ({ list: flatTags }) => {
 		const tagsMap: Record<string, TagItem> = {};
 		const tagToParentMap: Record<string, string> = {};
 
@@ -72,7 +74,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	});
 
 	const tagsRegistry = useTagsRegistry();
-	const updateTags = tagsChanged;
+	const updateTags = tagsEvents.tagsUpdateRequested;
 
 	useEffect(() => {
 		updateTags();
@@ -210,7 +212,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				activeItem={activeTag === null ? 'all' : undefined}
 				onPick={(id) => {
 					if (id === 'all') {
-						setActiveTag(null);
+						tagsEvents.selectedTagChanged(null);
 					}
 				}}
 			/>
@@ -234,7 +236,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					<TagsList
 						tags={tagsTree}
 						activeTag={activeTag ?? undefined}
-						onTagClick={setActiveTag}
+						onTagClick={tagsEvents.selectedTagChanged}
 						contextMenu={{
 							onAdd(id) {
 								const tag = tags.find((tag) => id === tag.id);

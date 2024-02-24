@@ -14,16 +14,17 @@ import {
 	FaPenToSquare,
 	FaUserLarge,
 } from 'react-icons/fa6';
-import { useStore, useStoreMap } from 'effector-react';
+import { useStoreMap } from 'effector-react';
 import { useButtonsManager } from '@api/buttons/useButtonsManager';
 import { cn } from '@bem-react/classname';
 import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import { $activeTag, $tags, tagAttachmentsChanged } from '@core/state/tags';
+import { tagAttachmentsChanged } from '@core/state/tags';
 import { useActiveNotesContext } from '@features/App/utils/activeNotes';
 import { useProfilesContext } from '@features/App/utils/openedProfiles';
+import { useTagsContext } from '@features/App/utils/tags';
 
 import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
@@ -51,7 +52,9 @@ export const MainScreen: FC = () => {
 
 	const [notes, setNotes] = useState<INote[]>([]);
 
-	const activeTag = useStore($activeTag);
+	const { $tags } = useTagsContext();
+	const activeTag = useStoreMap($tags, ({ selected }) => selected);
+
 	const updateNotes = useCallback(async () => {
 		const tags = activeTag === null ? [] : [activeTag];
 		const notes = await notesRegistry.get({ limit: 10000, tags });
@@ -66,13 +69,9 @@ export const MainScreen: FC = () => {
 		setNotes(notes);
 	}, [activeTag, notesRegistry]);
 
-	const activeTagName = useStoreMap({
-		store: $tags,
-		fn(state, [activeTag]) {
-			if (activeTag === null) return null;
-			return state.find((tag) => tag.id === activeTag)?.name ?? null;
-		},
-		keys: [activeTag],
+	const activeTagName = useStoreMap($tags, ({ selected, list }) => {
+		if (selected === null) return null;
+		return list.find((tag) => tag.id === selected)?.name ?? null;
 	});
 
 	useEffect(() => {

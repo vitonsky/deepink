@@ -22,7 +22,7 @@ import {
 	FaTrashCan,
 	FaXmark,
 } from 'react-icons/fa6';
-import { useStore } from 'effector-react';
+import { useStoreMap } from 'effector-react';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
@@ -31,12 +31,8 @@ import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
-import {
-	$tags,
-	setActiveTag,
-	tagAttachmentsChanged,
-	tagsChanged,
-} from '@core/state/tags';
+import { tagAttachmentsChanged } from '@core/state/tags';
+import { useTagsContext } from '@features/App/utils/tags';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
@@ -62,7 +58,9 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const tagsRegistry = useTagsRegistry();
 
-	const tags = useStore($tags);
+	const { $tags, events: tagsEvents } = useTagsContext();
+	const tags = useStoreMap($tags, ({ list }) => list);
+
 	const [notAttachedTags, setNotAttachedTags] = useState<IResolvedTag[]>([]);
 	const [attachedTags, setAttachedTags] = useState<IResolvedTag[]>([]);
 	const updateTags = useCallback(async () => {
@@ -365,7 +363,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						className={cnNoteEditor('Attachment')}
 						key={tag.id}
 						onClick={() => {
-							setActiveTag(tag.id);
+							tagsEvents.selectedTagChanged(tag.id);
 						}}
 					>
 						<span>{tag.resolvedName}</span>
@@ -496,7 +494,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								shortenedTagName,
 								parentTagId,
 							);
-							tagsChanged();
+							tagsEvents.tagsUpdateRequested();
 							await tagsRegistry.setAttachedTags(noteId, [
 								...attachedTags.map(({ id }) => id),
 								tagId,
