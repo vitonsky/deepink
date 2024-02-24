@@ -165,7 +165,7 @@ export const useProfiles = () => {
 
 			// Setup files
 			// TODO: implement methods to close the objects after use
-			const attachmentsRegistry = new AttachmentsController(db);
+			const attachmentsController = new AttachmentsController(db);
 			const filesController = new ElectronFilesController(
 				[profile.id, 'files'].join('/'),
 				encryption,
@@ -173,7 +173,7 @@ export const useProfiles = () => {
 			const filesRegistry = new FilesController(
 				db,
 				filesController,
-				attachmentsRegistry,
+				attachmentsController,
 			);
 			const tagsRegistry = new TagsController(db);
 			const notesRegistry = new NotesController(db);
@@ -187,7 +187,7 @@ export const useProfiles = () => {
 			const newProfile = new DisposableBox(
 				{
 					db,
-					attachmentsRegistry,
+					attachmentsController,
 					filesController,
 					filesRegistry,
 					tagsRegistry,

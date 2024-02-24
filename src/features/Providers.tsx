@@ -18,11 +18,11 @@ export const useFilesRegistry = () => {
 	return useContext(filesRegistryContext);
 };
 
-export const attachmentsRegistryContext = createContext<AttachmentsController>(
+export const attachmentsControllerContext = createContext<AttachmentsController>(
 	null as any,
 );
-export const useAttachmentsRegistry = () => {
-	return useContext(attachmentsRegistryContext);
+export const useAttachmentsController = () => {
+	return useContext(attachmentsControllerContext);
 };
 
 export const tagsRegistryContext = createContext<TagsController>(null as any);
@@ -38,7 +38,7 @@ export const useNotesRegistry = () => {
 export type ProvidedAppContext = {
 	db: SQLiteDatabase;
 	filesRegistry: FilesController;
-	attachmentsRegistry: AttachmentsController;
+	attachmentsController: AttachmentsController;
 	tagsRegistry: TagsController;
 	notesRegistry: INotesController;
 };
@@ -50,7 +50,7 @@ type ProvidersProps = ProvidedAppContext & {
 export const Providers: FC<ProvidersProps> = ({
 	children,
 	filesRegistry,
-	attachmentsRegistry,
+	attachmentsController,
 	tagsRegistry,
 	notesRegistry,
 	db,
@@ -58,13 +58,13 @@ export const Providers: FC<ProvidersProps> = ({
 	return (
 		<dbContext.Provider value={db}>
 			<filesRegistryContext.Provider value={filesRegistry}>
-				<attachmentsRegistryContext.Provider value={attachmentsRegistry}>
+				<attachmentsControllerContext.Provider value={attachmentsController}>
 					<tagsRegistryContext.Provider value={tagsRegistry}>
 						<notesRegistryContext.Provider value={notesRegistry}>
 							{children}
 						</notesRegistryContext.Provider>
 					</tagsRegistryContext.Provider>
-				</attachmentsRegistryContext.Provider>
+				</attachmentsControllerContext.Provider>
 			</filesRegistryContext.Provider>
 		</dbContext.Provider>
 	);

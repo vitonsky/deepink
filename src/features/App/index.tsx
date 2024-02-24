@@ -25,7 +25,7 @@ const config = new ConfigStorage('config.json', new ElectronFilesController('/')
 
 export type AppContext = {
 	db: SQLiteDatabase;
-	attachmentsRegistry: AttachmentsController;
+	attachmentsController: AttachmentsController;
 	filesController: ElectronFilesController;
 	filesRegistry: FilesController;
 	tagsRegistry: TagsController;

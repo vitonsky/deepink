@@ -15,7 +15,7 @@ import { tagsChanged } from '@core/state/tags';
 import { importNotes } from '@electron/requests/files/renderer';
 
 import {
-	useAttachmentsRegistry,
+	useAttachmentsController,
 	useFilesRegistry,
 	useTagsRegistry,
 } from '../../../Providers';
@@ -64,7 +64,7 @@ export const useImportNotes = ({
 	updateNotes: () => void;
 }) => {
 	const filesRegistry = useFilesRegistry();
-	const attachmentsRegistry = useAttachmentsRegistry();
+	const attachmentsRegistry = useAttachmentsController();
 	const tagsRegistry = useTagsRegistry();
 
 	// TODO: transparent encrypt files and upload to a temporary directory, instead of keep in memory

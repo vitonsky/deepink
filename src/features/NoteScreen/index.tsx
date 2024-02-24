@@ -16,7 +16,7 @@ import { cn } from '@bem-react/classname';
 import { getResourceIdInUrl } from '@core/features/links';
 import { INote } from '@core/features/notes';
 
-import { useAttachmentsRegistry, useFilesRegistry } from '../Providers';
+import { useAttachmentsController, useFilesRegistry } from '../Providers';
 import {
 	Checkbox,
 	InputComponent,
@@ -113,7 +113,7 @@ const useFilesUrls = () => {
 export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 	const [text, setText] = useState('');
 
-	const attachmentsRegistry = useAttachmentsRegistry();
+	const attachmentsRegistry = useAttachmentsController();
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedSetText = useCallback(

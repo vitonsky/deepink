@@ -41,7 +41,11 @@ import {
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
-import { useAttachmentsRegistry, useFilesRegistry, useTagsRegistry } from '../Providers';
+import {
+	useAttachmentsController,
+	useFilesRegistry,
+	useTagsRegistry,
+} from '../Providers';
 
 import './NoteEditor.css';
 
@@ -104,7 +108,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		[filesRegistry],
 	);
 
-	const attachments = useAttachmentsRegistry();
+	const attachments = useAttachmentsController();
 
 	// TODO: throttle calls and run in IDLE
 	const noteId = note.id;
