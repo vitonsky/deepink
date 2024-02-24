@@ -29,13 +29,13 @@ export const useProfileSelector = (
 				}
 			}
 		});
-	}, [onRestoreLastActiveProfile, profiles, setCurrentProfile]);
+	}, [config, onRestoreLastActiveProfile, profiles, setCurrentProfile]);
 
 	useEffect(() => {
 		if (currentProfile !== null) {
 			config.set('activeProfile', currentProfile);
 		}
-	}, [currentProfile]);
+	}, [config, currentProfile]);
 
 	return state;
 };
