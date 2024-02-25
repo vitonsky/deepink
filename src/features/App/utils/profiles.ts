@@ -38,6 +38,8 @@ const decryptKey = async (
 	});
 };
 
+// TODO: remove node specific code
+// TODO: refactor to use one store and events instead of reducers
 export const createProfilesApi = <T extends DisposableBox<unknown>>(
 	autoChangeActiveProfile = true,
 ) => {

@@ -19,7 +19,7 @@ import { createTagsApi, tagsContext } from '@features/App/utils/tags';
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
 import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
-import { Profile, profilesContext, useProfiles } from './utils/openedProfiles';
+import { Profile, profilesContext, useProfiles } from './utils/profiles';
 import { useProfilesManager } from './utils/profilesManager';
 import { createWorkspaceApi, workspaceContext } from './utils/workspace';
 

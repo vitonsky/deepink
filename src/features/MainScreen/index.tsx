@@ -22,7 +22,7 @@ import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
 import { useActiveNotesContext } from '@features/App/utils/activeNotes';
-import { useProfilesContext } from '@features/App/utils/openedProfiles';
+import { useProfilesContext } from '@features/App/utils/profiles';
 import { useTagsContext } from '@features/App/utils/tags';
 import { useWorkspaceContext } from '@features/App/utils/workspace';
 
