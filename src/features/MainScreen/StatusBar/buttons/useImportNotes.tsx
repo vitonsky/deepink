@@ -5,7 +5,6 @@ import remarkParse from 'remark-parse';
 import { Root } from 'remark-parse/lib';
 import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
-import { useWorkspaceContext } from 'src/state/workspace';
 import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
@@ -13,6 +12,7 @@ import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
 import { importNotes } from '@electron/requests/files/renderer';
+import { useWorkspaceContext } from '@state/workspace';
 
 import {
 	useAttachmentsController,

@@ -24,8 +24,6 @@ import {
 } from 'react-icons/fa6';
 import { useStoreMap } from 'effector-react';
 import { debounce } from 'lodash';
-import { useTagsContext } from 'src/state/tags';
-import { useWorkspaceContext } from 'src/state/workspace';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
@@ -33,6 +31,8 @@ import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
+import { useTagsContext } from '@state/tags';
+import { useWorkspaceContext } from '@state/workspace';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';

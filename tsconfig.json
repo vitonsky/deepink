@@ -37,6 +37,7 @@
 			"@components/*": ["src/components/*"],
 			"@features/*": ["src/features/*"],
 			"@api/*": ["src/api/*"],
+			"@state/*": ["src/state/*"],
 			"@utils/*": ["src/utils/*"]
 		}
 	},
