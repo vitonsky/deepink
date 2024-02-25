@@ -3,9 +3,9 @@ import { ContextMenuCallback, useContextMenu } from '@components/hooks/useContex
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
-import { tagAttachmentsChanged } from '@core/state/tags';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
+import { useWorkspaceContext } from '@features/App/utils/workspace';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
@@ -56,6 +56,8 @@ export const useDefaultNoteContextMenu = ({
 	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
+	const { events: workspaceEvents } = useWorkspaceContext();
+
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
 			switch (action) {
@@ -69,7 +71,7 @@ export const useDefaultNoteContextMenu = ({
 					const attachedTags = await tagsRegistry.getAttachedTags(id);
 					await tagsRegistry.setAttachedTags(id, []);
 					attachedTags.forEach(({ id: tagId }) =>
-						tagAttachmentsChanged([
+						workspaceEvents.tagAttachmentsChanged([
 							{
 								tagId,
 								target: id,
@@ -99,7 +101,7 @@ export const useDefaultNoteContextMenu = ({
 					const attachedTagsIds = attachedTags.map(({ id }) => id);
 
 					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
-					tagAttachmentsChanged(
+					workspaceEvents.tagAttachmentsChanged(
 						attachedTagsIds.map((tagId) => ({
 							tagId,
 							target: newNoteId,
@@ -164,7 +166,14 @@ export const useDefaultNoteContextMenu = ({
 				}
 			}
 		},
-		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
+		[
+			closeNote,
+			filesRegistry,
+			notesRegistry,
+			tagsRegistry,
+			updateNotes,
+			workspaceEvents,
+		],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);

@@ -31,8 +31,8 @@ import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
-import { tagAttachmentsChanged } from '@core/state/tags';
 import { useTagsContext } from '@features/App/utils/tags';
+import { useWorkspaceContext } from '@features/App/utils/workspace';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
@@ -60,6 +60,8 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const { $tags, events: tagsEvents } = useTagsContext();
 	const tags = useStoreMap($tags, ({ list }) => list);
+
+	const { events: workspaceEvents } = useWorkspaceContext();
 
 	const [notAttachedTags, setNotAttachedTags] = useState<IResolvedTag[]>([]);
 	const [attachedTags, setAttachedTags] = useState<IResolvedTag[]>([]);
@@ -377,7 +379,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 									.filter(({ id }) => id !== tag.id)
 									.map(({ id }) => id);
 								await tagsRegistry.setAttachedTags(noteId, updatedTags);
-								tagAttachmentsChanged([
+								workspaceEvents.tagAttachmentsChanged([
 									{
 										tagId: tag.id,
 										target: noteId,
@@ -453,7 +455,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								...attachedTags.map(({ id }) => id),
 								id,
 							]);
-							tagAttachmentsChanged([
+							workspaceEvents.tagAttachmentsChanged([
 								{
 									tagId: id,
 									target: noteId,
@@ -499,7 +501,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								...attachedTags.map(({ id }) => id),
 								tagId,
 							]);
-							tagAttachmentsChanged([
+							workspaceEvents.tagAttachmentsChanged([
 								{
 									tagId: tagId,
 									target: noteId,

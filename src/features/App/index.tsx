@@ -21,6 +21,7 @@ import { Providers } from '../Providers';
 import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
 import { Profile, profilesContext, useProfiles } from './utils/openedProfiles';
 import { useProfilesManager } from './utils/profilesManager';
+import { createWorkspaceApi, workspaceContext } from './utils/workspace';
 
 import './App.css';
 
@@ -48,6 +49,7 @@ export const App: FC = () => {
 	const activeProfile = profiles.activeProfile;
 
 	const [tags] = useState(createTagsApi);
+	const [workspaceApi] = useState(createWorkspaceApi);
 
 	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
 
@@ -141,15 +143,17 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<tagsContext.Provider value={tags}>
-				<activeNotesContext.Provider value={activeNotes}>
-					<profilesContext.Provider value={profiles}>
-						<Providers {...appContext}>
-							<MainScreen key={activeProfileId} />
-						</Providers>
-					</profilesContext.Provider>
-				</activeNotesContext.Provider>
-			</tagsContext.Provider>
+			<workspaceContext.Provider value={workspaceApi}>
+				<tagsContext.Provider value={tags}>
+					<activeNotesContext.Provider value={activeNotes}>
+						<profilesContext.Provider value={profiles}>
+							<Providers {...appContext}>
+								<MainScreen key={activeProfileId} />
+							</Providers>
+						</profilesContext.Provider>
+					</activeNotesContext.Provider>
+				</tagsContext.Provider>
+			</workspaceContext.Provider>
 		</div>
 	);
 };

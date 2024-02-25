@@ -21,10 +21,10 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import { tagAttachmentsChanged } from '@core/state/tags';
 import { useActiveNotesContext } from '@features/App/utils/activeNotes';
 import { useProfilesContext } from '@features/App/utils/openedProfiles';
 import { useTagsContext } from '@features/App/utils/tags';
+import { useWorkspaceContext } from '@features/App/utils/workspace';
 
 import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';
@@ -44,6 +44,8 @@ export const MainScreen: FC = () => {
 	const notesRegistry = useNotesRegistry();
 	const activeNotesContext = useActiveNotesContext();
 	const { events: notesEvents } = activeNotesContext;
+
+	const { events: workspaceEvents } = useWorkspaceContext();
 
 	const activeNoteId = useStoreMap(
 		activeNotesContext.$notes,
@@ -77,13 +79,13 @@ export const MainScreen: FC = () => {
 	useEffect(() => {
 		if (activeTag === null) return;
 
-		return tagAttachmentsChanged.watch((ops) => {
+		return workspaceEvents.tagAttachmentsChanged.watch((ops) => {
 			const isHaveUpdates = ops.some(({ tagId }) => activeTag === tagId);
 			if (isHaveUpdates) {
 				updateNotes();
 			}
 		});
-	}, [activeTag, updateNotes]);
+	}, [activeTag, updateNotes, workspaceEvents.tagAttachmentsChanged]);
 
 	// Init
 	useEffect(() => {
@@ -138,7 +140,7 @@ export const MainScreen: FC = () => {
 
 		if (activeTag) {
 			await tagsRegistry.setAttachedTags(noteId, [activeTag]);
-			tagAttachmentsChanged([
+			workspaceEvents.tagAttachmentsChanged([
 				{
 					tagId: activeTag,
 					target: noteId,
@@ -149,7 +151,7 @@ export const MainScreen: FC = () => {
 
 		newNoteIdRef.current = noteId;
 		updateNotes();
-	}, [activeTag, notesRegistry, tagsRegistry, updateNotes]);
+	}, [activeTag, notesRegistry, tagsRegistry, updateNotes, workspaceEvents]);
 
 	// Focus on new note
 	useEffect(() => {
