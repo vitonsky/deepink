@@ -44,13 +44,11 @@ export const App: FC = () => {
 	const profiles = useProfiles();
 
 	const activeProfile = profiles.activeProfile;
-
-	const [tags] = useState(createTagsApi);
-	const [workspaceApi] = useState(createWorkspaceApi);
-
 	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
 
 	// TODO: move on profile level contexts
+	const [workspaceApi] = useState(createWorkspaceApi);
+	const [tagsApi] = useState(createTagsApi);
 	const [notesApi] = useState(createNotesApi);
 	useEffect(() => {
 		notesApi.events.notesClosed();
@@ -101,7 +99,7 @@ export const App: FC = () => {
 		if (!activeProfile || activeProfile.isDisposed()) return;
 
 		const { tagsRegistry } = activeProfile.getContent();
-		const updateTags = () => tagsRegistry.getTags().then(tags.events.tagsUpdated);
+		const updateTags = () => tagsRegistry.getTags().then(tagsApi.events.tagsUpdated);
 
 		const cleanup = workspaceApi.events.tagsUpdateRequested.watch(updateTags);
 		updateTags();
@@ -138,10 +136,11 @@ export const App: FC = () => {
 		);
 	}
 
+	// TODO: introduce a workspace provider
 	return (
 		<div className={cnApp()}>
 			<workspaceContext.Provider value={workspaceApi}>
-				<tagsContext.Provider value={tags}>
+				<tagsContext.Provider value={tagsApi}>
 					<notesContext.Provider value={notesApi}>
 						<profilesContext.Provider value={profiles}>
 							<Providers {...appContext}>
