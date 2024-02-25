@@ -20,7 +20,7 @@ const findNearNote = (notes: INote[], noteId: NoteId) => {
 };
 
 // TODO: add tests
-export const createActiveNotesApi = () => {
+export const createNotesApi = () => {
 	const $notes = createStore<{
 		activeNote: NoteId | null;
 		openedNotes: INote[];
@@ -138,8 +138,8 @@ export const createActiveNotesApi = () => {
 	};
 };
 
-export type ActiveNotesApi = ReturnType<typeof createActiveNotesApi>;
+export type NotesApi = ReturnType<typeof createNotesApi>;
 
-export const activeNotesContext = createContext<ActiveNotesApi | null>(null);
+export const notesContext = createContext<NotesApi | null>(null);
 
-export const useActiveNotesContext = createContextGetterHook(activeNotesContext);
+export const useNotesContext = createContextGetterHook(notesContext);

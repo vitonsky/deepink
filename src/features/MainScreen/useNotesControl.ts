@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
-import { useActiveNotesContext } from '@features/App/utils/activeNotes';
+import { useNotesContext } from '@features/App/utils/notes';
 
 import { useNotesRegistry } from '../Providers';
 
 export const useNotesControl = () => {
 	const notesRegistry = useNotesRegistry();
-	const { events } = useActiveNotesContext();
+	const { events } = useNotesContext();
 
 	const open = useCallback(
 		async (id: string) => {

@@ -10,10 +10,7 @@ import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteData
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfileSelector } from '@features/App/useProfileSelector';
-import {
-	activeNotesContext,
-	createActiveNotesApi,
-} from '@features/App/utils/activeNotes';
+import { createNotesApi, notesContext } from '@features/App/utils/notes';
 import { createTagsApi, tagsContext } from '@features/App/utils/tags';
 
 import { MainScreen } from '../MainScreen';
@@ -54,10 +51,10 @@ export const App: FC = () => {
 	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
 
 	// TODO: move on profile level contexts
-	const [activeNotes] = useState(createActiveNotesApi);
+	const [notesApi] = useState(createNotesApi);
 	useEffect(() => {
-		activeNotes.events.notesClosed();
-	}, [activeNotes.events, activeProfileId]);
+		notesApi.events.notesClosed();
+	}, [notesApi.events, activeProfileId]);
 
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (id: string, password?: string) => {
@@ -145,13 +142,13 @@ export const App: FC = () => {
 		<div className={cnApp()}>
 			<workspaceContext.Provider value={workspaceApi}>
 				<tagsContext.Provider value={tags}>
-					<activeNotesContext.Provider value={activeNotes}>
+					<notesContext.Provider value={notesApi}>
 						<profilesContext.Provider value={profiles}>
 							<Providers {...appContext}>
 								<MainScreen key={activeProfileId} />
 							</Providers>
 						</profilesContext.Provider>
-					</activeNotesContext.Provider>
+					</notesContext.Provider>
 				</tagsContext.Provider>
 			</workspaceContext.Provider>
 		</div>

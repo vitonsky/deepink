@@ -21,7 +21,7 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import { useActiveNotesContext } from '@features/App/utils/activeNotes';
+import { useNotesContext } from '@features/App/utils/notes';
 import { useProfilesContext } from '@features/App/utils/profiles';
 import { useTagsContext } from '@features/App/utils/tags';
 import { useWorkspaceContext } from '@features/App/utils/workspace';
@@ -42,7 +42,7 @@ export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
 	const notesRegistry = useNotesRegistry();
-	const activeNotesContext = useActiveNotesContext();
+	const activeNotesContext = useNotesContext();
 	const { events: notesEvents } = activeNotesContext;
 
 	const { events: workspaceEvents } = useWorkspaceContext();
