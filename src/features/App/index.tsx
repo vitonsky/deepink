@@ -1,4 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
+import { createNotesApi, notesContext } from 'src/state/notes';
+import { createTagsApi, tagsContext } from 'src/state/tags';
 import { cn } from '@bem-react/classname';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
@@ -10,15 +12,13 @@ import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteData
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfileSelector } from '@features/App/useProfileSelector';
-import { createNotesApi, notesContext } from '@features/App/utils/notes';
-import { createTagsApi, tagsContext } from '@features/App/utils/tags';
+import { Profile, profilesContext, useProfiles } from '@state/profiles';
+import { useProfilesManager } from '@state/profilesManager';
+import { createWorkspaceApi, workspaceContext } from '@state/workspace';
 
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
 import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
-import { Profile, profilesContext, useProfiles } from './utils/profiles';
-import { useProfilesManager } from './utils/profilesManager';
-import { createWorkspaceApi, workspaceContext } from './utils/workspace';
 
 import './App.css';
 

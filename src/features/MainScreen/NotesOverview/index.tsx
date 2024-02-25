@@ -9,13 +9,13 @@ import {
 	FaTrash,
 } from 'react-icons/fa6';
 import { useStoreMap } from 'effector-react';
+import { useTagsContext } from 'src/state/tags';
+import { useWorkspaceContext } from 'src/state/workspace';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
-import { useTagsContext } from '@features/App/utils/tags';
-import { useWorkspaceContext } from '@features/App/utils/workspace';
 
 import { useTagsRegistry } from '../../Providers';
 

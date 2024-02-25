@@ -15,16 +15,16 @@ import {
 	FaUserLarge,
 } from 'react-icons/fa6';
 import { useStoreMap } from 'effector-react';
+import { useNotesContext } from 'src/state/notes';
+import { useProfilesContext } from 'src/state/profiles';
+import { useTagsContext } from 'src/state/tags';
+import { useWorkspaceContext } from 'src/state/workspace';
 import { useButtonsManager } from '@api/buttons/useButtonsManager';
 import { cn } from '@bem-react/classname';
 import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import { useNotesContext } from '@features/App/utils/notes';
-import { useProfilesContext } from '@features/App/utils/profiles';
-import { useTagsContext } from '@features/App/utils/tags';
-import { useWorkspaceContext } from '@features/App/utils/workspace';
 
 import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';

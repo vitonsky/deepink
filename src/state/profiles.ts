@@ -14,11 +14,11 @@ import { openDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDataba
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { getUserDataPath } from '@electron/requests/files/renderer';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { AppContext } from '@features/App';
 import { DisposableBox } from '@utils/disposable';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { readFile } from 'fs/promises';
-import { AppContext } from '..';
 
 export type Profile = {
 	id: string;

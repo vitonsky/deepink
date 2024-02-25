@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
+import { useWorkspaceContext } from 'src/state/workspace';
 import { ContextMenuCallback, useContextMenu } from '@components/hooks/useContextMenu';
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
-import { useWorkspaceContext } from '@features/App/utils/workspace';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { useFilesRegistry, useTagsRegistry } from '../../../Providers';

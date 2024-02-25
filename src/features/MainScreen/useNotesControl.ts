@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNotesContext } from '@features/App/utils/notes';
+import { useNotesContext } from 'src/state/notes';
 
 import { useNotesRegistry } from '../Providers';
 
