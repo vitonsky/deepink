@@ -4,6 +4,7 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export const createWorkspaceApi = () => {
 	const events = {
+		tagsUpdateRequested: createEvent(),
 		tagAttachmentsChanged: createEvent<
 			{
 				target: string;

@@ -106,7 +106,7 @@ export const App: FC = () => {
 		const { tagsRegistry } = activeProfile.getContent();
 		const updateTags = () => tagsRegistry.getTags().then(tags.events.tagsUpdated);
 
-		const cleanup = tags.events.tagsUpdateRequested.watch(updateTags);
+		const cleanup = workspaceApi.events.tagsUpdateRequested.watch(updateTags);
 		updateTags();
 
 		return cleanup;

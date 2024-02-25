@@ -12,7 +12,7 @@ import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
 import { importNotes } from '@electron/requests/files/renderer';
-import { useTagsContext } from '@features/App/utils/tags';
+import { useWorkspaceContext } from '@features/App/utils/workspace';
 
 import {
 	useAttachmentsController,
@@ -63,11 +63,11 @@ export const useImportNotes = ({
 	notesRegistry: INotesController;
 	updateNotes: () => void;
 }) => {
+	const { events: workspaceEvents } = useWorkspaceContext();
+
 	const filesRegistry = useFilesRegistry();
 	const attachmentsRegistry = useAttachmentsController();
 	const tagsRegistry = useTagsRegistry();
-
-	const { events: tagsEvents } = useTagsContext();
 
 	// TODO: transparent encrypt files and upload to a temporary directory, instead of keep in memory
 	return useCallback(async () => {
@@ -158,14 +158,14 @@ export const useImportNotes = ({
 							tagNamePartToAdd,
 							parentTag.id,
 						);
-						tagsEvents.tagsUpdateRequested();
+						workspaceEvents.tagsUpdateRequested();
 						tagsToAttach.push(createdTagId);
 						continue;
 					}
 
 					// Create full resolved tag
 					const createdTagId = await tagsRegistry.add(resolvedTagName, null);
-					tagsEvents.tagsUpdateRequested();
+					workspaceEvents.tagsUpdateRequested();
 					tagsToAttach.push(createdTagId);
 				}
 
@@ -297,7 +297,7 @@ export const useImportNotes = ({
 					.join('/');
 
 				tagId = await tagsRegistry.add(tagNameToCreate, parentTagId);
-				tagsEvents.tagsUpdateRequested();
+				workspaceEvents.tagsUpdateRequested();
 
 				break;
 			}
@@ -306,7 +306,7 @@ export const useImportNotes = ({
 				const tagNameToCreate = filenameBasePathSegments.join('/').trim();
 				if (tagNameToCreate) {
 					tagId = await tagsRegistry.add(tagNameToCreate, null);
-					tagsEvents.tagsUpdateRequested();
+					workspaceEvents.tagsUpdateRequested();
 				}
 			}
 
@@ -325,8 +325,8 @@ export const useImportNotes = ({
 		attachmentsRegistry,
 		filesRegistry,
 		notesRegistry,
-		tagsEvents,
 		tagsRegistry,
 		updateNotes,
+		workspaceEvents,
 	]);
 };

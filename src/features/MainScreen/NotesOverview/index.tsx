@@ -15,6 +15,7 @@ import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import { useTagsContext } from '@features/App/utils/tags';
+import { useWorkspaceContext } from '@features/App/utils/workspace';
 
 import { useTagsRegistry } from '../../Providers';
 
@@ -27,6 +28,8 @@ export const cnNotesOverview = cn('NotesOverview');
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
+	const { events: workspaceEvents } = useWorkspaceContext();
+
 	const { $tags, events: tagsEvents } = useTagsContext();
 	const activeTag = useStoreMap($tags, ({ selected }) => selected);
 
@@ -74,7 +77,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	});
 
 	const tagsRegistry = useTagsRegistry();
-	const updateTags = tagsEvents.tagsUpdateRequested;
+	const updateTags = workspaceEvents.tagsUpdateRequested;
 
 	useEffect(() => {
 		updateTags();

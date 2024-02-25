@@ -496,7 +496,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								shortenedTagName,
 								parentTagId,
 							);
-							tagsEvents.tagsUpdateRequested();
+							workspaceEvents.tagsUpdateRequested();
 							await tagsRegistry.setAttachedTags(noteId, [
 								...attachedTags.map(({ id }) => id),
 								tagId,

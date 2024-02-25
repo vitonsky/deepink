@@ -16,9 +16,6 @@ export const createTagsApi = () => {
 	const events = {
 		selectedTagChanged: createEvent<string | null>(),
 		tagsUpdated: createEvent<IResolvedTag[]>(),
-
-		// TODO: move it to another API
-		tagsUpdateRequested: createEvent(),
 	};
 
 	// Update tags
