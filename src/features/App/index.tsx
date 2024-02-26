@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback } from 'react';
 import { cn } from '@bem-react/classname';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
@@ -10,11 +10,9 @@ import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteData
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfileSelector } from '@features/App/useProfileSelector';
-import { createNotesApi, notesContext } from '@state/notes';
+import { Workspace } from '@features/Workspace';
 import { Profile, profilesContext, useProfiles } from '@state/profiles';
 import { useProfilesManager } from '@state/profilesManager';
-import { createTagsApi, tagsContext } from '@state/tags';
-import { createWorkspaceApi, workspaceContext } from '@state/workspace';
 
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
@@ -46,14 +44,6 @@ export const App: FC = () => {
 	const activeProfile = profiles.activeProfile;
 	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
 
-	// TODO: move on profile level contexts
-	const [workspaceApi] = useState(createWorkspaceApi);
-	const [tagsApi] = useState(createTagsApi);
-	const [notesApi] = useState(createNotesApi);
-	useEffect(() => {
-		notesApi.events.notesClosed();
-	}, [notesApi.events, activeProfileId]);
-
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (id: string, password?: string) => {
 			const profile =
@@ -83,30 +73,6 @@ export const App: FC = () => {
 		[profilesManager.profiles, profiles],
 	);
 
-	// Run optional services for active profile
-	useEffect(() => {
-		if (activeProfile === null || activeProfile.isDisposed()) return;
-
-		const { filesRegistry } = activeProfile.getContent();
-
-		// TODO: schedule when to run method
-		filesRegistry.clearOrphaned();
-	}, [activeProfile]);
-
-	// TODO: replace to hook
-	// Load tags
-	useEffect(() => {
-		if (!activeProfile || activeProfile.isDisposed()) return;
-
-		const { tagsRegistry } = activeProfile.getContent();
-		const updateTags = () => tagsRegistry.getTags().then(tagsApi.events.tagsUpdated);
-
-		const cleanup = workspaceApi.events.tagsUpdateRequested.watch(updateTags);
-		updateTags();
-
-		return cleanup;
-	});
-
 	const [currentProfile, setCurrentProfile] = useProfileSelector(
 		config,
 		profilesManager.profiles,
@@ -124,7 +90,7 @@ export const App: FC = () => {
 
 	// TODO: show `SplashScreen` component while loading
 	// TODO: show only if workspace requires password
-	if (appContext === null) {
+	if (appContext === null || activeProfile === null) {
 		return (
 			<WorkspaceManager
 				profiles={profilesManager.profiles ?? []}
@@ -136,20 +102,17 @@ export const App: FC = () => {
 		);
 	}
 
-	// TODO: introduce a workspace provider
+	// TODO: support multiple opened workspaces
+	// TODO: support multiple opened profiles
 	return (
 		<div className={cnApp()}>
-			<workspaceContext.Provider value={workspaceApi}>
-				<tagsContext.Provider value={tagsApi}>
-					<notesContext.Provider value={notesApi}>
-						<profilesContext.Provider value={profiles}>
-							<Providers {...appContext}>
-								<MainScreen key={activeProfileId} />
-							</Providers>
-						</profilesContext.Provider>
-					</notesContext.Provider>
-				</tagsContext.Provider>
-			</workspaceContext.Provider>
+			<profilesContext.Provider value={profiles}>
+				<Workspace profile={activeProfile}>
+					<Providers {...appContext}>
+						<MainScreen key={activeProfileId} />
+					</Providers>
+				</Workspace>
+			</profilesContext.Provider>
 		</div>
 	);
 };
