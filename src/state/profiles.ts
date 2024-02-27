@@ -4,7 +4,7 @@ import { useUnit } from 'effector-react';
 import path from 'path';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
-import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
+import { createEncryption } from '@core/encryption/utils/createEncryption';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
@@ -31,11 +31,13 @@ const decryptKey = async (
 	password: string,
 	salt: ArrayBuffer,
 ) => {
-	const workerEncryptionForKey = new WorkerEncryptionProxyProcessor(password, salt);
-	const encryptionForKey = new EncryptionController(workerEncryptionForKey);
-	return encryptionForKey.decrypt(encryptedKey).finally(() => {
-		workerEncryptionForKey.terminate();
-	});
+	const encryption = await createEncryption({ key: password, salt });
+	return encryption
+		.getContent()
+		.decrypt(encryptedKey)
+		.finally(() => {
+			encryption.dispose();
+		});
 };
 
 // TODO: remove node specific code
@@ -152,10 +154,10 @@ export const useProfiles = () => {
 			const profileDir = await getUserDataPath(profile.id);
 
 			// Setup encryption
-			let encryption: EncryptionController;
+			let encryptionController: EncryptionController;
 			let encryptionCleanup: null | (() => any) = null;
 			if (profile.encryption === null) {
-				encryption = new EncryptionController(
+				encryptionController = new EncryptionController(
 					new PlaceholderEncryptionController(),
 				);
 			} else {
@@ -167,16 +169,16 @@ export const useProfiles = () => {
 				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
 				const key = await decryptKey(encryptedKeyFile.buffer, password, salt);
 
-				const workerEncryption = new WorkerEncryptionProxyProcessor(key, salt);
-				encryptionCleanup = () => workerEncryption.terminate();
+				const encryption = await createEncryption({ key, salt });
 
-				encryption = new EncryptionController(workerEncryption);
+				encryptionCleanup = () => encryption.dispose();
+				encryptionController = encryption.getContent();
 			}
 
 			// TODO: replace to files manager
 			// Setup DB
 			const db = await openDatabase(path.join(profileDir, 'deepink.db'), {
-				encryption: encryption,
+				encryption: encryptionController,
 			});
 
 			// TODO: close DB first and close encryption last
@@ -187,7 +189,7 @@ export const useProfiles = () => {
 			const attachmentsController = new AttachmentsController(db);
 			const filesController = new ElectronFilesController(
 				[profile.id, 'files'].join('/'),
-				encryption,
+				encryptionController,
 			);
 			const filesRegistry = new FilesController(
 				db,
