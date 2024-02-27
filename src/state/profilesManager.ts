@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createEvent, createStore } from 'effector';
-import { useStore } from 'effector-react';
+import { useUnit } from 'effector-react';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { WorkerEncryptionProxyProcessor } from '@core/encryption/processors/WorkerEncryptionProxyProcessor';
 import { bytesToBase64 } from '@core/encryption/utils/encoding';
@@ -37,7 +37,7 @@ export const useProfilesManager = () => {
 
 	const [profilesManagerApi] = useState(createProfilesManagerApi);
 
-	const profiles = useStore(profilesManagerApi.$profiles);
+	const profiles = useUnit(profilesManagerApi.$profiles);
 
 	const updateProfiles = useCallback(
 		() =>

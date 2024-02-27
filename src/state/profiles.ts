@@ -1,6 +1,6 @@
 import { createContext, useCallback, useState } from 'react';
 import { combine, createApi, createEvent, createStore, sample } from 'effector';
-import { useStore } from 'effector-react';
+import { useUnit } from 'effector-react';
 import path from 'path';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
@@ -141,8 +141,8 @@ export const useProfiles = () => {
 		createProfilesApi<DisposableBox<AppContext>>(),
 	);
 
-	const profiles = useStore($profiles);
-	const activeProfile = useStore($activeProfile);
+	const profiles = useUnit($profiles);
+	const activeProfile = useUnit($activeProfile);
 
 	const { profileOpened } = api.events;
 	const openProfile = useCallback(
