@@ -7,5 +7,5 @@ export const cnSplashScreen = cn('SplashScreen');
 
 // TODO: implement splash screen
 export const SplashScreen = () => {
-	return <div className={cnSplashScreen()}>Loading...</div>;
+	return <div className={cnSplashScreen({ fullscreen: true })}>Loading...</div>;
 };

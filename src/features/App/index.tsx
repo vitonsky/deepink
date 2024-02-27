@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { cn } from '@bem-react/classname';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
@@ -10,6 +10,7 @@ import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteData
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfileSelector } from '@features/App/useProfileSelector';
+import { SplashScreen } from '@features/SplashScreen';
 import { Workspace } from '@features/Workspace';
 import { Profile, profilesContext, useProfiles } from '@state/profiles';
 import { useProfilesManager } from '@state/profilesManager';
@@ -73,20 +74,44 @@ export const App: FC = () => {
 		[profilesManager.profiles, profiles],
 	);
 
+	const [loadingState, setLoadingState] = useState<{
+		isProfilesLoading: boolean;
+		isProfileLoading: boolean;
+	}>({
+		isProfilesLoading: true,
+		isProfileLoading: false,
+	});
 	const [currentProfile, setCurrentProfile] = useProfileSelector(
 		config,
 		profilesManager.profiles,
 		useCallback(
-			(profile: ProfileObject) => {
-				if (!profile.encryption) {
+			(profile: ProfileObject | null) => {
+				if (profile && !profile.encryption) {
 					onOpenProfile(profile.id);
+					setLoadingState({
+						isProfilesLoading: false,
+						isProfileLoading: true,
+					});
+				} else {
+					setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
 				}
 			},
 			[onOpenProfile],
 		),
 	);
 
+	useEffect(() => {
+		if (activeProfile) {
+			setLoadingState((state) => ({ ...state, isProfileLoading: false }));
+		}
+	}, [activeProfile]);
+
 	const appContext = activeProfile ? activeProfile.getContent() : null;
+
+	const isLoadingState = Object.values(loadingState).some(Boolean);
+	if (isLoadingState) {
+		return <SplashScreen />;
+	}
 
 	// TODO: show `SplashScreen` component while loading
 	// TODO: show only if workspace requires password

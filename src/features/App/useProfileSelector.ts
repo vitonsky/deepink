@@ -5,7 +5,7 @@ import { ProfileObject } from '@core/storage/ProfilesManager';
 export const useProfileSelector = (
 	config: ConfigStorage,
 	profiles: ProfileObject[] | null,
-	onRestoreLastActiveProfile?: (profile: ProfileObject) => void,
+	onRestoreLastActiveProfile?: (profile: ProfileObject | null) => void,
 ) => {
 	const state = useState<null | string>(null);
 
@@ -18,16 +18,14 @@ export const useProfileSelector = (
 		config.get('activeProfile').then((activeProfile) => {
 			isActiveProfileRestoredRef.current = true;
 
-			if (activeProfile) {
-				setCurrentProfile(activeProfile);
-
-				if (!onRestoreLastActiveProfile || !profiles) return;
-
-				const profile = profiles.find((profile) => profile.id === activeProfile);
-				if (profile) {
-					onRestoreLastActiveProfile(profile);
-				}
+			if (onRestoreLastActiveProfile && profiles) {
+				const foundProfile = activeProfile
+					? profiles.find((profile) => profile.id === activeProfile) ?? null
+					: null;
+				onRestoreLastActiveProfile(foundProfile);
 			}
+
+			setCurrentProfile(activeProfile);
 		});
 	}, [config, onRestoreLastActiveProfile, profiles, setCurrentProfile]);
 
