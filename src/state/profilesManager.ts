@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createEvent, createStore } from 'effector';
 import { useUnit } from 'effector-react';
-import { EncryptionController } from '@core/encryption/EncryptionController';
 import { bytesToBase64 } from '@core/encryption/utils/encoding';
 import { getRandomBytes } from '@core/encryption/utils/random';
-import { WorkerEncryptionProxyProcessor } from '@core/features/encryption/workers/WorkerEncryptionProxyProcessor';
+import { createEncryption } from '@core/features/encryption/createEncryption';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { NewProfile } from '@features/WorkspaceManager/ProfileCreator';
@@ -64,17 +63,13 @@ export const useProfilesManager = () => {
 			// Create encrypted profile
 			const salt = getRandomBytes(96);
 
-			// TODO: replace to `createEncryption`
-			const workerEncryption = new WorkerEncryptionProxyProcessor(
-				profile.password,
-				new Uint8Array(salt),
-			);
-			const encryption = new EncryptionController(workerEncryption);
+			const encryption = await createEncryption({ key: profile.password, salt });
 
 			const key = getRandomBytes(32);
-			const encryptedKey = await encryption.encrypt(key);
-
-			workerEncryption.terminate();
+			const encryptedKey = await encryption
+				.getContent()
+				.encrypt(key)
+				.finally(() => encryption.dispose());
 
 			await profilesManager.add({
 				name: profile.name,

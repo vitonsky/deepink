@@ -24,6 +24,11 @@ const workerId = performance.now();
 requests.addHandler('init', async ({ secretKey, salt }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
+	// Convert `ArrayBuffer`
+	if (salt instanceof ArrayBuffer) {
+		salt = new Uint8Array(salt);
+	}
+
 	if (!(salt instanceof Uint8Array))
 		throw new Error('Salt is not instance of Uint8Array');
 
