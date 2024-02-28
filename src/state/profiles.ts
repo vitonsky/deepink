@@ -1,24 +1,21 @@
 import { createContext, useCallback, useState } from 'react';
 import { combine, createApi, createEvent, createStore, sample } from 'effector';
 import { useUnit } from 'effector-react';
-import path from 'path';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createEncryption } from '@core/features/encryption/createEncryption';
+import { FileController } from '@core/features/files/FileController';
 import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { getUserDataPath } from '@electron/requests/files/renderer';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { AppContext } from '@features/App';
 import { DisposableBox } from '@utils/disposable';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
-
-import { readFile } from 'fs/promises';
 
 export type Profile = {
 	id: string;
@@ -151,7 +148,7 @@ export const useProfiles = () => {
 		async ({ profile, password }: { profile: ProfileObject; password?: string }) => {
 			const cleanups: Array<() => void> = [];
 
-			const profileDir = await getUserDataPath(profile.id);
+			const profileFilesController = new ElectronFilesController(`/${profile.id}`);
 
 			// Setup encryption
 			let encryptionController: EncryptionController;
@@ -164,10 +161,13 @@ export const useProfiles = () => {
 				if (password === undefined)
 					throw new TypeError('Empty password for encrypted profile');
 
-				const keyFilePath = path.join(profileDir, 'key');
-				const encryptedKeyFile = await readFile(keyFilePath);
+				const encryptedKeyBuffer = await profileFilesController.get('key');
+				if (!encryptedKeyBuffer) {
+					throw new Error('Key file is not found in profile directory');
+				}
+
 				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
-				const key = await decryptKey(encryptedKeyFile.buffer, password, salt);
+				const key = await decryptKey(encryptedKeyBuffer, password, salt);
 
 				const encryption = await createEncryption({ key, salt });
 
@@ -175,11 +175,13 @@ export const useProfiles = () => {
 				encryptionController = encryption.getContent();
 			}
 
-			// TODO: replace to files manager
 			// Setup DB
-			const db = await openDatabase(path.join(profileDir, 'deepink.db'), {
-				encryption: encryptionController,
-			});
+			const db = await openDatabase(
+				new FileController('deepink.db', profileFilesController),
+				{
+					encryption: encryptionController,
+				},
+			);
 
 			// TODO: close DB first and close encryption last
 			cleanups.push(() => db.close());
