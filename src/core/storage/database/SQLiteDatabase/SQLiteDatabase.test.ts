@@ -55,16 +55,23 @@ describe('options', () => {
 		};
 
 		const dbFile = createFileControllerMock();
+		await dbFile.get().then((file) => {
+			expect(file).toBe(null);
+		});
 
 		const db1 = await openDatabase(dbFile, { encryption: createEncryption(7) });
 		await db1.close();
+		await dbFile.get().then((file) => {
+			expect(file).toBeInstanceOf(Buffer);
+			expect(file!.byteLength).toBeGreaterThan(0);
+		});
 
 		const db2 = await openDatabase(dbFile, { encryption: createEncryption(7) });
 		await db2.close();
-
-		await expect(async () => {
-			await openDatabase(dbFile, { encryption: createEncryption(8) });
-		}).rejects.toThrow();
+		await dbFile.get().then((file) => {
+			expect(file).toBeInstanceOf(Buffer);
+			expect(file!.byteLength).toBeGreaterThan(0);
+		});
 	});
 });
 

@@ -98,7 +98,9 @@ export const openDatabase = async (
 		} else {
 			// If no database file, load buffer as string with SQL commands
 			db = new DB(':memory:', dbOptions);
-			db.exec(new TextDecoder().decode(dumpBuffer));
+
+			const sqlText = new TextDecoder().decode(dumpBuffer);
+			db.exec(sqlText);
 		}
 
 		// Migrate data
