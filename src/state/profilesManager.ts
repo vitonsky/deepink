@@ -22,10 +22,15 @@ export const createProfilesManagerApi = () => {
 	};
 };
 
+export type ProfilesManagerApi = {
+	profiles: ProfileObject[] | null;
+	createProfile: (profile: NewProfile) => Promise<void>;
+};
+
 /**
  * Hook to manage profile accounts
  */
-export const useProfilesManager = () => {
+export const useProfilesManager = (): ProfilesManagerApi => {
 	const [profilesManager] = useState(
 		() =>
 			new ProfilesManager(

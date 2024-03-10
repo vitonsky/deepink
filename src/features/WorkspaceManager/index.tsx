@@ -1,11 +1,12 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { cn } from '@bem-react/classname';
-import { ProfileObject } from '@core/storage/ProfilesManager';
+import { ProfilesApi } from '@state/profiles';
+import { ProfilesManagerApi } from '@state/profilesManager';
 
-import { ProfileCreator, ProfileCreatorProps } from './ProfileCreator';
+import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 
 import './WorkspaceManager.css';
@@ -23,11 +24,10 @@ export type OnPickProfile = (
 ) => Promise<PickProfileResponse>;
 
 export type IWorkspacePickerProps = {
-	profiles: ProfileObject[];
+	profiles: ProfilesApi;
+	profilesManager: ProfilesManagerApi;
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
-	onOpenProfile: OnPickProfile;
-	onCreateProfile: ProfileCreatorProps['onCreateProfile'];
 };
 
 // TODO: allow to choose algorithm
@@ -35,15 +35,45 @@ export type IWorkspacePickerProps = {
  * Manages a workspace profiles
  */
 export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
+	profilesManager,
 	profiles,
 	currentProfile,
 	onChooseProfile,
-	onOpenProfile,
-	onCreateProfile,
 }) => {
+	const onOpenProfile: OnPickProfile = useCallback(
+		async (id: string, password?: string) => {
+			const profile =
+				profilesManager.profiles &&
+				profilesManager.profiles.find((profile) => profile.id === id);
+			if (!profile) return { status: 'error', message: 'Profile not exists' };
+
+			// Profiles with no password
+			if (!profile.encryption) {
+				await profiles.openProfile({ profile });
+				return { status: 'ok' };
+			}
+
+			// Profiles with password
+			if (password === undefined)
+				return { status: 'error', message: 'Enter password' };
+
+			try {
+				await profiles.openProfile({ profile, password });
+				return { status: 'ok' };
+			} catch (err) {
+				console.error(err);
+
+				return { status: 'error', message: 'Invalid password' };
+			}
+		},
+		[profilesManager.profiles, profiles],
+	);
+
 	const currentProfileObject = useMemo(
-		() => profiles.find((profile) => profile.id === currentProfile) ?? null,
-		[currentProfile, profiles],
+		() =>
+			profilesManager.profiles?.find((profile) => profile.id === currentProfile) ??
+			null,
+		[currentProfile, profilesManager.profiles],
 	);
 
 	const [screenName, setScreenName] = useState<'main' | 'createProfile'>('main');
@@ -53,11 +83,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
-						onCreateProfile(profile).then((error) => {
-							if (error) return error;
-
+						profilesManager.createProfile(profile).then(() => {
 							setScreenName('main');
-							return undefined;
 						})
 					}
 					onCancel={() => setScreenName('main')}
@@ -82,7 +109,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				<h3 className={cnWorkspaceManager('Header')}>Choose the profile</h3>
 
 				<ul className={cnWorkspaceManager('ProfilesList')}>
-					{profiles.map((profile) => (
+					{(profilesManager.profiles ?? []).map((profile) => (
 						<li
 							key={profile.id}
 							onClick={() => {
@@ -109,9 +136,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	}, [
 		currentProfileObject,
 		onChooseProfile,
-		onCreateProfile,
 		onOpenProfile,
-		profiles,
+		profilesManager,
 		screenName,
 	]);
 

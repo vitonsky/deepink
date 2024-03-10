@@ -17,7 +17,7 @@ import { useProfilesManager } from '@state/profilesManager';
 
 import { MainScreen } from '../MainScreen';
 import { Providers } from '../Providers';
-import { OnPickProfile, WorkspaceManager } from '../WorkspaceManager';
+import { WorkspaceManager } from '../WorkspaceManager';
 
 import './App.css';
 
@@ -45,35 +45,6 @@ export const App: FC = () => {
 	const activeProfile = profiles.activeProfile;
 	const activeProfileId = activeProfile?.getContent().profile.id ?? 'unknown';
 
-	const onOpenProfile: OnPickProfile = useCallback(
-		async (id: string, password?: string) => {
-			const profile =
-				profilesManager.profiles &&
-				profilesManager.profiles.find((profile) => profile.id === id);
-			if (!profile) return { status: 'error', message: 'Profile not exists' };
-
-			// Profiles with no password
-			if (!profile.encryption) {
-				await profiles.openProfile({ profile });
-				return { status: 'ok' };
-			}
-
-			// Profiles with password
-			if (password === undefined)
-				return { status: 'error', message: 'Enter password' };
-
-			try {
-				await profiles.openProfile({ profile, password });
-				return { status: 'ok' };
-			} catch (err) {
-				console.error(err);
-
-				return { status: 'error', message: 'Invalid password' };
-			}
-		},
-		[profilesManager.profiles, profiles],
-	);
-
 	const [loadingState, setLoadingState] = useState<{
 		isProfilesLoading: boolean;
 		isProfileLoading: boolean;
@@ -87,7 +58,7 @@ export const App: FC = () => {
 		useCallback(
 			(profile: ProfileObject | null) => {
 				if (profile && !profile.encryption) {
-					onOpenProfile(profile.id);
+					profiles.openProfile({ profile });
 					setLoadingState({
 						isProfilesLoading: false,
 						isProfileLoading: true,
@@ -96,7 +67,7 @@ export const App: FC = () => {
 					setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
 				}
 			},
-			[onOpenProfile],
+			[profiles],
 		),
 	);
 
@@ -118,11 +89,10 @@ export const App: FC = () => {
 	if (appContext === null || activeProfile === null) {
 		return (
 			<WorkspaceManager
-				profiles={profilesManager.profiles ?? []}
+				profiles={profiles}
+				profilesManager={profilesManager}
 				currentProfile={currentProfile}
 				onChooseProfile={setCurrentProfile}
-				onOpenProfile={onOpenProfile}
-				onCreateProfile={profilesManager.createProfile}
 			/>
 		);
 	}
