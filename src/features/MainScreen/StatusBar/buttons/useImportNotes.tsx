@@ -12,7 +12,7 @@ import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
 import { importNotes } from '@electron/requests/files/renderer';
-import { useWorkspaceContext } from '@state/workspace';
+import { useWorkspaceContext } from '@features/Workspace/WorkspaceProvider';
 
 import {
 	useAttachmentsController,

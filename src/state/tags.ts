@@ -1,7 +1,5 @@
-import { createContext } from 'react';
 import { createEvent, createStore, sample } from 'effector';
 import { IResolvedTag } from '@core/features/tags';
-import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 // TODO: add tests
 export const createTagsApi = () => {
@@ -54,7 +52,3 @@ export const createTagsApi = () => {
 };
 
 export type TagsApi = ReturnType<typeof createTagsApi>;
-
-export const tagsContext = createContext<TagsApi | null>(null);
-
-export const useTagsContext = createContextGetterHook(tagsContext);

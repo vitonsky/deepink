@@ -14,8 +14,10 @@ import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
-import { useTagsContext } from '@state/tags';
-import { useWorkspaceContext } from '@state/workspace';
+import {
+	useTagsContext,
+	useWorkspaceContext,
+} from '@features/Workspace/WorkspaceProvider';
 
 import { useTagsRegistry } from '../../Providers';
 

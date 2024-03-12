@@ -5,7 +5,7 @@ import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
-import { useWorkspaceContext } from '@state/workspace';
+import { useWorkspaceContext } from '@features/Workspace/WorkspaceProvider';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { useFilesRegistry, useTagsRegistry } from '../../../Providers';

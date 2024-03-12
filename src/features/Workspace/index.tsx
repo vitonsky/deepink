@@ -6,10 +6,11 @@ import {
 	tagsRegistryContext,
 } from '@features/Providers';
 import { SplashScreen } from '@features/SplashScreen';
+import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { createNotesApi } from '@state/notes';
 import { ProfileContainer } from '@state/profiles';
 import { createTagsApi } from '@state/tags';
-import { createWorkspaceApi, useWorkspace } from '@state/workspace';
+import { createWorkspaceApi } from '@state/workspace';
 
 import { WorkspaceProvider } from './WorkspaceProvider';
 

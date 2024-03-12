@@ -1,7 +1,5 @@
-import { createContext } from 'react';
 import { createEvent, createStore, sample } from 'effector';
 import { INote, NoteId } from '@core/features/notes';
-import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 /**
  * Find a note near current, but except current note in edge cases
@@ -139,7 +137,3 @@ export const createNotesApi = () => {
 };
 
 export type NotesApi = ReturnType<typeof createNotesApi>;
-
-export const notesContext = createContext<NotesApi | null>(null);
-
-export const useNotesContext = createContextGetterHook(notesContext);
