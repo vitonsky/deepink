@@ -23,15 +23,20 @@ import './App.css';
 
 const config = new ConfigStorage('config.json', new ElectronFilesController('/'));
 
-export type AppContext = {
+export type ProfileContainer = {
+	profile: Profile;
 	db: SQLiteDatabase;
+};
+
+export type WorkspaceContainer = {
 	attachmentsController: AttachmentsController;
 	filesController: ElectronFilesController;
 	filesRegistry: FilesController;
 	tagsRegistry: TagsController;
 	notesRegistry: NotesController;
-	profile: Profile;
 };
+
+export type AppContext = ProfileContainer & WorkspaceContainer;
 
 export const cnApp = cn('App');
 export const getNoteTitle = (note: INoteContent) =>
@@ -85,7 +90,6 @@ export const App: FC = () => {
 	}
 
 	// TODO: show `SplashScreen` component while loading
-	// TODO: show only if workspace requires password
 	if (appContext === null || activeProfile === null) {
 		return (
 			<WorkspaceManager
@@ -102,11 +106,11 @@ export const App: FC = () => {
 	return (
 		<div className={cnApp()}>
 			<profilesContext.Provider value={profiles}>
-				<Workspace profile={activeProfile}>
-					<Providers {...appContext}>
+				<Providers {...appContext}>
+					<Workspace profile={activeProfile}>
 						<MainScreen key={activeProfileId} />
-					</Providers>
-				</Workspace>
+					</Workspace>
+				</Providers>
 			</profilesContext.Provider>
 		</div>
 	);
