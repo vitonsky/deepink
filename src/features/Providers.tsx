@@ -1,4 +1,4 @@
-import React, { createContext, FC } from 'react';
+import { createContext } from 'react';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { INotesController } from '@core/features/notes/controller';
@@ -27,38 +27,3 @@ export const useTagsRegistry = createContextGetterHook(tagsRegistryContext);
 
 export const notesRegistryContext = createContext<INotesController | null>(null);
 export const useNotesRegistry = createContextGetterHook(notesRegistryContext);
-
-export type ProvidedAppContext = {
-	db: SQLiteDatabase;
-	filesRegistry: FilesController;
-	attachmentsController: AttachmentsController;
-	tagsRegistry: TagsController;
-	notesRegistry: INotesController;
-};
-
-type ProvidersProps = ProvidedAppContext & {
-	children: React.ReactNode;
-};
-
-export const Providers: FC<ProvidersProps> = ({
-	children,
-	filesRegistry,
-	attachmentsController,
-	tagsRegistry,
-	notesRegistry,
-	db,
-}) => {
-	return (
-		<dbContext.Provider value={db}>
-			<filesRegistryContext.Provider value={filesRegistry}>
-				<attachmentsControllerContext.Provider value={attachmentsController}>
-					<tagsRegistryContext.Provider value={tagsRegistry}>
-						<notesRegistryContext.Provider value={notesRegistry}>
-							{children}
-						</notesRegistryContext.Provider>
-					</tagsRegistryContext.Provider>
-				</attachmentsControllerContext.Provider>
-			</filesRegistryContext.Provider>
-		</dbContext.Provider>
-	);
-};

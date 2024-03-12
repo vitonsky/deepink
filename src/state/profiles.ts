@@ -4,20 +4,16 @@ import { useUnit } from 'effector-react';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
-import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { FileController } from '@core/features/files/FileController';
-import { FilesController } from '@core/features/files/FilesController';
-import { NotesController } from '@core/features/notes/controller/NotesController';
-import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { AppContext } from '@features/App';
+import { ProfileContainer } from '@features/App';
 import { DisposableBox } from '@utils/disposable';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export type Profile = {
+export type ProfileEntry = {
 	id: string;
 	name: string;
 	isEncrypted: boolean;
@@ -137,7 +133,7 @@ export const createProfilesApi = <T extends DisposableBox<unknown>>(
  */
 export const useProfiles = () => {
 	const [{ $profiles, $activeProfile, ...api }] = useState(() =>
-		createProfilesApi<DisposableBox<AppContext>>(),
+		createProfilesApi<DisposableBox<ProfileContainer>>(),
 	);
 
 	const profiles = useUnit($profiles);
@@ -186,22 +182,7 @@ export const useProfiles = () => {
 			// TODO: close DB first and close encryption last
 			cleanups.push(() => db.close());
 
-			// Setup files
-			// TODO: implement methods to close the objects after use
-			const attachmentsController = new AttachmentsController(db);
-			const filesController = new ElectronFilesController(
-				[profile.id, 'files'].join('/'),
-				encryptionController,
-			);
-			const filesRegistry = new FilesController(
-				db,
-				filesController,
-				attachmentsController,
-			);
-			const tagsRegistry = new TagsController(db);
-			const notesRegistry = new NotesController(db);
-
-			const profileObject: Profile = {
+			const profileObject: ProfileEntry = {
 				id: profile.id,
 				name: profile.name,
 				isEncrypted: profile.encryption !== null,
@@ -210,12 +191,8 @@ export const useProfiles = () => {
 			const newProfile = new DisposableBox(
 				{
 					db,
-					attachmentsController,
-					filesController,
-					filesRegistry,
-					tagsRegistry,
-					notesRegistry,
 					profile: profileObject,
+					encryptionController,
 				},
 				async () => {
 					// TODO: remove key of RAM. Set control with callback to remove key
