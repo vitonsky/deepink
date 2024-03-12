@@ -5,7 +5,7 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { ProfileContainer, WorkspaceContainer } from '@features/App';
+import { ProfileContainer } from '@state/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export const createWorkspaceApi = () => {
@@ -30,6 +30,14 @@ export type WorkspaceApi = ReturnType<typeof createWorkspaceApi>;
 export const workspaceContext = createContext<WorkspaceApi | null>(null);
 
 export const useWorkspaceContext = createContextGetterHook(workspaceContext);
+
+export type WorkspaceContainer = {
+	attachmentsController: AttachmentsController;
+	filesController: ElectronFilesController;
+	filesRegistry: FilesController;
+	tagsRegistry: TagsController;
+	notesRegistry: NotesController;
+};
 
 // TODO: move to workspace feature
 export const useWorkspace = (currentProfile: ProfileContainer) => {

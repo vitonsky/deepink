@@ -3,8 +3,7 @@ import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
-
-import { getNoteTitle } from '../../App';
+import { getNoteTitle } from '@core/features/notes/utils';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 

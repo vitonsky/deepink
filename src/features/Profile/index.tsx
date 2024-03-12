@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
-import { ProfileContainer } from '@features/App';
 import { MainScreen } from '@features/MainScreen';
 import { dbContext } from '@features/Providers';
 import { Workspace } from '@features/Workspace';
+import { ProfileContainer } from '@state/profiles';
 
 export type ProfileProps = {
 	profile: ProfileContainer;

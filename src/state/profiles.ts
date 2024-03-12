@@ -6,10 +6,12 @@ import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEnc
 import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { FileController } from '@core/features/files/FileController';
-import { openDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
+import {
+	openDatabase,
+	SQLiteDatabase,
+} from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { ProfileContainer } from '@features/App';
 import { DisposableBox } from '@utils/disposable';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
@@ -126,6 +128,12 @@ export const createProfilesApi = <T extends DisposableBox<unknown>>(
 			profileClosed,
 		},
 	};
+};
+
+export type ProfileContainer = {
+	profile: ProfileEntry;
+	db: SQLiteDatabase;
+	encryptionController: EncryptionController;
 };
 
 /**
