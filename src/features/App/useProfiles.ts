@@ -45,9 +45,12 @@ export const useProfiles = () => {
 	const profiles = useUnit($profiles);
 	const activeProfile = useUnit($activeProfile);
 
-	const { profileOpened } = api.events;
+	const { profileOpened, activeProfileChanged } = api.events;
 	const openProfile = useCallback(
-		async ({ profile, password }: { profile: ProfileObject; password?: string }) => {
+		async (
+			{ profile, password }: { profile: ProfileObject; password?: string },
+			changeActiveProfile = false,
+		) => {
 			const cleanups: Array<() => void> = [];
 
 			const profileFilesController = new ElectronFilesController(`/${profile.id}`);
@@ -115,9 +118,13 @@ export const useProfiles = () => {
 
 			profileOpened(newProfile);
 
+			if (changeActiveProfile) {
+				activeProfileChanged(newProfile);
+			}
+
 			return newProfile;
 		},
-		[profileOpened],
+		[activeProfileChanged, profileOpened],
 	);
 
 	return {

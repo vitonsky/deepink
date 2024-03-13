@@ -80,22 +80,11 @@ export const createProfilesApi = <T extends DisposableBox<unknown>>(
 		target: $activeProfile,
 	});
 
-	const activeProfileCloseRequested = createEvent();
-	sample({
-		clock: activeProfileCloseRequested,
-		source: $activeProfile,
-	}).watch((activeProfile) => {
-		if (activeProfile !== null) {
-			profileClosed(activeProfile);
-		}
-	});
-
 	return {
 		$activeProfile,
 		$profiles,
 		events: {
 			activeProfileChanged,
-			activeProfileCloseRequested,
 			profileOpened,
 			profileClosed,
 		},

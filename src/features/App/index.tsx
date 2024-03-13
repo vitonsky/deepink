@@ -20,9 +20,7 @@ export const cnApp = cn('App');
 
 export const App: FC = () => {
 	const profilesManager = useProfilesManager();
-	const profiles = useProfiles();
-
-	const activeProfile = profiles.activeProfile;
+	const profilesController = useProfiles();
 
 	const [loadingState, setLoadingState] = useState<{
 		isProfilesLoading: boolean;
@@ -37,7 +35,7 @@ export const App: FC = () => {
 		useCallback(
 			(profile: ProfileObject | null) => {
 				if (profile && !profile.encryption) {
-					profiles.openProfile({ profile });
+					profilesController.openProfile({ profile }, true);
 					setLoadingState({
 						isProfilesLoading: false,
 						isProfileLoading: true,
@@ -46,27 +44,25 @@ export const App: FC = () => {
 					setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
 				}
 			},
-			[profiles],
+			[profilesController],
 		),
 	);
 
 	useEffect(() => {
-		if (activeProfile) {
+		if (profilesController.profiles.length > 0) {
 			setLoadingState((state) => ({ ...state, isProfileLoading: false }));
 		}
-	}, [activeProfile]);
-
-	const profile = activeProfile ? activeProfile.getContent() : null;
+	}, [profilesController.profiles.length]);
 
 	const isLoadingState = Object.values(loadingState).some(Boolean);
 	if (isLoadingState) {
 		return <SplashScreen />;
 	}
 
-	if (profile === null || activeProfile === null) {
+	if (profilesController.profiles.length === 0) {
 		return (
 			<WorkspaceManager
-				profiles={profiles}
+				profiles={profilesController}
 				profilesManager={profilesManager}
 				currentProfile={currentProfile}
 				onChooseProfile={setCurrentProfile}
@@ -76,8 +72,27 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<Profiles profiles={profiles}>
-				<Profile profile={profile} />
+			<Profiles profiles={profilesController}>
+				{profilesController.profiles.map((profileContainer) => {
+					// TODO: hide not active profile, instead of unmount
+					if (profilesController.activeProfile !== profileContainer) return;
+
+					if (profileContainer.isDisposed()) return;
+
+					const profile = profileContainer.getContent();
+					return (
+						<Profile
+							profile={profile}
+							key={profile.profile.id}
+							controls={{
+								close: () =>
+									profilesController.events.profileClosed(
+										profileContainer,
+									),
+							}}
+						/>
+					);
+				})}
 			</Profiles>
 		</div>
 	);

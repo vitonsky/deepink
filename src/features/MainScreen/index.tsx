@@ -21,7 +21,7 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import { useProfilesContext } from '@features/Profiles';
+import { useProfileControls } from '@features/Profile';
 import {
 	useNotesContext,
 	useNotesRegistry,
@@ -170,16 +170,14 @@ export const MainScreen: FC = () => {
 
 	const buttonsManager = useButtonsManager();
 
-	const {
-		events: { activeProfileCloseRequested },
-	} = useProfilesContext();
+	const profileControls = useProfileControls();
 	useFirstRender(() => {
 		buttonsManager.manager.register(
 			'dbChange',
 			{
 				visible: true,
 				title: 'Change database',
-				onClick: () => activeProfileCloseRequested(),
+				onClick: () => profileControls.close(),
 				icon: <FaUserLarge />,
 			},
 			{

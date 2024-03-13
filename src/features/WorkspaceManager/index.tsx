@@ -49,7 +49,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 
 			// Profiles with no password
 			if (!profile.encryption) {
-				await profiles.openProfile({ profile });
+				await profiles.openProfile({ profile }, true);
 				return { status: 'ok' };
 			}
 
@@ -58,7 +58,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				return { status: 'error', message: 'Enter password' };
 
 			try {
-				await profiles.openProfile({ profile, password });
+				await profiles.openProfile({ profile, password }, true);
 				return { status: 'ok' };
 			} catch (err) {
 				console.error(err);
