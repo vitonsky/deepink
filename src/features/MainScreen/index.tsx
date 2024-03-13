@@ -21,12 +21,12 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
+import { useProfilesContext } from '@features/App';
 import {
 	useNotesContext,
 	useTagsContext,
 	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
-import { useProfilesContext } from '@state/profiles';
 
 import { Preferences } from '../Preferences/Preferences';
 import { useNotesRegistry, useTagsRegistry } from '../Providers';

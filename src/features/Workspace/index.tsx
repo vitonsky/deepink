@@ -1,4 +1,5 @@
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
+import { ProfileContainer } from '@features/App/useProfiles';
 import {
 	attachmentsControllerContext,
 	filesRegistryContext,
@@ -8,7 +9,6 @@ import {
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { createNotesApi } from '@state/notes';
-import { ProfileContainer } from '@state/profiles';
 import { createTagsApi } from '@state/tags';
 import { createWorkspaceApi } from '@state/workspace';
 

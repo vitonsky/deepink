@@ -4,7 +4,7 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { ProfileContainer } from '@state/profiles';
+import { ProfileContainer } from '@features/App/useProfiles';
 
 export type WorkspaceContainer = {
 	attachmentsController: AttachmentsController;

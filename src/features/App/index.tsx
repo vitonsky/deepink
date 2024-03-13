@@ -1,13 +1,15 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { createContext, FC, useCallback, useEffect, useState } from 'react';
 import { cn } from '@bem-react/classname';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { useProfiles } from '@features/App/useProfiles';
 import { useProfileSelector } from '@features/App/useProfileSelector';
+import { useProfilesManager } from '@features/App/useProfilesManager';
 import { Profile } from '@features/Profile';
 import { SplashScreen } from '@features/SplashScreen';
-import { profilesContext, useProfiles } from '@state/profiles';
-import { useProfilesManager } from '@state/profilesManager';
+import { ProfilesApi } from '@state/profiles';
+import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { WorkspaceManager } from '../WorkspaceManager';
 
@@ -16,6 +18,9 @@ import './App.css';
 const config = new ConfigStorage('config.json', new ElectronFilesController('/'));
 
 export const cnApp = cn('App');
+
+export const profilesContext = createContext<ProfilesApi | null>(null);
+export const useProfilesContext = createContextGetterHook(profilesContext);
 
 export const App: FC = () => {
 	const profilesManager = useProfilesManager();
