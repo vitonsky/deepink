@@ -1,5 +1,6 @@
-import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { ProfileContainer } from '@features/App/useProfiles';
+import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { createNotesApi } from '@state/notes';
@@ -8,14 +9,14 @@ import { createWorkspaceApi } from '@state/workspace';
 
 import { WorkspaceProvider } from './WorkspaceProvider';
 
-export interface WorkspaceProps extends PropsWithChildren {
+export interface WorkspaceProps {
 	profile: ProfileContainer;
 }
 
 /**
  * Manage one workspace
  */
-export const Workspace: FC<WorkspaceProps> = ({ profile, children }) => {
+export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const [workspaceApi] = useState(createWorkspaceApi);
 	const [tagsApi] = useState(createTagsApi);
 	const [notesApi] = useState(createNotesApi);
@@ -57,7 +58,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile, children }) => {
 
 	return (
 		<WorkspaceProvider {...{ workspaceApi, notesApi, tagsApi, ...workspace }}>
-			{children}
+			<MainScreen />
 		</WorkspaceProvider>
 	);
 };

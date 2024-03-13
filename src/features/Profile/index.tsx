@@ -1,6 +1,5 @@
 import React, { createContext, FC } from 'react';
 import { ProfileContainer } from '@features/App/useProfiles';
-import { MainScreen } from '@features/MainScreen';
 import { Workspace } from '@features/Workspace';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
@@ -22,9 +21,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	// TODO: support multiple opened workspaces
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			<Workspace profile={currentProfile}>
-				<MainScreen key={activeProfileId} />
-			</Workspace>
+			<Workspace profile={currentProfile} key={activeProfileId} />
 		</ProfileControlsContext.Provider>
 	);
 };
