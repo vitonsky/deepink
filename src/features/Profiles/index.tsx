@@ -1,15 +1,35 @@
-import React, { createContext, FC, PropsWithChildren } from 'react';
+import React, { createContext, FC } from 'react';
+import { Profile } from '@features/Profile';
 import { ProfilesApi } from '@state/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export const profilesContext = createContext<ProfilesApi | null>(null);
-export const useProfilesContext = createContextGetterHook(profilesContext);
-export type ProfilesProps = PropsWithChildren<{
-	profiles: ProfilesApi;
-}>;
-export const Profiles: FC<ProfilesProps> = ({ profiles, children }) => {
-	// TODO: support multiple opened profiles
+export const ProfilesContext = createContext<ProfilesApi | null>(null);
+export const useProfilesContext = createContextGetterHook(ProfilesContext);
+export type ProfilesProps = {
+	profilesApi: ProfilesApi;
+};
+
+export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 	return (
-		<profilesContext.Provider value={profiles}>{children}</profilesContext.Provider>
+		<ProfilesContext.Provider value={profilesApi}>
+			{profilesApi.profiles.map((profileContainer) => {
+				// TODO: hide not active profile, instead of unmount
+				if (profilesApi.activeProfile !== profileContainer) return;
+
+				if (profileContainer.isDisposed()) return;
+
+				const profile = profileContainer.getContent();
+				return (
+					<Profile
+						profile={profile}
+						key={profile.profile.id}
+						controls={{
+							close: () =>
+								profilesApi.events.profileClosed(profileContainer),
+						}}
+					/>
+				);
+			})}
+		</ProfilesContext.Provider>
 	);
 };

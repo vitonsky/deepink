@@ -6,7 +6,6 @@ import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfiles } from '@features/App/useProfiles';
 import { useProfileSelector } from '@features/App/useProfileSelector';
 import { useProfilesManager } from '@features/App/useProfilesManager';
-import { Profile } from '@features/Profile';
 import { Profiles } from '@features/Profiles';
 import { SplashScreen } from '@features/SplashScreen';
 
@@ -20,7 +19,7 @@ export const cnApp = cn('App');
 
 export const App: FC = () => {
 	const profilesManager = useProfilesManager();
-	const profilesController = useProfiles();
+	const profilesApi = useProfiles();
 
 	const [loadingState, setLoadingState] = useState<{
 		isProfilesLoading: boolean;
@@ -35,7 +34,7 @@ export const App: FC = () => {
 		useCallback(
 			(profile: ProfileObject | null) => {
 				if (profile && !profile.encryption) {
-					profilesController.openProfile({ profile }, true);
+					profilesApi.openProfile({ profile }, true);
 					setLoadingState({
 						isProfilesLoading: false,
 						isProfileLoading: true,
@@ -44,25 +43,25 @@ export const App: FC = () => {
 					setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
 				}
 			},
-			[profilesController],
+			[profilesApi],
 		),
 	);
 
 	useEffect(() => {
-		if (profilesController.profiles.length > 0) {
+		if (profilesApi.profiles.length > 0) {
 			setLoadingState((state) => ({ ...state, isProfileLoading: false }));
 		}
-	}, [profilesController.profiles.length]);
+	}, [profilesApi.profiles.length]);
 
 	const isLoadingState = Object.values(loadingState).some(Boolean);
 	if (isLoadingState) {
 		return <SplashScreen />;
 	}
 
-	if (profilesController.profiles.length === 0) {
+	if (profilesApi.profiles.length === 0) {
 		return (
 			<WorkspaceManager
-				profiles={profilesController}
+				profiles={profilesApi}
 				profilesManager={profilesManager}
 				currentProfile={currentProfile}
 				onChooseProfile={setCurrentProfile}
@@ -72,28 +71,7 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<Profiles profiles={profilesController}>
-				{profilesController.profiles.map((profileContainer) => {
-					// TODO: hide not active profile, instead of unmount
-					if (profilesController.activeProfile !== profileContainer) return;
-
-					if (profileContainer.isDisposed()) return;
-
-					const profile = profileContainer.getContent();
-					return (
-						<Profile
-							profile={profile}
-							key={profile.profile.id}
-							controls={{
-								close: () =>
-									profilesController.events.profileClosed(
-										profileContainer,
-									),
-							}}
-						/>
-					);
-				})}
-			</Profiles>
+			<Profiles profilesApi={profilesApi} />
 		</div>
 	);
 };
