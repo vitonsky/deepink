@@ -1,4 +1,4 @@
-import React, { createContext, FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { cn } from '@bem-react/classname';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
@@ -7,9 +7,8 @@ import { useProfiles } from '@features/App/useProfiles';
 import { useProfileSelector } from '@features/App/useProfileSelector';
 import { useProfilesManager } from '@features/App/useProfilesManager';
 import { Profile } from '@features/Profile';
+import { Profiles } from '@features/Profiles';
 import { SplashScreen } from '@features/SplashScreen';
-import { ProfilesApi } from '@state/profiles';
-import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { WorkspaceManager } from '../WorkspaceManager';
 
@@ -18,9 +17,6 @@ import './App.css';
 const config = new ConfigStorage('config.json', new ElectronFilesController('/'));
 
 export const cnApp = cn('App');
-
-export const profilesContext = createContext<ProfilesApi | null>(null);
-export const useProfilesContext = createContextGetterHook(profilesContext);
 
 export const App: FC = () => {
 	const profilesManager = useProfilesManager();
@@ -67,7 +63,6 @@ export const App: FC = () => {
 		return <SplashScreen />;
 	}
 
-	// TODO: show `SplashScreen` component while loading
 	if (profile === null || activeProfile === null) {
 		return (
 			<WorkspaceManager
@@ -79,13 +74,11 @@ export const App: FC = () => {
 		);
 	}
 
-	// TODO: support multiple opened workspaces
-	// TODO: support multiple opened profiles
 	return (
 		<div className={cnApp()}>
-			<profilesContext.Provider value={profiles}>
+			<Profiles profiles={profiles}>
 				<Profile profile={profile} />
-			</profilesContext.Provider>
+			</Profiles>
 		</div>
 	);
 };

@@ -10,6 +10,7 @@ export type ProfileProps = {
 export const Profile: FC<ProfileProps> = ({ profile: currentProfile }) => {
 	const activeProfileId = currentProfile.profile.id;
 
+	// TODO: support multiple opened workspaces
 	return (
 		<Workspace profile={currentProfile}>
 			<MainScreen key={activeProfileId} />

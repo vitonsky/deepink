@@ -21,7 +21,7 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import { useProfilesContext } from '@features/App';
+import { useProfilesContext } from '@features/Profiles';
 import {
 	useNotesContext,
 	useNotesRegistry,
