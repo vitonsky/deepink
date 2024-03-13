@@ -32,18 +32,16 @@ import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
 import {
+	useAttachmentsController,
+	useFilesRegistry,
 	useTagsContext,
+	useTagsRegistry,
 	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
-import {
-	useAttachmentsController,
-	useFilesRegistry,
-	useTagsRegistry,
-} from '../Providers';
 
 import './NoteEditor.css';
 

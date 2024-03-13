@@ -24,12 +24,13 @@ import { INote, NoteId } from '@core/features/notes';
 import { useProfilesContext } from '@features/App';
 import {
 	useNotesContext,
+	useNotesRegistry,
 	useTagsContext,
+	useTagsRegistry,
 	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
 
 import { Preferences } from '../Preferences/Preferences';
-import { useNotesRegistry, useTagsRegistry } from '../Providers';
 import { WorkspaceSettings } from '../WorkspaceSettings/WorkspaceSettings';
 import { Notes } from './Notes';
 import { NotesList } from './NotesList';

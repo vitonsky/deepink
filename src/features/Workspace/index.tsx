@@ -1,11 +1,5 @@
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { ProfileContainer } from '@features/App/useProfiles';
-import {
-	attachmentsControllerContext,
-	filesRegistryContext,
-	notesRegistryContext,
-	tagsRegistryContext,
-} from '@features/Providers';
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { createNotesApi } from '@state/notes';
@@ -61,20 +55,9 @@ export const Workspace: FC<WorkspaceProps> = ({ profile, children }) => {
 		return <SplashScreen />;
 	}
 
-	// TODO: move providers to workspace provider
 	return (
-		<WorkspaceProvider {...{ workspaceApi, notesApi, tagsApi }}>
-			<filesRegistryContext.Provider value={workspace.filesRegistry}>
-				<attachmentsControllerContext.Provider
-					value={workspace.attachmentsController}
-				>
-					<tagsRegistryContext.Provider value={workspace.tagsRegistry}>
-						<notesRegistryContext.Provider value={workspace.notesRegistry}>
-							{children}
-						</notesRegistryContext.Provider>
-					</tagsRegistryContext.Provider>
-				</attachmentsControllerContext.Provider>
-			</filesRegistryContext.Provider>
+		<WorkspaceProvider {...{ workspaceApi, notesApi, tagsApi, ...workspace }}>
+			{children}
 		</WorkspaceProvider>
 	);
 };

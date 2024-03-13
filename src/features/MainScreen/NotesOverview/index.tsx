@@ -16,10 +16,9 @@ import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import {
 	useTagsContext,
+	useTagsRegistry,
 	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
-
-import { useTagsRegistry } from '../../Providers';
 
 import { TagItem, TagsList } from './TagsList';
 

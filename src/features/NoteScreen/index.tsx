@@ -15,8 +15,11 @@ import remarkGfm from 'remark-gfm';
 import { cn } from '@bem-react/classname';
 import { getResourceIdInUrl } from '@core/features/links';
 import { INote } from '@core/features/notes';
+import {
+	useAttachmentsController,
+	useFilesRegistry,
+} from '@features/Workspace/WorkspaceProvider';
 
-import { useAttachmentsController, useFilesRegistry } from '../Providers';
 import {
 	Checkbox,
 	InputComponent,

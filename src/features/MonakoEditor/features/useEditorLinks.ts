@@ -3,9 +3,9 @@ import { saveAs } from 'file-saver';
 import { editor, languages } from 'monaco-editor-core';
 import { findLinksInText, getAppResourceDataInUrl } from '@core/features/links';
 import { openLink } from '@electron/requests/interactions/renderer';
+import { useFilesRegistry } from '@features/Workspace/WorkspaceProvider';
 
 import { useNotesControl } from '../../MainScreen/useNotesControl';
-import { useFilesRegistry } from '../../Providers';
 
 /**
  * Hook to enable app links handling in monaco editor

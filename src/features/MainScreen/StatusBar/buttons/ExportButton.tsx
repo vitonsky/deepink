@@ -2,8 +2,12 @@ import React, { useCallback, useState } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Spinner } from '@components/Spinner';
 import { selectDirectory } from '@electron/requests/files/renderer';
+import {
+	useFilesRegistry,
+	useNotesRegistry,
+	useTagsRegistry,
+} from '@features/Workspace/WorkspaceProvider';
 
-import { useFilesRegistry, useNotesRegistry, useTagsRegistry } from '../../../Providers';
 import { NotesExporter } from '../../NotesList/NoteContextMenu/NotesExporter';
 
 import { mkdir, writeFile } from 'fs/promises';

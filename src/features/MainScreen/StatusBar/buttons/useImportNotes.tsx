@@ -12,13 +12,12 @@ import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
 import { importNotes } from '@electron/requests/files/renderer';
-import { useWorkspaceContext } from '@features/Workspace/WorkspaceProvider';
-
 import {
 	useAttachmentsController,
 	useFilesRegistry,
 	useTagsRegistry,
-} from '../../../Providers';
+	useWorkspaceContext,
+} from '@features/Workspace/WorkspaceProvider';
 
 export const replaceUrls = (
 	tree: Root,
