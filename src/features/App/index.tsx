@@ -13,11 +13,13 @@ import { WorkspaceManager } from '../WorkspaceManager';
 
 import './App.css';
 
-const config = new ConfigStorage('config.json', new ElectronFilesController('/'));
-
 export const cnApp = cn('App');
 
 export const App: FC = () => {
+	const [config] = useState(
+		() => new ConfigStorage('config.json', new ElectronFilesController('/')),
+	);
+
 	const profilesManager = useProfilesManager();
 	const profilesApi = useProfiles();
 
