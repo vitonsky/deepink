@@ -8,6 +8,31 @@ import { TagsApi } from '@state/tags';
 import { WorkspaceApi } from '@state/workspace';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
+export const WorkspaceContext = createContext<WorkspaceApi | null>(null);
+export const useWorkspaceContext = createContextGetterHook(WorkspaceContext);
+
+export const NotesContext = createContext<NotesApi | null>(null);
+export const useNotesContext = createContextGetterHook(NotesContext);
+
+export const TagsContext = createContext<TagsApi | null>(null);
+export const useTagsContext = createContextGetterHook(TagsContext);
+
+export const NotesRegistryContext = createContext<INotesController | null>(null);
+export const useNotesRegistry = createContextGetterHook(NotesRegistryContext);
+
+export const TagsRegistryContext = createContext<TagsController | null>(null);
+export const useTagsRegistry = createContextGetterHook(TagsRegistryContext);
+
+export const AttachmentsControllerContext = createContext<AttachmentsController | null>(
+	null,
+);
+export const useAttachmentsController = createContextGetterHook(
+	AttachmentsControllerContext,
+);
+
+export const FilesRegistryContext = createContext<FilesController | null>(null);
+export const useFilesRegistry = createContextGetterHook(FilesRegistryContext);
+
 export interface WorkspaceProviderProps extends PropsWithChildren {
 	workspaceApi: WorkspaceApi;
 	notesApi: NotesApi;
@@ -18,31 +43,6 @@ export interface WorkspaceProviderProps extends PropsWithChildren {
 	tagsRegistry: TagsController;
 	notesRegistry: INotesController;
 }
-
-export const workspaceContext = createContext<WorkspaceApi | null>(null);
-export const useWorkspaceContext = createContextGetterHook(workspaceContext);
-
-export const notesContext = createContext<NotesApi | null>(null);
-export const useNotesContext = createContextGetterHook(notesContext);
-
-export const tagsContext = createContext<TagsApi | null>(null);
-export const useTagsContext = createContextGetterHook(tagsContext);
-
-export const notesRegistryContext = createContext<INotesController | null>(null);
-export const useNotesRegistry = createContextGetterHook(notesRegistryContext);
-
-export const tagsRegistryContext = createContext<TagsController | null>(null);
-export const useTagsRegistry = createContextGetterHook(tagsRegistryContext);
-
-export const attachmentsControllerContext = createContext<AttachmentsController | null>(
-	null,
-);
-export const useAttachmentsController = createContextGetterHook(
-	attachmentsControllerContext,
-);
-
-export const filesRegistryContext = createContext<FilesController | null>(null);
-export const useFilesRegistry = createContextGetterHook(filesRegistryContext);
 
 export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 	workspaceApi,
@@ -55,22 +55,22 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 	children,
 }) => {
 	return (
-		<workspaceContext.Provider value={workspaceApi}>
-			<notesContext.Provider value={notesApi}>
-				<tagsContext.Provider value={tagsApi}>
-					<filesRegistryContext.Provider value={filesRegistry}>
-						<attachmentsControllerContext.Provider
+		<WorkspaceContext.Provider value={workspaceApi}>
+			<NotesContext.Provider value={notesApi}>
+				<TagsContext.Provider value={tagsApi}>
+					<FilesRegistryContext.Provider value={filesRegistry}>
+						<AttachmentsControllerContext.Provider
 							value={attachmentsController}
 						>
-							<tagsRegistryContext.Provider value={tagsRegistry}>
-								<notesRegistryContext.Provider value={notesRegistry}>
+							<TagsRegistryContext.Provider value={tagsRegistry}>
+								<NotesRegistryContext.Provider value={notesRegistry}>
 									{children}
-								</notesRegistryContext.Provider>
-							</tagsRegistryContext.Provider>
-						</attachmentsControllerContext.Provider>
-					</filesRegistryContext.Provider>
-				</tagsContext.Provider>
-			</notesContext.Provider>
-		</workspaceContext.Provider>
+								</NotesRegistryContext.Provider>
+							</TagsRegistryContext.Provider>
+						</AttachmentsControllerContext.Provider>
+					</FilesRegistryContext.Provider>
+				</TagsContext.Provider>
+			</NotesContext.Provider>
+		</WorkspaceContext.Provider>
 	);
 };
