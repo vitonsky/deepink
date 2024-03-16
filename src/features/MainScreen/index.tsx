@@ -1,16 +1,11 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
-import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import {
-	FaArrowDownWideShort,
 	FaArrowsRotate,
 	FaClockRotateLeft,
-	FaGear,
 	FaLock,
-	FaMagnifyingGlass,
 	FaPenToSquare,
 	FaUserLarge,
 } from 'react-icons/fa6';
@@ -18,9 +13,10 @@ import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
-import { Stack } from '@components/Stack/Stack';
 import { NoteId } from '@core/features/notes';
+import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useProfileControls } from '@features/Profile';
 import {
@@ -35,8 +31,6 @@ import { useNoteActions } from '../../hooks/notes/useNoteActions';
 import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
 
 import { Preferences } from '../Preferences/Preferences';
-import { WorkspaceSettings } from '../WorkspaceSettings/WorkspaceSettings';
-import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
 import { Notifications } from './Notifications/Notifications';
 import { StatusBar } from './StatusBar';
@@ -62,11 +56,6 @@ export const MainScreen: FC = () => {
 	const activeTag = useStoreMap($tags, ({ selected }) => selected);
 
 	const updateNotes = useUpdateNotes();
-
-	const activeTagName = useStoreMap($tags, ({ selected, list }) => {
-		if (selected === null) return null;
-		return list.find((tag) => tag.id === selected)?.name ?? null;
-	});
 
 	useEffect(() => {
 		if (activeTag === null) return;
@@ -124,6 +113,8 @@ export const MainScreen: FC = () => {
 	}, [notes, noteActions.click]);
 
 	const statusBarButtons = useStatusBarManager();
+
+	// Profile controls on status bar
 	const profileControls = useProfileControls();
 	useFirstRender(() => {
 		statusBarButtons.controls.register(
@@ -165,6 +156,7 @@ export const MainScreen: FC = () => {
 		);
 	});
 
+	// Note items on status bar
 	useEffect(() => {
 		const note =
 			activeNoteId !== null && openedNotes.find((note) => note.id === activeNoteId);
@@ -194,12 +186,6 @@ export const MainScreen: FC = () => {
 		};
 	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
 
-	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
-	const editWorkspace = useCallback(() => {
-		setIsWorkspaceEditing(true);
-	}, []);
-
-	// TODO: add memoizing for tabs mapping
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
 			<div className={cnMainScreen('Content')}>
@@ -219,66 +205,11 @@ export const MainScreen: FC = () => {
 
 					<NotesOverview />
 
-					<div className={cnMainScreen('Workspace')}>
-						<Select
-							className={cnMainScreen('WorkspacePicker')}
-							options={[
-								{
-									id: 'default',
-									content: 'Default',
-								},
-							]}
-							value="default"
-						></Select>
-						<Button title="Workspace settings" onPress={editWorkspace}>
-							<Icon boxSize="1rem" hasGlyph>
-								<FaGear size="100%" />
-							</Icon>
-						</Button>
-					</div>
+					<WorkspaceBar />
 				</div>
 
 				<div className={cnMainScreen('SideBar')}>
-					<Stack direction="horizontal" spacing={1}>
-						<Textinput
-							placeholder="Search..."
-							size="s"
-							addonBeforeControl={
-								<Icon
-									boxSize="1rem"
-									hasGlyph
-									style={{
-										zIndex: 2,
-										marginInlineStart: '.5rem',
-										marginInlineEnd: '.3rem',
-										opacity: 0.7,
-									}}
-								>
-									<FaMagnifyingGlass size="100%" />
-								</Icon>
-							}
-						/>
-
-						<Button view="default">
-							<Icon boxSize="1rem" hasGlyph>
-								<FaArrowDownWideShort size="100%" />
-							</Icon>
-						</Button>
-					</Stack>
-
-					<div className={cnMainScreen('NotesList')}>
-						{activeTagName && (
-							<div className={cnMainScreen('NotesListSelectedTag')}>
-								With tag{' '}
-								<span
-									className={cnMainScreen('NotesListSelectedTagName')}
-								>
-									{activeTagName}
-								</span>
-							</div>
-						)}
-						<NotesList />
-					</div>
+					<NotesPanel />
 				</div>
 
 				<NotesContainer />
@@ -288,11 +219,6 @@ export const MainScreen: FC = () => {
 
 			<Notifications />
 			<Preferences />
-
-			<WorkspaceSettings
-				isVisible={isWorkspaceEditing}
-				onClose={() => setIsWorkspaceEditing(false)}
-			/>
 		</div>
 	);
 };
