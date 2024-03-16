@@ -3,8 +3,10 @@ import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useNoteActions, useUpdateNotes } from '@features/NotesContainer';
 import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
+
+import { useNoteActions } from '../../../hooks/notes/useNoteActions';
+import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 

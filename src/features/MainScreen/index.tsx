@@ -21,7 +21,7 @@ import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { NoteId } from '@core/features/notes';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
-import { NotesContainer, useNoteActions, useUpdateNotes } from '@features/NotesContainer';
+import { NotesContainer } from '@features/NotesContainer';
 import { useProfileControls } from '@features/Profile';
 import {
 	useNotesContext,
@@ -30,6 +30,9 @@ import {
 	useTagsRegistry,
 	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
+
+import { useNoteActions } from '../../hooks/notes/useNoteActions';
+import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
 
 import { Preferences } from '../Preferences/Preferences';
 import { WorkspaceSettings } from '../WorkspaceSettings/WorkspaceSettings';
