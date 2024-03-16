@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { ProfileContainer } from '@features/App/useProfiles';
 import { MainScreen } from '@features/MainScreen';
-import { StatusBarProvider } from '@features/MainScreen/StatusBar';
+import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { createNotesApi } from '@state/notes';

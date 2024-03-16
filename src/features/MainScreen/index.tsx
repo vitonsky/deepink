@@ -20,6 +20,7 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
+import { useBottomPanelManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useProfileControls } from '@features/Profile';
 import {
 	useNotesContext,
@@ -35,7 +36,7 @@ import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
 import { Notifications } from './Notifications/Notifications';
-import { StatusBar, useBottomPanelManager } from './StatusBar';
+import { StatusBar } from './StatusBar';
 import { TopBar } from './TopBar';
 
 import './MainScreen.css';

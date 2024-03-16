@@ -8,8 +8,8 @@ import { cn } from '@bem-react/classname';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { useBottomPanelManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
-import { useBottomPanelManager } from '../MainScreen/StatusBar';
 import { ModalScreen } from '../ModalScreen/ModalScreen';
 
 import './Preferences.css';
