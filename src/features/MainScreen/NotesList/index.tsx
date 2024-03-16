@@ -1,9 +1,10 @@
 import React, { FC } from 'react';
+import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
-import { INote, NoteId } from '@core/features/notes';
-import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
+import { useNoteActions, useUpdateNotes } from '@features/NotesContainer';
+import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
@@ -11,30 +12,27 @@ import './NotesList.css';
 
 export const cnNotesList = cn('NotesList');
 
-export type NotesListProps = {
-	notes: INote[];
-	onPick: (id: NoteId) => void;
-	onClose: (id: NoteId) => void;
-	updateNotes: () => void;
+export type NotesListProps = {};
 
-	// TODO: receive with react context
-	notesRegistry: INotesController;
+export const NotesList: FC<NotesListProps> = () => {
+	const notesRegistry = useNotesRegistry();
+	const updateNotes = useUpdateNotes();
+	const noteActions = useNoteActions();
 
-	openedNotes?: NoteId[];
-	activeNote?: NoteId | null;
-};
+	const activeNotesContext = useNotesContext();
+	const notes = useStoreMap(activeNotesContext.$notes, ({ notes }) => notes);
 
-export const NotesList: FC<NotesListProps> = ({
-	notes,
-	onPick,
-	onClose,
-	updateNotes,
-	notesRegistry,
-	openedNotes,
-	activeNote,
-}) => {
+	const activeNote = useStoreMap(
+		activeNotesContext.$notes,
+		({ activeNote }) => activeNote,
+	);
+
+	const openedNotesIdList = useStoreMap(activeNotesContext.$notes, ({ openedNotes }) =>
+		openedNotes.map((note) => note.id),
+	);
+
 	const openNoteContextMenu = useDefaultNoteContextMenu({
-		closeNote: onClose,
+		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
 	});
@@ -53,7 +51,9 @@ export const NotesList: FC<NotesListProps> = ({
 						direction="vertical"
 						className={cnNotesList('Note', {
 							active: note.id === activeNote,
-							opened: openedNotes && openedNotes.indexOf(note.id) !== -1,
+							opened:
+								openedNotesIdList &&
+								openedNotesIdList.indexOf(note.id) !== -1,
 						})}
 						onContextMenu={(evt) => {
 							openNoteContextMenu(note.id, {
@@ -62,7 +62,7 @@ export const NotesList: FC<NotesListProps> = ({
 							});
 						}}
 						onClick={() => {
-							onPick(note.id);
+							noteActions.click(note.id);
 						}}
 					>
 						<div className={cnNotesList('Title')}>

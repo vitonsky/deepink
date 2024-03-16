@@ -19,8 +19,9 @@ import { cn } from '@bem-react/classname';
 import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
-import { INote, NoteId } from '@core/features/notes';
+import { NoteId } from '@core/features/notes';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { NotesContainer, useNoteActions, useUpdateNotes } from '@features/NotesContainer';
 import { useProfileControls } from '@features/Profile';
 import {
 	useNotesContext,
@@ -32,12 +33,10 @@ import {
 
 import { Preferences } from '../Preferences/Preferences';
 import { WorkspaceSettings } from '../WorkspaceSettings/WorkspaceSettings';
-import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
 import { Notifications } from './Notifications/Notifications';
 import { StatusBar } from './StatusBar';
-import { TopBar } from './TopBar';
 
 import './MainScreen.css';
 
@@ -46,7 +45,6 @@ export const cnMainScreen = cn('MainScreen');
 export const MainScreen: FC = () => {
 	const notesRegistry = useNotesRegistry();
 	const activeNotesContext = useNotesContext();
-	const { events: notesEvents } = activeNotesContext;
 
 	const { events: workspaceEvents } = useWorkspaceContext();
 
@@ -55,24 +53,12 @@ export const MainScreen: FC = () => {
 		({ activeNote }) => activeNote,
 	);
 
-	const [notes, setNotes] = useState<INote[]>([]);
+	const notes = useStoreMap(activeNotesContext.$notes, ({ notes }) => notes);
 
 	const { $tags } = useTagsContext();
 	const activeTag = useStoreMap($tags, ({ selected }) => selected);
 
-	const updateNotes = useCallback(async () => {
-		const tags = activeTag === null ? [] : [activeTag];
-		const notes = await notesRegistry.get({ limit: 10000, tags });
-		notes.sort((a, b) => {
-			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
-			const timeB = b.updatedTimestamp ?? b.createdTimestamp ?? 0;
-
-			if (timeA > timeB) return -1;
-			if (timeB > timeA) return 1;
-			return 0;
-		});
-		setNotes(notes);
-	}, [activeTag, notesRegistry]);
+	const updateNotes = useUpdateNotes();
 
 	const activeTagName = useStoreMap($tags, ({ selected, list }) => {
 		if (selected === null) return null;
@@ -99,42 +85,8 @@ export const MainScreen: FC = () => {
 		activeNotesContext.$notes,
 		({ openedNotes }) => openedNotes,
 	);
-	const tabs = useStoreMap(activeNotesContext.$notes, ({ openedNotes }) =>
-		openedNotes.map((note) => note.id),
-	);
 
-	// TODO: focus on note input
-	const onNoteClick = useCallback(
-		(id: NoteId) => {
-			const isNoteOpened = openedNotes.some((note) => note.id === id);
-			if (isNoteOpened) {
-				notesEvents.activeNoteChanged(id);
-			} else {
-				const note = notes.find((note) => note.id === id);
-				if (note) {
-					notesEvents.noteOpened(note);
-				}
-			}
-		},
-		[notes, notesEvents, openedNotes],
-	);
-
-	const onNoteClose = useCallback(
-		(id: NoteId) => {
-			notesEvents.noteClosed(id);
-		},
-		[notesEvents],
-	);
-
-	// Simulate note update
-	const updateNote = useCallback(
-		async (note: INote) => {
-			notesEvents.noteUpdated(note);
-			await notesRegistry.update(note.id, note.content);
-			await updateNotes();
-		},
-		[notesEvents, notesRegistry, updateNotes],
-	);
+	const noteActions = useNoteActions();
 
 	const tagsRegistry = useTagsRegistry();
 	const newNoteIdRef = useRef<NoteId | null>(null);
@@ -164,9 +116,9 @@ export const MainScreen: FC = () => {
 		const isNoteExists = notes.find((note) => note.id === newNoteId);
 		if (isNoteExists) {
 			newNoteIdRef.current = null;
-			onNoteClick(newNoteId);
+			noteActions.click(newNoteId);
 		}
-	}, [notes, onNoteClick]);
+	}, [notes, noteActions.click]);
 
 	const statusBarButtons = useStatusBarManager();
 	const profileControls = useProfileControls();
@@ -322,49 +274,14 @@ export const MainScreen: FC = () => {
 								</span>
 							</div>
 						)}
-						<NotesList
-							{...{
-								notesRegistry,
-								notes,
-								updateNotes,
-								onPick: onNoteClick,
-								onClose: onNoteClose,
-								openedNotes: tabs,
-								activeNote: activeNoteId,
-							}}
-						/>
+						<NotesList />
 					</div>
 				</div>
-				<Stack
-					direction="vertical"
-					spacing={2}
-					className={cnMainScreen('ContentBlock')}
-				>
-					<TopBar
-						{...{
-							notesRegistry,
-							updateNotes,
-							notes: openedNotes,
-							tabs,
-							activeTab: activeNoteId ?? null,
-							onClose: onNoteClose,
-							onPick: onNoteClick,
-						}}
-					/>
-					<div className={cnMainScreen('NoteEditors')}>
-						<Notes
-							{...{
-								notes: openedNotes,
-								tabs,
-								activeTab: activeNoteId ?? null,
-								updateNote,
-							}}
-						/>
-					</div>
-				</Stack>
+
+				<NotesContainer />
 			</div>
 
-			<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
+			<StatusBar />
 
 			<Notifications />
 			<Preferences />

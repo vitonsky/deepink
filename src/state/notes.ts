@@ -22,9 +22,11 @@ export const createNotesApi = () => {
 	const $notes = createStore<{
 		activeNote: NoteId | null;
 		openedNotes: INote[];
+		notes: INote[];
 	}>({
 		activeNote: null,
 		openedNotes: [],
+		notes: [],
 	});
 
 	const events = {
@@ -33,7 +35,20 @@ export const createNotesApi = () => {
 		noteUpdated: createEvent<INote>(),
 		noteClosed: createEvent<NoteId>(),
 		notesClosed: createEvent(),
+		addNotes: createEvent<INote[]>(),
+		setNotes: createEvent<INote[]>(),
 	};
+
+	// Update notes list
+	$notes.on(events.setNotes, (state, payload) => ({
+		...state,
+		notes: [...payload],
+	}));
+
+	$notes.on(events.addNotes, (state, payload) => ({
+		...state,
+		notes: [...state.notes, ...payload],
+	}));
 
 	// Open note
 	sample({

@@ -3,25 +3,16 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
-import { INotesController } from '@core/features/notes/controller';
 import { useStatusBar } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import './StatusBar.css';
 
 export const cnStatusBar = cn('StatusBar');
 
-export type StatusBarProps = HTMLProps<HTMLDivElement> & {
-	notesRegistry: INotesController;
-	updateNotes: () => void;
-};
+export type StatusBarProps = HTMLProps<HTMLDivElement>;
 
 // TODO: make status bar extensible
-export const StatusBar: FC<StatusBarProps> = ({
-	className,
-	notesRegistry,
-	updateNotes,
-	...props
-}) => {
+export const StatusBar: FC<StatusBarProps> = ({ className, ...props }) => {
 	const { start, end } = useStatusBar();
 
 	return (
