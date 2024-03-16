@@ -15,7 +15,6 @@ import {
 	FaUserLarge,
 } from 'react-icons/fa6';
 import { useStoreMap } from 'effector-react';
-import { useButtonsManager } from '@api/buttons/useButtonsManager';
 import { cn } from '@bem-react/classname';
 import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
@@ -36,7 +35,7 @@ import { Notes } from './Notes';
 import { NotesList } from './NotesList';
 import { NotesOverview } from './NotesOverview';
 import { Notifications } from './Notifications/Notifications';
-import { BottomPanelManagerContext, StatusBar, StatusBarContext } from './StatusBar';
+import { StatusBar, useBottomPanelManager } from './StatusBar';
 import { TopBar } from './TopBar';
 
 import './MainScreen.css';
@@ -168,8 +167,7 @@ export const MainScreen: FC = () => {
 		}
 	}, [notes, onNoteClick]);
 
-	const buttonsManager = useButtonsManager();
-
+	const buttonsManager = useBottomPanelManager();
 	const profileControls = useProfileControls();
 	useFirstRender(() => {
 		buttonsManager.manager.register(
@@ -365,14 +363,10 @@ export const MainScreen: FC = () => {
 				</Stack>
 			</div>
 
-			<StatusBarContext.Provider value={buttonsManager.state}>
-				<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
-			</StatusBarContext.Provider>
+			<StatusBar notesRegistry={notesRegistry} updateNotes={updateNotes} />
 
-			<BottomPanelManagerContext.Provider value={buttonsManager}>
-				<Notifications />
-				<Preferences />
-			</BottomPanelManagerContext.Provider>
+			<Notifications />
+			<Preferences />
 
 			<WorkspaceSettings
 				isVisible={isWorkspaceEditing}

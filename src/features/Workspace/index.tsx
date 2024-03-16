@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { ProfileContainer } from '@features/App/useProfiles';
 import { MainScreen } from '@features/MainScreen';
+import { StatusBarProvider } from '@features/MainScreen/StatusBar';
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { createNotesApi } from '@state/notes';
@@ -58,7 +59,9 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 
 	return (
 		<WorkspaceProvider {...{ workspaceApi, notesApi, tagsApi, ...workspace }}>
-			<MainScreen />
+			<StatusBarProvider>
+				<MainScreen />
+			</StatusBarProvider>
 		</WorkspaceProvider>
 	);
 };

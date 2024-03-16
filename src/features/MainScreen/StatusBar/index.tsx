@@ -1,6 +1,12 @@
-import React, { createContext, FC, HTMLProps, useContext } from 'react';
+import React, {
+	createContext,
+	FC,
+	HTMLProps,
+	PropsWithChildren,
+	useContext,
+} from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { ButtonsManagerObject } from '@api/buttons/useButtonsManager';
+import { ButtonsManagerObject, useButtonsManager } from '@api/buttons/useButtonsManager';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
@@ -22,6 +28,18 @@ export const StatusBarContext = createContext<ButtonsManagerObject['state']>({
 	start: [],
 	end: [],
 });
+
+export const StatusBarProvider: FC<PropsWithChildren> = ({ children }) => {
+	const buttonsManager = useButtonsManager();
+
+	return (
+		<StatusBarContext.Provider value={buttonsManager.state}>
+			<BottomPanelManagerContext.Provider value={buttonsManager}>
+				{children}
+			</BottomPanelManagerContext.Provider>
+		</StatusBarContext.Provider>
+	);
+};
 
 export type StatusBarProps = HTMLProps<HTMLDivElement> & {
 	notesRegistry: INotesController;
