@@ -8,7 +8,7 @@ import { cn } from '@bem-react/classname';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
-import { useBottomPanelManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import { ModalScreen } from '../ModalScreen/ModalScreen';
 
@@ -19,9 +19,9 @@ export const cnPreferences = cn('Preferences');
 export const Preferences = () => {
 	const [isOpened, setIsOpened] = useState(false);
 
-	const { manager } = useBottomPanelManager();
+	const { controls } = useStatusBarManager();
 	useEffect(() => {
-		manager.register(
+		controls.register(
 			'preferences',
 			{
 				visible: true,
@@ -36,9 +36,9 @@ export const Preferences = () => {
 		);
 
 		return () => {
-			manager.unregister('preferences');
+			controls.unregister('preferences');
 		};
-	}, [manager]);
+	}, [controls]);
 
 	const onClose = useCallback(() => setIsOpened(false), []);
 

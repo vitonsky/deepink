@@ -20,7 +20,7 @@ import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { INote, NoteId } from '@core/features/notes';
-import { useBottomPanelManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useProfileControls } from '@features/Profile';
 import {
 	useNotesContext,
@@ -168,10 +168,10 @@ export const MainScreen: FC = () => {
 		}
 	}, [notes, onNoteClick]);
 
-	const buttonsManager = useBottomPanelManager();
+	const statusBarButtons = useStatusBarManager();
 	const profileControls = useProfileControls();
 	useFirstRender(() => {
-		buttonsManager.manager.register(
+		statusBarButtons.controls.register(
 			'dbChange',
 			{
 				visible: true,
@@ -184,7 +184,7 @@ export const MainScreen: FC = () => {
 				priority: 1,
 			},
 		);
-		buttonsManager.manager.register(
+		statusBarButtons.controls.register(
 			'dbLock',
 			{
 				visible: true,
@@ -196,7 +196,7 @@ export const MainScreen: FC = () => {
 				priority: 2,
 			},
 		);
-		buttonsManager.manager.register(
+		statusBarButtons.controls.register(
 			'sync',
 			{
 				visible: true,
@@ -219,7 +219,7 @@ export const MainScreen: FC = () => {
 			? new Date(note.updatedTimestamp).toLocaleDateString()
 			: null;
 
-		buttonsManager.manager.register(
+		statusBarButtons.controls.register(
 			'noteTime',
 			{
 				visible: noteDate !== null,
@@ -235,9 +235,9 @@ export const MainScreen: FC = () => {
 		);
 
 		return () => {
-			buttonsManager.manager.unregister('noteTime');
+			statusBarButtons.controls.unregister('noteTime');
 		};
-	}, [activeNoteId, buttonsManager.manager, openedNotes]);
+	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
 
 	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
 	const editWorkspace = useCallback(() => {

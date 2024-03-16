@@ -2,8 +2,8 @@ import React, { createContext, FC, PropsWithChildren } from 'react';
 import { ButtonsManagerObject, useButtonsManager } from '@api/buttons/useButtonsManager';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export const BottomPanelManagerContext = createContext<ButtonsManagerObject | null>(null);
-export const useBottomPanelManager = createContextGetterHook(BottomPanelManagerContext);
+export const StatusBarManagerContext = createContext<ButtonsManagerObject | null>(null);
+export const useStatusBarManager = createContextGetterHook(StatusBarManagerContext);
 
 export const StatusBarContext = createContext<ButtonsManagerObject['state']>({
 	start: [],
@@ -16,9 +16,9 @@ export const StatusBarProvider: FC<PropsWithChildren> = ({ children }) => {
 
 	return (
 		<StatusBarContext.Provider value={buttonsManager.state}>
-			<BottomPanelManagerContext.Provider value={buttonsManager}>
+			<StatusBarManagerContext.Provider value={buttonsManager}>
 				{children}
-			</BottomPanelManagerContext.Provider>
+			</StatusBarManagerContext.Provider>
 		</StatusBarContext.Provider>
 	);
 };
