@@ -5,8 +5,8 @@ import { Icon } from '@components/Icon/Icon.bundle/common';
 import { TabsMenu } from '@components/TabsMenu';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
+import { getNoteTitle } from '@core/features/notes/utils';
 
-import { getNoteTitle } from '../..';
 import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
 
 import './TopBar.css';

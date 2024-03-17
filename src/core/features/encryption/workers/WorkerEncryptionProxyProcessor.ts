@@ -2,10 +2,10 @@ import { Terminable } from '@utils/disposable';
 import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
 import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
-import EncryptionWorker from '../../workers/Cryptography.worker';
+import { IEncryptionProcessor } from '../../../encryption';
+import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
-import { convertBufferToTransferable } from '../utils/buffers';
-import { IEncryptionProcessor } from '..';
+import EncryptionWorker from './Cryptography.worker';
 
 // TODO: provide algorithm parameters
 /**

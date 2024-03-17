@@ -1,13 +1,12 @@
-import { tmpdir } from 'os';
-import { tmpNameSync } from 'tmp';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { AttachmentsController } from './AttachmentsController';
 
 test('basic usage', async () => {
-	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const db = await openDatabase(dbPath);
+	const dbFile = createFileControllerMock();
+	const db = await openDatabase(dbFile);
 
 	const attachments = new AttachmentsController(db);
 	await attachments.set('target1', ['foo', 'bar']);

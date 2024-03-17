@@ -1,21 +1,19 @@
 import { useCallback } from 'react';
-import { activeNoteChanged, openedNotesControls } from '@core/state/notes';
-
-import { useNotesRegistry } from '../Providers';
+import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
 
 export const useNotesControl = () => {
 	const notesRegistry = useNotesRegistry();
+	const { events } = useNotesContext();
 
 	const open = useCallback(
 		async (id: string) => {
 			const note = await notesRegistry.getById(id);
 			if (!note) return false;
 
-			openedNotesControls.add(note);
-			activeNoteChanged(note.id);
+			events.noteOpened(note);
 			return true;
 		},
-		[notesRegistry],
+		[events, notesRegistry],
 	);
 
 	return {

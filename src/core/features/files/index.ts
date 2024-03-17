@@ -10,3 +10,9 @@ export type IFilesStorage = {
 	delete: (uuid: string[]) => Promise<void>;
 	list: () => Promise<string[]>;
 };
+
+export type IFileController = {
+	write: (buffer: ArrayBuffer) => Promise<void>;
+	get: () => Promise<ArrayBuffer | null>;
+	delete: () => Promise<void>;
+};

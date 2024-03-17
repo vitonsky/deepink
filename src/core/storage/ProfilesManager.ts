@@ -8,6 +8,7 @@ export type ProfileObject = {
 	encryption: null | {
 		algorithm: string;
 		salt: string;
+		key: ArrayBuffer;
 	};
 };
 
@@ -15,8 +16,13 @@ export type ProfileObject = {
 // TODO: implement update method
 export class ProfilesManager {
 	private filesController: IFilesStorage;
-	constructor(filesController: IFilesStorage) {
+	private getProfileFilesController;
+	constructor(
+		filesController: IFilesStorage,
+		getProfileFilesController: (profileName: string) => IFilesStorage,
+	) {
 		this.filesController = filesController;
+		this.getProfileFilesController = getProfileFilesController;
 	}
 
 	public async getProfiles(): Promise<ProfileObject[]> {
@@ -47,6 +53,12 @@ export class ProfilesManager {
 		const serializedProfiles = JSON.stringify(profiles);
 		const buffer = new TextEncoder().encode(serializedProfiles);
 		await this.filesController.write('profiles.json', buffer);
+
+		// Write key
+		if (profileData.encryption) {
+			const profileFiles = this.getProfileFilesController(newProfile.id);
+			await profileFiles.write('key', profileData.encryption.key);
+		}
 
 		return newProfile;
 	}

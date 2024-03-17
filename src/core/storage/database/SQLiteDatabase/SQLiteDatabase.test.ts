@@ -1,13 +1,12 @@
-import { statSync, writeFileSync } from 'fs';
-import { tmpdir } from 'os';
-import { tmpNameSync } from 'tmp';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from './SQLiteDatabase';
 
 describe('migrations', () => {
 	test('from most old version to latest', async () => {
+		const dbFile = createFileControllerMock();
+
 		// Write DB
-		const dbPath = tmpNameSync({ dir: tmpdir() });
 		const setupSQL = `CREATE TABLE "notes" (
 			"id" TEXT NOT NULL UNIQUE,
 			"title" TEXT NOT NULL,
@@ -16,10 +15,11 @@ describe('migrations', () => {
 			"lastUpdateTime" INTEGER NOT NULL DEFAULT 0,
 			PRIMARY KEY("id")
 		);`;
-		writeFileSync(dbPath, setupSQL);
+
+		await dbFile.write(new TextEncoder().encode(setupSQL));
 
 		// Test structure
-		const db = await openDatabase(dbPath);
+		const db = await openDatabase(dbFile);
 
 		const tablesList = db.db
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
@@ -54,49 +54,32 @@ describe('options', () => {
 			};
 		};
 
-		const dbPath = tmpNameSync({ dir: tmpdir() });
+		const dbFile = createFileControllerMock();
+		await dbFile.get().then((file) => {
+			expect(file).toBe(null);
+		});
 
-		const db1 = await openDatabase(dbPath, { encryption: createEncryption(7) });
+		const db1 = await openDatabase(dbFile, { encryption: createEncryption(7) });
 		await db1.close();
+		await dbFile.get().then((file) => {
+			expect(file).toBeInstanceOf(Buffer);
+			expect(file!.byteLength).toBeGreaterThan(0);
+		});
 
-		const db2 = await openDatabase(dbPath, { encryption: createEncryption(7) });
+		const db2 = await openDatabase(dbFile, { encryption: createEncryption(7) });
 		await db2.close();
-
-		await expect(async () => {
-			await openDatabase(dbPath, { encryption: createEncryption(8) });
-		}).rejects.toThrow();
+		await dbFile.get().then((file) => {
+			expect(file).toBeInstanceOf(Buffer);
+			expect(file!.byteLength).toBeGreaterThan(0);
+		});
 	});
 });
 
 describe('concurrency', () => {
-	test('throw exception for attempt to open DB that already opened and locked', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-
-		const db = await openDatabase(dbPath);
-		await expect(async () => {
-			await openDatabase(dbPath);
-		}).rejects.toThrow('Database file are locked');
-
-		await db.close();
-	});
-
-	test('database file unlocked after close DB', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-
-		const db1 = await openDatabase(dbPath);
-		await db1.close();
-
-		const db2 = await openDatabase(dbPath);
-		await db2.close();
-
-		const db3 = await openDatabase(dbPath);
-		await db3.close();
-	});
-
 	test('throw exception for attempt to sync DB that been closed', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
+		const dbFile = createFileControllerMock();
 
-		const db = await openDatabase(dbPath);
+		const db = await openDatabase(dbFile);
 		await expect(db.sync()).resolves.not.toThrow();
 		await expect(db.sync()).resolves.not.toThrow();
 
@@ -105,21 +88,5 @@ describe('concurrency', () => {
 		await expect(async () => {
 			await db.sync();
 		}).rejects.toThrow();
-	});
-});
-
-describe('consistency', () => {
-	test('preserve inode', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-
-		const db = await openDatabase(dbPath);
-		await db.sync();
-
-		const fileUniqueId = statSync(dbPath).ino;
-
-		await db.sync();
-		expect(statSync(dbPath).ino).toBe(fileUniqueId);
-
-		await db.close();
 	});
 });

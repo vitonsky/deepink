@@ -1,5 +1,4 @@
-import { tmpdir } from 'os';
-import { tmpNameSync } from 'tmp';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -7,8 +6,8 @@ import { TagsController } from './TagsController';
 
 describe('manage tags', () => {
 	test('nested tags', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase(dbPath);
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
 
 		const tags = new TagsController(db);
 
@@ -40,8 +39,8 @@ describe('manage tags', () => {
 	});
 
 	test('update tags', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase(dbPath);
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
 
 		const tags = new TagsController(db);
 
@@ -88,8 +87,8 @@ describe('manage tags', () => {
 	});
 
 	test('delete tags', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase(dbPath);
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
 
 		const tags = new TagsController(db);
 
@@ -115,8 +114,8 @@ describe('manage tags', () => {
 
 describe('manage attachments', () => {
 	test('set attached tags', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase(dbPath);
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
 
 		const tags = new TagsController(db);
 
@@ -160,8 +159,8 @@ describe('manage attachments', () => {
 	});
 
 	test('deleted tag will not appears in tags list', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase(dbPath);
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
 
 		const tags = new TagsController(db);
 

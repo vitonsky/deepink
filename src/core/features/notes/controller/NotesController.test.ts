@@ -1,13 +1,12 @@
-import { tmpdir } from 'os';
-import { tmpNameSync } from 'tmp';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { NotesController } from './NotesController';
 
 describe('CRUD operations', () => {
-	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const dbPromise = openDatabase(dbPath);
+	const dbFile = createFileControllerMock();
+	const dbPromise = openDatabase(dbFile);
 
 	afterAll(async () => {
 		const db = await dbPromise;
@@ -57,8 +56,8 @@ describe('CRUD operations', () => {
 	});
 
 	test('delete entries', async () => {
-		const dbPath = tmpNameSync({ dir: tmpdir() });
-		const db = await openDatabase(dbPath);
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db);
 
 		// Insert entries to test
@@ -95,7 +94,7 @@ describe('CRUD operations', () => {
 });
 
 describe('data fetching', () => {
-	const dbPath = tmpNameSync({ dir: tmpdir() });
+	const dbFile = createFileControllerMock();
 
 	const notesSample = Array(300)
 		.fill(null)
@@ -107,7 +106,7 @@ describe('data fetching', () => {
 		});
 
 	test('insert sample entries', async () => {
-		const db = await openDatabase(dbPath);
+		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db);
 
 		for (const note of notesSample) {
@@ -118,7 +117,7 @@ describe('data fetching', () => {
 	});
 
 	test('get entries by pages', async () => {
-		const db = await openDatabase(dbPath);
+		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db);
 
 		await registry.getLength().then((length) => {
@@ -140,10 +139,10 @@ describe('data fetching', () => {
 });
 
 describe('multi instances', () => {
-	const dbPath = tmpNameSync({ dir: tmpdir() });
+	const dbFile = createFileControllerMock();
 
 	test('insertion multiple entries and close with sync data', async () => {
-		const db = await openDatabase(dbPath);
+		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db);
 
 		const notes = [
@@ -157,7 +156,7 @@ describe('multi instances', () => {
 	});
 
 	test('read entries from previous step', async () => {
-		const db = await openDatabase(dbPath);
+		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db);
 
 		// Entries match data

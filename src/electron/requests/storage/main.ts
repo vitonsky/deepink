@@ -1,6 +1,6 @@
 import { existsSync } from 'fs';
 import path from 'path';
-import { writeFileAtomic } from '@utils/files';
+import { recoveryAtomicFile, writeFileAtomic } from '@utils/files';
 
 import { getUserDataPath, joinPath } from '../../utils/files';
 import { ipcMainHandler } from '../../utils/ipc/ipcMainHandler';
@@ -20,6 +20,8 @@ export const enableStorage = () =>
 
 		async get({ req: [id, subdir] }) {
 			const filePath = getUserDataPath(path.join(subdir, id));
+
+			recoveryAtomicFile(filePath);
 
 			if (!existsSync(filePath)) return null;
 
