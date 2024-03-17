@@ -2,22 +2,14 @@ import React, { FC, useEffect } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
-import {
-	FaArrowsRotate,
-	FaClockRotateLeft,
-	FaLock,
-	FaPenToSquare,
-	FaUserLarge,
-} from 'react-icons/fa6';
+import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
 import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
-import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
-import { useProfileControls } from '@features/Profile';
 import {
 	useNotesContext,
 	useTagsContext,
@@ -74,51 +66,8 @@ export const MainScreen: FC = () => {
 
 	const createNote = useCreateNote();
 
-	const statusBarButtons = useStatusBarManager();
-
-	// Profile controls on status bar
-	const profileControls = useProfileControls();
-	useFirstRender(() => {
-		statusBarButtons.controls.register(
-			'dbChange',
-			{
-				visible: true,
-				title: 'Change database',
-				onClick: () => profileControls.close(),
-				icon: <FaUserLarge />,
-			},
-			{
-				placement: 'start',
-				priority: 1,
-			},
-		);
-		statusBarButtons.controls.register(
-			'dbLock',
-			{
-				visible: true,
-				title: 'Lock database',
-				icon: <FaLock />,
-			},
-			{
-				placement: 'start',
-				priority: 2,
-			},
-		);
-		statusBarButtons.controls.register(
-			'sync',
-			{
-				visible: true,
-				title: 'Sync changes',
-				icon: <FaArrowsRotate />,
-			},
-			{
-				placement: 'start',
-				priority: 3,
-			},
-		);
-	});
-
 	// Note items on status bar
+	const statusBarButtons = useStatusBarManager();
 	useEffect(() => {
 		const note =
 			activeNoteId !== null && openedNotes.find((note) => note.id === activeNoteId);

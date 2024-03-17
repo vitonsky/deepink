@@ -4,6 +4,7 @@ import { MainScreen } from '@features/MainScreen';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
+import { WorkspaceStatusBarItems } from '@features/Workspace/WorkspaceStatusBarItems';
 import { createNotesApi } from '@state/notes';
 import { createTagsApi } from '@state/tags';
 import { createWorkspaceApi } from '@state/workspace';
@@ -61,6 +62,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 		<WorkspaceProvider {...{ workspaceApi, notesApi, tagsApi, ...workspace }}>
 			<StatusBarProvider>
 				<MainScreen />
+				<WorkspaceStatusBarItems />
 			</StatusBarProvider>
 		</WorkspaceProvider>
 	);
