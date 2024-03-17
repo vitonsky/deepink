@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
@@ -13,7 +13,6 @@ import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { useFirstRender } from '@components/hooks/useFirstRender';
 import { Icon } from '@components/Icon/Icon.bundle/common';
-import { NoteId } from '@core/features/notes';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
@@ -21,13 +20,11 @@ import { NotesContainer } from '@features/NotesContainer';
 import { useProfileControls } from '@features/Profile';
 import {
 	useNotesContext,
-	useNotesRegistry,
 	useTagsContext,
-	useTagsRegistry,
 	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
 
-import { useNoteActions } from '../../hooks/notes/useNoteActions';
+import { useCreateNote } from '../../hooks/notes/useCreateNote';
 import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
 
 import { Preferences } from '../Preferences/Preferences';
@@ -40,7 +37,6 @@ import './MainScreen.css';
 export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
-	const notesRegistry = useNotesRegistry();
 	const activeNotesContext = useNotesContext();
 
 	const { events: workspaceEvents } = useWorkspaceContext();
@@ -49,8 +45,6 @@ export const MainScreen: FC = () => {
 		activeNotesContext.$notes,
 		({ activeNote }) => activeNote,
 	);
-
-	const notes = useStoreMap(activeNotesContext.$notes, ({ notes }) => notes);
 
 	const { $tags } = useTagsContext();
 	const activeTag = useStoreMap($tags, ({ selected }) => selected);
@@ -78,39 +72,7 @@ export const MainScreen: FC = () => {
 		({ openedNotes }) => openedNotes,
 	);
 
-	const noteActions = useNoteActions();
-
-	const tagsRegistry = useTagsRegistry();
-	const newNoteIdRef = useRef<NoteId | null>(null);
-	const createNote = useCallback(async () => {
-		const noteId = await notesRegistry.add({ title: '', text: '' });
-
-		if (activeTag) {
-			await tagsRegistry.setAttachedTags(noteId, [activeTag]);
-			workspaceEvents.tagAttachmentsChanged([
-				{
-					tagId: activeTag,
-					target: noteId,
-					state: 'add',
-				},
-			]);
-		}
-
-		newNoteIdRef.current = noteId;
-		updateNotes();
-	}, [activeTag, notesRegistry, tagsRegistry, updateNotes, workspaceEvents]);
-
-	// Focus on new note
-	useEffect(() => {
-		if (newNoteIdRef.current === null) return;
-
-		const newNoteId = newNoteIdRef.current;
-		const isNoteExists = notes.find((note) => note.id === newNoteId);
-		if (isNoteExists) {
-			newNoteIdRef.current = null;
-			noteActions.click(newNoteId);
-		}
-	}, [notes, noteActions.click]);
+	const createNote = useCreateNote();
 
 	const statusBarButtons = useStatusBarManager();
 
