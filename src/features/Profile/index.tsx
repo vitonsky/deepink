@@ -1,6 +1,6 @@
 import React, { createContext, FC } from 'react';
-import { ProfileContainer } from '@features/App/useProfiles';
 import { Workspace } from '@features/Workspace';
+import { ProfileContainer } from '@state/profiles/useProfiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export type ProfileControls = {

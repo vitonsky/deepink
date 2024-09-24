@@ -1,5 +1,4 @@
 import { combine, createApi, createEvent, createStore, sample } from 'effector';
-import { useProfiles } from '@features/App/useProfiles';
 import { DisposableBox } from '@utils/disposable';
 
 export type ProfileEntry = {
@@ -90,5 +89,3 @@ export const createProfilesApi = <T extends DisposableBox<unknown>>(
 		},
 	};
 };
-
-export type ProfilesApi = ReturnType<typeof useProfiles>;

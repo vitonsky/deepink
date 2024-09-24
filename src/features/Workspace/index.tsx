@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
-import { ProfileContainer } from '@features/App/useProfiles';
 import { MainScreen } from '@features/MainScreen';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { WorkspaceStatusBarItems } from '@features/Workspace/WorkspaceStatusBarItems';
 import { createNotesApi } from '@state/notes';
+import { ProfileContainer } from '@state/profiles/useProfiles';
 import { createTagsApi } from '@state/tags';
 import { createWorkspaceApi } from '@state/workspace';
 

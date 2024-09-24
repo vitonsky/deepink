@@ -3,8 +3,8 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { cn } from '@bem-react/classname';
-import { ProfilesApi } from '@state/profiles';
-import { ProfilesManagerApi } from '@state/profilesManager';
+import { ProfilesApi } from '@state/profiles/useProfiles';
+import { ProfilesManagerApi } from '@state/profilesManager/useProfilesManager';
 
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';

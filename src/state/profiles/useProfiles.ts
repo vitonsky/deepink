@@ -11,8 +11,9 @@ import {
 } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { createProfilesApi, ProfileEntry } from '@state/profiles';
 import { DisposableBox } from '@utils/disposable';
+
+import { createProfilesApi, ProfileEntry } from './profiles';
 
 export type ProfileContainer = {
 	profile: ProfileEntry;
@@ -134,3 +135,5 @@ export const useProfiles = () => {
 		openProfile,
 	};
 };
+
+export type ProfilesApi = ReturnType<typeof useProfiles>;

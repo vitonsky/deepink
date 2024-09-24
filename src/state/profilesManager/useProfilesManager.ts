@@ -3,10 +3,16 @@ import { useUnit } from 'effector-react';
 import { bytesToBase64 } from '@core/encryption/utils/encoding';
 import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
-import { ProfilesManager } from '@core/storage/ProfilesManager';
+import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { NewProfile } from '@features/WorkspaceManager/ProfileCreator';
-import { createProfilesManagerApi, ProfilesManagerApi } from '@state/profilesManager';
+
+import { createProfilesManagerApi } from './profilesManager';
+
+export type ProfilesManagerApi = {
+	profiles: ProfileObject[] | null;
+	createProfile: (profile: NewProfile) => Promise<void>;
+};
 
 /**
  * Hook to manage profile accounts

@@ -3,11 +3,11 @@ import { cn } from '@bem-react/classname';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { useProfiles } from '@features/App/useProfiles';
 import { useProfileSelector } from '@features/App/useProfileSelector';
-import { useProfilesManager } from '@features/App/useProfilesManager';
 import { Profiles } from '@features/Profiles';
 import { SplashScreen } from '@features/SplashScreen';
+import { useProfiles } from '@state/profiles/useProfiles';
+import { useProfilesManager } from '@state/profilesManager/useProfilesManager';
 
 import { WorkspaceManager } from '../WorkspaceManager';
 

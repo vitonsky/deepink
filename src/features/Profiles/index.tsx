@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Profile } from '@features/Profile';
-import { ProfilesApi } from '@state/profiles';
+import { ProfilesApi } from '@state/profiles/useProfiles';
 
 export type ProfilesProps = {
 	profilesApi: ProfilesApi;
