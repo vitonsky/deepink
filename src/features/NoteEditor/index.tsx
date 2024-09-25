@@ -22,7 +22,6 @@ import {
 	FaTrashCan,
 	FaXmark,
 } from 'react-icons/fa6';
-import { useStoreMap } from 'effector-react';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
@@ -34,10 +33,10 @@ import { IResolvedTag } from '@core/features/tags';
 import {
 	useAttachmentsController,
 	useFilesRegistry,
-	useTagsContext,
 	useTagsRegistry,
-	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { selectTags, workspacesApi } from '@state/redux/workspaces';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
@@ -53,15 +52,14 @@ export type NoteEditorProps = {
 };
 
 export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
+	const dispatch = useAppDispatch();
+
 	const [title, setTitle] = useState(note.content.title);
 	const [text, setText] = useState(note.content.text);
 
 	const tagsRegistry = useTagsRegistry();
 
-	const { $tags, events: tagsEvents } = useTagsContext();
-	const tags = useStoreMap($tags, ({ list }) => list);
-
-	const { events: workspaceEvents } = useWorkspaceContext();
+	const tags = useAppSelector(selectTags('default'));
 
 	const [notAttachedTags, setNotAttachedTags] = useState<IResolvedTag[]>([]);
 	const [attachedTags, setAttachedTags] = useState<IResolvedTag[]>([]);
@@ -365,7 +363,12 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						className={cnNoteEditor('Attachment')}
 						key={tag.id}
 						onClick={() => {
-							tagsEvents.selectedTagChanged(tag.id);
+							dispatch(
+								workspacesApi.setSelectedTag({
+									workspace: 'default',
+									tag: tag.id,
+								}),
+							);
 						}}
 					>
 						<span>{tag.resolvedName}</span>
@@ -379,13 +382,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 									.filter(({ id }) => id !== tag.id)
 									.map(({ id }) => id);
 								await tagsRegistry.setAttachedTags(noteId, updatedTags);
-								workspaceEvents.tagAttachmentsChanged([
-									{
-										tagId: tag.id,
-										target: noteId,
-										state: 'delete',
-									},
-								]);
 								await updateTags();
 							}}
 						/>
@@ -455,13 +451,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								...attachedTags.map(({ id }) => id),
 								id,
 							]);
-							workspaceEvents.tagAttachmentsChanged([
-								{
-									tagId: id,
-									target: noteId,
-									state: 'add',
-								},
-							]);
 
 							await updateTags();
 						}}
@@ -496,17 +485,9 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								shortenedTagName,
 								parentTagId,
 							);
-							workspaceEvents.tagsUpdateRequested();
 							await tagsRegistry.setAttachedTags(noteId, [
 								...attachedTags.map(({ id }) => id),
 								tagId,
-							]);
-							workspaceEvents.tagAttachmentsChanged([
-								{
-									tagId: tagId,
-									target: noteId,
-									state: 'add',
-								},
 							]);
 
 							await updateTags();

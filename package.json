@@ -85,6 +85,7 @@
 	},
 	"dependencies": {
 		"@bem-react/classname": "^1.6.0",
+		"@reduxjs/toolkit": "^2.2.7",
 		"better-sqlite3": "^9.3.0",
 		"crc": "^4.3.2",
 		"debounce": "^2.0.0",
@@ -104,6 +105,7 @@
 		"react-elegant-ui": "^0.3.4",
 		"react-icons": "^4.12.0",
 		"react-markdown": "^8.0.7",
+		"react-redux": "^9.1.2",
 		"remark-breaks": "^3.0.3",
 		"remark-frontmatter": "^4.0.1",
 		"remark-gfm": "^3.0.1",

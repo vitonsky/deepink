@@ -1,29 +1,19 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useStoreMap } from 'effector-react';
 import { NoteId } from '@core/features/notes';
-import {
-	useNotesContext,
-	useNotesRegistry,
-	useTagsContext,
-	useTagsRegistry,
-	useWorkspaceContext,
-} from '@features/Workspace/WorkspaceProvider';
+import { useNotesRegistry, useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectActiveTag, selectNotes } from '@state/redux/workspaces';
 
 import { useNoteActions } from './useNoteActions';
 import { useUpdateNotes } from './useUpdateNotes';
 
 export const useCreateNote = () => {
-	const { events: workspaceEvents } = useWorkspaceContext();
-
 	const notesRegistry = useNotesRegistry();
 	const noteActions = useNoteActions();
 	const tagsRegistry = useTagsRegistry();
 
-	const { $notes } = useNotesContext();
-	const notes = useStoreMap($notes, ({ notes }) => notes);
-
-	const { $tags } = useTagsContext();
-	const activeTagId = useStoreMap($tags, ({ selected }) => selected);
+	const notes = useAppSelector(selectNotes('default'));
+	const activeTag = useAppSelector(selectActiveTag('default'));
 
 	const updateNotes = useUpdateNotes();
 
@@ -38,23 +28,16 @@ export const useCreateNote = () => {
 			newNoteIdRef.current = null;
 			noteActions.click(newNoteId);
 		}
-	}, [notes, noteActions.click]);
+	}, [noteActions, notes]);
 
 	return useCallback(async () => {
 		const noteId = await notesRegistry.add({ title: '', text: '' });
 
-		if (activeTagId) {
-			await tagsRegistry.setAttachedTags(noteId, [activeTagId]);
-			workspaceEvents.tagAttachmentsChanged([
-				{
-					tagId: activeTagId,
-					target: noteId,
-					state: 'add',
-				},
-			]);
+		if (activeTag) {
+			await tagsRegistry.setAttachedTags(noteId, [activeTag.id]);
 		}
 
 		newNoteIdRef.current = noteId;
 		updateNotes();
-	}, [activeTagId, notesRegistry, tagsRegistry, updateNotes, workspaceEvents]);
+	}, [activeTag, notesRegistry, tagsRegistry, updateNotes]);
 };

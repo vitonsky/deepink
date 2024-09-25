@@ -1,9 +1,15 @@
 import React, { FC } from 'react';
-import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useAppSelector } from '@state/redux/hooks';
+import { createAppSelector } from '@state/redux/utils';
+import {
+	selectActiveNoteId,
+	selectNotes,
+	selectOpenedNotes,
+} from '@state/redux/workspaces';
 
 import { useNoteActions } from '../../../hooks/notes/useNoteActions';
 import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';
@@ -21,17 +27,13 @@ export const NotesList: FC<NotesListProps> = () => {
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
-	const activeNotesContext = useNotesContext();
-	const notes = useStoreMap(activeNotesContext.$notes, ({ notes }) => notes);
-
-	const activeNote = useStoreMap(
-		activeNotesContext.$notes,
-		({ activeNote }) => activeNote,
+	const activeNoteId = useAppSelector(selectActiveNoteId('default'));
+	const openedNotesIdList = useAppSelector(
+		createAppSelector(selectOpenedNotes('default'), (notes) =>
+			notes.map((note) => note.id),
+		),
 	);
-
-	const openedNotesIdList = useStoreMap(activeNotesContext.$notes, ({ openedNotes }) =>
-		openedNotes.map((note) => note.id),
-	);
+	const notes = useAppSelector(selectNotes('default'));
 
 	const openNoteContextMenu = useDefaultNoteContextMenu({
 		closeNote: noteActions.close,
@@ -52,7 +54,7 @@ export const NotesList: FC<NotesListProps> = () => {
 						spacing={2}
 						direction="vertical"
 						className={cnNotesList('Note', {
-							active: note.id === activeNote,
+							active: note.id === activeNoteId,
 							opened:
 								openedNotesIdList &&
 								openedNotesIdList.indexOf(note.id) !== -1,

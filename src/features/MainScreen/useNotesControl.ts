@@ -3,17 +3,17 @@ import { useNotesContext, useNotesRegistry } from '@features/Workspace/Workspace
 
 export const useNotesControl = () => {
 	const notesRegistry = useNotesRegistry();
-	const { events } = useNotesContext();
+	const { openNote } = useNotesContext();
 
 	const open = useCallback(
 		async (id: string) => {
 			const note = await notesRegistry.getById(id);
 			if (!note) return false;
 
-			events.noteOpened(note);
+			openNote(note);
 			return true;
 		},
-		[events, notesRegistry],
+		[notesRegistry, openNote],
 	);
 
 	return {

@@ -8,19 +8,21 @@ import {
 	FaInbox,
 	FaTrash,
 } from 'react-icons/fa6';
-import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
+import { useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
-	useTagsContext,
-	useTagsRegistry,
-	useWorkspaceContext,
-} from '@features/Workspace/WorkspaceProvider';
+	selectActiveTag,
+	selectTags,
+	selectTagsTree,
+	workspacesApi,
+} from '@state/redux/workspaces';
 
-import { TagItem, TagsList } from './TagsList';
+import { TagsList } from './TagsList';
 
 import './NotesOverview.css';
 
@@ -29,63 +31,13 @@ export const cnNotesOverview = cn('NotesOverview');
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
-	const { events: workspaceEvents } = useWorkspaceContext();
+	const dispatch = useAppDispatch();
 
-	const { $tags, events: tagsEvents } = useTagsContext();
-	const activeTag = useStoreMap($tags, ({ selected }) => selected);
-
-	const tags = useStoreMap($tags, ({ list }) => list);
-
-	const tagsTree = useStoreMap($tags, ({ list: flatTags }) => {
-		const tagsMap: Record<string, TagItem> = {};
-		const tagToParentMap: Record<string, string> = {};
-
-		// Fill maps
-		flatTags.forEach(({ id, name, parent }) => {
-			tagsMap[id] = {
-				id,
-				content: name,
-			};
-
-			if (parent !== null) {
-				tagToParentMap[id] = parent;
-			}
-		});
-
-		// Attach tags to parents
-		for (const tagId in tagToParentMap) {
-			const parentId = tagToParentMap[tagId];
-
-			const tag = tagsMap[tagId];
-			const parentTag = tagsMap[parentId];
-
-			// Create array
-			if (!parentTag.childrens) {
-				parentTag.childrens = [];
-			}
-
-			// Attach tag to another tag
-			parentTag.childrens.push(tag);
-		}
-
-		// Delete nested tags from tags map
-		Object.keys(tagToParentMap).forEach((nestedTagId) => {
-			delete tagsMap[nestedTagId];
-		});
-
-		// Collect tags array from a map
-		return Object.values(tagsMap);
-	});
+	const activeTag = useAppSelector(selectActiveTag('default'));
+	const tags = useAppSelector(selectTags('default'));
+	const tagsTree = useAppSelector(selectTagsTree('default'));
 
 	const tagsRegistry = useTagsRegistry();
-	const updateTags = workspaceEvents.tagsUpdateRequested;
-
-	useEffect(() => {
-		updateTags();
-
-		// Run once for init state
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	const parentTagForNewTagRef = useRef<IResolvedTag | null>(null);
 	const [isAddTagPopupOpened, setIsAddTagPopupOpened] = useState(false);
@@ -111,7 +63,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						if (data.id === undefined) return;
 
 						await tagsRegistry.update({ id: data.id, ...data });
-						await updateTags();
 						setEditedTag(null);
 					}}
 					onCancel={() => {
@@ -130,7 +81,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				onSave={async (data) => {
 					console.warn('Create tag', data);
 					await tagsRegistry.add(data.name, data.parent);
-					await updateTags();
 					setIsAddTagPopupOpened(false);
 				}}
 				onCancel={() => {
@@ -138,7 +88,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				}}
 			/>
 		);
-	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry, updateTags]);
+	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry]);
 
 	// TODO: show spinner while loading tags
 	return (
@@ -216,7 +166,12 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				activeItem={activeTag === null ? 'all' : undefined}
 				onPick={(id) => {
 					if (id === 'all') {
-						tagsEvents.selectedTagChanged(null);
+						dispatch(
+							workspacesApi.setSelectedTag({
+								workspace: 'default',
+								tag: null,
+							}),
+						);
 					}
 				}}
 			/>
@@ -239,8 +194,15 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				<div className={cnNotesOverview('TagsList')}>
 					<TagsList
 						tags={tagsTree}
-						activeTag={activeTag ?? undefined}
-						onTagClick={tagsEvents.selectedTagChanged}
+						activeTag={activeTag ? activeTag.id : undefined}
+						onTagClick={(tagId) =>
+							dispatch(
+								workspacesApi.setSelectedTag({
+									workspace: 'default',
+									tag: tagId,
+								}),
+							)
+						}
 						contextMenu={{
 							onAdd(id) {
 								const tag = tags.find((tag) => id === tag.id);
@@ -262,7 +224,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								if (!isConfirmed) return;
 
 								await tagsRegistry.delete(id);
-								updateTags();
 							},
 							onEdit(id) {
 								console.log('Edit tag', id);

@@ -2,19 +2,15 @@ import React from 'react';
 import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { FaArrowDownWideShort, FaMagnifyingGlass } from 'react-icons/fa6';
-import { useStoreMap } from 'effector-react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { cnMainScreen } from '@features/MainScreen';
 import { NotesList } from '@features/MainScreen/NotesList';
-import { useTagsContext } from '@features/Workspace/WorkspaceProvider';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectActiveTag } from '@state/redux/workspaces';
 
 export const NotesPanel = () => {
-	const { $tags } = useTagsContext();
-	const activeTagName = useStoreMap($tags, ({ selected, list }) => {
-		if (selected === null) return null;
-		return list.find((tag) => tag.id === selected)?.name ?? null;
-	});
+	const activeTag = useAppSelector(selectActiveTag('default'));
 
 	return (
 		<>
@@ -46,11 +42,11 @@ export const NotesPanel = () => {
 			</Stack>
 
 			<div className={cnMainScreen('NotesList')}>
-				{activeTagName && (
+				{activeTag && (
 					<div className={cnMainScreen('NotesListSelectedTag')}>
 						With tag{' '}
 						<span className={cnMainScreen('NotesListSelectedTagName')}>
-							{activeTagName}
+							{activeTag.name}
 						</span>
 					</div>
 				)}

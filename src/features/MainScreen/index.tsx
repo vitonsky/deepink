@@ -3,18 +3,15 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
-import { useStoreMap } from 'effector-react';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
-import {
-	useNotesContext,
-	useTagsContext,
-	useWorkspaceContext,
-} from '@features/Workspace/WorkspaceProvider';
+import { useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/workspaces';
 
 import { useCreateNote } from '../../hooks/notes/useCreateNote';
 import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
@@ -29,40 +26,25 @@ import './MainScreen.css';
 export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
-	const activeNotesContext = useNotesContext();
+	const activeNoteId = useAppSelector(selectActiveNoteId('default'));
 
-	const { events: workspaceEvents } = useWorkspaceContext();
-
-	const activeNoteId = useStoreMap(
-		activeNotesContext.$notes,
-		({ activeNote }) => activeNote,
-	);
-
-	const { $tags } = useTagsContext();
-	const activeTag = useStoreMap($tags, ({ selected }) => selected);
-
+	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
 
 	useEffect(() => {
-		if (activeTag === null) return;
-
-		return workspaceEvents.tagAttachmentsChanged.watch((ops) => {
-			const isHaveUpdates = ops.some(({ tagId }) => activeTag === tagId);
-			if (isHaveUpdates) {
+		return tagsRegistry.onChange((scope) => {
+			if (scope === 'noteTags') {
 				updateNotes();
 			}
 		});
-	}, [activeTag, updateNotes, workspaceEvents.tagAttachmentsChanged]);
+	}, [tagsRegistry, updateNotes]);
 
 	// Init
 	useEffect(() => {
 		updateNotes();
 	}, [updateNotes]);
 
-	const openedNotes = useStoreMap(
-		activeNotesContext.$notes,
-		({ openedNotes }) => openedNotes,
-	);
+	const openedNotes = useAppSelector(selectOpenedNotes('default'));
 
 	const createNote = useCreateNote();
 

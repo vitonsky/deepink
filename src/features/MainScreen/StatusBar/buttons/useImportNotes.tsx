@@ -16,7 +16,6 @@ import {
 	useAttachmentsController,
 	useFilesRegistry,
 	useTagsRegistry,
-	useWorkspaceContext,
 } from '@features/Workspace/WorkspaceProvider';
 
 export const replaceUrls = (
@@ -62,8 +61,6 @@ export const useImportNotes = ({
 	notesRegistry: INotesController;
 	updateNotes: () => void;
 }) => {
-	const { events: workspaceEvents } = useWorkspaceContext();
-
 	const filesRegistry = useFilesRegistry();
 	const attachmentsRegistry = useAttachmentsController();
 	const tagsRegistry = useTagsRegistry();
@@ -157,14 +154,12 @@ export const useImportNotes = ({
 							tagNamePartToAdd,
 							parentTag.id,
 						);
-						workspaceEvents.tagsUpdateRequested();
 						tagsToAttach.push(createdTagId);
 						continue;
 					}
 
 					// Create full resolved tag
 					const createdTagId = await tagsRegistry.add(resolvedTagName, null);
-					workspaceEvents.tagsUpdateRequested();
 					tagsToAttach.push(createdTagId);
 				}
 
@@ -296,7 +291,6 @@ export const useImportNotes = ({
 					.join('/');
 
 				tagId = await tagsRegistry.add(tagNameToCreate, parentTagId);
-				workspaceEvents.tagsUpdateRequested();
 
 				break;
 			}
@@ -305,7 +299,6 @@ export const useImportNotes = ({
 				const tagNameToCreate = filenameBasePathSegments.join('/').trim();
 				if (tagNameToCreate) {
 					tagId = await tagsRegistry.add(tagNameToCreate, null);
-					workspaceEvents.tagsUpdateRequested();
 				}
 			}
 
@@ -320,12 +313,5 @@ export const useImportNotes = ({
 		}
 
 		updateNotes();
-	}, [
-		attachmentsRegistry,
-		filesRegistry,
-		notesRegistry,
-		tagsRegistry,
-		updateNotes,
-		workspaceEvents,
-	]);
+	}, [attachmentsRegistry, filesRegistry, notesRegistry, tagsRegistry, updateNotes]);
 };

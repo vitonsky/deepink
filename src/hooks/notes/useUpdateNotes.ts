@@ -1,22 +1,16 @@
 import { useCallback } from 'react';
-import { useStoreMap } from 'effector-react';
-import {
-	useNotesContext,
-	useNotesRegistry,
-	useTagsContext,
-} from '@features/Workspace/WorkspaceProvider';
+import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { selectActiveTag, workspacesApi } from '@state/redux/workspaces';
 
 export const useUpdateNotes = () => {
+	const dispatch = useAppDispatch();
+
 	const notesRegistry = useNotesRegistry();
-	const activeNotesContext = useNotesContext();
-
-	const setNotes = activeNotesContext.events.setNotes;
-
-	const { $tags } = useTagsContext();
-	const activeTag = useStoreMap($tags, ({ selected }) => selected);
+	const activeTag = useAppSelector(selectActiveTag('default'));
 
 	return useCallback(async () => {
-		const tags = activeTag === null ? [] : [activeTag];
+		const tags = activeTag === null ? [] : [activeTag.id];
 		const notes = await notesRegistry.get({ limit: 10000, tags });
 		notes.sort((a, b) => {
 			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
@@ -26,6 +20,7 @@ export const useUpdateNotes = () => {
 			if (timeB > timeA) return 1;
 			return 0;
 		});
-		setNotes(notes);
-	}, [activeTag, notesRegistry]);
+
+		dispatch(workspacesApi.setNotes({ workspace: 'default', notes }));
+	}, [activeTag, dispatch, notesRegistry]);
 };

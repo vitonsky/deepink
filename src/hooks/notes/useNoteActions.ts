@@ -1,40 +1,40 @@
 import { useCallback } from 'react';
-import { useStoreMap } from 'effector-react';
 import { NoteId } from '@core/features/notes';
 import { useNotesContext } from '@features/Workspace/WorkspaceProvider';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { selectNotes, selectOpenedNotes, workspacesApi } from '@state/redux/workspaces';
 
 export const useNoteActions = () => {
-	const activeNotesContext = useNotesContext();
-	const { events: notesEvents } = activeNotesContext;
+	const dispatch = useAppDispatch();
 
-	const openedNotes = useStoreMap(
-		activeNotesContext.$notes,
-		({ openedNotes }) => openedNotes,
-	);
+	const { openNote, noteClosed } = useNotesContext();
 
-	const notes = useStoreMap(activeNotesContext.$notes, ({ notes }) => notes);
+	const openedNotes = useAppSelector(selectOpenedNotes('default'));
+	const notes = useAppSelector(selectNotes('default'));
 
 	// TODO: focus on note input
 	const click = useCallback(
 		(id: NoteId) => {
 			const isNoteOpened = openedNotes.some((note) => note.id === id);
 			if (isNoteOpened) {
-				notesEvents.activeNoteChanged(id);
+				dispatch(
+					workspacesApi.setActiveNote({ workspace: 'default', noteId: id }),
+				);
 			} else {
 				const note = notes.find((note) => note.id === id);
 				if (note) {
-					notesEvents.noteOpened(note);
+					openNote(note);
 				}
 			}
 		},
-		[notes, notesEvents, openedNotes],
+		[dispatch, notes, openNote, openedNotes],
 	);
 
 	const close = useCallback(
 		(id: NoteId) => {
-			notesEvents.noteClosed(id);
+			noteClosed(id);
 		},
-		[notesEvents],
+		[noteClosed],
 	);
 
 	return { click, close };

@@ -5,11 +5,7 @@ import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
-import {
-	useFilesRegistry,
-	useTagsRegistry,
-	useWorkspaceContext,
-} from '@features/Workspace/WorkspaceProvider';
+import { useFilesRegistry, useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
@@ -58,8 +54,6 @@ export const useDefaultNoteContextMenu = ({
 	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
-	const { events: workspaceEvents } = useWorkspaceContext();
-
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
 			switch (action) {
@@ -70,17 +64,7 @@ export const useDefaultNoteContextMenu = ({
 					closeNote(id);
 					await notesRegistry.delete([id]);
 
-					const attachedTags = await tagsRegistry.getAttachedTags(id);
 					await tagsRegistry.setAttachedTags(id, []);
-					attachedTags.forEach(({ id: tagId }) =>
-						workspaceEvents.tagAttachmentsChanged([
-							{
-								tagId,
-								target: id,
-								state: 'delete',
-							},
-						]),
-					);
 
 					updateNotes();
 					break;
@@ -103,13 +87,6 @@ export const useDefaultNoteContextMenu = ({
 					const attachedTagsIds = attachedTags.map(({ id }) => id);
 
 					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
-					workspaceEvents.tagAttachmentsChanged(
-						attachedTagsIds.map((tagId) => ({
-							tagId,
-							target: newNoteId,
-							state: 'add',
-						})),
-					);
 
 					updateNotes();
 					break;
@@ -168,14 +145,7 @@ export const useDefaultNoteContextMenu = ({
 				}
 			}
 		},
-		[
-			closeNote,
-			filesRegistry,
-			notesRegistry,
-			tagsRegistry,
-			updateNotes,
-			workspaceEvents,
-		],
+		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);

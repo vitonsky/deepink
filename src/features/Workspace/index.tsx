@@ -1,13 +1,13 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
+import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { WorkspaceStatusBarItems } from '@features/Workspace/WorkspaceStatusBarItems';
-import { createNotesApi } from '@state/notes';
 import { ProfileContainer } from '@state/profiles/useProfiles';
-import { createTagsApi } from '@state/tags';
-import { createWorkspaceApi } from '@state/workspace';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { selectActiveWorkspace, workspacesApi } from '@state/redux/workspaces';
 
 import { WorkspaceProvider } from './WorkspaceProvider';
 
@@ -19,16 +19,18 @@ export interface WorkspaceProps {
  * Manage one workspace
  */
 export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
-	const [workspaceApi] = useState(createWorkspaceApi);
-	const [tagsApi] = useState(createTagsApi);
-	const [notesApi] = useState(createNotesApi);
-
 	const workspace = useWorkspace(profile);
+	const dispatch = useAppDispatch();
 
 	// Close notes by unmount
 	useEffect(() => {
-		return () => notesApi.events.notesClosed();
-	}, [notesApi.events, profile]);
+		return () => {
+			// TODO: use actual workspace id once will be implemented
+			dispatch(workspacesApi.setActiveNote({ workspace: 'default', noteId: null }));
+			dispatch(workspacesApi.setOpenedNotes({ workspace: 'default', notes: [] }));
+			dispatch(workspacesApi.setNotes({ workspace: 'default', notes: [] }));
+		};
+	}, []);
 
 	// Run optional services for active profile
 	useEffect(() => {
@@ -46,20 +48,69 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 		if (!workspace) return;
 
 		const { tagsRegistry } = workspace;
-		const updateTags = () => tagsRegistry.getTags().then(tagsApi.events.tagsUpdated);
+		const updateTags = () =>
+			tagsRegistry.getTags().then((tags) => {
+				dispatch(workspacesApi.setTags({ workspace: 'default', tags }));
+			});
 
-		const cleanup = workspaceApi.events.tagsUpdateRequested.watch(updateTags);
 		updateTags();
 
+		const cleanup = tagsRegistry.onChange(updateTags);
 		return cleanup;
 	});
 
-	if (!workspace) {
+	const activeWorkspace = useAppSelector(selectActiveWorkspace);
+	useEffect(() => {
+		// TODO: Set specific workspace and profile
+		dispatch(
+			workspacesApi.setWorkspaces([
+				{
+					id: 'default',
+
+					activeNote: null,
+					openedNotes: [],
+					notes: [],
+
+					tags: {
+						selected: null,
+						list: [],
+					},
+				},
+			]),
+		);
+		dispatch(workspacesApi.setActiveWorkspace('default'));
+	}, [dispatch]);
+
+	if (!workspace || !activeWorkspace) {
 		return <SplashScreen />;
 	}
 
 	return (
-		<WorkspaceProvider {...{ workspaceApi, notesApi, tagsApi, ...workspace }}>
+		<WorkspaceProvider
+			{...workspace}
+			notesApi={{
+				openNote: (note: INote, focus = true) => {
+					dispatch(workspacesApi.addOpenedNote({ workspace: 'default', note }));
+
+					if (focus) {
+						dispatch(
+							workspacesApi.setActiveNote({
+								workspace: 'default',
+								noteId: note.id,
+							}),
+						);
+					}
+				},
+				noteUpdated: (note: INote) =>
+					dispatch(
+						workspacesApi.updateOpenedNote({ workspace: 'default', note }),
+					),
+				noteClosed: (noteId: string) =>
+					dispatch(
+						workspacesApi.removeOpenedNote({ workspace: 'default', noteId }),
+					),
+			}}
+		>
 			<StatusBarProvider>
 				<MainScreen />
 				<WorkspaceStatusBarItems />

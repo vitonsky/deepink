@@ -1,3 +1,4 @@
+import { createEvent } from 'effector';
 import { v4 as uuid4 } from 'uuid';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
@@ -5,10 +6,19 @@ import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteD
 import tagsQuery from './selectTagsWithResolvedNames.sql';
 import { IResolvedTag, ITag } from '..';
 
+type ChangeEvent = 'tags' | 'noteTags';
+
 export class TagsController {
 	private db;
+	private readonly onChanged;
 	constructor(db: SQLiteDatabase) {
 		this.db = db;
+		this.onChanged = createEvent<ChangeEvent>();
+	}
+
+	public onChange(event: (scope: ChangeEvent) => void) {
+		const subscription = this.onChanged.watch(event);
+		return () => subscription.unsubscribe();
 	}
 
 	/**
@@ -74,6 +84,8 @@ export class TagsController {
 			throw new Error("Can't get id of inserted row");
 		}
 
+		this.onChanged('tags');
+
 		return selectWithId.id;
 	}
 
@@ -85,6 +97,8 @@ export class TagsController {
 			tag.parent,
 			tag.id,
 		);
+
+		this.onChanged('tags');
 	}
 
 	public async delete(id: string): Promise<void> {
@@ -124,6 +138,8 @@ export class TagsController {
 					.join(',')})`,
 			).run(tagsIdForRemove);
 		})();
+
+		this.onChanged('tags');
 	}
 
 	/**
@@ -162,5 +178,7 @@ export class TagsController {
 				).run(tags.map((tagId) => [uuid4(), tagId, target]).flat());
 			}
 		})();
+
+		this.onChanged('noteTags');
 	}
 }
