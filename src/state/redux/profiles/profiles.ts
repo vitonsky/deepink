@@ -3,6 +3,7 @@ import { IResolvedTag } from '@core/features/tags';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
+import { findNearNote } from './utils';
 
 export type ProfileScoped<T extends {} = {}> = T & {
 	profileId: string;
@@ -11,22 +12,6 @@ export type WorkspaceScoped<T extends {} = {}> = T &
 	ProfileScoped<{
 		workspaceId: string;
 	}>;
-
-/**
- * Find a note near current, but except current note in edge cases
- */
-const findNearNote = (notes: INote[], noteId: NoteId) => {
-	const currentNoteIndex = notes.findIndex((note) => note.id === noteId);
-	if (currentNoteIndex === -1) {
-		return notes.length === 0 ? null : notes.at(-1) ?? null;
-	}
-
-	if (notes.length === 1) return null;
-
-	const prevIndex = currentNoteIndex - 1;
-	const nextIndex = currentNoteIndex + 1;
-	return notes[prevIndex] ?? notes[nextIndex] ?? null;
-};
 
 export type WorkspaceData = {
 	id: string;
