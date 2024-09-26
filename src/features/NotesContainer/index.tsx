@@ -5,9 +5,9 @@ import { cnMainScreen } from '@features/MainScreen';
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
 import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
-import { createAppSelector } from '@state/redux/utils';
 import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import {
+	createWorkspaceSelector,
 	selectActiveNoteId,
 	selectOpenedNotes,
 } from '@state/redux/workspaces/workspaces';
@@ -27,10 +27,10 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
-	const tabs = useWorkspaceSelector((scope) =>
-		createAppSelector(selectOpenedNotes(scope), (notes) =>
+	const tabs = useWorkspaceSelector((state) =>
+		createWorkspaceSelector([selectOpenedNotes], (notes) =>
 			notes.map((note) => note.id),
-		),
+		)(state),
 	);
 
 	// Simulate note update

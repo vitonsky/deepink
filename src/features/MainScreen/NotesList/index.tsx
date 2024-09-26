@@ -3,9 +3,9 @@ import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
-import { createAppSelector } from '@state/redux/utils';
 import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import {
+	createWorkspaceSelector,
 	selectActiveNoteId,
 	selectNotes,
 	selectOpenedNotes,
@@ -28,8 +28,8 @@ export const NotesList: FC<NotesListProps> = () => {
 	const noteActions = useNoteActions();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	const openedNotesIdList = useWorkspaceSelector((scope) =>
-		createAppSelector(selectOpenedNotes(scope), (notes) =>
+	const openedNotesIdList = useWorkspaceSelector(
+		createWorkspaceSelector(selectOpenedNotes, (notes) =>
 			notes.map((note) => note.id),
 		),
 	);

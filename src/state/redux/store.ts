@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { workspacesSlice } from './workspaces/workspaces';
+import { WorkspaceData, workspacesSlice } from './workspaces/workspaces';
 
 export const store = configureStore({
 	reducer: {
@@ -11,3 +11,8 @@ export const store = configureStore({
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore['getState']>;
 export type AppDispatch = AppStore['dispatch'];
+
+export type WorkspaceContextState = {
+	root: RootState;
+	workspace: WorkspaceData | null;
+};

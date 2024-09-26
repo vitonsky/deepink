@@ -1,12 +1,19 @@
+import { useMemo } from 'react';
 import { Selector } from '@reduxjs/toolkit';
 
 import { useAppSelector } from '../hooks';
-import { RootState } from '../store';
-import { WorkspaceScope } from './workspaces';
+import { selectWorkspace, WorkspaceData } from './workspaces';
+
+export const useWorkspaceRootSelector = () => {
+	const workspace = 'default';
+	return useMemo(() => selectWorkspace(workspace), [workspace]);
+};
 
 export const useWorkspaceSelector = <T>(
-	selectorGetter: (scope: WorkspaceScope) => Selector<RootState, T>,
-) => {
-	const selector = selectorGetter({ workspaceId: 'default', profileId: 'default' });
-	return useAppSelector(selector);
+	selector: Selector<WorkspaceData | null, T>,
+): T => {
+	const selectWorkspace = useWorkspaceRootSelector();
+	const state = useAppSelector(selectWorkspace);
+
+	return selector(state);
 };

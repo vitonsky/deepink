@@ -1,9 +1,8 @@
 import { INote, NoteId } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
 import { TagItem } from '@features/MainScreen/NotesOverview/TagsList';
-import { createSlice, PayloadAction, Selector } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { RootState } from '../store';
 import { createAppSelector } from '../utils';
 
 export type WorkspaceScoped<T extends {}> = T & {
@@ -43,6 +42,8 @@ export type WorkspacesState = {
 	activeWorkspace: string | null;
 	workspaces: WorkspaceData[];
 };
+
+export const createWorkspaceSelector = createSelector.withTypes<WorkspaceData>();
 
 // TODO: replace to profiles slice with workspaces
 export const workspacesSlice = createSlice({
@@ -233,27 +234,17 @@ export const selectWorkspace = (workspaceId: string) =>
 		return workspaces.find((workspace) => workspace.id === workspaceId) ?? null;
 	});
 
-export const createWorkspaceSelector = <T>(
-	selectorConstructor: (
-		workspaceSelector: Selector<RootState, WorkspaceData | null>,
-	) => T,
-) => {
-	return (scope: WorkspaceScope) => {
-		const workspaceSelector = selectWorkspace(scope.workspaceId);
-		return selectorConstructor(workspaceSelector);
-	};
-};
+export const selectWorkspaceRoot = (workspace: WorkspaceData | null) => workspace;
 
-export const selectTags = createWorkspaceSelector((selectWorkspace) =>
-	createAppSelector([selectWorkspace], (workspace) => {
-		if (!workspace) return [];
+export const selectTags = createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
+	if (!workspace) return [];
 
-		return workspace.tags.list;
-	}),
-);
+	return workspace.tags.list;
+});
 
-export const selectTagsTree = createWorkspaceSelector((selectWorkspace) =>
-	createAppSelector([selectWorkspace], (workspace) => {
+export const selectTagsTree = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
 		if (!workspace) return [];
 
 		const flatTags = workspace.tags.list;
@@ -296,31 +287,31 @@ export const selectTagsTree = createWorkspaceSelector((selectWorkspace) =>
 
 		// Collect tags array from a map
 		return Object.values(tagsMap);
-	}),
+	},
 );
 
-export const selectActiveNoteId = createWorkspaceSelector((selectWorkspace) =>
-	createAppSelector([selectWorkspace], (workspace) => {
+export const selectActiveNoteId = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
 		if (!workspace) return null;
 
 		return workspace.activeNote ?? null;
-	}),
+	},
 );
 
 export const selectNote = (noteId: string | null) =>
-	createWorkspaceSelector((selectWorkspace) =>
-		createAppSelector([selectWorkspace], (workspace) => {
-			if (!workspace) return null;
-			if (!noteId) return null;
+	createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
+		if (!workspace) return null;
+		if (!noteId) return null;
 
-			const { notes } = workspace;
+		const { notes } = workspace;
 
-			return notes.find((note) => note.id === noteId) ?? null;
-		}),
-	);
+		return notes.find((note) => note.id === noteId) ?? null;
+	});
 
-export const selectActiveNote = createWorkspaceSelector((selectWorkspace) =>
-	createAppSelector([selectWorkspace], (workspace) => {
+export const selectActiveNote = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
 		if (!workspace) return null;
 
 		const { activeNote } = workspace;
@@ -329,30 +320,30 @@ export const selectActiveNote = createWorkspaceSelector((selectWorkspace) =>
 		const { notes } = workspace;
 
 		return notes.find((note) => note.id === activeNote) ?? null;
-	}),
+	},
 );
 
-export const selectActiveTag = createWorkspaceSelector((selectWorkspace) =>
-	createAppSelector([selectWorkspace], (workspace) => {
+export const selectActiveTag = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
 		if (!workspace) return null;
 
 		const currentTag = workspace.tags.selected;
 		if (!currentTag) return null;
 
 		return workspace.tags.list.find((tag) => tag.id === currentTag) ?? null;
-	}),
+	},
 );
 
-export const selectNotes = createWorkspaceSelector((selectWorkspace) =>
-	createAppSelector([selectWorkspace], (workspace) => {
-		if (!workspace) return [];
-		return workspace.notes;
-	}),
-);
+export const selectNotes = createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
+	if (!workspace) return [];
+	return workspace.notes;
+});
 
-export const selectOpenedNotes = createWorkspaceSelector((selectWorkspace) =>
-	createAppSelector([selectWorkspace], (workspace) => {
+export const selectOpenedNotes = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
 		if (!workspace) return [];
 		return workspace.openedNotes;
-	}),
+	},
 );
