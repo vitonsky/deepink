@@ -35,8 +35,9 @@ import {
 	useFilesRegistry,
 	useTagsRegistry,
 } from '@features/Workspace/WorkspaceProvider';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectTags, workspacesApi } from '@state/redux/workspaces';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { selectTags, workspacesApi } from '@state/redux/workspaces/workspaces';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
@@ -59,7 +60,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const tagsRegistry = useTagsRegistry();
 
-	const tags = useAppSelector(selectTags('default'));
+	const tags = useWorkspaceSelector(selectTags);
 
 	const [notAttachedTags, setNotAttachedTags] = useState<IResolvedTag[]>([]);
 	const [attachedTags, setAttachedTags] = useState<IResolvedTag[]>([]);

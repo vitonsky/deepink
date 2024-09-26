@@ -1,16 +1,21 @@
 import { useCallback } from 'react';
 import { NoteId } from '@core/features/notes';
 import { useNotesContext } from '@features/Workspace/WorkspaceProvider';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectNotes, selectOpenedNotes, workspacesApi } from '@state/redux/workspaces';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import {
+	selectNotes,
+	selectOpenedNotes,
+	workspacesApi,
+} from '@state/redux/workspaces/workspaces';
 
 export const useNoteActions = () => {
 	const dispatch = useAppDispatch();
 
 	const { openNote, noteClosed } = useNotesContext();
 
-	const openedNotes = useAppSelector(selectOpenedNotes('default'));
-	const notes = useAppSelector(selectNotes('default'));
+	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
+	const notes = useWorkspaceSelector(selectNotes);
 
 	// TODO: focus on note input
 	const click = useCallback(

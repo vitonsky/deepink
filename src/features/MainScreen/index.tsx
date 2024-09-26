@@ -10,8 +10,11 @@ import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarPro
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useAppSelector } from '@state/redux/hooks';
-import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/workspaces';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import {
+	selectActiveNoteId,
+	selectOpenedNotes,
+} from '@state/redux/workspaces/workspaces';
 
 import { useCreateNote } from '../../hooks/notes/useCreateNote';
 import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
@@ -26,7 +29,7 @@ import './MainScreen.css';
 export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
-	const activeNoteId = useAppSelector(selectActiveNoteId('default'));
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
@@ -44,7 +47,7 @@ export const MainScreen: FC = () => {
 		updateNotes();
 	}, [updateNotes]);
 
-	const openedNotes = useAppSelector(selectOpenedNotes('default'));
+	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
 	const createNote = useCreateNote();
 

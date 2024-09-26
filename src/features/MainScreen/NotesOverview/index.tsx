@@ -14,13 +14,14 @@ import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import { useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import {
 	selectActiveTag,
 	selectTags,
 	selectTagsTree,
 	workspacesApi,
-} from '@state/redux/workspaces';
+} from '@state/redux/workspaces/workspaces';
 
 import { TagsList } from './TagsList';
 
@@ -33,9 +34,9 @@ export type NotesOverviewProps = {};
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const dispatch = useAppDispatch();
 
-	const activeTag = useAppSelector(selectActiveTag('default'));
-	const tags = useAppSelector(selectTags('default'));
-	const tagsTree = useAppSelector(selectTagsTree('default'));
+	const activeTag = useWorkspaceSelector(selectActiveTag);
+	const tags = useWorkspaceSelector(selectTags);
+	const tagsTree = useWorkspaceSelector(selectTagsTree);
 
 	const tagsRegistry = useTagsRegistry();
 

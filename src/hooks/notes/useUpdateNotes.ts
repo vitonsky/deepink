@@ -1,13 +1,14 @@
 import { useCallback } from 'react';
 import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectActiveTag, workspacesApi } from '@state/redux/workspaces';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { selectActiveTag, workspacesApi } from '@state/redux/workspaces/workspaces';
 
 export const useUpdateNotes = () => {
 	const dispatch = useAppDispatch();
 
 	const notesRegistry = useNotesRegistry();
-	const activeTag = useAppSelector(selectActiveTag('default'));
+	const activeTag = useWorkspaceSelector(selectActiveTag);
 
 	return useCallback(async () => {
 		const tags = activeTag === null ? [] : [activeTag.id];

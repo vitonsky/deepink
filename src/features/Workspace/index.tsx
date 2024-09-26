@@ -7,7 +7,7 @@ import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { WorkspaceStatusBarItems } from '@features/Workspace/WorkspaceStatusBarItems';
 import { ProfileContainer } from '@state/profiles/useProfiles';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectActiveWorkspace, workspacesApi } from '@state/redux/workspaces';
+import { selectActiveWorkspace, workspacesApi } from '@state/redux/workspaces/workspaces';
 
 import { WorkspaceProvider } from './WorkspaceProvider';
 

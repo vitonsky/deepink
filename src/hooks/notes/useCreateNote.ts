@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { NoteId } from '@core/features/notes';
 import { useNotesRegistry, useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useAppSelector } from '@state/redux/hooks';
-import { selectActiveTag, selectNotes } from '@state/redux/workspaces';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { selectActiveTag, selectNotes } from '@state/redux/workspaces/workspaces';
 
 import { useNoteActions } from './useNoteActions';
 import { useUpdateNotes } from './useUpdateNotes';
@@ -12,8 +12,8 @@ export const useCreateNote = () => {
 	const noteActions = useNoteActions();
 	const tagsRegistry = useTagsRegistry();
 
-	const notes = useAppSelector(selectNotes('default'));
-	const activeTag = useAppSelector(selectActiveTag('default'));
+	const notes = useWorkspaceSelector(selectNotes);
+	const activeTag = useWorkspaceSelector(selectActiveTag);
 
 	const updateNotes = useUpdateNotes();
 

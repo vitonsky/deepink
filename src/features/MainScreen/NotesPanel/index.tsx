@@ -6,11 +6,11 @@ import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { cnMainScreen } from '@features/MainScreen';
 import { NotesList } from '@features/MainScreen/NotesList';
-import { useAppSelector } from '@state/redux/hooks';
-import { selectActiveTag } from '@state/redux/workspaces';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { selectActiveTag } from '@state/redux/workspaces/workspaces';
 
 export const NotesPanel = () => {
-	const activeTag = useAppSelector(selectActiveTag('default'));
+	const activeTag = useWorkspaceSelector(selectActiveTag);
 
 	return (
 		<>

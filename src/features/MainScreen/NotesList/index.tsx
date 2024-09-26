@@ -3,13 +3,13 @@ import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useAppSelector } from '@state/redux/hooks';
 import { createAppSelector } from '@state/redux/utils';
+import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import {
 	selectActiveNoteId,
 	selectNotes,
 	selectOpenedNotes,
-} from '@state/redux/workspaces';
+} from '@state/redux/workspaces/workspaces';
 
 import { useNoteActions } from '../../../hooks/notes/useNoteActions';
 import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';
@@ -27,13 +27,13 @@ export const NotesList: FC<NotesListProps> = () => {
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
-	const activeNoteId = useAppSelector(selectActiveNoteId('default'));
-	const openedNotesIdList = useAppSelector(
-		createAppSelector(selectOpenedNotes('default'), (notes) =>
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+	const openedNotesIdList = useWorkspaceSelector((scope) =>
+		createAppSelector(selectOpenedNotes(scope), (notes) =>
 			notes.map((note) => note.id),
 		),
 	);
-	const notes = useAppSelector(selectNotes('default'));
+	const notes = useWorkspaceSelector(selectNotes);
 
 	const openNoteContextMenu = useDefaultNoteContextMenu({
 		closeNote: noteActions.close,
