@@ -6,8 +6,8 @@ import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
 import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
 import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { createWorkspaceSelector } from '@state/redux/workspaces/utils';
 import {
-	createWorkspaceSelector,
 	selectActiveNoteId,
 	selectOpenedNotes,
 } from '@state/redux/workspaces/workspaces';

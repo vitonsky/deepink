@@ -4,8 +4,8 @@ import { Stack } from '@components/Stack/Stack';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
 import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { createWorkspaceSelector } from '@state/redux/workspaces/utils';
 import {
-	createWorkspaceSelector,
 	selectActiveNoteId,
 	selectNotes,
 	selectOpenedNotes,

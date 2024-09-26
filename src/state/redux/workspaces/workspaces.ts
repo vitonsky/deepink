@@ -1,7 +1,6 @@
 import { INote, NoteId } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
-import { TagItem } from '@features/MainScreen/NotesOverview/TagsList';
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
 
@@ -42,8 +41,6 @@ export type WorkspacesState = {
 	activeWorkspace: string | null;
 	workspaces: WorkspaceData[];
 };
-
-export const createWorkspaceSelector = createSelector.withTypes<WorkspaceData>();
 
 // TODO: replace to profiles slice with workspaces
 export const workspacesSlice = createSlice({
@@ -220,130 +217,15 @@ export const workspacesSlice = createSlice({
 	},
 });
 
+// TODO: select workspace in profile
 export const { selectActiveWorkspace } = workspacesSlice.selectors;
 
 export const workspacesApi = workspacesSlice.actions;
-
-export type WorkspaceScope = {
-	profileId: string;
-	workspaceId: string;
-};
 
 export const selectWorkspace = (workspaceId: string) =>
 	createAppSelector(workspacesSlice.selectSlice, ({ workspaces }) => {
 		return workspaces.find((workspace) => workspace.id === workspaceId) ?? null;
 	});
 
-export const selectWorkspaceRoot = (workspace: WorkspaceData | null) => workspace;
-
-export const selectTags = createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
-	if (!workspace) return [];
-
-	return workspace.tags.list;
-});
-
-export const selectTagsTree = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) return [];
-
-		const flatTags = workspace.tags.list;
-
-		const tagsMap: Record<string, TagItem> = {};
-		const tagToParentMap: Record<string, string> = {};
-
-		// Fill maps
-		flatTags.forEach(({ id, name, parent }) => {
-			tagsMap[id] = {
-				id,
-				content: name,
-			};
-
-			if (parent !== null) {
-				tagToParentMap[id] = parent;
-			}
-		});
-
-		// Attach tags to parents
-		for (const tagId in tagToParentMap) {
-			const parentId = tagToParentMap[tagId];
-
-			const tag = tagsMap[tagId];
-			const parentTag = tagsMap[parentId];
-
-			// Create array
-			if (!parentTag.childrens) {
-				parentTag.childrens = [];
-			}
-
-			// Attach tag to another tag
-			parentTag.childrens.push(tag);
-		}
-
-		// Delete nested tags from tags map
-		Object.keys(tagToParentMap).forEach((nestedTagId) => {
-			delete tagsMap[nestedTagId];
-		});
-
-		// Collect tags array from a map
-		return Object.values(tagsMap);
-	},
-);
-
-export const selectActiveNoteId = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) return null;
-
-		return workspace.activeNote ?? null;
-	},
-);
-
-export const selectNote = (noteId: string | null) =>
-	createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
-		if (!workspace) return null;
-		if (!noteId) return null;
-
-		const { notes } = workspace;
-
-		return notes.find((note) => note.id === noteId) ?? null;
-	});
-
-export const selectActiveNote = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) return null;
-
-		const { activeNote } = workspace;
-		if (!activeNote) return null;
-
-		const { notes } = workspace;
-
-		return notes.find((note) => note.id === activeNote) ?? null;
-	},
-);
-
-export const selectActiveTag = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) return null;
-
-		const currentTag = workspace.tags.selected;
-		if (!currentTag) return null;
-
-		return workspace.tags.list.find((tag) => tag.id === currentTag) ?? null;
-	},
-);
-
-export const selectNotes = createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
-	if (!workspace) return [];
-	return workspace.notes;
-});
-
-export const selectOpenedNotes = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) return [];
-		return workspace.openedNotes;
-	},
-);
+export * from './selectors/notes';
+export * from './selectors/tags';
