@@ -15,13 +15,13 @@ import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import { useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveTag,
 	selectTags,
 	selectTagsTree,
 	workspacesApi,
-} from '@state/redux/workspaces/workspaces';
+} from '@state/redux/profiles/profiles';
 
 import { TagsList } from './TagsList';
 

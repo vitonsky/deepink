@@ -5,12 +5,9 @@ import { cnMainScreen } from '@features/MainScreen';
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
 import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
-import { createWorkspaceSelector } from '@state/redux/workspaces/utils';
-import {
-	selectActiveNoteId,
-	selectOpenedNotes,
-} from '@state/redux/workspaces/workspaces';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
+import { createWorkspaceSelector } from '@state/redux/profiles/utils';
 
 import { useNoteActions } from '../../hooks/notes/useNoteActions';
 import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';

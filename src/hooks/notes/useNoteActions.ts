@@ -2,12 +2,12 @@ import { useCallback } from 'react';
 import { NoteId } from '@core/features/notes';
 import { useNotesContext } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectNotes,
 	selectOpenedNotes,
 	workspacesApi,
-} from '@state/redux/workspaces/workspaces';
+} from '@state/redux/profiles/profiles';
 
 export const useNoteActions = () => {
 	const dispatch = useAppDispatch();

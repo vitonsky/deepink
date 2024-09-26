@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 
-import { WorkspaceData } from './workspaces';
+import { WorkspaceData } from './profiles';
 
 export const createWorkspaceSelector = createSelector.withTypes<WorkspaceData>();
 

@@ -46,25 +46,24 @@ export type ProfileData = {
 	workspaces: Record<string, WorkspaceData>;
 };
 
-export type WorkspacesState = {
+export type ProfilesState = {
 	activeProfile: string | null;
 	profiles: Record<string, ProfileData>;
 };
 
-// TODO: replace to profiles slice with workspaces
-export const workspacesSlice = createSlice({
-	name: 'workspaces',
+export const profilesSlice = createSlice({
+	name: 'profiles',
 	initialState: {
 		activeProfile: null,
 		profiles: {},
-	} as WorkspacesState,
+	} as ProfilesState,
 	reducers: {
 		setProfiles: (state, { payload }: PayloadAction<Record<string, ProfileData>>) => {
-			return { ...state, profiles: payload } as WorkspacesState;
+			return { ...state, profiles: payload } as ProfilesState;
 		},
 
 		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
-			return { ...state, activeProfile: payload } as WorkspacesState;
+			return { ...state, activeProfile: payload } as ProfilesState;
 		},
 
 		setWorkspaces: (
@@ -237,20 +236,20 @@ export const workspacesSlice = createSlice({
 	},
 });
 
-export const workspacesApi = workspacesSlice.actions;
+export const workspacesApi = profilesSlice.actions;
 
 export const selectProfile = ({ profileId }: ProfileScoped) =>
-	createAppSelector(workspacesSlice.selectSlice, (state) => {
+	createAppSelector(profilesSlice.selectSlice, (state) => {
 		return state.profiles[profileId] ?? null;
 	});
 
 export const selectWorkspace = ({ profileId, workspaceId }: WorkspaceScoped) =>
-	createAppSelector(workspacesSlice.selectSlice, (state) => {
+	createAppSelector(profilesSlice.selectSlice, (state) => {
 		return state.profiles[profileId].workspaces[workspaceId] ?? null;
 	});
 
 export const selectActiveWorkspace = ({ profileId }: ProfileScoped) =>
-	createAppSelector(workspacesSlice.selectSlice, (state) => {
+	createAppSelector(profilesSlice.selectSlice, (state) => {
 		const profile = state.profiles[profileId];
 		if (!profile || !profile.activeWorkspace) return null;
 

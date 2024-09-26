@@ -10,11 +10,8 @@ import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarPro
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
-import {
-	selectActiveNoteId,
-	selectOpenedNotes,
-} from '@state/redux/workspaces/workspaces';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
 import { useCreateNote } from '../../hooks/notes/useCreateNote';
 import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';

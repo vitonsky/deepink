@@ -6,8 +6,8 @@ import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { cnMainScreen } from '@features/MainScreen';
 import { NotesList } from '@features/MainScreen/NotesList';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
-import { selectActiveTag } from '@state/redux/workspaces/workspaces';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveTag } from '@state/redux/profiles/profiles';
 
 export const NotesPanel = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);

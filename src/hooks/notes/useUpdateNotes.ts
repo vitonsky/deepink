@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
-import { selectActiveTag, workspacesApi } from '@state/redux/workspaces/workspaces';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveTag, workspacesApi } from '@state/redux/profiles/profiles';
 
 export const useUpdateNotes = () => {
 	const dispatch = useAppDispatch();

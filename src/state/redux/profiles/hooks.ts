@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Selector } from '@reduxjs/toolkit';
 
 import { useAppSelector } from '../hooks';
-import { selectWorkspace, WorkspaceData } from './workspaces';
+import { selectWorkspace, WorkspaceData } from './profiles';
 
 export const useWorkspaceData = () => {
 	return useMemo(

@@ -36,8 +36,8 @@ import {
 	useTagsRegistry,
 } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
-import { selectTags, workspacesApi } from '@state/redux/workspaces/workspaces';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';

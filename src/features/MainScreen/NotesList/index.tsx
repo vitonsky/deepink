@@ -3,13 +3,13 @@ import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
-import { createWorkspaceSelector } from '@state/redux/workspaces/utils';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
 	selectNotes,
 	selectOpenedNotes,
-} from '@state/redux/workspaces/workspaces';
+} from '@state/redux/profiles/profiles';
+import { createWorkspaceSelector } from '@state/redux/profiles/utils';
 
 import { useNoteActions } from '../../../hooks/notes/useNoteActions';
 import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { NoteId } from '@core/features/notes';
 import { useNotesRegistry, useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
-import { selectActiveTag, selectNotes } from '@state/redux/workspaces/workspaces';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveTag, selectNotes } from '@state/redux/profiles/profiles';
 
 import { useNoteActions } from './useNoteActions';
 import { useUpdateNotes } from './useUpdateNotes';
