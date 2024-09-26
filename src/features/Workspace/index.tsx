@@ -7,6 +7,7 @@ import { useWorkspace } from '@features/Workspace/useWorkspace';
 import { WorkspaceStatusBarItems } from '@features/Workspace/WorkspaceStatusBarItems';
 import { ProfileContainer } from '@state/profiles/useProfiles';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { useWorkspaceData } from '@state/redux/workspaces/hooks';
 import { selectActiveWorkspace, workspacesApi } from '@state/redux/workspaces/workspaces';
 
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -21,16 +22,17 @@ export interface WorkspaceProps {
 export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
 
 	// Close notes by unmount
 	useEffect(() => {
 		return () => {
 			// TODO: use actual workspace id once will be implemented
-			dispatch(workspacesApi.setActiveNote({ workspace: 'default', noteId: null }));
-			dispatch(workspacesApi.setOpenedNotes({ workspace: 'default', notes: [] }));
-			dispatch(workspacesApi.setNotes({ workspace: 'default', notes: [] }));
+			dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: null }));
+			dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes: [] }));
+			dispatch(workspacesApi.setNotes({ ...workspaceData, notes: [] }));
 		};
-	}, []);
+	}, [dispatch, workspaceData]);
 
 	// Run optional services for active profile
 	useEffect(() => {
@@ -50,35 +52,42 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 		const { tagsRegistry } = workspace;
 		const updateTags = () =>
 			tagsRegistry.getTags().then((tags) => {
-				dispatch(workspacesApi.setTags({ workspace: 'default', tags }));
+				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 			});
 
 		updateTags();
 
 		const cleanup = tagsRegistry.onChange(updateTags);
 		return cleanup;
-	});
+	}, [dispatch, workspace, workspaceData]);
 
-	const activeWorkspace = useAppSelector(selectActiveWorkspace);
+	const activeWorkspace = useAppSelector(
+		selectActiveWorkspace({ profileId: 'default' }),
+	);
 	useEffect(() => {
 		// TODO: Set specific workspace and profile
 		dispatch(
-			workspacesApi.setWorkspaces([
-				{
-					id: 'default',
+			workspacesApi.setProfiles({
+				default: {
+					activeWorkspace: 'default',
+					workspaces: {
+						default: {
+							id: 'default',
 
-					activeNote: null,
-					openedNotes: [],
-					notes: [],
+							activeNote: null,
+							openedNotes: [],
+							notes: [],
 
-					tags: {
-						selected: null,
-						list: [],
+							tags: {
+								selected: null,
+								list: [],
+							},
+						},
 					},
 				},
-			]),
+			}),
 		);
-		dispatch(workspacesApi.setActiveWorkspace('default'));
+		dispatch(workspacesApi.setActiveProfile('default'));
 	}, [dispatch]);
 
 	if (!workspace || !activeWorkspace) {
@@ -90,24 +99,22 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 			{...workspace}
 			notesApi={{
 				openNote: (note: INote, focus = true) => {
-					dispatch(workspacesApi.addOpenedNote({ workspace: 'default', note }));
+					dispatch(workspacesApi.addOpenedNote({ ...workspaceData, note }));
 
 					if (focus) {
 						dispatch(
 							workspacesApi.setActiveNote({
-								workspace: 'default',
+								...workspaceData,
 								noteId: note.id,
 							}),
 						);
 					}
 				},
 				noteUpdated: (note: INote) =>
-					dispatch(
-						workspacesApi.updateOpenedNote({ workspace: 'default', note }),
-					),
+					dispatch(workspacesApi.updateOpenedNote({ ...workspaceData, note })),
 				noteClosed: (noteId: string) =>
 					dispatch(
-						workspacesApi.removeOpenedNote({ workspace: 'default', noteId }),
+						workspacesApi.removeOpenedNote({ ...workspaceData, noteId }),
 					),
 			}}
 		>

@@ -15,7 +15,7 @@ import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import { useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import {
 	selectActiveTag,
 	selectTags,
@@ -33,6 +33,7 @@ export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
 
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 	const tags = useWorkspaceSelector(selectTags);
@@ -169,7 +170,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					if (id === 'all') {
 						dispatch(
 							workspacesApi.setSelectedTag({
-								workspace: 'default',
+								...workspaceData,
 								tag: null,
 							}),
 						);
@@ -199,7 +200,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						onTagClick={(tagId) =>
 							dispatch(
 								workspacesApi.setSelectedTag({
-									workspace: 'default',
+									...workspaceData,
 									tag: tagId,
 								}),
 							)

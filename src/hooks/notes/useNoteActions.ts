@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { NoteId } from '@core/features/notes';
 import { useNotesContext } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import {
 	selectNotes,
 	selectOpenedNotes,
@@ -11,6 +11,7 @@ import {
 
 export const useNoteActions = () => {
 	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
 
 	const { openNote, noteClosed } = useNotesContext();
 
@@ -22,9 +23,7 @@ export const useNoteActions = () => {
 		(id: NoteId) => {
 			const isNoteOpened = openedNotes.some((note) => note.id === id);
 			if (isNoteOpened) {
-				dispatch(
-					workspacesApi.setActiveNote({ workspace: 'default', noteId: id }),
-				);
+				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: id }));
 			} else {
 				const note = notes.find((note) => note.id === id);
 				if (note) {
@@ -32,7 +31,7 @@ export const useNoteActions = () => {
 				}
 			}
 		},
-		[dispatch, notes, openNote, openedNotes],
+		[dispatch, notes, openNote, openedNotes, workspaceData],
 	);
 
 	const close = useCallback(

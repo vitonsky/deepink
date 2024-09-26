@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
 import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import { selectActiveTag, workspacesApi } from '@state/redux/workspaces/workspaces';
 
 export const useUpdateNotes = () => {
 	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
 
 	const notesRegistry = useNotesRegistry();
 	const activeTag = useWorkspaceSelector(selectActiveTag);
@@ -22,6 +23,6 @@ export const useUpdateNotes = () => {
 			return 0;
 		});
 
-		dispatch(workspacesApi.setNotes({ workspace: 'default', notes }));
-	}, [activeTag, dispatch, notesRegistry]);
+		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
+	}, [activeTag, dispatch, notesRegistry, workspaceData]);
 };

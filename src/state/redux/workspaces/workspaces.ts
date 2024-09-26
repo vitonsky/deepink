@@ -4,9 +4,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
 
-export type WorkspaceScoped<T extends {}> = T & {
-	workspace: string;
+export type ProfileScoped<T extends {} = {}> = T & {
+	profileId: string;
 };
+export type WorkspaceScoped<T extends {} = {}> = T &
+	ProfileScoped<{
+		workspaceId: string;
+	}>;
 
 /**
  * Find a note near current, but except current note in edge cases
@@ -37,37 +41,60 @@ export type WorkspaceData = {
 	};
 };
 
-export type WorkspacesState = {
+export type ProfileData = {
 	activeWorkspace: string | null;
-	workspaces: WorkspaceData[];
+	workspaces: Record<string, WorkspaceData>;
+};
+
+export type WorkspacesState = {
+	activeProfile: string | null;
+	profiles: Record<string, ProfileData>;
 };
 
 // TODO: replace to profiles slice with workspaces
 export const workspacesSlice = createSlice({
 	name: 'workspaces',
 	initialState: {
-		activeWorkspace: null,
-		workspaces: [],
+		activeProfile: null,
+		profiles: {},
 	} as WorkspacesState,
 	reducers: {
-		setWorkspaces: (state, { payload }: PayloadAction<WorkspaceData[]>) => {
-			return { ...state, workspaces: payload } as WorkspacesState;
+		setProfiles: (state, { payload }: PayloadAction<Record<string, ProfileData>>) => {
+			return { ...state, profiles: payload } as WorkspacesState;
 		},
 
-		setActiveWorkspace: (state, { payload }: PayloadAction<string | null>) => {
-			return { ...state, activeWorkspace: payload } as WorkspacesState;
+		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
+			return { ...state, activeProfile: payload } as WorkspacesState;
+		},
+
+		setWorkspaces: (
+			state,
+			{
+				payload: { profileId, workspaces },
+			}: PayloadAction<
+				ProfileScoped<{ workspaces: Record<string, WorkspaceData> }>
+			>,
+		) => {
+			state.profiles[profileId].workspaces = workspaces;
+		},
+
+		setActiveWorkspace: (
+			state,
+			{
+				payload: { profileId, workspaceId },
+			}: PayloadAction<ProfileScoped<{ workspaceId: string | null }>>,
+		) => {
+			state.profiles[profileId].activeWorkspace = workspaceId;
 		},
 
 		setActiveNote: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ noteId: NoteId | null }>>,
+			{
+				payload: { profileId, workspaceId, noteId },
+			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId | null }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
-
-			const { noteId } = payload;
 
 			// Set null and avoid array iterating
 			if (noteId === null) {
@@ -84,26 +111,24 @@ export const workspacesSlice = createSlice({
 
 		setNotes: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
+			{
+				payload: { profileId, workspaceId, notes },
+			}: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
 
-			workspace.notes = payload.notes;
+			workspace.notes = notes;
 		},
 
 		addOpenedNote: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ note: INote }>>,
+			{
+				payload: { profileId, workspaceId, note },
+			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
-
-			const { note } = payload;
 
 			const foundNoteInList = workspace.openedNotes.find(
 				({ id }) => id === note.id,
@@ -117,14 +142,13 @@ export const workspacesSlice = createSlice({
 
 		removeOpenedNote: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ noteId: NoteId }>>,
+			{
+				payload: { profileId, workspaceId, noteId },
+			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
 
-			const { noteId } = payload;
 			const { activeNote, openedNotes } = workspace;
 
 			const filteredNotes = openedNotes.filter(({ id }) => id !== noteId);
@@ -139,14 +163,13 @@ export const workspacesSlice = createSlice({
 
 		updateOpenedNote: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ note: INote }>>,
+			{
+				payload: { profileId, workspaceId, note },
+			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
 
-			const { note } = payload;
 			const { openedNotes } = workspace;
 
 			// Ignore not exists notes
@@ -162,26 +185,26 @@ export const workspacesSlice = createSlice({
 
 		setOpenedNotes: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
+			{
+				payload: { profileId, workspaceId, notes },
+			}: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
 
-			workspace.openedNotes = payload.notes;
+			workspace.openedNotes = notes;
 		},
 
 		setSelectedTag: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ tag: string | null }>>,
+			{
+				payload: { profileId, workspaceId, tag },
+			}: PayloadAction<WorkspaceScoped<{ tag: string | null }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
 
-			workspace.tags.selected = payload.tag;
+			workspace.tags.selected = tag;
 
 			// Reset selected if no tag exist
 			const isSelectedTagExists = workspace.tags.list.some(
@@ -194,14 +217,14 @@ export const workspacesSlice = createSlice({
 
 		setTags: (
 			state,
-			{ payload }: PayloadAction<WorkspaceScoped<{ tags: IResolvedTag[] }>>,
+			{
+				payload: { profileId, workspaceId, tags },
+			}: PayloadAction<WorkspaceScoped<{ tags: IResolvedTag[] }>>,
 		) => {
-			const workspace = state.workspaces.find(
-				(workspace) => workspace.id === payload.workspace,
-			);
+			const workspace = state.profiles[profileId].workspaces[workspaceId];
 			if (!workspace) return;
 
-			workspace.tags.list = payload.tags;
+			workspace.tags.list = tags;
 
 			// Reset selected if no tag exist
 			const isSelectedTagExists = workspace.tags.list.some(
@@ -212,19 +235,26 @@ export const workspacesSlice = createSlice({
 			}
 		},
 	},
-	selectors: {
-		selectActiveWorkspace: (state) => state.activeWorkspace,
-	},
 });
-
-// TODO: select workspace in profile
-export const { selectActiveWorkspace } = workspacesSlice.selectors;
 
 export const workspacesApi = workspacesSlice.actions;
 
-export const selectWorkspace = (workspaceId: string) =>
-	createAppSelector(workspacesSlice.selectSlice, ({ workspaces }) => {
-		return workspaces.find((workspace) => workspace.id === workspaceId) ?? null;
+export const selectProfile = ({ profileId }: ProfileScoped) =>
+	createAppSelector(workspacesSlice.selectSlice, (state) => {
+		return state.profiles[profileId] ?? null;
+	});
+
+export const selectWorkspace = ({ profileId, workspaceId }: WorkspaceScoped) =>
+	createAppSelector(workspacesSlice.selectSlice, (state) => {
+		return state.profiles[profileId].workspaces[workspaceId] ?? null;
+	});
+
+export const selectActiveWorkspace = ({ profileId }: ProfileScoped) =>
+	createAppSelector(workspacesSlice.selectSlice, (state) => {
+		const profile = state.profiles[profileId];
+		if (!profile || !profile.activeWorkspace) return null;
+
+		return profile.workspaces[profile.activeWorkspace] ?? null;
 	});
 
 export * from './selectors/notes';

@@ -36,7 +36,7 @@ import {
 	useTagsRegistry,
 } from '@features/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceSelector } from '@state/redux/workspaces/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/workspaces/hooks';
 import { selectTags, workspacesApi } from '@state/redux/workspaces/workspaces';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
@@ -54,6 +54,7 @@ export type NoteEditorProps = {
 
 export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
 
 	const [title, setTitle] = useState(note.content.title);
 	const [text, setText] = useState(note.content.text);
@@ -366,7 +367,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						onClick={() => {
 							dispatch(
 								workspacesApi.setSelectedTag({
-									workspace: 'default',
+									...workspaceData,
 									tag: tag.id,
 								}),
 							);
