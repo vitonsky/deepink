@@ -47,6 +47,22 @@ export const profilesSlice = createSlice({
 			return { ...state, profiles: payload } as ProfilesState;
 		},
 
+		addProfile: (
+			state,
+			{
+				payload: { profileId, profile },
+			}: PayloadAction<{ profileId: string; profile: ProfileData }>,
+		) => {
+			state.profiles[profileId] = profile;
+		},
+
+		removeProfile: (
+			state,
+			{ payload: { profileId } }: PayloadAction<{ profileId: string }>,
+		) => {
+			delete state.profiles[profileId];
+		},
+
 		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
 			return { ...state, activeProfile: payload } as ProfilesState;
 		},
@@ -226,6 +242,11 @@ export const workspacesApi = profilesSlice.actions;
 export const selectProfile = ({ profileId }: ProfileScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
 		return state.profiles[profileId] ?? null;
+	});
+
+export const selectWorkspaces = ({ profileId }: ProfileScoped) =>
+	createAppSelector(profilesSlice.selectSlice, (state) => {
+		return Object.values(state.profiles[profileId]?.workspaces ?? {});
 	});
 
 export const selectWorkspace = ({ profileId, workspaceId }: WorkspaceScoped) =>

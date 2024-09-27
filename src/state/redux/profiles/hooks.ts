@@ -1,17 +1,13 @@
 import { useMemo } from 'react';
+import { useWorkspaceContext } from '@features/Workspace';
 import { Selector } from '@reduxjs/toolkit';
 
 import { useAppSelector } from '../hooks';
 import { selectWorkspace, WorkspaceData } from './profiles';
 
 export const useWorkspaceData = () => {
-	return useMemo(
-		() => ({
-			profileId: 'default',
-			workspaceId: 'default',
-		}),
-		[],
-	);
+	const { profileId, workspaceId } = useWorkspaceContext();
+	return useMemo(() => ({ profileId, workspaceId }), [profileId, workspaceId]);
 };
 
 // Select profile and workspace from context

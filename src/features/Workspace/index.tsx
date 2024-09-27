@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { createContext, FC, useEffect } from 'react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -9,8 +9,15 @@ import { ProfileContainer } from '@state/profiles/useProfiles';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectActiveWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
+import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { WorkspaceProvider } from './WorkspaceProvider';
+
+export const WorkspaceContext = createContext<{
+	workspaceId: string;
+	profileId: string;
+} | null>(null);
+export const useWorkspaceContext = createContextGetterHook(WorkspaceContext);
 
 export interface WorkspaceProps {
 	profile: ProfileContainer;
@@ -61,34 +68,8 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 		return cleanup;
 	}, [dispatch, workspace, workspaceData]);
 
-	const activeWorkspace = useAppSelector(
-		selectActiveWorkspace({ profileId: 'default' }),
-	);
-	useEffect(() => {
-		// TODO: Set specific workspace and profile
-		dispatch(
-			workspacesApi.setProfiles({
-				default: {
-					activeWorkspace: 'default',
-					workspaces: {
-						default: {
-							id: 'default',
-
-							activeNote: null,
-							openedNotes: [],
-							notes: [],
-
-							tags: {
-								selected: null,
-								list: [],
-							},
-						},
-					},
-				},
-			}),
-		);
-		dispatch(workspacesApi.setActiveProfile('default'));
-	}, [dispatch]);
+	const { profileId } = useWorkspaceData();
+	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
 
 	if (!workspace || !activeWorkspace) {
 		return <SplashScreen />;
