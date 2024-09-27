@@ -1,14 +1,14 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { cn } from '@bem-react/classname';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
-import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { useProfileSelector } from '@features/App/useProfileSelector';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
+import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
 
 import './App.css';
@@ -20,8 +20,8 @@ export const App: FC = () => {
 		() => new ConfigStorage('config.json', new ElectronFilesController('/')),
 	);
 
-	const profilesManager = useProfilesList();
-	const profilesApi = useProfileContainers();
+	const profilesList = useProfilesList();
+	const profileContainers = useProfileContainers();
 
 	const [loadingState, setLoadingState] = useState<{
 		isProfilesLoading: boolean;
@@ -30,41 +30,54 @@ export const App: FC = () => {
 		isProfilesLoading: true,
 		isProfileLoading: false,
 	});
-	const [currentProfile, setCurrentProfile] = useProfileSelector(
-		config,
-		profilesManager.profiles,
-		useCallback(
-			(profile: ProfileObject | null) => {
-				if (profile && !profile.encryption) {
-					profilesApi.openProfile({ profile }, true);
-					setLoadingState({
-						isProfilesLoading: false,
-						isProfileLoading: true,
-					});
-				} else {
-					setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
-				}
-			},
-			[profilesApi],
-		),
+	const [currentProfile, setCurrentProfile] = useProfileSelector(config);
+
+	// Open recent profile
+	const recentProfile = useRecentProfile(config);
+	useEffect(
+		() => {
+			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
+
+			// Restore profile id
+			setCurrentProfile(recentProfile.profileId);
+
+			const profile = profilesList.profiles.find(
+				(profile) => profile.id === recentProfile.profileId,
+			);
+			if (!profile || profile.encryption) {
+				setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
+				return;
+			}
+
+			// Automatically open profile with no encryption
+			profileContainers.openProfile({ profile }, true);
+			setLoadingState({
+				isProfilesLoading: false,
+				isProfileLoading: true,
+			});
+		},
+
+		// Depends only of loading status and run only once
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
 	);
 
 	useEffect(() => {
-		if (profilesApi.profiles.length > 0) {
+		if (profileContainers.profiles.length > 0) {
 			setLoadingState((state) => ({ ...state, isProfileLoading: false }));
 		}
-	}, [profilesApi.profiles.length]);
+	}, [profileContainers.profiles.length]);
 
 	const isLoadingState = Object.values(loadingState).some(Boolean);
 	if (isLoadingState) {
 		return <SplashScreen />;
 	}
 
-	if (profilesApi.profiles.length === 0) {
+	if (profileContainers.profiles.length === 0) {
 		return (
 			<WorkspaceManager
-				profiles={profilesApi}
-				profilesManager={profilesManager}
+				profiles={profileContainers}
+				profilesManager={profilesList}
 				currentProfile={currentProfile}
 				onChooseProfile={setCurrentProfile}
 			/>
@@ -73,7 +86,7 @@ export const App: FC = () => {
 
 	return (
 		<div className={cnApp()}>
-			<Profiles profilesApi={profilesApi} />
+			<Profiles profilesApi={profileContainers} />
 		</div>
 	);
 };

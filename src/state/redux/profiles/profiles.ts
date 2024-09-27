@@ -240,6 +240,13 @@ export const profilesSlice = createSlice({
 
 export const workspacesApi = profilesSlice.actions;
 
+export const selectActiveProfile = createAppSelector(
+	profilesSlice.selectSlice,
+	(state) => {
+		return state.activeProfile ?? null;
+	},
+);
+
 export const selectProfile = ({ profileId }: ProfileScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
 		return state.profiles[profileId] ?? null;

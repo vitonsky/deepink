@@ -5,7 +5,7 @@ import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { cn } from '@bem-react/classname';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
-import { ProfilesManagerApi } from '../useProfilesList';
+import { ProfilesListApi } from '../useProfilesList';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 
@@ -25,7 +25,7 @@ export type OnPickProfile = (
 
 export type IWorkspacePickerProps = {
 	profiles: ProfilesApi;
-	profilesManager: ProfilesManagerApi;
+	profilesManager: ProfilesListApi;
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
 };

@@ -1,39 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
-import { ProfileObject } from '@core/storage/ProfilesManager';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { selectActiveProfile, workspacesApi } from '@state/redux/profiles/profiles';
 
-export const useProfileSelector = (
-	config: ConfigStorage,
-	profiles: ProfileObject[] | null,
-	onRestoreLastActiveProfile?: (profile: ProfileObject | null) => void,
-) => {
-	const state = useState<null | string>(null);
+export const useProfileSelector = (config: ConfigStorage) => {
+	const dispatch = useAppDispatch();
 
-	const [currentProfile, setCurrentProfile] = state;
-	const isActiveProfileRestoredRef = useRef(false);
-	useEffect(() => {
-		if (profiles === null) return;
-		if (isActiveProfileRestoredRef.current) return;
+	const currentProfile = useAppSelector(selectActiveProfile);
+	const setCurrentProfile = useCallback(
+		(profileId: string | null) => {
+			dispatch(workspacesApi.setActiveProfile(profileId));
+		},
+		[dispatch],
+	);
 
-		config.get('activeProfile').then((activeProfile) => {
-			isActiveProfileRestoredRef.current = true;
-
-			if (onRestoreLastActiveProfile && profiles) {
-				const foundProfile = activeProfile
-					? profiles.find((profile) => profile.id === activeProfile) ?? null
-					: null;
-				onRestoreLastActiveProfile(foundProfile);
-			}
-
-			setCurrentProfile(activeProfile);
-		});
-	}, [config, onRestoreLastActiveProfile, profiles, setCurrentProfile]);
-
+	// Write recent profile to config
 	useEffect(() => {
 		if (currentProfile !== null) {
 			config.set('activeProfile', currentProfile);
 		}
 	}, [config, currentProfile]);
 
-	return state;
+	return [currentProfile, setCurrentProfile] as const;
 };
