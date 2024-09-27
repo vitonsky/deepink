@@ -33,6 +33,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					workspaces: {
 						default: {
 							id: 'default',
+							name: 'Default workspace',
 
 							activeNote: null,
 							openedNotes: [],

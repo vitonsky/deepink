@@ -15,6 +15,7 @@ export type WorkspaceScoped<T extends {} = {}> = T &
 
 export type WorkspaceData = {
 	id: string;
+	name: string;
 
 	activeNote: NoteId | null;
 	openedNotes: INote[];
