@@ -29,12 +29,12 @@ export type WorkspaceData = {
 
 export type ProfileData = {
 	activeWorkspace: string | null;
-	workspaces: Record<string, WorkspaceData>;
+	workspaces: Record<string, WorkspaceData | undefined>;
 };
 
 export type ProfilesState = {
 	activeProfile: string | null;
-	profiles: Record<string, ProfileData>;
+	profiles: Record<string, ProfileData | undefined>;
 };
 
 export const profilesSlice = createSlice({
@@ -76,7 +76,10 @@ export const profilesSlice = createSlice({
 				ProfileScoped<{ workspaces: Record<string, WorkspaceData> }>
 			>,
 		) => {
-			state.profiles[profileId].workspaces = workspaces;
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			profile.workspaces = workspaces;
 		},
 
 		setActiveWorkspace: (
@@ -85,7 +88,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId },
 			}: PayloadAction<ProfileScoped<{ workspaceId: string | null }>>,
 		) => {
-			state.profiles[profileId].activeWorkspace = workspaceId;
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			profile.activeWorkspace = workspaceId;
 		},
 
 		setActiveNote: (
@@ -94,7 +100,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, noteId },
 			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId | null }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			// Set null and avoid array iterating
@@ -116,7 +125,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, notes },
 			}: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			workspace.notes = notes;
@@ -128,7 +140,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, note },
 			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			const foundNoteInList = workspace.openedNotes.find(
@@ -147,7 +162,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, noteId },
 			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			const { activeNote, openedNotes } = workspace;
@@ -168,7 +186,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, note },
 			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			const { openedNotes } = workspace;
@@ -190,7 +211,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, notes },
 			}: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			workspace.openedNotes = notes;
@@ -202,7 +226,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, tag },
 			}: PayloadAction<WorkspaceScoped<{ tag: string | null }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			workspace.tags.selected = tag;
@@ -222,7 +249,10 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, tags },
 			}: PayloadAction<WorkspaceScoped<{ tags: IResolvedTag[] }>>,
 		) => {
-			const workspace = state.profiles[profileId].workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
 			workspace.tags.list = tags;
@@ -249,17 +279,24 @@ export const selectActiveProfile = createAppSelector(
 
 export const selectProfile = ({ profileId }: ProfileScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
-		return state.profiles[profileId] ?? null;
+		const profile = state.profiles[profileId];
+		return profile ?? null;
 	});
 
 export const selectWorkspaces = ({ profileId }: ProfileScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
-		return Object.values(state.profiles[profileId]?.workspaces ?? {});
+		const profile = state.profiles[profileId];
+		if (!profile) return [];
+
+		return Object.values(profile.workspaces ?? {}).filter(Boolean) as WorkspaceData[];
 	});
 
 export const selectWorkspace = ({ profileId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
-		return state.profiles[profileId].workspaces[workspaceId] ?? null;
+		const profile = state.profiles[profileId];
+		if (!profile) return null;
+
+		return profile.workspaces[workspaceId] ?? null;
 	});
 
 export const selectActiveWorkspace = ({ profileId }: ProfileScoped) =>
