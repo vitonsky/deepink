@@ -5,6 +5,16 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createAppSelector } from '../utils';
 import { findNearNote } from './utils';
 
+const selectWorkspaceObject = (
+	state: ProfilesState,
+	{ profileId, workspaceId }: WorkspaceScoped,
+) => {
+	const profile = state.profiles[profileId];
+	if (!profile) return null;
+
+	return profile.workspaces[workspaceId] ?? null;
+};
+
 export type ProfileScoped<T extends {} = {}> = T & {
 	profileId: string;
 };
@@ -100,10 +110,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, noteId },
 			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId | null }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			// Set null and avoid array iterating
@@ -125,10 +132,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, notes },
 			}: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			workspace.notes = notes;
@@ -140,10 +144,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, note },
 			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			const foundNoteInList = workspace.openedNotes.find(
@@ -162,10 +163,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, noteId },
 			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			const { activeNote, openedNotes } = workspace;
@@ -186,10 +184,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, note },
 			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			const { openedNotes } = workspace;
@@ -211,10 +206,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, notes },
 			}: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			workspace.openedNotes = notes;
@@ -226,10 +218,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, tag },
 			}: PayloadAction<WorkspaceScoped<{ tag: string | null }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			workspace.tags.selected = tag;
@@ -249,10 +238,7 @@ export const profilesSlice = createSlice({
 				payload: { profileId, workspaceId, tags },
 			}: PayloadAction<WorkspaceScoped<{ tags: IResolvedTag[] }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
-
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
 			workspace.tags.list = tags;
