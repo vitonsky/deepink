@@ -1,6 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from '@features/index';
+import { Provider } from 'react-redux';
+import { App } from '@features/App/index';
+import { store } from '@state/redux/store';
 
 const rootNode = document.getElementById('appRoot');
 if (!rootNode) {
@@ -8,4 +10,8 @@ if (!rootNode) {
 }
 
 const reactRoot = createRoot(rootNode);
-reactRoot.render(<App />);
+reactRoot.render(
+	<Provider store={store}>
+		<App />
+	</Provider>,
+);

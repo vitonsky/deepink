@@ -1,14 +1,15 @@
 import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
 import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
-import { AESGCMCipher } from '../encryption/ciphers/AES';
-import { TwofishCTRCipher } from '../encryption/ciphers/Twofish';
-import { EncryptionController } from '../encryption/EncryptionController';
-import { BufferIntegrityProcessor } from '../encryption/processors/BufferIntegrityProcessor';
-import { BufferSizeObfuscationProcessor } from '../encryption/processors/BufferSizeObfuscationProcessor';
-import { PipelineProcessor } from '../encryption/processors/PipelineProcessor';
-import { getDerivedKeysManager, getMasterKey } from '../encryption/utils/keys';
-import { getRandomBytes } from '../encryption/utils/random';
+import { AESGCMCipher } from '../../../encryption/ciphers/AES';
+import { TwofishCTRCipher } from '../../../encryption/ciphers/Twofish';
+import { EncryptionController } from '../../../encryption/EncryptionController';
+import { BufferIntegrityProcessor } from '../../../encryption/processors/BufferIntegrityProcessor';
+import { BufferSizeObfuscationProcessor } from '../../../encryption/processors/BufferSizeObfuscationProcessor';
+import { PipelineProcessor } from '../../../encryption/processors/PipelineProcessor';
+import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
+import { getRandomBytes } from '../../../encryption/utils/random';
+
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -22,6 +23,11 @@ const requests = new WorkerRPC(messenger);
 const workerId = performance.now();
 requests.addHandler('init', async ({ secretKey, salt }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
+
+	// Convert `ArrayBuffer`
+	if (salt instanceof ArrayBuffer) {
+		salt = new Uint8Array(salt);
+	}
 
 	if (!(salt instanceof Uint8Array))
 		throw new Error('Salt is not instance of Uint8Array');

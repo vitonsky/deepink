@@ -1,40 +1,42 @@
 import React, { FC } from 'react';
 import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
-import { INote, NoteId } from '@core/features/notes';
-import { INotesController } from '@core/features/notes/controller';
+import { getNoteTitle } from '@core/features/notes/utils';
+import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	selectActiveNoteId,
+	selectNotes,
+	selectOpenedNotes,
+} from '@state/redux/profiles/profiles';
+import { createWorkspaceSelector } from '@state/redux/profiles/utils';
 
-import { getNoteTitle } from '../..';
+import { useNoteActions } from '../../../hooks/notes/useNoteActions';
+import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';
+
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
 import './NotesList.css';
 
 export const cnNotesList = cn('NotesList');
 
-export type NotesListProps = {
-	notes: INote[];
-	onPick: (id: NoteId) => void;
-	onClose: (id: NoteId) => void;
-	updateNotes: () => void;
+export type NotesListProps = {};
 
-	// TODO: receive with react context
-	notesRegistry: INotesController;
+export const NotesList: FC<NotesListProps> = () => {
+	const notesRegistry = useNotesRegistry();
+	const updateNotes = useUpdateNotes();
+	const noteActions = useNoteActions();
 
-	openedNotes?: NoteId[];
-	activeNote?: NoteId | null;
-};
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+	const openedNotesIdList = useWorkspaceSelector(
+		createWorkspaceSelector(selectOpenedNotes, (notes) =>
+			notes.map((note) => note.id),
+		),
+	);
+	const notes = useWorkspaceSelector(selectNotes);
 
-export const NotesList: FC<NotesListProps> = ({
-	notes,
-	onPick,
-	onClose,
-	updateNotes,
-	notesRegistry,
-	openedNotes,
-	activeNote,
-}) => {
 	const openNoteContextMenu = useDefaultNoteContextMenu({
-		closeNote: onClose,
+		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
 	});
@@ -52,8 +54,10 @@ export const NotesList: FC<NotesListProps> = ({
 						spacing={2}
 						direction="vertical"
 						className={cnNotesList('Note', {
-							active: note.id === activeNote,
-							opened: openedNotes && openedNotes.indexOf(note.id) !== -1,
+							active: note.id === activeNoteId,
+							opened:
+								openedNotesIdList &&
+								openedNotesIdList.indexOf(note.id) !== -1,
 						})}
 						onContextMenu={(evt) => {
 							openNoteContextMenu(note.id, {
@@ -62,7 +66,7 @@ export const NotesList: FC<NotesListProps> = ({
 							});
 						}}
 						onClick={() => {
-							onPick(note.id);
+							noteActions.click(note.id);
 						}}
 					>
 						<div className={cnNotesList('Title')}>

@@ -7,3 +7,11 @@
 	/* stylelint-disable-next-line font-family-name-quotes */
 	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serifarial;
 }
+
+.SplashScreen_fullscreen {
+	height: 100vh;
+	width: 100%;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+}

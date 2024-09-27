@@ -11,14 +11,12 @@ import { visit } from 'unist-util-visit';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
-import { tagsChanged } from '@core/state/tags';
 import { importNotes } from '@electron/requests/files/renderer';
-
 import {
-	useAttachmentsRegistry,
+	useAttachmentsController,
 	useFilesRegistry,
 	useTagsRegistry,
-} from '../../../Providers';
+} from '@features/App/Workspace/WorkspaceProvider';
 
 export const replaceUrls = (
 	tree: Root,
@@ -64,7 +62,7 @@ export const useImportNotes = ({
 	updateNotes: () => void;
 }) => {
 	const filesRegistry = useFilesRegistry();
-	const attachmentsRegistry = useAttachmentsRegistry();
+	const attachmentsRegistry = useAttachmentsController();
 	const tagsRegistry = useTagsRegistry();
 
 	// TODO: transparent encrypt files and upload to a temporary directory, instead of keep in memory
@@ -156,14 +154,12 @@ export const useImportNotes = ({
 							tagNamePartToAdd,
 							parentTag.id,
 						);
-						tagsChanged();
 						tagsToAttach.push(createdTagId);
 						continue;
 					}
 
 					// Create full resolved tag
 					const createdTagId = await tagsRegistry.add(resolvedTagName, null);
-					tagsChanged();
 					tagsToAttach.push(createdTagId);
 				}
 
@@ -295,7 +291,6 @@ export const useImportNotes = ({
 					.join('/');
 
 				tagId = await tagsRegistry.add(tagNameToCreate, parentTagId);
-				tagsChanged();
 
 				break;
 			}
@@ -304,7 +299,6 @@ export const useImportNotes = ({
 				const tagNameToCreate = filenameBasePathSegments.join('/').trim();
 				if (tagNameToCreate) {
 					tagId = await tagsRegistry.add(tagNameToCreate, null);
-					tagsChanged();
 				}
 			}
 

@@ -1,12 +1,9 @@
 import DB, { Database } from 'better-sqlite3';
 import debounce from 'debounce';
-import { existsSync } from 'fs';
-import { check as checkFileLock, lock as lockFile } from 'proper-lockfile';
-import { recoveryAtomicFile, writeFileAtomic } from '@utils/files';
+import { IFileController } from '@core/features/files';
 
 import { IEncryptionController } from '../../../encryption';
 
-import { readFile, writeFile } from 'fs/promises';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 
@@ -69,29 +66,9 @@ export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 50
 };
 
 export const openDatabase = async (
-	dbPath: string,
+	dbFile: IFileController,
 	{ verbose: verboseLog = false, encryption }: Options = {},
 ): Promise<SQLiteDatabase> => {
-	// Check lock
-	if (existsSync(dbPath)) {
-		const isLocked = await checkFileLock(dbPath);
-		if (isLocked) {
-			throw new Error('Database file are locked');
-		}
-	}
-
-	// Ensure changes applied for atomic file
-	recoveryAtomicFile(dbPath);
-
-	// Create empty file if not exists
-	// It needs to create proper lock file
-	if (!existsSync(dbPath)) {
-		await writeFile(dbPath, '');
-	}
-
-	// Get lock
-	const unlockDatabaseFile = await lockFile(dbPath);
-
 	// Create DB
 	let db: Database;
 	const tracingCallbacks: Array<(command: string) => void> = [];
@@ -105,23 +82,25 @@ export const openDatabase = async (
 		},
 	};
 
-	const dbFileBuffer = await readFile(dbPath);
-	if (dbFileBuffer.byteLength > 0) {
+	const dbFileBuffer = await dbFile.get();
+	if (dbFileBuffer && dbFileBuffer.byteLength > 0) {
 		// Load DB
 		const dumpBuffer = encryption
 			? await encryption.decrypt(dbFileBuffer)
 			: dbFileBuffer;
 
 		// Check header signature, to detect a database file https://www.sqlite.org/fileformat.html#the_database_header
-		const isDatabaseFile = dumpBuffer
-			.toString('utf8', 0, 16)
+		const isDatabaseFile = new TextDecoder()
+			.decode(dumpBuffer.slice(0, 16))
 			.startsWith(`SQLite format 3`);
 		if (isDatabaseFile) {
-			db = new DB(dumpBuffer, dbOptions);
+			db = new DB(Buffer.from(dumpBuffer), dbOptions);
 		} else {
 			// If no database file, load buffer as string with SQL commands
 			db = new DB(':memory:', dbOptions);
-			db.exec(dumpBuffer.toString());
+
+			const sqlText = new TextDecoder().decode(dumpBuffer);
+			db.exec(sqlText);
 		}
 
 		// Migrate data
@@ -165,7 +144,7 @@ export const openDatabase = async (
 
 				// Write file
 				const dbDump = encryption ? await encryption.encrypt(buffer) : buffer;
-				await writeFileAtomic(dbPath, dbDump);
+				await dbFile.write(dbDump);
 
 				if (verboseLog) {
 					console.info('DB saved');
@@ -233,7 +212,6 @@ export const openDatabase = async (
 		await sync();
 
 		await waitDatabaseLock(() => db.close());
-		await unlockDatabaseFile();
 	};
 
 	await sync();

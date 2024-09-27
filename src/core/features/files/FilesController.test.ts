@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
-import { tmpdir } from 'os';
-import { tmpNameSync } from 'tmp';
+
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -40,8 +40,8 @@ const testFiles = Array(5)
 	.map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
 
 test('clear orphaned files', async () => {
-	const dbPath = tmpNameSync({ dir: tmpdir() });
-	const db = await openDatabase(dbPath);
+	const dbFile = createFileControllerMock();
+	const db = await openDatabase(dbFile);
 	const fileManager = createFileManagerMock();
 	const attachments = new AttachmentsController(db);
 	const files = new FilesController(db, fileManager, attachments);

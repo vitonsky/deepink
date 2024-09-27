@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { ButtonObject, ButtonsManager } from './ButtonsManager';
 
 export type ButtonsManagerObject = {
-	readonly manager: ButtonsManager;
+	readonly controls: ButtonsManager;
 	readonly state: {
 		start: ButtonObject[];
 		end: ButtonObject[];
@@ -26,5 +26,5 @@ export const useButtonsManager = (): ButtonsManagerObject => {
 		});
 	}
 
-	return { state, manager: managerRef.current };
+	return { state, controls: managerRef.current };
 };

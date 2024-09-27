@@ -5,20 +5,19 @@ import { FaBell, FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
-
-import { useBottomPanelManager } from '../StatusBar';
+import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import './Notifications.css';
 
 export const cnNotifications = cn('Notifications');
 
 export const Notifications = () => {
-	const { manager } = useBottomPanelManager();
+	const { controls } = useStatusBarManager();
 
 	const [isVisible, setIsVisible] = useState(false);
 
 	useEffect(() => {
-		manager.register(
+		controls.register(
 			'notifications',
 			{
 				visible: true,
@@ -33,9 +32,9 @@ export const Notifications = () => {
 		);
 
 		return () => {
-			manager.unregister('notifications');
+			controls.unregister('notifications');
 		};
-	}, [manager]);
+	}, [controls]);
 
 	const onClose = () => setIsVisible(false);
 

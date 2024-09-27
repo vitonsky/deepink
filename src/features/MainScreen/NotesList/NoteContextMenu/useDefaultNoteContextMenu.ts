@@ -3,12 +3,13 @@ import { ContextMenuCallback, useContextMenu } from '@components/hooks/useContex
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
-import { tagAttachmentsChanged } from '@core/state/tags';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
+import {
+	useFilesRegistry,
+	useTagsRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { copyTextToClipboard } from '@utils/clipboard';
-
-import { useFilesRegistry, useTagsRegistry } from '../../../Providers';
 
 import { mkdir, writeFile } from 'fs/promises';
 import { NotesExporter } from './NotesExporter';
@@ -66,17 +67,7 @@ export const useDefaultNoteContextMenu = ({
 					closeNote(id);
 					await notesRegistry.delete([id]);
 
-					const attachedTags = await tagsRegistry.getAttachedTags(id);
 					await tagsRegistry.setAttachedTags(id, []);
-					attachedTags.forEach(({ id: tagId }) =>
-						tagAttachmentsChanged([
-							{
-								tagId,
-								target: id,
-								state: 'delete',
-							},
-						]),
-					);
 
 					updateNotes();
 					break;
@@ -99,13 +90,6 @@ export const useDefaultNoteContextMenu = ({
 					const attachedTagsIds = attachedTags.map(({ id }) => id);
 
 					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
-					tagAttachmentsChanged(
-						attachedTagsIds.map((tagId) => ({
-							tagId,
-							target: newNoteId,
-							state: 'add',
-						})),
-					);
 
 					updateNotes();
 					break;
