@@ -3,15 +3,15 @@ import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
-import { useWorkspace } from '@features/Workspace/useWorkspace';
-import { WorkspaceStatusBarItems } from '@features/Workspace/WorkspaceStatusBarItems';
 import { ProfileContainer } from '@state/profiles/useProfiles';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectActiveWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
+import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
+import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
 export const WorkspaceContext = createContext<{
 	workspaceId: string;

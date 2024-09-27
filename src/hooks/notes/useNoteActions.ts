@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { NoteId } from '@core/features/notes';
-import { useNotesContext } from '@features/Workspace/WorkspaceProvider';
+import { useNotesContext } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {

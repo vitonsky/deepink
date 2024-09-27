@@ -3,7 +3,7 @@ import { Components } from 'react-markdown';
 import { saveAs } from 'file-saver';
 import { getAppResourceDataInUrl } from '@core/features/links';
 import { openLink } from '@electron/requests/interactions/renderer';
-import { useFilesRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 
 import { useNotesControl } from '../../MainScreen/useNotesControl';
 

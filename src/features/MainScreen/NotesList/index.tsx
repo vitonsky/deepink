@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { cn } from '@bem-react/classname';
 import { Stack } from '@components/Stack/Stack';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,

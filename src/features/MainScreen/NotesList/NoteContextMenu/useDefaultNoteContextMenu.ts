@@ -5,7 +5,10 @@ import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
-import { useFilesRegistry, useTagsRegistry } from '@features/Workspace/WorkspaceProvider';
+import {
+	useFilesRegistry,
+	useTagsRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';

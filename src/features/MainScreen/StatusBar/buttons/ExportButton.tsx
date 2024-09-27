@@ -6,7 +6,7 @@ import {
 	useFilesRegistry,
 	useNotesRegistry,
 	useTagsRegistry,
-} from '@features/Workspace/WorkspaceProvider';
+} from '@features/App/Workspace/WorkspaceProvider';
 
 import { NotesExporter } from '../../NotesList/NoteContextMenu/NotesExporter';
 

@@ -16,7 +16,7 @@ import {
 	useAttachmentsController,
 	useFilesRegistry,
 	useTagsRegistry,
-} from '@features/Workspace/WorkspaceProvider';
+} from '@features/App/Workspace/WorkspaceProvider';
 
 export const replaceUrls = (
 	tree: Root,

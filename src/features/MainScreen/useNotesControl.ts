@@ -1,5 +1,8 @@
 import { useCallback } from 'react';
-import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
+import {
+	useNotesContext,
+	useNotesRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 
 export const useNotesControl = () => {
 	const notesRegistry = useNotesRegistry();

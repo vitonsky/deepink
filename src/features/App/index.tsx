@@ -4,12 +4,12 @@ import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfileSelector } from '@features/App/useProfileSelector';
-import { Profiles } from '@features/Profiles';
 import { SplashScreen } from '@features/SplashScreen';
 import { useProfiles } from '@state/profiles/useProfiles';
 import { useProfilesManager } from '@state/profilesManager/useProfilesManager';
 
-import { WorkspaceManager } from '../WorkspaceManager';
+import { Profiles } from './Profiles';
+import { WorkspaceManager } from './WorkspaceManager';
 
 import './App.css';
 

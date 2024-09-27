@@ -5,7 +5,7 @@ import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
-import { NewProfile } from '@features/WorkspaceManager/ProfileCreator';
+import { NewProfile } from '@features/App/WorkspaceManager/ProfileCreator';
 
 import { createProfilesManagerApi } from './profilesManager';
 

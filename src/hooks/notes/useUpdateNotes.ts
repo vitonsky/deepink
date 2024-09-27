@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
+import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveTag, workspacesApi } from '@state/redux/profiles/profiles';

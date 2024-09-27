@@ -2,7 +2,8 @@ import React from 'react';
 import { FaArrowsRotate, FaLock, FaUserLarge } from 'react-icons/fa6';
 import { useFirstRender } from '@components/hooks/useFirstRender';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
-import { useProfileControls } from '@features/Profile';
+
+import { useProfileControls } from '../Profile';
 
 export const WorkspaceStatusBarItems = () => {
 	const statusBarButtons = useStatusBarManager();

@@ -1,10 +1,13 @@
 import React, { FC, useCallback } from 'react';
 import { IStackProps, Stack } from '@components/Stack/Stack';
 import { INote } from '@core/features/notes';
+import {
+	useNotesContext,
+	useNotesRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { cnMainScreen } from '@features/MainScreen';
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
-import { useNotesContext, useNotesRegistry } from '@features/Workspace/WorkspaceProvider';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 import { createWorkspaceSelector } from '@state/redux/profiles/utils';

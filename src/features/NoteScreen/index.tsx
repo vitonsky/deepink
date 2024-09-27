@@ -18,7 +18,7 @@ import { INote } from '@core/features/notes';
 import {
 	useAttachmentsController,
 	useFilesRegistry,
-} from '@features/Workspace/WorkspaceProvider';
+} from '@features/App/Workspace/WorkspaceProvider';
 
 import {
 	Checkbox,

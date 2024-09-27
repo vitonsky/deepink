@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useWorkspaceContext } from '@features/Workspace';
+import { useWorkspaceContext } from '@features/App/Workspace';
 import { Selector } from '@reduxjs/toolkit';
 
 import { useAppSelector } from '../hooks';
