@@ -5,10 +5,10 @@ import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useProfileSelector } from '@features/App/useProfileSelector';
 import { SplashScreen } from '@features/SplashScreen';
-import { useProfiles } from '@state/profiles/useProfiles';
-import { useProfilesManager } from '@state/profilesManager/useProfilesManager';
 
 import { Profiles } from './Profiles';
+import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { useProfilesList } from './useProfilesList';
 import { WorkspaceManager } from './WorkspaceManager';
 
 import './App.css';
@@ -20,8 +20,8 @@ export const App: FC = () => {
 		() => new ConfigStorage('config.json', new ElectronFilesController('/')),
 	);
 
-	const profilesManager = useProfilesManager();
-	const profilesApi = useProfiles();
+	const profilesManager = useProfilesList();
+	const profilesApi = useProfileContainers();
 
 	const [loadingState, setLoadingState] = useState<{
 		isProfilesLoading: boolean;

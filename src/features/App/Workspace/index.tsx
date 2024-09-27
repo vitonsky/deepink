@@ -3,12 +3,12 @@ import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
-import { ProfileContainer } from '@state/profiles/useProfiles';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectActiveWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
+import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';

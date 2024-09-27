@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createEvent, createStore } from 'effector';
 import { useUnit } from 'effector-react';
 import { bytesToBase64 } from '@core/encryption/utils/encoding';
 import { getRandomBytes } from '@core/encryption/utils/random';
@@ -7,7 +8,19 @@ import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { NewProfile } from '@features/App/WorkspaceManager/ProfileCreator';
 
-import { createProfilesManagerApi } from './profilesManager';
+export const createProfilesManagerApi = () => {
+	const $profiles = createStore<null | ProfileObject[]>(null);
+	const events = {
+		profilesUpdated: createEvent<null | ProfileObject[]>(),
+	};
+
+	$profiles.on(events.profilesUpdated, (_state, payload) => payload);
+
+	return {
+		$profiles,
+		events,
+	};
+};
 
 export type ProfilesManagerApi = {
 	profiles: ProfileObject[] | null;
@@ -17,7 +30,7 @@ export type ProfilesManagerApi = {
 /**
  * Hook to manage profile accounts
  */
-export const useProfilesManager = (): ProfilesManagerApi => {
+export const useProfilesList = (): ProfilesManagerApi => {
 	const [profilesManager] = useState(
 		() =>
 			new ProfilesManager(

@@ -38,7 +38,7 @@ const decryptKey = async (
 /**
  * Hook to manage active and opened profiles
  */
-export const useProfiles = () => {
+export const useProfileContainers = () => {
 	const [{ $profiles, $activeProfile, ...api }] = useState(() =>
 		createProfilesApi<DisposableBox<ProfileContainer>>(),
 	);
@@ -136,4 +136,4 @@ export const useProfiles = () => {
 	};
 };
 
-export type ProfilesApi = ReturnType<typeof useProfiles>;
+export type ProfilesApi = ReturnType<typeof useProfileContainers>;

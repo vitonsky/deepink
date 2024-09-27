@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
-import { ProfilesApi } from '@state/profiles/useProfiles';
 
 import { Profile } from '../Profile';
+import { ProfilesApi } from './hooks/useProfileContainers';
 
 export type ProfilesProps = {
 	profilesApi: ProfilesApi;

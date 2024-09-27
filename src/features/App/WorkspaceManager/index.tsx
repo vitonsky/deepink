@@ -3,9 +3,9 @@ import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/des
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { cn } from '@bem-react/classname';
-import { ProfilesApi } from '@state/profiles/useProfiles';
-import { ProfilesManagerApi } from '@state/profilesManager/useProfilesManager';
 
+import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
+import { ProfilesManagerApi } from '../useProfilesList';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 

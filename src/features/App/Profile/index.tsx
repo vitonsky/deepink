@@ -1,9 +1,9 @@
 import React, { createContext, FC, useEffect } from 'react';
-import { ProfileContainer } from '@state/profiles/useProfiles';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
+import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
 
 export type ProfileControls = {
