@@ -1,17 +1,43 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import React, {
+	FC,
+	PropsWithChildren,
+	ReactNode,
+	useCallback,
+	useMemo,
+	useState,
+} from 'react';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
-import { cn } from '@bem-react/classname';
+import { FaUser } from 'react-icons/fa6';
+import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 
-import './WorkspaceManager.css';
+export type ProfilesFormProps = PropsWithChildren<{
+	title?: ReactNode;
+	controls?: ReactNode;
+}>;
 
-export const cnWorkspaceManager = cn('WorkspaceManager');
+export const ProfilesForm = ({ title, controls, children }: ProfilesFormProps) => {
+	return (
+		<VStack alignItems="start" gap="1.5rem">
+			<VStack alignItems="start" w="100%" gap="1rem">
+				{title && (
+					<Text as="h3" color="#4e4e4e" fontSize="20px">
+						{title}
+					</Text>
+				)}
+
+				{children}
+			</VStack>
+
+			{controls && <VStack w="100%">{controls}</VStack>}
+		</VStack>
+	);
+};
 
 type PickProfileResponse = {
 	status: 'ok' | 'error';
@@ -105,12 +131,43 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		}
 
 		return (
-			<div className={cnWorkspaceManager('Container')}>
-				<h3 className={cnWorkspaceManager('Header')}>Choose the profile</h3>
-
-				<ul className={cnWorkspaceManager('ProfilesList')}>
+			<ProfilesForm
+				title="Choose the profile"
+				controls={
+					<>
+						<Button
+							colorScheme="primary"
+							size="lg"
+							w="100%"
+							onClick={() => setScreenName('createProfile')}
+						>
+							Create new profile
+						</Button>
+					</>
+				}
+			>
+				<VStack
+					w="100%"
+					gap="1px"
+					bgColor="#3667b5"
+					border="1px solid #3667b5"
+					borderRadius="4px"
+					maxHeight="230px"
+					overflow="auto"
+				>
 					{(profilesManager.profiles ?? []).map((profile) => (
-						<li
+						<HStack
+							as="button"
+							sx={{
+								backgroundColor: '#f2f2f3',
+								padding: '.8rem 1rem',
+								w: '100%',
+								cursor: 'pointer',
+								gap: '.8rem',
+								'&:hover': {
+									backgroundColor: '#ededee',
+								},
+							}}
 							key={profile.id}
 							onClick={() => {
 								onChooseProfile(profile.id);
@@ -119,19 +176,12 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 								}
 							}}
 						>
-							{profile.name}
-						</li>
+							<FaUser />
+							<Text>{profile.name}</Text>
+						</HStack>
 					))}
-				</ul>
-
-				<Button
-					view="action"
-					size="l"
-					onClick={() => setScreenName('createProfile')}
-				>
-					Create a new profile
-				</Button>
-			</div>
+				</VStack>
+			</ProfilesForm>
 		);
 	}, [
 		currentProfileObject,
@@ -141,5 +191,17 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		screenName,
 	]);
 
-	return <div className={cnWorkspaceManager({}, [cnTheme(theme)])}>{content}</div>;
+	return (
+		<Box
+			display="flex"
+			minH="100vh"
+			justifyContent="center"
+			alignItems="center"
+			className={cnTheme(theme)}
+		>
+			<Box maxW="500px" minW="350px" padding="1rem">
+				{content}
+			</Box>
+		</Box>
+	);
 };

@@ -85,6 +85,9 @@
 	},
 	"dependencies": {
 		"@bem-react/classname": "^1.6.0",
+		"@chakra-ui/react": "^2.8.2",
+		"@emotion/react": "^11.13.3",
+		"@emotion/styled": "^11.13.0",
 		"@reduxjs/toolkit": "^2.2.7",
 		"better-sqlite3": "^9.3.0",
 		"crc": "^4.3.2",
@@ -93,6 +96,7 @@
 		"effector-react": "^23.2.0",
 		"fast-glob": "^3.3.1",
 		"file-saver": "^2.0.5",
+		"framer-motion": "^11.9.0",
 		"github-markdown-css": "^5.2.0",
 		"lodash": "^4.17.21",
 		"monaco-editor-core": "^0.39.0",
