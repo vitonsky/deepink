@@ -9,6 +9,7 @@ import {
 	FaTrash,
 } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
+import { Divider, HStack } from '@chakra-ui/react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
@@ -96,72 +97,71 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	return (
 		<>
 			<List
-				classNameExtensions={{ ItemBody: cnNotesOverview('MenuItem') }}
 				items={[
 					{
 						id: 'inbox',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaInbox size="100%" />
 								</Icon>{' '}
 								<span>Inbox</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'all',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaBookOpen size="100%" />
 								</Icon>{' '}
 								<span>All notes</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'bookmarks',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaBookmark size="100%" />
 								</Icon>{' '}
 								<span>Bookmarks</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'archive',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaBoxArchive size="100%" />
 								</Icon>{' '}
 								<span>Archive</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'files',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaFile size="100%" />
 								</Icon>{' '}
 								<span>Files</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'bin',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaTrash size="100%" />
 								</Icon>{' '}
 								<span>Bin</span>
-							</>
+							</HStack>
 						),
 					},
 				]}
@@ -177,6 +177,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					}
 				}}
 			/>
+
+			<Divider />
 
 			<div className={cnNotesOverview('Tags')}>
 				<div className={cnNotesOverview('TagsControls')}>

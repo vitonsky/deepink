@@ -1,10 +1,9 @@
 import React, { FC, useEffect } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
+import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -83,18 +82,14 @@ export const MainScreen: FC = () => {
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
 			<div className={cnMainScreen('Content')}>
 				<div className={cnMainScreen('SideBar', { view: 'main' })}>
-					<Button
-						className={cnMainScreen('NewNoteButton')}
-						view="action"
-						onPress={createNote}
-						iconLeft={() => (
-							<Icon boxSize="1rem" hasGlyph>
-								<FaPenToSquare size="100%" />
-							</Icon>
-						)}
-					>
-						New note
+					<Button variant="primary" onClick={createNote}>
+						<HStack gap="1rem">
+							<FaPenToSquare />
+							<Text>New note</Text>
+						</HStack>
 					</Button>
+
+					<Divider />
 
 					<NotesOverview />
 

@@ -40,11 +40,5 @@ export const theme = extendTheme({
 				},
 			},
 		},
-		Stack: {
-			defaultProps: {
-				alignItems: 'start',
-				w: '100%',
-			},
-		},
 	},
 });
