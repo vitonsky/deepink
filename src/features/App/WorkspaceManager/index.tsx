@@ -1,11 +1,4 @@
-import React, {
-	FC,
-	PropsWithChildren,
-	ReactNode,
-	useCallback,
-	useMemo,
-	useState,
-} from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaUser } from 'react-icons/fa6';
@@ -15,29 +8,7 @@ import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
-
-export type ProfilesFormProps = PropsWithChildren<{
-	title?: ReactNode;
-	controls?: ReactNode;
-}>;
-
-export const ProfilesForm = ({ title, controls, children }: ProfilesFormProps) => {
-	return (
-		<VStack alignItems="start" gap="1.5rem">
-			<VStack alignItems="start" w="100%" gap="1rem">
-				{title && (
-					<Text as="h3" color="#4e4e4e" fontSize="20px">
-						{title}
-					</Text>
-				)}
-
-				{children}
-			</VStack>
-
-			{controls && <VStack w="100%">{controls}</VStack>}
-		</VStack>
-	);
-};
+import { ProfilesForm } from './ProfilesForm';
 
 type PickProfileResponse = {
 	status: 'ok' | 'error';

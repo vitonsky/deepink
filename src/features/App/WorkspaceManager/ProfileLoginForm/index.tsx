@@ -3,7 +3,8 @@ import { Button, Input, Text, VStack } from '@chakra-ui/react';
 import { useFocusableRef } from '@components/hooks/useFocusableRef';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 
-import { OnPickProfile, ProfilesForm } from '..';
+import { ProfilesForm } from '../ProfilesForm';
+import { OnPickProfile } from '..';
 
 export type ProfileLoginFormProps = {
 	profile: ProfileObject;
@@ -62,13 +63,13 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 				<Input
 					ref={firstInputRef}
 					variant="filled"
+					size="lg"
 					type="password"
 					placeholder="Enter password"
 					value={secret}
 					onChange={(evt) => setSecret(evt.target.value)}
 					focusBorderColor={errorMessage ? 'red.500' : undefined}
 					disabled={isPending}
-					size="lg"
 				/>
 
 				{errorMessage && <Text color="red.500">{errorMessage}</Text>}

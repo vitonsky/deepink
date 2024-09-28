@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Button, Input, Text, VStack } from '@chakra-ui/react';
 import { useFocusableRef } from '@components/hooks/useFocusableRef';
 
-import { ProfilesForm } from '..';
+import { ProfilesForm } from '../ProfilesForm';
 
 export type NewProfile = {
 	name: string;
@@ -100,6 +100,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				<VStack w="100%" alignItems="start">
 					<Input
 						ref={firstInputRef}
+						variant="filled"
+						size="lg"
 						placeholder="Profile name"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
@@ -112,6 +114,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 				<VStack w="100%" alignItems="start">
 					<Input
+						variant="filled"
+						size="lg"
 						type="password"
 						placeholder="Enter password"
 						value={password}
