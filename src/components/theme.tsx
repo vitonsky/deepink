@@ -2,6 +2,7 @@ import { extendTheme } from '@chakra-ui/react';
 
 export const theme = extendTheme({
 	colors: {
+		surface: '#fdfdfd',
 		primary2: {
 			'50': '#E7FEE7',
 			'100': '#BCFCBB',
@@ -36,6 +37,36 @@ export const theme = extendTheme({
 					'&:hover': {
 						backgroundColor: '#e8e6ff',
 						color: '#6b00cb',
+					},
+				},
+				secondary: {
+					backgroundColor: '#ededed',
+					color: '#2c252e',
+					'&:hover': {
+						backgroundColor: '#e1e1e1',
+					},
+				},
+			},
+		},
+		Select: {
+			variants: {
+				primary: {
+					field: {
+						backgroundColor: '#e6f0ff',
+						color: '#0066ff',
+						'&:hover': {
+							backgroundColor: '#e8e6ff',
+							color: '#6b00cb',
+						},
+					},
+				},
+				secondary: {
+					field: {
+						backgroundColor: '#ededed',
+						color: '#2c252e',
+						'&:hover': {
+							backgroundColor: '#e1e1e1',
+						},
 					},
 				},
 			},

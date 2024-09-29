@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import {
 	FaBookmark,
 	FaBookOpen,
@@ -9,7 +8,7 @@ import {
 	FaTrash,
 } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-import { Divider, HStack } from '@chakra-ui/react';
+import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
@@ -95,7 +94,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	// TODO: show spinner while loading tags
 	return (
-		<>
+		<VStack w="100%" gap="2rem">
 			<List
 				items={[
 					{
@@ -178,24 +177,27 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				}}
 			/>
 
-			<Divider />
-
-			<div className={cnNotesOverview('Tags')}>
-				<div className={cnNotesOverview('TagsControls')}>
-					<h2>Tags</h2>
+			<VStack w="100%" align="start">
+				<HStack w="100%">
+					<Text as="h2" fontWeight="bold" fontSize="16px" color="#4c4c4c">
+						Tags
+					</Text>
 
 					<Button
-						view="clear"
-						onPress={() => {
+						variant="ghost"
+						onClick={() => {
 							setIsAddTagPopupOpened(true);
 						}}
-						size="s"
+						size="sm"
+						marginLeft="auto"
 					>
 						<Icon glyph="add" scalable />
 					</Button>
-				</div>
+				</HStack>
 
-				<div className={cnNotesOverview('TagsList')}>
+				<Divider />
+
+				<Box w="100%">
 					<TagsList
 						tags={tagsTree}
 						activeTag={activeTag ? activeTag.id : undefined}
@@ -241,10 +243,10 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 							},
 						}}
 					/>
-				</div>
-			</div>
+				</Box>
+			</VStack>
 
 			{tagEditor}
-		</>
+		</VStack>
 	);
 };

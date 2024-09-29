@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
 import { FaGear } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
+import { Button, Select } from '@chakra-ui/react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { cnMainScreen } from '@features/MainScreen';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
@@ -33,12 +32,18 @@ export const WorkspaceBar = () => {
 	return (
 		<>
 			<div className={cnMainScreen('Workspace')}>
-				<Select
-					className={cnMainScreen('WorkspacePicker')}
-					options={workspaces}
-					value="default"
-				></Select>
-				<Button title="Workspace settings" onPress={editWorkspace}>
+				<Select variant="secondary" value="default">
+					{workspaces.map((workspace) => (
+						<option key={workspace.id} value={workspace.id}>
+							{workspace.content}
+						</option>
+					))}
+				</Select>
+				<Button
+					variant="secondary"
+					title="Workspace settings"
+					onClick={editWorkspace}
+				>
 					<Icon boxSize="1rem" hasGlyph>
 						<FaGear size="100%" />
 					</Icon>

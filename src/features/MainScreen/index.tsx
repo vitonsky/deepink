@@ -3,7 +3,7 @@ import { cnTheme } from 'react-elegant-ui/esm/theme';
 import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-import { Button, Divider, HStack, Text } from '@chakra-ui/react';
+import { Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -80,28 +80,56 @@ export const MainScreen: FC = () => {
 
 	return (
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
-			<div className={cnMainScreen('Content')}>
-				<div className={cnMainScreen('SideBar', { view: 'main' })}>
-					<Button variant="primary" onClick={createNote}>
-						<HStack gap="1rem">
-							<FaPenToSquare />
-							<Text>New note</Text>
-						</HStack>
-					</Button>
+			<HStack
+				align="start"
+				sx={{
+					flexGrow: '100',
+					width: '100%',
+					height: '100vh',
+					maxWidth: '100%',
+					maxHeight: '100%',
+					overflow: 'hidden',
+				}}
+				className={cnMainScreen('Content1')}
+			>
+				<VStack
+					sx={{
+						bgColor: 'surface',
+						alignItems: 'start',
 
-					<Divider />
+						width: '100%',
+						height: '100%',
+						minWidth: '250px',
+						maxWidth: '250px',
+						padding: '6px',
+						overflow: 'auto',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '1rem',
+						borderRight: '1px solid #e2e8f0',
+					}}
+					className={cnMainScreen('SideBar1', { view: 'main' })}
+				>
+					<VStack w="100%" gap=".5rem">
+						<Button variant="primary" w="100%" onClick={createNote}>
+							<HStack gap="1rem">
+								<FaPenToSquare />
+								<Text>New note</Text>
+							</HStack>
+						</Button>
 
-					<NotesOverview />
+						<NotesOverview />
+					</VStack>
 
 					<WorkspaceBar />
-				</div>
+				</VStack>
 
 				<div className={cnMainScreen('SideBar')}>
 					<NotesPanel />
 				</div>
 
 				<NotesContainer />
-			</div>
+			</HStack>
 
 			<StatusBar />
 
