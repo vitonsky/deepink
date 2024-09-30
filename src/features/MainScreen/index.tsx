@@ -82,6 +82,7 @@ export const MainScreen: FC = () => {
 		<div className={cnMainScreen({}, [cnTheme(theme)])}>
 			<HStack
 				align="start"
+				gap={0}
 				sx={{
 					flexGrow: '100',
 					width: '100%',
@@ -90,7 +91,6 @@ export const MainScreen: FC = () => {
 					maxHeight: '100%',
 					overflow: 'hidden',
 				}}
-				className={cnMainScreen('Content1')}
 			>
 				<VStack
 					sx={{
@@ -101,14 +101,13 @@ export const MainScreen: FC = () => {
 						height: '100%',
 						minWidth: '250px',
 						maxWidth: '250px',
-						padding: '6px',
+						padding: '.5rem',
 						overflow: 'auto',
 						display: 'flex',
 						flexDirection: 'column',
 						gap: '1rem',
 						borderRight: '1px solid #e2e8f0',
 					}}
-					className={cnMainScreen('SideBar1', { view: 'main' })}
 				>
 					<VStack w="100%" gap=".5rem">
 						<Button variant="primary" w="100%" onClick={createNote}>
@@ -124,9 +123,24 @@ export const MainScreen: FC = () => {
 					<WorkspaceBar />
 				</VStack>
 
-				<div className={cnMainScreen('SideBar')}>
+				<VStack
+					sx={{
+						alignItems: 'start',
+
+						width: '100%',
+						height: '100%',
+						minWidth: '250px',
+						maxWidth: '250px',
+						padding: '.5rem',
+						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '1rem',
+						borderRight: '1px solid #e2e8f0',
+					}}
+				>
 					<NotesPanel />
-				</div>
+				</VStack>
 
 				<NotesContainer />
 			</HStack>
