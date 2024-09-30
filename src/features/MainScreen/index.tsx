@@ -102,14 +102,14 @@ export const MainScreen: FC = () => {
 						minWidth: '250px',
 						maxWidth: '250px',
 						padding: '.5rem',
-						overflow: 'auto',
+						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
 						gap: '1rem',
 						borderRight: '1px solid #e2e8f0',
 					}}
 				>
-					<VStack w="100%" gap=".5rem">
+					<VStack w="100%" gap=".5rem" overflow="hidden">
 						<Button variant="primary" w="100%" onClick={createNote}>
 							<HStack gap="1rem">
 								<FaPenToSquare />

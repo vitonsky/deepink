@@ -1,5 +1,5 @@
 import React, { FC, ReactNode } from 'react';
-import { HStack, VStack } from '@chakra-ui/react';
+import { HStack, StackProps, VStack } from '@chakra-ui/react';
 
 export type ListItem = {
 	id: string;
@@ -8,20 +8,19 @@ export type ListItem = {
 	collapsed?: boolean;
 };
 
-export type IListProps = {
+export type IListProps = StackProps & {
 	items: ListItem[];
 	activeItem?: string;
 	onPick?: (id: string) => void;
 };
 
-export const List: FC<IListProps> = ({ items, ...props }) => {
-	const { activeItem, onPick } = props;
-
+export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) => {
 	return (
 		<VStack
 			as="ul"
 			w="100%"
 			gap="0"
+			{...props}
 			sx={{
 				margin: '0',
 				paddingLeft: '0',
@@ -32,6 +31,7 @@ export const List: FC<IListProps> = ({ items, ...props }) => {
 				'& &': {
 					paddingStart: '.5rem',
 				},
+				...props.sx,
 			}}
 		>
 			{items.map((item) => {
@@ -68,7 +68,7 @@ export const List: FC<IListProps> = ({ items, ...props }) => {
 
 						{item.childrens && !isGroupCollapsed && (
 							<VStack w="100%" paddingStart=".5rem">
-								<List items={item.childrens} {...props} />
+								<List items={item.childrens} />
 							</VStack>
 						)}
 					</VStack>

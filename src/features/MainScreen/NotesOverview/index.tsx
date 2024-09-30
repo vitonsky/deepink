@@ -89,8 +89,10 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	// TODO: show spinner while loading tags
 	return (
-		<VStack w="100%" gap="2rem">
+		<VStack flex={1} w="100%" gap="2rem" overflow="hidden">
 			<List
+				overflow="auto"
+				minHeight="150px"
 				items={[
 					{
 						id: 'inbox',
@@ -172,7 +174,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				}}
 			/>
 
-			<VStack w="100%" align="start">
+			<VStack flex={1} minH="200px" w="100%" align="start" overflow="hidden">
 				<HStack w="100%">
 					<Text as="h2" fontWeight="bold" fontSize="16px" color="#4c4c4c">
 						Tags
@@ -192,7 +194,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 				<Divider />
 
-				<Box w="100%">
+				<Box w="100%" overflow="auto">
 					<TagsList
 						tags={tagsTree}
 						activeTag={activeTag ? activeTag.id : undefined}
