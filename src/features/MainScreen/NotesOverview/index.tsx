@@ -7,7 +7,6 @@ import {
 	FaInbox,
 	FaTrash,
 } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
 import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
@@ -24,10 +23,6 @@ import {
 } from '@state/redux/profiles/profiles';
 
 import { TagsList } from './TagsList';
-
-import './NotesOverview.css';
-
-export const cnNotesOverview = cn('NotesOverview');
 
 export type NotesOverviewProps = {};
 
