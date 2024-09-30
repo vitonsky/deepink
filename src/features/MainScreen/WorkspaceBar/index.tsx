@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { FaGear } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
-import { Button, Select } from '@chakra-ui/react';
+import { Button, HStack, Select } from '@chakra-ui/react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
-import { cnMainScreen } from '@features/MainScreen';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -31,8 +30,8 @@ export const WorkspaceBar = () => {
 
 	return (
 		<>
-			<div className={cnMainScreen('Workspace')}>
-				<Select variant="secondary" value="default">
+			<HStack w="100%" marginTop="auto">
+				<Select size="sm" variant="secondary" value="default" borderRadius="6px">
 					{workspaces.map((workspace) => (
 						<option key={workspace.id} value={workspace.id}>
 							{workspace.content}
@@ -40,6 +39,7 @@ export const WorkspaceBar = () => {
 					))}
 				</Select>
 				<Button
+					size="sm"
 					variant="secondary"
 					title="Workspace settings"
 					onClick={editWorkspace}
@@ -48,7 +48,7 @@ export const WorkspaceBar = () => {
 						<FaGear size="100%" />
 					</Icon>
 				</Button>
-			</div>
+			</HStack>
 
 			<WorkspaceSettings
 				isVisible={isWorkspaceEditing}
