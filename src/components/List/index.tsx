@@ -1,10 +1,5 @@
 import React, { FC, ReactNode } from 'react';
-import { cn } from '@bem-react/classname';
-import { ClassNameExtensions, extendClassName } from '@utils/className';
-
-import './List.css';
-
-const cnList = cn('List');
+import { HStack, StackProps, VStack } from '@chakra-ui/react';
 
 export type ListItem = {
 	id: string;
@@ -13,32 +8,54 @@ export type ListItem = {
 	collapsed?: boolean;
 };
 
-export type IListProps = {
+export type IListProps = StackProps & {
 	items: ListItem[];
 	activeItem?: string;
 	onPick?: (id: string) => void;
-	classNameExtensions?: ClassNameExtensions;
 };
 
-export const List: FC<IListProps> = ({ items, ...props }) => {
-	const { activeItem, onPick, classNameExtensions = {} } = props;
-	const extendedListCn = extendClassName(cnList, classNameExtensions);
-
+export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) => {
 	return (
-		<ul className={extendedListCn()}>
+		<VStack
+			as="ul"
+			w="100%"
+			gap="0"
+			{...props}
+			sx={{
+				margin: '0',
+				paddingLeft: '0',
+				listStyle: 'none',
+				// eslint-disable-next-line spellcheck/spell-checker
+				fontFamily: 'Arial, Helvetica, sans-serif',
+				userSelect: 'none',
+				'& &': {
+					paddingStart: '.5rem',
+				},
+				...props.sx,
+			}}
+		>
 			{items.map((item) => {
 				const tagId = item.id;
 				const isGroupCollapsed = Boolean(item.collapsed);
 
 				return (
-					<li
-						key={tagId}
-						className={extendedListCn('Item', {
-							active: activeItem === tagId,
-						})}
-					>
-						<div
-							className={extendedListCn('ItemBody')}
+					<VStack w="100%" key={tagId} as="li" lineHeight="1.5rem" gap="0">
+						<HStack
+							w="100%"
+							sx={{
+								...(activeItem === tagId
+									? {
+											backgroundColor: '#e8e6ff',
+											color: '#6b00cb',
+									  }
+									: {
+											'&:hover': {
+												backgroundColor:
+													'var(--color-control-type-list-fill-color-hover)',
+												color: 'var(--color-control-type-list-typo-base)',
+											},
+									  }),
+							}}
 							onClick={(evt) => {
 								if (onPick) {
 									evt.stopPropagation();
@@ -47,16 +64,20 @@ export const List: FC<IListProps> = ({ items, ...props }) => {
 							}}
 						>
 							{item.content}
-						</div>
+						</HStack>
 
 						{item.childrens && !isGroupCollapsed && (
-							<div className={extendedListCn('Group')}>
-								<List items={item.childrens} {...props} />
-							</div>
+							<VStack w="100%" paddingStart=".5rem">
+								<List
+									items={item.childrens}
+									activeItem={activeItem}
+									onPick={onPick}
+								/>
+							</VStack>
 						)}
-					</li>
+					</VStack>
 				);
 			})}
-		</ul>
+		</VStack>
 	);
 };

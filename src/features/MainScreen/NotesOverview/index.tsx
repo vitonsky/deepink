@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import {
 	FaBookmark,
 	FaBookOpen,
@@ -8,7 +7,7 @@ import {
 	FaInbox,
 	FaTrash,
 } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
+import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
@@ -24,10 +23,6 @@ import {
 } from '@state/redux/profiles/profiles';
 
 import { TagsList } from './TagsList';
-
-import './NotesOverview.css';
-
-export const cnNotesOverview = cn('NotesOverview');
 
 export type NotesOverviewProps = {};
 
@@ -94,74 +89,75 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	// TODO: show spinner while loading tags
 	return (
-		<>
+		<VStack flex={1} w="100%" gap="2rem" overflow="hidden">
 			<List
-				classNameExtensions={{ ItemBody: cnNotesOverview('MenuItem') }}
+				overflow="auto"
+				minHeight="150px"
 				items={[
 					{
 						id: 'inbox',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaInbox size="100%" />
 								</Icon>{' '}
 								<span>Inbox</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'all',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaBookOpen size="100%" />
 								</Icon>{' '}
 								<span>All notes</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'bookmarks',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaBookmark size="100%" />
 								</Icon>{' '}
 								<span>Bookmarks</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'archive',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaBoxArchive size="100%" />
 								</Icon>{' '}
 								<span>Archive</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'files',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaFile size="100%" />
 								</Icon>{' '}
 								<span>Files</span>
-							</>
+							</HStack>
 						),
 					},
 					{
 						id: 'bin',
 						content: (
-							<>
+							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<Icon hasGlyph boxSize=".9rem">
 									<FaTrash size="100%" />
 								</Icon>{' '}
 								<span>Bin</span>
-							</>
+							</HStack>
 						),
 					},
 				]}
@@ -178,22 +174,27 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				}}
 			/>
 
-			<div className={cnNotesOverview('Tags')}>
-				<div className={cnNotesOverview('TagsControls')}>
-					<h2>Tags</h2>
+			<VStack flex={1} minH="200px" w="100%" align="start" overflow="hidden">
+				<HStack w="100%">
+					<Text as="h2" fontWeight="bold" fontSize="16px" color="#4c4c4c">
+						Tags
+					</Text>
 
 					<Button
-						view="clear"
-						onPress={() => {
+						variant="ghost"
+						onClick={() => {
 							setIsAddTagPopupOpened(true);
 						}}
-						size="s"
+						size="sm"
+						marginLeft="auto"
 					>
 						<Icon glyph="add" scalable />
 					</Button>
-				</div>
+				</HStack>
 
-				<div className={cnNotesOverview('TagsList')}>
+				<Divider />
+
+				<Box w="100%" overflow="auto">
 					<TagsList
 						tags={tagsTree}
 						activeTag={activeTag ? activeTag.id : undefined}
@@ -239,10 +240,10 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 							},
 						}}
 					/>
-				</div>
-			</div>
+				</Box>
+			</VStack>
 
 			{tagEditor}
-		</>
+		</VStack>
 	);
 };
