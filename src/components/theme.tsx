@@ -1,4 +1,4 @@
-import { extendTheme } from '@chakra-ui/react';
+import { defineStyleConfig, extendTheme } from '@chakra-ui/react';
 
 export const theme = extendTheme({
 	colors: {
@@ -29,6 +29,16 @@ export const theme = extendTheme({
 		},
 	},
 	components: {
+		Menu: defineStyleConfig({
+			baseStyle: {
+				item: {
+					transitionDuration: '0s',
+					'&:hover, &:focus': {
+						bgColor: '#e6f0ff',
+					},
+				},
+			},
+		}),
 		Button: {
 			variants: {
 				primary: {
