@@ -1,9 +1,7 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
 import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
-import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import {
 	FaBell,
 	FaBookmark,
@@ -24,6 +22,7 @@ import {
 } from 'react-icons/fa6';
 import { debounce } from 'lodash';
 import { cn } from '@bem-react/classname';
+import { Box, Button, Divider, HStack, Input, Tag, Text } from '@chakra-ui/react';
 import { Icon } from '@components/Icon/Icon.bundle/common';
 import { Stack } from '@components/Stack/Stack';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
@@ -160,22 +159,25 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	return (
 		<div className={cnNoteEditor()}>
-			<Stack direction="horizontal">
-				<Textinput
-					className={cnNoteEditor('Title')}
-					value={title}
-					onInputText={setTitle}
-					placeholder="Note title"
-				/>
-				<Button
-					view="default"
-					innerRef={noteControlButtonRef}
-					onPress={() => setIsNoteMenuOpened((state) => !state)}
-				>
-					<Icon boxSize="1rem" hasGlyph>
-						<FaEllipsis size="100%" />
-					</Icon>
-				</Button>
+			<HStack w="100%" align="start">
+				<HStack w="100%" align="start">
+					<Input
+						placeholder="Note title"
+						size="sm"
+						borderRadius="6px"
+						value={title}
+						onChange={(evt) => setTitle(evt.target.value)}
+					/>
+
+					<Button
+						ref={noteControlButtonRef}
+						variant="primary"
+						size="sm"
+						onClick={() => setIsNoteMenuOpened((state) => !state)}
+					>
+						<FaEllipsis />
+					</Button>
+				</HStack>
 
 				{/* TODO: add options that may be toggled */}
 				{/* TODO: render popups in portal */}
@@ -345,25 +347,25 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						}}
 					/>
 				</Popup>
-			</Stack>
-			<div className={cnNoteEditor('Attachments')}>
+			</HStack>
+
+			<Box alignItems="center" className={cnNoteEditor('Attachments')}>
 				<Stack direction="horizontal">
-					<Button view="clear" size="s">
-						<Icon boxSize="1rem" hasGlyph>
-							<FaBookmark size="100%" />
-						</Icon>
+					<Button variant="ghost" size="xs">
+						<FaBookmark />
 					</Button>
-					<Button view="clear" size="s">
-						<Icon boxSize="1rem" hasGlyph>
-							<FaFlag size="100%" />
-						</Icon>
+					<Button variant="ghost" size="xs">
+						<FaFlag />
 					</Button>
 				</Stack>
 
+				<Divider orientation="vertical" h="1em" />
+
 				{attachedTags.map((tag) => (
-					<div
-						className={cnNoteEditor('Attachment')}
+					<Tag
+						as={HStack}
 						key={tag.id}
+						height="fit-content"
 						onClick={() => {
 							dispatch(
 								workspacesApi.setSelectedTag({
@@ -373,27 +375,39 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							);
 						}}
 					>
-						<span>{tag.resolvedName}</span>
-						<Icon
-							glyph="clear"
-							onClick={async (evt) => {
-								evt.stopPropagation();
-								console.warn('Remove attached tag', tag.resolvedName);
-
-								const updatedTags = attachedTags
-									.filter(({ id }) => id !== tag.id)
-									.map(({ id }) => id);
-								await tagsRegistry.setAttachedTags(noteId, updatedTags);
-								await updateTags();
+						<Text>{tag.resolvedName}</Text>
+						<Box
+							sx={{
+								'&:not(:hover)': {
+									opacity: '.6',
+								},
 							}}
-						/>
-					</div>
+						>
+							<FaXmark
+								onClick={async (evt) => {
+									evt.stopPropagation();
+									console.warn('Remove attached tag', tag.resolvedName);
+
+									const updatedTags = attachedTags
+										.filter(({ id }) => id !== tag.id)
+										.map(({ id }) => id);
+									await tagsRegistry.setAttachedTags(
+										noteId,
+										updatedTags,
+									);
+									await updateTags();
+								}}
+							/>
+						</Box>
+					</Tag>
 				))}
 
-				<input
+				<Input
 					type="text"
 					ref={tagInputRef}
-					className={cnNoteEditor('AttachmentInput')}
+					size="xs"
+					variant="ghost"
+					w="auto"
 					placeholder="Add some tags..."
 					value={attachTagName}
 					onChange={(evt) => {
@@ -407,7 +421,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						setAttachTagName('');
 					}}
 				/>
-			</div>
+			</Box>
 
 			<div className={cnNoteEditor('SplitContainer')}>
 				<MonacoEditor
@@ -422,7 +436,11 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 			{sidePanel === 'backlinks' && (
 				<div className={cnNoteEditor('SideBar')}>
 					<div className={cnNoteEditor('SideBarHead')}>
-						<Button view="clear" size="s" onPress={() => setSidePanel(null)}>
+						<Button
+							variant="ghost"
+							size="s"
+							onClick={() => setSidePanel(null)}
+						>
 							<Icon hasGlyph scalable boxSize=".8rem">
 								<FaXmark />
 							</Icon>
