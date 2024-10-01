@@ -16,7 +16,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 			borderTop="1px solid #e2e8f0"
 			{...props}
 		>
-			<HStack w="auto">
+			<HStack w="auto" gap="0">
 				{start.map((item, idx) =>
 					item.visible ? (
 						<Button
@@ -36,7 +36,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 				)}
 			</HStack>
 
-			<HStack w="auto" marginLeft="auto">
+			<HStack w="auto" gap="0" marginLeft="auto">
 				{end.map((item, idx) =>
 					item.visible ? (
 						<Button
