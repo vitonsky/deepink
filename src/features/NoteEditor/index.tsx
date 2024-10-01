@@ -18,7 +18,6 @@ import {
 	FaXmark,
 } from 'react-icons/fa6';
 import { debounce } from 'lodash';
-import { cn } from '@bem-react/classname';
 import {
 	Box,
 	Button,
@@ -36,7 +35,6 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
-import { Stack } from '@components/Stack/Stack';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
@@ -53,10 +51,6 @@ import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
-
-import './NoteEditor.css';
-
-const cnNoteEditor = cn('NoteEditor');
 
 export type NoteEditorProps = {
 	note: INote;
@@ -164,7 +158,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
 	return (
-		<div className={cnNoteEditor()}>
+		<VStack w="100%">
 			<HStack w="100%" align="start">
 				<HStack w="100%" align="start">
 					<Input
@@ -259,15 +253,15 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				</HStack>
 			</HStack>
 
-			<Box alignItems="center" className={cnNoteEditor('Attachments')}>
-				<Stack direction="horizontal">
+			<HStack alignItems="center" w="100%" flexWrap="wrap">
+				<HStack>
 					<Button variant="ghost" size="xs">
 						<FaBookmark />
 					</Button>
 					<Button variant="ghost" size="xs">
 						<FaFlag />
 					</Button>
-				</Stack>
+				</HStack>
 
 				<Divider orientation="vertical" h="1em" />
 
@@ -322,6 +316,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						<Input
 							type="text"
 							ref={tagInputRef}
+							maxW="150px"
 							size="xs"
 							variant="ghost"
 							w="auto"
@@ -410,17 +405,27 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						/>
 					</PopoverContent>
 				</Popover>
-			</Box>
+			</HStack>
 
-			<div className={cnNoteEditor('SplitContainer')}>
-				<MonacoEditor
+			<Box
+				sx={{
+					width: '100%',
+					display: 'grid',
+					overflow: 'hidden',
+					gap: '0.3rem',
+					flexGrow: '100',
+					gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+				}}
+			>
+				<Box
+					as={MonacoEditor}
 					value={text}
 					setValue={setText}
-					className={cnNoteEditor('Editor')}
+					flexGrow="100"
 					uploadFile={uploadFile}
 				/>
 				<NoteScreen note={note} update={onTextUpdate} />
-			</div>
+			</Box>
 
 			{sidePanel === 'backlinks' && (
 				<VStack
@@ -446,6 +451,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					<Box w="100%">TODO: Note related data here</Box>
 				</VStack>
 			)}
-		</div>
+		</VStack>
 	);
 };
