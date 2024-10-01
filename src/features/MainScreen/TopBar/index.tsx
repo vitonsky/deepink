@@ -69,13 +69,18 @@ export const TopBar: FC<TopBarProps> = ({
 						throw new Error('Note not found');
 					}
 
+					const title = getNoteTitle(note.content);
+
 					return (
 						<Tab
 							key={note.id}
-							padding="0.4rem 0.6rem"
+							padding="0.4rem 0.7rem"
 							border="none"
 							color="#000"
+							fontWeight="600"
+							fontSize="14"
 							marginBottom={0}
+							title={title}
 							sx={{
 								'&:hover': {
 									backgroundColor: '#f1f1f1',
@@ -89,8 +94,12 @@ export const TopBar: FC<TopBarProps> = ({
 								},
 							}}
 						>
-							<HStack gap=".3rem">
+							<HStack gap=".5rem">
 								<Text
+									maxW="180px"
+									whiteSpace="nowrap"
+									overflow="hidden"
+									textOverflow="ellipsis"
 									onContextMenu={(evt) => {
 										openNoteContextMenu(note.id, {
 											x: evt.pageX,
@@ -98,7 +107,7 @@ export const TopBar: FC<TopBarProps> = ({
 										});
 									}}
 								>
-									{getNoteTitle(note.content)}
+									{title}
 								</Text>
 								<Box
 									className={cnTopBar('CloseButton')}
