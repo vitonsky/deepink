@@ -408,6 +408,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					}}
 				/>
 			</div>
+
 			<div className={cnNoteEditor('SplitContainer')}>
 				<MonacoEditor
 					value={text}
@@ -417,6 +418,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				/>
 				<NoteScreen note={note} update={onTextUpdate} />
 			</div>
+
 			{sidePanel === 'backlinks' && (
 				<div className={cnNoteEditor('SideBar')}>
 					<div className={cnNoteEditor('SideBarHead')}>
@@ -432,6 +434,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					</div>
 				</div>
 			)}
+
 			{isShowTagsList && (
 				<Popup
 					target="anchor"

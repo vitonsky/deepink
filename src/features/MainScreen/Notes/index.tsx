@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { TabsPanes } from 'react-elegant-ui/esm/components/TabsPanes/TabsPanes.bundle/desktop';
 import { isEqual } from 'lodash';
 import { cn } from '@bem-react/classname';
+import { Box } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
@@ -23,7 +24,9 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 	useEditorLinks();
 
 	return (
-		<TabsPanes
+		<Box
+			as={TabsPanes}
+			w="100%"
 			className={cnNotes()}
 			renderAll
 			activePane={activeTab ?? undefined}
