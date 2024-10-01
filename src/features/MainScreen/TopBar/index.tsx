@@ -81,6 +81,19 @@ export const TopBar: FC<TopBarProps> = ({
 							fontSize="14"
 							marginBottom={0}
 							title={title}
+							onMouseDown={(evt) => {
+								const isMiddleButton = evt.button === 1;
+								if (!isMiddleButton) return;
+
+								evt.preventDefault();
+								evt.stopPropagation();
+							}}
+							onMouseUp={(evt) => {
+								const isMiddleButton = evt.button === 1;
+								if (!isMiddleButton) return;
+
+								onClose(note.id);
+							}}
 							sx={{
 								'&:hover': {
 									backgroundColor: '#f1f1f1',
