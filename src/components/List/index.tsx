@@ -68,7 +68,11 @@ export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) =>
 
 						{item.childrens && !isGroupCollapsed && (
 							<VStack w="100%" paddingStart=".5rem">
-								<List items={item.childrens} />
+								<List
+									items={item.childrens}
+									activeItem={activeItem}
+									onPick={onPick}
+								/>
 							</VStack>
 						)}
 					</VStack>
