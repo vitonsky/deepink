@@ -38,6 +38,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 						id: note.id,
 						content: (
 							<NoteEditor
+								key={note.id}
 								note={note}
 								updateNote={(content) => {
 									// Skip updates with not changed data
