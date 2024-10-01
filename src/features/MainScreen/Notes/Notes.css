@@ -11,6 +11,5 @@
 }
 
 .Notes > * {
-	overflow: auto;
 	max-height: 100%;
 }
