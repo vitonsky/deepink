@@ -1,67 +1,60 @@
-import React, { FC, HTMLProps } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
-import { Stack } from '@components/Stack/Stack';
+import React, { FC } from 'react';
+import { Button, HStack, StackProps, Text } from '@chakra-ui/react';
 import { useStatusBar } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
-import './StatusBar.css';
-
-export const cnStatusBar = cn('StatusBar');
-
-export type StatusBarProps = HTMLProps<HTMLDivElement>;
+export type StatusBarProps = StackProps;
 
 // TODO: make status bar extensible
-export const StatusBar: FC<StatusBarProps> = ({ className, ...props }) => {
+export const StatusBar: FC<StatusBarProps> = (props) => {
 	const { start, end } = useStatusBar();
 
 	return (
-		<div {...props} className={cnStatusBar({}, [className])}>
-			<div className={cnStatusBar('LeftItems')}>
+		<HStack
+			minW="100%"
+			fontSize=".9em"
+			bgColor="surface"
+			borderTop="1px solid #e2e8f0"
+			{...props}
+		>
+			<HStack w="auto">
 				{start.map((item, idx) =>
 					item.visible ? (
 						<Button
 							key={idx}
-							size="s"
-							view="clear"
+							size="xs"
+							variant="ghost"
+							borderRadius="0"
 							title={item.title}
 							onClick={item.onClick}
 						>
-							<Stack direction="horizontal">
-								{item.icon && (
-									<Icon hasGlyph boxSize="1rem">
-										{item.icon}
-									</Icon>
-								)}
-								{item.text && <span>{item.text}</span>}
-							</Stack>
+							<HStack>
+								{item.icon}
+								{item.text && <Text>{item.text}</Text>}
+							</HStack>
 						</Button>
 					) : undefined,
 				)}
-			</div>
+			</HStack>
 
-			<div className={cnStatusBar('RightItems')}>
+			<HStack w="auto" marginLeft="auto">
 				{end.map((item, idx) =>
 					item.visible ? (
 						<Button
 							key={idx}
-							size="s"
-							view="clear"
+							size="xs"
+							variant="ghost"
+							borderRadius="0"
 							title={item.title}
 							onClick={item.onClick}
 						>
-							<Stack direction="horizontal">
-								{item.icon && (
-									<Icon hasGlyph boxSize="1rem">
-										{item.icon}
-									</Icon>
-								)}
-								{item.text && <span>{item.text}</span>}
-							</Stack>
+							<HStack>
+								{item.icon}
+								{item.text && <Text>{item.text}</Text>}
+							</HStack>
 						</Button>
 					) : undefined,
 				)}
-			</div>
-		</div>
+			</HStack>
+		</HStack>
 	);
 };
