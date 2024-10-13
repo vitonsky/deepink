@@ -50,9 +50,8 @@ export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) =>
 									  }
 									: {
 											'&:hover': {
-												backgroundColor:
-													'var(--color-control-type-list-fill-color-hover)',
-												color: 'var(--color-control-type-list-typo-base)',
+												backgroundColor: '#e6f0ff',
+												color: '#0066ff',
 											},
 									  }),
 							}}

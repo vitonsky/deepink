@@ -1,8 +1,5 @@
 import React, { FC, useEffect } from 'react';
-import { cnTheme } from 'react-elegant-ui/esm/theme';
-import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
 import { Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
@@ -19,10 +16,6 @@ import { Preferences } from '../Preferences/Preferences';
 import { NotesOverview } from './NotesOverview';
 import { Notifications } from './Notifications/Notifications';
 import { StatusBar } from './StatusBar';
-
-import './MainScreen.css';
-
-export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
@@ -79,7 +72,19 @@ export const MainScreen: FC = () => {
 	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
 
 	return (
-		<div className={cnMainScreen({}, [cnTheme(theme)])}>
+		<VStack
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				background: 'var(--color-fill-color-default)',
+				color: 'var(--color-typo-primary)',
+			}}
+		>
 			<HStack
 				align="start"
 				gap={0}
@@ -149,6 +154,6 @@ export const MainScreen: FC = () => {
 
 			<Notifications />
 			<Preferences />
-		</div>
+		</VStack>
 	);
 };
