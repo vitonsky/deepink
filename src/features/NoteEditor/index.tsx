@@ -28,9 +28,6 @@ import {
 	MenuButton,
 	MenuItem,
 	MenuList,
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
 	Tag,
 	Text,
 	VStack,
@@ -151,9 +148,10 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		[debouncedUpdateNote, title],
 	);
 
-	const [attachTagName, setAttachTagName] = useState('');
-	const [isShowTagsList, setIsShowTagsList] = useState(false);
-	const tagInputRef = useRef<HTMLInputElement | null>(null);
+	const [attachTagName, setAttachTagName] = useState<IResolvedTag | null>(null);
+	const [tagSearch, setTagSearch] = useState(
+		attachTagName ? attachTagName.resolvedName : '',
+	);
 
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
@@ -306,105 +304,74 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					</Tag>
 				))}
 
-				<Popover
-					isOpen={isShowTagsList}
-					autoFocus={false}
-					closeOnBlur={false}
-					returnFocusOnClose={false}
-				>
-					<PopoverTrigger>
-						<Input
-							type="text"
-							ref={tagInputRef}
-							maxW="150px"
-							size="xs"
-							variant="ghost"
-							w="auto"
-							placeholder="Add some tags..."
-							value={attachTagName}
-							onKeyDown={(evt) => {
-								if (evt.key === 'Escape') {
-									setIsShowTagsList(false);
-									setAttachTagName('');
-									return;
-								}
+				<SuggestedTagsList
+					tags={notAttachedTags}
+					selectedTag={attachTagName ?? undefined}
+					inputValue={tagSearch}
+					onInputChange={setTagSearch}
+					sx={{
+						display: 'inline',
+						w: 'auto',
+						maxW: '150px',
+					}}
+					inputProps={{
+						variant: 'ghost',
+						placeholder: 'Add some tags...',
+						// size: 'sm',
+						size: 'xs',
+					}}
+					hasTagName={(tagName) =>
+						tags.some(({ resolvedName }) => resolvedName === tagName)
+					}
+					onPick={async (tag) => {
+						setAttachTagName(tag);
+						await tagsRegistry.setAttachedTags(noteId, [
+							...attachedTags.map(({ id }) => id),
+							tag.id,
+						]);
 
-								setIsShowTagsList(true);
-							}}
-							onChange={(evt) => {
-								setAttachTagName(evt.target.value);
-							}}
-							onFocus={() => {
-								setIsShowTagsList(true);
-							}}
-							onBlur={() => {
-								setIsShowTagsList(false);
-								setAttachTagName('');
-							}}
-						/>
-					</PopoverTrigger>
-					<PopoverContent>
-						<SuggestedTagsList
-							tags={notAttachedTags}
-							tagName={attachTagName}
-							hasTagName={(tagName) =>
-								tags.some(({ resolvedName }) => resolvedName === tagName)
+						setTagSearch('');
+
+						await updateTags();
+					}}
+					onCreateTag={async (tagName) => {
+						setAttachTagName(null);
+
+						let shortenedTagName = tagName;
+						let parentTagId: string | null = null;
+						const tagSegments = tagName.split('/');
+						for (
+							let lastSegmentIndex = tagSegments.length - 1;
+							lastSegmentIndex > 0;
+							lastSegmentIndex--
+						) {
+							const resolvedParentTag = tagSegments
+								.slice(0, lastSegmentIndex)
+								.join('/');
+							const foundTag = tags.find(
+								({ resolvedName }) => resolvedName === resolvedParentTag,
+							);
+							if (foundTag) {
+								parentTagId = foundTag.id;
+								shortenedTagName = tagSegments
+									.slice(lastSegmentIndex)
+									.join('/');
+								break;
 							}
-							onPickTag={async (id) => {
-								// tagInputRef.current?.blur();
-								setAttachTagName('');
-								await tagsRegistry.setAttachedTags(noteId, [
-									...attachedTags.map(({ id }) => id),
-									id,
-								]);
+						}
 
-								await updateTags();
-							}}
-							onCreateTag={async (tagName) => {
-								setAttachTagName('');
+						const tagId = await tagsRegistry.add(
+							shortenedTagName,
+							parentTagId,
+						);
+						await tagsRegistry.setAttachedTags(noteId, [
+							...attachedTags.map(({ id }) => id),
+							tagId,
+						]);
 
-								let shortenedTagName = tagName;
-								let parentTagId: string | null = null;
-								const tagSegments = tagName.split('/');
-								for (
-									let lastSegmentIndex = tagSegments.length - 1;
-									lastSegmentIndex > 0;
-									lastSegmentIndex--
-								) {
-									const resolvedParentTag = tagSegments
-										.slice(0, lastSegmentIndex)
-										.join('/');
-									const foundTag = tags.find(
-										({ resolvedName }) =>
-											resolvedName === resolvedParentTag,
-									);
-									if (foundTag) {
-										parentTagId = foundTag.id;
-										shortenedTagName = tagSegments
-											.slice(lastSegmentIndex)
-											.join('/');
-										break;
-									}
-								}
-
-								const tagId = await tagsRegistry.add(
-									shortenedTagName,
-									parentTagId,
-								);
-								await tagsRegistry.setAttachedTags(noteId, [
-									...attachedTags.map(({ id }) => id),
-									tagId,
-								]);
-
-								await updateTags();
-							}}
-							onMouseDownCapture={(evt) => {
-								evt.preventDefault();
-								evt.stopPropagation();
-							}}
-						/>
-					</PopoverContent>
-				</Popover>
+						await updateTags();
+					}}
+				/>
 			</HStack>
 
 			<Box

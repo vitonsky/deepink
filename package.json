@@ -92,6 +92,7 @@
 		"better-sqlite3": "^9.3.0",
 		"crc": "^4.3.2",
 		"debounce": "^2.0.0",
+		"downshift": "^9.0.8",
 		"effector": "^23.2.0",
 		"effector-react": "^23.2.0",
 		"fast-glob": "^3.3.1",

@@ -12,9 +12,6 @@ import {
 	ModalFooter,
 	ModalHeader,
 	ModalOverlay,
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
@@ -50,8 +47,8 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	const [parentTagId, setParentTagId] = useState<string | null>(
 		parentTag ? parentTag.id : null,
 	);
-	const [parentTagName, setParentTagName] = useState(
-		parentTag ? parentTag.resolvedName : '',
+	const [selectedParentTag, setSelectedParentTag] = useState<IResolvedTag | null>(
+		parentTag ? parentTag : null,
 	);
 
 	const [tagName, setTagName] = useState(editedTag ? editedTag.name : '');
@@ -68,29 +65,28 @@ export const TagEditor: FC<ITagEditorProps> = ({
 		if (!parentTag) return;
 
 		setParentTagId(parentTag.id);
-		setParentTagName(parentTag.resolvedName);
+		setSelectedParentTag(parentTag);
 	}, [parentTag]);
 
 	// Remove parent tag
 	useEffect(() => {
-		const isEmptyValue = parentTagName.trim().length === 0;
-		if (isEmptyValue) {
+		if (!selectedParentTag) {
 			setParentTagId(null);
 		}
-	}, [parentTagName]);
+	}, [selectedParentTag]);
 
 	// Reset parent tag name
 	useEffect(() => {
 		if (isTagsListVisible) return;
 
 		const parentTag = tags.find(({ id }) => id === parentTagId);
-		setParentTagName(parentTag ? parentTag.resolvedName : '');
+		setSelectedParentTag(parentTag ? parentTag : null);
 	}, [isTagsListVisible, parentTagId, tags]);
 
 	// Set parent tag name
 	useEffect(() => {
 		const parentTag = tags.find(({ id }) => id === parentTagId);
-		setParentTagName(parentTag ? parentTag.resolvedName : '');
+		setSelectedParentTag(parentTag ? parentTag : null);
 	}, [parentTagId, tags]);
 
 	return (
@@ -102,64 +98,29 @@ export const TagEditor: FC<ITagEditorProps> = ({
 
 				<ModalBody>
 					<VStack>
-						<Popover
-							isOpen={isTagsListVisible}
-							autoFocus={false}
-							closeOnBlur={false}
-							returnFocusOnClose={false}
-						>
-							<PopoverTrigger>
-								<FormControl isInvalid={tagNameError !== null}>
-									<Input
-										placeholder="Parent tag"
-										value={parentTagName}
-										onChange={(evt) => {
-											console.log('change');
-											setParentTagName(evt.target.value);
-										}}
-										onFocus={() => {
-											setIsTagsListVisible(true);
-										}}
-										onBlur={() => {
-											setIsTagsListVisible(false);
-										}}
-										onKeyDown={() => {
-											setIsTagsListVisible(true);
-										}}
-										onClick={() => {
-											setIsTagsListVisible(true);
-										}}
-									/>
-
-									{tagNameError && (
-										<FormErrorMessage>
-											{tagNameError}
-										</FormErrorMessage>
-									)}
-								</FormControl>
-							</PopoverTrigger>
-							<PopoverContent>
-								<SuggestedTagsList
-									tags={tags}
-									tagName={parentTagName}
-									onMouseDown={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
-									}}
-									onPick={(id) => {
-										setParentTagId(id);
-										setIsTagsListVisible(false);
-									}}
-								/>
-							</PopoverContent>
-						</Popover>
-						<Input
-							placeholder="Tag name"
-							value={tagName}
-							onChange={(evt) => {
-								setTagName(evt.target.value);
+						<SuggestedTagsList
+							placeholder="Parent tag"
+							tags={tags}
+							selectedTag={selectedParentTag ?? undefined}
+							onPick={(tag) => {
+								setParentTagId(tag.id);
+								setIsTagsListVisible(false);
 							}}
 						/>
+
+						<FormControl isInvalid={tagNameError !== null}>
+							<Input
+								placeholder="Tag name"
+								value={tagName}
+								onChange={(evt) => {
+									setTagName(evt.target.value);
+								}}
+							/>
+
+							{tagNameError && (
+								<FormErrorMessage>{tagNameError}</FormErrorMessage>
+							)}
+						</FormControl>
 					</VStack>
 				</ModalBody>
 
