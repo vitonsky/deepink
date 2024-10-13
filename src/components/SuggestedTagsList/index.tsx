@@ -1,6 +1,5 @@
 import React, { FC, useCallback } from 'react';
 import Downshift from 'downshift';
-import { cn } from '@bem-react/classname';
 import {
 	Box,
 	BoxProps,
@@ -12,10 +11,6 @@ import {
 	useControllableState,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
-
-import './SuggestedTagsList.css';
-
-export const cnSuggestedTagsList = cn('SuggestedTagsList');
 
 export type ListItem = {
 	id: string;
