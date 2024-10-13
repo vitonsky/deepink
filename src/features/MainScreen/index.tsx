@@ -73,6 +73,7 @@ export const MainScreen: FC = () => {
 
 	return (
 		<VStack
+			gap={0}
 			sx={{
 				display: 'flex',
 				flexDirection: 'column',
