@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from 'react';
-import { cn } from '@bem-react/classname';
 import {
 	Button,
 	FormControl,
@@ -21,10 +20,6 @@ import {
 import { IResolvedTag } from '@core/features/tags';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
-
-import './TagEditor.css';
-
-export const cnTagEditor = cn('TagEditor');
 
 export type TagEditorData = {
 	id?: string;
@@ -101,7 +96,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	return (
 		<Modal isOpen onClose={onCancel} isCentered>
 			<ModalOverlay />
-			<ModalContent className={cnTagEditor()}>
+			<ModalContent>
 				<ModalCloseButton />
 				<ModalHeader>{isEditingMode ? 'Edit tag' : 'Add tag'}</ModalHeader>
 
