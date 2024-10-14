@@ -5,10 +5,10 @@ import {
 	FaBoxArchive,
 	FaFile,
 	FaInbox,
+	FaPlus,
 	FaTrash,
 } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
-import { Icon } from '@components/Icon/Icon.bundle/common';
 import { List } from '@components/List';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
@@ -98,10 +98,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						id: 'inbox',
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<Icon hasGlyph boxSize=".9rem">
-									<FaInbox size="100%" />
-								</Icon>{' '}
-								<span>Inbox</span>
+								<FaInbox />
+								<Text>Inbox</Text>
 							</HStack>
 						),
 					},
@@ -109,10 +107,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						id: 'all',
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<Icon hasGlyph boxSize=".9rem">
-									<FaBookOpen size="100%" />
-								</Icon>{' '}
-								<span>All notes</span>
+								<FaBookOpen />
+								<Text>All notes</Text>
 							</HStack>
 						),
 					},
@@ -120,10 +116,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						id: 'bookmarks',
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<Icon hasGlyph boxSize=".9rem">
-									<FaBookmark size="100%" />
-								</Icon>{' '}
-								<span>Bookmarks</span>
+								<FaBookmark />
+								<Text>Bookmarks</Text>
 							</HStack>
 						),
 					},
@@ -131,10 +125,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						id: 'archive',
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<Icon hasGlyph boxSize=".9rem">
-									<FaBoxArchive size="100%" />
-								</Icon>{' '}
-								<span>Archive</span>
+								<FaBoxArchive />
+								<Text>Archive</Text>
 							</HStack>
 						),
 					},
@@ -142,10 +134,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						id: 'files',
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<Icon hasGlyph boxSize=".9rem">
-									<FaFile size="100%" />
-								</Icon>{' '}
-								<span>Files</span>
+								<FaFile />
+								<Text>Files</Text>
 							</HStack>
 						),
 					},
@@ -153,10 +143,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						id: 'bin',
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<Icon hasGlyph boxSize=".9rem">
-									<FaTrash size="100%" />
-								</Icon>{' '}
-								<span>Bin</span>
+								<FaTrash />
+								<Text>Bin</Text>
 							</HStack>
 						),
 					},
@@ -188,7 +176,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						size="sm"
 						marginLeft="auto"
 					>
-						<Icon glyph="add" scalable />
+						<FaPlus />
 					</Button>
 				</HStack>
 
