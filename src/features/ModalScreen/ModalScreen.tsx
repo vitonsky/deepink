@@ -19,6 +19,7 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 		<Modal
 			size="full"
 			isOpen={Boolean(isVisible)}
+			scrollBehavior="inside"
 			onClose={() => {
 				if (onClose) {
 					onClose();
@@ -31,7 +32,7 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 					{Boolean(title || onClose) && (
 						<HStack w="100%" padding=".3rem">
 							{title && (
-								<Text fontSize="1rem" fontWeight="bold">
+								<Text fontSize="1.3rem" fontWeight="bold">
 									{title}
 								</Text>
 							)}
@@ -50,7 +51,7 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 						</HStack>
 					)}
 
-					<Box display="flex" flex="1" w="100%" h="100%">
+					<Box display="flex" flex="1" w="100%" h="100%" overflow="auto">
 						{children}
 					</Box>
 				</VStack>

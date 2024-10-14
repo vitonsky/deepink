@@ -1,10 +1,7 @@
-import React, { FC, HTMLAttributes } from 'react';
+import React, { FC } from 'react';
+import { Text, TextProps } from '@chakra-ui/react';
 
-import { cnFeatures } from '../Features';
-
-import './FeaturesHeader.css';
-
-export interface FeaturesHeaderProps extends HTMLAttributes<HTMLHeadingElement> {
+export interface FeaturesHeaderProps extends TextProps {
 	view?: 'section' | 'group' | 'primary';
 }
 
@@ -14,8 +11,20 @@ export const FeaturesHeader: FC<FeaturesHeaderProps> = ({
 	...rest
 }) => {
 	return (
-		<h2 {...rest} className={cnFeatures('Header', { view }, [rest.className])}>
+		<Text
+			as="h2"
+			{...rest}
+			sx={{
+				marginLeft: '40%',
+				fontSize: '18px',
+				fontWeight: 'bold',
+				'&:not(:first-child)': {
+					marginTop: '2rem',
+				},
+				...rest.sx,
+			}}
+		>
 			{children}
-		</h2>
+		</Text>
 	);
 };

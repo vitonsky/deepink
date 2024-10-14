@@ -1,20 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Checkbox } from 'react-elegant-ui/esm/components/Checkbox/Checkbox.bundle/desktop';
-import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
-import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import { FaWrench } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
+import { Button, Checkbox, Input, Select, VStack } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import { ModalScreen } from '../ModalScreen/ModalScreen';
-
-import './Preferences.css';
-
-export const cnPreferences = cn('Preferences');
 
 export const Preferences = () => {
 	const [isOpened, setIsOpened] = useState(false);
@@ -43,22 +35,17 @@ export const Preferences = () => {
 	const onClose = useCallback(() => setIsOpened(false), []);
 
 	return (
-		<ModalScreen
-			isVisible={isOpened}
-			onClose={onClose}
-			className={cnPreferences()}
-			title="Settings"
-		>
-			<div className={cnPreferences('Body')}>
+		<ModalScreen isVisible={isOpened} onClose={onClose} title="Settings">
+			<VStack w="100%" minH="100%" p="2rem 5rem" justifyContent="center">
 				<Features>
 					<FeaturesHeader view="primary">Database settings</FeaturesHeader>
 
 					<FeaturesOption title="Database name">
-						<Textinput placeholder="Enter database name" />
+						<Input placeholder="Enter database name" />
 					</FeaturesOption>
 
 					<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password">
-						<Checkbox label="Remember workspaces passwords" checked />
+						<Checkbox>Remember workspaces passwords" checked</Checkbox>
 					</FeaturesOption>
 
 					<FeaturesHeader view="section">Encryption</FeaturesHeader>
@@ -67,23 +54,26 @@ export const Preferences = () => {
 						title="Encryption algorithm"
 						description="Choose best algorithm you trust"
 					>
-						<Select
-							options={[
+						<Select value="aes">
+							{[
 								{
-									id: 'none',
-									content: 'None',
+									value: 'none',
+									text: 'None',
 								},
 								{
-									id: 'aes',
-									content: 'AES',
+									value: 'aes',
+									text: 'AES',
 								},
 								{
-									id: 'twofish',
-									content: 'Twofish',
+									value: 'twofish',
+									text: 'Twofish',
 								},
-							]}
-							value="aes"
-						/>
+							].map(({ value, text }) => (
+								<option key={value} value={value}>
+									{text}
+								</option>
+							))}
+						</Select>
 					</FeaturesOption>
 
 					<FeaturesOption title="Password">
@@ -93,32 +83,35 @@ export const Preferences = () => {
 					<FeaturesHeader view="section">Synchronization</FeaturesHeader>
 
 					<FeaturesOption description="Sync all data in database between your devices, to not loose it. All data are encrypted.">
-						<Checkbox label="Enable synchronization" checked />
+						<Checkbox>Enable synchronization" checked</Checkbox>
 					</FeaturesOption>
 					<FeaturesOption title="Synchronization method">
-						<Select
-							options={[
+						<Select value="fs">
+							{[
 								{
-									id: 'fs',
-									content: 'File system',
+									value: 'fs',
+									text: 'File system',
 								},
 								{
-									id: 'server',
-									content: 'Server',
+									value: 'server',
+									text: 'Server',
 								},
-							]}
-							value="fs"
-						/>
+							].map(({ value, text }) => (
+								<option key={value} value={value}>
+									{text}
+								</option>
+							))}
+						</Select>
 					</FeaturesOption>
 					<FeaturesOption title="Synchronization directory">
-						<Textinput
+						<Input
 							placeholder="Enter path on directory"
 							value="/foo/bar"
 							disabled
 						/>
 					</FeaturesOption>
 				</Features>
-			</div>
+			</VStack>
 		</ModalScreen>
 	);
 };

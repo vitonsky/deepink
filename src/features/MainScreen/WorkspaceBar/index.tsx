@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FaGear } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
 import { Button, HStack, Select } from '@chakra-ui/react';
-import { Icon } from '@components/Icon/Icon.bundle/common';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -44,9 +43,7 @@ export const WorkspaceBar = () => {
 					title="Workspace settings"
 					onClick={editWorkspace}
 				>
-					<Icon boxSize="1rem" hasGlyph>
-						<FaGear size="100%" />
-					</Icon>
+					<FaGear />
 				</Button>
 			</HStack>
 
