@@ -1,19 +1,10 @@
-import React, { FC, HTMLAttributes, ReactNode } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
+import React, { FC, HTMLAttributes } from 'react';
 import { FaXmark } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
-import { Modal } from '@components/Modal/Modal.bundle/Modal.desktop';
-
-import './ModalScreen.css';
-
-export const cnModalScreen = cn('ModalScreen');
+import { Box, Button, HStack, Modal, ModalContent, Text, VStack } from '@chakra-ui/react';
 
 export interface ModalScreenProps extends HTMLAttributes<HTMLDivElement> {
 	isVisible?: boolean;
 	onClose?: () => void;
-	head?: ReactNode;
-	footer?: ReactNode;
 	title?: string;
 }
 
@@ -21,44 +12,49 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 	isVisible,
 	onClose,
 	title,
-	head,
-	footer,
 	children,
 	...rest
 }) => {
 	return (
 		<Modal
-			visible={isVisible}
-			onClose={onClose}
-			renderToStack
-			view="screen"
+			size="full"
+			isOpen={Boolean(isVisible)}
+			onClose={() => {
+				if (onClose) {
+					onClose();
+				}
+			}}
 			{...rest}
 		>
-			<div className={cnModalScreen()}>
-				{head && <div className={cnModalScreen('Head')}>{head}</div>}
-				{Boolean(title || onClose) && (
-					<div className={cnModalScreen('Head')}>
-						{title && (
-							<div className={cnModalScreen('HeadTitle')}>{title}</div>
-						)}
-						{onClose && (
-							<Button
-								view="clear"
-								className={cnModalScreen('CloseButton')}
-								onPress={onClose}
-							>
-								<Icon hasGlyph scalable boxSize="1rem">
+			<ModalContent w="100%" h="100%">
+				<VStack w="100%" h="100%" maxW="800px" margin="auto">
+					{Boolean(title || onClose) && (
+						<HStack w="100%" padding=".3rem">
+							{title && (
+								<Text fontSize="1rem" fontWeight="bold">
+									{title}
+								</Text>
+							)}
+							{onClose && (
+								<Button
+									variant="ghost"
+									onClick={onClose}
+									marginLeft="auto"
+									borderRadius="100%"
+									padding="0"
+									width="auto"
+								>
 									<FaXmark />
-								</Icon>
-							</Button>
-						)}
-					</div>
-				)}
+								</Button>
+							)}
+						</HStack>
+					)}
 
-				<div className={cnModalScreen('Body')}>{children}</div>
-
-				{footer && <div className={cnModalScreen('Footer')}>{footer}</div>}
-			</div>
+					<Box display="flex" flex="1" w="100%" h="100%">
+						{children}
+					</Box>
+				</VStack>
+			</ModalContent>
 		</Modal>
 	);
 };
