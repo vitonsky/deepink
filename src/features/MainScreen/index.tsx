@@ -1,10 +1,6 @@
 import React, { FC, useEffect } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { cnTheme } from 'react-elegant-ui/esm/theme';
-import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
+import { Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -20,10 +16,6 @@ import { Preferences } from '../Preferences/Preferences';
 import { NotesOverview } from './NotesOverview';
 import { Notifications } from './Notifications/Notifications';
 import { StatusBar } from './StatusBar';
-
-import './MainScreen.css';
-
-export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
@@ -80,38 +72,89 @@ export const MainScreen: FC = () => {
 	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
 
 	return (
-		<div className={cnMainScreen({}, [cnTheme(theme)])}>
-			<div className={cnMainScreen('Content')}>
-				<div className={cnMainScreen('SideBar', { view: 'main' })}>
-					<Button
-						className={cnMainScreen('NewNoteButton')}
-						view="action"
-						onPress={createNote}
-						iconLeft={() => (
-							<Icon boxSize="1rem" hasGlyph>
-								<FaPenToSquare size="100%" />
-							</Icon>
-						)}
-					>
-						New note
-					</Button>
+		<VStack
+			gap={0}
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				background: 'var(--color-fill-color-default)',
+				color: 'var(--color-typo-primary)',
+			}}
+		>
+			<HStack
+				align="start"
+				gap={0}
+				sx={{
+					flexGrow: '100',
+					width: '100%',
+					height: '100vh',
+					maxWidth: '100%',
+					maxHeight: '100%',
+					overflow: 'hidden',
+				}}
+			>
+				<VStack
+					sx={{
+						bgColor: 'surface',
+						alignItems: 'start',
 
-					<NotesOverview />
+						width: '100%',
+						height: '100%',
+						minWidth: '250px',
+						maxWidth: '250px',
+						padding: '.5rem',
+						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '1rem',
+						borderRight: '1px solid #e2e8f0',
+					}}
+				>
+					<VStack w="100%" gap=".5rem" overflow="hidden">
+						<Button variant="primary" w="100%" onClick={createNote}>
+							<HStack gap="1rem">
+								<FaPenToSquare />
+								<Text>New note</Text>
+							</HStack>
+						</Button>
+
+						<NotesOverview />
+					</VStack>
 
 					<WorkspaceBar />
-				</div>
+				</VStack>
 
-				<div className={cnMainScreen('SideBar')}>
+				<VStack
+					sx={{
+						alignItems: 'start',
+
+						width: '100%',
+						height: '100%',
+						minWidth: '250px',
+						maxWidth: '250px',
+						padding: '.5rem',
+						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '1rem',
+						borderRight: '1px solid #e2e8f0',
+					}}
+				>
 					<NotesPanel />
-				</div>
+				</VStack>
 
 				<NotesContainer />
-			</div>
+			</HStack>
 
 			<StatusBar />
 
 			<Notifications />
 			<Preferences />
-		</div>
+		</VStack>
 	);
 };

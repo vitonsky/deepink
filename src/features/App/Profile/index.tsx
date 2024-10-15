@@ -60,8 +60,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		};
 	}, [dispatch, profileId]);
 
-	console.log({ workspaces });
-
 	// TODO: support multiple opened workspaces
 	return (
 		<ProfileControlsContext.Provider value={controls}>

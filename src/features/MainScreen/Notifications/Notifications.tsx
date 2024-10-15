@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
 import { FaBell, FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
-import { Stack } from '@components/Stack/Stack';
+import { Button, VStack } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import './Notifications.css';
@@ -44,20 +42,18 @@ export const Notifications = () => {
 		<div className={cnNotifications({ visible: isVisible })} ref={ref}>
 			<div className={cnNotifications('Head')}>
 				<div className={cnNotifications('Title')}>Notifications</div>
-				<Button view="clear" size="s" onPress={onClose}>
-					<Icon hasGlyph scalable boxSize=".8rem">
-						<FaXmark />
-					</Icon>
+				<Button variant="ghost" size="s" onClick={onClose}>
+					<FaXmark />
 				</Button>
 			</div>
-			<Stack direction="vertical" spacing={2} className={cnNotifications('Body')}>
+			<VStack className={cnNotifications('Body')}>
 				<div className={cnNotifications('Notification')}>
 					Demo message for notification
 				</div>
 				<div className={cnNotifications('Notification')}>
 					One more message in notifications container
 				</div>
-			</Stack>
+			</VStack>
 		</div>
 	);
 };

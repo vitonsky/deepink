@@ -1,10 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Select } from 'react-elegant-ui/esm/components/Select/Select.bundle/desktop';
 import { FaGear } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
-import { Icon } from '@components/Icon/Icon.bundle/common';
-import { cnMainScreen } from '@features/MainScreen';
+import { Button, HStack, Select } from '@chakra-ui/react';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -32,18 +29,28 @@ export const WorkspaceBar = () => {
 
 	return (
 		<>
-			<div className={cnMainScreen('Workspace')}>
+			<HStack w="100%" marginTop="auto">
 				<Select
-					className={cnMainScreen('WorkspacePicker')}
-					options={workspaces}
-					value="default"
-				></Select>
-				<Button title="Workspace settings" onPress={editWorkspace}>
-					<Icon boxSize="1rem" hasGlyph>
-						<FaGear size="100%" />
-					</Icon>
+					size="sm"
+					variant="secondary"
+					defaultValue="default"
+					borderRadius="6px"
+				>
+					{workspaces.map((workspace) => (
+						<option key={workspace.id} value={workspace.id}>
+							{workspace.content}
+						</option>
+					))}
+				</Select>
+				<Button
+					size="sm"
+					variant="secondary"
+					title="Workspace settings"
+					onClick={editWorkspace}
+				>
+					<FaGear />
 				</Button>
-			</div>
+			</HStack>
 
 			<WorkspaceSettings
 				isVisible={isWorkspaceEditing}

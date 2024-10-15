@@ -7,12 +7,12 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { Spinner } from 'react-elegant-ui/esm/components/Spinner/Spinner.bundle/desktop';
 import ReactMarkdown from 'react-markdown';
 import { debounce } from 'lodash';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@bem-react/classname';
+import { Spinner } from '@chakra-ui/react';
 import { getResourceIdInUrl } from '@core/features/links';
 import { INote } from '@core/features/notes';
 import {
@@ -220,12 +220,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 				</div>
 			) : (
 				<div className={cnNoteScreen('SplashScreen')}>
-					<Spinner
-						className={cnNoteScreen('Spinner')}
-						view="primitive"
-						size="l"
-						progress
-					/>
+					<Spinner className={cnNoteScreen('Spinner')} size="lg" />
 				</div>
 			)}
 		</div>

@@ -1,16 +1,12 @@
 import React, { FC } from 'react';
-import { cn } from '@bem-react/classname';
+import { StackProps, VStack } from '@chakra-ui/react';
 
-import { IStackProps, Stack } from '../Stack/Stack';
-
-export const cnFeatures = cn('Features');
-
-export interface FeaturesProps extends Partial<IStackProps> {}
+export interface FeaturesProps extends StackProps {}
 
 export const Features: FC<FeaturesProps> = ({ children, ...rest }) => {
 	return (
-		<Stack direction="vertical" spacing={6} {...rest} className={cnFeatures()}>
+		<VStack gap="1.5rem" align="start" {...rest}>
 			{children}
-		</Stack>
+		</VStack>
 	);
 };
