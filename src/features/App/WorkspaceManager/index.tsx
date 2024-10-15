@@ -1,6 +1,4 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { cnTheme } from 'react-elegant-ui/esm/theme';
-import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 
@@ -163,13 +161,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	]);
 
 	return (
-		<Box
-			display="flex"
-			minH="100vh"
-			justifyContent="center"
-			alignItems="center"
-			className={cnTheme(theme)}
-		>
+		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<Box maxW="500px" minW="350px" padding="1rem">
 				{content}
 			</Box>

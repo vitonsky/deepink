@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { TabsPanes } from 'react-elegant-ui/esm/components/TabsPanes/TabsPanes.bundle/desktop';
 import { isEqual } from 'lodash';
 import { cn } from '@bem-react/classname';
 import { Box } from '@chakra-ui/react';
@@ -24,19 +23,14 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 	useEditorLinks();
 
 	return (
-		<Box
-			as={TabsPanes}
-			w="100%"
-			className={cnNotes()}
-			renderAll
-			activePane={activeTab ?? undefined}
-			panes={tabs
+		<Box w="100%" className={cnNotes()}>
+			{tabs
 				.filter((id) => notes.some((note) => note.id === id))
 				.map((id) => {
 					const note = notes.find((note) => note.id === id) as INote;
-					return {
-						id: note.id,
-						content: (
+					const isActiveTab = activeTab === note.id;
+					return (
+						<Box display={isActiveTab ? 'flex' : 'none'} w="100%" h="100%">
 							<NoteEditor
 								key={note.id}
 								note={note}
@@ -49,9 +43,9 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 									updateNote({ ...note, content });
 								}}
 							/>
-						),
-					};
+						</Box>
+					);
 				})}
-		/>
+		</Box>
 	);
 };

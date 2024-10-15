@@ -107,7 +107,6 @@
 		"react": "^18.2.0",
 		"react-detect-click-outside": "^1.1.7",
 		"react-dom": "^18.2.0",
-		"react-elegant-ui": "^0.3.4",
 		"react-icons": "^4.12.0",
 		"react-markdown": "^8.0.7",
 		"react-redux": "^9.1.2",
