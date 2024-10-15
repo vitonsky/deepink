@@ -30,7 +30,12 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 					const note = notes.find((note) => note.id === id) as INote;
 					const isActiveTab = activeTab === note.id;
 					return (
-						<Box display={isActiveTab ? 'flex' : 'none'} w="100%" h="100%">
+						<Box
+							key={note.id}
+							display={isActiveTab ? 'flex' : 'none'}
+							w="100%"
+							h="100%"
+						>
 							<NoteEditor
 								key={note.id}
 								note={note}

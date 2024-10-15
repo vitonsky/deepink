@@ -18,7 +18,10 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ isVisible, onClo
 				<Features>
 					<FeaturesOption title="Workspace name">
 						<HStack>
-							<Input placeholder="Enter workspace name" value="Default" />
+							<Input
+								placeholder="Enter workspace name"
+								defaultValue="Default"
+							/>
 							<Button variant="primary" disabled>
 								Update
 							</Button>

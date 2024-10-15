@@ -30,7 +30,12 @@ export const WorkspaceBar = () => {
 	return (
 		<>
 			<HStack w="100%" marginTop="auto">
-				<Select size="sm" variant="secondary" value="default" borderRadius="6px">
+				<Select
+					size="sm"
+					variant="secondary"
+					defaultValue="default"
+					borderRadius="6px"
+				>
 					{workspaces.map((workspace) => (
 						<option key={workspace.id} value={workspace.id}>
 							{workspace.content}

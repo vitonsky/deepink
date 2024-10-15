@@ -41,7 +41,10 @@ export const Preferences = () => {
 					<FeaturesHeader view="primary">Database settings</FeaturesHeader>
 
 					<FeaturesOption title="Database name">
-						<Input placeholder="Enter database name" />
+						<Input
+							placeholder="Enter database name"
+							defaultValue="My database"
+						/>
 					</FeaturesOption>
 
 					<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password">
@@ -54,7 +57,7 @@ export const Preferences = () => {
 						title="Encryption algorithm"
 						description="Choose best algorithm you trust"
 					>
-						<Select value="aes">
+						<Select defaultValue="aes">
 							{[
 								{
 									value: 'none',
@@ -86,7 +89,7 @@ export const Preferences = () => {
 						<Checkbox>Enable synchronization" checked</Checkbox>
 					</FeaturesOption>
 					<FeaturesOption title="Synchronization method">
-						<Select value="fs">
+						<Select defaultValue="fs">
 							{[
 								{
 									value: 'fs',
@@ -106,7 +109,7 @@ export const Preferences = () => {
 					<FeaturesOption title="Synchronization directory">
 						<Input
 							placeholder="Enter path on directory"
-							value="/foo/bar"
+							defaultValue="/foo/bar"
 							disabled
 						/>
 					</FeaturesOption>
