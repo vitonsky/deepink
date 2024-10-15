@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import { FaBell, FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-import { Button } from '@chakra-ui/react';
-import { Stack } from '@components/Stack/Stack';
+import { Button, VStack } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import './Notifications.css';
@@ -47,14 +46,14 @@ export const Notifications = () => {
 					<FaXmark />
 				</Button>
 			</div>
-			<Stack direction="vertical" spacing={2} className={cnNotifications('Body')}>
+			<VStack className={cnNotifications('Body')}>
 				<div className={cnNotifications('Notification')}>
 					Demo message for notification
 				</div>
 				<div className={cnNotifications('Notification')}>
 					One more message in notifications container
 				</div>
-			</Stack>
+			</VStack>
 		</div>
 	);
 };
