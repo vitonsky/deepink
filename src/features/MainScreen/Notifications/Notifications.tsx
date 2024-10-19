@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useDetectClickOutside } from 'react-detect-click-outside';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaBell, FaXmark } from 'react-icons/fa6';
 import { cn } from '@bem-react/classname';
-import { Button, VStack } from '@chakra-ui/react';
+import { Button, Card, HStack, Text, useOutsideClick, VStack } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import './Notifications.css';
@@ -36,24 +35,48 @@ export const Notifications = () => {
 
 	const onClose = () => setIsVisible(false);
 
-	const ref = useDetectClickOutside({ onTriggered: onClose });
+	const ref = useRef<HTMLDivElement>(null);
+	useOutsideClick({
+		ref,
+		handler: onClose,
+	});
 
 	return (
-		<div className={cnNotifications({ visible: isVisible })} ref={ref}>
-			<div className={cnNotifications('Head')}>
-				<div className={cnNotifications('Title')}>Notifications</div>
-				<Button variant="ghost" size="s" onClick={onClose}>
-					<FaXmark />
-				</Button>
-			</div>
-			<VStack className={cnNotifications('Body')}>
-				<div className={cnNotifications('Notification')}>
-					Demo message for notification
-				</div>
-				<div className={cnNotifications('Notification')}>
-					One more message in notifications container
-				</div>
+		<VStack
+			sx={{
+				display: isVisible ? undefined : 'none',
+				position: 'absolute',
+				bottom: '2rem',
+				right: '0.5rem',
+				background: '#fff',
+				border: '2px solid #eee',
+				borderRadius: '4px',
+				minWidth: '300px',
+				maxWidth: '500px',
+				maxHeight: '500px',
+				boxShadow: '0 5px 30px -20px black',
+			}}
+			ref={ref}
+		>
+			<HStack w="100%" padding="1rem">
+				<Text>Notifications</Text>
+				<VStack marginStart="auto">
+					<Button variant="ghost" size="sm" onClick={onClose}>
+						<FaXmark />
+					</Button>
+				</VStack>
+			</HStack>
+
+			<VStack w="100%" alignItems="start" padding="1rem">
+				{[
+					'Demo message for notification',
+					'One more message in notifications container',
+				].map((message, idx) => (
+					<Card key={idx} padding="1rem" w="100%" variant="outline">
+						{message}
+					</Card>
+				))}
 			</VStack>
-		</div>
+		</VStack>
 	);
 };
