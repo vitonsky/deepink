@@ -381,6 +381,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					overflow: 'hidden',
 					gap: '0.3rem',
 					flexGrow: '100',
+					flex: 1,
 					gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
 				}}
 			>
@@ -399,6 +400,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					align="start"
 					w="100%"
 					h="300px"
+					flex={1}
 					padding=".5rem"
 					gap="1rem"
 					borderTop="1px solid #e2e8f0"
