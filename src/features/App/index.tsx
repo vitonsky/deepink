@@ -62,6 +62,7 @@ export const App: FC = () => {
 		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
 	);
 
+	// Handle case with auto open profile. Wait the end of loading
 	useEffect(() => {
 		if (profileContainers.profiles.length > 0) {
 			setLoadingState((state) => ({ ...state, isProfileLoading: false }));

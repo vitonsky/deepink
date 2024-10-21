@@ -1,5 +1,11 @@
-import React, { ChangeEvent, createContext, FC, useCallback, useContext } from 'react';
-import { ExtractProps } from 'react-elegant-ui/esm/lib/compose';
+import React, {
+	ChangeEvent,
+	ComponentType,
+	createContext,
+	FC,
+	useCallback,
+	useContext,
+} from 'react';
 import { Components } from 'react-markdown';
 
 type PositionSegment = {
@@ -34,6 +40,15 @@ export const ListItem: Exclude<Components['li'], undefined> = ({
 };
 
 export type RequestCheckboxUpdate = (state: boolean, sourcePosition: Position) => void;
+
+/**
+ * Helper to extract props from `ComponentType`
+ */
+export type ExtractProps<T> = T extends ComponentType<infer K>
+	? {
+			[P in keyof K]: K[P];
+	  }
+	: never;
 
 export type InputComponent = Exclude<Components['input'], undefined>;
 type CheckboxProps = ExtractProps<InputComponent> & {
