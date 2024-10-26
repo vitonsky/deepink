@@ -10,6 +10,7 @@ import {
 	FaEye,
 	FaFileExport,
 	FaFlag,
+	FaHashtag,
 	FaLink,
 	FaRotate,
 	FaShield,
@@ -268,6 +269,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						as={HStack}
 						key={tag.id}
 						height="fit-content"
+						gap=".4rem"
 						onClick={() => {
 							dispatch(
 								workspacesApi.setSelectedTag({
@@ -276,8 +278,12 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								}),
 							);
 						}}
+						sx={{ cursor: 'pointer' }}
 					>
-						<Text>{tag.resolvedName}</Text>
+						<HStack gap=".2rem">
+							<FaHashtag />
+							<Text>{tag.resolvedName}</Text>
+						</HStack>
 						<Box
 							sx={{
 								'&:not(:hover)': {

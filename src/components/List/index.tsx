@@ -45,13 +45,13 @@ export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) =>
 							sx={{
 								...(activeItem === tagId
 									? {
-											backgroundColor: '#e8e6ff',
-											color: '#6b00cb',
+											backgroundColor: 'accent.100',
+											color: 'accent.500',
 									  }
 									: {
 											'&:hover': {
-												backgroundColor: '#e6f0ff',
-												color: '#0066ff',
+												backgroundColor: 'dim.100',
+												color: '#3e3d3d',
 											},
 									  }),
 							}}

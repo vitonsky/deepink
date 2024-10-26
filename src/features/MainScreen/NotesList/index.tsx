@@ -56,12 +56,13 @@ export const NotesList: FC<NotesListProps> = () => {
 
 									...(note.id === activeNoteId
 										? {
-												backgroundColor: '#e8e6ff',
-												color: '#6b00cb',
+												backgroundColor: 'accent.100',
+												color: 'accent.500',
 										  }
 										: {
 												'&:hover': {
-													backgroundColor: '#f1f1f1',
+													backgroundColor: 'dim.100',
+													color: '#3e3d3d',
 												},
 										  }),
 								}}

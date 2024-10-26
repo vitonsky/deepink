@@ -94,18 +94,6 @@ export const TopBar: FC<TopBarProps> = ({
 
 								onClose(note.id);
 							}}
-							sx={{
-								'&:hover': {
-									backgroundColor: '#f1f1f1',
-								},
-							}}
-							_selected={{
-								backgroundColor: '#e8e6ff',
-								color: '#6b00cb',
-								'&:hover': {
-									backgroundColor: '#e8e6ff',
-								},
-							}}
 						>
 							<HStack gap=".5rem">
 								<Text

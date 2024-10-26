@@ -1,8 +1,22 @@
-import { defineStyleConfig, extendTheme } from '@chakra-ui/react';
+import {
+	createMultiStyleConfigHelpers,
+	defineStyleConfig,
+	extendTheme,
+} from '@chakra-ui/react';
 
 export const theme = extendTheme({
 	colors: {
 		surface: '#fdfdfd',
+		dim: {
+			50: '#f5f5f5',
+			100: '#f3f3f3',
+			// #e3e3e3
+			400: '#e7e7e7',
+		},
+		accent: {
+			100: '#e8e6ff',
+			500: '#6b00cb',
+		},
 		primary2: {
 			'50': '#E7FEE7',
 			'100': '#BCFCBB',
@@ -39,25 +53,92 @@ export const theme = extendTheme({
 				},
 			},
 		}),
-		Button: {
+		Button: defineStyleConfig({
 			variants: {
 				primary: {
 					backgroundColor: '#e6f0ff',
 					color: '#0066ff',
+					// '&:hover': {
+					// 	backgroundColor: '#e8e6ff',
+					// 	color: '#6b00cb',
+					// },
 					'&:hover': {
-						backgroundColor: '#e8e6ff',
-						color: '#6b00cb',
+						backgroundColor: '#d7e7ff',
 					},
 				},
 				secondary: {
-					backgroundColor: '#ededed',
-					color: '#2c252e',
+					backgroundColor: 'dim.100',
+					color: '#3e3d3d',
+					// borderWidth: '1px',
+					// borderColor: 'dim.400',
 					'&:hover': {
-						backgroundColor: '#e1e1e1',
+						backgroundColor: 'dim.400',
+					},
+				},
+				ghost: {
+					'&:hover': {
+						backgroundColor: 'dim.400',
 					},
 				},
 			},
-		},
+			defaultProps: {
+				variant: 'secondary',
+			},
+		}),
+		Tag: createMultiStyleConfigHelpers(['container']).defineMultiStyleConfig({
+			variants: {
+				default: {
+					container: {
+						backgroundColor: 'dim.100',
+						color: '#3e3d3d',
+						// borderWidth: '1px',
+						// borderColor: 'dim.400',
+						'&:hover': {
+							backgroundColor: 'dim.400',
+						},
+					},
+				},
+				accent: {
+					container: {
+						backgroundColor: '#e6f0ff',
+						color: '#0066ff',
+						// '&:hover': {
+						// 	backgroundColor: '#e8e6ff',
+						// 	color: '#6b00cb',
+						// },
+						'&:hover': {
+							backgroundColor: '#d7e7ff',
+						},
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'default',
+			},
+		}),
+		Tabs: createMultiStyleConfigHelpers(['tab']).defineMultiStyleConfig({
+			variants: {
+				default: {
+					tab: {
+						'&:hover': {
+							backgroundColor: 'dim.100',
+							color: '#3e3d3d',
+						},
+						_selected: {
+							backgroundColor: 'accent.100',
+							color: 'accent.500',
+							'&:hover': {
+								color: 'accent.500',
+								backgroundColor: 'accent.100',
+							},
+						},
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'default',
+			},
+		}),
 		Select: {
 			variants: {
 				primary: {
@@ -72,10 +153,12 @@ export const theme = extendTheme({
 				},
 				secondary: {
 					field: {
-						backgroundColor: '#ededed',
-						color: '#2c252e',
+						backgroundColor: 'dim.100',
+						color: '#3e3d3d',
+						// borderWidth: '1px',
+						// borderColor: 'dim.400',
 						'&:hover': {
-							backgroundColor: '#e1e1e1',
+							backgroundColor: 'dim.400',
 						},
 					},
 				},
