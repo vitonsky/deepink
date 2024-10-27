@@ -116,6 +116,72 @@ export const theme = extendTheme({
 				variant: 'default',
 			},
 		}),
+		NotesList: createMultiStyleConfigHelpers([
+			'root',
+			'notes',
+			'note',
+			'body',
+			'title',
+			'text',
+			'meta',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				root: {
+					w: '100%',
+					h: '100%',
+					overflow: 'auto',
+					align: 'center',
+					userSelect: 'none',
+				},
+				notes: {
+					w: '100%',
+					align: 'start',
+					gap: '4px',
+				},
+				note: {
+					cursor: 'pointer',
+					padding: '0.5rem',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					// borderRadius: '6px',
+				},
+				body: {
+					gap: '0.2rem',
+					alignItems: 'start',
+				},
+				title: {
+					fontWeight: 'bold',
+					fontSize: '18px',
+				},
+				text: {
+					fontSize: '14px',
+				},
+				meta: {
+					fontSize: '14px',
+				},
+			},
+			variants: {
+				default: {
+					note: {
+						'&:not([aria-selected=true]):hover': {
+							backgroundColor: 'dim.100',
+							color: '#3e3d3d',
+						},
+
+						_selected: {
+							backgroundColor: 'accent.100',
+							color: 'accent.500',
+						},
+					},
+					meta: {
+						color: '#000000bf',
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'default',
+			},
+		}),
 		Tabs: createMultiStyleConfigHelpers(['tab']).defineMultiStyleConfig({
 			variants: {
 				default: {

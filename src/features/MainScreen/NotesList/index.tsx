@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Text, VStack } from '@chakra-ui/react';
+import { Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -13,6 +13,8 @@ import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteConte
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
+	const styles = useMultiStyleConfig('NotesList');
+
 	const notesRegistry = useNotesRegistry();
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
@@ -30,13 +32,13 @@ export const NotesList: FC<NotesListProps> = () => {
 	// TODO: show attachments
 	// TODO: implement dragging and moving items
 	return (
-		<VStack w="100%" h="100%" overflow="auto" align="center">
+		<VStack sx={styles.root}>
 			{notes.length === 0 ? (
 				<Text pos="relative" top="40%">
 					Nothing added yet
 				</Text>
 			) : (
-				<VStack w="100%" align="start" gap="4px">
+				<VStack sx={styles.notes}>
 					{notes.map((note) => {
 						const date = note.createdTimestamp ?? note.updatedTimestamp;
 						const text = note.content.text.slice(0, 80).trim();
@@ -47,25 +49,8 @@ export const NotesList: FC<NotesListProps> = () => {
 								w="100%"
 								align="start"
 								gap="0.6rem"
-								sx={{
-									cursor: 'pointer',
-									padding: '0.5rem',
-									overflow: 'hidden',
-									textOverflow: 'ellipsis',
-									// borderRadius: '6px',
-
-									...(note.id === activeNoteId
-										? {
-												backgroundColor: 'accent.100',
-												color: 'accent.500',
-										  }
-										: {
-												'&:hover': {
-													backgroundColor: 'dim.100',
-													color: '#3e3d3d',
-												},
-										  }),
-								}}
+								sx={styles.note}
+								aria-selected={note.id === activeNoteId}
 								onContextMenu={(evt) => {
 									openNoteContextMenu(note.id, {
 										x: evt.pageX,
@@ -76,18 +61,18 @@ export const NotesList: FC<NotesListProps> = () => {
 									noteActions.click(note.id);
 								}}
 							>
-								<VStack gap="0.2rem" align="start">
-									<Text as="h3" fontWeight="bold" fontSize="18px">
+								<VStack sx={styles.body}>
+									<Text as="h3" sx={styles.title}>
 										{getNoteTitle(note.content)}
 									</Text>
 
 									{text.length > 0 && (
-										<Text fontSize="14px">{text}</Text>
+										<Text sx={styles.text}>{text}</Text>
 									)}
 								</VStack>
 
 								{date && (
-									<Text color="#000000bf" fontSize="14px">
+									<Text sx={styles.meta}>
 										{new Date(date).toDateString()}
 									</Text>
 								)}
