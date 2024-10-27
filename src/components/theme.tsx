@@ -182,6 +182,58 @@ export const theme = extendTheme({
 				variant: 'default',
 			},
 		}),
+		List2: createMultiStyleConfigHelpers([
+			'root',
+			'item',
+			'content',
+			'group',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				root: {
+					margin: '0',
+					paddingLeft: '0',
+					listStyle: 'none',
+					// eslint-disable-next-line spellcheck/spell-checker
+					fontFamily: 'Arial, Helvetica, sans-serif',
+					userSelect: 'none',
+					'& &': {
+						paddingStart: '.5rem',
+					},
+					w: '100%',
+					gap: '0',
+				},
+				item: {
+					w: '100%',
+					lineHeight: '1.5rem',
+					gap: '0',
+				},
+				content: {
+					w: '100%',
+				},
+				group: {
+					w: '100%',
+					paddingStart: '.5rem',
+				},
+			},
+			variants: {
+				default: {
+					content: {
+						'&:not([aria-selected=true]):hover': {
+							backgroundColor: 'dim.100',
+							color: '#3e3d3d',
+						},
+
+						_selected: {
+							backgroundColor: 'accent.100',
+							color: 'accent.500',
+						},
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'default',
+			},
+		}),
 		Tabs: createMultiStyleConfigHelpers(['tab']).defineMultiStyleConfig({
 			variants: {
 				default: {

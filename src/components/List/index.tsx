@@ -1,5 +1,5 @@
 import React, { FC, ReactNode } from 'react';
-import { HStack, StackProps, VStack } from '@chakra-ui/react';
+import { HStack, StackProps, useMultiStyleConfig, VStack } from '@chakra-ui/react';
 
 export type ListItem = {
 	id: string;
@@ -15,46 +15,19 @@ export type IListProps = StackProps & {
 };
 
 export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) => {
+	const styles = useMultiStyleConfig('List2');
+
 	return (
-		<VStack
-			as="ul"
-			w="100%"
-			gap="0"
-			{...props}
-			sx={{
-				margin: '0',
-				paddingLeft: '0',
-				listStyle: 'none',
-				// eslint-disable-next-line spellcheck/spell-checker
-				fontFamily: 'Arial, Helvetica, sans-serif',
-				userSelect: 'none',
-				'& &': {
-					paddingStart: '.5rem',
-				},
-				...props.sx,
-			}}
-		>
+		<VStack as="ul" {...props} sx={styles.root}>
 			{items.map((item) => {
 				const tagId = item.id;
 				const isGroupCollapsed = Boolean(item.collapsed);
 
 				return (
-					<VStack w="100%" key={tagId} as="li" lineHeight="1.5rem" gap="0">
+					<VStack key={tagId} as="li" __css={styles.item}>
 						<HStack
-							w="100%"
-							sx={{
-								...(activeItem === tagId
-									? {
-											backgroundColor: 'accent.100',
-											color: 'accent.500',
-									  }
-									: {
-											'&:hover': {
-												backgroundColor: 'dim.100',
-												color: '#3e3d3d',
-											},
-									  }),
-							}}
+							__css={styles.content}
+							aria-selected={activeItem === tagId}
 							onClick={(evt) => {
 								if (onPick) {
 									evt.stopPropagation();
@@ -66,7 +39,7 @@ export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) =>
 						</HStack>
 
 						{item.childrens && !isGroupCollapsed && (
-							<VStack w="100%" paddingStart=".5rem">
+							<VStack __css={styles.group}>
 								<List
 									items={item.childrens}
 									activeItem={activeItem}
