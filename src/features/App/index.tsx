@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { cn } from '@bem-react/classname';
+import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { SplashScreen } from '@features/SplashScreen';
@@ -10,10 +10,6 @@ import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
-
-import './App.css';
-
-export const cnApp = cn('App');
 
 export const App: FC = () => {
 	const [config] = useState(
@@ -86,8 +82,14 @@ export const App: FC = () => {
 	}
 
 	return (
-		<div className={cnApp()}>
+		<Box
+			sx={{
+				display: 'flex',
+				width: '100%',
+				height: '100vh',
+			}}
+		>
 			<Profiles profilesApi={profileContainers} />
-		</div>
+		</Box>
 	);
 };

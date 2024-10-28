@@ -1,3 +1,4 @@
+/* eslint-disable spellcheck/spell-checker */
 import {
 	createMultiStyleConfigHelpers,
 	defineStyleConfig,
@@ -5,6 +6,19 @@ import {
 } from '@chakra-ui/react';
 
 export const theme = extendTheme({
+	styles: {
+		global: {
+			fontFamily: `-apple-system,
+			blinkmacsystemfont,
+			'Segoe UI',
+			'Noto Sans',
+			helvetica,
+			arial,
+			sans-serif,
+			'Apple Color Emoji',
+			'Segoe UI Emoji'`,
+		},
+	},
 	colors: {
 		surface: '#fdfdfd',
 		dim: {
