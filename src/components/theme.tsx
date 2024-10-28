@@ -27,9 +27,16 @@ export const theme = extendTheme({
 			// #e3e3e3
 			400: '#e7e7e7',
 		},
+		link: {
+			base: '#0066ff',
+			hover: '#0453c9',
+		},
 		accent: {
 			100: '#e8e6ff',
 			500: '#6b00cb',
+		},
+		accent2: {
+			500: '#0066ff',
 		},
 		primary2: {
 			'50': '#E7FEE7',

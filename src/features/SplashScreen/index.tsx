@@ -1,11 +1,22 @@
 import React from 'react';
-import { cn } from '@bem-react/classname';
-
-import './SplashScreen.css';
-
-export const cnSplashScreen = cn('SplashScreen');
+import { Box } from '@chakra-ui/react';
 
 // TODO: implement splash screen
 export const SplashScreen = () => {
-	return <div className={cnSplashScreen({ fullscreen: true })}>Loading...</div>;
+	return (
+		<Box
+			sx={{
+				display: 'flex',
+				height: '100vh',
+				width: '100%',
+				margin: 'auto',
+				justifyContent: 'center',
+				alignItems: 'center',
+				fontSize: '2rem',
+				fontWeight: 'bold',
+			}}
+		>
+			Loading...
+		</Box>
+	);
 };

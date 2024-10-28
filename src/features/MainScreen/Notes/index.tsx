@@ -1,15 +1,10 @@
 import React, { FC } from 'react';
 import { isEqual } from 'lodash';
-import { cn } from '@bem-react/classname';
 import { Box } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
-
-import './Notes.css';
-
-export const cnNotes = cn('Notes');
 
 export type NotesProps = {
 	tabs: NoteId[];
@@ -23,7 +18,14 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 	useEditorLinks();
 
 	return (
-		<Box w="100%" className={cnNotes()}>
+		<Box
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+			}}
+		>
 			{tabs
 				.filter((id) => notes.some((note) => note.id === id))
 				.map((id) => {

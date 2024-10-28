@@ -11,8 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import { debounce } from 'lodash';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import { cn } from '@bem-react/classname';
-import { Spinner } from '@chakra-ui/react';
+import { Box, Spinner } from '@chakra-ui/react';
 import { getResourceIdInUrl } from '@core/features/links';
 import { INote } from '@core/features/notes';
 import {
@@ -29,9 +28,6 @@ import {
 import { Link } from './components/Link';
 
 import 'github-markdown-css/github-markdown.css';
-import './NoteScreen.css';
-
-const cnNoteScreen = cn('NoteScreen');
 
 export type NoteScreenProps = {
 	note: INote;
@@ -213,16 +209,41 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 	}, [Input, attachmentsRegistry, getFilesUrl, note.id, text, update]);
 
 	return (
-		<div className={cnNoteScreen()}>
+		<Box w="100%" overflow="auto">
 			{markdownContent ? (
-				<div className={cnNoteScreen('Content', ['markdown-body'])}>
+				<Box
+					sx={{
+						overflow: 'auto',
+						wordBreak: 'break-word',
+						wordWrap: 'break-word',
+						minHeight: '100%',
+						boxSizing: 'border-box',
+
+						'& a': {
+							color: 'link.base',
+							'&:hover': {
+								color: 'link.hover',
+								textDecoration: 'underline',
+							},
+						},
+					}}
+				>
 					{markdownContent}
-				</div>
+				</Box>
 			) : (
-				<div className={cnNoteScreen('SplashScreen')}>
-					<Spinner className={cnNoteScreen('Spinner')} size="lg" />
-				</div>
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						height: '100%',
+						width: '100%',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}
+				>
+					<Spinner size="lg" color="accent2.500" />
+				</Box>
 			)}
-		</div>
+		</Box>
 	);
 };
