@@ -1,12 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaBell, FaXmark } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
 import { Button, Card, HStack, Text, useOutsideClick, VStack } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
-
-import './Notifications.css';
-
-export const cnNotifications = cn('Notifications');
 
 export const Notifications = () => {
 	const { controls } = useStatusBarManager();
