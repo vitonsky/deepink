@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { FaAngleDown, FaHashtag } from 'react-icons/fa6';
 import { Box, HStack, Text } from '@chakra-ui/react';
-import { ListItem,NestedList } from '@components/NestedList';
+import { ListItem, NestedList } from '@components/NestedList';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
 
