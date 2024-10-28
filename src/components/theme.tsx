@@ -20,7 +20,11 @@ export const theme = extendTheme({
 		},
 	},
 	colors: {
-		surface: '#fdfdfd',
+		surface: {
+			background: '#ffffff',
+			panel: '#fdfdfd',
+			border: '#e2e8f0',
+		},
 		dim: {
 			50: '#f5f5f5',
 			100: '#f3f3f3',

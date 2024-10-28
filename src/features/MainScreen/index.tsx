@@ -100,7 +100,7 @@ export const MainScreen: FC = () => {
 			>
 				<VStack
 					sx={{
-						bgColor: 'surface',
+						bgColor: 'surface.panel',
 						alignItems: 'start',
 
 						width: '100%',
@@ -112,7 +112,8 @@ export const MainScreen: FC = () => {
 						display: 'flex',
 						flexDirection: 'column',
 						gap: '1rem',
-						borderRight: '1px solid #e2e8f0',
+						borderRight: '1px solid',
+						borderColor: 'surface.border',
 					}}
 				>
 					<VStack w="100%" gap=".5rem" overflow="hidden">
@@ -142,7 +143,8 @@ export const MainScreen: FC = () => {
 						display: 'flex',
 						flexDirection: 'column',
 						gap: '1rem',
-						borderRight: '1px solid #e2e8f0',
+						borderRight: '1px solid',
+						borderColor: 'surface.border',
 					}}
 				>
 					<NotesPanel />

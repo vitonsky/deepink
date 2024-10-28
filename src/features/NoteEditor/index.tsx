@@ -409,7 +409,8 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					flex={1}
 					padding=".5rem"
 					gap="1rem"
-					borderTop="1px solid #e2e8f0"
+					borderTop="1px solid"
+					borderColor="surface.border"
 				>
 					<HStack w="100%">
 						<Text fontWeight="bold">Back links tree</Text>

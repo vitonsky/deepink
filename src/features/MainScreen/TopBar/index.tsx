@@ -54,9 +54,13 @@ export const TopBar: FC<TopBarProps> = ({
 				onPick(existsTabs[index]);
 			}}
 			w="100%"
-			bgColor="surface"
+			bgColor="surface.panel"
 		>
-			<TabList flexWrap="wrap" borderBottom="1px solid #e2e8f0">
+			<TabList
+				flexWrap="wrap"
+				borderBottom="1px solid"
+				borderColor="surface.border"
+			>
 				{existsTabs.map((noteId) => {
 					// TODO: handle case when object not found
 					const note = notes.find((note) => note.id === noteId);

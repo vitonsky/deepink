@@ -12,8 +12,9 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 		<HStack
 			minW="100%"
 			fontSize=".9em"
-			bgColor="surface"
-			borderTop="1px solid #e2e8f0"
+			bgColor="surface.panel"
+			borderTop="1px solid"
+			borderColor="surface.border"
 			{...props}
 		>
 			<HStack w="auto" gap="0">
