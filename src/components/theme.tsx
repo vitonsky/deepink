@@ -100,15 +100,8 @@ export const theme = extendTheme({
 				},
 				accent: {
 					container: {
-						backgroundColor: '#e6f0ff',
-						color: '#0066ff',
-						// '&:hover': {
-						// 	backgroundColor: '#e8e6ff',
-						// 	color: '#6b00cb',
-						// },
-						'&:hover': {
-							backgroundColor: '#d7e7ff',
-						},
+						backgroundColor: 'accent.100',
+						color: 'accent.500',
 					},
 				},
 			},

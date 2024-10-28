@@ -44,7 +44,7 @@ export const NotesPanel = () => {
 				{activeTag && (
 					<HStack maxW="100%" paddingInline=".3rem">
 						<Text minW="fit-content">With tag</Text>
-						<Tag backgroundColor="#e8e6ff" color="#6b00cb">
+						<Tag variant="accent">
 							<Text
 								maxW="100%"
 								whiteSpace="nowrap"
