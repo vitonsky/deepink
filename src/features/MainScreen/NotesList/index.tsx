@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
+import { Text, VStack } from '@chakra-ui/react';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -9,12 +9,11 @@ import { useNoteActions } from '../../../hooks/notes/useNoteActions';
 import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
+import { NotePreview } from './NotePreview';
 
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
-	const styles = useMultiStyleConfig('NotesList');
-
 	const notesRegistry = useNotesRegistry();
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
@@ -28,29 +27,48 @@ export const NotesList: FC<NotesListProps> = () => {
 		updateNotes,
 	});
 
-	// TODO: get preview text from DB as prepared value
-	// TODO: show attachments
 	// TODO: implement dragging and moving items
 	return (
-		<VStack sx={styles.root}>
+		<VStack
+			sx={{
+				w: '100%',
+				h: '100%',
+				overflow: 'auto',
+				align: 'center',
+				userSelect: 'none',
+			}}
+		>
 			{notes.length === 0 ? (
 				<Text pos="relative" top="40%">
 					Nothing added yet
 				</Text>
 			) : (
-				<VStack sx={styles.notes}>
+				<VStack
+					sx={{
+						w: '100%',
+						align: 'start',
+						gap: '4px',
+					}}
+				>
 					{notes.map((note) => {
 						const date = note.createdTimestamp ?? note.updatedTimestamp;
 						const text = note.content.text.slice(0, 80).trim();
 
+						// TODO: get preview text from DB as prepared value
+						// TODO: show attachments
 						return (
-							<VStack
+							<NotePreview
 								key={note.id}
-								w="100%"
-								align="start"
-								gap="0.6rem"
-								sx={styles.note}
-								aria-selected={note.id === activeNoteId}
+								isSelected={note.id === activeNoteId}
+								title={getNoteTitle(note.content)}
+								text={text}
+								meta={
+									<>
+										{date && (
+											<Text>{new Date(date).toDateString()}</Text>
+										)}
+									</>
+								}
 								onContextMenu={(evt) => {
 									openNoteContextMenu(note.id, {
 										x: evt.pageX,
@@ -60,23 +78,7 @@ export const NotesList: FC<NotesListProps> = () => {
 								onClick={() => {
 									noteActions.click(note.id);
 								}}
-							>
-								<VStack sx={styles.body}>
-									<Text as="h3" sx={styles.title}>
-										{getNoteTitle(note.content)}
-									</Text>
-
-									{text.length > 0 && (
-										<Text sx={styles.text}>{text}</Text>
-									)}
-								</VStack>
-
-								{date && (
-									<Text sx={styles.meta}>
-										{new Date(date).toDateString()}
-									</Text>
-								)}
-							</VStack>
+							/>
 						);
 					})}
 				</VStack>

@@ -116,10 +116,8 @@ export const theme = extendTheme({
 				variant: 'default',
 			},
 		}),
-		NotesList: createMultiStyleConfigHelpers([
+		NotePreview: createMultiStyleConfigHelpers([
 			'root',
-			'notes',
-			'note',
 			'body',
 			'title',
 			'text',
@@ -127,22 +125,13 @@ export const theme = extendTheme({
 		]).defineMultiStyleConfig({
 			baseStyle: {
 				root: {
-					w: '100%',
-					h: '100%',
-					overflow: 'auto',
-					align: 'center',
-					userSelect: 'none',
-				},
-				notes: {
-					w: '100%',
-					align: 'start',
-					gap: '4px',
-				},
-				note: {
 					cursor: 'pointer',
 					padding: '0.5rem',
 					overflow: 'hidden',
 					textOverflow: 'ellipsis',
+					width: '100%',
+					alignItems: 'start',
+					gap: '0.6rem',
 					// borderRadius: '6px',
 				},
 				body: {
@@ -158,11 +147,12 @@ export const theme = extendTheme({
 				},
 				meta: {
 					fontSize: '14px',
+					width: '100%',
 				},
 			},
 			variants: {
 				default: {
-					note: {
+					root: {
 						'&:not([aria-selected=true]):hover': {
 							backgroundColor: 'dim.100',
 							color: '#3e3d3d',
@@ -174,7 +164,7 @@ export const theme = extendTheme({
 						},
 					},
 					meta: {
-						color: '#000000bf',
+						color: '#444444',
 					},
 				},
 			},
