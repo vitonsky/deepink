@@ -1,16 +1,11 @@
 import React, { FC, useMemo } from 'react';
 import { FaXmark } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
 import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
 import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
-
-import './TopBar.css';
-
-export const cnTopBar = cn('TopBar');
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -111,7 +106,11 @@ export const TopBar: FC<TopBarProps> = ({
 									{title}
 								</Text>
 								<Box
-									className={cnTopBar('CloseButton')}
+									sx={{
+										'&:not(:hover)': {
+											opacity: '0.7',
+										},
+									}}
 									onClick={(evt) => {
 										evt.stopPropagation();
 										onClose(noteId);
