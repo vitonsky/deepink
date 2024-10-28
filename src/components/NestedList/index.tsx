@@ -8,30 +8,42 @@ export type ListItem = {
 	collapsed?: boolean;
 };
 
-export type IListProps = StackProps & {
+export type INestedListProps = StackProps & {
 	items: ListItem[];
 	activeItem?: string;
 	onPick?: (id: string) => void;
 };
 
-export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) => {
-	const styles = useMultiStyleConfig('List2');
+export const NestedList: FC<INestedListProps> = ({
+	items,
+	activeItem,
+	onPick,
+	...props
+}) => {
+	const styles = useMultiStyleConfig('NestedList');
 
 	return (
-		<VStack as="ul" {...props} sx={styles.root}>
+		<VStack
+			as="ul"
+			{...props}
+			sx={{
+				...styles.root,
+				...props.sx,
+			}}
+		>
 			{items.map((item) => {
-				const tagId = item.id;
+				const itemId = item.id;
 				const isGroupCollapsed = Boolean(item.collapsed);
 
 				return (
-					<VStack key={tagId} as="li" __css={styles.item}>
+					<VStack key={itemId} as="li" sx={styles.item}>
 						<HStack
-							__css={styles.content}
-							aria-selected={activeItem === tagId}
+							sx={styles.content}
+							aria-selected={activeItem === itemId}
 							onClick={(evt) => {
 								if (onPick) {
 									evt.stopPropagation();
-									onPick(tagId);
+									onPick(itemId);
 								}
 							}}
 						>
@@ -39,8 +51,8 @@ export const List: FC<IListProps> = ({ items, activeItem, onPick, ...props }) =>
 						</HStack>
 
 						{item.childrens && !isGroupCollapsed && (
-							<VStack __css={styles.group}>
-								<List
+							<VStack sx={styles.group}>
+								<NestedList
 									items={item.childrens}
 									activeItem={activeItem}
 									onPick={onPick}

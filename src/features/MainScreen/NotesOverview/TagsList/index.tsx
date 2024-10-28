@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { FaAngleDown, FaHashtag } from 'react-icons/fa6';
 import { Box, HStack, Text } from '@chakra-ui/react';
-import { List, ListItem } from '@components/List';
+import { ListItem,NestedList } from '@components/NestedList';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
 
@@ -99,5 +99,5 @@ export const TagsList: FC<ITagsListProps> = ({
 		});
 	}, [onTagMenu, tags, toggledTags]);
 
-	return <List items={items} activeItem={activeTag} onPick={onTagClick} />;
+	return <NestedList items={items} activeItem={activeTag} onPick={onTagClick} />;
 };

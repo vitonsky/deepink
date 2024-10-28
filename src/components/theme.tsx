@@ -172,7 +172,7 @@ export const theme = extendTheme({
 				variant: 'default',
 			},
 		}),
-		List2: createMultiStyleConfigHelpers([
+		NestedList: createMultiStyleConfigHelpers([
 			'root',
 			'item',
 			'content',

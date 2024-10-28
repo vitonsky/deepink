@@ -9,7 +9,7 @@ import {
 	FaTrash,
 } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
-import { List } from '@components/List';
+import { NestedList } from '@components/NestedList';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
@@ -90,7 +90,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	// TODO: show spinner while loading tags
 	return (
 		<VStack flex={1} w="100%" gap="2rem" overflow="hidden">
-			<List
+			<NestedList
 				overflow="auto"
 				minHeight="150px"
 				items={[
