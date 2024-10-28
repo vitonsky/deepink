@@ -43,7 +43,7 @@ export const Notifications = () => {
 				position: 'absolute',
 				bottom: '2rem',
 				right: '0.5rem',
-				background: '#fff',
+				backgroundColor: 'surface.background',
 				border: '2px solid #eee',
 				borderRadius: '4px',
 				minWidth: '300px',

@@ -82,7 +82,7 @@ export const MainScreen: FC = () => {
 				height: '100vh',
 				maxWidth: '100%',
 				maxHeight: '100%',
-				background: 'var(--color-fill-color-default)',
+				backgroundColor: 'surface.background',
 				color: 'var(--color-typo-primary)',
 			}}
 		>

@@ -37,6 +37,7 @@ export type ISuggestedTagsListProps = BoxProps & {
 	onInputChange?: (inputValue: string) => void;
 };
 
+// TODO: define style with theme
 export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 	tags,
 	selectedTag,
@@ -155,9 +156,10 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 							margin={0}
 							marginTop=".3rem"
 							zIndex={999}
-							border="1px solid #eee"
-							backgroundColor="#fff"
-							color="#000"
+							border="1px solid"
+							borderColor="surface.border"
+							backgroundColor="surface.background"
+							color="typography.primary"
 							borderRadius="6px"
 							paddingBlock=".3rem"
 						>
@@ -173,7 +175,7 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 											fontSize: '1rem',
 											...(isHighlighted
 												? {
-														backgroundColor: '#e6f0ff',
+														backgroundColor: 'accent2.200',
 												  }
 												: {}),
 										}}

@@ -20,7 +20,11 @@ export const theme = extendTheme({
 		},
 	},
 	colors: {
+		typography: {
+			primary: '#000',
+		},
 		surface: {
+			// background: 'red',
 			background: '#ffffff',
 			panel: '#fdfdfd',
 			border: '#e2e8f0',
@@ -40,6 +44,7 @@ export const theme = extendTheme({
 			500: '#6b00cb',
 		},
 		accent2: {
+			200: '#e6f0ff',
 			500: '#0066ff',
 		},
 		primary2: {
