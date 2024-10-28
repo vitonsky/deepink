@@ -212,20 +212,13 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 		<Box w="100%" overflow="auto">
 			{markdownContent ? (
 				<Box
+					className="markdown-body"
 					sx={{
 						overflow: 'auto',
 						wordBreak: 'break-word',
 						wordWrap: 'break-word',
 						minHeight: '100%',
 						boxSizing: 'border-box',
-
-						'& a': {
-							color: 'link.base',
-							'&:hover': {
-								color: 'link.hover',
-								textDecoration: 'underline',
-							},
-						},
 					}}
 				>
 					{markdownContent}
