@@ -83,7 +83,7 @@ export const MainScreen: FC = () => {
 				maxWidth: '100%',
 				maxHeight: '100%',
 				backgroundColor: 'surface.background',
-				color: 'var(--color-typo-primary)',
+				color: 'typography.primary',
 			}}
 		>
 			<HStack

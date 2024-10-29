@@ -22,6 +22,7 @@ export const theme = extendTheme({
 	colors: {
 		typography: {
 			primary: '#000',
+			secondary: '#727272',
 		},
 		surface: {
 			// background: 'red',
@@ -252,6 +253,8 @@ export const theme = extendTheme({
 			variants: {
 				default: {
 					tab: {
+						color: 'typography.primary',
+
 						'&:hover': {
 							backgroundColor: 'dim.100',
 							color: '#3e3d3d',

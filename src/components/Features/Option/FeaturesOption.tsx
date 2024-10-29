@@ -38,7 +38,7 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 					<Text
 						sx={{
 							fontSize: '0.9rem',
-							color: 'gray',
+							color: 'typography.secondary',
 							lineHeight: '140%',
 						}}
 					>

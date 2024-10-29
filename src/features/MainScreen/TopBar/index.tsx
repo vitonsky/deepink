@@ -75,7 +75,6 @@ export const TopBar: FC<TopBarProps> = ({
 							key={note.id}
 							padding="0.4rem 0.7rem"
 							border="none"
-							color="#000"
 							fontWeight="600"
 							fontSize="14"
 							marginBottom={0}
