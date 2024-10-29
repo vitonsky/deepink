@@ -32,7 +32,7 @@ export const WorkspaceBar = () => {
 			<HStack w="100%" marginTop="auto">
 				<Select
 					size="sm"
-					variant="primary"
+					variant="secondary"
 					defaultValue="default"
 					borderRadius="6px"
 				>
@@ -44,7 +44,7 @@ export const WorkspaceBar = () => {
 				</Select>
 				<Button
 					size="sm"
-					variant="primary"
+					variant="secondary"
 					title="Workspace settings"
 					onClick={editWorkspace}
 				>
