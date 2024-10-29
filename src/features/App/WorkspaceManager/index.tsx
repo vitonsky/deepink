@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
-import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, HStack, Text } from '@chakra-ui/react';
+import { NestedList } from '@components/NestedList';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -105,7 +106,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				controls={
 					<>
 						<Button
-							colorScheme="primary"
+							variant="primary"
 							size="lg"
 							w="100%"
 							onClick={() => setScreenName('createProfile')}
@@ -115,41 +116,48 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 					</>
 				}
 			>
-				<VStack
-					w="100%"
-					gap="1px"
-					bgColor="#3667b5"
-					border="1px solid #3667b5"
-					borderRadius="4px"
-					maxHeight="230px"
-					overflow="auto"
-				>
-					{(profilesManager.profiles ?? []).map((profile) => (
-						<HStack
-							as="button"
-							sx={{
-								backgroundColor: '#f2f2f3',
-								padding: '.8rem 1rem',
-								w: '100%',
-								cursor: 'pointer',
-								gap: '.8rem',
-								'&:hover': {
-									backgroundColor: '#ededee',
-								},
-							}}
-							key={profile.id}
-							onClick={() => {
-								onChooseProfile(profile.id);
-								if (profile.encryption === null) {
-									onOpenProfile(profile.id);
-								}
-							}}
-						>
-							<FaUser />
-							<Text>{profile.name}</Text>
-						</HStack>
-					))}
-				</VStack>
+				<NestedList
+					sx={{
+						w: '100%',
+						gap: '1px',
+						bgColor: 'accent2.700',
+						border: '1px solid',
+						borderColor: 'accent2.700',
+						borderRadius: '4px',
+						maxHeight: '230px',
+						overflow: 'auto',
+					}}
+					items={(profilesManager.profiles ?? []).map((profile) => ({
+						id: profile.id,
+						content: (
+							<HStack
+								as="button"
+								sx={{
+									padding: '.8rem 1rem',
+									w: '100%',
+									cursor: 'pointer',
+									gap: '.8rem',
+
+									backgroundColor: 'dim.100',
+									color: 'typography.primary',
+									'&:hover': {
+										backgroundColor: 'dim.400',
+									},
+								}}
+								key={profile.id}
+								onClick={() => {
+									onChooseProfile(profile.id);
+									if (profile.encryption === null) {
+										onOpenProfile(profile.id);
+									}
+								}}
+							>
+								<FaUser />
+								<Text>{profile.name}</Text>
+							</HStack>
+						),
+					}))}
+				/>
 			</ProfilesForm>
 		);
 	}, [

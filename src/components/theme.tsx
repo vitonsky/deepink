@@ -46,6 +46,7 @@ export const theme = extendTheme({
 		accent2: {
 			200: '#e6f0ff',
 			500: '#0066ff',
+			700: '#3667b5',
 		},
 		primary2: {
 			'50': '#E7FEE7',
