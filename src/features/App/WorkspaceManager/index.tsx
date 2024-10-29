@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
-import { Box, Button, HStack, Text } from '@chakra-ui/react';
+import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
@@ -117,15 +117,17 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				}
 			>
 				<NestedList
+					divider={
+						<Divider borderColor="accent2.700" margin="0px !important" />
+					}
 					sx={{
 						w: '100%',
-						gap: '1px',
-						bgColor: 'accent2.700',
-						border: '1px solid',
-						borderColor: 'accent2.700',
 						borderRadius: '4px',
 						maxHeight: '230px',
 						overflow: 'auto',
+
+						border: '1px solid',
+						borderColor: 'accent2.700',
 					}}
 					items={(profilesManager.profiles ?? []).map((profile) => ({
 						id: profile.id,
@@ -137,12 +139,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									w: '100%',
 									cursor: 'pointer',
 									gap: '.8rem',
-
-									backgroundColor: 'dim.100',
-									color: 'typography.primary',
-									'&:hover': {
-										backgroundColor: 'dim.400',
-									},
 								}}
 								key={profile.id}
 								onClick={() => {
