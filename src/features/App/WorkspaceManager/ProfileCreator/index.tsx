@@ -70,7 +70,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			controls={
 				<>
 					<Button
-						colorScheme="primary"
+						variant="primary"
 						w="100%"
 						onClick={() => onPressCreate(true)}
 						disabled={isPending}
@@ -78,7 +78,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						Create profile
 					</Button>
 					<Button
-						variant="primary"
+						variant="secondary"
 						w="100%"
 						onClick={() => onPressCreate(false)}
 						disabled={isPending}
@@ -86,7 +86,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						Continue with no password
 					</Button>
 					<Button
-						variant="primary"
+						variant="secondary"
 						w="100%"
 						onClick={onCancel}
 						disabled={isPending}

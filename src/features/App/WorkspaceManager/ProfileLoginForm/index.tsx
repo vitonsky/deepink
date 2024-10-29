@@ -46,14 +46,14 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 			controls={
 				<>
 					<Button
-						colorScheme="primary"
+						variant="primary"
 						w="100%"
 						onClick={onPressLogin}
 						disabled={isPending}
 					>
 						Unlock
 					</Button>
-					<Button variant="primary" w="100%" onClick={onPickAnotherProfile}>
+					<Button variant="secondary" w="100%" onClick={onPickAnotherProfile}>
 						Change profile
 					</Button>
 				</>
