@@ -5,7 +5,7 @@ import {
 	extendTheme,
 } from '@chakra-ui/react';
 
-// TODO: optimize theme
+// TODO: add alternative theme
 export const theme = extendTheme({
 	styles: {
 		global: {
@@ -21,12 +21,24 @@ export const theme = extendTheme({
 		},
 	},
 	colors: {
+		accent: {
+			// Accent color
+			100: '#e8e6ff',
+			500: '#6b00cb',
+		},
+		primary: {
+			// Primary color for controls
+			200: '#e6f0ff',
+			300: '#d7e7ff',
+			500: '#0066ff',
+			700: '#3667b5',
+		},
 		typography: {
 			primary: '#000',
 			secondary: '#727272',
+			additional: '#3e3d3d',
 		},
 		surface: {
-			// background: 'red',
 			background: '#ffffff',
 			panel: '#fdfdfd',
 			border: '#e2e8f0',
@@ -40,15 +52,6 @@ export const theme = extendTheme({
 			base: '#0066ff',
 			hover: '#0453c9',
 		},
-		accent: {
-			100: '#e8e6ff',
-			500: '#6b00cb',
-		},
-		accent2: {
-			200: '#e6f0ff',
-			500: '#0066ff',
-			700: '#3667b5',
-		},
 	},
 	components: {
 		Menu: defineStyleConfig({
@@ -56,7 +59,7 @@ export const theme = extendTheme({
 				item: {
 					transitionDuration: '0s',
 					'&:hover, &:focus': {
-						bgColor: '#e6f0ff',
+						backgroundColor: 'primary.200',
 					},
 				},
 			},
@@ -64,20 +67,21 @@ export const theme = extendTheme({
 		Button: defineStyleConfig({
 			variants: {
 				primary: {
-					backgroundColor: '#e6f0ff',
-					color: '#0066ff',
+					backgroundColor: 'primary.200',
+					color: 'primary.500',
 					'&:hover': {
-						backgroundColor: '#d7e7ff',
+						backgroundColor: 'primary.300',
 					},
 				},
 				secondary: {
 					backgroundColor: 'dim.100',
-					color: '#3e3d3d',
+					color: 'typography.additional',
 					'&:hover': {
 						backgroundColor: 'dim.400',
 					},
 				},
 				ghost: {
+					color: 'typography.primary',
 					'&:hover': {
 						backgroundColor: 'dim.400',
 					},
@@ -92,7 +96,7 @@ export const theme = extendTheme({
 				default: {
 					container: {
 						backgroundColor: 'dim.100',
-						color: '#3e3d3d',
+						color: 'typography.additional',
 						'&:hover': {
 							backgroundColor: 'dim.400',
 						},
@@ -145,9 +149,10 @@ export const theme = extendTheme({
 			variants: {
 				default: {
 					root: {
+						color: 'typography.primary',
+
 						'&:not([aria-selected=true]):hover': {
 							backgroundColor: 'dim.100',
-							color: '#3e3d3d',
 						},
 
 						_selected: {
@@ -156,7 +161,7 @@ export const theme = extendTheme({
 						},
 					},
 					meta: {
-						color: '#444444',
+						color: 'typography.additional',
 					},
 				},
 			},
@@ -200,9 +205,10 @@ export const theme = extendTheme({
 			variants: {
 				default: {
 					content: {
+						color: 'typography.primary',
+
 						'&:not([aria-selected=true]):hover': {
 							backgroundColor: 'dim.100',
-							color: '#3e3d3d',
 						},
 
 						_selected: {
@@ -220,11 +226,10 @@ export const theme = extendTheme({
 			variants: {
 				default: {
 					tab: {
-						color: 'typography.primary',
+						color: 'typography.additional',
 
 						'&:hover': {
 							backgroundColor: 'dim.100',
-							color: '#3e3d3d',
 						},
 						_selected: {
 							backgroundColor: 'accent.100',
@@ -245,20 +250,20 @@ export const theme = extendTheme({
 			variants: {
 				primary: {
 					field: {
-						backgroundColor: '#e6f0ff',
-						color: '#0066ff',
+						backgroundColor: 'primary.200',
+						color: 'primary.500',
 						'&:hover': {
-							backgroundColor: '#d7e7ff',
+							backgroundColor: 'primary.300',
 						},
 					},
 					icon: {
-						color: '#0066ff',
+						color: 'primary.500',
 					},
 				},
 				secondary: {
 					field: {
 						backgroundColor: 'dim.100',
-						color: '#3e3d3d',
+						color: 'typography.additional',
 						'&:hover': {
 							backgroundColor: 'dim.400',
 						},
