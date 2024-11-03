@@ -5,6 +5,29 @@ import {
 	extendTheme,
 } from '@chakra-ui/react';
 
+const scrollBarStyles = {
+	'::-webkit-scrollbar': {
+		width: '10px',
+	},
+
+	'::-webkit-scrollbar-track': {
+		background: '#f1f1f1',
+		borderRadius: '0px',
+		border: '1px solid transparent',
+	},
+
+	'::-webkit-scrollbar-thumb': {
+		background: '#c5c5c5',
+		borderRadius: '0px',
+		border: '0px solid transparent',
+		backgroundClip: 'padding-box',
+	},
+
+	'::-webkit-scrollbar-thumb:hover': {
+		background: '#939393',
+	},
+};
+
 // TODO: add alternative theme
 export const theme = extendTheme({
 	styles: {
@@ -18,6 +41,13 @@ export const theme = extendTheme({
 			sans-serif,
 			'Apple Color Emoji',
 			'Segoe UI Emoji'`,
+
+			body: {
+				background: 'surface.background',
+				margin: 0,
+			},
+
+			...scrollBarStyles,
 		},
 	},
 	colors: {
@@ -25,6 +55,7 @@ export const theme = extendTheme({
 			// Accent color
 			100: '#e8e6ff',
 			500: '#6b00cb',
+			600: '#4e0095',
 		},
 		primary: {
 			// Primary color for controls
@@ -37,14 +68,15 @@ export const theme = extendTheme({
 			primary: '#000',
 			secondary: '#727272',
 			additional: '#3e3d3d',
+			ghost: '#6e6e6e',
 		},
 		surface: {
 			background: '#ffffff',
 			panel: '#fdfdfd',
 			border: '#e2e8f0',
+			alternativeBorder: '#c0c4c9',
 		},
 		dim: {
-			50: '#f5f5f5',
 			100: '#f3f3f3',
 			400: '#e7e7e7',
 		},
@@ -52,18 +84,45 @@ export const theme = extendTheme({
 			base: '#0066ff',
 			hover: '#0453c9',
 		},
+		overlay: {
+			500: '#00000075',
+		},
 	},
 	components: {
-		Menu: defineStyleConfig({
+		Menu: createMultiStyleConfigHelpers(['list', 'item']).defineMultiStyleConfig({
 			baseStyle: {
+				list: {
+					borderColor: 'surface.border',
+					backgroundColor: 'surface.background',
+				},
 				item: {
+					color: 'typography.primary',
+					backgroundColor: 'surface.background',
+
 					transitionDuration: '0s',
 					'&:hover, &:focus': {
-						backgroundColor: 'primary.200',
+						backgroundColor: 'dim.100',
 					},
 				},
 			},
 		}),
+		List: createMultiStyleConfigHelpers(['container', 'item']).defineMultiStyleConfig(
+			{
+				baseStyle: {
+					list: {
+						borderColor: 'surface.border',
+						backgroundColor: 'surface.background',
+					},
+					item: {
+						color: 'typography.primary',
+
+						'&[aria-selected=true]': {
+							backgroundColor: 'dim.100',
+						},
+					},
+				},
+			},
+		),
 		Button: defineStyleConfig({
 			variants: {
 				primary: {
@@ -75,7 +134,7 @@ export const theme = extendTheme({
 				},
 				secondary: {
 					backgroundColor: 'dim.100',
-					color: 'typography.additional',
+					color: 'typography.primary',
 					'&:hover': {
 						backgroundColor: 'dim.400',
 					},
@@ -161,7 +220,7 @@ export const theme = extendTheme({
 						},
 					},
 					meta: {
-						color: 'typography.additional',
+						color: 'typography.ghost',
 					},
 				},
 			},
@@ -246,8 +305,65 @@ export const theme = extendTheme({
 				variant: 'default',
 			},
 		}),
-		Select: {
+		Input: createMultiStyleConfigHelpers([
+			'field',
+			'addon',
+			'element',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				field: {
+					color: 'typography.primary',
+					'&::placeholder': {
+						color: 'inherit',
+						opacity: '.6',
+					},
+				},
+			},
 			variants: {
+				outline: {
+					field: {
+						borderColor: 'surface.border',
+						'&:not(:focus):hover': {
+							borderColor: 'surface.alternativeBorder',
+						},
+					},
+				},
+				filled: {
+					field: {
+						borderColor: 'surface.alternativeBorder',
+						'&:not(:focus)': {
+							backgroundColor: 'dim.100',
+						},
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'outline',
+			},
+		}),
+		Select: createMultiStyleConfigHelpers(['field', 'icon']).defineMultiStyleConfig({
+			baseStyle: {
+				field: {
+					color: 'typography.primary',
+					'&::placeholder': {
+						color: 'inherit',
+						opacity: '.8',
+					},
+				},
+			},
+			variants: {
+				outline: {
+					field: {
+						'&, & >option': {
+							backgroundColor: 'surface.background',
+						},
+
+						borderColor: 'surface.border',
+						'&:not(:focus):hover': {
+							borderColor: 'surface.alternativeBorder',
+						},
+					},
+				},
 				primary: {
 					field: {
 						backgroundColor: 'primary.200',
@@ -263,14 +379,17 @@ export const theme = extendTheme({
 				secondary: {
 					field: {
 						backgroundColor: 'dim.100',
-						color: 'typography.additional',
+						color: 'typography.primary',
 						'&:hover': {
 							backgroundColor: 'dim.400',
 						},
 					},
 				},
 			},
-		},
+			defaultProps: {
+				variant: 'outline',
+			},
+		}),
 		Spinner: defineStyleConfig({
 			variants: {
 				primary: {
@@ -279,6 +398,20 @@ export const theme = extendTheme({
 			},
 			defaultProps: {
 				variant: 'primary',
+			},
+		}),
+		Modal: createMultiStyleConfigHelpers([
+			'overlay',
+			'dialog',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				overlay: {
+					backgroundColor: 'overlay.500',
+				},
+				dialog: {
+					color: 'typography.primary',
+					backgroundColor: 'surface.background',
+				},
 			},
 		}),
 	},

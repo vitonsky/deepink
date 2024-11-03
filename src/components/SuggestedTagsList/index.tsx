@@ -130,7 +130,6 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 				getMenuProps,
 				isOpen,
 				inputValue,
-				highlightedIndex,
 				getRootProps,
 			}) => (
 				<Box w="100%" position="relative" {...props}>
@@ -140,6 +139,7 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 						{...getRootProps({}, { suppressRefError: true })}
 					>
 						<Input
+							backgroundColor="transparent"
 							{...getInputProps()}
 							{...{ placeholder, ...inputProps }}
 							w="100%"
@@ -164,8 +164,6 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 							paddingBlock=".3rem"
 						>
 							{getListItems(inputValue).map((item, index) => {
-								const isHighlighted = highlightedIndex === index;
-
 								return (
 									<ListItem
 										listStyleType="none"
@@ -173,11 +171,6 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 											padding: '.3rem',
 											paddingInline: '1rem',
 											fontSize: '1rem',
-											...(isHighlighted
-												? {
-														backgroundColor: 'accent2.200',
-												  }
-												: {}),
 										}}
 										{...getItemProps({
 											key: item.content,
