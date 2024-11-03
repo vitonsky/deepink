@@ -5,6 +5,7 @@ import {
 	extendTheme,
 } from '@chakra-ui/react';
 
+// TODO: optimize theme
 export const theme = extendTheme({
 	styles: {
 		global: {
@@ -33,7 +34,6 @@ export const theme = extendTheme({
 		dim: {
 			50: '#f5f5f5',
 			100: '#f3f3f3',
-			// #e3e3e3
 			400: '#e7e7e7',
 		},
 		link: {
@@ -48,30 +48,6 @@ export const theme = extendTheme({
 			200: '#e6f0ff',
 			500: '#0066ff',
 			700: '#3667b5',
-		},
-		primary2: {
-			'50': '#E7FEE7',
-			'100': '#BCFCBB',
-			'200': '#91FA8F',
-			'300': '#66F863',
-			'400': '#3BF637',
-			'500': '#10F40B',
-			'600': '#0DC408',
-			'700': '#0A9306',
-			'800': '#066204',
-			'900': '#033102',
-		},
-		primary: {
-			50: '#E6EDFF',
-			100: '#B8CBFF',
-			200: '#8AAAFF',
-			300: '#5C89FE',
-			400: '#2F68FE',
-			500: '#0146FE',
-			600: '#0138CB',
-			700: '#012A98',
-			800: '#001C66',
-			900: '#000E33',
 		},
 	},
 	components: {
@@ -90,10 +66,6 @@ export const theme = extendTheme({
 				primary: {
 					backgroundColor: '#e6f0ff',
 					color: '#0066ff',
-					// '&:hover': {
-					// 	backgroundColor: '#e8e6ff',
-					// 	color: '#6b00cb',
-					// },
 					'&:hover': {
 						backgroundColor: '#d7e7ff',
 					},
@@ -101,8 +73,6 @@ export const theme = extendTheme({
 				secondary: {
 					backgroundColor: 'dim.100',
 					color: '#3e3d3d',
-					// borderWidth: '1px',
-					// borderColor: 'dim.400',
 					'&:hover': {
 						backgroundColor: 'dim.400',
 					},
@@ -123,8 +93,6 @@ export const theme = extendTheme({
 					container: {
 						backgroundColor: 'dim.100',
 						color: '#3e3d3d',
-						// borderWidth: '1px',
-						// borderColor: 'dim.400',
 						'&:hover': {
 							backgroundColor: 'dim.400',
 						},
@@ -157,7 +125,6 @@ export const theme = extendTheme({
 					width: '100%',
 					alignItems: 'start',
 					gap: '0.6rem',
-					// borderRadius: '6px',
 				},
 				body: {
 					gap: '0.2rem',
@@ -292,8 +259,6 @@ export const theme = extendTheme({
 					field: {
 						backgroundColor: 'dim.100',
 						color: '#3e3d3d',
-						// borderWidth: '1px',
-						// borderColor: 'dim.400',
 						'&:hover': {
 							backgroundColor: 'dim.400',
 						},
