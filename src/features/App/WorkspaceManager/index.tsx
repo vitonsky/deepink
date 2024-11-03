@@ -118,7 +118,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			>
 				<NestedList
 					divider={
-						<Divider borderColor="accent2.700" margin="0px !important" />
+						<Divider borderColor="primary.700" margin="0px !important" />
 					}
 					sx={{
 						w: '100%',
@@ -127,7 +127,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 						overflow: 'auto',
 
 						border: '1px solid',
-						borderColor: 'accent2.700',
+						borderColor: 'primary.700',
 					}}
 					items={(profilesManager.profiles ?? []).map((profile) => ({
 						id: profile.id,
