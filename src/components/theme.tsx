@@ -271,5 +271,15 @@ export const theme = extendTheme({
 				},
 			},
 		},
+		Spinner: defineStyleConfig({
+			variants: {
+				primary: {
+					color: 'primary.500',
+				},
+			},
+			defaultProps: {
+				variant: 'primary',
+			},
+		}),
 	},
 });

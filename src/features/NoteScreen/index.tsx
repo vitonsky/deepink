@@ -234,7 +234,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 						alignItems: 'center',
 					}}
 				>
-					<Spinner size="lg" color="accent2.500" />
+					<Spinner size="lg" />
 				</Box>
 			)}
 		</Box>
