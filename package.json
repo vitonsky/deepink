@@ -12,8 +12,8 @@
 		"start": "electron-forge start",
 		"package": "electron-forge package",
 		"make": "electron-forge make",
-		"lint": "prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint \"{*,**/*}.css\"",
-		"prettify": "prettier --write \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint --fix \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint --fix \"{*,**/*}.css\"",
+		"lint": "prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint \"{*,**/*}.{ts,tsx,js,jsx}\"",
+		"prettify": "prettier --write \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint --fix \"{*,**/*}.{ts,tsx,js,jsx}\"",
 		"packages:upgrade": "npm-check-updates -u",
 		"prepare-electron-deps": "electron-builder install-app-deps",
 		"prepare": "husky install"
