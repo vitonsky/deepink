@@ -55,7 +55,13 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					onPick: noteActions.click,
 				}}
 			/>
-			<Box display="flex" flexGrow="100" width="100%" padding="0 .5rem">
+			<Box
+				display="flex"
+				flexGrow="100"
+				width="100%"
+				overflow="auto"
+				padding="0 .5rem"
+			>
 				<Notes
 					{...{
 						notes: openedNotes,
