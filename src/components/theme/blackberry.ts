@@ -3,7 +3,7 @@ import { createMultiStyleConfigHelpers, extendTheme } from '@chakra-ui/react';
 
 import { basicTheme, getScrollBarStyles } from './basic';
 
-export const wineTheme = extendTheme(basicTheme, {
+export const blackberryTheme = extendTheme(basicTheme, {
 	styles: {
 		global: {
 			...getScrollBarStyles({
