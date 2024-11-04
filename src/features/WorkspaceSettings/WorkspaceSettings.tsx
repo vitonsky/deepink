@@ -21,6 +21,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ isVisible, onClo
 							<Input
 								placeholder="Enter workspace name"
 								defaultValue="Default"
+								flex="100"
 							/>
 							<Button variant="primary" disabled>
 								Update
