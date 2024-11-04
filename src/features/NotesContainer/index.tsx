@@ -43,7 +43,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	);
 
 	return (
-		<VStack align="start" w="100%" h="100%" {...props} gap=".5rem">
+		<VStack align="start" w="100%" h="100%" gap={0} {...props}>
 			<TopBar
 				{...{
 					notesRegistry,
@@ -60,7 +60,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 				flexGrow="100"
 				width="100%"
 				overflow="auto"
-				padding="0 .5rem"
+				padding=".5rem"
 			>
 				<Notes
 					{...{
