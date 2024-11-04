@@ -1,6 +1,15 @@
 import React, { FC, HTMLAttributes } from 'react';
 import { FaXmark } from 'react-icons/fa6';
-import { Box, Button, HStack, Modal, ModalContent, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	HStack,
+	Modal,
+	ModalContent,
+	Text,
+	useMultiStyleConfig,
+	VStack,
+} from '@chakra-ui/react';
 
 export interface ModalScreenProps extends HTMLAttributes<HTMLDivElement> {
 	isVisible?: boolean;
@@ -15,6 +24,8 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 	children,
 	...rest
 }) => {
+	const styles = useMultiStyleConfig('ModalScreen');
+
 	return (
 		<Modal
 			size="full"
@@ -27,10 +38,10 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 			}}
 			{...rest}
 		>
-			<ModalContent w="100%" h="100%">
-				<VStack w="100%" h="100%" maxW="800px" margin="auto">
+			<ModalContent w="100%" h="100%" sx={styles.root}>
+				<VStack w="100%" h="100%" overflow="auto">
 					{Boolean(title || onClose) && (
-						<HStack w="100%" padding=".3rem">
+						<HStack sx={styles.head}>
 							{title && (
 								<Text fontSize="1.3rem" fontWeight="bold">
 									{title}
@@ -51,8 +62,8 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 						</HStack>
 					)}
 
-					<Box display="flex" flex="1" w="100%" h="100%" overflow="auto">
-						{children}
+					<Box sx={styles.body}>
+						<Box sx={styles.content}>{children}</Box>
 					</Box>
 				</VStack>
 			</ModalContent>

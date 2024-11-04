@@ -80,6 +80,7 @@ export const basicTheme = extendTheme({
 		surface: {
 			background: '#ffffff',
 			panel: '#fdfdfd',
+			contrastPanel: '#f7f7f7',
 			border: '#e2e8f0',
 			alternativeBorder: '#c0c4c9',
 		},
@@ -177,6 +178,33 @@ export const basicTheme = extendTheme({
 			},
 			defaultProps: {
 				variant: 'default',
+			},
+		}),
+		ModalScreen: createMultiStyleConfigHelpers([
+			'root',
+			'head',
+			'body',
+			'content',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				head: {
+					position: 'sticky',
+					top: '0',
+					width: '100%',
+					padding: '.3rem 1rem',
+					backgroundColor: 'surface.contrastPanel',
+					borderBottom: '1px solid',
+					borderColor: 'surface.border',
+				},
+				body: {
+					display: 'flex',
+					flex: '1',
+					width: '100%',
+					justifyContent: 'center',
+				},
+				content: {
+					maxWidth: '800px',
+				},
 			},
 		}),
 		NotePreview: createMultiStyleConfigHelpers([
