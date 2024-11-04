@@ -116,16 +116,19 @@ export const MainScreen: FC = () => {
 						borderColor: 'surface.border',
 					}}
 				>
-					<VStack w="100%" gap=".5rem" overflow="hidden">
-						<Button variant="primary" w="100%" onClick={createNote}>
-							<HStack gap="1rem">
-								<FaPenToSquare />
-								<Text>New note</Text>
-							</HStack>
-						</Button>
+					<Button
+						variant="primary"
+						w="100%"
+						flexShrink={0}
+						onClick={createNote}
+					>
+						<HStack gap="1rem">
+							<FaPenToSquare />
+							<Text>New note</Text>
+						</HStack>
+					</Button>
 
-						<NotesOverview />
-					</VStack>
+					<NotesOverview />
 
 					<WorkspaceBar />
 				</VStack>

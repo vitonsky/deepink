@@ -89,7 +89,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	// TODO: show spinner while loading tags
 	return (
-		<VStack flex={1} w="100%" gap="2rem" overflow="hidden">
+		<VStack flex={1} w="100%" gap="2rem" minHeight="0">
 			<NestedList
 				overflow="auto"
 				minHeight="150px"
@@ -162,7 +162,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				}}
 			/>
 
-			<VStack flex={1} minH="200px" w="100%" align="start" overflow="hidden">
+			<VStack flex={1} minH="200px" w="100%" align="start">
 				<HStack w="100%">
 					<Text
 						as="h2"
