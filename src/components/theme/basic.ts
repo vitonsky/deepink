@@ -132,6 +132,12 @@ export const basicTheme = extendTheme({
 			},
 		),
 		Button: defineStyleConfig({
+			baseStyle: {
+				transition: 'transform .20ms ease',
+				'&:active': {
+					transform: 'scale(.95)',
+				},
+			},
 			variants: {
 				primary: {
 					backgroundColor: 'primary.200',
