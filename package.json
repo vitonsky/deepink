@@ -84,7 +84,6 @@
 		"worker-loader": "^3.0.8"
 	},
 	"dependencies": {
-		"@bem-react/classname": "^1.6.0",
 		"@chakra-ui/react": "^2.8.2",
 		"@emotion/react": "^11.13.3",
 		"@emotion/styled": "^11.13.0",
