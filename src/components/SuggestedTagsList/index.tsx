@@ -139,7 +139,6 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 						{...getRootProps({}, { suppressRefError: true })}
 					>
 						<Input
-							backgroundColor="transparent"
 							{...getInputProps()}
 							{...{ placeholder, ...inputProps }}
 							w="100%"
