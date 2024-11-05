@@ -55,6 +55,10 @@ export const basicTheme = extendTheme({
 			},
 
 			...getScrollBarStyles(),
+
+			'select:focus-visible, button:focus-visible, input:focus-visible, ': {
+				boxShadow: 'outline',
+			},
 		},
 	},
 	colors: {
