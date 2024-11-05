@@ -258,15 +258,26 @@ export const basicTheme = extendTheme({
 				},
 				filled: {
 					field: {
-						borderColor: 'surface.alternativeBorder',
+						borderColor: 'transparent',
+						'&:hover': {
+							borderColor: 'dim.400',
+						},
+						'&:focus-visible': {
+							borderColor: 'transparent',
+						},
 						'&:not(:focus)': {
 							backgroundColor: 'dim.100',
 						},
 					},
 				},
+				ghost: {
+					field: {
+						background: 'transparent',
+					},
+				},
 			},
 			defaultProps: {
-				variant: 'outline',
+				variant: 'filled',
 			},
 		}),
 		Select: createMultiStyleConfigHelpers(['field', 'icon']).defineMultiStyleConfig({
@@ -326,6 +337,26 @@ export const basicTheme = extendTheme({
 			},
 			defaultProps: {
 				variant: 'primary',
+			},
+		}),
+		Divider: defineStyleConfig({
+			baseStyle: {
+				borderColor: 'surface.border',
+			},
+		}),
+		Checkbox: createMultiStyleConfigHelpers([
+			'control',
+			'icon',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				control: {
+					borderColor: 'surface.border',
+					'&[aria-checked=true], &[data-checked]': {
+						color: 'primary.500',
+						borderColor: 'primary.300',
+						backgroundColor: 'primary.300',
+					},
+				},
 			},
 		}),
 		Modal: createMultiStyleConfigHelpers([
