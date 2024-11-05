@@ -32,7 +32,7 @@ export const alternativeTheme = extendTheme(basicTheme, {
 			primary: '#000',
 			secondary: '#4e3a0c',
 			additional: '#3e3d3d',
-			ghost: '#6e6e6e',
+			ghost: '#3a3a3a',
 		},
 		surface: {
 			background: '#fffaf3',
