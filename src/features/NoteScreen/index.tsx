@@ -209,7 +209,7 @@ export const NoteScreen: FC<NoteScreenProps> = ({ note, update }) => {
 	}, [Input, attachmentsRegistry, getFilesUrl, note.id, text, update]);
 
 	return (
-		<Box w="100%" overflow="auto">
+		<Box w="100%" overflow="auto" paddingInline=".5rem">
 			{markdownContent ? (
 				<Box
 					className="markdown-body"
