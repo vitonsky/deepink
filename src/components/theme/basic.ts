@@ -70,7 +70,6 @@ export const basicTheme = extendTheme({
 			// Accent color
 			100: '#e8e6ff',
 			500: '#6b00cb',
-			600: '#4e0095',
 		},
 		primary: {
 			// Primary color for controls
