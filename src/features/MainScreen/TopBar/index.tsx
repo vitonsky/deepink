@@ -80,8 +80,8 @@ export const TopBar: FC<TopBarProps> = ({
 							marginBottom={0}
 							title={title}
 							onMouseDown={(evt) => {
-								const isMiddleButton = evt.button === 1;
-								if (!isMiddleButton) return;
+								const isLeftButton = evt.button === 0;
+								if (isLeftButton) return;
 
 								evt.preventDefault();
 								evt.stopPropagation();
