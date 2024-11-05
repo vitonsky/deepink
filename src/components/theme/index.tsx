@@ -1,3 +1,3 @@
-import { basicTheme } from './basic';
+import { alternativeTheme } from './alternative';
 
-export const theme = basicTheme;
+export const theme = alternativeTheme;
