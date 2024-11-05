@@ -3,8 +3,7 @@ import { Button, Checkbox, HStack, Input, VStack } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
-
-import { ModalScreen } from '../ModalScreen/ModalScreen';
+import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 
 export interface WorkspaceSettingsProps {
 	isVisible?: boolean;

@@ -4,9 +4,8 @@ import { Button, Checkbox, Input, Select, VStack } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
-
-import { ModalScreen } from '../ModalScreen/ModalScreen';
 
 export const Preferences = () => {
 	const [isOpened, setIsOpened] = useState(false);

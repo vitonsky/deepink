@@ -4,6 +4,10 @@ import {
 	defineStyleConfig,
 	extendTheme,
 } from '@chakra-ui/react';
+import { ModalScreenTheme } from '@components/ModalScreen/ModalScreen.theme';
+import { NestedListTheme } from '@components/NestedList/NestedList.theme';
+import { NotePreviewTheme } from '@components/NotePreview/NotePreview.theme';
+import { NotificationsTheme } from '@components/Notifications/Notifications.theme';
 
 export const getScrollBarStyles = ({
 	trackColor = '#f1f1f1',
@@ -101,6 +105,39 @@ export const basicTheme = extendTheme({
 		},
 	},
 	components: {
+		Button: defineStyleConfig({
+			baseStyle: {
+				transition: 'transform .20ms ease',
+				'&:active': {
+					transform: 'scale(.95)',
+				},
+			},
+			variants: {
+				primary: {
+					backgroundColor: 'primary.200',
+					color: 'primary.500',
+					'&:hover': {
+						backgroundColor: 'primary.300',
+					},
+				},
+				secondary: {
+					backgroundColor: 'dim.100',
+					color: 'typography.primary',
+					'&:hover': {
+						backgroundColor: 'dim.400',
+					},
+				},
+				ghost: {
+					color: 'typography.primary',
+					'&:hover': {
+						backgroundColor: 'dim.400',
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'secondary',
+			},
+		}),
 		Menu: createMultiStyleConfigHelpers(['list', 'item']).defineMultiStyleConfig({
 			baseStyle: {
 				list: {
@@ -135,39 +172,6 @@ export const basicTheme = extendTheme({
 				},
 			},
 		),
-		Button: defineStyleConfig({
-			baseStyle: {
-				transition: 'transform .20ms ease',
-				'&:active': {
-					transform: 'scale(.95)',
-				},
-			},
-			variants: {
-				primary: {
-					backgroundColor: 'primary.200',
-					color: 'primary.500',
-					'&:hover': {
-						backgroundColor: 'primary.300',
-					},
-				},
-				secondary: {
-					backgroundColor: 'dim.100',
-					color: 'typography.primary',
-					'&:hover': {
-						backgroundColor: 'dim.400',
-					},
-				},
-				ghost: {
-					color: 'typography.primary',
-					'&:hover': {
-						backgroundColor: 'dim.400',
-					},
-				},
-			},
-			defaultProps: {
-				variant: 'secondary',
-			},
-		}),
 		Tag: createMultiStyleConfigHelpers(['container']).defineMultiStyleConfig({
 			variants: {
 				default: {
@@ -204,172 +208,6 @@ export const basicTheme = extendTheme({
 						color: 'primary.500',
 					},
 				},
-			},
-		}),
-		Notifications: createMultiStyleConfigHelpers([
-			'root',
-			'head',
-			'body',
-		]).defineMultiStyleConfig({
-			baseStyle: {
-				root: {
-					position: 'absolute',
-					bottom: '2rem',
-					right: '0.5rem',
-					backgroundColor: 'surface.background',
-					border: '2px solid #eee',
-					borderRadius: '4px',
-					minWidth: '300px',
-					maxWidth: '500px',
-					maxHeight: '500px',
-					boxShadow: '0 5px 30px -20px black',
-				},
-				head: {
-					w: '100%',
-					padding: '.5rem 1rem',
-					backgroundColor: 'surface.contrastPanel',
-				},
-				body: {
-					w: '100%',
-					alignItems: 'start',
-					padding: '1rem',
-				},
-			},
-		}),
-		ModalScreen: createMultiStyleConfigHelpers([
-			'root',
-			'head',
-			'body',
-			'content',
-		]).defineMultiStyleConfig({
-			baseStyle: {
-				head: {
-					position: 'sticky',
-					top: '0',
-					width: '100%',
-					padding: '.3rem 1rem',
-					backgroundColor: 'surface.contrastPanel',
-					borderBottom: '1px solid',
-					borderColor: 'surface.border',
-				},
-				body: {
-					display: 'flex',
-					flex: '1',
-					width: '100%',
-					justifyContent: 'center',
-				},
-				content: {
-					maxWidth: '800px',
-				},
-			},
-		}),
-		NotePreview: createMultiStyleConfigHelpers([
-			'root',
-			'body',
-			'title',
-			'text',
-			'meta',
-		]).defineMultiStyleConfig({
-			baseStyle: {
-				root: {
-					cursor: 'pointer',
-					padding: '0.5rem',
-					overflow: 'hidden',
-					textOverflow: 'ellipsis',
-					width: '100%',
-					alignItems: 'start',
-					gap: '0.6rem',
-				},
-				body: {
-					gap: '0.2rem',
-					alignItems: 'start',
-				},
-				title: {
-					fontWeight: 'bold',
-					fontSize: '18px',
-				},
-				text: {
-					fontSize: '14px',
-				},
-				meta: {
-					fontSize: '14px',
-					width: '100%',
-				},
-			},
-			variants: {
-				default: {
-					root: {
-						color: 'typography.primary',
-
-						'&:not([aria-selected=true]):hover': {
-							backgroundColor: 'dim.100',
-						},
-
-						_selected: {
-							backgroundColor: 'accent.100',
-							color: 'accent.500',
-						},
-					},
-					meta: {
-						color: 'typography.ghost',
-					},
-				},
-			},
-			defaultProps: {
-				variant: 'default',
-			},
-		}),
-		NestedList: createMultiStyleConfigHelpers([
-			'root',
-			'item',
-			'content',
-			'group',
-		]).defineMultiStyleConfig({
-			baseStyle: {
-				root: {
-					margin: '0',
-					paddingLeft: '0',
-					listStyle: 'none',
-					// eslint-disable-next-line spellcheck/spell-checker
-					fontFamily: 'Arial, Helvetica, sans-serif',
-					userSelect: 'none',
-					'& &': {
-						paddingStart: '.5rem',
-					},
-					w: '100%',
-					gap: '0',
-				},
-				item: {
-					w: '100%',
-					lineHeight: '1.5rem',
-					gap: '0',
-				},
-				content: {
-					w: '100%',
-				},
-				group: {
-					w: '100%',
-					paddingStart: '.5rem',
-				},
-			},
-			variants: {
-				default: {
-					content: {
-						color: 'typography.primary',
-
-						'&:not([aria-selected=true]):hover': {
-							backgroundColor: 'dim.100',
-						},
-
-						_selected: {
-							backgroundColor: 'accent.100',
-							color: 'accent.500',
-						},
-					},
-				},
-			},
-			defaultProps: {
-				variant: 'default',
 			},
 		}),
 		Tabs: createMultiStyleConfigHelpers(['tab']).defineMultiStyleConfig({
@@ -505,5 +343,9 @@ export const basicTheme = extendTheme({
 				},
 			},
 		}),
+		Notifications: NotificationsTheme,
+		ModalScreen: ModalScreenTheme,
+		NotePreview: NotePreviewTheme,
+		NestedList: NestedListTheme,
 	},
 });

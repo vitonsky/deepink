@@ -13,7 +13,7 @@ import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/pro
 
 import { Preferences } from '../Preferences/Preferences';
 import { NotesOverview } from './NotesOverview';
-import { Notifications } from './Notifications/Notifications';
+import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
 export const MainScreen: FC = () => {
@@ -157,7 +157,7 @@ export const MainScreen: FC = () => {
 
 			<StatusBar />
 
-			<Notifications />
+			<NotificationsPopup />
 			<Preferences />
 		</VStack>
 	);

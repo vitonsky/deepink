@@ -1,15 +1,14 @@
 import React, { FC } from 'react';
 import { Text, VStack } from '@chakra-ui/react';
+import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useNoteActions } from '@hooks/notes/useNoteActions';
+import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 
-import { useNoteActions } from '../../../hooks/notes/useNoteActions';
-import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';
-
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
-import { NotePreview } from './NotePreview';
 
 export type NotesListProps = {};
 
@@ -63,11 +62,7 @@ export const NotesList: FC<NotesListProps> = () => {
 								title={getNoteTitle(note.content)}
 								text={text}
 								meta={
-									<>
-										{date && (
-											<Text>{new Date(date).toDateString()}</Text>
-										)}
-									</>
+									date && <Text>{new Date(date).toDateString()}</Text>
 								}
 								onContextMenu={(evt) => {
 									openNoteContextMenu(note.id, {
