@@ -36,6 +36,7 @@
 			"@electron/*": ["src/electron/*"],
 			"@components/*": ["src/components/*"],
 			"@features/*": ["src/features/*"],
+			"@hooks/*": ["src/hooks/*"],
 			"@api/*": ["src/api/*"],
 			"@state/*": ["src/state/*"],
 			"@utils/*": ["src/utils/*"]

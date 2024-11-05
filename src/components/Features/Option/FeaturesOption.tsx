@@ -24,7 +24,6 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 				sx={{
 					display: 'flex',
 					justifyContent: 'end',
-					// alignItems: 'center',
 					lineHeight: '120%',
 					paddingTop: '.8rem',
 					paddingInlineEnd: '1rem',

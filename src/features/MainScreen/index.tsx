@@ -6,11 +6,10 @@ import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
+import { useCreateNote } from '@hooks/notes/useCreateNote';
+import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
-
-import { useCreateNote } from '../../hooks/notes/useCreateNote';
-import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
 
 import { Preferences } from '../Preferences/Preferences';
 import { NotesOverview } from './NotesOverview';

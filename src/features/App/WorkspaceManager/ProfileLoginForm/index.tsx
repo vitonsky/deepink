@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Button, Input, Text, VStack } from '@chakra-ui/react';
-import { useFocusableRef } from '@components/hooks/useFocusableRef';
 import { ProfileObject } from '@core/storage/ProfilesManager';
+import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
 import { OnPickProfile } from '..';

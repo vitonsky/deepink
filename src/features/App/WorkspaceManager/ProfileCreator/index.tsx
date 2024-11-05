@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Button, Input, Text, VStack } from '@chakra-ui/react';
-import { useFocusableRef } from '@components/hooks/useFocusableRef';
+import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
 

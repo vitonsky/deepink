@@ -7,12 +7,11 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
+import { useNoteActions } from '@hooks/notes/useNoteActions';
+import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 import { createWorkspaceSelector } from '@state/redux/profiles/utils';
-
-import { useNoteActions } from '../../hooks/notes/useNoteActions';
-import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
 
 export type NotesContainerProps = Partial<StackProps>;
 
