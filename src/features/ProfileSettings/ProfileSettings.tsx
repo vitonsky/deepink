@@ -7,7 +7,7 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
-export const Preferences = () => {
+export const ProfileSettings = () => {
 	const [isOpened, setIsOpened] = useState(false);
 
 	const { controls } = useStatusBarManager();

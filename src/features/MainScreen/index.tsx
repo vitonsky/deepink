@@ -11,7 +11,7 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
-import { Preferences } from '../Preferences/Preferences';
+import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
@@ -158,7 +158,7 @@ export const MainScreen: FC = () => {
 			<StatusBar />
 
 			<NotificationsPopup />
-			<Preferences />
+			<ProfileSettings />
 		</VStack>
 	);
 };
