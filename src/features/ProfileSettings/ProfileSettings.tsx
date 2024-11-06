@@ -47,7 +47,7 @@ export const ProfileSettings = () => {
 					</FeaturesOption>
 
 					<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password">
-						<Checkbox>Remember workspaces passwords" checked</Checkbox>
+						<Checkbox>Remember workspaces passwords</Checkbox>
 					</FeaturesOption>
 
 					<FeaturesHeader view="section">Encryption</FeaturesHeader>
@@ -85,7 +85,7 @@ export const ProfileSettings = () => {
 					<FeaturesHeader view="section">Synchronization</FeaturesHeader>
 
 					<FeaturesOption description="Sync all data in database between your devices, to not loose it. All data are encrypted.">
-						<Checkbox>Enable synchronization" checked</Checkbox>
+						<Checkbox>Enable synchronization</Checkbox>
 					</FeaturesOption>
 					<FeaturesOption title="Synchronization method">
 						<Select variant="secondary" defaultValue="fs">
