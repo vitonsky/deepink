@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Spinner } from '@components/Spinner';
+import { Button, Spinner } from '@chakra-ui/react';
 import { selectDirectory } from '@electron/requests/files/renderer';
 import {
 	useFilesRegistry,
@@ -59,8 +58,8 @@ export const ExportButton = () => {
 	}, [onExport]);
 
 	return (
-		<Button size="s" view="action" onPress={exportNotes}>
-			Export {isLoading && <Spinner size="s" progress />}
+		<Button size="sm" variant="primary" onClick={exportNotes}>
+			Export {isLoading && <Spinner size="sm" />}
 		</Button>
 	);
 };

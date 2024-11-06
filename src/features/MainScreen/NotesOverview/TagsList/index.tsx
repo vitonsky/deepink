@@ -1,13 +1,9 @@
 import React, { FC, ReactNode, useMemo, useState } from 'react';
-import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
-import { List, ListItem } from '@components/List';
+import { FaAngleDown, FaHashtag } from 'react-icons/fa6';
+import { Box, HStack, Text } from '@chakra-ui/react';
+import { ListItem, NestedList } from '@components/NestedList';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
-
-import './TagsList.css';
-
-const cnTagsList = cn('TagsList');
 
 export type TagItem = {
 	id: string;
@@ -57,23 +53,29 @@ export const TagsList: FC<ITagsListProps> = ({
 			return {
 				id,
 				content: (
-					<div
-						className={cnTagsList('Tag')}
+					<HStack
+						w="100%"
+						align="start"
+						gap="0.5rem"
+						padding="0.4rem"
+						alignItems="center"
 						onContextMenu={(evt) => {
 							onTagMenu(id, { x: evt.clientX, y: evt.clientY });
 						}}
 					>
-						<Icon
-							glyph={isHaveChilds ? 'expand-more' : undefined}
-							scalable
-							className={cnTagsList(
-								'ExpandButton',
-								{
-									opened: isOpenedGroup,
-									visible: isHaveChilds,
-								},
-								[cnTagsList('Icon')],
-							)}
+						<Box
+							padding="2px"
+							sx={{
+								...(isHaveChilds
+									? {
+											borderRadius: '4px',
+											'&:hover': {
+												backdropFilter: 'contrast(0.7)',
+											},
+									  }
+									: { display: 'none' }),
+								...(isOpenedGroup ? {} : { transform: 'rotate(-90deg)' }),
+							}}
 							onClick={(evt) => {
 								evt.stopPropagation();
 								setToggledTags((tags) => {
@@ -81,21 +83,21 @@ export const TagsList: FC<ITagsListProps> = ({
 									return tags.filter((tag) => tag !== id);
 								});
 							}}
-						/>
+						>
+							<FaAngleDown size={14} />
+						</Box>
 
-						<Icon glyph="tag" scalable className={cnTagsList('Icon')} />
+						<FaHashtag size={14} />
 
-						<span className={cnTagsList('TagContent')}>{content}</span>
-					</div>
+						<Text overflow="hidden" textOverflow="ellipsis">
+							{content}
+						</Text>
+					</HStack>
 				),
 				collapsed: !isOpenedGroup,
 			};
 		});
 	}, [onTagMenu, tags, toggledTags]);
 
-	return (
-		<div className={cnTagsList()}>
-			<List items={items} activeItem={activeTag} onPick={onTagClick} />
-		</div>
-	);
+	return <NestedList items={items} activeItem={activeTag} onPick={onTagClick} />;
 };

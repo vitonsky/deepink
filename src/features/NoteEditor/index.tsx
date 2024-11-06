@@ -1,9 +1,4 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Menu } from 'react-elegant-ui/esm/components/Menu/Menu.bundle/desktop';
-import { Popup } from 'react-elegant-ui/esm/components/Popup/Popup.bundle/desktop';
-import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
 import {
 	FaBell,
 	FaBookmark,
@@ -15,6 +10,7 @@ import {
 	FaEye,
 	FaFileExport,
 	FaFlag,
+	FaHashtag,
 	FaLink,
 	FaRotate,
 	FaShield,
@@ -23,9 +19,20 @@ import {
 	FaXmark,
 } from 'react-icons/fa6';
 import { debounce } from 'lodash';
-import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
-import { Stack } from '@components/Stack/Stack';
+import {
+	Box,
+	Button,
+	Divider,
+	HStack,
+	Input,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
+	Tag,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
@@ -42,10 +49,6 @@ import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
-
-import './NoteEditor.css';
-
-const cnNoteEditor = cn('NoteEditor');
 
 export type NoteEditorProps = {
 	note: INote;
@@ -146,224 +149,127 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		[debouncedUpdateNote, title],
 	);
 
-	const [attachTagName, setAttachTagName] = useState('');
-	const [isShowTagsList, setIsShowTagsList] = useState(false);
-	const tagInputRef = useRef<HTMLInputElement | null>(null);
-
-	// TODO: create hook for boilerplate for trigger
-	const noteControlButtonRef = useRef<HTMLButtonElement | null>(null);
-	const [isNoteMenuOpened, setIsNoteMenuOpened] = useState(false);
-
-	const ref = useDetectClickOutside({ onTriggered: () => setIsNoteMenuOpened(false) });
+	const [attachTagName, setAttachTagName] = useState<IResolvedTag | null>(null);
+	const [tagSearch, setTagSearch] = useState(
+		attachTagName ? attachTagName.resolvedName : '',
+	);
 
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
 	return (
-		<div className={cnNoteEditor()}>
-			<Stack direction="horizontal">
-				<Textinput
-					className={cnNoteEditor('Title')}
-					value={title}
-					onInputText={setTitle}
-					placeholder="Note title"
-				/>
-				<Button
-					view="default"
-					innerRef={noteControlButtonRef}
-					onPress={() => setIsNoteMenuOpened((state) => !state)}
-				>
-					<Icon boxSize="1rem" hasGlyph>
-						<FaEllipsis size="100%" />
-					</Icon>
-				</Button>
-
-				{/* TODO: add options that may be toggled */}
-				{/* TODO: render popups in portal */}
-				<Popup
-					target="anchor"
-					anchor={noteControlButtonRef}
-					view="default"
-					visible={isNoteMenuOpened}
-					zIndex={99}
-					boundary={{ current: document.body }}
-					innerRef={ref}
-				>
-					<Menu
-						items={[
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaCopy />
-										</Icon>
-										<span>Copy reference on note</span>
-									</Stack>
-								),
-								textContent: 'Copy reference on note',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaBell />
-										</Icon>
-										<span>Remind me</span>
-									</Stack>
-								),
-								textContent: 'Remind me',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaClock />
-										</Icon>
-										<span>History</span>
-									</Stack>
-								),
-								textContent: 'History',
-							},
-							{
-								id: 'backlinks',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaLink />
-										</Icon>
-										<span>Back links</span>
-									</Stack>
-								),
-								textContent: 'Back links',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaEye />
-										</Icon>
-										<span>Readonly mode</span>
-									</Stack>
-								),
-								textContent: 'Read-only mode',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaDownload />
-										</Icon>
-										<span>Download and convert a network media</span>
-									</Stack>
-								),
-								textContent: 'Download and convert a network media',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaSpellCheck />
-										</Icon>
-										<span>Spellcheck</span>
-									</Stack>
-								),
-								textContent: 'Spellcheck',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaFileExport />
-										</Icon>
-										<span>Export...</span>
-									</Stack>
-								),
-								textContent: 'Export...',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaShield />
-										</Icon>
-										<span>Password protection...</span>
-									</Stack>
-								),
-								textContent: 'Password protection...',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaRotate />
-										</Icon>
-										<span>Disable sync</span>
-									</Stack>
-								),
-								textContent: 'Disable sync',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaBoxArchive />
-										</Icon>
-										<span>Archive</span>
-									</Stack>
-								),
-								textContent: 'Archive',
-							},
-							{
-								id: 'id',
-								content: (
-									<Stack direction="horizontal" spacing={4}>
-										<Icon hasGlyph boxSize="1rem">
-											<FaTrashCan />
-										</Icon>
-										<span>Delete</span>
-									</Stack>
-								),
-								textContent: 'Delete',
-							},
-						]}
-						onPick={(id) => {
-							console.log('pick menu', id);
-							if (id === 'backlinks') {
-								setSidePanel('backlinks');
-							}
-
-							setIsNoteMenuOpened(false);
-						}}
+		<VStack w="100%">
+			<HStack w="100%" align="start">
+				<HStack w="100%" align="start">
+					<Input
+						placeholder="Note title"
+						size="sm"
+						borderRadius="6px"
+						value={title}
+						onChange={(evt) => setTitle(evt.target.value)}
 					/>
-				</Popup>
-			</Stack>
-			<div className={cnNoteEditor('Attachments')}>
-				<Stack direction="horizontal">
-					<Button view="clear" size="s">
-						<Icon boxSize="1rem" hasGlyph>
-							<FaBookmark size="100%" />
-						</Icon>
+
+					{/* TODO: add options that may be toggled */}
+					<Menu>
+						<MenuButton as={Button} variant="primary" size="sm">
+							<FaEllipsis />
+						</MenuButton>
+						<MenuList>
+							<MenuItem>
+								<HStack>
+									<FaCopy />
+									<Text>Copy reference on note</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaBell />
+									<Text>Remind me</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaClock />
+									<Text>History</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem onClick={() => setSidePanel('backlinks')}>
+								<HStack>
+									<FaLink />
+									<Text>Back links</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaEye />
+									<Text>Readonly mode</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaDownload />
+									<Text>Download and convert a network media</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaSpellCheck />
+									<Text>Spellcheck</Text>
+								</HStack>
+							</MenuItem>
+
+							<MenuItem>
+								<HStack>
+									<FaFileExport />
+									<Text>Export...</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaShield />
+									<Text>Password protection...</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaRotate />
+									<Text>Disable sync</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaBoxArchive />
+									<Text>Archive</Text>
+								</HStack>
+							</MenuItem>
+							<MenuItem>
+								<HStack>
+									<FaTrashCan />
+									<Text>Delete</Text>
+								</HStack>
+							</MenuItem>
+						</MenuList>
+					</Menu>
+				</HStack>
+			</HStack>
+
+			<HStack alignItems="center" w="100%" flexWrap="wrap">
+				<HStack>
+					<Button variant="ghost" size="xs">
+						<FaBookmark />
 					</Button>
-					<Button view="clear" size="s">
-						<Icon boxSize="1rem" hasGlyph>
-							<FaFlag size="100%" />
-						</Icon>
+					<Button variant="ghost" size="xs">
+						<FaFlag />
 					</Button>
-				</Stack>
+				</HStack>
+
+				<Divider orientation="vertical" h="1em" />
 
 				{attachedTags.map((tag) => (
-					<div
-						className={cnNoteEditor('Attachment')}
+					<Tag
+						as={HStack}
 						key={tag.id}
+						height="fit-content"
+						gap=".4rem"
 						onClick={() => {
 							dispatch(
 								workspacesApi.setSelectedTag({
@@ -372,135 +278,155 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 								}),
 							);
 						}}
+						sx={{ cursor: 'pointer' }}
 					>
-						<span>{tag.resolvedName}</span>
-						<Icon
-							glyph="clear"
-							onClick={async (evt) => {
-								evt.stopPropagation();
-								console.warn('Remove attached tag', tag.resolvedName);
-
-								const updatedTags = attachedTags
-									.filter(({ id }) => id !== tag.id)
-									.map(({ id }) => id);
-								await tagsRegistry.setAttachedTags(noteId, updatedTags);
-								await updateTags();
+						<HStack gap=".2rem">
+							<FaHashtag />
+							<Text>{tag.resolvedName}</Text>
+						</HStack>
+						<Box
+							sx={{
+								'&:not(:hover)': {
+									opacity: '.6',
+								},
 							}}
-						/>
-					</div>
+						>
+							<FaXmark
+								onClick={async (evt) => {
+									evt.stopPropagation();
+									console.warn('Remove attached tag', tag.resolvedName);
+
+									const updatedTags = attachedTags
+										.filter(({ id }) => id !== tag.id)
+										.map(({ id }) => id);
+									await tagsRegistry.setAttachedTags(
+										noteId,
+										updatedTags,
+									);
+									await updateTags();
+								}}
+							/>
+						</Box>
+					</Tag>
 				))}
 
-				<input
-					type="text"
-					ref={tagInputRef}
-					className={cnNoteEditor('AttachmentInput')}
-					placeholder="Add some tags..."
-					value={attachTagName}
-					onChange={(evt) => {
-						setAttachTagName(evt.target.value);
+				<SuggestedTagsList
+					tags={notAttachedTags}
+					selectedTag={attachTagName ?? undefined}
+					inputValue={tagSearch}
+					onInputChange={setTagSearch}
+					sx={{
+						display: 'inline',
+						w: 'auto',
+						maxW: '150px',
 					}}
-					onFocus={() => {
-						setIsShowTagsList(true);
+					inputProps={{
+						variant: 'ghost',
+						placeholder: 'Add some tags...',
+						// size: 'sm',
+						size: 'xs',
 					}}
-					onBlur={() => {
-						setIsShowTagsList(false);
-						setAttachTagName('');
+					hasTagName={(tagName) =>
+						tags.some(({ resolvedName }) => resolvedName === tagName)
+					}
+					onPick={async (tag) => {
+						setAttachTagName(tag);
+						await tagsRegistry.setAttachedTags(noteId, [
+							...attachedTags.map(({ id }) => id),
+							tag.id,
+						]);
+
+						setTagSearch('');
+
+						await updateTags();
+					}}
+					onCreateTag={async (tagName) => {
+						setAttachTagName(null);
+
+						let shortenedTagName = tagName;
+						let parentTagId: string | null = null;
+						const tagSegments = tagName.split('/');
+						for (
+							let lastSegmentIndex = tagSegments.length - 1;
+							lastSegmentIndex > 0;
+							lastSegmentIndex--
+						) {
+							const resolvedParentTag = tagSegments
+								.slice(0, lastSegmentIndex)
+								.join('/');
+							const foundTag = tags.find(
+								({ resolvedName }) => resolvedName === resolvedParentTag,
+							);
+							if (foundTag) {
+								parentTagId = foundTag.id;
+								shortenedTagName = tagSegments
+									.slice(lastSegmentIndex)
+									.join('/');
+								break;
+							}
+						}
+
+						const tagId = await tagsRegistry.add(
+							shortenedTagName,
+							parentTagId,
+						);
+						await tagsRegistry.setAttachedTags(noteId, [
+							...attachedTags.map(({ id }) => id),
+							tagId,
+						]);
+
+						await updateTags();
 					}}
 				/>
-			</div>
-			<div className={cnNoteEditor('SplitContainer')}>
-				<MonacoEditor
+			</HStack>
+
+			<Box
+				sx={{
+					width: '100%',
+					display: 'grid',
+					overflow: 'hidden',
+					gap: '0.3rem',
+					flexGrow: '100',
+					flex: 1,
+					gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+				}}
+			>
+				<Box
+					as={MonacoEditor}
 					value={text}
 					setValue={setText}
-					className={cnNoteEditor('Editor')}
+					flexGrow="100"
 					uploadFile={uploadFile}
 				/>
 				<NoteScreen note={note} update={onTextUpdate} />
-			</div>
+			</Box>
+
 			{sidePanel === 'backlinks' && (
-				<div className={cnNoteEditor('SideBar')}>
-					<div className={cnNoteEditor('SideBarHead')}>
-						<Button view="clear" size="s" onPress={() => setSidePanel(null)}>
-							<Icon hasGlyph scalable boxSize=".8rem">
-								<FaXmark />
-							</Icon>
-						</Button>
-					</div>
-
-					<div className={cnNoteEditor('SideBarBody')}>
-						TODO: Note related data here
-					</div>
-				</div>
-			)}
-			{isShowTagsList && (
-				<Popup
-					target="anchor"
-					anchor={tagInputRef}
-					view="default"
-					visible
-					direction={['bottom-start', 'bottom', 'bottom-end']}
+				<VStack
+					align="start"
+					w="100%"
+					h="300px"
+					flex={1}
+					padding=".5rem"
+					gap="1rem"
+					borderTop="1px solid"
+					borderColor="surface.border"
 				>
-					<SuggestedTagsList
-						tags={notAttachedTags}
-						tagName={attachTagName}
-						hasTagName={(tagName) =>
-							tags.some(({ resolvedName }) => resolvedName === tagName)
-						}
-						onPickTag={async (id) => {
-							// tagInputRef.current?.blur();
-							setAttachTagName('');
-							await tagsRegistry.setAttachedTags(noteId, [
-								...attachedTags.map(({ id }) => id),
-								id,
-							]);
+					<HStack w="100%">
+						<Text fontWeight="bold">Back links tree</Text>
+						<Button
+							variant="ghost"
+							size="xs"
+							marginLeft="auto"
+							onClick={() => setSidePanel(null)}
+						>
+							<FaXmark />
+						</Button>
+					</HStack>
 
-							await updateTags();
-						}}
-						onCreateTag={async (tagName) => {
-							setAttachTagName('');
-
-							let shortenedTagName = tagName;
-							let parentTagId: string | null = null;
-							const tagSegments = tagName.split('/');
-							for (
-								let lastSegmentIndex = tagSegments.length - 1;
-								lastSegmentIndex > 0;
-								lastSegmentIndex--
-							) {
-								const resolvedParentTag = tagSegments
-									.slice(0, lastSegmentIndex)
-									.join('/');
-								const foundTag = tags.find(
-									({ resolvedName }) =>
-										resolvedName === resolvedParentTag,
-								);
-								if (foundTag) {
-									parentTagId = foundTag.id;
-									shortenedTagName = tagSegments
-										.slice(lastSegmentIndex)
-										.join('/');
-									break;
-								}
-							}
-
-							const tagId = await tagsRegistry.add(
-								shortenedTagName,
-								parentTagId,
-							);
-							await tagsRegistry.setAttachedTags(noteId, [
-								...attachedTags.map(({ id }) => id),
-								tagId,
-							]);
-
-							await updateTags();
-						}}
-						onMouseDownCapture={(evt) => {
-							evt.preventDefault();
-							evt.stopPropagation();
-						}}
-					/>
-				</Popup>
+					<Box w="100%">TODO: Note related data here</Box>
+				</VStack>
 			)}
-		</div>
+		</VStack>
 	);
 };

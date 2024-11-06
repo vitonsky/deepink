@@ -1,17 +1,13 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { cnTheme } from 'react-elegant-ui/esm/theme';
-import { theme } from 'react-elegant-ui/esm/theme/presets/default';
-import { cn } from '@bem-react/classname';
+import { FaUser } from 'react-icons/fa6';
+import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
+import { NestedList } from '@components/NestedList';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
-
-import './WorkspaceManager.css';
-
-export const cnWorkspaceManager = cn('WorkspaceManager');
+import { ProfilesForm } from './ProfilesForm';
 
 type PickProfileResponse = {
 	status: 'ok' | 'error';
@@ -105,33 +101,60 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		}
 
 		return (
-			<div className={cnWorkspaceManager('Container')}>
-				<h3 className={cnWorkspaceManager('Header')}>Choose the profile</h3>
-
-				<ul className={cnWorkspaceManager('ProfilesList')}>
-					{(profilesManager.profiles ?? []).map((profile) => (
-						<li
-							key={profile.id}
-							onClick={() => {
-								onChooseProfile(profile.id);
-								if (profile.encryption === null) {
-									onOpenProfile(profile.id);
-								}
-							}}
+			<ProfilesForm
+				title="Choose the profile"
+				controls={
+					<>
+						<Button
+							variant="primary"
+							size="lg"
+							w="100%"
+							onClick={() => setScreenName('createProfile')}
 						>
-							{profile.name}
-						</li>
-					))}
-				</ul>
+							Create new profile
+						</Button>
+					</>
+				}
+			>
+				<NestedList
+					divider={
+						<Divider borderColor="primary.700" margin="0px !important" />
+					}
+					sx={{
+						w: '100%',
+						borderRadius: '4px',
+						maxHeight: '230px',
+						overflow: 'auto',
 
-				<Button
-					view="action"
-					size="l"
-					onClick={() => setScreenName('createProfile')}
-				>
-					Create a new profile
-				</Button>
-			</div>
+						border: '1px solid',
+						borderColor: 'primary.700',
+					}}
+					items={(profilesManager.profiles ?? []).map((profile) => ({
+						id: profile.id,
+						content: (
+							<HStack
+								as="button"
+								sx={{
+									padding: '.8rem 1rem',
+									w: '100%',
+									cursor: 'pointer',
+									gap: '.8rem',
+								}}
+								key={profile.id}
+								onClick={() => {
+									onChooseProfile(profile.id);
+									if (profile.encryption === null) {
+										onOpenProfile(profile.id);
+									}
+								}}
+							>
+								<FaUser />
+								<Text>{profile.name}</Text>
+							</HStack>
+						),
+					}))}
+				/>
+			</ProfilesForm>
 		);
 	}, [
 		currentProfileObject,
@@ -141,5 +164,11 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		screenName,
 	]);
 
-	return <div className={cnWorkspaceManager({}, [cnTheme(theme)])}>{content}</div>;
+	return (
+		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
+			<Box maxW="500px" minW="350px" padding="1rem">
+				{content}
+			</Box>
+		</Box>
+	);
 };

@@ -1,29 +1,20 @@
 import React, { FC, useEffect } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { cnTheme } from 'react-elegant-ui/esm/theme';
-import { theme } from 'react-elegant-ui/esm/theme/presets/default';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
-import { cn } from '@bem-react/classname';
-import { Icon } from '@components/Icon/Icon.bundle/common';
+import { Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
+import { useCreateNote } from '@hooks/notes/useCreateNote';
+import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
-import { useCreateNote } from '../../hooks/notes/useCreateNote';
-import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
-
-import { Preferences } from '../Preferences/Preferences';
+import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NotesOverview } from './NotesOverview';
-import { Notifications } from './Notifications/Notifications';
+import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
-
-import './MainScreen.css';
-
-export const cnMainScreen = cn('MainScreen');
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
@@ -80,38 +71,94 @@ export const MainScreen: FC = () => {
 	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
 
 	return (
-		<div className={cnMainScreen({}, [cnTheme(theme)])}>
-			<div className={cnMainScreen('Content')}>
-				<div className={cnMainScreen('SideBar', { view: 'main' })}>
+		<VStack
+			gap={0}
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				backgroundColor: 'surface.background',
+				color: 'typography.primary',
+			}}
+		>
+			<HStack
+				align="start"
+				gap={0}
+				sx={{
+					flexGrow: '100',
+					width: '100%',
+					height: '100vh',
+					maxWidth: '100%',
+					maxHeight: '100%',
+					overflow: 'hidden',
+				}}
+			>
+				<VStack
+					sx={{
+						bgColor: 'surface.panel',
+						alignItems: 'start',
+
+						width: '100%',
+						height: '100%',
+						minWidth: '250px',
+						maxWidth: '250px',
+						padding: '.5rem',
+						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '1rem',
+						borderRight: '1px solid',
+						borderColor: 'surface.border',
+					}}
+				>
 					<Button
-						className={cnMainScreen('NewNoteButton')}
-						view="action"
-						onPress={createNote}
-						iconLeft={() => (
-							<Icon boxSize="1rem" hasGlyph>
-								<FaPenToSquare size="100%" />
-							</Icon>
-						)}
+						variant="primary"
+						w="100%"
+						flexShrink={0}
+						onClick={createNote}
 					>
-						New note
+						<HStack gap="1rem">
+							<FaPenToSquare />
+							<Text>New note</Text>
+						</HStack>
 					</Button>
 
 					<NotesOverview />
 
 					<WorkspaceBar />
-				</div>
+				</VStack>
 
-				<div className={cnMainScreen('SideBar')}>
+				<VStack
+					sx={{
+						alignItems: 'start',
+
+						width: '100%',
+						height: '100%',
+						minWidth: '250px',
+						maxWidth: '250px',
+						padding: '.5rem',
+						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '1rem',
+						borderRight: '1px solid',
+						borderColor: 'surface.border',
+					}}
+				>
 					<NotesPanel />
-				</div>
+				</VStack>
 
 				<NotesContainer />
-			</div>
+			</HStack>
 
 			<StatusBar />
 
-			<Notifications />
-			<Preferences />
-		</div>
+			<NotificationsPopup />
+			<ProfileSettings />
+		</VStack>
 	);
 };

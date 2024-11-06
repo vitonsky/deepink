@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { ContextMenuCallback, useContextMenu } from '@components/hooks/useContextMenu';
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
@@ -9,6 +8,7 @@ import {
 	useFilesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';

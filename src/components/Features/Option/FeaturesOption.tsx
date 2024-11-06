@@ -1,10 +1,5 @@
 import React, { FC, PropsWithChildren } from 'react';
-
-import { Stack } from '../../Stack/Stack';
-
-import { cnFeatures } from '../Features';
-
-import './FeaturesOption.css';
+import { Box, Text, VStack } from '@chakra-ui/react';
 
 export type FeaturesOptionProps = PropsWithChildren<{
 	title?: string;
@@ -17,18 +12,39 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 	children,
 }) => {
 	return (
-		<Stack direction="vertical" spacing={2} className={cnFeatures('Option')}>
-			<div className={cnFeatures('OptionTitle')}>{title}</div>
-			<Stack
-				direction="vertical"
-				spacing={2}
-				className={cnFeatures('OptionContent')}
+		<Box
+			w="100%"
+			sx={{
+				display: 'grid',
+				gridTemplateColumns: '40% auto',
+				gridRowGap: '50rem',
+			}}
+		>
+			<Text
+				sx={{
+					display: 'flex',
+					justifyContent: 'end',
+					lineHeight: '120%',
+					paddingTop: '.8rem',
+					paddingInlineEnd: '1rem',
+				}}
 			>
+				{title}
+			</Text>
+			<VStack alignItems="baseline">
 				{children}
 				{description && (
-					<div className={cnFeatures('OptionDescription')}>{description}</div>
+					<Text
+						sx={{
+							fontSize: '0.9rem',
+							color: 'typography.secondary',
+							lineHeight: '140%',
+						}}
+					>
+						{description}
+					</Text>
 				)}
-			</Stack>
-		</Stack>
+			</VStack>
+		</Box>
 	);
 };

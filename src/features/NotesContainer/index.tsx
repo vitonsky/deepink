@@ -1,21 +1,19 @@
 import React, { FC, useCallback } from 'react';
-import { IStackProps, Stack } from '@components/Stack/Stack';
+import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import {
 	useNotesContext,
 	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { cnMainScreen } from '@features/MainScreen';
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
+import { useNoteActions } from '@hooks/notes/useNoteActions';
+import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 import { createWorkspaceSelector } from '@state/redux/profiles/utils';
 
-import { useNoteActions } from '../../hooks/notes/useNoteActions';
-import { useUpdateNotes } from '../../hooks/notes/useUpdateNotes';
-
-export type NotesContainerProps = Partial<IStackProps>;
+export type NotesContainerProps = Partial<StackProps>;
 
 export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	const updateNotes = useUpdateNotes();
@@ -44,12 +42,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	);
 
 	return (
-		<Stack
-			{...props}
-			direction="vertical"
-			spacing={2}
-			className={cnMainScreen('ContentBlock')}
-		>
+		<VStack align="start" w="100%" h="100%" gap={0} {...props}>
 			<TopBar
 				{...{
 					notesRegistry,
@@ -61,7 +54,13 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					onPick: noteActions.click,
 				}}
 			/>
-			<div className={cnMainScreen('NoteEditors')}>
+			<Box
+				display="flex"
+				flexGrow="100"
+				width="100%"
+				overflow="auto"
+				padding=".5rem"
+			>
 				<Notes
 					{...{
 						notes: openedNotes,
@@ -70,7 +69,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 						updateNote,
 					}}
 				/>
-			</div>
-		</Stack>
+			</Box>
+		</VStack>
 	);
 };

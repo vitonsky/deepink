@@ -1,18 +1,9 @@
 import React, { FC } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Checkbox } from 'react-elegant-ui/esm/components/Checkbox/Checkbox.bundle/desktop';
-import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
-import { cn } from '@bem-react/classname';
+import { Button, Checkbox, HStack, Input, VStack } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
-import { Stack } from '@components/Stack/Stack';
-
-import { ModalScreen } from '../ModalScreen/ModalScreen';
-
-import './WorkspaceSettings.css';
-
-export const cnWorkspaceSettings = cn('WorkspaceSettings');
+import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 
 export interface WorkspaceSettingsProps {
 	isVisible?: boolean;
@@ -21,44 +12,40 @@ export interface WorkspaceSettingsProps {
 
 export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ isVisible, onClose }) => {
 	return (
-		<ModalScreen
-			isVisible={isVisible}
-			onClose={onClose}
-			className={cnWorkspaceSettings()}
-			title="Workspace settings"
-		>
-			<div className={cnWorkspaceSettings('Body')}>
+		<ModalScreen isVisible={isVisible} onClose={onClose} title="Workspace settings">
+			<VStack w="100%" minH="100%" p="2rem 5rem" justifyContent="center">
 				<Features>
 					<FeaturesOption title="Workspace name">
-						<Stack direction="horizontal">
-							<Textinput
+						<HStack>
+							<Input
 								placeholder="Enter workspace name"
-								value="Default"
+								defaultValue="Default"
+								flex="100"
 							/>
-							<Button view="action" disabled>
+							<Button variant="primary" disabled>
 								Update
 							</Button>
-						</Stack>
+						</HStack>
 					</FeaturesOption>
 
 					<FeaturesHeader view="section">Notes management</FeaturesHeader>
 
 					<FeaturesOption description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app">
-						<Stack direction="horizontal" spacing={2}>
+						<HStack>
 							<Button>Import notes</Button>
 							<Button>Export notes</Button>
-						</Stack>
+						</HStack>
 					</FeaturesOption>
 
 					<FeaturesOption description="Keep full changes log for notes. You may disable history for single notes">
-						<Checkbox label="Enable history for notes" />
+						<Checkbox>Enable history for notes</Checkbox>
 					</FeaturesOption>
 
 					<FeaturesOption description="Move notes to recycle bin, instead of instant deletion">
-						<Checkbox label="Use recycle bin" />
+						<Checkbox>Use recycle bin</Checkbox>
 					</FeaturesOption>
 				</Features>
-			</div>
+			</VStack>
 		</ModalScreen>
 	);
 };

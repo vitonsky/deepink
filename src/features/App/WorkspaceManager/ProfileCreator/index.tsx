@@ -1,9 +1,8 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
-import { useFocusableRef } from '@components/hooks/useFocusableRef';
+import { Button, Input, Text, VStack } from '@chakra-ui/react';
+import { useFocusableRef } from '@hooks/useFocusableRef';
 
-import { cnWorkspaceManager } from '..';
+import { ProfilesForm } from '../ProfilesForm';
 
 export type NewProfile = {
 	name: string;
@@ -66,47 +65,68 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const firstInputRef = useFocusableRef<HTMLInputElement>();
 
 	return (
-		<div className={cnWorkspaceManager('Container')}>
-			<h3 className={cnWorkspaceManager('Header')}>Create a new profile</h3>
-			<Textinput
-				placeholder="Profile name"
-				value={profileName}
-				onChange={(evt) => setProfileName(evt.target.value)}
-				hint={profileNameError ?? undefined}
-				state={profileNameError ? 'error' : undefined}
-				disabled={isPending}
-				controlProps={{ innerRef: firstInputRef }}
-			/>
-			<Textinput
-				controlProps={{
-					type: 'password',
-				}}
-				placeholder="Enter password"
-				value={password}
-				onChange={(evt) => setPassword(evt.target.value)}
-				hint={passwordError ?? undefined}
-				state={passwordError ? 'error' : undefined}
-				disabled={isPending}
-			/>
-			<Button
-				view="action"
-				size="l"
-				onClick={() => onPressCreate(true)}
-				disabled={isPending}
-			>
-				Create profile
-			</Button>
-			<Button
-				view="default"
-				size="l"
-				onClick={() => onPressCreate(false)}
-				disabled={isPending}
-			>
-				Continue with no password
-			</Button>
-			<Button view="default" size="l" onClick={onCancel} disabled={isPending}>
-				Cancel
-			</Button>
-		</div>
+		<ProfilesForm
+			title="Create a new profile"
+			controls={
+				<>
+					<Button
+						variant="primary"
+						w="100%"
+						onClick={() => onPressCreate(true)}
+						disabled={isPending}
+					>
+						Create profile
+					</Button>
+					<Button
+						variant="secondary"
+						w="100%"
+						onClick={() => onPressCreate(false)}
+						disabled={isPending}
+					>
+						Continue with no password
+					</Button>
+					<Button
+						variant="secondary"
+						w="100%"
+						onClick={onCancel}
+						disabled={isPending}
+					>
+						Cancel
+					</Button>
+				</>
+			}
+		>
+			<VStack w="100%" alignItems="start">
+				<VStack w="100%" alignItems="start">
+					<Input
+						ref={firstInputRef}
+						variant="filled"
+						size="lg"
+						placeholder="Profile name"
+						value={profileName}
+						onChange={(evt) => setProfileName(evt.target.value)}
+						focusBorderColor={profileNameError ? 'red.500' : undefined}
+						disabled={isPending}
+					/>
+
+					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
+				</VStack>
+
+				<VStack w="100%" alignItems="start">
+					<Input
+						variant="filled"
+						size="lg"
+						type="password"
+						placeholder="Enter password"
+						value={password}
+						onChange={(evt) => setPassword(evt.target.value)}
+						focusBorderColor={passwordError ? 'red.500' : undefined}
+						disabled={isPending}
+					/>
+
+					{passwordError && <Text color="red.500">{passwordError}</Text>}
+				</VStack>
+			</VStack>
+		</ProfilesForm>
 	);
 };

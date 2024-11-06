@@ -1,24 +1,14 @@
 import React, { FC } from 'react';
-import { cn } from '@bem-react/classname';
-import { Stack } from '@components/Stack/Stack';
+import { Text, VStack } from '@chakra-ui/react';
+import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useNoteActions } from '@hooks/notes/useNoteActions';
+import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import {
-	selectActiveNoteId,
-	selectNotes,
-	selectOpenedNotes,
-} from '@state/redux/profiles/profiles';
-import { createWorkspaceSelector } from '@state/redux/profiles/utils';
-
-import { useNoteActions } from '../../../hooks/notes/useNoteActions';
-import { useUpdateNotes } from '../../../hooks/notes/useUpdateNotes';
+import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
-
-import './NotesList.css';
-
-export const cnNotesList = cn('NotesList');
 
 export type NotesListProps = {};
 
@@ -28,11 +18,6 @@ export const NotesList: FC<NotesListProps> = () => {
 	const noteActions = useNoteActions();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	const openedNotesIdList = useWorkspaceSelector(
-		createWorkspaceSelector(selectOpenedNotes, (notes) =>
-			notes.map((note) => note.id),
-		),
-	);
 	const notes = useWorkspaceSelector(selectNotes);
 
 	const openNoteContextMenu = useDefaultNoteContextMenu({
@@ -41,48 +26,58 @@ export const NotesList: FC<NotesListProps> = () => {
 		updateNotes,
 	});
 
-	// TODO: get preview text from DB as prepared value
-	// TODO: show attachments
 	// TODO: implement dragging and moving items
 	return (
-		<Stack direction="vertical" className={cnNotesList()}>
-			{notes.map((note) => {
-				const date = note.createdTimestamp ?? note.updatedTimestamp;
-				return (
-					<Stack
-						key={note.id}
-						spacing={2}
-						direction="vertical"
-						className={cnNotesList('Note', {
-							active: note.id === activeNoteId,
-							opened:
-								openedNotesIdList &&
-								openedNotesIdList.indexOf(note.id) !== -1,
-						})}
-						onContextMenu={(evt) => {
-							openNoteContextMenu(note.id, {
-								x: evt.pageX,
-								y: evt.pageY,
-							});
-						}}
-						onClick={() => {
-							noteActions.click(note.id);
-						}}
-					>
-						<div className={cnNotesList('Title')}>
-							{getNoteTitle(note.content)}
-						</div>
-						<div className={cnNotesList('TextPreview')}>
-							{note.content.text.slice(0, 80)}
-						</div>
-						{date && (
-							<div className={cnNotesList('Meta')}>
-								{new Date(date).toDateString()}
-							</div>
-						)}
-					</Stack>
-				);
-			})}
-		</Stack>
+		<VStack
+			sx={{
+				w: '100%',
+				h: '100%',
+				overflow: 'auto',
+				align: 'center',
+				userSelect: 'none',
+			}}
+		>
+			{notes.length === 0 ? (
+				<Text pos="relative" top="40%">
+					Nothing added yet
+				</Text>
+			) : (
+				<VStack
+					sx={{
+						w: '100%',
+						align: 'start',
+						gap: '4px',
+					}}
+				>
+					{notes.map((note) => {
+						const date = note.createdTimestamp ?? note.updatedTimestamp;
+						const text = note.content.text.slice(0, 80).trim();
+
+						// TODO: get preview text from DB as prepared value
+						// TODO: show attachments
+						return (
+							<NotePreview
+								key={note.id}
+								isSelected={note.id === activeNoteId}
+								title={getNoteTitle(note.content)}
+								text={text}
+								meta={
+									date && <Text>{new Date(date).toDateString()}</Text>
+								}
+								onContextMenu={(evt) => {
+									openNoteContextMenu(note.id, {
+										x: evt.pageX,
+										y: evt.pageY,
+									});
+								}}
+								onClick={() => {
+									noteActions.click(note.id);
+								}}
+							/>
+						);
+					})}
+				</VStack>
+			)}
+		</VStack>
 	);
 };

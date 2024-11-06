@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaArrowsRotate, FaLock, FaUserLarge } from 'react-icons/fa6';
-import { useFirstRender } from '@components/hooks/useFirstRender';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { useFirstRender } from '@hooks/useFirstRender';
 
 import { useProfileControls } from '../Profile';
 

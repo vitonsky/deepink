@@ -1,10 +1,10 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Button } from 'react-elegant-ui/esm/components/Button/Button.bundle/desktop';
-import { Textinput } from 'react-elegant-ui/esm/components/Textinput/Textinput.bundle/desktop';
-import { useFocusableRef } from '@components/hooks/useFocusableRef';
+import { Button, Input, Text, VStack } from '@chakra-ui/react';
 import { ProfileObject } from '@core/storage/ProfilesManager';
+import { useFocusableRef } from '@hooks/useFocusableRef';
 
-import { cnWorkspaceManager, OnPickProfile } from '..';
+import { ProfilesForm } from '../ProfilesForm';
+import { OnPickProfile } from '..';
 
 export type ProfileLoginFormProps = {
 	profile: ProfileObject;
@@ -41,26 +41,39 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 	const firstInputRef = useFocusableRef<HTMLInputElement>();
 
 	return (
-		<div className={cnWorkspaceManager('Container')}>
-			<h3 className={cnWorkspaceManager('Header')}>Unlock profile</h3>
-			<Textinput
-				controlProps={{
-					type: 'password',
-					innerRef: firstInputRef,
-				}}
-				placeholder="Enter password"
-				value={secret}
-				onChange={(evt) => setSecret(evt.target.value)}
-				hint={errorMessage ?? undefined}
-				state={errorMessage ? 'error' : undefined}
-				disabled={isPending}
-			/>
-			<Button view="action" size="l" onClick={onPressLogin} disabled={isPending}>
-				Unlock
-			</Button>
-			<Button view="default" size="l" onClick={onPickAnotherProfile}>
-				Change profile
-			</Button>
-		</div>
+		<ProfilesForm
+			title="Unlock profile"
+			controls={
+				<>
+					<Button
+						variant="primary"
+						w="100%"
+						onClick={onPressLogin}
+						disabled={isPending}
+					>
+						Unlock
+					</Button>
+					<Button variant="secondary" w="100%" onClick={onPickAnotherProfile}>
+						Change profile
+					</Button>
+				</>
+			}
+		>
+			<VStack w="100%" alignItems="start">
+				<Input
+					ref={firstInputRef}
+					variant="filled"
+					size="lg"
+					type="password"
+					placeholder="Enter password"
+					value={secret}
+					onChange={(evt) => setSecret(evt.target.value)}
+					focusBorderColor={errorMessage ? 'red.500' : undefined}
+					disabled={isPending}
+				/>
+
+				{errorMessage && <Text color="red.500">{errorMessage}</Text>}
+			</VStack>
+		</ProfilesForm>
 	);
 };

@@ -1,15 +1,10 @@
 import React, { FC } from 'react';
-import { TabsPanes } from 'react-elegant-ui/esm/components/TabsPanes/TabsPanes.bundle/desktop';
 import { isEqual } from 'lodash';
-import { cn } from '@bem-react/classname';
+import { Box } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
-
-import './Notes.css';
-
-export const cnNotes = cn('Notes');
 
 export type NotesProps = {
 	tabs: NoteId[];
@@ -23,18 +18,28 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 	useEditorLinks();
 
 	return (
-		<TabsPanes
-			className={cnNotes()}
-			renderAll
-			activePane={activeTab ?? undefined}
-			panes={tabs
+		<Box
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+			}}
+		>
+			{tabs
 				.filter((id) => notes.some((note) => note.id === id))
 				.map((id) => {
 					const note = notes.find((note) => note.id === id) as INote;
-					return {
-						id: note.id,
-						content: (
+					const isActiveTab = activeTab === note.id;
+					return (
+						<Box
+							key={note.id}
+							display={isActiveTab ? 'flex' : 'none'}
+							w="100%"
+							h="100%"
+						>
 							<NoteEditor
+								key={note.id}
 								note={note}
 								updateNote={(content) => {
 									// Skip updates with not changed data
@@ -45,9 +50,9 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 									updateNote({ ...note, content });
 								}}
 							/>
-						),
-					};
+						</Box>
+					);
 				})}
-		/>
+		</Box>
 	);
 };

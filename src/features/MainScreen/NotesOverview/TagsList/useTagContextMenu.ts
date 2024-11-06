@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { ContextMenuCallback, useContextMenu } from '@components/hooks/useContextMenu';
 import { ContextMenu } from '@electron/requests/contextMenu';
+import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 
 export enum TagContextMenu {
 	ADD = 'add',
