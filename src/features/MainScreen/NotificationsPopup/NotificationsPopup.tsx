@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaBell } from 'react-icons/fa6';
 import { useOutsideClick } from '@chakra-ui/react';
-import { Notifications as Notifications2 } from '@components/Notifications/Notifications';
+import { Notifications } from '@components/Notifications/Notifications';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 export const NotificationsPopup = () => {
@@ -38,7 +38,7 @@ export const NotificationsPopup = () => {
 	});
 
 	return (
-		<Notifications2
+		<Notifications
 			ref={ref}
 			isVisible={isVisible}
 			onClose={onClose}
