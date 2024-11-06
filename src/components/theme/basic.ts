@@ -65,6 +65,9 @@ export const basicTheme = extendTheme({
 			},
 		},
 	},
+	shadows: {
+		outline: '0 0 0 3px #0066ffaa',
+	},
 	colors: {
 		accent: {
 			// Accent color
@@ -203,8 +206,8 @@ export const basicTheme = extendTheme({
 				},
 				container: {
 					'&[data-status="info"]': {
-						backgroundColor: 'primary.200',
-						color: 'primary.500',
+						backgroundColor: 'accent.100',
+						color: 'accent.500',
 					},
 				},
 			},
