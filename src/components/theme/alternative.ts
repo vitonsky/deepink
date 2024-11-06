@@ -23,10 +23,10 @@ export const alternativeTheme = extendTheme(basicTheme, {
 		},
 		primary: {
 			// Primary color for controls
-			200: '#dbc490',
-			300: '#d3b97c',
-			500: '#000',
-			700: '#d3b97c',
+			200: '#b78665',
+			300: '#ae7f5f',
+			500: '#fff',
+			700: '#ae7f5f',
 		},
 		typography: {
 			primary: '#000',
