@@ -49,6 +49,7 @@ import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
+import { RichEditor } from './RichEditor/RichEditor';
 
 export type NoteEditorProps = {
 	note: INote;
@@ -380,26 +381,40 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				/>
 			</HStack>
 
-			<Box
-				sx={{
-					width: '100%',
-					display: 'grid',
-					overflow: 'hidden',
-					gap: '0.3rem',
-					flexGrow: '100',
-					flex: 1,
-					gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-				}}
-			>
+			{/* TODO: toggle editors with button and remember in settings */}
+			{true ? (
 				<Box
-					as={MonacoEditor}
-					value={text}
-					setValue={setText}
-					flexGrow="100"
-					uploadFile={uploadFile}
-				/>
-				<NoteScreen note={note} update={onTextUpdate} />
-			</Box>
+					sx={{
+						display: 'flex',
+						width: '100%',
+						height: '100%',
+						overflow: 'hidden',
+					}}
+				>
+					<RichEditor value={text} />
+				</Box>
+			) : (
+				<Box
+					sx={{
+						width: '100%',
+						display: 'grid',
+						overflow: 'hidden',
+						gap: '0.3rem',
+						flexGrow: '100',
+						flex: 1,
+						gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+					}}
+				>
+					<Box
+						as={MonacoEditor}
+						value={text}
+						setValue={setText}
+						flexGrow="100"
+						uploadFile={uploadFile}
+					/>
+					<NoteScreen note={note} update={onTextUpdate} />
+				</Box>
+			)}
 
 			{sidePanel === 'backlinks' && (
 				<VStack
