@@ -6,7 +6,7 @@ import { HashtagNode } from '@lexical/hashtag';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';
-import { $convertFromMarkdownString, TRANSFORMERS } from '@lexical/markdown';
+import { $convertFromMarkdownString, CHECK_LIST, TRANSFORMERS } from '@lexical/markdown';
 import { OverflowNode } from '@lexical/overflow';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
@@ -37,12 +37,14 @@ export type RichEditorProps = BoxProps & {
 	value: string;
 };
 
+const customTransformers = [CHECK_LIST, ...TRANSFORMERS];
+
 export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 	const [editor] = useLexicalComposerContext();
 
 	useEffect(() => {
 		editor.update(() => {
-			$convertFromMarkdownString(value, TRANSFORMERS);
+			$convertFromMarkdownString(value, customTransformers);
 		});
 	}, [editor, value]);
 
@@ -73,13 +75,13 @@ export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 				}
 				ErrorBoundary={LexicalErrorBoundary}
 			/>
+			<MarkdownShortcutPlugin transformers={customTransformers} />
 			<HistoryPlugin />
 			<AutoFocusPlugin />
 			<ListPlugin />
 			<CheckListPlugin />
 			<TabIndentationPlugin />
 			<LinkPlugin />
-			<MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 
 			<ClearEditorPlugin />
 			<ClickableLinkPlugin />
@@ -92,7 +94,7 @@ export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 	);
 };
 
-// TODO: make links clickable
+// TODO: make links editable
 // TODO: support attachments
 // TODO: move lines with alt+arrows
 // TODO: support images
