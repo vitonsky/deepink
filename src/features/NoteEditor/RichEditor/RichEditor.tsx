@@ -1,12 +1,17 @@
 /* eslint-disable spellcheck/spell-checker */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, BoxProps } from '@chakra-ui/react';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { HashtagNode } from '@lexical/hashtag';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';
-import { $convertFromMarkdownString, CHECK_LIST, TRANSFORMERS } from '@lexical/markdown';
+import {
+	$convertFromMarkdownString,
+	$convertToMarkdownString,
+	CHECK_LIST,
+	TRANSFORMERS,
+} from '@lexical/markdown';
 import { OverflowNode } from '@lexical/overflow';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
@@ -35,18 +40,35 @@ import { MarkdownChecklistShortcutPlugin } from './plugins/MarkdownChecklistShor
 
 export type RichEditorProps = BoxProps & {
 	value: string;
+	onValueChanged?: (value: string) => void;
 };
 
 const customTransformers = [CHECK_LIST, ...TRANSFORMERS];
 
-export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
+export const RichEditorContent = ({
+	value,
+	onValueChanged,
+	...props
+}: RichEditorProps) => {
 	const [editor] = useLexicalComposerContext();
 
+	const valueRef = useRef<string | null>(null);
 	useEffect(() => {
+		// Skip updates that has been sent from this component
+		if (valueRef.current === value) return;
+
 		editor.update(() => {
-			$convertFromMarkdownString(value, customTransformers);
+			$convertFromMarkdownString(value, customTransformers, undefined, true, false);
 		});
 	}, [editor, value]);
+
+	const onChange = (value: string) => {
+		valueRef.current = value;
+
+		if (onValueChanged) {
+			onValueChanged(value);
+		}
+	};
 
 	return (
 		<Box position="relative" display="flex" width="100%" height="100%">
@@ -89,7 +111,15 @@ export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 			<HashtagPlugin />
 			<HorizontalRulePlugin />
 			<TablePlugin />
-			<OnChangePlugin onChange={console.log} />
+			<OnChangePlugin
+				onChange={(_, editor) => {
+					editor.update(() => {
+						onChange(
+							$convertToMarkdownString(customTransformers, undefined, true),
+						);
+					});
+				}}
+			/>
 			<MarkdownChecklistShortcutPlugin />
 		</Box>
 	);
@@ -100,6 +130,7 @@ export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 // TODO: move lines with alt+arrows
 // TODO: support images
 // TODO: support videos
+// TODO: improve styles
 // TODO: copy markdown text by selection, not rich text
 // TODO: when user start remove markdown element - transform it to markdown and remove single char instead
 // TODO: add context menu for block elements, to toggle list types

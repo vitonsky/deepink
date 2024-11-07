@@ -391,7 +391,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						overflow: 'hidden',
 					}}
 				>
-					<RichEditor value={text} />
+					<RichEditor value={text} onValueChanged={setText} />
 				</Box>
 			) : (
 				<Box
