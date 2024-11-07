@@ -49,7 +49,7 @@ export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 	}, [editor, value]);
 
 	return (
-		<>
+		<Box position="relative" display="flex" width="100%" height="100%">
 			<RichTextPlugin
 				contentEditable={
 					<Box
@@ -69,6 +69,7 @@ export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 						right={0}
 						bottom={0}
 						padding="1rem"
+						pointerEvents="none"
 					>
 						Enter some text...
 					</Box>
@@ -90,7 +91,7 @@ export const RichEditorContent = ({ value, ...props }: RichEditorProps) => {
 			<TablePlugin />
 			<OnChangePlugin onChange={console.log} />
 			<MarkdownChecklistShortcutPlugin />
-		</>
+		</Box>
 	);
 };
 
