@@ -31,6 +31,7 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
 import { ImageNode } from './nodes/ImageNode';
+import { RawTextNode } from './nodes/RawTextNode';
 import theme from './PlaygroundEditorTheme';
 import ImagesPlugin from './plugins/ImagesPlugin';
 import { MarkdownChecklistShortcutPlugin } from './plugins/MarkdownChecklistShortcutPlugin';
@@ -158,6 +159,7 @@ export const RichEditor = (props: RichEditorProps) => {
 					// });
 				},
 				nodes: [
+					RawTextNode,
 					ImageNode,
 					LinkNode,
 					AutoLinkNode,

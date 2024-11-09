@@ -9,7 +9,7 @@ import {
 	IS_ITALIC,
 	LexicalNode,
 } from 'lexical';
-import { Content, Image, Paragraph, Root, Text } from 'mdast';
+import { Content, HTML, Image, Paragraph, Root, Text } from 'mdast';
 // import remarkBreaks from 'remark-breaks';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
@@ -20,6 +20,7 @@ import { unified } from 'unified';
 import { u } from 'unist-builder';
 
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
+import { $createRawTextNode } from '../nodes/RawTextNode';
 
 const markdownProcessor = unified()
 	.use(remarkParse)
@@ -40,11 +41,21 @@ const markdownProcessor = unified()
 	})
 	.freeze();
 
+const dumpMarkdownNode = (node: Content) =>
+	markdownProcessor.stringify(
+		u('root', {
+			children: [node],
+		}) satisfies Root,
+	);
+
 export const $convertFromMarkdownString = (rawMarkdown: string) => {
 	const mdTree = markdownProcessor.parse(rawMarkdown);
 
 	function transformMdNode(node: Content): LexicalNode {
 		switch (node.type) {
+			case 'text': {
+				return $createTextNode(node.value);
+			}
 			case 'paragraph': {
 				const paragraph = $createParagraphNode();
 				paragraph.append(...transformMdTree(node.children));
@@ -75,11 +86,8 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 		}
 
-		const value = 'value' in node ? node.value : '';
-
-		// console.log("Unknown node", value, node);
-
-		return $createTextNode(value);
+		// console.log("Unknown node", node);
+		return $createRawTextNode({ content: dumpMarkdownNode(node) });
 	}
 
 	function transformMdTree(mdTree: Content[]): LexicalNode[] {
@@ -186,7 +194,12 @@ export const $convertToMarkdownString = () => {
 			}) satisfies Image;
 		}
 
-		return u('text', { value: node.getTextContent() }) satisfies Text;
+		if ($isTextNode(node)) {
+			return u('text', { value: node.getTextContent() }) satisfies Text;
+		}
+
+		// Default node
+		return u('html', { value: node.getTextContent() }) as HTML;
 	};
 
 	const childs = rootNode.getChildren();
