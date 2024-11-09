@@ -12,6 +12,8 @@ if (!rootNode) {
 	throw new Error('Root node not found!');
 }
 
+document.body.style.overflow = 'hidden';
+
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
 	<Provider store={store}>

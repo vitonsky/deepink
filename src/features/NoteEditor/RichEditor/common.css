@@ -1,0 +1,5 @@
+.editor-image,
+.editor-image img {
+	display: flex;
+	max-width: 100%;
+}

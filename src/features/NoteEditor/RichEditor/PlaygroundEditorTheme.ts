@@ -9,6 +9,7 @@
 
 import type { EditorThemeClasses } from 'lexical';
 
+import './common.css';
 import './PlaygroundEditorTheme.css';
 
 export const theme: EditorThemeClasses = {

@@ -1,5 +1,6 @@
 /* eslint-disable spellcheck/spell-checker */
 import React, { useEffect, useRef } from 'react';
+import { $isParagraphNode } from 'lexical';
 import { Box, BoxProps } from '@chakra-ui/react';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { HashtagNode } from '@lexical/hashtag';
@@ -10,6 +11,8 @@ import {
 	$convertFromMarkdownString,
 	$convertToMarkdownString,
 	CHECK_LIST,
+	ElementTransformer,
+	LINK,
 	TRANSFORMERS,
 } from '@lexical/markdown';
 import { OverflowNode } from '@lexical/overflow';
@@ -35,7 +38,9 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
+import { $createImageNode, $isImageNode, ImageNode } from './nodes/ImageNode';
 import theme from './PlaygroundEditorTheme';
+import ImagesPlugin from './plugins/ImagesPlugin';
 import { MarkdownChecklistShortcutPlugin } from './plugins/MarkdownChecklistShortcutPlugin';
 
 export type RichEditorProps = BoxProps & {
@@ -43,7 +48,39 @@ export type RichEditorProps = BoxProps & {
 	onValueChanged?: (value: string) => void;
 };
 
-const customTransformers = [CHECK_LIST, ...TRANSFORMERS];
+// TODO: parse images in lines and insert image as text node, not as block (paragraph)
+export const imageTransformer: ElementTransformer = {
+	dependencies: [ImageNode],
+	export: (node) => {
+		let imageNode: ImageNode | null = null;
+		if ($isParagraphNode(node)) {
+			imageNode =
+				node.getChildren().find((node) => node instanceof ImageNode) || null;
+		} else if ($isImageNode(node)) {
+			imageNode = node;
+		}
+
+		// console.log('EXPORT IMAGE', node, (node as ParagraphNode).getChildren());
+		const result = imageNode
+			? `![${imageNode.getAltText()}](${imageNode.getSrc()})`
+			: null;
+
+		// console.log("RESULT", result);
+		return result;
+	},
+	regExp: /!\[(.*?)\]\((.+)\)/i,
+	replace: (parent, _children, match) => {
+		parent.append(
+			$createImageNode({
+				altText: match[1] || '',
+				src: match[2],
+			}),
+		);
+	},
+	type: 'element',
+};
+
+const customTransformers = [LINK, CHECK_LIST, imageTransformer, ...TRANSFORMERS];
 
 export const RichEditorContent = ({
 	value,
@@ -105,6 +142,7 @@ export const RichEditorContent = ({
 			<CheckListPlugin />
 			<TabIndentationPlugin />
 			<LinkPlugin />
+			<ImagesPlugin />
 
 			<ClearEditorPlugin />
 			<ClickableLinkPlugin />
@@ -150,6 +188,7 @@ export const RichEditor = (props: RichEditorProps) => {
 					// });
 				},
 				nodes: [
+					ImageNode,
 					LinkNode,
 					AutoLinkNode,
 					ListNode,
