@@ -1,20 +1,12 @@
 /* eslint-disable spellcheck/spell-checker */
 import React, { useEffect, useRef } from 'react';
-import { $isParagraphNode } from 'lexical';
 import { Box, BoxProps } from '@chakra-ui/react';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { HashtagNode } from '@lexical/hashtag';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';
-import {
-	$convertFromMarkdownString,
-	$convertToMarkdownString,
-	CHECK_LIST,
-	ElementTransformer,
-	LINK,
-	TRANSFORMERS,
-} from '@lexical/markdown';
+import { CHECK_LIST, LINK, TRANSFORMERS } from '@lexical/markdown';
 import { OverflowNode } from '@lexical/overflow';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
@@ -38,49 +30,21 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
-import { $createImageNode, $isImageNode, ImageNode } from './nodes/ImageNode';
+import { ImageNode } from './nodes/ImageNode';
 import theme from './PlaygroundEditorTheme';
 import ImagesPlugin from './plugins/ImagesPlugin';
 import { MarkdownChecklistShortcutPlugin } from './plugins/MarkdownChecklistShortcutPlugin';
+import {
+	$convertFromMarkdownString,
+	$convertToMarkdownString,
+} from './plugins/markdownParser';
 
 export type RichEditorProps = BoxProps & {
 	value: string;
 	onValueChanged?: (value: string) => void;
 };
 
-// TODO: parse images in lines and insert image as text node, not as block (paragraph)
-export const imageTransformer: ElementTransformer = {
-	dependencies: [ImageNode],
-	export: (node) => {
-		let imageNode: ImageNode | null = null;
-		if ($isParagraphNode(node)) {
-			imageNode =
-				node.getChildren().find((node) => node instanceof ImageNode) || null;
-		} else if ($isImageNode(node)) {
-			imageNode = node;
-		}
-
-		// console.log('EXPORT IMAGE', node, (node as ParagraphNode).getChildren());
-		const result = imageNode
-			? `![${imageNode.getAltText()}](${imageNode.getSrc()})`
-			: null;
-
-		// console.log("RESULT", result);
-		return result;
-	},
-	regExp: /!\[(.*?)\]\((.+)\)/i,
-	replace: (parent, _children, match) => {
-		parent.append(
-			$createImageNode({
-				altText: match[1] || '',
-				src: match[2],
-			}),
-		);
-	},
-	type: 'element',
-};
-
-const customTransformers = [LINK, CHECK_LIST, imageTransformer, ...TRANSFORMERS];
+const customTransformers = [LINK, CHECK_LIST, ...TRANSFORMERS];
 
 export const RichEditorContent = ({
 	value,
@@ -95,8 +59,14 @@ export const RichEditorContent = ({
 		if (valueRef.current === value) return;
 
 		editor.update(() => {
-			$convertFromMarkdownString(value, customTransformers, undefined, true, false);
+			$convertFromMarkdownString(value);
 		});
+
+		(window as any)['update'] = (text: string) => {
+			editor.update(() => {
+				$convertFromMarkdownString(text);
+			});
+		};
 	}, [editor, value]);
 
 	const onChange = (value: string) => {
@@ -152,9 +122,7 @@ export const RichEditorContent = ({
 			<OnChangePlugin
 				onChange={(_, editor) => {
 					editor.update(() => {
-						onChange(
-							$convertToMarkdownString(customTransformers, undefined, true),
-						);
+						onChange($convertToMarkdownString());
 					});
 				}}
 			/>
@@ -179,7 +147,9 @@ export const RichEditor = (props: RichEditorProps) => {
 				namespace: 'RichEditor',
 				theme,
 				editorState: (editor) => {
-					editor.registerUpdateListener(console.warn);
+					editor.registerUpdateListener(() => {
+						console.warn('Updated state', editor.getEditorState().toJSON());
+					});
 					// editor.update(() => {
 					// 	$convertFromMarkdownString(
 					// 		'Hello **world**! \n* [x] Unchecked item\n\n Hello again',
