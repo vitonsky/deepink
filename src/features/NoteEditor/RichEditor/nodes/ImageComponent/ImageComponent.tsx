@@ -20,10 +20,6 @@ import {
 	NodeKey,
 } from 'lexical';
 import {
-	Modal,
-	ModalBody,
-	ModalContent,
-	ModalOverlay,
 	Popover,
 	PopoverArrow,
 	PopoverBody,
@@ -122,8 +118,6 @@ export default function ImageComponent({
 	const [isMenuOpened, setIsMenuOpened] = useState(false);
 	const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
 
-	const [isImageOpened, setIsImageOpened] = useState(false);
-
 	const [isLoadError, setIsLoadError] = useState<boolean>(false);
 	useEffect(() => {
 		setIsLoadError(false);
@@ -171,7 +165,7 @@ export default function ImageComponent({
 			event.target instanceof Node &&
 			containerRef.current.contains(event.target)
 		) {
-			setIsImageOpened(true);
+			containerRef.current.requestFullscreen();
 			return true;
 		}
 
@@ -283,41 +277,6 @@ export default function ImageComponent({
 					</PopoverBody>
 				</PopoverContent>
 			</Portal>
-			{isImageOpened && (
-				<Modal isOpen onClose={() => setIsImageOpened(false)} closeOnEsc>
-					<ModalOverlay />
-					<ModalContent
-						backgroundColor="transparent"
-						borderRadius={0}
-						w="inherit"
-						h="inherit"
-						maxWidth="max-content"
-						maxHeight="100%"
-						margin={0}
-						boxShadow="none"
-						justifyContent="center"
-						alignItems="center"
-					>
-						<ModalBody
-							display="flex"
-							overflow="hidden"
-							justifyContent="center"
-							padding={0}
-							maxW="100%"
-							maxH="100%"
-						>
-							<LazyImage
-								src={src}
-								altText={altText}
-								width={width}
-								height={height}
-								maxWidth={maxWidth}
-								onError={() => setIsLoadError(true)}
-							/>
-						</ModalBody>
-					</ModalContent>
-				</Modal>
-			)}
 		</Popover>
 	);
 }
