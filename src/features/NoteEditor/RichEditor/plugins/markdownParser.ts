@@ -173,7 +173,12 @@ export const $convertToMarkdownString = () => {
 
 			const paragraph = u('paragraph', { children: [] }) as Paragraph;
 
-			if (node.getTextContent().trim().length === 0) {
+			const nestedNodes = node.getChildren();
+			if (
+				nestedNodes.length === 0 ||
+				(nestedNodes.every((node) => $isTextNode(node)) &&
+					node.getTextContent().trim().length === 0)
+			) {
 				// return u('text', { value: '\n' }) satisfies Text;
 				paragraph.children.push(u('text', { value: '' }) satisfies Text);
 				return paragraph;
