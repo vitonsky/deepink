@@ -9,7 +9,18 @@ import {
 	IS_ITALIC,
 	LexicalNode,
 } from 'lexical';
-import { Content, Heading, HTML, Image, Paragraph, Root, Text } from 'mdast';
+import {
+	Content,
+	Heading,
+	HTML,
+	Image,
+	Link,
+	List,
+	ListItem,
+	Paragraph,
+	Root,
+	Text,
+} from 'mdast';
 // import remarkBreaks from 'remark-breaks';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
@@ -18,6 +29,14 @@ import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { u } from 'unist-builder';
+import { $createLinkNode, $isLinkNode } from '@lexical/link';
+import {
+	$createListItemNode,
+	$createListNode,
+	$isListItemNode,
+	$isListNode,
+	ListType,
+} from '@lexical/list';
 import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
 
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
@@ -74,6 +93,31 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				heading.append(...transformMdTree(node.children));
 
 				return heading;
+			}
+			case 'list': {
+				let listType: ListType = 'bullet';
+				if (node.children.some((item) => item.checked !== undefined)) {
+					listType = 'check';
+				} else if (node.ordered || node.start !== undefined) {
+					listType = 'number';
+				}
+
+				const list = $createListNode(listType);
+				list.append(...transformMdTree(node.children));
+
+				return list;
+			}
+			case 'listItem': {
+				const listItem = $createListItemNode(node.checked ?? undefined);
+				listItem.append(...transformMdTree(node.children));
+
+				return listItem;
+			}
+			case 'link': {
+				const link = $createLinkNode(node.url, { title: node.title });
+				link.append(...transformMdTree(node.children));
+
+				return link;
 			}
 			case 'emphasis': {
 				const paragraph = $createParagraphNode();
@@ -208,6 +252,34 @@ export const $convertToMarkdownString = () => {
 
 		if ($isTextNode(node)) {
 			return u('text', { value: node.getTextContent() }) satisfies Text;
+		}
+
+		// TODO: temporary disabled due to infinite recursion. Fix it!
+		if (0) {
+			if ($isListNode(node)) {
+				return u('list', {
+					type: node.getListType(),
+					children: node
+						.getChildren()
+						.map(transformMdASTNode) as List['children'],
+				}) satisfies List;
+			}
+			if ($isListItemNode(node)) {
+				return u('listItem', {
+					checked: node.getChecked(),
+					children: node
+						.getChildren()
+						.map(transformMdASTNode) as ListItem['children'],
+				}) satisfies ListItem;
+			}
+		}
+
+		if ($isLinkNode(node)) {
+			return u('link', {
+				url: node.getURL(),
+				alt: node.getTitle(),
+				children: node.getChildren().map(transformMdASTNode) as Link['children'],
+			}) satisfies Link;
 		}
 
 		if ($isHeadingNode(node)) {
