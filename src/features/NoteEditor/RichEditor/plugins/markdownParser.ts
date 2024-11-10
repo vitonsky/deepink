@@ -269,9 +269,13 @@ export const $convertToMarkdownString = () => {
 			return u('listItem', {
 				spread: false,
 				checked: node.getChecked(),
-				children: node
-					.getChildren()
-					.map(transformMdASTNode) as ListItem['children'],
+				children: [
+					u('paragraph', {
+						children: node
+							.getChildren()
+							.map(transformMdASTNode) as Paragraph['children'],
+					}) as Paragraph,
+				],
 			}) satisfies ListItem;
 		}
 

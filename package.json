@@ -113,7 +113,7 @@
 		"react-redux": "^9.1.2",
 		"remark-breaks": "^3.0.3",
 		"remark-frontmatter": "^4.0.1",
-		"remark-gfm": "^3.0.1",
+		"remark-gfm": "^4.0.0",
 		"remark-parse": "^10.0.2",
 		"remark-parse-frontmatter": "^1.0.3",
 		"remark-stringify": "^10.0.3",
