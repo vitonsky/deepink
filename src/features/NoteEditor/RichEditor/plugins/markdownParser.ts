@@ -9,7 +9,7 @@ import {
 	IS_ITALIC,
 	LexicalNode,
 } from 'lexical';
-import { Content, HTML, Image, Paragraph, Root, Text } from 'mdast';
+import { Content, Heading, HTML, Image, Paragraph, Root, Text } from 'mdast';
 // import remarkBreaks from 'remark-breaks';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
@@ -18,6 +18,7 @@ import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { u } from 'unist-builder';
+import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
 
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
 import { $createRawTextNode } from '../nodes/RawTextNode';
@@ -67,6 +68,12 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 					src: node.url,
 					altText: node.alt || '',
 				});
+			}
+			case 'heading': {
+				const heading = $createHeadingNode(`h${node.depth}`);
+				heading.append(...transformMdTree(node.children));
+
+				return heading;
 			}
 			case 'emphasis': {
 				const paragraph = $createParagraphNode();
@@ -201,6 +208,19 @@ export const $convertToMarkdownString = () => {
 
 		if ($isTextNode(node)) {
 			return u('text', { value: node.getTextContent() }) satisfies Text;
+		}
+
+		if ($isHeadingNode(node)) {
+			const depth = Math.max(
+				1,
+				Math.min(parseInt(node.getTag().slice(1)), 6),
+			) as Heading['depth'];
+			return u('heading', {
+				depth: depth,
+				children: node
+					.getChildren()
+					.map(transformMdASTNode) as Heading['children'],
+			}) satisfies Heading;
 		}
 
 		// Default node
