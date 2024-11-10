@@ -49,7 +49,6 @@ const markdownProcessor = unified()
 	.use(remarkGfm)
 	// .use(remarkBreaks)
 	.use(remarkStringify, {
-		unsafe: [],
 		bullet: '-',
 		listItemIndent: 'one',
 		join: [
@@ -96,7 +95,11 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 			case 'list': {
 				let listType: ListType = 'bullet';
-				if (node.children.some((item) => item.checked !== undefined)) {
+				if (
+					node.children.some(
+						(item) => item.checked !== undefined && item.checked !== null,
+					)
+				) {
 					listType = 'check';
 				} else if (node.ordered || node.start !== undefined) {
 					listType = 'number';
@@ -254,24 +257,22 @@ export const $convertToMarkdownString = () => {
 			return u('text', { value: node.getTextContent() }) satisfies Text;
 		}
 
-		// TODO: temporary disabled due to infinite recursion. Fix it!
-		if (0) {
-			if ($isListNode(node)) {
-				return u('list', {
-					type: node.getListType(),
-					children: node
-						.getChildren()
-						.map(transformMdASTNode) as List['children'],
-				}) satisfies List;
-			}
-			if ($isListItemNode(node)) {
-				return u('listItem', {
-					checked: node.getChecked(),
-					children: node
-						.getChildren()
-						.map(transformMdASTNode) as ListItem['children'],
-				}) satisfies ListItem;
-			}
+		if ($isListNode(node)) {
+			return u('list', {
+				ordered: false,
+				start: null,
+				spread: false,
+				children: node.getChildren().map(transformMdASTNode) as List['children'],
+			}) satisfies List;
+		}
+		if ($isListItemNode(node)) {
+			return u('listItem', {
+				spread: false,
+				checked: node.getChecked(),
+				children: node
+					.getChildren()
+					.map(transformMdASTNode) as ListItem['children'],
+			}) satisfies ListItem;
 		}
 
 		if ($isLinkNode(node)) {
