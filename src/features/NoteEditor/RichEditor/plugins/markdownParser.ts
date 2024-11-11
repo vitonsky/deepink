@@ -101,7 +101,7 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 					)
 				) {
 					listType = 'check';
-				} else if (node.ordered || node.start !== undefined) {
+				} else if (node.ordered || typeof node.start === 'number') {
 					listType = 'number';
 				}
 
@@ -259,8 +259,8 @@ export const $convertToMarkdownString = () => {
 
 		if ($isListNode(node)) {
 			return u('list', {
-				ordered: false,
-				start: null,
+				ordered: node.getTag() === 'ol',
+				start: node.getStart(),
 				spread: false,
 				children: node.getChildren().map(transformMdASTNode) as List['children'],
 			}) satisfies List;
