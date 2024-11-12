@@ -6,14 +6,17 @@ import {
 	$isParagraphNode,
 	$isTextNode,
 	IS_BOLD,
+	IS_CODE,
 	IS_ITALIC,
 	LexicalNode,
 } from 'lexical';
 import {
+	Code,
 	Content,
 	Heading,
 	HTML,
 	Image,
+	InlineCode,
 	Link,
 	List,
 	ListItem,
@@ -22,13 +25,12 @@ import {
 	Text,
 } from 'mdast';
 // import remarkBreaks from 'remark-breaks';
-import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
-import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { u } from 'unist-builder';
+import { $createCodeNode, $isCodeNode } from '@lexical/code';
 import { $createLinkNode, $isLinkNode } from '@lexical/link';
 import {
 	$createListItemNode,
@@ -44,8 +46,8 @@ import { $createRawTextNode } from '../nodes/RawTextNode';
 
 const markdownProcessor = unified()
 	.use(remarkParse)
-	.use(remarkParseFrontmatter)
-	.use(remarkFrontmatter, ['yaml', 'toml'])
+	// .use(remarkParseFrontmatter)
+	// .use(remarkFrontmatter, ['yaml', 'toml'])
 	.use(remarkGfm)
 	// .use(remarkBreaks)
 	.use(remarkStringify, {
@@ -121,6 +123,17 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				link.append(...transformMdTree(node.children));
 
 				return link;
+			}
+			case 'code': {
+				const code = $createCodeNode(node.lang);
+				code.append($createTextNode(node.value));
+
+				return code;
+			}
+			case 'inlineCode': {
+				const text = $createTextNode(node.value);
+				text.setFormat(IS_CODE);
+				return text;
 			}
 			case 'emphasis': {
 				const paragraph = $createParagraphNode();
@@ -254,7 +267,20 @@ export const $convertToMarkdownString = () => {
 		}
 
 		if ($isTextNode(node)) {
+			if (node.hasFormat('code')) {
+				return u('inlineCode', {
+					value: node.getTextContent(),
+				}) satisfies InlineCode;
+			}
+
 			return u('text', { value: node.getTextContent() }) satisfies Text;
+		}
+
+		if ($isCodeNode(node)) {
+			return u('code', {
+				lang: node.getLanguage(),
+				value: node.getTextContent(),
+			}) satisfies Code;
 		}
 
 		if ($isListNode(node)) {
