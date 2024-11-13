@@ -25,6 +25,7 @@ import {
 	Root,
 	Strong,
 	Text,
+	ThematicBreak,
 } from 'mdast';
 // import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
@@ -168,6 +169,10 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				const format = $createFormattingNodeNode({ tag: 'del' });
 				format.append(...transformMdTree(node.children));
 
+				return format;
+			}
+			case 'thematicBreak': {
+				const format = $createFormattingNodeNode({ tag: 'hr' });
 				return format;
 			}
 		}
@@ -325,6 +330,9 @@ export const $convertToMarkdownString = () => {
 							.getChildren()
 							.map(transformMdASTNode) as Strong['children'],
 					}) satisfies Strong;
+				}
+				case 'hr': {
+					return u('thematicBreak') satisfies ThematicBreak;
 				}
 			}
 		}
