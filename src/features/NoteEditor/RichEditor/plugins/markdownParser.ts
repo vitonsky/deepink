@@ -9,6 +9,7 @@ import {
 	LexicalNode,
 } from 'lexical';
 import {
+	Blockquote,
 	Code,
 	Content,
 	Delete,
@@ -40,7 +41,12 @@ import {
 	$isListNode,
 	ListType,
 } from '@lexical/list';
-import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
+import {
+	$createHeadingNode,
+	$createQuoteNode,
+	$isHeadingNode,
+	$isQuoteNode,
+} from '@lexical/rich-text';
 
 import {
 	$createFormattingNodeNode,
@@ -128,6 +134,12 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				link.append(...transformMdTree(node.children));
 
 				return link;
+			}
+			case 'blockquote': {
+				const quote = $createQuoteNode();
+				quote.append(...transformMdTree(node.children));
+
+				return quote;
 			}
 			case 'code': {
 				const code = $createCodeNode(node.lang);
@@ -345,6 +357,14 @@ export const $convertToMarkdownString = () => {
 				alt: node.getTitle(),
 				children: node.getChildren().map(transformMdASTNode) as Link['children'],
 			}) satisfies Link;
+		}
+
+		if ($isQuoteNode(node)) {
+			return u('blockquote', {
+				children: node
+					.getChildren()
+					.map(transformMdASTNode) as Blockquote['children'],
+			}) satisfies Blockquote;
 		}
 
 		if ($isHeadingNode(node)) {
