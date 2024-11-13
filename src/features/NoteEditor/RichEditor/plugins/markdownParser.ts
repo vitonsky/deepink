@@ -5,14 +5,14 @@ import {
 	$getRoot,
 	$isParagraphNode,
 	$isTextNode,
-	IS_BOLD,
 	IS_CODE,
-	IS_ITALIC,
 	LexicalNode,
 } from 'lexical';
 import {
 	Code,
 	Content,
+	Delete,
+	Emphasis,
 	Heading,
 	HTML,
 	Image,
@@ -22,6 +22,7 @@ import {
 	ListItem,
 	Paragraph,
 	Root,
+	Strong,
 	Text,
 } from 'mdast';
 // import remarkBreaks from 'remark-breaks';
@@ -41,6 +42,10 @@ import {
 } from '@lexical/list';
 import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
 
+import {
+	$createFormattingNodeNode,
+	$isFormattingNodeNode,
+} from '../nodes/FormattingNode';
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
 import { $createRawTextNode } from '../nodes/RawTextNode';
 
@@ -136,20 +141,22 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				return text;
 			}
 			case 'emphasis': {
-				const paragraph = $createParagraphNode();
-				paragraph.setTextFormat(IS_ITALIC);
+				const format = $createFormattingNodeNode({ tag: 'em' });
+				format.append(...transformMdTree(node.children));
 
-				paragraph.append(...transformMdTree(node.children));
-
-				return paragraph;
+				return format;
 			}
 			case 'strong': {
-				const paragraph = $createParagraphNode();
-				paragraph.setTextFormat(IS_BOLD);
+				const format = $createFormattingNodeNode({ tag: 'b' });
+				format.append(...transformMdTree(node.children));
 
-				paragraph.append(...transformMdTree(node.children));
+				return format;
+			}
+			case 'delete': {
+				const format = $createFormattingNodeNode({ tag: 'del' });
+				format.append(...transformMdTree(node.children));
 
-				return paragraph;
+				return format;
 			}
 		}
 
@@ -281,6 +288,33 @@ export const $convertToMarkdownString = () => {
 				lang: node.getLanguage(),
 				value: node.getTextContent(),
 			}) satisfies Code;
+		}
+
+		if ($isFormattingNodeNode(node)) {
+			const tagName = node.getTagName();
+			switch (tagName) {
+				case 'em': {
+					return u('emphasis', {
+						children: node
+							.getChildren()
+							.map(transformMdASTNode) as Emphasis['children'],
+					}) satisfies Emphasis;
+				}
+				case 'del': {
+					return u('delete', {
+						children: node
+							.getChildren()
+							.map(transformMdASTNode) as Delete['children'],
+					}) satisfies Delete;
+				}
+				case 'b': {
+					return u('strong', {
+						children: node
+							.getChildren()
+							.map(transformMdASTNode) as Strong['children'],
+					}) satisfies Strong;
+				}
+			}
 		}
 
 		if ($isListNode(node)) {
