@@ -24,6 +24,9 @@ import {
 	Paragraph,
 	Root,
 	Strong,
+	Table,
+	TableCell,
+	TableRow,
 	Text,
 	ThematicBreak,
 } from 'mdast';
@@ -48,6 +51,15 @@ import {
 	$isHeadingNode,
 	$isQuoteNode,
 } from '@lexical/rich-text';
+import {
+	$createTableCellNode,
+	$createTableNode,
+	$createTableRowNode,
+	$isTableCellNode,
+	$isTableNode,
+	$isTableRowNode,
+	TableCellHeaderStates,
+} from '@lexical/table';
 
 import {
 	$createFormattingNodeNode,
@@ -142,6 +154,21 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 
 				return quote;
 			}
+			case 'table': {
+				const table = $createTableNode();
+				table.append(...transformMdTree(node.children, true));
+				return table;
+			}
+			case 'tableRow': {
+				const tableRow = $createTableRowNode();
+				tableRow.append(...transformMdTree(node.children, true));
+				return tableRow;
+			}
+			case 'tableCell': {
+				const tableCell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
+				tableCell.append(...transformMdTree(node.children, true));
+				return tableCell;
+			}
 			case 'code': {
 				const code = $createCodeNode(node.lang);
 				code.append($createTextNode(node.value));
@@ -181,31 +208,33 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 		return $createRawTextNode({ content: dumpMarkdownNode(node) });
 	}
 
-	function transformMdTree(mdTree: Content[]): LexicalNode[] {
+	function transformMdTree(mdTree: Content[], strictMode = false): LexicalNode[] {
 		const lexicalTree: LexicalNode[] = [];
 
 		let lastNode: Content | null = null;
 		for (const mdNode of mdTree) {
-			// Insert line breaks
-			if (
-				lastNode !== null &&
-				lastNode.position &&
-				mdNode !== null &&
-				mdNode.position
-			) {
-				const missedLines =
-					mdNode.position.start.line - lastNode.position.end.line;
+			if (!strictMode) {
+				// Insert line breaks
+				if (
+					lastNode !== null &&
+					lastNode.position &&
+					mdNode !== null &&
+					mdNode.position
+				) {
+					const missedLines =
+						mdNode.position.start.line - lastNode.position.end.line;
 
-				console.log('Missed lines', missedLines);
-				for (let i = 0; i < missedLines - 1; i++) {
-					lexicalTree.push($createParagraphNode());
+					console.log('Missed lines', missedLines);
+					for (let i = 0; i < missedLines - 1; i++) {
+						lexicalTree.push($createParagraphNode());
+					}
+
+					// if (missedLines > 0) {
+					// 	const p = $createParagraphNode();
+					// 	p.append($createTextNode('\n'.repeat(missedLines)));
+					// 	lexicalTree.push(p);
+					// }
 				}
-
-				// if (missedLines > 0) {
-				// 	const p = $createParagraphNode();
-				// 	p.append($createTextNode('\n'.repeat(missedLines)));
-				// 	lexicalTree.push(p);
-				// }
 			}
 
 			lastNode = mdNode;
@@ -373,6 +402,26 @@ export const $convertToMarkdownString = () => {
 					.getChildren()
 					.map(transformMdASTNode) as Blockquote['children'],
 			}) satisfies Blockquote;
+		}
+
+		if ($isTableNode(node)) {
+			return u('table', {
+				children: node.getChildren().map(transformMdASTNode) as Table['children'],
+			}) satisfies Table;
+		}
+		if ($isTableRowNode(node)) {
+			return u('tableRow', {
+				children: node
+					.getChildren()
+					.map(transformMdASTNode) as TableRow['children'],
+			}) satisfies TableRow;
+		}
+		if ($isTableCellNode(node)) {
+			return u('tableCell', {
+				children: node
+					.getChildren()
+					.map(transformMdASTNode) as TableCell['children'],
+			}) satisfies TableCell;
 		}
 
 		if ($isHeadingNode(node)) {
