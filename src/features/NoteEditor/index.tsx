@@ -383,7 +383,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 			{/* TODO: toggle editors with button and remember in settings */}
 			{true ? (
-				<Box
+				<HStack
 					sx={{
 						display: 'flex',
 						width: '100%',
@@ -391,8 +391,17 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						overflow: 'hidden',
 					}}
 				>
+					<Box
+						as={MonacoEditor}
+						value={text}
+						setValue={setText}
+						flexGrow="100"
+						uploadFile={uploadFile}
+						width="100%"
+						height="100%"
+					/>
 					<RichEditor value={text} onValueChanged={setText} />
-				</Box>
+				</HStack>
 			) : (
 				<Box
 					sx={{

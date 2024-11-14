@@ -8,7 +8,6 @@ import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';
 import { CHECK_LIST, LINK, TRANSFORMERS } from '@lexical/markdown';
 import { OverflowNode } from '@lexical/overflow';
-import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { ClearEditorPlugin } from '@lexical/react/LexicalClearEditorPlugin';
 import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin';
@@ -30,8 +29,9 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
+import { FormattingNode } from './nodes/FormattingNode';
 import { ImageNode } from './nodes/ImageNode';
-import { RawTextNode } from './nodes/RawTextNode';
+import { RawNode } from './nodes/RawNode';
 import theme from './PlaygroundEditorTheme';
 import ImagesPlugin from './plugins/ImagesPlugin';
 import { MarkdownChecklistShortcutPlugin } from './plugins/MarkdownChecklistShortcutPlugin';
@@ -53,6 +53,33 @@ export const RichEditorContent = ({
 	...props
 }: RichEditorProps) => {
 	const [editor] = useLexicalComposerContext();
+
+	const containerRef = useRef<HTMLDivElement | null>(null);
+	const isActive = () => {
+		const container = containerRef.current;
+		if (!container || !document.activeElement) return false;
+		if (
+			container !== document.activeElement &&
+			!container.contains(document.activeElement)
+		)
+			return false;
+
+		return true;
+	};
+
+	// toggle `editable` based on focus
+	useEffect(() => {
+		const onFocus = () => {
+			const editable = isActive();
+			console.log('Change editable state', editable);
+			editor.setEditable(editable);
+		};
+
+		document.addEventListener('focusin', onFocus);
+		return () => {
+			document.removeEventListener('focusin', onFocus);
+		};
+	}, [editor]);
 
 	const valueRef = useRef<string | null>(null);
 	useEffect(() => {
@@ -79,14 +106,32 @@ export const RichEditorContent = ({
 	};
 
 	return (
-		<Box position="relative" display="flex" width="100%" height="100%">
+		<Box
+			position="relative"
+			display="flex"
+			width="100%"
+			height="100%"
+			overflow="hidden"
+			sx={{
+				'& pre': {
+					whiteSpace: 'break-spaces',
+				},
+				'& hr': {
+					borderColor: 'surface.border',
+				},
+			}}
+		>
 			<RichTextPlugin
 				contentEditable={
 					<Box
+						ref={containerRef}
 						w="100%"
 						maxH="100%"
 						overflow="auto"
 						padding="1rem"
+						onMouseDown={() => {
+							editor.setEditable(true);
+						}}
 						{...props}
 						as={ContentEditable}
 					/>
@@ -108,7 +153,7 @@ export const RichEditorContent = ({
 			/>
 			<MarkdownShortcutPlugin transformers={customTransformers} />
 			<HistoryPlugin />
-			<AutoFocusPlugin />
+			{/* <AutoFocusPlugin /> */}
 			<ListPlugin />
 			<CheckListPlugin />
 			<TabIndentationPlugin />
@@ -122,7 +167,9 @@ export const RichEditorContent = ({
 			<TablePlugin />
 			<OnChangePlugin
 				onChange={(_, editor) => {
-					editor.update(() => {
+					if (!isActive()) return;
+
+					editor.read(() => {
 						onChange($convertToMarkdownString());
 					});
 				}}
@@ -149,7 +196,11 @@ export const RichEditor = (props: RichEditorProps) => {
 				theme,
 				editorState: (editor) => {
 					editor.registerUpdateListener(() => {
-						console.warn('Updated state', editor.getEditorState().toJSON());
+						console.warn(
+							'Updated state',
+							editor,
+							editor.getEditorState().toJSON(),
+						);
 					});
 					// editor.update(() => {
 					// 	$convertFromMarkdownString(
@@ -159,7 +210,8 @@ export const RichEditor = (props: RichEditorProps) => {
 					// });
 				},
 				nodes: [
-					RawTextNode,
+					FormattingNode,
+					RawNode,
 					ImageNode,
 					LinkNode,
 					AutoLinkNode,
