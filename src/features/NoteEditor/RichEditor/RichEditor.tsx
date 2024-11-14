@@ -33,6 +33,7 @@ import { FormattingNode } from './nodes/FormattingNode';
 import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
 import theme from './PlaygroundEditorTheme';
+import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
 import { MarkdownChecklistShortcutPlugin } from './plugins/MarkdownChecklistShortcutPlugin';
 import {
@@ -159,6 +160,7 @@ export const RichEditorContent = ({
 			<TabIndentationPlugin />
 			<LinkPlugin />
 			<ImagesPlugin />
+			<FormattingPlugin />
 
 			<ClearEditorPlugin />
 			<ClickableLinkPlugin />
