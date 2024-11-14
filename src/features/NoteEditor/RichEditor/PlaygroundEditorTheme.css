@@ -36,24 +36,31 @@
 }
 
 .PlaygroundEditorTheme__h1 {
-	font-size: 24px;
-	color: rgb(5 5 5);
-	font-weight: 400;
-	margin: 0;
+	padding-bottom: 0.3em;
+	font-size: 2em;
+	border-bottom: 1px solid var(--chakra-colors-surface-border);
 }
 
 .PlaygroundEditorTheme__h2 {
-	font-size: 15px;
-	color: rgb(101 103 107);
-	font-weight: 700;
-	margin: 0;
-	text-transform: uppercase;
+	padding-bottom: 0.3em;
+	font-size: 1.5em;
+	border-bottom: 1px solid var(--chakra-colors-surface-border);
 }
 
 .PlaygroundEditorTheme__h3 {
-	font-size: 12px;
-	margin: 0;
-	text-transform: uppercase;
+	font-size: 1.25em;
+}
+
+.PlaygroundEditorTheme__h4 {
+	font-size: 1em;
+}
+
+.PlaygroundEditorTheme__h5 {
+	font-size: 0.875em;
+}
+
+.PlaygroundEditorTheme__h6 {
+	font-size: 0.85em;
 }
 
 .PlaygroundEditorTheme__indent {
@@ -91,7 +98,8 @@
 }
 
 .PlaygroundEditorTheme__textCode {
-	background-color: rgb(240 242 245);
+	background-color: var(--chakra-colors-dim-100);
+	color: var(--chakra-colors-typography-primary);
 	padding: 1px 0.25rem;
 	font-family: Menlo, Consolas, Monaco, monospace;
 	font-size: 94%;
@@ -113,10 +121,11 @@
 }
 
 .PlaygroundEditorTheme__code {
-	background-color: rgb(240 242 245);
+	background-color: var(--chakra-colors-dim-100);
+	color: var(--chakra-colors-typography-primary);
 	font-family: Menlo, Consolas, Monaco, monospace;
 	display: block;
-	padding: 8px 8px 8px 52px;
+	padding: 0.8rem;
 	line-height: 1.53;
 	font-size: 13px;
 	margin: 0;
@@ -125,20 +134,7 @@
 	overflow-x: auto;
 	position: relative;
 	tab-size: 2;
-}
-
-.PlaygroundEditorTheme__code::before {
-	content: attr(data-gutter);
-	position: absolute;
-	background-color: #eee;
-	left: 0;
-	top: 0;
-	border-right: 1px solid #ccc;
-	padding: 8px;
-	color: #777;
-	white-space: pre-wrap;
-	text-align: right;
-	min-width: 25px;
+	border-radius: 4px;
 }
 
 .PlaygroundEditorTheme__table {
