@@ -17,27 +17,27 @@ export interface RawTextPayload {
 	key?: NodeKey;
 }
 
-export type SerializedRawTextNode = Spread<{}, SerializedElementNode>;
+export type SerializedRawNode = Spread<{}, SerializedElementNode>;
 
 function $convertPreElement(domNode: Node): null | DOMConversionOutput {
 	if (!(domNode instanceof HTMLPreElement)) {
 		return null;
 	}
-	const node = $createRawTextNode();
+	const node = $createRawNode();
 	return { node };
 }
 
-export class RawTextNode extends ElementNode {
+export class RawNode extends ElementNode {
 	static getType(): string {
 		return 'raw';
 	}
 
-	static clone(node: RawTextNode): RawTextNode {
-		return new RawTextNode(node.__key);
+	static clone(node: RawNode): RawNode {
+		return new RawNode(node.__key);
 	}
 
-	static importJSON(_serializedNode: SerializedRawTextNode): RawTextNode {
-		return $createRawTextNode();
+	static importJSON(_serializedNode: SerializedRawNode): RawNode {
+		return $createRawNode();
 	}
 
 	exportDOM(): DOMExportOutput {
@@ -58,7 +58,7 @@ export class RawTextNode extends ElementNode {
 		super(key);
 	}
 
-	exportJSON(): SerializedRawTextNode {
+	exportJSON(): SerializedRawNode {
 		return {
 			...super.exportJSON(),
 			type: this.getType(),
@@ -77,12 +77,10 @@ export class RawTextNode extends ElementNode {
 	}
 }
 
-export function $createRawTextNode({ key }: RawTextPayload = {}): RawTextNode {
-	return $applyNodeReplacement(new RawTextNode(key));
+export function $createRawNode({ key }: RawTextPayload = {}): RawNode {
+	return $applyNodeReplacement(new RawNode(key));
 }
 
-export function $isRawTextNode(
-	node: LexicalNode | null | undefined,
-): node is RawTextNode {
-	return node instanceof RawTextNode;
+export function $isRawNode(node: LexicalNode | null | undefined): node is RawNode {
+	return node instanceof RawNode;
 }

@@ -63,7 +63,7 @@ import {
 
 import { $createFormattingNode, $isFormattingNode } from '../nodes/FormattingNode';
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
-import { $createRawTextNode } from '../nodes/RawTextNode';
+import { $createRawNode } from '../nodes/RawNode';
 
 const markdownProcessor = unified()
 	.use(remarkParse)
@@ -202,7 +202,7 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 		}
 
 		// console.log("Unknown node", node);
-		const rawNode = $createRawTextNode();
+		const rawNode = $createRawNode();
 		rawNode.append($createTextNode(dumpMarkdownNode(node)));
 		return rawNode;
 	}
