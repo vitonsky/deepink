@@ -61,10 +61,7 @@ import {
 	TableCellHeaderStates,
 } from '@lexical/table';
 
-import {
-	$createFormattingNodeNode,
-	$isFormattingNodeNode,
-} from '../nodes/FormattingNode';
+import { $createFormattingNode, $isFormattingNode } from '../nodes/FormattingNode';
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
 import { $createRawTextNode } from '../nodes/RawTextNode';
 
@@ -181,25 +178,25 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				return text;
 			}
 			case 'emphasis': {
-				const format = $createFormattingNodeNode({ tag: 'em' });
+				const format = $createFormattingNode({ tag: 'em' });
 				format.append(...transformMdTree(node.children));
 
 				return format;
 			}
 			case 'strong': {
-				const format = $createFormattingNodeNode({ tag: 'b' });
+				const format = $createFormattingNode({ tag: 'b' });
 				format.append(...transformMdTree(node.children));
 
 				return format;
 			}
 			case 'delete': {
-				const format = $createFormattingNodeNode({ tag: 'del' });
+				const format = $createFormattingNode({ tag: 'del' });
 				format.append(...transformMdTree(node.children));
 
 				return format;
 			}
 			case 'thematicBreak': {
-				const format = $createFormattingNodeNode({ tag: 'hr' });
+				const format = $createFormattingNode({ tag: 'hr' });
 				return format;
 			}
 		}
@@ -336,7 +333,7 @@ export const $convertToMarkdownString = () => {
 			}) satisfies Code;
 		}
 
-		if ($isFormattingNodeNode(node)) {
+		if ($isFormattingNode(node)) {
 			const tagName = node.getTagName();
 			switch (tagName) {
 				case 'em': {

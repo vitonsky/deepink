@@ -18,7 +18,7 @@ export interface FormattingNodePayload {
 	key?: NodeKey;
 }
 
-export type SerializedFormattingNodeNode = Spread<
+export type SerializedFormattingNode = Spread<
 	{
 		content: string;
 	},
@@ -30,24 +30,24 @@ function $convertPreElement(domNode: Node): null | DOMConversionOutput {
 		return null;
 	}
 
-	const node = $createFormattingNodeNode({ tag: domNode.tagName.toLowerCase() });
+	const node = $createFormattingNode({ tag: domNode.tagName.toLowerCase() });
 	return { node };
 }
 
-export class FormattingNodeNode extends ElementNode {
+export class FormattingNode extends ElementNode {
 	__tagName: string;
 
 	static getType(): string {
 		return 'formatting';
 	}
 
-	static clone(node: FormattingNodeNode): FormattingNodeNode {
-		return new FormattingNodeNode(node.__tagName, node.__key);
+	static clone(node: FormattingNode): FormattingNode {
+		return new FormattingNode(node.__tagName, node.__key);
 	}
 
-	static importJSON(serializedNode: SerializedFormattingNodeNode): FormattingNodeNode {
+	static importJSON(serializedNode: SerializedFormattingNode): FormattingNode {
 		const { content } = serializedNode;
-		return $createFormattingNodeNode({ tag: content });
+		return $createFormattingNode({ tag: content });
 	}
 
 	exportDOM(): DOMExportOutput {
@@ -70,7 +70,7 @@ export class FormattingNodeNode extends ElementNode {
 		this.__tagName = tagName;
 	}
 
-	exportJSON(): SerializedFormattingNodeNode {
+	exportJSON(): SerializedFormattingNode {
 		return {
 			...super.exportJSON(),
 			type: this.getType(),
@@ -94,15 +94,15 @@ export class FormattingNodeNode extends ElementNode {
 	}
 }
 
-export function $createFormattingNodeNode({
+export function $createFormattingNode({
 	tag,
 	key,
-}: FormattingNodePayload): FormattingNodeNode {
-	return $applyNodeReplacement(new FormattingNodeNode(tag, key));
+}: FormattingNodePayload): FormattingNode {
+	return $applyNodeReplacement(new FormattingNode(tag, key));
 }
 
-export function $isFormattingNodeNode(
+export function $isFormattingNode(
 	node: LexicalNode | null | undefined,
-): node is FormattingNodeNode {
-	return node instanceof FormattingNodeNode;
+): node is FormattingNode {
+	return node instanceof FormattingNode;
 }
