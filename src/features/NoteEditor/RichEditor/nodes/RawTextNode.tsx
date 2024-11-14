@@ -1,60 +1,47 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable spellcheck/spell-checker */
 
-import * as React from 'react';
-import { Suspense } from 'react';
 import {
 	$applyNodeReplacement,
-	DecoratorNode,
 	DOMConversionMap,
 	DOMConversionOutput,
 	DOMExportOutput,
-	EditorConfig,
+	ElementNode,
 	LexicalNode,
 	NodeKey,
-	SerializedLexicalNode,
+	SerializedElementNode,
 	Spread,
 } from 'lexical';
 
 export interface RawTextPayload {
-	content: string;
 	key?: NodeKey;
 }
 
-export type SerializedRawTextNode = Spread<
-	{
-		content: string;
-	},
-	SerializedLexicalNode
->;
+export type SerializedRawTextNode = Spread<{}, SerializedElementNode>;
 
 function $convertPreElement(domNode: Node): null | DOMConversionOutput {
 	if (!(domNode instanceof HTMLPreElement)) {
 		return null;
 	}
-	const node = $createRawTextNode({ content: domNode.innerText });
+	const node = $createRawTextNode();
 	return { node };
 }
 
-export class RawTextNode extends DecoratorNode<JSX.Element> {
-	__content: string;
-
+export class RawTextNode extends ElementNode {
 	static getType(): string {
-		return 'raw-text';
+		return 'raw';
 	}
 
 	static clone(node: RawTextNode): RawTextNode {
-		return new RawTextNode(node.__content, node.__key);
+		return new RawTextNode(node.__key);
 	}
 
-	static importJSON(serializedNode: SerializedRawTextNode): RawTextNode {
-		const { content } = serializedNode;
-		return $createRawTextNode({ content });
+	static importJSON(_serializedNode: SerializedRawTextNode): RawTextNode {
+		return $createRawTextNode();
 	}
 
 	exportDOM(): DOMExportOutput {
 		const element = document.createElement('pre');
-		element.innerText = this.__content;
 		return { element };
 	}
 
@@ -67,55 +54,31 @@ export class RawTextNode extends DecoratorNode<JSX.Element> {
 		};
 	}
 
-	constructor(content: string, key?: NodeKey) {
+	constructor(key?: NodeKey) {
 		super(key);
-		this.__content = content;
 	}
 
 	exportJSON(): SerializedRawTextNode {
 		return {
+			...super.exportJSON(),
 			type: this.getType(),
-			version: 1,
-			content: this.getTextContent(),
 		};
 	}
 
 	// View
 
-	createDOM(config: EditorConfig): HTMLElement {
+	createDOM(): HTMLElement {
 		const span = document.createElement('span');
-		const theme = config.theme;
-		const className = theme.embedBlock?.base;
-		if (className !== undefined) {
-			span.className = className;
-		}
 		return span;
 	}
 
 	updateDOM(): false {
 		return false;
 	}
-
-	getTextContent(): string {
-		return this.__content;
-	}
-
-	setTextContent(content: string) {
-		const writable = this.getWritable();
-		writable.__content = content;
-	}
-
-	decorate(): JSX.Element {
-		return (
-			<Suspense fallback={null}>
-				<pre>{this.__content}</pre>
-			</Suspense>
-		);
-	}
 }
 
-export function $createRawTextNode({ content, key }: RawTextPayload): RawTextNode {
-	return $applyNodeReplacement(new RawTextNode(content, key));
+export function $createRawTextNode({ key }: RawTextPayload = {}): RawTextNode {
+	return $applyNodeReplacement(new RawTextNode(key));
 }
 
 export function $isRawTextNode(

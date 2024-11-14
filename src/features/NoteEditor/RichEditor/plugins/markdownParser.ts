@@ -202,7 +202,9 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 		}
 
 		// console.log("Unknown node", node);
-		return $createRawTextNode({ content: dumpMarkdownNode(node) });
+		const rawNode = $createRawTextNode();
+		rawNode.append($createTextNode(dumpMarkdownNode(node)));
+		return rawNode;
 	}
 
 	function transformMdTree(mdTree: Content[], strictMode = false): LexicalNode[] {
