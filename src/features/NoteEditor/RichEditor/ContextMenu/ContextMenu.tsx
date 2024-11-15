@@ -5,7 +5,7 @@ import { $getNearestNodeFromDOMNode, LexicalEditor, LexicalNode } from 'lexical'
 import { Box, BoxProps, Portal } from '@chakra-ui/react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
-import { flip, offset, preventOverflow } from '@popperjs/core';
+import { computeStyles, flip, offset, preventOverflow } from '@popperjs/core';
 
 export type ContextMenuProps = BoxProps & {
 	onOpen: (props: {
@@ -93,6 +93,13 @@ export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 	const popper = usePopper(menuContext?.element, popperRef, {
 		placement: 'top',
 		modifiers: [
+			{
+				...computeStyles,
+				options: {
+					// Prevent scroll body
+					gpuAcceleration: false,
+				},
+			},
 			{ ...flip, options: { fallbackPlacements: ['bottom', 'top'] } },
 			{ ...offset, options: { offset: [0, 10] } },
 			{
