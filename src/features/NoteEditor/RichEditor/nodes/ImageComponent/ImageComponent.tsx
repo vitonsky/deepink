@@ -19,22 +19,11 @@ import {
 	LexicalCommand,
 	NodeKey,
 } from 'lexical';
-import {
-	Popover,
-	PopoverArrow,
-	PopoverBody,
-	PopoverCloseButton,
-	PopoverContent,
-	PopoverHeader,
-	PopoverTrigger,
-	Portal,
-} from '@chakra-ui/react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
 
 import { $isImageNode } from '../ImageNode';
-import { ImagePropertiesPicker } from './ImagePropertiesPicker';
 
 const imageCache = new Set();
 
@@ -115,7 +104,6 @@ export default function ImageComponent({
 	const containerRef = useRef<null | HTMLImageElement>(null);
 
 	const [editor] = useLexicalComposerContext();
-	const [isMenuOpened, setIsMenuOpened] = useState(false);
 	const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
 
 	const [isLoadError, setIsLoadError] = useState<boolean>(false);
@@ -142,21 +130,6 @@ export default function ImageComponent({
 		[editor, isSelected],
 	);
 
-	const onContextMenu = useCallback((payload: MouseEvent) => {
-		const event = payload;
-
-		if (
-			containerRef.current &&
-			event.target instanceof Node &&
-			containerRef.current.contains(event.target)
-		) {
-			setIsMenuOpened(true);
-			return true;
-		}
-
-		return false;
-	}, []);
-
 	const onImageClick = useCallback((payload: MouseEvent) => {
 		const event = payload;
 
@@ -174,11 +147,6 @@ export default function ImageComponent({
 
 	useEffect(() => {
 		const unregister = mergeRegister(
-			editor.registerCommand<MouseEvent>(
-				RIGHT_CLICK_IMAGE_COMMAND,
-				onContextMenu,
-				COMMAND_PRIORITY_LOW,
-			),
 			editor.registerCommand<MouseEvent>(
 				LEFT_CLICK_IMAGE_COMMAND,
 				onImageClick,
@@ -202,81 +170,47 @@ export default function ImageComponent({
 		nodeKey,
 		$onDelete,
 		setSelected,
-		onContextMenu,
 		onImageClick,
 	]);
 
 	return (
-		<Popover
-			isOpen={isMenuOpened}
-			placement="bottom"
-			closeOnBlur
-			closeOnEsc
-			onClose={() => setIsMenuOpened(false)}
-			returnFocusOnClose={false}
+		<div
+			ref={containerRef}
+			draggable={false}
+			onContextMenu={(event) => {
+				editor.getEditorState().read(() => {
+					editor.dispatchCommand(
+						RIGHT_CLICK_IMAGE_COMMAND,
+						event.nativeEvent as MouseEvent,
+					);
+				});
+			}}
+			onClick={(event) => {
+				if (!(event.target instanceof HTMLImageElement)) return;
+				if (event.button !== 0) return;
+
+				editor.getEditorState().read(() => {
+					editor.dispatchCommand(
+						LEFT_CLICK_IMAGE_COMMAND,
+						event.nativeEvent as MouseEvent,
+					);
+				});
+			}}
 		>
-			<PopoverTrigger>
-				<div
-					ref={containerRef}
-					draggable={false}
-					onContextMenu={(event) => {
-						editor.getEditorState().read(() => {
-							editor.dispatchCommand(
-								RIGHT_CLICK_IMAGE_COMMAND,
-								event.nativeEvent as MouseEvent,
-							);
-						});
-					}}
-					onClick={(event) => {
-						if (!(event.target instanceof HTMLImageElement)) return;
-						if (event.button !== 0) return;
-
-						editor.getEditorState().read(() => {
-							editor.dispatchCommand(
-								LEFT_CLICK_IMAGE_COMMAND,
-								event.nativeEvent as MouseEvent,
-							);
-						});
-					}}
-				>
-					<Suspense fallback={<div>Loading...</div>}>
-						{isLoadError ? (
-							<BrokenImage />
-						) : (
-							<LazyImage
-								src={src}
-								altText={altText}
-								width={width}
-								height={height}
-								maxWidth={maxWidth}
-								onError={() => setIsLoadError(true)}
-							/>
-						)}
-					</Suspense>
-				</div>
-			</PopoverTrigger>
-			<Portal>
-				<PopoverContent>
-					<PopoverArrow />
-					<PopoverHeader>Image url</PopoverHeader>
-					<PopoverCloseButton onClick={() => setIsMenuOpened(false)} />
-					<PopoverBody>
-						<ImagePropertiesPicker
-							src={src}
-							onUpdateUrl={(url) => {
-								editor.update(() => {
-									const imageNode = editor
-										.getEditorState()
-										._nodeMap.get(nodeKey);
-									if (!imageNode || !$isImageNode(imageNode)) return;
-
-									imageNode.setSrc(url);
-								});
-							}}
-						/>
-					</PopoverBody>
-				</PopoverContent>
-			</Portal>
-		</Popover>
+			<Suspense fallback={<div>Loading...</div>}>
+				{isLoadError ? (
+					<BrokenImage />
+				) : (
+					<LazyImage
+						src={src}
+						altText={altText}
+						width={width}
+						height={height}
+						maxWidth={maxWidth}
+						onError={() => setIsLoadError(true)}
+					/>
+				)}
+			</Suspense>
+		</div>
 	);
 }

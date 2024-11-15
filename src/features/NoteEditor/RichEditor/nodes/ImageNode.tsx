@@ -178,6 +178,11 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 		return this.__altText;
 	}
 
+	setAltText(alt: string) {
+		const writable = this.getWritable();
+		writable.__altText = alt;
+	}
+
 	decorate(): JSX.Element {
 		return (
 			<Suspense fallback={null}>
