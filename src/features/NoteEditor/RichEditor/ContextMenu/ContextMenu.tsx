@@ -4,6 +4,7 @@ import { usePopper } from 'react-popper';
 import { $getNearestNodeFromDOMNode, LexicalEditor, LexicalNode } from 'lexical';
 import { Box, BoxProps, Portal } from '@chakra-ui/react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { mergeRegister } from '@lexical/utils';
 import { flip, offset, preventOverflow } from '@popperjs/core';
 
 export type ContextMenuProps = BoxProps & {
@@ -18,102 +19,21 @@ export type ContextMenuProps = BoxProps & {
 export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 	const [editor] = useLexicalComposerContext();
 
-	const [popperRef, setPopperRef] = useState<HTMLElement | null>(null);
-
 	const [menuContext, setMenuContext] = useState<{
 		node: LexicalNode;
 		element: Element;
 	} | null>(null);
-	const popper = usePopper(menuContext?.element, popperRef, {
-		placement: 'top',
-		modifiers: [
-			{ ...flip, options: { fallbackPlacements: ['bottom', 'top'] } },
-			{ ...offset, options: { offset: [0, 10] } },
-			{
-				...preventOverflow,
-				options: {
-					// rootBoundary: 'document',
-					mainAxis: true,
-					altAxis: true,
-					// altBoundary: true,
-					boundary: 'clippingParents',
-					padding: 10,
-				},
-			} as const,
-		],
-	});
 
 	const close = useCallback(() => {
 		setMenuContext(null);
 	}, []);
 
-	// Fix popup position
-	useEffect(() => {
-		if (!popper.forceUpdate) return;
-
-		return editor.registerUpdateListener(() => {
-			if (!popper.forceUpdate) return;
-			popper.forceUpdate();
-		});
-	}, [editor, menuContext, popper]);
-
-	useEffect(() => {
-		if (!menuContext) return;
-
-		return editor.registerUpdateListener((node) => {
-			const newElement = editor.getElementByKey(menuContext.node.getKey());
-			if (!newElement) return;
-			if (newElement === menuContext.element) return;
-
-			console.log('UPDATE!!! AND FOUND A CHANGE');
-
-			setMenuContext({
-				...menuContext,
-				element: newElement,
-			});
-		});
-	}, [editor, menuContext]);
-
-	useEffect(() => {
-		if (!menuContext) return;
-
-		const activeNode = menuContext.node;
-
-		// editor.registerMutationListener(activeNode, console.log);
-
-		return editor.registerUpdateListener(() => {
-			const isAttached = editor.read(() => activeNode.isAttached());
-			if (!isAttached) {
-				close();
-			}
-		});
-	}, [close, editor, menuContext]);
-
-	useEffect(() => {
-		if (!popperRef) return;
-
-		const onMouseDown = (evt: MouseEvent) => {
-			const target = evt.target;
-
-			if (!(target instanceof HTMLElement)) return;
-			if (target === popperRef || popperRef.contains(target)) return;
-
-			close();
-		};
-
-		document.addEventListener('mousedown', onMouseDown);
-		return () => {
-			document.removeEventListener('mousedown', onMouseDown);
-		};
-	}, [close, popperRef, setMenuContext]);
-
+	// Trigger context menu
 	const rootElement = editor.getRootElement();
 	useEffect(() => {
 		if (!rootElement) return;
 
 		const onContextMenu = (evt: MouseEvent) => {
-			console.log('Context menu on editor');
-
 			editor.read(() => {
 				const target = evt.target as HTMLElement;
 
@@ -127,8 +47,6 @@ export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 					node: lexicalNode,
 					element: rootElement,
 				});
-
-				console.log('Node in context', lexicalNode);
 			});
 		};
 
@@ -137,6 +55,83 @@ export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 			rootElement.removeEventListener('contextmenu', onContextMenu);
 		};
 	}, [editor, rootElement, setMenuContext]);
+
+	// Maintain context data
+	useEffect(() => {
+		if (!menuContext) return;
+
+		const currentNode = menuContext.node;
+		const currentElement = menuContext.element;
+		return mergeRegister(
+			// Close context menu by remove node from tree
+			editor.registerUpdateListener(() => {
+				const isAttached = editor.read(() => currentNode.isAttached());
+				if (!isAttached) {
+					close();
+				}
+			}),
+			// Update DOM element in current context, bu changes in Lexical node
+			editor.registerUpdateListener((_node) => {
+				const newElement = editor.getElementByKey(menuContext.node.getKey());
+				if (!newElement) {
+					close();
+					return;
+				}
+
+				if (newElement === currentElement) return;
+
+				setMenuContext({
+					...menuContext,
+					element: newElement,
+				});
+			}),
+		);
+	}, [close, editor, menuContext]);
+
+	// Manage popper
+	const [popperRef, setPopperRef] = useState<HTMLElement | null>(null);
+	const popper = usePopper(menuContext?.element, popperRef, {
+		placement: 'top',
+		modifiers: [
+			{ ...flip, options: { fallbackPlacements: ['bottom', 'top'] } },
+			{ ...offset, options: { offset: [0, 10] } },
+			{
+				...preventOverflow,
+				options: {
+					mainAxis: true,
+					altAxis: true,
+					boundary: 'clippingParents',
+					padding: 10,
+				},
+			} as const,
+		],
+	});
+
+	// Fix popup position
+	useEffect(() => {
+		return editor.registerUpdateListener(() => {
+			popper?.forceUpdate?.();
+		});
+	}, [editor, popper]);
+
+	// Close popup by click outside
+	useEffect(() => {
+		if (!popperRef) return;
+
+		const onMouseDown = (evt: MouseEvent) => {
+			const target = evt.target;
+			if (!(target instanceof HTMLElement)) return;
+
+			if (target !== popperRef && !popperRef.contains(target)) {
+				close();
+			}
+		};
+
+		document.addEventListener('mousedown', onMouseDown);
+		return () => {
+			document.removeEventListener('mousedown', onMouseDown);
+		};
+	}, [close, popperRef, setMenuContext]);
 
 	const children = menuContext ? onOpen({ ...menuContext, editor, close }) : null;
 
@@ -148,6 +143,7 @@ export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 				{...props}
 				style={{ ...popper.styles.popper, ...props.style }}
 				onKeyUp={(evt) => {
+					// Close by escape
 					if (evt.key === 'Escape') {
 						close();
 					}
