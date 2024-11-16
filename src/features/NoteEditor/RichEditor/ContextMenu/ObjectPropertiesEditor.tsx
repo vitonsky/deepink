@@ -1,5 +1,7 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { isEqual } from 'lodash';
 import { Button, HStack, Input, VStack } from '@chakra-ui/react';
 
 type OptionObject = {
@@ -17,9 +19,16 @@ export const ObjectPropertiesEditor = <T extends OptionObject[]>({
 		[K in T[number]['value']]: string;
 	}) => void;
 }) => {
-	const { register, getValues } = useForm({
-		defaultValues: Object.fromEntries(options.map(({ id, value }) => [id, value])),
+	const optionsValues = Object.fromEntries(options.map(({ id, value }) => [id, value]));
+	const { register, getValues, setValue, reset } = useForm({
+		defaultValues: optionsValues,
 	});
+
+	useEffect(() => {
+		if (isEqual(optionsValues, getValues())) return;
+
+		reset(optionsValues);
+	}, [getValues, optionsValues, reset, setValue]);
 
 	return (
 		<VStack as="form" gap="1rem">
