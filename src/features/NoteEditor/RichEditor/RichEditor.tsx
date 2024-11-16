@@ -1,19 +1,9 @@
 /* eslint-disable spellcheck/spell-checker */
 import React, { useEffect, useRef } from 'react';
-import FocusLock, { AutoFocusInside } from 'react-focus-lock';
-import { FaXmark } from 'react-icons/fa6';
-import {
-	Box,
-	BoxProps,
-	Button,
-	Card,
-	CardBody,
-	CardHeader,
-	Text,
-} from '@chakra-ui/react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { HashtagNode } from '@lexical/hashtag';
-import { $isLinkNode, AutoLinkNode, LinkNode } from '@lexical/link';
+import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';
 import { CHECK_LIST, LINK, TRANSFORMERS } from '@lexical/markdown';
@@ -38,12 +28,11 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import { $findMatchingParent } from '@lexical/utils';
 
 import { ContextMenu } from './ContextMenu/ContextMenu';
-import { ObjectPropertiesEditor } from './ContextMenu/ObjectPropertiesEditor';
+import { GenericContextMenu } from './ContextMenu/GenericContextMenu';
 import { FormattingNode } from './nodes/FormattingNode';
-import { $isImageNode, ImageNode } from './nodes/ImageNode';
+import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
 import theme from './PlaygroundEditorTheme';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
@@ -135,123 +124,7 @@ export const RichEditorContent = ({
 				},
 			}}
 		>
-			<ContextMenu
-				onOpen={({ node, editor, close }) =>
-					editor.read(() => {
-						// TODO: make generic component
-						if ($isImageNode(node)) {
-							return (
-								<FocusLock>
-									<Card
-										sx={{ backgroundColor: 'surface.background' }}
-										boxShadow="outline"
-									>
-										<CardHeader
-											display="flex"
-											padding="1rem"
-											justifyContent="space-between"
-											alignItems="baseline"
-											fontWeight="bold"
-										>
-											<Text>Image properties</Text>
-											<Button size="sm" onClick={close}>
-												<FaXmark />
-											</Button>
-										</CardHeader>
-										<CardBody padding="1rem">
-											<AutoFocusInside>
-												<ObjectPropertiesEditor
-													options={[
-														{
-															id: 'url',
-															value: node.getSrc(),
-															label: 'Image url',
-														},
-														{
-															id: 'alt',
-															value:
-																node.getAltText() ?? '',
-															label: 'Image alt text',
-														},
-													]}
-													onUpdate={(update) => {
-														console.log(
-															'Updated data',
-															update,
-														);
-
-														const { url, alt } = update;
-														editor.update(() => {
-															node.setSrc(url);
-															node.setAltText(alt);
-														});
-													}}
-												/>
-											</AutoFocusInside>
-										</CardBody>
-									</Card>
-								</FocusLock>
-							);
-						}
-
-						const linkNode = $isLinkNode(node)
-							? node
-							: $findMatchingParent(node, (node) => $isLinkNode(node));
-						if ($isLinkNode(linkNode)) {
-							return (
-								<FocusLock>
-									<Card
-										sx={{ backgroundColor: 'surface.background' }}
-										boxShadow="outline"
-									>
-										<CardHeader
-											display="flex"
-											padding="1rem"
-											justifyContent="space-between"
-											alignItems="baseline"
-											fontWeight="bold"
-										>
-											<Text>Link properties</Text>
-											<Button size="sm" onClick={close}>
-												<FaXmark />
-											</Button>
-										</CardHeader>
-										<CardBody padding="1rem">
-											<AutoFocusInside>
-												<ObjectPropertiesEditor
-													options={[
-														{
-															id: 'url',
-															value: linkNode.getURL(),
-															label: 'Link url',
-														},
-													]}
-													onUpdate={({ url, alt }) => {
-														editor.update(() => {
-															linkNode.setURL(url);
-															linkNode.setTitle(alt);
-														});
-													}}
-												/>
-											</AutoFocusInside>
-										</CardBody>
-									</Card>
-								</FocusLock>
-							);
-						}
-
-						const content = node.getTextContent();
-
-						if (!content) return null;
-
-						return (
-							<Card>
-								<CardBody>Node content: {content}</CardBody>
-							</Card>
-						);
-					})
-				}
-			/>
+			<ContextMenu renderer={GenericContextMenu} />
 
 			<RichTextPlugin
 				contentEditable={

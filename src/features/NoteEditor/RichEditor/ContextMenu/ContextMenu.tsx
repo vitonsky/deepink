@@ -1,5 +1,5 @@
 /* eslint-disable spellcheck/spell-checker */
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { usePopper } from 'react-popper';
 import { $getNearestNodeFromDOMNode, LexicalEditor, LexicalNode } from 'lexical';
 import { Box, BoxProps, Portal } from '@chakra-ui/react';
@@ -7,17 +7,23 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { mergeRegister } from '@lexical/utils';
 import { computeStyles, flip, offset, preventOverflow } from '@popperjs/core';
 
-export type ContextMenuProps = BoxProps & {
-	onOpen: (props: {
-		node: LexicalNode;
-		element: Element;
-		editor: LexicalEditor;
-		close: () => void;
-	}) => ReactNode;
+export type ContextMenuRendererProps = {
+	node: LexicalNode;
+	element: Element;
+	editor: LexicalEditor;
+	close: () => void;
 };
 
-export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
+export type ContextMenuProps = BoxProps & {
+	renderer: FC<ContextMenuRendererProps>;
+};
+
+export const ContextMenu = ({
+	renderer: RendererComponent,
+	...props
+}: ContextMenuProps) => {
 	const [editor] = useLexicalComposerContext();
+	const rootElement = editor.getRootElement();
 
 	const [menuContext, setMenuContext] = useState<{
 		node: LexicalNode;
@@ -29,7 +35,6 @@ export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 	}, []);
 
 	// Trigger context menu
-	const rootElement = editor.getRootElement();
 	useEffect(() => {
 		if (!rootElement) return;
 
@@ -91,7 +96,7 @@ export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 	// Manage popper
 	const [popperRef, setPopperRef] = useState<HTMLElement | null>(null);
 	const popper = usePopper(menuContext?.element, popperRef, {
-		placement: 'top',
+		placement: 'auto',
 		modifiers: [
 			{
 				...computeStyles,
@@ -140,7 +145,9 @@ export const ContextMenu = ({ onOpen, ...props }: ContextMenuProps) => {
 		};
 	}, [close, popperRef, setMenuContext]);
 
-	const children = menuContext ? onOpen({ ...menuContext, editor, close }) : null;
+	const children = menuContext ? (
+		<RendererComponent {...{ ...menuContext, editor, close }} />
+	) : null;
 
 	return children ? (
 		<Portal>
