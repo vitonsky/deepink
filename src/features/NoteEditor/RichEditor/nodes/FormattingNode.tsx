@@ -3,8 +3,6 @@
 
 import {
 	$applyNodeReplacement,
-	DOMConversionMap,
-	DOMConversionOutput,
 	DOMExportOutput,
 	ElementNode,
 	LexicalNode,
@@ -20,19 +18,10 @@ export interface FormattingNodePayload {
 
 export type SerializedFormattingNode = Spread<
 	{
-		content: string;
+		tag: string;
 	},
 	SerializedElementNode
 >;
-
-function $convertPreElement(domNode: Node): null | DOMConversionOutput {
-	if (!(domNode instanceof HTMLElement)) {
-		return null;
-	}
-
-	const node = $createFormattingNode({ tag: domNode.tagName.toLowerCase() });
-	return { node };
-}
 
 export class FormattingNode extends ElementNode {
 	__tagName: string;
@@ -46,23 +35,13 @@ export class FormattingNode extends ElementNode {
 	}
 
 	static importJSON(serializedNode: SerializedFormattingNode): FormattingNode {
-		const { content } = serializedNode;
-		return $createFormattingNode({ tag: content });
+		const { tag } = serializedNode;
+		return $createFormattingNode({ tag });
 	}
 
 	exportDOM(): DOMExportOutput {
-		const element = document.createElement('pre');
-		element.innerText = this.__tagName;
+		const element = document.createElement(this.__tagName);
 		return { element };
-	}
-
-	static importDOM(): DOMConversionMap | null {
-		return {
-			img: (_node: Node) => ({
-				conversion: $convertPreElement,
-				priority: 0,
-			}),
-		};
 	}
 
 	constructor(tagName: string, key?: NodeKey) {
@@ -74,7 +53,7 @@ export class FormattingNode extends ElementNode {
 		return {
 			...super.exportJSON(),
 			type: this.getType(),
-			content: this.getTextContent(),
+			tag: this.getTagName(),
 		};
 	}
 
