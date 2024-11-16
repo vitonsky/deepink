@@ -180,12 +180,9 @@ export const RichEditorContent = ({
 	);
 };
 
-// TODO: make links editable
 // TODO: support attachments
 // TODO: move lines with alt+arrows
-// TODO: support images
 // TODO: support videos
-// TODO: improve styles
 // TODO: copy markdown text by selection, not rich text
 // TODO: when user start remove markdown element - transform it to markdown and remove single char instead
 // TODO: add context menu for block elements, to toggle list types

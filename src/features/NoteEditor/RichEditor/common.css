@@ -1,4 +1,8 @@
-.editor-image,
+.editor-image {
+	display: inline-flex;
+	max-width: 100%;
+}
+
 .editor-image img {
 	display: flex;
 	max-width: 100%;
