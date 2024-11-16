@@ -58,6 +58,7 @@ export const $convertTextNodeFormatting = (node: TextNode) => {
 		const newNode = $createFormattingNode({ tag: meta.tag });
 		node.replace(newNode);
 		newNode.append(node);
+		node.select();
 	}
 };
 
