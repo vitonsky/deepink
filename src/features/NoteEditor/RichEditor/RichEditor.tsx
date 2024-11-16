@@ -6,7 +6,6 @@ import { HashtagNode } from '@lexical/hashtag';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';
-import { CHECK_LIST, LINK, TRANSFORMERS } from '@lexical/markdown';
 import { OverflowNode } from '@lexical/overflow';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { ClearEditorPlugin } from '@lexical/react/LexicalClearEditorPlugin';
@@ -21,7 +20,6 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
-import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
@@ -37,18 +35,16 @@ import { RawNode } from './nodes/RawNode';
 import theme from './PlaygroundEditorTheme';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
-import { MarkdownChecklistShortcutPlugin } from './plugins/MarkdownChecklistShortcutPlugin';
 import {
 	$convertFromMarkdownString,
 	$convertToMarkdownString,
 } from './plugins/markdownParser';
+import { MarkdownShortcutPlugin } from './plugins/MarkdownShortcutPlugin';
 
 export type RichEditorProps = BoxProps & {
 	value: string;
 	onValueChanged?: (value: string) => void;
 };
-
-const customTransformers = [LINK, CHECK_LIST, ...TRANSFORMERS];
 
 export const RichEditorContent = ({
 	value,
@@ -156,7 +152,6 @@ export const RichEditorContent = ({
 				}
 				ErrorBoundary={LexicalErrorBoundary}
 			/>
-			<MarkdownShortcutPlugin transformers={customTransformers} />
 			<HistoryPlugin />
 			{/* <AutoFocusPlugin /> */}
 			<ListPlugin />
@@ -180,7 +175,7 @@ export const RichEditorContent = ({
 					});
 				}}
 			/>
-			<MarkdownChecklistShortcutPlugin />
+			<MarkdownShortcutPlugin />
 		</Box>
 	);
 };

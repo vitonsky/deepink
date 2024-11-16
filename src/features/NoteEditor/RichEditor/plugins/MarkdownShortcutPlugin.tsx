@@ -1,17 +1,22 @@
-import { useEffect } from 'react';
-import { $createTextNode, ParagraphNode, TextNode } from 'lexical';
+import React, { useEffect } from 'react';
+import { $createTextNode, $isParagraphNode, ParagraphNode, TextNode } from 'lexical';
 import {
 	$createListItemNode,
 	$createListNode,
 	ListItemNode,
 	ListNode,
 } from '@lexical/list';
+import { CHECK_LIST, LINK, TRANSFORMERS } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $createHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { MarkdownShortcutPlugin as ExternalMarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { mergeRegister } from '@lexical/utils';
+
+const customTransformers = [LINK, CHECK_LIST, ...TRANSFORMERS];
 
 // TODO: fix bug with multiple checkbox items
 // TODO: add tests for case `- [ ] hello` and `- `[ ]` hello`
-export const $transformTextNodeToCheckbox = (textNode: TextNode) => {
+export const $transformTextToCheckbox = (textNode: TextNode) => {
 	// Skip text node that have any format
 	if (!textNode.isSimpleText()) return;
 
@@ -73,16 +78,28 @@ export const $transformTextNodeToCheckbox = (textNode: TextNode) => {
 	}
 };
 
-export const MarkdownChecklistShortcutPlugin = () => {
+export const $transformTextToHorizontalRule = (node: TextNode) => {
+	if (!/^(\*|\-|\_){3,}$/.test(node.getTextContent())) return;
+
+	const parent = node.getParent();
+	if (!$isParagraphNode(parent)) return;
+
+	if (parent.getChildrenSize() !== 1) return;
+
+	parent.replace($createHorizontalRuleNode()).selectEnd();
+};
+
+export const MarkdownShortcutPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
 	useEffect(
 		() =>
 			mergeRegister(
-				editor.registerNodeTransform(TextNode, $transformTextNodeToCheckbox),
+				editor.registerNodeTransform(TextNode, $transformTextToCheckbox),
+				editor.registerNodeTransform(TextNode, $transformTextToHorizontalRule),
 			),
 		[editor],
 	);
 
-	return null;
+	return <ExternalMarkdownShortcutPlugin transformers={customTransformers} />;
 };
