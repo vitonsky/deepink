@@ -7,10 +7,7 @@ import {
 	IS_BOLD,
 	IS_ITALIC,
 	IS_STRIKETHROUGH,
-	KEY_BACKSPACE_COMMAND,
-	KEY_DELETE_COMMAND,
 	KEY_SPACE_COMMAND,
-	LexicalEditor,
 	TextFormatType,
 	TextNode,
 } from 'lexical';
@@ -22,7 +19,6 @@ import {
 	$isFormattingNode,
 	FormattingNode,
 } from '../nodes/FormattingNode';
-import { $isThematicBreakNode } from '../nodes/ThematicBreakNode';
 
 export const $convertTextNodeFormatting = (node: TextNode) => {
 	const format = node.getFormat();
@@ -73,28 +69,6 @@ export const $removeEmptyFormattingNode = (node: FormattingNode) => {
 	node.remove();
 };
 
-export const createDeleteThematicBreakCallback = (editor: LexicalEditor) => () => {
-	let hasChanged = false;
-
-	editor.update(() => {
-		const selection = $getSelection();
-
-		if (!selection) return;
-
-		const nodes = selection.getNodes();
-		if (nodes.length !== 1) return;
-
-		const [node] = nodes;
-
-		if (!$isThematicBreakNode(node)) return;
-
-		node.remove();
-		hasChanged = true;
-	});
-
-	return hasChanged;
-};
-
 export const FormattingPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
@@ -103,16 +77,6 @@ export const FormattingPlugin = () => {
 			mergeRegister(
 				editor.registerNodeTransform(TextNode, $convertTextNodeFormatting),
 				editor.registerNodeTransform(FormattingNode, $removeEmptyFormattingNode),
-				editor.registerCommand(
-					KEY_BACKSPACE_COMMAND,
-					createDeleteThematicBreakCallback(editor),
-					COMMAND_PRIORITY_NORMAL,
-				),
-				editor.registerCommand(
-					KEY_DELETE_COMMAND,
-					createDeleteThematicBreakCallback(editor),
-					COMMAND_PRIORITY_NORMAL,
-				),
 				editor.registerCommand(
 					KEY_SPACE_COMMAND,
 					(event) => {

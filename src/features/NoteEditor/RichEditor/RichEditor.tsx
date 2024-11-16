@@ -34,7 +34,6 @@ import { GenericContextMenu } from './ContextMenu/GenericContextMenu';
 import { FormattingNode } from './nodes/FormattingNode';
 import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
-import { ThematicBreakNode } from './nodes/ThematicBreakNode';
 import theme from './PlaygroundEditorTheme';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
@@ -217,7 +216,6 @@ export const RichEditor = (props: RichEditorProps) => {
 					// });
 				},
 				nodes: [
-					ThematicBreakNode,
 					FormattingNode,
 					RawNode,
 					ImageNode,

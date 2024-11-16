@@ -45,6 +45,10 @@ import {
 	ListType,
 } from '@lexical/list';
 import {
+	$createHorizontalRuleNode,
+	$isHorizontalRuleNode,
+} from '@lexical/react/LexicalHorizontalRuleNode';
+import {
 	$createHeadingNode,
 	$createQuoteNode,
 	$isHeadingNode,
@@ -63,10 +67,6 @@ import {
 import { $createFormattingNode, $isFormattingNode } from '../nodes/FormattingNode';
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
 import { $createRawNode } from '../nodes/RawNode';
-import {
-	$createThematicBreakNode,
-	$isThematicBreakNode,
-} from '../nodes/ThematicBreakNode';
 
 const markdownProcessor = unified()
 	.use(remarkParse)
@@ -202,7 +202,7 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				return format;
 			}
 			case 'thematicBreak': {
-				const format = $createThematicBreakNode();
+				const format = $createHorizontalRuleNode();
 				return format;
 			}
 		}
@@ -340,7 +340,7 @@ export const $convertToMarkdownString = () => {
 			}
 		}
 
-		if ($isThematicBreakNode(node)) {
+		if ($isHorizontalRuleNode(node)) {
 			return u('thematicBreak') satisfies ThematicBreak;
 		}
 
