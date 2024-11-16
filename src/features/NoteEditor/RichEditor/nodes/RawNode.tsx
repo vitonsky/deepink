@@ -3,8 +3,6 @@
 
 import {
 	$applyNodeReplacement,
-	DOMConversionMap,
-	DOMConversionOutput,
 	DOMExportOutput,
 	ElementNode,
 	LexicalNode,
@@ -18,14 +16,6 @@ export interface RawTextPayload {
 }
 
 export type SerializedRawNode = Spread<{}, SerializedElementNode>;
-
-function $convertPreElement(domNode: Node): null | DOMConversionOutput {
-	if (!(domNode instanceof HTMLPreElement)) {
-		return null;
-	}
-	const node = $createRawNode();
-	return { node };
-}
 
 export class RawNode extends ElementNode {
 	static getType(): string {
@@ -41,17 +31,8 @@ export class RawNode extends ElementNode {
 	}
 
 	exportDOM(): DOMExportOutput {
-		const element = document.createElement('pre');
+		const element = document.createElement('span');
 		return { element };
-	}
-
-	static importDOM(): DOMConversionMap | null {
-		return {
-			img: (_node: Node) => ({
-				conversion: $convertPreElement,
-				priority: 0,
-			}),
-		};
 	}
 
 	constructor(key?: NodeKey) {
@@ -63,6 +44,10 @@ export class RawNode extends ElementNode {
 			...super.exportJSON(),
 			type: this.getType(),
 		};
+	}
+
+	isInline() {
+		return true;
 	}
 
 	// View
