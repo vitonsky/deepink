@@ -62,6 +62,13 @@ export const $convertTextNodeFormatting = (node: TextNode) => {
 	}
 };
 
+export const $removeEmptyFormattingNode = (node: FormattingNode) => {
+	const textContent = node.getTextContent();
+	if (textContent.length > 0) return;
+
+	node.remove();
+};
+
 export const FormattingPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
@@ -69,6 +76,7 @@ export const FormattingPlugin = () => {
 		() =>
 			mergeRegister(
 				editor.registerNodeTransform(TextNode, $convertTextNodeFormatting),
+				editor.registerNodeTransform(FormattingNode, $removeEmptyFormattingNode),
 				editor.registerCommand(
 					KEY_SPACE_COMMAND,
 					(event) => {
