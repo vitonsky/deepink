@@ -30,7 +30,6 @@ import {
 	Text,
 	ThematicBreak,
 } from 'mdast';
-// import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
@@ -67,23 +66,19 @@ import { $createRawNode } from '../nodes/RawNode';
 
 const markdownProcessor = unified()
 	.use(remarkParse)
-	// .use(remarkParseFrontmatter)
-	// .use(remarkFrontmatter, ['yaml', 'toml'])
 	.use(remarkGfm)
-	// .use(remarkBreaks)
 	.use(remarkStringify, {
 		bullet: '-',
 		listItemIndent: 'one',
 		join: [
-			(left, right) => {
-				console.log(left, right);
+			() => {
 				return 0;
 			},
 		],
 	})
 	.freeze();
 
-const dumpMarkdownNode = (node: Content) => {
+export const dumpMarkdownNode = (node: Content) => {
 	const content = markdownProcessor.stringify(
 		u('root', {
 			children: [node],
@@ -100,14 +95,14 @@ const dumpMarkdownNode = (node: Content) => {
 export const $convertFromMarkdownString = (rawMarkdown: string) => {
 	const mdTree = markdownProcessor.parse(rawMarkdown);
 
-	function transformMdNode(node: Content): LexicalNode {
+	function convertToMarkdownNode(node: Content): LexicalNode {
 		switch (node.type) {
 			case 'text': {
 				return $createTextNode(node.value);
 			}
 			case 'paragraph': {
 				const paragraph = $createParagraphNode();
-				paragraph.append(...transformMdTree(node.children));
+				paragraph.append(...convertToMarkdownNodes(node.children));
 
 				return paragraph;
 			}
@@ -119,7 +114,7 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 			case 'heading': {
 				const heading = $createHeadingNode(`h${node.depth}`);
-				heading.append(...transformMdTree(node.children));
+				heading.append(...convertToMarkdownNodes(node.children));
 
 				return heading;
 			}
@@ -136,41 +131,41 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				}
 
 				const list = $createListNode(listType);
-				list.append(...transformMdTree(node.children));
+				list.append(...convertToMarkdownNodes(node.children));
 
 				return list;
 			}
 			case 'listItem': {
 				const listItem = $createListItemNode(node.checked ?? undefined);
-				listItem.append(...transformMdTree(node.children));
+				listItem.append(...convertToMarkdownNodes(node.children));
 
 				return listItem;
 			}
 			case 'link': {
 				const link = $createLinkNode(node.url, { title: node.title });
-				link.append(...transformMdTree(node.children));
+				link.append(...convertToMarkdownNodes(node.children));
 
 				return link;
 			}
 			case 'blockquote': {
 				const quote = $createQuoteNode();
-				quote.append(...transformMdTree(node.children));
+				quote.append(...convertToMarkdownNodes(node.children));
 
 				return quote;
 			}
 			case 'table': {
 				const table = $createTableNode();
-				table.append(...transformMdTree(node.children, true));
+				table.append(...convertToMarkdownNodes(node.children, true));
 				return table;
 			}
 			case 'tableRow': {
 				const tableRow = $createTableRowNode();
-				tableRow.append(...transformMdTree(node.children, true));
+				tableRow.append(...convertToMarkdownNodes(node.children, true));
 				return tableRow;
 			}
 			case 'tableCell': {
 				const tableCell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
-				tableCell.append(...transformMdTree(node.children, true));
+				tableCell.append(...convertToMarkdownNodes(node.children, true));
 				return tableCell;
 			}
 			case 'code': {
@@ -186,19 +181,19 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 			case 'emphasis': {
 				const format = $createFormattingNode({ tag: 'em' });
-				format.append(...transformMdTree(node.children));
+				format.append(...convertToMarkdownNodes(node.children));
 
 				return format;
 			}
 			case 'strong': {
 				const format = $createFormattingNode({ tag: 'b' });
-				format.append(...transformMdTree(node.children));
+				format.append(...convertToMarkdownNodes(node.children));
 
 				return format;
 			}
 			case 'delete': {
 				const format = $createFormattingNode({ tag: 'del' });
-				format.append(...transformMdTree(node.children));
+				format.append(...convertToMarkdownNodes(node.children));
 
 				return format;
 			}
@@ -208,13 +203,15 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 		}
 
-		// console.log("Unknown node", node);
 		const rawNode = $createRawNode();
 		rawNode.append($createTextNode(dumpMarkdownNode(node)));
 		return rawNode;
 	}
 
-	function transformMdTree(mdTree: Content[], strictMode = false): LexicalNode[] {
+	function convertToMarkdownNodes(
+		mdTree: Content[],
+		strictMode = false,
+	): LexicalNode[] {
 		const lexicalTree: LexicalNode[] = [];
 
 		let lastNode: Content | null = null;
@@ -230,27 +227,20 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 					const missedLines =
 						mdNode.position.start.line - lastNode.position.end.line;
 
-					console.log('Missed lines', missedLines);
 					for (let i = 0; i < missedLines - 1; i++) {
 						lexicalTree.push($createParagraphNode());
 					}
-
-					// if (missedLines > 0) {
-					// 	const p = $createParagraphNode();
-					// 	p.append($createTextNode('\n'.repeat(missedLines)));
-					// 	lexicalTree.push(p);
-					// }
 				}
 			}
 
 			lastNode = mdNode;
-			lexicalTree.push(transformMdNode(mdNode));
+			lexicalTree.push(convertToMarkdownNode(mdNode));
 		}
 
 		return lexicalTree;
 	}
 
-	const transformedNodes = transformMdTree(mdTree.children).map((node) => {
+	const lexicalNodes = convertToMarkdownNodes(mdTree.children).map((node) => {
 		if (!$isTextNode(node)) return node;
 
 		const paragraph = $createParagraphNode();
@@ -260,43 +250,21 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 
 	const rootNode = $getRoot();
 	rootNode.clear();
-	rootNode.append(...transformedNodes);
+	rootNode.append(...lexicalNodes);
 
 	console.log('Import', {
 		rawMarkdown,
 		mdTree,
-		transformedNodes,
+		transformedNodes: lexicalNodes,
 		rootNode: rootNode.exportJSON(),
 	});
 };
 
-// const transformers = [
-// 	{
-// 		node: ImageNode,
-// 		transform: (node: ImageNode) => {
-// 			return u('image', {
-// 				url: node.getSrc(),
-// 				alt: node.getAltText(),
-// 			}) satisfies Image;
-// 		}
-// 	},
-// 	{
-// 		node: ParagraphNode,
-// 		transform: (node: ParagraphNode, children?: ChildNode[]) => {
-// 			return u('paragraph', { children: children ?? [] }) satisfies Paragraph;
-// 		}
-// 	},
-// ];
 export const $convertToMarkdownString = () => {
 	const rootNode = $getRoot();
 
-	const transformMdASTNode = (node: LexicalNode): Content => {
-		// $isElementNode(node) && node.getIndent();
+	const convertToMarkdownNode = (node: LexicalNode): Content => {
 		if ($isParagraphNode(node)) {
-			// if (node.getTextContent().trim().length === 0) {
-			// 	return u('break') as Break;
-			// }
-
 			const paragraph = u('paragraph', { children: [] }) as Paragraph;
 
 			const nestedNodes = node.getChildren();
@@ -305,13 +273,12 @@ export const $convertToMarkdownString = () => {
 				(nestedNodes.every((node) => $isTextNode(node)) &&
 					node.getTextContent().trim().length === 0)
 			) {
-				// return u('text', { value: '\n' }) satisfies Text;
 				paragraph.children.push(u('text', { value: '' }) satisfies Text);
 				return paragraph;
 			}
 
 			for (const child of node.getChildren()) {
-				const content = transformMdASTNode(child);
+				const content = convertToMarkdownNode(child);
 				paragraph.children.push(content as any);
 			}
 
@@ -349,21 +316,21 @@ export const $convertToMarkdownString = () => {
 					return u('emphasis', {
 						children: node
 							.getChildren()
-							.map(transformMdASTNode) as Emphasis['children'],
+							.map(convertToMarkdownNode) as Emphasis['children'],
 					}) satisfies Emphasis;
 				}
 				case 'del': {
 					return u('delete', {
 						children: node
 							.getChildren()
-							.map(transformMdASTNode) as Delete['children'],
+							.map(convertToMarkdownNode) as Delete['children'],
 					}) satisfies Delete;
 				}
 				case 'b': {
 					return u('strong', {
 						children: node
 							.getChildren()
-							.map(transformMdASTNode) as Strong['children'],
+							.map(convertToMarkdownNode) as Strong['children'],
 					}) satisfies Strong;
 				}
 				case 'hr': {
@@ -377,7 +344,9 @@ export const $convertToMarkdownString = () => {
 				ordered: node.getTag() === 'ol',
 				start: node.getStart(),
 				spread: false,
-				children: node.getChildren().map(transformMdASTNode) as List['children'],
+				children: node
+					.getChildren()
+					.map(convertToMarkdownNode) as List['children'],
 			}) satisfies List;
 		}
 		if ($isListItemNode(node)) {
@@ -388,7 +357,7 @@ export const $convertToMarkdownString = () => {
 					u('paragraph', {
 						children: node
 							.getChildren()
-							.map(transformMdASTNode) as Paragraph['children'],
+							.map(convertToMarkdownNode) as Paragraph['children'],
 					}) as Paragraph,
 				],
 			}) satisfies ListItem;
@@ -398,7 +367,9 @@ export const $convertToMarkdownString = () => {
 			return u('link', {
 				url: node.getURL(),
 				alt: node.getTitle(),
-				children: node.getChildren().map(transformMdASTNode) as Link['children'],
+				children: node
+					.getChildren()
+					.map(convertToMarkdownNode) as Link['children'],
 			}) satisfies Link;
 		}
 
@@ -406,27 +377,29 @@ export const $convertToMarkdownString = () => {
 			return u('blockquote', {
 				children: node
 					.getChildren()
-					.map(transformMdASTNode) as Blockquote['children'],
+					.map(convertToMarkdownNode) as Blockquote['children'],
 			}) satisfies Blockquote;
 		}
 
 		if ($isTableNode(node)) {
 			return u('table', {
-				children: node.getChildren().map(transformMdASTNode) as Table['children'],
+				children: node
+					.getChildren()
+					.map(convertToMarkdownNode) as Table['children'],
 			}) satisfies Table;
 		}
 		if ($isTableRowNode(node)) {
 			return u('tableRow', {
 				children: node
 					.getChildren()
-					.map(transformMdASTNode) as TableRow['children'],
+					.map(convertToMarkdownNode) as TableRow['children'],
 			}) satisfies TableRow;
 		}
 		if ($isTableCellNode(node)) {
 			return u('tableCell', {
 				children: node
 					.getChildren()
-					.map(transformMdASTNode) as TableCell['children'],
+					.map(convertToMarkdownNode) as TableCell['children'],
 			}) satisfies TableCell;
 		}
 
@@ -439,7 +412,7 @@ export const $convertToMarkdownString = () => {
 				depth: depth,
 				children: node
 					.getChildren()
-					.map(transformMdASTNode) as Heading['children'],
+					.map(convertToMarkdownNode) as Heading['children'],
 			}) satisfies Heading;
 		}
 
@@ -447,9 +420,9 @@ export const $convertToMarkdownString = () => {
 		return u('html', { value: node.getTextContent() }) as HTML;
 	};
 
-	const childs = rootNode.getChildren();
+	const children = rootNode.getChildren();
 	const mdTree = u('root', {
-		children: childs.map(transformMdASTNode),
+		children: children.map(convertToMarkdownNode),
 	}) satisfies Root;
 
 	const serializedData = markdownProcessor.stringify(mdTree);
@@ -457,7 +430,7 @@ export const $convertToMarkdownString = () => {
 	console.log('EXPORT', {
 		serializedData,
 		rootNode: rootNode.exportJSON(),
-		childs,
+		children,
 		mdTree,
 	});
 	return serializedData;

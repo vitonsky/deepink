@@ -47,8 +47,6 @@ export const $transformTextNodeToCheckbox = (textNode: TextNode) => {
 			.getTextContent()
 			.slice(checkboxSegmentInsideListMatch[0].length);
 		textNode.setTextContent(slice);
-
-		console.log('DBG', textNode.getTextContent(), checkboxSegmentInsideListMatch);
 	}
 
 	// Checkbox at any place in text
