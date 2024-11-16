@@ -83,12 +83,19 @@ const markdownProcessor = unified()
 	})
 	.freeze();
 
-const dumpMarkdownNode = (node: Content) =>
-	markdownProcessor.stringify(
+const dumpMarkdownNode = (node: Content) => {
+	const content = markdownProcessor.stringify(
 		u('root', {
 			children: [node],
 		}) satisfies Root,
 	);
+
+	if (content.slice(-1) === '\n') {
+		return content.slice(0, -1);
+	}
+
+	return content;
+};
 
 export const $convertFromMarkdownString = (rawMarkdown: string) => {
 	const mdTree = markdownProcessor.parse(rawMarkdown);
