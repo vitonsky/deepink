@@ -20,6 +20,8 @@ export const getScrollBarStyles = ({
 } = {}) => ({
 	'::-webkit-scrollbar': {
 		width: '10px',
+		// For horizontal scroll
+		height: '10px',
 	},
 
 	'::-webkit-scrollbar-track': {
