@@ -49,6 +49,10 @@ export class FormattingNode extends ElementNode {
 		this.__tagName = tagName;
 	}
 
+	isInline(): boolean {
+		return true;
+	}
+
 	exportJSON(): SerializedFormattingNode {
 		return {
 			...super.exportJSON(),
