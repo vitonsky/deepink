@@ -1,9 +1,25 @@
 import { useEffect } from 'react';
-import { IS_BOLD, IS_ITALIC, IS_STRIKETHROUGH, TextFormatType, TextNode } from 'lexical';
+import {
+	$createTextNode,
+	$getSelection,
+	$isElementNode,
+	$isTextNode,
+	COMMAND_PRIORITY_NORMAL,
+	IS_BOLD,
+	IS_ITALIC,
+	IS_STRIKETHROUGH,
+	KEY_SPACE_COMMAND,
+	TextFormatType,
+	TextNode,
+} from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 
-import { $createFormattingNode, FormattingNode } from '../nodes/FormattingNode';
+import {
+	$createFormattingNode,
+	$isFormattingNode,
+	FormattingNode,
+} from '../nodes/FormattingNode';
 
 export const $convertTextNodeFormatting = (node: TextNode) => {
 	const format = node.getFormat();
@@ -53,6 +69,66 @@ export const FormattingPlugin = () => {
 		() =>
 			mergeRegister(
 				editor.registerNodeTransform(TextNode, $convertTextNodeFormatting),
+				editor.registerCommand(
+					KEY_SPACE_COMMAND,
+					(event) => {
+						let hasChanged = false;
+
+						editor.update(() => {
+							const selection = $getSelection();
+							if (!selection) return;
+
+							const points = selection.getStartEndPoints();
+							if (!points) return;
+
+							const [start, end] = points;
+
+							if (
+								start.getNode() !== end.getNode() ||
+								start.offset !== end.offset
+							)
+								return;
+
+							const focusedNode = end.getNode();
+							if (!$isTextNode(focusedNode)) return;
+
+							const parent = focusedNode.getParent();
+							if (
+								!parent ||
+								!$isFormattingNode(parent) ||
+								parent.getLastChild() !== focusedNode
+							)
+								return;
+
+							// We are back for 1 symbol, so we have to handle case with last symbol and previous one
+							if (end.offset < focusedNode.getTextContentSize()) return;
+
+							const isHaveContentAfter = Boolean(
+								!parent.isLastChild() ||
+									$findMatchingParent(
+										parent,
+										(node) =>
+											$isElementNode(node) && !node.isLastChild(),
+									),
+							);
+
+							if (isHaveContentAfter) return;
+
+							const textNode = $createTextNode(' ');
+							parent.insertAfter(textNode);
+							textNode.select();
+
+							event.stopImmediatePropagation();
+							event.stopPropagation();
+							event.preventDefault();
+
+							hasChanged = true;
+						});
+
+						return hasChanged;
+					},
+					COMMAND_PRIORITY_NORMAL,
+				),
 			),
 		[editor],
 	);
