@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import {
 	$createTextNode,
 	$getSelection,
-	$isElementNode,
 	$isTextNode,
 	COMMAND_PRIORITY_NORMAL,
 	IS_BOLD,
@@ -72,6 +71,8 @@ export const FormattingPlugin = () => {
 				editor.registerCommand(
 					KEY_SPACE_COMMAND,
 					(event) => {
+						if (!event.shiftKey) return false;
+
 						let hasChanged = false;
 
 						editor.update(() => {
@@ -100,19 +101,7 @@ export const FormattingPlugin = () => {
 							)
 								return;
 
-							// We are back for 1 symbol, so we have to handle case with last symbol and previous one
-							if (end.offset < focusedNode.getTextContentSize()) return;
-
-							const isHaveContentAfter = Boolean(
-								!parent.isLastChild() ||
-									$findMatchingParent(
-										parent,
-										(node) =>
-											$isElementNode(node) && !node.isLastChild(),
-									),
-							);
-
-							if (isHaveContentAfter) return;
+							if (end.offset != focusedNode.getTextContentSize()) return;
 
 							const textNode = $createTextNode(' ');
 							parent.insertAfter(textNode);
