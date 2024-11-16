@@ -49,6 +49,8 @@ import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { NoteScreen } from '../NoteScreen';
+import { EditorPanelContext } from './EditorPanel';
+import { EditorPanel } from './EditorPanel/EditorPanel';
 import { RichEditor } from './RichEditor/RichEditor';
 
 export type NoteEditorProps = {
@@ -158,7 +160,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
 	return (
-		<VStack w="100%">
+		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
 				<HStack w="100%" align="start">
 					<Input
@@ -381,49 +383,55 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 				/>
 			</HStack>
 
-			{/* TODO: toggle editors with button and remember in settings */}
-			{true ? (
-				<HStack
-					sx={{
-						display: 'flex',
-						width: '100%',
-						height: '100%',
-						overflow: 'hidden',
-					}}
-				>
-					<Box
-						as={MonacoEditor}
-						value={text}
-						setValue={setText}
-						flexGrow="100"
-						uploadFile={uploadFile}
-						width="100%"
-						height="100%"
-					/>
-					<RichEditor value={text} onValueChanged={setText} />
+			<EditorPanelContext>
+				<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
+					<EditorPanel />
 				</HStack>
-			) : (
-				<Box
-					sx={{
-						width: '100%',
-						display: 'grid',
-						overflow: 'hidden',
-						gap: '0.3rem',
-						flexGrow: '100',
-						flex: 1,
-						gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-					}}
-				>
+
+				{/* TODO: toggle editors with button and remember in settings */}
+				{true ? (
+					<HStack
+						sx={{
+							display: 'flex',
+							width: '100%',
+							height: '100%',
+							overflow: 'hidden',
+						}}
+					>
+						<Box
+							as={MonacoEditor}
+							value={text}
+							setValue={setText}
+							flexGrow="100"
+							uploadFile={uploadFile}
+							width="100%"
+							height="100%"
+						/>
+						<RichEditor value={text} onValueChanged={setText} />
+					</HStack>
+				) : (
 					<Box
-						as={MonacoEditor}
-						value={text}
-						setValue={setText}
-						flexGrow="100"
-						uploadFile={uploadFile}
-					/>
-					<NoteScreen note={note} update={onTextUpdate} />
-				</Box>
-			)}
+						sx={{
+							width: '100%',
+							display: 'grid',
+							overflow: 'hidden',
+							gap: '0.3rem',
+							flexGrow: '100',
+							flex: 1,
+							gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+						}}
+					>
+						<Box
+							as={MonacoEditor}
+							value={text}
+							setValue={setText}
+							flexGrow="100"
+							uploadFile={uploadFile}
+						/>
+						<NoteScreen note={note} update={onTextUpdate} />
+					</Box>
+				)}
+			</EditorPanelContext>
 
 			{sidePanel === 'backlinks' && (
 				<VStack

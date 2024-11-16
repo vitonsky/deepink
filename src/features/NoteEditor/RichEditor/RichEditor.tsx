@@ -33,6 +33,7 @@ import { FormattingNode } from './nodes/FormattingNode';
 import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
 import theme from './PlaygroundEditorTheme';
+import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
 import {
@@ -159,7 +160,10 @@ export const RichEditorContent = ({
 			<TabIndentationPlugin />
 			<LinkPlugin />
 			<ImagesPlugin />
+
+			<MarkdownShortcutPlugin />
 			<FormattingPlugin />
+			<EditorPanelPlugin />
 
 			<ClearEditorPlugin />
 			<ClickableLinkPlugin />
@@ -175,7 +179,6 @@ export const RichEditorContent = ({
 					});
 				}}
 			/>
-			<MarkdownShortcutPlugin />
 		</Box>
 	);
 };

@@ -51,6 +51,7 @@
 					"Globals",
 					"Hkdf",
 					"Blockquote",
+					"Strikethrough",
 					"Hmac",
 					"Obfuscator",
 					"Outdent",
