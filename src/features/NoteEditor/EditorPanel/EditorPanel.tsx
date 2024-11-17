@@ -78,16 +78,49 @@ export const EditorPanel = () => {
 				</Button>
 			</HStack>
 			<HStack gap="0">
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onInserting({
+							type: 'link',
+							data: { url: 'https://example.org', text: 'test link' },
+						});
+					}}
+				>
 					<FaLink />
 				</Button>
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onInserting({
+							type: 'image',
+							data: {
+								url: 'https://artprojectsforkids.org/wp-content/uploads/2024/04/How-to-Draw-a-Cow-web.jpg',
+								altText: 'alt text',
+							},
+						});
+					}}
+				>
 					<FaImage />
 				</Button>
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onInserting({ type: 'code', data: {} });
+					}}
+				>
 					<FaCode />
 				</Button>
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onInserting({ type: 'quote', data: {} });
+					}}
+				>
 					<FaQuoteLeft />
 				</Button>
 				<Button
@@ -102,7 +135,16 @@ export const EditorPanel = () => {
 				<Button size="sm" variant="ghost">
 					<FaPaperclip />
 				</Button>
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onInserting({
+							type: 'date',
+							data: { date: new Date().toDateString() },
+						});
+					}}
+				>
 					<FaCalendarDay />
 				</Button>
 			</HStack>

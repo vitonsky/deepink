@@ -1,8 +1,25 @@
 import { useEffect } from 'react';
+import {
+	$createParagraphNode,
+	$getSelection,
+	$isBlockElementNode,
+	$isRangeSelection,
+	CONTROLLED_TEXT_INSERTION_COMMAND,
+	ElementNode,
+} from 'lexical';
+import {} from '@lexical/code';
+import { TOGGLE_LINK_COMMAND } from '@lexical/link';
+import {
+	INSERT_CHECK_LIST_COMMAND,
+	INSERT_ORDERED_LIST_COMMAND,
+	INSERT_UNORDERED_LIST_COMMAND,
+} from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
+import { $createQuoteNode } from '@lexical/rich-text';
+import { $findMatchingParent, $insertFirst } from '@lexical/utils';
 
-import { useEditorPanelContext } from '../../EditorPanel';
+import { InsertingPayloadMap, useEditorPanelContext } from '../../EditorPanel';
 
 // TODO: implement all inserting & formatting features
 export const EditorPanelPlugin = () => {
@@ -14,11 +31,103 @@ export const EditorPanelPlugin = () => {
 		return onInserting.watch((evt) => {
 			console.warn('INSERTING ELEMENT', evt);
 
-			switch (evt.type) {
-				case 'horizontalRule': {
+			const commands: {
+				[K in keyof InsertingPayloadMap]?: (
+					payload: InsertingPayloadMap[K],
+				) => void;
+			} = {
+				horizontalRule() {
 					editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
-					break;
-				}
+				},
+				date({ date }) {
+					editor.dispatchCommand(CONTROLLED_TEXT_INSERTION_COMMAND, date);
+				},
+				quote() {
+					editor.update(() => {
+						const selection = $getSelection();
+
+						const points = selection?.getStartEndPoints();
+						if (!selection || !points) return;
+
+						const [start, end] = points;
+
+						if (
+							$isRangeSelection(selection) &&
+							(start.getNode() !== end.getNode() ||
+								start.offset !== end.offset)
+						) {
+							const selectedNodes = selection.getNodes();
+							if (!selectedNodes) return;
+
+							// Insert quote
+							const quote = $createQuoteNode();
+
+							const firstNode = selectedNodes[0];
+							const prevNode = firstNode.getPreviousSibling();
+							if (prevNode) {
+								prevNode.insertAfter(quote);
+							} else {
+								firstNode.replace(quote);
+							}
+
+							// Fill quote
+							quote.append(...selectedNodes);
+							quote.select();
+							return;
+						}
+
+						const blockElement = $findMatchingParent(
+							start.getNode(),
+							(node) =>
+								$isBlockElementNode(node) && !node.isParentRequired(),
+						) as ElementNode | null;
+						if (!blockElement) return;
+
+						const childs = blockElement.getChildren();
+
+						const quote = $createQuoteNode();
+						$insertFirst(blockElement, quote);
+
+						const paragraph = $createParagraphNode();
+						paragraph.append(...childs);
+						quote.append(paragraph);
+						paragraph.select();
+					});
+				},
+				// code({ text }) {
+				// 	editor.dispatchCommand();
+				// },
+				link({ url }) {
+					editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url });
+				},
+				// image({ url }) {
+				// 	editor.dispatchCommand(INSERT_IMAGE_COMMAND, { });
+				// },
+				list({ type }) {
+					switch (type) {
+						case 'checkbox':
+							editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined);
+							break;
+						case 'ordered':
+							editor.dispatchCommand(
+								INSERT_ORDERED_LIST_COMMAND,
+								undefined,
+							);
+							break;
+						case 'unordered':
+							editor.dispatchCommand(
+								INSERT_UNORDERED_LIST_COMMAND,
+								undefined,
+							);
+							break;
+					}
+				},
+			};
+
+			const command = commands[evt.type];
+			if (command) {
+				// @ts-ignore
+				command(evt.data);
 			}
 		});
 	}, [editor, onInserting]);
