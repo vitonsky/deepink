@@ -177,7 +177,9 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 			case 'code': {
 				const code = $createCodeNode(node.lang);
-				code.append($createTextNode(node.value));
+				const paragraph = $createParagraphNode();
+				paragraph.append($createTextNode(node.value));
+				code.append(paragraph);
 
 				return code;
 			}
