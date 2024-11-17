@@ -7,7 +7,7 @@ import {
 	CONTROLLED_TEXT_INSERTION_COMMAND,
 	ElementNode,
 } from 'lexical';
-import {} from '@lexical/code';
+import { $createCodeNode } from '@lexical/code';
 import { TOGGLE_LINK_COMMAND } from '@lexical/link';
 import {
 	INSERT_CHECK_LIST_COMMAND,
@@ -21,6 +21,31 @@ import { $wrapNodes } from '@lexical/selection';
 import { $findMatchingParent, $wrapNodeInElement } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../EditorPanel';
+
+export const $insertOrWrapWithNode = (createElement: () => ElementNode) => {
+	const selection = $getSelection();
+
+	const points = selection?.getStartEndPoints();
+	if (!selection || !points) return;
+
+	const [start, end] = points;
+
+	if (
+		$isRangeSelection(selection) &&
+		(start.getNode() !== end.getNode() || start.offset !== end.offset)
+	) {
+		$wrapNodes(selection, $createParagraphNode, createElement());
+		return;
+	}
+
+	const blockElement = $findMatchingParent(
+		start.getNode(),
+		(node) => $isBlockElementNode(node) && !node.isParentRequired(),
+	) as ElementNode | null;
+	if (!blockElement) return;
+
+	$wrapNodeInElement(blockElement, createElement);
+};
 
 // TODO: implement all inserting & formatting features
 export const EditorPanelPlugin = () => {
@@ -45,39 +70,14 @@ export const EditorPanelPlugin = () => {
 				},
 				quote() {
 					editor.update(() => {
-						const selection = $getSelection();
-
-						const points = selection?.getStartEndPoints();
-						if (!selection || !points) return;
-
-						const [start, end] = points;
-
-						if (
-							$isRangeSelection(selection) &&
-							(start.getNode() !== end.getNode() ||
-								start.offset !== end.offset)
-						) {
-							$wrapNodes(
-								selection,
-								$createParagraphNode,
-								$createQuoteNode(),
-							);
-							return;
-						}
-
-						const blockElement = $findMatchingParent(
-							start.getNode(),
-							(node) =>
-								$isBlockElementNode(node) && !node.isParentRequired(),
-						) as ElementNode | null;
-						if (!blockElement) return;
-
-						$wrapNodeInElement(blockElement, $createQuoteNode);
+						$insertOrWrapWithNode($createQuoteNode);
 					});
 				},
-				// code({ text }) {
-				// 	editor.dispatchCommand();
-				// },
+				code() {
+					editor.update(() => {
+						$insertOrWrapWithNode($createCodeNode);
+					});
+				},
 				link({ url }) {
 					editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url });
 				},
