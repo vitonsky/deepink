@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import {
+	$createLineBreakNode,
 	$createParagraphNode,
 	$createTextNode,
 	$getRoot,
+	$isLineBreakNode,
 	$isParagraphNode,
 	$isTextNode,
 	IS_CODE,
@@ -10,6 +12,7 @@ import {
 } from 'lexical';
 import {
 	Blockquote,
+	Break,
 	Code,
 	Content,
 	Delete,
@@ -200,6 +203,9 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 				format.append(...convertToMarkdownNodes(node.children));
 
 				return format;
+			}
+			case 'break': {
+				return $createLineBreakNode();
 			}
 			case 'thematicBreak': {
 				const format = $createHorizontalRuleNode();
@@ -406,6 +412,10 @@ export const $convertToMarkdownString = () => {
 					.getChildren()
 					.map(convertToMarkdownNode) as TableCell['children'],
 			}) satisfies TableCell;
+		}
+
+		if ($isLineBreakNode(node)) {
+			return u('break', {}) satisfies Break;
 		}
 
 		if ($isHeadingNode(node)) {
