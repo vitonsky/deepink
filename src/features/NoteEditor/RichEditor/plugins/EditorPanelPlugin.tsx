@@ -17,7 +17,8 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createQuoteNode } from '@lexical/rich-text';
-import { $findMatchingParent, $insertFirst } from '@lexical/utils';
+import { $wrapNodes } from '@lexical/selection';
+import { $findMatchingParent, $wrapNodeInElement } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../EditorPanel';
 
@@ -56,23 +57,11 @@ export const EditorPanelPlugin = () => {
 							(start.getNode() !== end.getNode() ||
 								start.offset !== end.offset)
 						) {
-							const selectedNodes = selection.getNodes();
-							if (!selectedNodes) return;
-
-							// Insert quote
-							const quote = $createQuoteNode();
-
-							const firstNode = selectedNodes[0];
-							const prevNode = firstNode.getPreviousSibling();
-							if (prevNode) {
-								prevNode.insertAfter(quote);
-							} else {
-								firstNode.replace(quote);
-							}
-
-							// Fill quote
-							quote.append(...selectedNodes);
-							quote.select();
+							$wrapNodes(
+								selection,
+								$createParagraphNode,
+								$createQuoteNode(),
+							);
 							return;
 						}
 
@@ -83,15 +72,7 @@ export const EditorPanelPlugin = () => {
 						) as ElementNode | null;
 						if (!blockElement) return;
 
-						const childs = blockElement.getChildren();
-
-						const quote = $createQuoteNode();
-						$insertFirst(blockElement, quote);
-
-						const paragraph = $createParagraphNode();
-						paragraph.append(...childs);
-						quote.append(paragraph);
-						paragraph.select();
+						$wrapNodeInElement(blockElement, $createQuoteNode);
 					});
 				},
 				// code({ text }) {

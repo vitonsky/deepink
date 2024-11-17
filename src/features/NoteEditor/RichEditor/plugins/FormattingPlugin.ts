@@ -1,17 +1,22 @@
 import { useEffect } from 'react';
 import {
+	$createParagraphNode,
 	$createTextNode,
 	$getSelection,
+	$isParagraphNode,
 	$isTextNode,
 	COMMAND_PRIORITY_NORMAL,
 	IS_BOLD,
 	IS_ITALIC,
 	IS_STRIKETHROUGH,
+	KEY_ENTER_COMMAND,
 	KEY_SPACE_COMMAND,
+	ParagraphNode,
 	TextFormatType,
 	TextNode,
 } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $isQuoteNode } from '@lexical/rich-text';
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 
 import {
@@ -77,6 +82,71 @@ export const FormattingPlugin = () => {
 			mergeRegister(
 				editor.registerNodeTransform(TextNode, $convertTextNodeFormatting),
 				editor.registerNodeTransform(FormattingNode, $removeEmptyFormattingNode),
+				editor.registerCommand(
+					KEY_ENTER_COMMAND,
+					(_event) => {
+						let hasChanged = false;
+
+						editor.update(() => {
+							const selection = $getSelection();
+							if (!selection) return;
+
+							const points = selection.getStartEndPoints();
+							if (!points) return;
+
+							const [start, end] = points;
+
+							if (
+								start.getNode() !== end.getNode() ||
+								start.offset !== end.offset
+							)
+								return;
+
+							const focusedNode = end.getNode();
+
+							let paragraph: ParagraphNode | null = null;
+							if ($isParagraphNode(focusedNode)) {
+								paragraph = focusedNode;
+							} else if ($isTextNode(focusedNode)) {
+								const parent = focusedNode.getParent();
+								if ($isParagraphNode(parent)) {
+									paragraph = parent;
+								}
+							}
+
+							if (
+								!paragraph ||
+								!paragraph.isLastChild() ||
+								paragraph.getTextContent() !== ''
+							)
+								return;
+
+							const quote = paragraph.getParent();
+							if (!$isQuoteNode(quote)) return;
+
+							const prevParagraph = paragraph.getPreviousSibling();
+							if (
+								!$isParagraphNode(prevParagraph) ||
+								prevParagraph.getTextContent() !== ''
+							)
+								return;
+
+							console.warn('DEBUG');
+
+							const newParagraph = $createParagraphNode();
+							quote.insertAfter(newParagraph);
+							newParagraph.select();
+
+							paragraph.remove();
+							prevParagraph.remove();
+
+							hasChanged = true;
+						});
+
+						return hasChanged;
+					},
+					COMMAND_PRIORITY_NORMAL,
+				),
 				editor.registerCommand(
 					KEY_SPACE_COMMAND,
 					(event) => {
