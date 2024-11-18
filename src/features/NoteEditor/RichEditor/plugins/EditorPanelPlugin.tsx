@@ -26,6 +26,8 @@ import { $findMatchingParent } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../EditorPanel';
 
+import { $createImageNode } from '../nodes/ImageNode';
+
 export const $canInsertElementsToNode = (node: LexicalNode) => {
 	if ($isTextNode(node)) return false;
 
@@ -155,9 +157,35 @@ export const EditorPanelPlugin = () => {
 				link({ url }) {
 					editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url });
 				},
-				// image({ url }) {
-				// 	editor.dispatchCommand(INSERT_IMAGE_COMMAND, { });
-				// },
+				image({ url, altText }) {
+					editor.update(() => {
+						const selection = $getSelection();
+						if (!selection) return;
+
+						const anchorNode = $isRangeSelection(selection)
+							? selection.anchor.getNode()
+							: selection.getNodes()[0];
+
+						let targetNode: LexicalNode | null = anchorNode;
+						const parent = targetNode.getParent();
+						if (parent && !$canInsertElementsToNode(parent)) {
+							const parents = targetNode.getParents();
+							targetNode = null;
+
+							for (let i = parents.length - 2; i > 0; i++) {
+								const target = parents[i + 1];
+								const parent = parents[i];
+
+								if (!$canInsertElementsToNode(parent)) continue;
+								targetNode = target;
+							}
+
+							if (!targetNode) return;
+						}
+
+						targetNode.insertAfter($createImageNode({ src: url, altText }));
+					});
+				},
 				list({ type }) {
 					switch (type) {
 						case 'checkbox':
