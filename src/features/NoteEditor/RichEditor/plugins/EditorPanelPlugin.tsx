@@ -136,10 +136,14 @@ export const EditorPanelPlugin = () => {
 						$wrapNodes((nodes) => {
 							const code = $createCodeNode();
 
-							const p = $createParagraphNode();
-							p.append(...nodes);
-							const textContent = p.getTextContent();
-							p.remove();
+							const textContent = nodes
+								.map(
+									(node) =>
+										node.getTextContent() +
+										(node.isInline() ? '' : '\n'),
+								)
+								.join('');
+							nodes.forEach((node) => node.remove());
 
 							code.append($createTextNode(textContent));
 							code.select();
