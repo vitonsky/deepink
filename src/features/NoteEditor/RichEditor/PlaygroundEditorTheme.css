@@ -111,6 +111,7 @@
 }
 
 .PlaygroundEditorTheme__link {
+	display: inline-block;
 	color: rgb(33 111 219);
 	text-decoration: none;
 }
