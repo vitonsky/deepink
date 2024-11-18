@@ -140,7 +140,7 @@ export const EditorPanelPlugin = () => {
 								.map(
 									(node) =>
 										node.getTextContent() +
-										(node.isInline() ? '' : '\n'),
+										($isBlockElementNode(node) ? '\n' : ''),
 								)
 								.join('');
 							nodes.forEach((node) => node.remove());
