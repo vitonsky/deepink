@@ -34,7 +34,13 @@ export const EditorPanel = () => {
 				evt.stopPropagation();
 			}}
 		>
-			<Button size="sm" variant="ghost">
+			<Button
+				size="sm"
+				variant="ghost"
+				onClick={() => {
+					onInserting({ type: 'heading', data: { level: 1 } });
+				}}
+			>
 				<FaHeading />
 			</Button>
 			<HStack gap="0">

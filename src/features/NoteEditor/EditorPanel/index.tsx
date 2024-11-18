@@ -6,7 +6,7 @@ export type FormattingPayload = 'bold' | 'italic' | 'strikethrough';
 
 export type InsertingPayloadMap = {
 	heading: {
-		level: number;
+		level: 1 | 2 | 3 | 4 | 5 | 6;
 	};
 	list: {
 		type: 'checkbox' | 'ordered' | 'unordered';

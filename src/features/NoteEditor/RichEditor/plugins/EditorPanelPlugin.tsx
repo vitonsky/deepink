@@ -21,7 +21,7 @@ import {
 } from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
-import { $createQuoteNode } from '@lexical/rich-text';
+import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import { $findMatchingParent } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../EditorPanel';
@@ -204,6 +204,34 @@ export const EditorPanelPlugin = () => {
 							);
 							break;
 					}
+				},
+				heading({ level }) {
+					editor.update(() => {
+						const selection = $getSelection();
+						if (!selection) return;
+
+						const points = selection.getStartEndPoints();
+						if (!points) return;
+
+						const target = points[0].getNode();
+						if (!target) return;
+
+						const parent = target.getParent();
+						if (parent && !$canInsertElementsToNode(parent)) return;
+
+						// Insert
+						if ($isTextNode(target)) {
+							const heading = $createHeadingNode(`h${level}`);
+
+							target.replace(heading);
+							heading.append(target);
+							heading.select();
+						} else {
+							const heading = $createHeadingNode(`h${level}`);
+							target.insertBefore(heading);
+							heading.select();
+						}
+					});
 				},
 			};
 
