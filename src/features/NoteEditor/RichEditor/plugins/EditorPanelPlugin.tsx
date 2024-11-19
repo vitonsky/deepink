@@ -22,7 +22,7 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
-import { $findMatchingParent } from '@lexical/utils';
+import { $dfs, $findMatchingParent } from '@lexical/utils';
 
 import {
 	InsertingPayloadMap,
@@ -49,11 +49,14 @@ const formatMap = {
 } satisfies Record<TextFormat, string>;
 
 const $getFormatNode = (node: LexicalNode, format: TextFormat) => {
-	return (
-		$getFormatNodes(node).find(
-			(formatNode) => formatNode.getTagName() === formatMap[format],
-		) ?? null
-	);
+	const isMatch = (formatNode: FormattingNode) =>
+		formatNode.getTagName() === formatMap[format];
+
+	if ($isFormattingNode(node) && isMatch(node)) {
+		return node;
+	}
+
+	return $getFormatNodes(node).find(isMatch) ?? null;
 };
 
 const $setFormatNode = (node: LexicalNode, format: TextFormat) => {
@@ -72,6 +75,36 @@ const $setFormatNode = (node: LexicalNode, format: TextFormat) => {
 	return formattingNode;
 };
 
+const $insertAfter = (target: LexicalNode, nodes: LexicalNode[]) => {
+	const nodesList = [...nodes].reverse();
+	for (let lastNode: LexicalNode | null = target; lastNode;) {
+		const node = nodesList.pop();
+
+		if (node) {
+			lastNode.insertAfter(node);
+		}
+
+		lastNode = node ?? null;
+	}
+};
+
+const $removeFormatNode = (node: LexicalNode, format: TextFormat) => {
+	const parentFormat = $getFormatNode(node, format);
+	if (!parentFormat) return;
+
+	$insertAfter(parentFormat, parentFormat.getChildren());
+};
+
+const $toggleFormatNode = (node: LexicalNode, format: TextFormat) => {
+	const parentFormat = $getFormatNode(node, format);
+
+	if (!parentFormat) {
+		$setFormatNode(node, format);
+	} else {
+		$removeFormatNode(node, format);
+	}
+};
+
 // Insertion
 export const $canInsertElementsToNode = (node: LexicalNode) => {
 	if ($isTextNode(node)) return false;
@@ -86,7 +119,15 @@ export const $canInsertElementsToNode = (node: LexicalNode) => {
 	return true;
 };
 
-export const $findCommonAncestor = (startNode: LexicalNode, nodes: LexicalNode[]) => {
+export const $findCommonAncestor = (
+	startNode: LexicalNode,
+	nodes: LexicalNode[],
+	filter: (node: LexicalNode) => boolean = () => true,
+) => {
+	if (nodes.length === 1 && startNode.is(nodes[0]) && filter(startNode)) {
+		return startNode;
+	}
+
 	return $findMatchingParent(startNode, (parent) => {
 		return (
 			nodes.every((selectedNode) => $hasAncestor(selectedNode, parent)) &&
@@ -173,19 +214,14 @@ export const EditorPanelPlugin = () => {
 				if (!selection) return;
 
 				const nodes = selection.getNodes();
-				const nodesWithNoFormatting = nodes.filter(
-					(node) => $getFormatNode(node, format) === null,
-				);
+				if (nodes.length === 0) return;
 
-				if (nodesWithNoFormatting.length === 0) return;
-
-				const commonAncestor = $findCommonAncestor(
-					nodesWithNoFormatting[0],
-					nodesWithNoFormatting,
+				const commonAncestor = $findCommonAncestor(nodes[0], nodes, (node) =>
+					$dfs(node).some(({ node }) => $isCodeNode(node)),
 				);
 				if (!commonAncestor) return;
 
-				$setFormatNode(commonAncestor, format);
+				$toggleFormatNode(commonAncestor, format);
 			});
 		});
 

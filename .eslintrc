@@ -53,6 +53,7 @@
 					"Blockquote",
 					"Strikethrough",
 					"Hmac",
+					"dfs",
 					"Obfuscator",
 					"Outdent",
 					"Paddings",
