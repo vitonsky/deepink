@@ -29,6 +29,7 @@ export const LinkButton: FC<
 			<Button
 				size="sm"
 				variant="ghost"
+				title="Insert link"
 				onClick={() => {
 					show({
 						content: ({ onClose }) => (

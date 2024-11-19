@@ -29,6 +29,7 @@ export const ImageButton: FC<
 			<Button
 				size="sm"
 				variant="ghost"
+				title="Insert image"
 				onClick={() => {
 					show({
 						content: ({ onClose }) => (

@@ -19,7 +19,7 @@ import { ImageButton } from './buttons/ImageButton';
 import { LinkButton } from './buttons/LinkButton';
 import { useEditorPanelContext } from '.';
 
-// TODO: add titles for buttons
+// TODO: add hotkeys to trigger panel commands
 // TODO: implement notifications from editor to panel, to render current state for formatting buttons
 export const EditorPanel = () => {
 	const { onInserting, onFormatting } = useEditorPanelContext();
@@ -44,6 +44,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Toggle bold text style"
 					onClick={() => {
 						onFormatting('bold');
 					}}
@@ -53,6 +54,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Toggle italic text style"
 					onClick={() => {
 						onFormatting('italic');
 					}}
@@ -62,6 +64,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Toggle strikethrough text style"
 					onClick={() => {
 						onFormatting('strikethrough');
 					}}
@@ -74,6 +77,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Insert or toggle unordered list"
 					onClick={() => {
 						onInserting({ type: 'list', data: { type: 'unordered' } });
 					}}
@@ -83,6 +87,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Insert or toggle checkbox list"
 					onClick={() => {
 						onInserting({ type: 'list', data: { type: 'checkbox' } });
 					}}
@@ -92,6 +97,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Insert or toggle ordered list"
 					onClick={() => {
 						onInserting({ type: 'list', data: { type: 'ordered' } });
 					}}
@@ -120,6 +126,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Insert or wrap text with code block"
 					onClick={() => {
 						onInserting({ type: 'code', data: {} });
 					}}
@@ -129,6 +136,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Insert or wrap text with quote block"
 					onClick={() => {
 						onInserting({ type: 'quote', data: {} });
 					}}
@@ -138,6 +146,7 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Insert date"
 					onClick={() => {
 						onInserting({
 							type: 'date',
@@ -150,13 +159,14 @@ export const EditorPanel = () => {
 				<Button
 					size="sm"
 					variant="ghost"
+					title="Insert page break"
 					onClick={() => {
 						onInserting({ type: 'horizontalRule' });
 					}}
 				>
 					<FaMinus />
 				</Button>
-				<Button size="sm" variant="ghost">
+				<Button size="sm" variant="ghost" title="Insert file" isDisabled>
 					<FaPaperclip />
 				</Button>
 			</HStack>
