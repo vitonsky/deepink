@@ -24,10 +24,55 @@ import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontal
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import { $findMatchingParent } from '@lexical/utils';
 
-import { InsertingPayloadMap, useEditorPanelContext } from '../../EditorPanel';
+import {
+	InsertingPayloadMap,
+	TextFormat,
+	useEditorPanelContext,
+} from '../../EditorPanel';
 
+import {
+	$createFormattingNode,
+	$isFormattingNode,
+	FormattingNode,
+} from '../nodes/FormattingNode';
 import { $createImageNode } from '../nodes/ImageNode';
 
+// Format
+const $getFormatNodes = (node: LexicalNode): FormattingNode[] => {
+	return node.getParents().filter((node) => $isFormattingNode(node));
+};
+
+const formatMap = {
+	bold: 'b',
+	italic: 'em',
+	strikethrough: 'del',
+} satisfies Record<TextFormat, string>;
+
+const $getFormatNode = (node: LexicalNode, format: TextFormat) => {
+	return (
+		$getFormatNodes(node).find(
+			(formatNode) => formatNode.getTagName() === formatMap[format],
+		) ?? null
+	);
+};
+
+const $setFormatNode = (node: LexicalNode, format: TextFormat) => {
+	const parentFormat = $getFormatNode(node, format);
+	if (parentFormat) return;
+
+	const formattingNode = $createFormattingNode({ tag: formatMap[format] });
+	if ($isBlockElementNode(node)) {
+		formattingNode.append(...node.getChildren());
+		node.append(formattingNode);
+		return formattingNode;
+	}
+
+	node.replace(formattingNode);
+	formattingNode.append(node);
+	return formattingNode;
+};
+
+// Insertion
 export const $canInsertElementsToNode = (node: LexicalNode) => {
 	if ($isTextNode(node)) return false;
 
@@ -39,6 +84,15 @@ export const $canInsertElementsToNode = (node: LexicalNode) => {
 	}
 
 	return true;
+};
+
+export const $findCommonAncestor = (startNode: LexicalNode, nodes: LexicalNode[]) => {
+	return $findMatchingParent(startNode, (parent) => {
+		return (
+			nodes.every((selectedNode) => $hasAncestor(selectedNode, parent)) &&
+			$canInsertElementsToNode(parent)
+		);
+	});
 };
 
 export const $wrapNodes = (createElement: (nodes: LexicalNode[]) => ElementNode) => {
@@ -107,12 +161,35 @@ export const $wrapNodes = (createElement: (nodes: LexicalNode[]) => ElementNode)
 export const EditorPanelPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
-	const { onInserting } = useEditorPanelContext();
+	const { onInserting, onFormatting } = useEditorPanelContext();
 
 	useEffect(() => {
-		return onInserting.watch((evt) => {
-			console.warn('INSERTING ELEMENT', evt);
+		const cleanupFormatting = onFormatting.watch((format) => {
+			console.log('Format text', format);
 
+			// TODO: support formatting selected text slices
+			editor.update(() => {
+				const selection = $getSelection();
+				if (!selection) return;
+
+				const nodes = selection.getNodes();
+				const nodesWithNoFormatting = nodes.filter(
+					(node) => $getFormatNode(node, format) === null,
+				);
+
+				if (nodesWithNoFormatting.length === 0) return;
+
+				const commonAncestor = $findCommonAncestor(
+					nodesWithNoFormatting[0],
+					nodesWithNoFormatting,
+				);
+				if (!commonAncestor) return;
+
+				$setFormatNode(commonAncestor, format);
+			});
+		});
+
+		const cleanupInserting = onInserting.watch((evt) => {
 			const commands: {
 				[K in keyof InsertingPayloadMap]?: (
 					payload: InsertingPayloadMap[K],
@@ -241,7 +318,12 @@ export const EditorPanelPlugin = () => {
 				command(evt.data);
 			}
 		});
-	}, [editor, onInserting]);
+
+		return () => {
+			cleanupFormatting();
+			cleanupInserting();
+		};
+	}, [editor, onFormatting, onInserting]);
 
 	return null;
 };

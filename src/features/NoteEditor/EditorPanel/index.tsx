@@ -2,7 +2,7 @@ import React, { createContext, PropsWithChildren, useState } from 'react';
 import { createEvent, EventCallable } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export type FormattingPayload = 'bold' | 'italic' | 'strikethrough';
+export type TextFormat = 'bold' | 'italic' | 'strikethrough';
 
 export type InsertingPayloadMap = {
 	heading: {
@@ -40,14 +40,14 @@ export type InsertingPayload = {
 }[keyof InsertingPayloadMap];
 
 export const editorPanelContext = createContext<{
-	onFormatting: EventCallable<FormattingPayload>;
+	onFormatting: EventCallable<TextFormat>;
 	onInserting: EventCallable<InsertingPayload>;
 }>(null as any);
 
 export const useEditorPanelContext = createContextGetterHook(editorPanelContext);
 export const EditorPanelContext = ({ children }: PropsWithChildren) => {
 	const [events] = useState(() => ({
-		onFormatting: createEvent<FormattingPayload>(),
+		onFormatting: createEvent<TextFormat>(),
 		onInserting: createEvent<InsertingPayload>(),
 	}));
 

@@ -24,7 +24,7 @@ import { useEditorPanelContext } from '.';
 // TODO: add titles for buttons
 // TODO: implement notifications from editor to panel, to render current state for formatting buttons
 export const EditorPanel = () => {
-	const { onInserting } = useEditorPanelContext();
+	const { onInserting, onFormatting } = useEditorPanelContext();
 
 	return (
 		<HStack
@@ -44,13 +44,31 @@ export const EditorPanel = () => {
 				<FaHeading />
 			</Button>
 			<HStack gap="0">
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onFormatting('bold');
+					}}
+				>
 					<FaBold />
 				</Button>
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onFormatting('italic');
+					}}
+				>
 					<FaItalic />
 				</Button>
-				<Button size="sm" variant="ghost">
+				<Button
+					size="sm"
+					variant="ghost"
+					onClick={() => {
+						onFormatting('strikethrough');
+					}}
+				>
 					<FaStrikethrough />
 				</Button>
 			</HStack>
