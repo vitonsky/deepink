@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 // eslint-disable-next-line spellcheck/spell-checker
 import { ChakraProvider } from '@chakra-ui/react';
 import { theme } from '@components/theme';
+import { ModalWindowProvider } from '@components/useModalWindow';
 import { App } from '@features/App/index';
 import { store } from '@state/redux/store';
 
@@ -18,7 +19,9 @@ const reactRoot = createRoot(rootNode);
 reactRoot.render(
 	<Provider store={store}>
 		<ChakraProvider theme={theme}>
-			<App />
+			<ModalWindowProvider>
+				<App />
+			</ModalWindowProvider>
 		</ChakraProvider>
 	</Provider>,
 );
