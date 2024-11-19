@@ -172,7 +172,11 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 			case 'tableCell': {
 				const tableCell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
-				tableCell.append(...convertToMarkdownNodes(node.children, true));
+
+				const paragraph = $createParagraphNode();
+				paragraph.append(...convertToMarkdownNodes(node.children, true));
+				tableCell.append(paragraph);
+
 				return tableCell;
 			}
 			case 'code': {
