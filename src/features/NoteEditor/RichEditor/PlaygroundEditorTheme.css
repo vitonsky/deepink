@@ -25,11 +25,11 @@
 
 .PlaygroundEditorTheme__quote {
 	margin: 0;
-	margin-left: 20px;
+	margin-left: 10px;
 	margin-bottom: 10px;
 	font-size: 15px;
-	color: rgb(101 103 107);
-	border-left-color: rgb(206 208 212);
+	color: var(--chakra-colors-typography-secondary);
+	border-left-color: var(--chakra-colors-surface-border);
 	border-left-width: 4px;
 	border-left-style: solid;
 	padding-left: 16px;
