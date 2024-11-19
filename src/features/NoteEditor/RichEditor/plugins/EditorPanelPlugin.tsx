@@ -39,7 +39,9 @@ import { $createImageNode } from '../nodes/ImageNode';
 
 // Format
 const $getFormatNodes = (node: LexicalNode): FormattingNode[] => {
-	return node.getParents().filter((node) => $isFormattingNode(node));
+	return node
+		.getParents()
+		.filter((node) => $isFormattingNode(node)) as FormattingNode[];
 };
 
 const formatMap = {
