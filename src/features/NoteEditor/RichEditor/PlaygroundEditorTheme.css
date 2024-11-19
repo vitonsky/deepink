@@ -113,7 +113,7 @@
 .PlaygroundEditorTheme__link {
 	display: inline-block;
 	color: rgb(33 111 219);
-	text-decoration: none;
+	text-decoration: inherit;
 }
 
 .PlaygroundEditorTheme__link:hover {
@@ -144,8 +144,7 @@
 	overflow-y: scroll;
 	overflow-x: scroll;
 	table-layout: fixed;
-	width: fit-content;
-	margin: 0 25px 30px 0;
+	width: inherit;
 }
 
 .PlaygroundEditorTheme__tableRowStriping tr:nth-child(even) {
