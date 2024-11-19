@@ -133,7 +133,7 @@ export const basicTheme = extendTheme({
 				},
 				ghost: {
 					color: 'typography.primary',
-					'&:hover, &:active': {
+					'&:hover, &:active, &[data-active]': {
 						backgroundColor: 'dim.400',
 					},
 				},
@@ -142,7 +142,11 @@ export const basicTheme = extendTheme({
 				variant: 'secondary',
 			},
 		}),
-		Menu: createMultiStyleConfigHelpers(['list', 'item']).defineMultiStyleConfig({
+		Menu: createMultiStyleConfigHelpers([
+			'button',
+			'list',
+			'item',
+		]).defineMultiStyleConfig({
 			baseStyle: {
 				list: {
 					borderColor: 'surface.border',
