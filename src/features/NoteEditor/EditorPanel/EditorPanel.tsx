@@ -4,7 +4,6 @@ import {
 	FaCalendarDay,
 	FaCode,
 	FaHeading,
-	FaImage,
 	FaItalic,
 	FaListCheck,
 	FaListOl,
@@ -25,6 +24,7 @@ import {
 	Text,
 } from '@chakra-ui/react';
 
+import { ImageButton } from './ImageButton';
 import { LinkButton } from './LinkButton';
 import { HeaderLevel, useEditorPanelContext } from '.';
 
@@ -183,21 +183,14 @@ export const EditorPanel = () => {
 						})
 					}
 				/>
-				<Button
-					size="sm"
-					variant="ghost"
-					onClick={() => {
+				<ImageButton
+					onPick={(payload) =>
 						onInserting({
 							type: 'image',
-							data: {
-								url: 'https://artprojectsforkids.org/wp-content/uploads/2024/04/How-to-Draw-a-Cow-web.jpg',
-								altText: 'alt text',
-							},
-						});
-					}}
-				>
-					<FaImage />
-				</Button>
+							data: payload,
+						})
+					}
+				/>
 				<Button
 					size="sm"
 					variant="ghost"
