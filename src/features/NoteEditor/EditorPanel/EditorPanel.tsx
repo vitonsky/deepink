@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import {
 	FaBold,
 	FaCalendarDay,
 	FaCode,
-	FaHeading,
 	FaItalic,
 	FaListCheck,
 	FaListOl,
@@ -13,86 +12,13 @@ import {
 	FaQuoteLeft,
 	FaStrikethrough,
 } from 'react-icons/fa6';
-import {
-	Button,
-	HStack,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuList,
-	MenuProps,
-	Text,
-} from '@chakra-ui/react';
+import { Button, HStack } from '@chakra-ui/react';
 
-import { ImageButton } from './ImageButton';
-import { LinkButton } from './LinkButton';
-import { HeaderLevel, useEditorPanelContext } from '.';
+import { HeaderPicker } from './buttons/HeaderPicker';
+import { ImageButton } from './buttons/ImageButton';
+import { LinkButton } from './buttons/LinkButton';
+import { useEditorPanelContext } from '.';
 
-export const HeaderPicker = ({
-	onPick,
-	defaultLevel,
-	...props
-}: Omit<MenuProps, 'children'> & {
-	onPick: (level: HeaderLevel) => void;
-	defaultLevel?: HeaderLevel;
-}) => {
-	const [level, setLevel] = useState<HeaderLevel>(defaultLevel ?? 1);
-	useEffect(() => {
-		if (!defaultLevel) return;
-		setLevel(defaultLevel);
-	}, [defaultLevel]);
-
-	const onPress = useCallback(
-		(level: HeaderLevel) => {
-			onPick(level);
-			setLevel(level);
-		},
-		[onPick],
-	);
-
-	return (
-		<Menu autoSelect={false} {...props}>
-			<MenuButton
-				as={Button}
-				size="sm"
-				variant="ghost"
-				title={`Ctrl + click to insert header with level ${level}`}
-				onClick={(evt) => {
-					if (evt.ctrlKey) {
-						evt.preventDefault();
-						evt.stopPropagation();
-						onPress(level);
-					}
-				}}
-				minW="auto"
-			>
-				<FaHeading />
-			</MenuButton>
-			<MenuList minW="auto">
-				{([1, 2, 3, 4, 5, 6] as const).map((level) => (
-					<MenuItem
-						paddingInlineEnd="1rem"
-						onMouseDown={(evt) => {
-							evt.preventDefault();
-							evt.stopPropagation();
-						}}
-						onClick={() => {
-							onPress(level);
-						}}
-					>
-						<HStack>
-							<FaHeading />
-							<Text>Level {level}</Text>
-						</HStack>
-					</MenuItem>
-				))}
-			</MenuList>
-		</Menu>
-	);
-};
-
-// TODO: implement logic for all buttons
-// TODO: make heading button are menu with options to pick level
 // TODO: add titles for buttons
 // TODO: implement notifications from editor to panel, to render current state for formatting buttons
 export const EditorPanel = () => {

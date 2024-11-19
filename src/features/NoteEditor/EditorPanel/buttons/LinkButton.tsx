@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
-import { FaImage } from 'react-icons/fa6';
+import { FaLink } from 'react-icons/fa6';
 import {
 	Box,
 	Button,
@@ -13,12 +13,13 @@ import {
 } from '@chakra-ui/react';
 import { useModalWindow } from '@components/useModalWindow';
 
-import { PropertiesForm } from '../RichEditor/ContextMenu/ObjectPropertiesEditor';
-import { InsertingPayloadMap } from '.';
+import { PropertiesForm } from '../../RichEditor/ContextMenu/ObjectPropertiesEditor';
 
-export const ImageButton: FC<
+import { InsertingPayloadMap } from '..';
+
+export const LinkButton: FC<
 	ButtonProps & {
-		onPick: (payload: InsertingPayloadMap['image']) => void;
+		onPick: (payload: InsertingPayloadMap['link']) => void;
 	}
 > = ({ onPick }) => {
 	const { show } = useModalWindow();
@@ -34,12 +35,13 @@ export const ImageButton: FC<
 							<>
 								<ModalCloseButton />
 								<ModalHeader>
-									<Text>Add image</Text>
+									<Text>Add link</Text>
 								</ModalHeader>
 								<ModalBody paddingBottom="1rem">
 									<VStack w="100%" gap="1rem" align="start">
 										<Text color="typography.secondary">
-											Image will be inserted at cursor position.
+											Selected text become a link, or link will be
+											added at cursor position if nothing selected.
 										</Text>
 
 										<Box as={AutoFocusInside} w="100%">
@@ -48,19 +50,14 @@ export const ImageButton: FC<
 													{
 														id: 'url',
 														value: '',
-														label: 'Image url',
-													},
-													{
-														id: 'altText',
-														value: '',
-														label: 'Image alt text (optional)',
+														label: 'Link url',
 													},
 												]}
-												onUpdate={({ url, altText }) => {
+												onUpdate={({ url }) => {
 													onClose();
 
 													if (url) {
-														onPick({ url, altText });
+														onPick({ url });
 													}
 												}}
 												submitButtonText="Add"
@@ -73,7 +70,7 @@ export const ImageButton: FC<
 					});
 				}}
 			>
-				<FaImage />
+				<FaLink />
 			</Button>
 		</>
 	);
