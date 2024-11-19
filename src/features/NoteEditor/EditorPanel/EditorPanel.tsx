@@ -6,7 +6,6 @@ import {
 	FaHeading,
 	FaImage,
 	FaItalic,
-	FaLink,
 	FaListCheck,
 	FaListOl,
 	FaListUl,
@@ -26,6 +25,7 @@ import {
 	Text,
 } from '@chakra-ui/react';
 
+import { LinkButton } from './LinkButton';
 import { HeaderLevel, useEditorPanelContext } from '.';
 
 export const HeaderPicker = ({
@@ -175,18 +175,14 @@ export const EditorPanel = () => {
 			</HStack>
 
 			<HStack gap="0">
-				<Button
-					size="sm"
-					variant="ghost"
-					onClick={() => {
+				<LinkButton
+					onPick={(payload) =>
 						onInserting({
 							type: 'link',
-							data: { url: 'https://example.org', text: 'test link' },
-						});
-					}}
-				>
-					<FaLink />
-				</Button>
+							data: payload,
+						})
+					}
+				/>
 				<Button
 					size="sm"
 					variant="ghost"

@@ -15,7 +15,6 @@ export type InsertingPayloadMap = {
 	};
 	link: {
 		url: string;
-		text: string;
 	};
 	image: {
 		url: string;

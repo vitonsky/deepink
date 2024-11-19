@@ -12,6 +12,7 @@ import {
 	FocusLock,
 	HStack,
 	Input,
+	StackProps,
 	Text,
 	VStack,
 } from '@chakra-ui/react';
@@ -22,18 +23,23 @@ export type OptionObject = {
 	label: string;
 };
 
-export type PropertiesFormProps<T extends OptionObject[]> = {
+export type PropertiesFormProps<T extends OptionObject[]> = StackProps & {
 	options: T;
 	onUpdate: (values: {
 		[K in T[number]['value']]: string;
 	}) => void;
 	onCancel?: () => void;
+	submitButtonText?: string;
+	cancelButtonText?: string;
 };
 
 export const PropertiesForm = <T extends OptionObject[]>({
 	options,
 	onUpdate,
 	onCancel,
+	submitButtonText = 'Save',
+	cancelButtonText = 'Cancel',
+	...props
 }: PropertiesFormProps<T>) => {
 	const optionsValues = Object.fromEntries(options.map(({ id, value }) => [id, value]));
 	const { register, getValues, setValue, reset } = useForm({
@@ -47,7 +53,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	}, [getValues, optionsValues, reset, setValue]);
 
 	return (
-		<VStack as="form" gap="1rem">
+		<VStack as="form" gap="1rem" w="100%" {...props}>
 			<VStack w="100%" gap="0.5rem">
 				{options.map(({ id, label }) => {
 					return <Input key={id} placeholder={label} {...register(id)} />;
@@ -55,14 +61,14 @@ export const PropertiesForm = <T extends OptionObject[]>({
 			</VStack>
 
 			<HStack w="100%" justifyContent="end">
-				{onCancel && <Button onClick={onCancel}>Cancel</Button>}
+				{onCancel && <Button onClick={onCancel}>{cancelButtonText}</Button>}
 				<Button
 					variant="primary"
 					onClick={() => {
 						onUpdate(getValues() as any);
 					}}
 				>
-					Save
+					{submitButtonText}
 				</Button>
 			</HStack>
 		</VStack>
