@@ -4,9 +4,11 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export type TextFormat = 'bold' | 'italic' | 'strikethrough';
 
+export type HeaderLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
 export type InsertingPayloadMap = {
 	heading: {
-		level: 1 | 2 | 3 | 4 | 5 | 6;
+		level: HeaderLevel;
 	};
 	list: {
 		type: 'checkbox' | 'ordered' | 'unordered';
