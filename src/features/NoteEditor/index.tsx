@@ -42,13 +42,13 @@ import {
 	useFilesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useAppDispatch } from '@state/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
+import { selectEditorMode } from '@state/redux/settings/settings';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
-import { NoteScreen } from '../NoteScreen';
 import { EditorPanelContext } from './EditorPanel';
 import { EditorPanel } from './EditorPanel/EditorPanel';
 import { RichEditor } from './RichEditor/RichEditor';
@@ -61,6 +61,8 @@ export type NoteEditorProps = {
 export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
+
+	const editorMode = useAppSelector(selectEditorMode);
 
 	const [title, setTitle] = useState(note.content.title);
 	const [text, setText] = useState(note.content.text);
@@ -388,16 +390,15 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					<EditorPanel />
 				</HStack>
 
-				{/* TODO: toggle editors with button and remember in settings */}
-				{true ? (
-					<HStack
-						sx={{
-							display: 'flex',
-							width: '100%',
-							height: '100%',
-							overflow: 'hidden',
-						}}
-					>
+				<HStack
+					sx={{
+						display: 'flex',
+						width: '100%',
+						height: '100%',
+						overflow: 'hidden',
+					}}
+				>
+					{(editorMode === 'plaintext' || editorMode === 'split-screen') && (
 						<Box
 							as={MonacoEditor}
 							value={text}
@@ -407,30 +408,11 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							width="100%"
 							height="100%"
 						/>
+					)}
+					{(editorMode === 'richtext' || editorMode === 'split-screen') && (
 						<RichEditor value={text} onValueChanged={setText} />
-					</HStack>
-				) : (
-					<Box
-						sx={{
-							width: '100%',
-							display: 'grid',
-							overflow: 'hidden',
-							gap: '0.3rem',
-							flexGrow: '100',
-							flex: 1,
-							gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-						}}
-					>
-						<Box
-							as={MonacoEditor}
-							value={text}
-							setValue={setText}
-							flexGrow="100"
-							uploadFile={uploadFile}
-						/>
-						<NoteScreen note={note} update={onTextUpdate} />
-					</Box>
-				)}
+					)}
+				</HStack>
 			</EditorPanelContext>
 
 			{sidePanel === 'backlinks' && (

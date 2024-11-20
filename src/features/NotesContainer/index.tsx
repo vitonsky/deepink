@@ -13,6 +13,8 @@ import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 import { createWorkspaceSelector } from '@state/redux/profiles/utils';
 
+import { EditorModePicker } from './EditorModePicker/EditorModePicker';
+
 export type NotesContainerProps = Partial<StackProps>;
 
 export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
@@ -70,6 +72,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					}}
 				/>
 			</Box>
+			<EditorModePicker />
 		</VStack>
 	);
 };
