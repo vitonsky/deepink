@@ -9,7 +9,7 @@
 		"test-fast": "npm rebuild && TEST_FAST=true jest",
 		"clean": "rm -Rf dist out",
 		"build:dev": "npm run prepare-electron-deps && webpack -w",
-		"start": "electron-forge start",
+		"start": "electron-forge start -- --no-sandbox",
 		"package": "electron-forge package",
 		"make": "electron-forge make",
 		"lint": "prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint \"{*,**/*}.{ts,tsx,js,jsx}\"",
