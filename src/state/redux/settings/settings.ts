@@ -14,6 +14,9 @@ export const settingsSlice = createSlice({
 		theme: 'zen',
 	} as GlobalSettings,
 	reducers: {
+		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
+			return { ...state, ...payload } as GlobalSettings;
+		},
 		setEditorMode: (
 			state,
 			{ payload }: PayloadAction<GlobalSettings['editorMode']>,
