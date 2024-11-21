@@ -19,13 +19,15 @@ import {
 	LexicalCommand,
 	NodeKey,
 } from 'lexical';
+import { getAppResourceDataInUrl } from '@core/features/links';
+import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
 
 import { $isImageNode } from '../ImageNode';
 
-const imageCache = new Set();
+const imageCache = new Map<string, string>();
 
 export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> = createCommand(
 	'RIGHT_CLICK_IMAGE_COMMAND',
@@ -35,19 +37,41 @@ export const LEFT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> = createComman
 );
 
 function useSuspenseImage(src: string) {
+	const filesRegistry = useFilesRegistry();
+
 	if (!imageCache.has(src)) {
-		throw new Promise((resolve) => {
+		throw new Promise(async (resolve, reject) => {
+			let actualSrc = src;
+
+			const resourceData = getAppResourceDataInUrl(src);
+			if (resourceData) {
+				if (resourceData.type !== 'resource') {
+					reject(new Error('Not a resource type'));
+					return;
+				}
+
+				const file = await filesRegistry.get(resourceData.id);
+				if (!file) {
+					reject(new Error('File not found'));
+					return;
+				}
+
+				actualSrc = URL.createObjectURL(new Blob([file]));
+			}
+
 			const img = new Image();
-			img.src = src;
+			img.src = actualSrc;
 			img.onload = () => {
-				imageCache.add(src);
+				imageCache.set(src, actualSrc);
 				resolve(null);
 			};
 			img.onerror = () => {
-				imageCache.add(src);
+				imageCache.set(src, actualSrc);
 			};
 		});
 	}
+
+	return imageCache.get(src) ?? src;
 }
 
 export const LazyImage = React.forwardRef<
@@ -62,13 +86,13 @@ export const LazyImage = React.forwardRef<
 		onError: () => void;
 	}
 >(({ altText, className, src, width, height, maxWidth, onError }, ref): JSX.Element => {
-	useSuspenseImage(src);
+	const url = useSuspenseImage(src);
 
 	return (
 		<img
 			ref={ref}
 			className={className || undefined}
-			src={src}
+			src={url}
 			alt={altText}
 			style={{
 				height,
