@@ -79,7 +79,7 @@ const $setFormatNode = (node: LexicalNode, format: TextFormat) => {
 
 const $insertAfter = (target: LexicalNode, nodes: LexicalNode[]) => {
 	const nodesList = [...nodes].reverse();
-	for (let lastNode: LexicalNode | null = target; lastNode;) {
+	for (let lastNode: LexicalNode | null = target; lastNode; ) {
 		const node = nodesList.pop();
 
 		if (node) {
