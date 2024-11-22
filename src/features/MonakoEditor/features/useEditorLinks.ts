@@ -1,11 +1,7 @@
 import { useEffect } from 'react';
-import { saveAs } from 'file-saver';
 import { editor, languages } from 'monaco-editor-core';
-import { findLinksInText, getAppResourceDataInUrl } from '@core/features/links';
-import { openLink } from '@electron/requests/interactions/renderer';
-import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
-
-import { useNotesControl } from '../../MainScreen/useNotesControl';
+import { findLinksInText } from '@core/features/links';
+import { useUrlOpener } from '@hooks/useUrlOpener';
 
 /**
  * Hook to enable app links handling in monaco editor
@@ -13,13 +9,10 @@ import { useNotesControl } from '../../MainScreen/useNotesControl';
  * WARNING: this hook are modify global objects, so must be used only once
  */
 export const useEditorLinks = () => {
-	const filesRegistry = useFilesRegistry();
-	const notesControl = useNotesControl();
+	const openUrl = useUrlOpener();
 
 	// Register files opener
 	useEffect(() => {
-		if (filesRegistry === null) return;
-
 		const mdLinkProvider = languages.registerLinkProvider('markdown', {
 			provideLinks: (
 				model: editor.ITextModel,
@@ -45,28 +38,7 @@ export const useEditorLinks = () => {
 
 		const appLinkOpener = editor.registerLinkOpener({
 			async open(resource) {
-				if (/^https?$/.test(resource.scheme)) {
-					openLink(resource.toString());
-					return true;
-				}
-
-				const resourceData = getAppResourceDataInUrl(resource);
-				if (!resourceData) return false;
-
-				switch (resourceData.type) {
-					case 'resource': {
-						const file = await filesRegistry.get(resourceData.id);
-						if (!file) return false;
-
-						const buffer = await file.arrayBuffer();
-						saveAs(new Blob([buffer]), file.name);
-						return true;
-					}
-					case 'note': {
-						notesControl.open(resourceData.id);
-						return true;
-					}
-				}
+				return openUrl(resource.toString());
 			},
 		});
 
@@ -74,5 +46,5 @@ export const useEditorLinks = () => {
 			mdLinkProvider.dispose();
 			appLinkOpener.dispose();
 		};
-	}, [filesRegistry, notesControl]);
+	}, [openUrl]);
 };
