@@ -1,4 +1,8 @@
-import { createMultiStyleConfigHelpers, extendTheme } from '@chakra-ui/react';
+import {
+	createMultiStyleConfigHelpers,
+	defineStyleConfig,
+	extendTheme,
+} from '@chakra-ui/react';
 
 import { basicTheme, getScrollBarStyles } from './basic';
 
@@ -73,6 +77,16 @@ export const zenTheme = extendTheme(basicTheme, {
 			},
 			defaultProps: {
 				variant: 'filled',
+			},
+		}),
+		Spinner: defineStyleConfig({
+			variants: {
+				primary: {
+					color: 'primary.200',
+				},
+			},
+			defaultProps: {
+				variant: 'primary',
 			},
 		}),
 	},

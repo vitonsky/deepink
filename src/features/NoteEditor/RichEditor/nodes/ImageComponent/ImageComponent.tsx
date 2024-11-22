@@ -19,6 +19,7 @@ import {
 	LexicalCommand,
 	NodeKey,
 } from 'lexical';
+import { HStack, Spinner, Text } from '@chakra-ui/react';
 import { getAppResourceDataInUrl } from '@core/features/links';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -221,7 +222,13 @@ export default function ImageComponent({
 				});
 			}}
 		>
-			<Suspense fallback={<div>Loading...</div>}>
+			<Suspense
+				fallback={
+					<HStack>
+						<Text>Image loading</Text> <Spinner />
+					</HStack>
+				}
+			>
 				{isLoadError ? (
 					<BrokenImage />
 				) : (
