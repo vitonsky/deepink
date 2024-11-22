@@ -33,6 +33,7 @@ import { FormattingNode } from './nodes/FormattingNode';
 import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
 import theme from './PlaygroundEditorTheme';
+import { AppLinks } from './plugins/AppLinks';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
@@ -165,6 +166,8 @@ export const RichEditorContent = ({
 			<FormattingPlugin />
 			<EditorPanelPlugin />
 
+			<AppLinks />
+
 			<ClearEditorPlugin />
 			<ClickableLinkPlugin />
 			<HashtagPlugin />
@@ -203,12 +206,6 @@ export const RichEditor = (props: RichEditorProps) => {
 							editor.getEditorState().toJSON(),
 						);
 					});
-					// editor.update(() => {
-					// 	$convertFromMarkdownString(
-					// 		'Hello **world**! \n* [x] Unchecked item\n\n Hello again',
-					// 		TRANSFORMERS,
-					// 	);
-					// });
 				},
 				nodes: [
 					FormattingNode,
@@ -224,7 +221,6 @@ export const RichEditor = (props: RichEditorProps) => {
 					HorizontalRuleNode,
 					CodeNode,
 					HeadingNode,
-					LinkNode,
 					ListNode,
 					ListItemNode,
 					QuoteNode,
