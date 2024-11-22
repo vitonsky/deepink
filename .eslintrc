@@ -188,7 +188,6 @@
 		"no-bitwise": "error",
 		"no-multi-spaces": "error",
 		"no-multiple-empty-lines": "error",
-		"space-in-parens": "error",
 		"semi": "error",
 		"prefer-const": "error",
 		// off cuz eslint is dumb: https://stackoverflow.com/questions/63818415/react-was-used-before-it-was-defined
