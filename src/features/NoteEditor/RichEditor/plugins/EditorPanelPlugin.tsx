@@ -36,6 +36,7 @@ import {
 	FormattingNode,
 } from '../nodes/FormattingNode';
 import { $createImageNode } from '../nodes/ImageNode';
+import { $insertAfter } from '../utils/selection';
 
 // Format
 const $getFormatNodes = (node: LexicalNode): FormattingNode[] => {
@@ -75,19 +76,6 @@ const $setFormatNode = (node: LexicalNode, format: TextFormat) => {
 	node.replace(formattingNode);
 	formattingNode.append(node);
 	return formattingNode;
-};
-
-const $insertAfter = (target: LexicalNode, nodes: LexicalNode[]) => {
-	const nodesList = [...nodes].reverse();
-	for (let lastNode: LexicalNode | null = target; lastNode; ) {
-		const node = nodesList.pop();
-
-		if (node) {
-			lastNode.insertAfter(node);
-		}
-
-		lastNode = node ?? null;
-	}
 };
 
 const $removeFormatNode = (node: LexicalNode, format: TextFormat) => {

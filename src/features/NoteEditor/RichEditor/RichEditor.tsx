@@ -34,6 +34,7 @@ import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
 import theme from './PlaygroundEditorTheme';
 import { AppLinks } from './plugins/AppLinks';
+import { DropFilesPlugin } from './plugins/DropFilesPlugin';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
@@ -167,6 +168,8 @@ export const RichEditorContent = ({
 			<EditorPanelPlugin />
 
 			<AppLinks />
+
+			<DropFilesPlugin />
 
 			<ClearEditorPlugin />
 			<ClickableLinkPlugin />
