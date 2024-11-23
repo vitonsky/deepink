@@ -166,7 +166,35 @@ export const EditorPanel = () => {
 				>
 					<FaMinus />
 				</Button>
-				<Button size="sm" variant="ghost" title="Insert file" isDisabled>
+				<Button
+					size="sm"
+					variant="ghost"
+					title="Insert file"
+					onClick={() => {
+						const input = document.createElement('input');
+						input.type = 'file';
+						input.multiple = true;
+						input.addEventListener(
+							'change',
+							(evt) => {
+								const files = input.files;
+								input.remove();
+
+								if (files) {
+									onInserting({
+										type: 'file',
+										data: {
+											files,
+										},
+									});
+								}
+							},
+							false,
+						);
+
+						input.click();
+					}}
+				>
 					<FaPaperclip />
 				</Button>
 			</HStack>

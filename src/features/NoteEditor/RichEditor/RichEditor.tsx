@@ -189,12 +189,10 @@ export const RichEditorContent = ({
 	);
 };
 
-// TODO: support attachments
 // TODO: move lines with alt+arrows
 // TODO: support videos
 // TODO: copy markdown text by selection, not rich text
 // TODO: when user start remove markdown element - transform it to markdown and remove single char instead
-// TODO: add context menu for block elements, to toggle list types
 export const RichEditor = (props: RichEditorProps) => {
 	return (
 		<LexicalComposer

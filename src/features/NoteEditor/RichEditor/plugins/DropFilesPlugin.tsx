@@ -12,6 +12,7 @@ import {
 import prettyBytes from 'pretty-bytes';
 import { formatResourceLink } from '@core/features/links';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useEditorPanelContext } from '@features/NoteEditor/EditorPanel';
 import { $createLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
@@ -28,6 +29,8 @@ const alertLimits = {
 
 export const DropFilesPlugin = () => {
 	const [editor] = useLexicalComposerContext();
+
+	const { onInserting } = useEditorPanelContext();
 
 	const filesRegistry = useFilesRegistry();
 
@@ -84,7 +87,7 @@ export const DropFilesPlugin = () => {
 			});
 		};
 
-		return mergeRegister(
+		const cleanupRegister = mergeRegister(
 			editor.registerCommand(
 				DROP_COMMAND,
 				(event) => {
@@ -128,7 +131,18 @@ export const DropFilesPlugin = () => {
 				COMMAND_PRIORITY_CRITICAL,
 			),
 		);
-	}, [editor, filesRegistry]);
+
+		const cleanupInserting = onInserting.watch((evt) => {
+			if (evt.type !== 'file') return;
+
+			$insertFiles(evt.data.files);
+		});
+
+		return () => {
+			cleanupRegister();
+			cleanupInserting();
+		};
+	}, [editor, filesRegistry, onInserting]);
 
 	return null;
 };

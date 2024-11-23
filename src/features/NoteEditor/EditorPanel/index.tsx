@@ -31,7 +31,7 @@ export type InsertingPayloadMap = {
 		date: string;
 	};
 	file: {
-		type: File;
+		files: FileList;
 	};
 };
 export type InsertingPayload = {
