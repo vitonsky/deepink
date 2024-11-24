@@ -9,24 +9,17 @@ import {
 	COMMAND_PRIORITY_NORMAL,
 	createCommand,
 	ElementNode,
-	IS_BOLD,
-	IS_ITALIC,
-	IS_STRIKETHROUGH,
 	KEY_ENTER_COMMAND,
 	KEY_SPACE_COMMAND,
-	TextFormatType,
 	TextNode,
 } from 'lexical';
 import { $isCodeNode } from '@lexical/code';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $isQuoteNode } from '@lexical/rich-text';
-import { $findMatchingParent, mergeRegister } from '@lexical/utils';
+import { mergeRegister } from '@lexical/utils';
 
-import {
-	$createFormattingNode,
-	$isFormattingNode,
-	FormattingNode,
-} from './Markdown/nodes/FormattingNode';
+import { $isFormattingNode, FormattingNode } from '../Markdown/nodes/FormattingNode';
+import { $convertTextNodeFormatting } from './utils';
 
 const OUT_OF_BLOCK_NODE_COMMAND = createCommand<ElementNode>();
 
@@ -67,61 +60,6 @@ const $getParentOfTextOnEnd = (selection: BaseSelection | null) => {
 	return null;
 };
 
-const $outOfBlockElement = (element: ElementNode) => {
-	const newParagraph = $createParagraphNode();
-	element.insertAfter(newParagraph);
-	newParagraph.select();
-};
-
-export const $convertTextNodeFormatting = (node: TextNode) => {
-	const format = node.getFormat();
-	if (format === 0) return;
-
-	// 'bold' | 'underline' | 'strikethrough' | 'italic' | 'highlight' | 'code' | 'subscript' | 'superscript'
-
-	const formatsMap = {
-		bold: {
-			tag: 'b',
-			code: IS_BOLD,
-		},
-		italic: {
-			tag: 'em',
-			code: IS_ITALIC,
-		},
-		strikethrough: {
-			tag: 'del',
-			code: IS_STRIKETHROUGH,
-		},
-	} as const;
-
-	for (const [format, meta] of Object.entries(formatsMap)) {
-		if (!node.hasFormat(format as TextFormatType)) continue;
-
-		const parentNode = $findMatchingParent(node, (node) => {
-			if (!(node instanceof FormattingNode)) return false;
-
-			return node.getTagName().toLowerCase() === meta.tag.toLowerCase();
-		});
-		if (parentNode) continue;
-
-		console.log('TEXT CHANGE', format, meta);
-
-		node.toggleFormat(format as TextFormatType);
-
-		const newNode = $createFormattingNode({ tag: meta.tag });
-		node.replace(newNode);
-		newNode.append(node);
-		node.select();
-	}
-};
-
-export const $removeEmptyFormattingNode = (node: FormattingNode) => {
-	const textContent = node.getTextContent();
-	if (textContent.length > 0) return;
-
-	node.remove();
-};
-
 export const FormattingPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
@@ -129,10 +67,17 @@ export const FormattingPlugin = () => {
 		() =>
 			mergeRegister(
 				editor.registerNodeTransform(TextNode, $convertTextNodeFormatting),
-				editor.registerNodeTransform(FormattingNode, $removeEmptyFormattingNode),
+				editor.registerNodeTransform(FormattingNode, (node: FormattingNode) => {
+					// Remove empty formatting nodes
+					const textContent = node.getTextContent();
+					if (textContent.length > 0) return;
+
+					node.remove();
+				}),
 				editor.registerCommand(
 					KEY_ENTER_COMMAND,
 					(event) => {
+						// Out of code and quote nodes by Ctrl+Enter
 						if (!event || !event.ctrlKey) return false;
 
 						const blockElement = $getParentOfTextOnEnd($getSelection());
@@ -151,7 +96,10 @@ export const FormattingPlugin = () => {
 				editor.registerCommand(
 					OUT_OF_BLOCK_NODE_COMMAND,
 					(blockElement) => {
-						$outOfBlockElement(blockElement);
+						// Out of block node
+						const newParagraph = $createParagraphNode();
+						blockElement.insertAfter(newParagraph);
+						newParagraph.select();
 
 						return true;
 					},
@@ -160,6 +108,7 @@ export const FormattingPlugin = () => {
 				editor.registerCommand(
 					KEY_SPACE_COMMAND,
 					(event) => {
+						// Out of inline nodes by Shift+Space
 						if (!event.shiftKey) return false;
 
 						let hasChanged = false;

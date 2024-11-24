@@ -17,7 +17,7 @@ import { GenericContextMenu } from './plugins/ContextMenu/components/GenericCont
 import { ContextMenuPlugin } from './plugins/ContextMenu/ContextMenuPlugin';
 import { DropFilesPlugin } from './plugins/DropFilesPlugin';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
-import { FormattingPlugin } from './plugins/FormattingPlugin';
+import { FormattingPlugin } from './plugins/Formatting/FormattingPlugin';
 import ImagesPlugin from './plugins/Image/ImagesPlugin';
 import { LinkClickHandlerPlugin } from './plugins/LinkClickHandlerPlugin';
 import {
