@@ -111,48 +111,42 @@ export const FormattingPlugin = () => {
 						// Out of inline nodes by Shift+Space
 						if (!event.shiftKey) return false;
 
-						let hasChanged = false;
+						const selection = $getSelection();
+						if (!selection) return false;
 
-						editor.update(() => {
-							const selection = $getSelection();
-							if (!selection) return;
+						const points = selection.getStartEndPoints();
+						if (!points) return false;
 
-							const points = selection.getStartEndPoints();
-							if (!points) return;
+						const [start, end] = points;
 
-							const [start, end] = points;
+						if (
+							start.getNode() !== end.getNode() ||
+							start.offset !== end.offset
+						)
+							return false;
 
-							if (
-								start.getNode() !== end.getNode() ||
-								start.offset !== end.offset
-							)
-								return;
+						const focusedNode = end.getNode();
+						if (!$isTextNode(focusedNode)) return false;
 
-							const focusedNode = end.getNode();
-							if (!$isTextNode(focusedNode)) return;
+						const parent = focusedNode.getParent();
+						if (
+							!parent ||
+							!$isFormattingNode(parent) ||
+							parent.getLastChild() !== focusedNode
+						)
+							return false;
 
-							const parent = focusedNode.getParent();
-							if (
-								!parent ||
-								!$isFormattingNode(parent) ||
-								parent.getLastChild() !== focusedNode
-							)
-								return;
+						if (end.offset != focusedNode.getTextContentSize()) return false;
 
-							if (end.offset != focusedNode.getTextContentSize()) return;
+						const textNode = $createTextNode(' ');
+						parent.insertAfter(textNode);
+						textNode.select();
 
-							const textNode = $createTextNode(' ');
-							parent.insertAfter(textNode);
-							textNode.select();
+						event.stopImmediatePropagation();
+						event.stopPropagation();
+						event.preventDefault();
 
-							event.stopImmediatePropagation();
-							event.stopPropagation();
-							event.preventDefault();
-
-							hasChanged = true;
-						});
-
-						return hasChanged;
+						return true;
 					},
 					COMMAND_PRIORITY_NORMAL,
 				),
