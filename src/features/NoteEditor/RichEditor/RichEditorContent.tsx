@@ -25,7 +25,7 @@ import {
 	MarkdownSerializePluginProps,
 } from './plugins/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/MarkdownShortcutPlugin';
-import theme from './theme/RichEditorTheme';
+import { theme } from './theme/RichEditor';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {

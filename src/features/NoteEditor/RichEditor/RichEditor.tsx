@@ -14,7 +14,7 @@ import { FormattingNode } from './nodes/FormattingNode';
 import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
 import { RichEditorContent, RichEditorContentProps } from './RichEditorContent';
-import theme from './theme/RichEditorTheme';
+import { theme } from './theme/RichEditor';
 
 // TODO: move lines with alt+arrows
 // TODO: support videos
