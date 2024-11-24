@@ -410,7 +410,11 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 						/>
 					)}
 					{(editorMode === 'richtext' || editorMode === 'split-screen') && (
-						<RichEditor value={text} onValueChanged={setText} />
+						<RichEditor
+							placeholder="Write your thoughts here..."
+							value={text}
+							onChanged={setText}
+						/>
 					)}
 				</HStack>
 			</EditorPanelContext>

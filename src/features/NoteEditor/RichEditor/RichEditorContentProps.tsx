@@ -31,12 +31,14 @@ import { MarkdownShortcutPlugin } from './plugins/MarkdownShortcutPlugin';
 
 export type RichEditorContentProps = BoxProps & {
 	value: string;
-	onValueChanged?: (value: string) => void;
+	onChanged?: (value: string) => void;
+	placeholder?: string;
 };
 
 export const RichEditorContent = ({
 	value,
-	onValueChanged,
+	onChanged,
+	placeholder,
 	...props
 }: RichEditorContentProps) => {
 	const [editor] = useLexicalComposerContext();
@@ -87,8 +89,8 @@ export const RichEditorContent = ({
 	const onChange = (value: string) => {
 		valueRef.current = value;
 
-		if (onValueChanged) {
-			onValueChanged(value);
+		if (onChanged) {
+			onChanged(value);
 		}
 	};
 
@@ -126,17 +128,19 @@ export const RichEditorContent = ({
 					/>
 				}
 				placeholder={
-					<Box
-						position="absolute"
-						top={0}
-						left={0}
-						right={0}
-						bottom={0}
-						padding="1rem"
-						pointerEvents="none"
-					>
-						Enter some text...
-					</Box>
+					placeholder ? (
+						<Box
+							position="absolute"
+							top={0}
+							left={0}
+							right={0}
+							bottom={0}
+							padding="1rem"
+							pointerEvents="none"
+						>
+							{placeholder}
+						</Box>
+					) : undefined
 				}
 				ErrorBoundary={LexicalErrorBoundary}
 			/>
