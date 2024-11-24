@@ -1,12 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { Box, BoxProps } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
-import { ClearEditorPlugin } from '@lexical/react/LexicalClearEditorPlugin';
-import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { HashtagPlugin } from '@lexical/react/LexicalHashtagPlugin';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
@@ -17,11 +14,11 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
 import { ContextMenu } from './ContextMenu/ContextMenu';
 import { GenericContextMenu } from './ContextMenu/GenericContextMenu';
-import { AppLinks } from './plugins/AppLinks';
 import { DropFilesPlugin } from './plugins/DropFilesPlugin';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
+import { LinkClickHandlerPlugin } from './plugins/LinkClickHandlerPlugin';
 import {
 	MarkdownSerializePlugin,
 	MarkdownSerializePluginProps,
@@ -118,29 +115,24 @@ export const RichEditorContent = ({
 				}
 				ErrorBoundary={LexicalErrorBoundary}
 			/>
-			<HistoryPlugin />
-			{/* <AutoFocusPlugin /> */}
-			<ListPlugin />
-			<CheckListPlugin />
-			<TabIndentationPlugin />
-			<LinkPlugin />
-			<ImagesPlugin />
-
+			<MarkdownSerializePlugin value={value} onChanged={onChanged} />
 			<MarkdownShortcutPlugin />
 			<FormattingPlugin />
-			<EditorPanelPlugin />
 
-			<AppLinks />
+			<ImagesPlugin />
+			<LinkPlugin />
+			<LinkClickHandlerPlugin />
 
 			<DropFilesPlugin />
+			<EditorPanelPlugin />
 
-			<ClearEditorPlugin />
-			<ClickableLinkPlugin />
-			<HashtagPlugin />
-			<HorizontalRulePlugin />
+			<HistoryPlugin />
+			<TabIndentationPlugin />
+
+			<ListPlugin />
+			<CheckListPlugin />
 			<TablePlugin />
-
-			<MarkdownSerializePlugin value={value} onChanged={onChanged} />
+			<HorizontalRulePlugin />
 		</Box>
 	);
 };

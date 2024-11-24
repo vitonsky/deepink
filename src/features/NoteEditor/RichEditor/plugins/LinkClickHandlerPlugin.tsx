@@ -5,7 +5,7 @@ import { $isLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $findMatchingParent } from '@lexical/utils';
 
-export const AppLinks = () => {
+export const LinkClickHandlerPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
 	const openUrl = useUrlOpener();

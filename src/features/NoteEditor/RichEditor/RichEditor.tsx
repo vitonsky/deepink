@@ -1,7 +1,6 @@
 /* eslint-disable spellcheck/spell-checker */
 import React from 'react';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { HashtagNode } from '@lexical/hashtag';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';
@@ -42,11 +41,10 @@ export const RichEditor = (props: RichEditorContentProps) => {
 					TableCellNode,
 					TableRowNode,
 					HorizontalRuleNode,
-					CodeNode,
 					HeadingNode,
 					QuoteNode,
+					CodeNode,
 					CodeHighlightNode,
-					HashtagNode,
 					MarkNode,
 					OverflowNode,
 				],
