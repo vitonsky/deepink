@@ -9,7 +9,6 @@
 
 import type { EditorThemeClasses } from 'lexical';
 
-import './common.css';
 import './RichEditor.css';
 
 export const theme = {
@@ -63,7 +62,7 @@ export const theme = {
 		h6: 'RichEditor__h6',
 	},
 	hr: 'RichEditor__hr',
-	image: 'editor-image',
+	image: 'RichEditor__image',
 	indent: 'RichEditor__indent',
 	inlineImage: 'inline-editor-image',
 	layoutContainer: 'RichEditor__layoutContainer',

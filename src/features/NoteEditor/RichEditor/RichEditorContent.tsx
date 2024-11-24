@@ -78,11 +78,14 @@ export const RichEditorContent = ({
 				'& pre': {
 					whiteSpace: 'break-spaces',
 				},
-				[`& .${theme.link}`]: {
-					borderColor: 'link.base',
+				[`& .${theme.heading.h1}, & .${theme.heading.h2}`]: {
+					borderColor: 'surface.border',
 				},
 				[`& .${theme.hr}`]: {
 					borderColor: 'surface.border',
+				},
+				[`& .${theme.link}`]: {
+					borderColor: 'link.base',
 				},
 				[`& .${theme.quote}`]: {
 					color: 'typography.secondary',
@@ -98,8 +101,13 @@ export const RichEditorContent = ({
 						backgroundColor: 'dim.400',
 					},
 				},
-				[`& .${theme.heading.h1}, & .${theme.heading.h2}`]: {
-					borderColor: 'surface.border',
+				[`& .${theme.image}`]: {
+					display: 'inline-flex',
+					maxWidth: '100%',
+					'& img': {
+						display: 'flex',
+						maxWidth: '100%',
+					},
 				},
 			}}
 		>
