@@ -10,20 +10,20 @@
  *
  *
  */
-.PlaygroundEditorTheme__ltr {
+.RichEditorTheme__ltr {
 	text-align: left;
 }
 
-.PlaygroundEditorTheme__rtl {
+.RichEditorTheme__rtl {
 	text-align: right;
 }
 
-.PlaygroundEditorTheme__paragraph {
+.RichEditorTheme__paragraph {
 	margin: 0;
 	position: relative;
 }
 
-.PlaygroundEditorTheme__quote {
+.RichEditorTheme__quote {
 	margin: 0;
 	margin-left: 10px;
 	margin-bottom: 10px;
@@ -35,69 +35,69 @@
 	padding-left: 16px;
 }
 
-.PlaygroundEditorTheme__h1 {
+.RichEditorTheme__h1 {
 	padding-bottom: 0.3em;
 	font-size: 2em;
 	border-bottom: 1px solid var(--chakra-colors-surface-border);
 }
 
-.PlaygroundEditorTheme__h2 {
+.RichEditorTheme__h2 {
 	padding-bottom: 0.3em;
 	font-size: 1.5em;
 	border-bottom: 1px solid var(--chakra-colors-surface-border);
 }
 
-.PlaygroundEditorTheme__h3 {
+.RichEditorTheme__h3 {
 	font-size: 1.25em;
 }
 
-.PlaygroundEditorTheme__h4 {
+.RichEditorTheme__h4 {
 	font-size: 1em;
 }
 
-.PlaygroundEditorTheme__h5 {
+.RichEditorTheme__h5 {
 	font-size: 0.875em;
 }
 
-.PlaygroundEditorTheme__h6 {
+.RichEditorTheme__h6 {
 	font-size: 0.85em;
 }
 
-.PlaygroundEditorTheme__indent {
+.RichEditorTheme__indent {
 	--lexical-indent-base-value: 40px;
 }
 
-.PlaygroundEditorTheme__textBold {
+.RichEditorTheme__textBold {
 	font-weight: bold;
 }
 
-.PlaygroundEditorTheme__textItalic {
+.RichEditorTheme__textItalic {
 	font-style: italic;
 }
 
-.PlaygroundEditorTheme__textUnderline {
+.RichEditorTheme__textUnderline {
 	text-decoration: underline;
 }
 
-.PlaygroundEditorTheme__textStrikethrough {
+.RichEditorTheme__textStrikethrough {
 	text-decoration: line-through;
 }
 
-.PlaygroundEditorTheme__textUnderlineStrikethrough {
+.RichEditorTheme__textUnderlineStrikethrough {
 	text-decoration: underline line-through;
 }
 
-.PlaygroundEditorTheme__textSubscript {
+.RichEditorTheme__textSubscript {
 	font-size: 0.8em;
 	vertical-align: sub !important;
 }
 
-.PlaygroundEditorTheme__textSuperscript {
+.RichEditorTheme__textSuperscript {
 	font-size: 0.8em;
 	vertical-align: super;
 }
 
-.PlaygroundEditorTheme__textCode {
+.RichEditorTheme__textCode {
 	background-color: var(--chakra-colors-dim-100);
 	color: var(--chakra-colors-typography-primary);
 	padding: 1px 0.25rem;
@@ -105,23 +105,23 @@
 	font-size: 94%;
 }
 
-.PlaygroundEditorTheme__hashtag {
+.RichEditorTheme__hashtag {
 	background-color: rgb(88 144 255 / 15%);
 	border-bottom: 1px solid rgb(88 144 255 / 30%);
 }
 
-.PlaygroundEditorTheme__link {
+.RichEditorTheme__link {
 	display: inline-block;
 	color: rgb(33 111 219);
 	text-decoration: inherit;
 }
 
-.PlaygroundEditorTheme__link:hover {
+.RichEditorTheme__link:hover {
 	text-decoration: underline;
 	cursor: pointer;
 }
 
-.PlaygroundEditorTheme__code {
+.RichEditorTheme__code {
 	--block-padding: 0.8rem;
 
 	background-color: var(--chakra-colors-dim-100);
@@ -140,7 +140,7 @@
 	border-radius: 4px;
 }
 
-.PlaygroundEditorTheme__code::before {
+.RichEditorTheme__code::before {
 	display: block;
 	float: left;
 	box-sizing: border-box;
@@ -152,7 +152,7 @@
 	margin-inline-end: var(--block-padding);
 }
 
-.PlaygroundEditorTheme__table {
+.RichEditorTheme__table {
 	border-collapse: collapse;
 	border-spacing: 0;
 	overflow-y: scroll;
@@ -161,19 +161,19 @@
 	width: inherit;
 }
 
-.PlaygroundEditorTheme__tableRowStriping tr:nth-child(even) {
+.RichEditorTheme__tableRowStriping tr:nth-child(even) {
 	background-color: #f2f5fb;
 }
 
-.PlaygroundEditorTheme__tableSelection *::selection {
+.RichEditorTheme__tableSelection *::selection {
 	background-color: transparent;
 }
 
-.PlaygroundEditorTheme__tableSelected {
+.RichEditorTheme__tableSelected {
 	outline: 2px solid rgb(60 132 244);
 }
 
-.PlaygroundEditorTheme__tableCell {
+.RichEditorTheme__tableCell {
 	border: 1px solid #bbb;
 	width: 75px;
 	vertical-align: top;
@@ -183,7 +183,7 @@
 	outline: none;
 }
 
-.PlaygroundEditorTheme__tableCellSortedIndicator {
+.RichEditorTheme__tableCellSortedIndicator {
 	display: block;
 	opacity: 0.5;
 	position: absolute;
@@ -194,7 +194,7 @@
 	background-color: #999;
 }
 
-.PlaygroundEditorTheme__tableCellResizer {
+.RichEditorTheme__tableCellResizer {
 	position: absolute;
 	right: -4px;
 	height: 100%;
@@ -204,16 +204,16 @@
 	top: 0;
 }
 
-.PlaygroundEditorTheme__tableCellHeader {
+.RichEditorTheme__tableCellHeader {
 	background-color: #f2f3f5;
 	text-align: start;
 }
 
-.PlaygroundEditorTheme__tableCellSelected {
+.RichEditorTheme__tableCellSelected {
 	background-color: #c9dbf0;
 }
 
-.PlaygroundEditorTheme__tableCellPrimarySelected {
+.RichEditorTheme__tableCellPrimarySelected {
 	border: 2px solid rgb(60 132 244);
 	display: block;
 	height: calc(100% - 2px);
@@ -224,12 +224,12 @@
 	z-index: 2;
 }
 
-.PlaygroundEditorTheme__tableCellEditing {
+.RichEditorTheme__tableCellEditing {
 	box-shadow: 0 0 5px rgb(0 0 0 / 40%);
 	border-radius: 3px;
 }
 
-.PlaygroundEditorTheme__tableAddColumns {
+.RichEditorTheme__tableAddColumns {
 	position: absolute;
 	background-color: #eee;
 	height: 100%;
@@ -238,7 +238,7 @@
 	cursor: pointer;
 }
 
-.PlaygroundEditorTheme__tableAddColumns::after {
+.RichEditorTheme__tableAddColumns::after {
 	/* background-image: url(../images/icons/plus.svg); */
 	background-size: contain;
 	background-position: center;
@@ -253,12 +253,12 @@
 	opacity: 0.4;
 }
 
-.PlaygroundEditorTheme__tableAddColumns:hover,
-.PlaygroundEditorTheme__tableAddRows:hover {
+.RichEditorTheme__tableAddColumns:hover,
+.RichEditorTheme__tableAddRows:hover {
 	background-color: #c9dbf0;
 }
 
-.PlaygroundEditorTheme__tableAddRows {
+.RichEditorTheme__tableAddRows {
 	position: absolute;
 	width: calc(100% - 25px);
 	background-color: #eee;
@@ -267,7 +267,7 @@
 	cursor: pointer;
 }
 
-.PlaygroundEditorTheme__tableAddRows::after {
+.RichEditorTheme__tableAddRows::after {
 	/* background-image: url(../images/icons/plus.svg); */
 	background-size: contain;
 	background-position: center;
@@ -292,7 +292,7 @@
 	}
 }
 
-.PlaygroundEditorTheme__tableCellResizeRuler {
+.RichEditorTheme__tableCellResizeRuler {
 	display: block;
 	position: absolute;
 	width: 1px;
@@ -301,7 +301,7 @@
 	top: 0;
 }
 
-.PlaygroundEditorTheme__tableCellActionButtonContainer {
+.RichEditorTheme__tableCellActionButtonContainer {
 	display: block;
 	right: 5px;
 	top: 6px;
@@ -311,7 +311,7 @@
 	height: 20px;
 }
 
-.PlaygroundEditorTheme__tableCellActionButton {
+.RichEditorTheme__tableCellActionButton {
 	background-color: #eee;
 	display: block;
 	border: 0;
@@ -322,61 +322,61 @@
 	cursor: pointer;
 }
 
-.PlaygroundEditorTheme__tableCellActionButton:hover {
+.RichEditorTheme__tableCellActionButton:hover {
 	background-color: #ddd;
 }
 
-.PlaygroundEditorTheme__characterLimit {
+.RichEditorTheme__characterLimit {
 	display: inline;
 	background-color: #fbb !important;
 }
 
-.PlaygroundEditorTheme__ol1 {
+.RichEditorTheme__ol1 {
 	padding: 0;
 	margin: 0;
 	list-style-position: outside;
 }
 
-.PlaygroundEditorTheme__ol2 {
+.RichEditorTheme__ol2 {
 	padding: 0;
 	margin: 0;
 	list-style-type: upper-alpha;
 	list-style-position: outside;
 }
 
-.PlaygroundEditorTheme__ol3 {
+.RichEditorTheme__ol3 {
 	padding: 0;
 	margin: 0;
 	list-style-type: lower-alpha;
 	list-style-position: outside;
 }
 
-.PlaygroundEditorTheme__ol4 {
+.RichEditorTheme__ol4 {
 	padding: 0;
 	margin: 0;
 	list-style-type: upper-roman;
 	list-style-position: outside;
 }
 
-.PlaygroundEditorTheme__ol5 {
+.RichEditorTheme__ol5 {
 	padding: 0;
 	margin: 0;
 	list-style-type: lower-roman;
 	list-style-position: outside;
 }
 
-.PlaygroundEditorTheme__ul {
+.RichEditorTheme__ul {
 	padding: 0;
 	margin: 0;
 	list-style-position: outside;
 }
 
-.PlaygroundEditorTheme__listItem {
+.RichEditorTheme__listItem {
 	margin: 0 32px;
 }
 
-.PlaygroundEditorTheme__listItemChecked,
-.PlaygroundEditorTheme__listItemUnchecked {
+.RichEditorTheme__listItemChecked,
+.RichEditorTheme__listItemUnchecked {
 	position: relative;
 	margin-left: 8px;
 	margin-right: 8px;
@@ -386,12 +386,12 @@
 	outline: none;
 }
 
-.PlaygroundEditorTheme__listItemChecked {
+.RichEditorTheme__listItemChecked {
 	text-decoration: line-through;
 }
 
-.PlaygroundEditorTheme__listItemUnchecked::before,
-.PlaygroundEditorTheme__listItemChecked::before {
+.RichEditorTheme__listItemUnchecked::before,
+.RichEditorTheme__listItemChecked::before {
 	content: '';
 	width: 16px;
 	height: 16px;
@@ -403,31 +403,31 @@
 	position: absolute;
 }
 
-.PlaygroundEditorTheme__listItemUnchecked[dir='rtl']::before,
-.PlaygroundEditorTheme__listItemChecked[dir='rtl']::before {
+.RichEditorTheme__listItemUnchecked[dir='rtl']::before,
+.RichEditorTheme__listItemChecked[dir='rtl']::before {
 	left: auto;
 	right: 0;
 }
 
-.PlaygroundEditorTheme__listItemUnchecked:focus::before,
-.PlaygroundEditorTheme__listItemChecked:focus::before {
+.RichEditorTheme__listItemUnchecked:focus::before,
+.RichEditorTheme__listItemChecked:focus::before {
 	box-shadow: 0 0 0 2px #a6cdfe;
 	border-radius: 2px;
 }
 
-.PlaygroundEditorTheme__listItemUnchecked::before {
+.RichEditorTheme__listItemUnchecked::before {
 	border: 1px solid #999;
 	border-radius: 2px;
 }
 
-.PlaygroundEditorTheme__listItemChecked::before {
+.RichEditorTheme__listItemChecked::before {
 	border: 1px solid rgb(61 135 245);
 	border-radius: 2px;
 	background-color: #3d87f5;
 	background-repeat: no-repeat;
 }
 
-.PlaygroundEditorTheme__listItemChecked::after {
+.RichEditorTheme__listItemChecked::after {
 	content: '';
 	cursor: pointer;
 	border-color: #fff;
@@ -443,99 +443,99 @@
 	border-width: 0 2px 2px 0;
 }
 
-.PlaygroundEditorTheme__nestedListItem {
+.RichEditorTheme__nestedListItem {
 	list-style-type: none;
 }
 
-.PlaygroundEditorTheme__nestedListItem::before,
-.PlaygroundEditorTheme__nestedListItem::after {
+.RichEditorTheme__nestedListItem::before,
+.RichEditorTheme__nestedListItem::after {
 	display: none;
 }
 
-.PlaygroundEditorTheme__tokenComment {
+.RichEditorTheme__tokenComment {
 	color: slategray;
 }
 
-.PlaygroundEditorTheme__tokenPunctuation {
+.RichEditorTheme__tokenPunctuation {
 	color: #999;
 }
 
-.PlaygroundEditorTheme__tokenProperty {
+.RichEditorTheme__tokenProperty {
 	color: #905;
 }
 
-.PlaygroundEditorTheme__tokenSelector {
+.RichEditorTheme__tokenSelector {
 	color: #690;
 }
 
-.PlaygroundEditorTheme__tokenOperator {
+.RichEditorTheme__tokenOperator {
 	color: #9a6e3a;
 }
 
-.PlaygroundEditorTheme__tokenAttr {
+.RichEditorTheme__tokenAttr {
 	color: #07a;
 }
 
-.PlaygroundEditorTheme__tokenVariable {
+.RichEditorTheme__tokenVariable {
 	color: #e90;
 }
 
-.PlaygroundEditorTheme__tokenFunction {
+.RichEditorTheme__tokenFunction {
 	color: #dd4a68;
 }
 
-.PlaygroundEditorTheme__mark {
+.RichEditorTheme__mark {
 	background: rgb(255 212 0 / 14%);
 	border-bottom: 2px solid rgb(255 212 0 / 30%);
 	padding-bottom: 2px;
 }
 
-.PlaygroundEditorTheme__markOverlap {
+.RichEditorTheme__markOverlap {
 	background: rgb(255 212 0 / 30%);
 	border-bottom: 2px solid rgb(255 212 0 / 70%);
 }
 
-.PlaygroundEditorTheme__mark.selected {
+.RichEditorTheme__mark.selected {
 	background: rgb(255 212 0 / 50%);
 	border-bottom: 2px solid rgb(255 212 0 / 100%);
 }
 
-.PlaygroundEditorTheme__markOverlap.selected {
+.RichEditorTheme__markOverlap.selected {
 	background: rgb(255 212 0 / 70%);
 	border-bottom: 2px solid rgb(255 212 0 / 70%);
 }
 
-.PlaygroundEditorTheme__embedBlock {
+.RichEditorTheme__embedBlock {
 	user-select: none;
 }
 
-.PlaygroundEditorTheme__embedBlockFocus {
+.RichEditorTheme__embedBlockFocus {
 	outline: 2px solid rgb(60 132 244);
 }
 
-.PlaygroundEditorTheme__layoutContainer {
+.RichEditorTheme__layoutContainer {
 	display: grid;
 	gap: 10px;
 	margin: 10px 0;
 }
 
-.PlaygroundEditorTheme__layoutItem {
+.RichEditorTheme__layoutItem {
 	border: 1px dashed #ddd;
 	padding: 8px 16px;
 }
 
-.PlaygroundEditorTheme__autocomplete {
+.RichEditorTheme__autocomplete {
 	color: #ccc;
 }
 
-.PlaygroundEditorTheme__hr {
+.RichEditorTheme__hr {
 	padding: 2px;
 	border: none;
 	margin: 1em 0;
 	cursor: pointer;
 }
 
-.PlaygroundEditorTheme__hr::after {
+.RichEditorTheme__hr::after {
 	content: '';
 	display: block;
 	height: 2px;
@@ -543,7 +543,7 @@
 	line-height: 2px;
 }
 
-.PlaygroundEditorTheme__hr.selected {
+.RichEditorTheme__hr.selected {
 	outline: 2px solid rgb(60 132 244);
 	user-select: none;
 }

@@ -13,8 +13,8 @@ import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { FormattingNode } from './nodes/FormattingNode';
 import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
-import theme from './PlaygroundEditorTheme';
 import { RichEditorContent, RichEditorContentProps } from './RichEditorContent';
+import theme from './theme/RichEditorTheme';
 
 // TODO: move lines with alt+arrows
 // TODO: support videos
