@@ -11,7 +11,6 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
@@ -24,16 +23,15 @@ import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
 import {
-	$convertFromMarkdownString,
-	$convertToMarkdownString,
-} from './plugins/markdownParser';
+	MarkdownSerializePlugin,
+	MarkdownSerializePluginProps,
+} from './plugins/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/MarkdownShortcutPlugin';
 
-export type RichEditorContentProps = BoxProps & {
-	value: string;
-	onChanged?: (value: string) => void;
-	placeholder?: string;
-};
+export type RichEditorContentProps = BoxProps &
+	MarkdownSerializePluginProps & {
+		placeholder?: string;
+	};
 
 export const RichEditorContent = ({
 	value,
@@ -69,30 +67,6 @@ export const RichEditorContent = ({
 			document.removeEventListener('focusin', onFocus);
 		};
 	}, [editor]);
-
-	const valueRef = useRef<string | null>(null);
-	useEffect(() => {
-		// Skip updates that has been sent from this component
-		if (valueRef.current === value) return;
-
-		editor.update(() => {
-			$convertFromMarkdownString(value);
-		});
-
-		(window as any)['update'] = (text: string) => {
-			editor.update(() => {
-				$convertFromMarkdownString(text);
-			});
-		};
-	}, [editor, value]);
-
-	const onChange = (value: string) => {
-		valueRef.current = value;
-
-		if (onChanged) {
-			onChanged(value);
-		}
-	};
 
 	return (
 		<Box
@@ -165,15 +139,8 @@ export const RichEditorContent = ({
 			<HashtagPlugin />
 			<HorizontalRulePlugin />
 			<TablePlugin />
-			<OnChangePlugin
-				onChange={(_, editor) => {
-					if (!isActive()) return;
 
-					editor.read(() => {
-						onChange($convertToMarkdownString());
-					});
-				}}
-			/>
+			<MarkdownSerializePlugin value={value} onChanged={onChanged} />
 		</Box>
 	);
 };
