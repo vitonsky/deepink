@@ -1,3 +1,4 @@
+/* stylelint-disable max-line-length */
 /* stylelint-disable declaration-block-no-redundant-longhand-properties */
 /* stylelint-disable function-url-quotes */
 /* stylelint-disable no-descending-specificity */
@@ -138,6 +139,7 @@
 	position: relative;
 	tab-size: 2;
 	border-radius: 4px;
+	white-space: pre;
 }
 
 .RichEditorTheme__code::before {
@@ -452,20 +454,25 @@
 	display: none;
 }
 
+/*
+* Based on "Gruvbox light" theme
+*
+* Source: https://github.com/PrismJS/prism-themes/blob/447479fc7b2be2051fe27e561aceed7cc87a589f/themes/prism-gruvbox-light.css
+*/
 .RichEditorTheme__tokenComment {
-	color: slategray;
+	color: #7c6f64;
 }
 
 .RichEditorTheme__tokenPunctuation {
-	color: #999;
+	color: #b57614;
 }
 
 .RichEditorTheme__tokenProperty {
-	color: #905;
+	color: #9d0006;
 }
 
 .RichEditorTheme__tokenSelector {
-	color: #690;
+	color: #797403;
 }
 
 .RichEditorTheme__tokenOperator {
@@ -473,7 +480,7 @@
 }
 
 .RichEditorTheme__tokenAttr {
-	color: #07a;
+	color: #9d0006;
 }
 
 .RichEditorTheme__tokenVariable {
@@ -481,7 +488,7 @@
 }
 
 .RichEditorTheme__tokenFunction {
-	color: #dd4a68;
+	color: #b57614;
 }
 
 .RichEditorTheme__mark {
