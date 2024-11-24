@@ -14,6 +14,7 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
 import { ContextMenu } from './ContextMenu/ContextMenu';
 import { GenericContextMenu } from './ContextMenu/GenericContextMenu';
+import { CodeHighlightPlugin } from './plugins/CodeHighlightPlugin';
 import { DropFilesPlugin } from './plugins/DropFilesPlugin';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
@@ -120,6 +121,7 @@ export const RichEditorContent = ({
 			<FormattingPlugin />
 
 			<ImagesPlugin />
+			<CodeHighlightPlugin />
 			<LinkPlugin />
 			<LinkClickHandlerPlugin />
 

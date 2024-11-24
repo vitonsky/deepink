@@ -122,11 +122,13 @@
 }
 
 .PlaygroundEditorTheme__code {
+	--block-padding: 0.8rem;
+
 	background-color: var(--chakra-colors-dim-100);
 	color: var(--chakra-colors-typography-primary);
 	font-family: Menlo, Consolas, Monaco, monospace;
 	display: block;
-	padding: 0.8rem;
+	padding: var(--block-padding);
 	line-height: 1.53;
 	font-size: 13px;
 	margin: 0;
@@ -136,6 +138,18 @@
 	position: relative;
 	tab-size: 2;
 	border-radius: 4px;
+}
+
+.PlaygroundEditorTheme__code::before {
+	display: block;
+	float: left;
+	box-sizing: border-box;
+	content: attr(data-gutter);
+	background: #00000012;
+	padding-block: var(--block-padding);
+	padding-inline: var(--block-padding);
+	margin: calc(-1 * var(--block-padding));
+	margin-inline-end: var(--block-padding);
 }
 
 .PlaygroundEditorTheme__table {
