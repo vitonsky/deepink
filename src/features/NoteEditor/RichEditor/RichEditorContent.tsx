@@ -25,6 +25,7 @@ import {
 	MarkdownSerializePluginProps,
 } from './plugins/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/MarkdownShortcutPlugin';
+import theme from './theme/RichEditorTheme';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
@@ -77,7 +78,27 @@ export const RichEditorContent = ({
 				'& pre': {
 					whiteSpace: 'break-spaces',
 				},
-				'& hr': {
+				[`& .${theme.link}`]: {
+					borderColor: 'link.base',
+				},
+				[`& .${theme.hr}`]: {
+					borderColor: 'surface.border',
+				},
+				[`& .${theme.quote}`]: {
+					color: 'typography.secondary',
+					borderColor: 'surface.border',
+				},
+				[`& .${theme.code}, & .${theme.text.code}`]: {
+					color: 'typography.primary',
+					backgroundColor: 'dim.100',
+				},
+				[`& .${theme.code}`]: {
+					backgroundColor: 'dim.100',
+					'&:before': {
+						backgroundColor: 'dim.400',
+					},
+				},
+				[`& .${theme.heading.h1}, & .${theme.heading.h2}`]: {
 					borderColor: 'surface.border',
 				},
 			}}

@@ -12,7 +12,7 @@ import type { EditorThemeClasses } from 'lexical';
 import './common.css';
 import './RichEditorTheme.css';
 
-export const theme: EditorThemeClasses = {
+export const theme = {
 	autocomplete: 'RichEditorTheme__autocomplete',
 	blockCursor: 'RichEditorTheme__blockCursor',
 	characterLimit: 'RichEditorTheme__characterLimit',
@@ -116,6 +116,6 @@ export const theme: EditorThemeClasses = {
 		underline: 'RichEditorTheme__textUnderline',
 		underlineStrikethrough: 'RichEditorTheme__textUnderlineStrikethrough',
 	},
-};
+} satisfies EditorThemeClasses;
 
 export default theme;
