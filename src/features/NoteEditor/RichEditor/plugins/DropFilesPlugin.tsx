@@ -4,6 +4,7 @@ import {
 	$createTextNode,
 	$getNearestNodeFromDOMNode,
 	$getRoot,
+	$isBlockElementNode,
 	COMMAND_PRIORITY_CRITICAL,
 	DROP_COMMAND,
 	LexicalNode,
@@ -75,7 +76,15 @@ export const DropFilesPlugin = () => {
 				const selectedNode =
 					targetNode && targetNode.isAttached() ? targetNode : $getCursorNode();
 				if (selectedNode) {
-					$insertAfter(selectedNode, fileNodes);
+					const nodes = $isBlockElementNode(selectedNode)
+						? fileNodes.map((node) => {
+								const paragraph = $createParagraphNode();
+								paragraph.append(node);
+								return paragraph;
+						  })
+						: fileNodes;
+
+					$insertAfter(selectedNode, nodes);
 				} else {
 					const root = $getRoot();
 
