@@ -29,12 +29,7 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $wrapNodeInElement, CAN_USE_DOM, mergeRegister } from '@lexical/utils';
 
-import {
-	$createImageNode,
-	$isImageNode,
-	ImageNode,
-	ImagePayload,
-} from '../nodes/ImageNode';
+import { $createImageNode, $isImageNode, ImageNode, ImagePayload } from './ImageNode';
 
 export type InsertImagePayload = Readonly<ImagePayload>;
 

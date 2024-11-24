@@ -17,8 +17,8 @@ import { $createLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
 
-import { $createImageNode } from '../nodes/ImageNode';
 import { $getCursorNode, $insertAfter } from '../utils/selection';
+import { $createImageNode } from './Image/ImageNode';
 
 const MEGABYTE_SIZE = 1024 ** 2;
 

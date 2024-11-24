@@ -11,8 +11,8 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
 import { FormattingNode } from './nodes/FormattingNode';
-import { ImageNode } from './nodes/ImageNode';
 import { RawNode } from './nodes/RawNode';
+import { ImageNode } from './plugins/Image/ImageNode';
 import { RichEditorContent, RichEditorContentProps } from './RichEditorContent';
 import { theme } from './theme/RichEditor';
 

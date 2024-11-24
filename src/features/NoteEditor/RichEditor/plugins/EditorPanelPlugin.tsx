@@ -35,8 +35,8 @@ import {
 	$isFormattingNode,
 	FormattingNode,
 } from '../nodes/FormattingNode';
-import { $createImageNode } from '../nodes/ImageNode';
 import { $insertAfter } from '../utils/selection';
+import { $createImageNode } from './Image/ImageNode';
 
 // Format
 const $getFormatNodes = (node: LexicalNode): FormattingNode[] => {

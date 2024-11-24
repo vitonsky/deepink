@@ -26,7 +26,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
 
-import { $isImageNode } from '../ImageNode';
+import { $isImageNode } from './ImageNode';
 
 const imageCache = new Map<string, string>();
 

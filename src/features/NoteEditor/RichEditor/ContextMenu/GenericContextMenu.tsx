@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { $isLinkNode } from '@lexical/link';
 import { $findMatchingParent } from '@lexical/utils';
 
-import { $isImageNode } from '../nodes/ImageNode';
+import { $isImageNode } from '../plugins/Image/ImageNode';
 import { ContextMenuRendererProps } from './ContextMenu';
 import { ObjectPropertiesEditor } from './ObjectPropertiesEditor';
 

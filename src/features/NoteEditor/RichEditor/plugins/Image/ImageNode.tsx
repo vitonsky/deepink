@@ -23,7 +23,7 @@ import {
 	Spread,
 } from 'lexical';
 
-const ImageComponent = React.lazy(() => import('./ImageComponent/ImageComponent'));
+const ImageComponent = React.lazy(() => import('./ImageComponent'));
 
 export interface ImagePayload {
 	src: string;

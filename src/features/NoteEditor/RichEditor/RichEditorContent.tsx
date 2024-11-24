@@ -18,7 +18,7 @@ import { CodeHighlightPlugin } from './plugins/CodeHighlightPlugin';
 import { DropFilesPlugin } from './plugins/DropFilesPlugin';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
-import ImagesPlugin from './plugins/ImagesPlugin';
+import ImagesPlugin from './plugins/Image/ImagesPlugin';
 import { LinkClickHandlerPlugin } from './plugins/LinkClickHandlerPlugin';
 import {
 	MarkdownSerializePlugin,

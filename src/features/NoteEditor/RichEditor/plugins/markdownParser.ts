@@ -68,8 +68,8 @@ import {
 } from '@lexical/table';
 
 import { $createFormattingNode, $isFormattingNode } from '../nodes/FormattingNode';
-import { $createImageNode, $isImageNode } from '../nodes/ImageNode';
 import { $createRawNode } from '../nodes/RawNode';
+import { $createImageNode, $isImageNode } from './Image/ImageNode';
 
 const markdownProcessor = unified()
 	.use(remarkParse)
