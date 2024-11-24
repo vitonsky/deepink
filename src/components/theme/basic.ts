@@ -8,6 +8,7 @@ import { ModalScreenTheme } from '@components/ModalScreen/ModalScreen.theme';
 import { NestedListTheme } from '@components/NestedList/NestedList.theme';
 import { NotePreviewTheme } from '@components/NotePreview/NotePreview.theme';
 import { NotificationsTheme } from '@components/Notifications/Notifications.theme';
+import { RichEditorTheme } from '@features/NoteEditor/RichEditor/RichEditor.theme';
 
 export const getScrollBarStyles = ({
 	trackColor = '#f1f1f1',
@@ -386,5 +387,6 @@ export const basicTheme = extendTheme({
 		ModalScreen: ModalScreenTheme,
 		NotePreview: NotePreviewTheme,
 		NestedList: NestedListTheme,
+		RichEditor: RichEditorTheme,
 	},
 });

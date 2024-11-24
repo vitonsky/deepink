@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Box, BoxProps } from '@chakra-ui/react';
+import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -25,7 +25,6 @@ import {
 	MarkdownSerializePluginProps,
 } from './plugins/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/MarkdownShortcutPlugin';
-import { theme } from './theme/RichEditor';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
@@ -39,6 +38,7 @@ export const RichEditorContent = ({
 	...props
 }: RichEditorContentProps) => {
 	const [editor] = useLexicalComposerContext();
+	const styles = useMultiStyleConfig('RichEditor');
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const isActive = () => {
@@ -74,42 +74,7 @@ export const RichEditorContent = ({
 			width="100%"
 			height="100%"
 			overflow="hidden"
-			sx={{
-				'& pre': {
-					whiteSpace: 'break-spaces',
-				},
-				[`& .${theme.heading.h1}, & .${theme.heading.h2}`]: {
-					borderColor: 'surface.border',
-				},
-				[`& .${theme.hr}`]: {
-					borderColor: 'surface.border',
-				},
-				[`& .${theme.link}`]: {
-					borderColor: 'link.base',
-				},
-				[`& .${theme.quote}`]: {
-					color: 'typography.secondary',
-					borderColor: 'surface.border',
-				},
-				[`& .${theme.code}, & .${theme.text.code}`]: {
-					color: 'typography.primary',
-					backgroundColor: 'dim.100',
-				},
-				[`& .${theme.code}`]: {
-					backgroundColor: 'dim.100',
-					'&:before': {
-						backgroundColor: 'dim.400',
-					},
-				},
-				[`& .${theme.image}`]: {
-					display: 'inline-flex',
-					maxWidth: '100%',
-					'& img': {
-						display: 'flex',
-						maxWidth: '100%',
-					},
-				},
-			}}
+			sx={styles.root}
 		>
 			<ContextMenu renderer={GenericContextMenu} />
 
