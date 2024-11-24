@@ -12,9 +12,9 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
-import { ContextMenu } from './ContextMenu/ContextMenu';
-import { GenericContextMenu } from './ContextMenu/GenericContextMenu';
 import { CodeHighlightPlugin } from './plugins/CodeHighlightPlugin';
+import { GenericContextMenu } from './plugins/ContextMenu/components/GenericContextMenu';
+import { ContextMenuPlugin } from './plugins/ContextMenu/ContextMenuPlugin';
 import { DropFilesPlugin } from './plugins/DropFilesPlugin';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/FormattingPlugin';
@@ -76,7 +76,7 @@ export const RichEditorContent = ({
 			overflow="hidden"
 			sx={styles.root}
 		>
-			<ContextMenu renderer={GenericContextMenu} />
+			<ContextMenuPlugin renderer={GenericContextMenu} />
 
 			<RichTextPlugin
 				contentEditable={

@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useModalWindow } from '@components/useModalWindow';
 
-import { PropertiesForm } from '../../RichEditor/ContextMenu/ObjectPropertiesEditor';
+import { PropertiesForm } from '../../RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 
 import { InsertingPayloadMap } from '..';
 

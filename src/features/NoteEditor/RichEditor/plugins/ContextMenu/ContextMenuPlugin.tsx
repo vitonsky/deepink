@@ -18,7 +18,7 @@ export type ContextMenuProps = BoxProps & {
 	renderer: FC<ContextMenuRendererProps>;
 };
 
-export const ContextMenu = ({
+export const ContextMenuPlugin = ({
 	renderer: RendererComponent,
 	...props
 }: ContextMenuProps) => {
