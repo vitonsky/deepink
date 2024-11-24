@@ -30,13 +30,13 @@ import {
 	useEditorPanelContext,
 } from '../../EditorPanel';
 
+import { $insertAfter } from '../utils/selection';
+import { $createImageNode } from './Image/ImageNode';
 import {
 	$createFormattingNode,
 	$isFormattingNode,
 	FormattingNode,
-} from '../nodes/FormattingNode';
-import { $insertAfter } from '../utils/selection';
-import { $createImageNode } from './Image/ImageNode';
+} from './Markdown/nodes/FormattingNode';
 
 // Format
 const $getFormatNodes = (node: LexicalNode): FormattingNode[] => {

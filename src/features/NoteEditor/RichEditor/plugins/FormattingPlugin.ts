@@ -26,7 +26,7 @@ import {
 	$createFormattingNode,
 	$isFormattingNode,
 	FormattingNode,
-} from '../nodes/FormattingNode';
+} from './Markdown/nodes/FormattingNode';
 
 const OUT_OF_BLOCK_NODE_COMMAND = createCommand<ElementNode>();
 

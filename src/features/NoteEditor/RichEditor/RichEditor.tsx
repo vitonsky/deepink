@@ -10,9 +10,9 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
-import { FormattingNode } from './nodes/FormattingNode';
-import { RawNode } from './nodes/RawNode';
 import { ImageNode } from './plugins/Image/ImageNode';
+import { FormattingNode } from './plugins/Markdown/nodes/FormattingNode';
+import { RawNode } from './plugins/Markdown/nodes/RawNode';
 import { RichEditorContent, RichEditorContentProps } from './RichEditorContent';
 import { theme } from './theme/RichEditor';
 

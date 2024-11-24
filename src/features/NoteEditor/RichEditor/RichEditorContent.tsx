@@ -23,8 +23,8 @@ import { LinkClickHandlerPlugin } from './plugins/LinkClickHandlerPlugin';
 import {
 	MarkdownSerializePlugin,
 	MarkdownSerializePluginProps,
-} from './plugins/MarkdownSerializePlugin';
-import { MarkdownShortcutPlugin } from './plugins/MarkdownShortcutPlugin';
+} from './plugins/Markdown/MarkdownSerializePlugin';
+import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {

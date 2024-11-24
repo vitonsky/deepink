@@ -67,9 +67,9 @@ import {
 	TableCellHeaderStates,
 } from '@lexical/table';
 
-import { $createFormattingNode, $isFormattingNode } from '../nodes/FormattingNode';
-import { $createRawNode } from '../nodes/RawNode';
-import { $createImageNode, $isImageNode } from './Image/ImageNode';
+import { $createImageNode, $isImageNode } from '../Image/ImageNode';
+import { $createFormattingNode, $isFormattingNode } from './nodes/FormattingNode';
+import { $createRawNode } from './nodes/RawNode';
 
 const markdownProcessor = unified()
 	.use(remarkParse)
