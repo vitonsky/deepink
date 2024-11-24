@@ -38,8 +38,6 @@ export const EditorPanelPlugin = () => {
 
 	useEffect(() => {
 		const cleanupFormatting = onFormatting.watch((format) => {
-			console.log('Format text', format);
-
 			// TODO: support formatting selected text slices
 			editor.update(() => {
 				const selection = $getSelection();

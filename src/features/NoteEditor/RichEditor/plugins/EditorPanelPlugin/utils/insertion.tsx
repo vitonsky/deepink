@@ -81,12 +81,6 @@ export const $wrapNodes = (createElement: (nodes: LexicalNode[]) => ElementNode)
 			commonAncestor.is(node.getParent()),
 		);
 
-		console.warn('FINAL STEP', {
-			commonAncestor,
-			topSelectedNodes,
-			selectedNodes,
-			parents: selectedNodes.map((node) => node.getParent()),
-		});
 		tmpNode.replace(createElement(topSelectedNodes));
 
 		return;
