@@ -2,14 +2,11 @@ import { useEffect } from 'react';
 import {
 	$createParagraphNode,
 	$createTextNode,
-	$getRoot,
 	$getSelection,
-	$hasAncestor,
 	$isBlockElementNode,
 	$isRangeSelection,
 	$isTextNode,
 	CONTROLLED_TEXT_INSERTION_COMMAND,
-	ElementNode,
 	LexicalNode,
 } from 'lexical';
 import { $createCodeNode, $isCodeNode } from '@lexical/code';
@@ -22,171 +19,17 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
-import { $dfs, $findMatchingParent } from '@lexical/utils';
+import { $dfs } from '@lexical/utils';
 
+import { InsertingPayloadMap, useEditorPanelContext } from '../../../EditorPanel';
+
+import { $createImageNode } from '../Image/ImageNode';
+import { $toggleFormatNode } from './utils/format';
 import {
-	InsertingPayloadMap,
-	TextFormat,
-	useEditorPanelContext,
-} from '../../EditorPanel';
-
-import { $insertAfter } from '../utils/selection';
-import { $createImageNode } from './Image/ImageNode';
-import {
-	$createFormattingNode,
-	$isFormattingNode,
-	FormattingNode,
-} from './Markdown/nodes/FormattingNode';
-
-// Format
-const $getFormatNodes = (node: LexicalNode): FormattingNode[] => {
-	return node
-		.getParents()
-		.filter((node) => $isFormattingNode(node)) as FormattingNode[];
-};
-
-const formatMap = {
-	bold: 'b',
-	italic: 'em',
-	strikethrough: 'del',
-} satisfies Record<TextFormat, string>;
-
-const $getFormatNode = (node: LexicalNode, format: TextFormat) => {
-	const isMatch = (formatNode: FormattingNode) =>
-		formatNode.getTagName() === formatMap[format];
-
-	if ($isFormattingNode(node) && isMatch(node)) {
-		return node;
-	}
-
-	return $getFormatNodes(node).find(isMatch) ?? null;
-};
-
-const $setFormatNode = (node: LexicalNode, format: TextFormat) => {
-	const parentFormat = $getFormatNode(node, format);
-	if (parentFormat) return;
-
-	const formattingNode = $createFormattingNode({ tag: formatMap[format] });
-	if ($isBlockElementNode(node)) {
-		formattingNode.append(...node.getChildren());
-		node.append(formattingNode);
-		return formattingNode;
-	}
-
-	node.replace(formattingNode);
-	formattingNode.append(node);
-	return formattingNode;
-};
-
-const $removeFormatNode = (node: LexicalNode, format: TextFormat) => {
-	const parentFormat = $getFormatNode(node, format);
-	if (!parentFormat) return;
-
-	$insertAfter(parentFormat, parentFormat.getChildren());
-};
-
-const $toggleFormatNode = (node: LexicalNode, format: TextFormat) => {
-	const parentFormat = $getFormatNode(node, format);
-
-	if (!parentFormat) {
-		$setFormatNode(node, format);
-	} else {
-		$removeFormatNode(node, format);
-	}
-};
-
-// Insertion
-export const $canInsertElementsToNode = (node: LexicalNode) => {
-	if ($isTextNode(node)) return false;
-
-	// Check for parents
-	let currentNode: LexicalNode | null = node;
-	while (currentNode !== null) {
-		if ($isCodeNode(currentNode)) return false;
-		currentNode = currentNode.getParent();
-	}
-
-	return true;
-};
-
-export const $findCommonAncestor = (
-	startNode: LexicalNode,
-	nodes: LexicalNode[],
-	filter: (node: LexicalNode) => boolean = () => true,
-) => {
-	if (nodes.length === 1 && startNode.is(nodes[0]) && filter(startNode)) {
-		return startNode;
-	}
-
-	return $findMatchingParent(startNode, (parent) => {
-		return (
-			nodes.every((selectedNode) => $hasAncestor(selectedNode, parent)) &&
-			$canInsertElementsToNode(parent)
-		);
-	});
-};
-
-export const $wrapNodes = (createElement: (nodes: LexicalNode[]) => ElementNode) => {
-	const selection = $getSelection();
-
-	const points = selection?.getStartEndPoints();
-	if (!selection || !points) return;
-
-	const [start, end] = points;
-
-	if (
-		$isRangeSelection(selection) &&
-		(start.getNode() !== end.getNode() || start.offset !== end.offset)
-	) {
-		const selectedNodes = selection.getNodes();
-		const anchorNode = selection.anchor.getNode();
-		const commonAncestor =
-			$findMatchingParent(
-				anchorNode,
-				(parent) =>
-					selectedNodes.every((selectedNode) =>
-						$hasAncestor(selectedNode, parent),
-					) && $canInsertElementsToNode(parent),
-			) ?? $getRoot();
-		if (!commonAncestor || !$isBlockElementNode(commonAncestor)) return;
-
-		// In case common ancestor is not direct parent of any node,
-		// current implementation will drop that case and will not wrap such selection.
-		// Otherwise, we would have to ensure nodes integrity
-		const firstChildNode = commonAncestor
-			.getChildren()
-			.find((children) => selectedNodes.includes(children));
-		if (!firstChildNode) return;
-
-		const tmpNode = $createParagraphNode();
-		firstChildNode.insertBefore(tmpNode);
-
-		const topSelectedNodes = selectedNodes.filter((node) =>
-			commonAncestor.is(node.getParent()),
-		);
-
-		console.warn('FINAL STEP', {
-			commonAncestor,
-			topSelectedNodes,
-			selectedNodes,
-			parents: selectedNodes.map((node) => node.getParent()),
-		});
-		tmpNode.replace(createElement(topSelectedNodes));
-
-		return;
-	}
-
-	const blockElement = $findMatchingParent(
-		start.getNode(),
-		(node) => $isBlockElementNode(node) && !node.isParentRequired(),
-	) as ElementNode | null;
-
-	if (!blockElement) return;
-
-	const tmpNode = $createParagraphNode();
-	blockElement.replace(tmpNode);
-	tmpNode.replace(createElement([blockElement]));
-};
+	$canInsertElementsToNode,
+	$findCommonAncestor,
+	$wrapNodes,
+} from './utils/insertion';
 
 export const EditorPanelPlugin = () => {
 	const [editor] = useLexicalComposerContext();
@@ -346,6 +189,7 @@ export const EditorPanelPlugin = () => {
 
 			const command = commands[evt.type];
 			if (command) {
+				// Data depends on type, so it always will match
 				// @ts-ignore
 				command(evt.data);
 			}

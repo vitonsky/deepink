@@ -16,7 +16,7 @@ import { CodeHighlightPlugin } from './plugins/CodeHighlightPlugin';
 import { GenericContextMenu } from './plugins/ContextMenu/components/GenericContextMenu';
 import { ContextMenuPlugin } from './plugins/ContextMenu/ContextMenuPlugin';
 import { DropFilesPlugin } from './plugins/DropFilesPlugin';
-import { EditorPanelPlugin } from './plugins/EditorPanelPlugin';
+import { EditorPanelPlugin } from './plugins/EditorPanelPlugin/EditorPanelPlugin';
 import { FormattingPlugin } from './plugins/Formatting/FormattingPlugin';
 import ImagesPlugin from './plugins/Image/ImagesPlugin';
 import { LinkClickHandlerPlugin } from './plugins/LinkClickHandlerPlugin';
