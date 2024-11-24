@@ -188,7 +188,6 @@ export const $wrapNodes = (createElement: (nodes: LexicalNode[]) => ElementNode)
 	tmpNode.replace(createElement([blockElement]));
 };
 
-// TODO: implement all inserting & formatting features
 export const EditorPanelPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
@@ -286,7 +285,14 @@ export const EditorPanelPlugin = () => {
 							if (!targetNode) return;
 						}
 
-						targetNode.insertAfter($createImageNode({ src: url, altText }));
+						const imageNode = $createImageNode({ src: url, altText });
+						if ($isBlockElementNode(targetNode)) {
+							const paragraphNode = $createParagraphNode();
+							paragraphNode.append(imageNode);
+							targetNode.insertAfter(paragraphNode);
+						} else {
+							targetNode.insertAfter(imageNode);
+						}
 					});
 				},
 				list({ type }) {
