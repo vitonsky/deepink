@@ -176,7 +176,7 @@ export const EditorPanel = () => {
 						input.multiple = true;
 						input.addEventListener(
 							'change',
-							(evt) => {
+							() => {
 								const files = input.files;
 								input.remove();
 

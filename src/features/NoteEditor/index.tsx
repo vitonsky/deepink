@@ -144,16 +144,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 		updateAttachments(text);
 	}, [text, updateAttachments]);
 
-	// Immediate update a text
-	const onTextUpdate = useCallback(
-		(text: string) => {
-			debouncedUpdateNote({ title, text });
-			debouncedUpdateNote.flush();
-			setText(text);
-		},
-		[debouncedUpdateNote, title],
-	);
-
 	const [attachTagName, setAttachTagName] = useState<IResolvedTag | null>(null);
 	const [tagSearch, setTagSearch] = useState(
 		attachTagName ? attachTagName.resolvedName : '',
