@@ -5,11 +5,9 @@ import {
 	$getRoot,
 	$getSelection,
 	$isBlockElementNode,
-	$isRangeSelection,
 	$isRootNode,
 	$isTextNode,
 	CONTROLLED_TEXT_INSERTION_COMMAND,
-	LexicalNode,
 } from 'lexical';
 import { $createCodeNode, $isCodeNode } from '@lexical/code';
 import { TOGGLE_LINK_COMMAND } from '@lexical/link';
@@ -32,8 +30,9 @@ import { $toggleFormatNode } from './utils/format';
 import {
 	$canInsertElementsToNode,
 	$findCommonAncestor,
+	$getNearestSibling,
 	$wrapNodes,
-} from './utils/insertion';
+} from './utils/tree';
 
 /**
  * Plugin to handle editor panel actions about formatting and nodes insertion
@@ -126,6 +125,32 @@ export const EditorPanelPlugin = () => {
 							break;
 					}
 				},
+				link({ url }) {
+					editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url });
+				},
+				image({ url, altText }) {
+					editor.update(() => {
+						const cursorNode = $getCursorNode();
+						if (!cursorNode) return;
+
+						const anchorNode = $getNearestSibling(cursorNode);
+						if (!anchorNode) return;
+
+						const imageNode = $createImageNode({ src: url, altText });
+						if ($isBlockElementNode(anchorNode)) {
+							const paragraphNode = $createParagraphNode();
+							paragraphNode.append(imageNode);
+
+							if ($isRootNode(anchorNode)) {
+								anchorNode.append(paragraphNode);
+							} else {
+								anchorNode.insertAfter(paragraphNode);
+							}
+						} else {
+							anchorNode.insertAfter(imageNode);
+						}
+					});
+				},
 				horizontalRule() {
 					editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
 				},
@@ -160,45 +185,6 @@ export const EditorPanelPlugin = () => {
 
 							return code;
 						});
-					});
-				},
-				link({ url }) {
-					editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url });
-				},
-				image({ url, altText }) {
-					editor.update(() => {
-						const selection = $getSelection();
-						if (!selection) return;
-
-						const anchorNode = $isRangeSelection(selection)
-							? selection.anchor.getNode()
-							: selection.getNodes()[0];
-
-						let targetNode: LexicalNode | null = anchorNode;
-						const parent = targetNode.getParent();
-						if (parent && !$canInsertElementsToNode(parent)) {
-							const parents = targetNode.getParents();
-							targetNode = null;
-
-							for (let i = parents.length - 2; i > 0; i++) {
-								const target = parents[i + 1];
-								const parent = parents[i];
-
-								if (!$canInsertElementsToNode(parent)) continue;
-								targetNode = target;
-							}
-
-							if (!targetNode) return;
-						}
-
-						const imageNode = $createImageNode({ src: url, altText });
-						if ($isBlockElementNode(targetNode)) {
-							const paragraphNode = $createParagraphNode();
-							paragraphNode.append(imageNode);
-							targetNode.insertAfter(paragraphNode);
-						} else {
-							targetNode.insertAfter(imageNode);
-						}
 					});
 				},
 				file(payload) {

@@ -97,3 +97,32 @@ export const $wrapNodes = (createElement: (nodes: LexicalNode[]) => ElementNode)
 	blockElement.replace(tmpNode);
 	tmpNode.replace(createElement([blockElement]));
 };
+/**
+ * Search up to tree for nearest sibling node
+ *
+ * Sibling node is a node beside the one may be placed another node.
+ *
+ * For example, text node inside code node is not a sibling, since code node may contain only one text node,
+ * so for that case we have to continue search, to find other node that will have parent that allow contains another nodes.
+ */
+
+export const $getNearestSibling = (startNode: LexicalNode) => {
+	const parent = startNode.getParent();
+
+	// Special case if parent node is root
+	if (!parent) return startNode.isAttached() ? startNode : null;
+
+	if ($canInsertElementsToNode(parent)) return startNode;
+
+	const parents = startNode.getParents();
+	for (let i = 0; i < parents.length; i++) {
+		const target = parents[i];
+		const parent = parents[i + 1] ?? $getRoot();
+
+		if ($canInsertElementsToNode(parent)) {
+			return target;
+		}
+	}
+
+	return null;
+};
