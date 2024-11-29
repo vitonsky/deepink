@@ -8,12 +8,13 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
 
-import { useInsertFiles } from './useInsertFiles';
+import { INSERT_FILES_COMMAND } from './FilesPlugin';
 
+/**
+ * Plugin to handle drop and paste files into editor
+ */
 export const DropFilesPlugin = () => {
 	const [editor] = useLexicalComposerContext();
-
-	const $insertFiles = useInsertFiles();
 
 	useEffect(() => {
 		return mergeRegister(
@@ -31,7 +32,7 @@ export const DropFilesPlugin = () => {
 						event.target instanceof Node
 							? $getNearestNodeFromDOMNode(event.target)
 							: null;
-					$insertFiles(files, targetNode);
+					editor.dispatchCommand(INSERT_FILES_COMMAND, { files, targetNode });
 					return true;
 				},
 				COMMAND_PRIORITY_LOW,
@@ -54,13 +55,13 @@ export const DropFilesPlugin = () => {
 						event.target instanceof Node
 							? $getNearestNodeFromDOMNode(event.target)
 							: null;
-					$insertFiles(files, targetNode);
+					editor.dispatchCommand(INSERT_FILES_COMMAND, { files, targetNode });
 					return true;
 				},
 				COMMAND_PRIORITY_LOW,
 			),
 		);
-	}, [$insertFiles, editor]);
+	}, [editor]);
 
 	return null;
 };

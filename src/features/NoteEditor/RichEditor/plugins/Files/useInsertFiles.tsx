@@ -12,8 +12,9 @@ import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { $createLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 
-import { $getCursorNode, $insertAfter } from '../utils/selection';
-import { $createImageNode } from './Image/ImageNode';
+import { $getCursorNode, $insertAfter } from '../../utils/selection';
+
+import { $createImageNode } from '../Image/ImageNode';
 
 const MEGABYTE_SIZE = 1024 ** 2;
 const alertLimits = {

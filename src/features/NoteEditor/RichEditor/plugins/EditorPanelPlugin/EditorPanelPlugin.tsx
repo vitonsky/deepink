@@ -23,8 +23,8 @@ import { $dfs } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../../EditorPanel';
 
+import { INSERT_FILES_COMMAND } from '../Files/FilesPlugin';
 import { $createImageNode } from '../Image/ImageNode';
-import { useInsertFiles } from '../useInsertFiles';
 import { $toggleFormatNode } from './utils/format';
 import {
 	$canInsertElementsToNode,
@@ -32,11 +32,13 @@ import {
 	$wrapNodes,
 } from './utils/insertion';
 
+/**
+ * Plugin to handle editor panel actions about formatting and nodes insertion
+ */
 export const EditorPanelPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
 	const { onInserting, onFormatting } = useEditorPanelContext();
-	const $insertFiles = useInsertFiles();
 
 	useEffect(() => {
 		const cleanupFormatting = onFormatting.watch((format) => {
@@ -139,7 +141,9 @@ export const EditorPanelPlugin = () => {
 					});
 				},
 				file(payload) {
-					$insertFiles(payload.files);
+					editor.dispatchCommand(INSERT_FILES_COMMAND, {
+						files: payload.files,
+					});
 				},
 				list({ type }) {
 					switch (type) {
@@ -202,7 +206,7 @@ export const EditorPanelPlugin = () => {
 			cleanupFormatting();
 			cleanupInserting();
 		};
-	}, [$insertFiles, editor, onFormatting, onInserting]);
+	}, [editor, onFormatting, onInserting]);
 
 	return null;
 };
