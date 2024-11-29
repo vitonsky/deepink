@@ -24,6 +24,7 @@ import { $dfs } from '@lexical/utils';
 import { InsertingPayloadMap, useEditorPanelContext } from '../../../EditorPanel';
 
 import { $createImageNode } from '../Image/ImageNode';
+import { useInsertFiles } from '../useInsertFiles';
 import { $toggleFormatNode } from './utils/format';
 import {
 	$canInsertElementsToNode,
@@ -35,6 +36,7 @@ export const EditorPanelPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
 	const { onInserting, onFormatting } = useEditorPanelContext();
+	const $insertFiles = useInsertFiles();
 
 	useEffect(() => {
 		const cleanupFormatting = onFormatting.watch((format) => {
@@ -136,6 +138,9 @@ export const EditorPanelPlugin = () => {
 						}
 					});
 				},
+				file(payload) {
+					$insertFiles(payload.files);
+				},
 				list({ type }) {
 					switch (type) {
 						case 'checkbox':
@@ -197,7 +202,7 @@ export const EditorPanelPlugin = () => {
 			cleanupFormatting();
 			cleanupInserting();
 		};
-	}, [editor, onFormatting, onInserting]);
+	}, [$insertFiles, editor, onFormatting, onInserting]);
 
 	return null;
 };
