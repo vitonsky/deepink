@@ -16,8 +16,6 @@ import {
 	$isNodeSelection,
 	$isRootOrShadowRoot,
 	$setSelection,
-	COMMAND_PRIORITY_EDITOR,
-	COMMAND_PRIORITY_HIGH,
 	COMMAND_PRIORITY_LOW,
 	createCommand,
 	DRAGOVER_COMMAND,
@@ -63,14 +61,14 @@ export default function ImagesPlugin({
 
 					return true;
 				},
-				COMMAND_PRIORITY_EDITOR,
+				COMMAND_PRIORITY_LOW,
 			),
 			editor.registerCommand<DragEvent>(
 				DRAGSTART_COMMAND,
 				(event) => {
 					return $onDragStart(event);
 				},
-				COMMAND_PRIORITY_HIGH,
+				COMMAND_PRIORITY_LOW,
 			),
 			editor.registerCommand<DragEvent>(
 				DRAGOVER_COMMAND,
@@ -84,7 +82,7 @@ export default function ImagesPlugin({
 				(event) => {
 					return $onDrop(event, editor);
 				},
-				COMMAND_PRIORITY_HIGH,
+				COMMAND_PRIORITY_LOW,
 			),
 		);
 	}, [captionsEnabled, editor]);

@@ -6,7 +6,7 @@ import {
 	$isParagraphNode,
 	$isTextNode,
 	BaseSelection,
-	COMMAND_PRIORITY_NORMAL,
+	COMMAND_PRIORITY_LOW,
 	createCommand,
 	ElementNode,
 	KEY_ENTER_COMMAND,
@@ -91,7 +91,7 @@ export const FormattingPlugin = () => {
 
 						return false;
 					},
-					COMMAND_PRIORITY_NORMAL,
+					COMMAND_PRIORITY_LOW,
 				),
 				editor.registerCommand(
 					OUT_OF_BLOCK_NODE_COMMAND,
@@ -103,7 +103,7 @@ export const FormattingPlugin = () => {
 
 						return true;
 					},
-					COMMAND_PRIORITY_NORMAL,
+					COMMAND_PRIORITY_LOW,
 				),
 				editor.registerCommand(
 					KEY_SPACE_COMMAND,
@@ -148,7 +148,7 @@ export const FormattingPlugin = () => {
 
 						return true;
 					},
-					COMMAND_PRIORITY_NORMAL,
+					COMMAND_PRIORITY_LOW,
 				),
 			),
 		[editor],

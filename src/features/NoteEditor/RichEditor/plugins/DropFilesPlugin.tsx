@@ -5,7 +5,7 @@ import {
 	$getNearestNodeFromDOMNode,
 	$getRoot,
 	$isBlockElementNode,
-	COMMAND_PRIORITY_CRITICAL,
+	COMMAND_PRIORITY_LOW,
 	DROP_COMMAND,
 	LexicalNode,
 	PASTE_COMMAND,
@@ -114,7 +114,7 @@ export const DropFilesPlugin = () => {
 					$insertFiles(files, targetNode);
 					return true;
 				},
-				COMMAND_PRIORITY_CRITICAL,
+				COMMAND_PRIORITY_LOW,
 			),
 			editor.registerCommand(
 				PASTE_COMMAND,
@@ -137,7 +137,7 @@ export const DropFilesPlugin = () => {
 					$insertFiles(files, targetNode);
 					return true;
 				},
-				COMMAND_PRIORITY_CRITICAL,
+				COMMAND_PRIORITY_LOW,
 			),
 		);
 
