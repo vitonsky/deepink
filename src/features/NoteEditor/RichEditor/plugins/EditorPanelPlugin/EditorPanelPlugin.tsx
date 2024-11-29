@@ -6,6 +6,7 @@ import {
 	$getSelection,
 	$isBlockElementNode,
 	$isRangeSelection,
+	$isRootNode,
 	$isTextNode,
 	CONTROLLED_TEXT_INSERTION_COMMAND,
 	LexicalNode,
@@ -95,6 +96,36 @@ export const EditorPanelPlugin = () => {
 						}
 					});
 				},
+				list({ type }) {
+					editor.update(() => {
+						const target = $getCursorNode();
+						if (!target) return;
+
+						if ($isRootNode(target)) {
+							const paragraph = $createParagraphNode();
+							target.append(paragraph);
+							paragraph.select();
+						}
+					});
+
+					switch (type) {
+						case 'checkbox':
+							editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined);
+							break;
+						case 'ordered':
+							editor.dispatchCommand(
+								INSERT_ORDERED_LIST_COMMAND,
+								undefined,
+							);
+							break;
+						case 'unordered':
+							editor.dispatchCommand(
+								INSERT_UNORDERED_LIST_COMMAND,
+								undefined,
+							);
+							break;
+					}
+				},
 				horizontalRule() {
 					editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
 				},
@@ -174,25 +205,6 @@ export const EditorPanelPlugin = () => {
 					editor.dispatchCommand(INSERT_FILES_COMMAND, {
 						files: payload.files,
 					});
-				},
-				list({ type }) {
-					switch (type) {
-						case 'checkbox':
-							editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined);
-							break;
-						case 'ordered':
-							editor.dispatchCommand(
-								INSERT_ORDERED_LIST_COMMAND,
-								undefined,
-							);
-							break;
-						case 'unordered':
-							editor.dispatchCommand(
-								INSERT_UNORDERED_LIST_COMMAND,
-								undefined,
-							);
-							break;
-					}
 				},
 			};
 
