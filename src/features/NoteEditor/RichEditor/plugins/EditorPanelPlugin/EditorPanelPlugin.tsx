@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import {
 	$createParagraphNode,
 	$createTextNode,
+	$getRoot,
 	$getSelection,
 	$isBlockElementNode,
 	$isRangeSelection,
@@ -22,6 +23,7 @@ import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import { $dfs } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../../EditorPanel';
+import { $getCursorNode } from '../../utils/selection';
 
 import { INSERT_FILES_COMMAND } from '../Files/FilesPlugin';
 import { $createImageNode } from '../Image/ImageNode';
@@ -65,6 +67,34 @@ export const EditorPanelPlugin = () => {
 					payload: InsertingPayloadMap[K],
 				) => void;
 			} = {
+				heading({ level }) {
+					editor.update(() => {
+						const target = $getCursorNode();
+						if (!target) return;
+
+						const parent = target.getParent();
+						if (parent && !$canInsertElementsToNode(parent)) return;
+
+						// Insert
+						const heading = $createHeadingNode(`h${level}`);
+						if ($isTextNode(target)) {
+							target.replace(heading);
+							heading.append(target);
+							heading.select();
+						} else {
+							// Insert at root
+							if (!parent) {
+								$getRoot().append(heading);
+								heading.select();
+								return;
+							}
+
+							// Insert before
+							target.insertBefore(heading);
+							heading.select();
+						}
+					});
+				},
 				horizontalRule() {
 					editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
 				},
@@ -163,34 +193,6 @@ export const EditorPanelPlugin = () => {
 							);
 							break;
 					}
-				},
-				heading({ level }) {
-					editor.update(() => {
-						const selection = $getSelection();
-						if (!selection) return;
-
-						const points = selection.getStartEndPoints();
-						if (!points) return;
-
-						const target = points[0].getNode();
-						if (!target) return;
-
-						const parent = target.getParent();
-						if (parent && !$canInsertElementsToNode(parent)) return;
-
-						// Insert
-						if ($isTextNode(target)) {
-							const heading = $createHeadingNode(`h${level}`);
-
-							target.replace(heading);
-							heading.append(target);
-							heading.select();
-						} else {
-							const heading = $createHeadingNode(`h${level}`);
-							target.insertBefore(heading);
-							heading.select();
-						}
-					});
 				},
 			};
 
