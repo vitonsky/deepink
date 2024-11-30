@@ -184,9 +184,10 @@ export const EditorPanelPlugin = () => {
 
 							const textContent = nodes
 								.map(
-									(node) =>
-										node.getTextContent() +
-										($isBlockElementNode(node) ? '\n' : ''),
+									(node, index) =>
+										($isBlockElementNode(node) && index > 0
+											? '\n'
+											: '') + node.getTextContent(),
 								)
 								.join('');
 							nodes.forEach((node) => node.remove());
