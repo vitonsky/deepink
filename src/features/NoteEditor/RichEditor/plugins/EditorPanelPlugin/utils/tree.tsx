@@ -5,6 +5,7 @@ import {
 	$hasAncestor,
 	$isBlockElementNode,
 	$isRangeSelection,
+	$isRootNode,
 	$isTextNode,
 	ElementNode,
 	LexicalNode,
@@ -86,16 +87,24 @@ export const $wrapNodes = (createElement: (nodes: LexicalNode[]) => ElementNode)
 		return;
 	}
 
-	const blockElement = $findMatchingParent(
-		start.getNode(),
-		(node) => $isBlockElementNode(node) && !node.isParentRequired(),
-	) as ElementNode | null;
+	const anchor = start.getNode();
+	if ($isRootNode(anchor)) {
+		// Handle case with empty editor state
+		const paragraph = $createParagraphNode();
+		anchor.append(paragraph);
+		paragraph.append(createElement([]));
+	} else {
+		const blockElement = $findMatchingParent(
+			anchor,
+			(node) => $isBlockElementNode(node) && !node.isParentRequired(),
+		) as ElementNode | null;
 
-	if (!blockElement) return;
+		if (!blockElement) return;
 
-	const tmpNode = $createParagraphNode();
-	blockElement.replace(tmpNode);
-	tmpNode.replace(createElement([blockElement]));
+		const tmpNode = $createParagraphNode();
+		blockElement.replace(tmpNode);
+		tmpNode.replace(createElement([blockElement]));
+	}
 };
 /**
  * Search up to tree for nearest sibling node

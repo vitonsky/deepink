@@ -5,6 +5,7 @@ import {
 	$getRoot,
 	$getSelection,
 	$isBlockElementNode,
+	$isParagraphNode,
 	$isRootNode,
 	$isTextNode,
 	CONTROLLED_TEXT_INSERTION_COMMAND,
@@ -151,17 +152,27 @@ export const EditorPanelPlugin = () => {
 						}
 					});
 				},
-				horizontalRule() {
-					editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
-				},
-				date({ date }) {
-					editor.dispatchCommand(CONTROLLED_TEXT_INSERTION_COMMAND, date);
-				},
 				quote() {
 					editor.update(() => {
 						$wrapNodes((nodes) => {
 							const quote = $createQuoteNode();
-							quote.append(...nodes);
+
+							if (nodes.length === 0) {
+								const paragraph = $createParagraphNode();
+								quote.append(paragraph);
+								paragraph.select();
+							} else {
+								quote.append(
+									...nodes.map((node) => {
+										if ($isParagraphNode(node)) return node;
+
+										const paragraph = $createParagraphNode();
+										paragraph.append(node);
+										return paragraph;
+									}),
+								);
+							}
+
 							return quote;
 						});
 					});
@@ -186,6 +197,12 @@ export const EditorPanelPlugin = () => {
 							return code;
 						});
 					});
+				},
+				horizontalRule() {
+					editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
+				},
+				date({ date }) {
+					editor.dispatchCommand(CONTROLLED_TEXT_INSERTION_COMMAND, date);
 				},
 				file(payload) {
 					editor.dispatchCommand(INSERT_FILES_COMMAND, {
