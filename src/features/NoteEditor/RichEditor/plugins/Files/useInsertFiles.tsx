@@ -4,6 +4,7 @@ import {
 	$createTextNode,
 	$getRoot,
 	$isBlockElementNode,
+	$isRootNode,
 	LexicalNode,
 } from 'lexical';
 import prettyBytes from 'pretty-bytes';
@@ -67,24 +68,25 @@ export const useInsertFiles = () => {
 
 				const selectedNode =
 					targetNode && targetNode.isAttached() ? targetNode : $getCursorNode();
-				if (selectedNode) {
-					const nodes = $isBlockElementNode(selectedNode)
-						? fileNodes.map((node) => {
-								const paragraph = $createParagraphNode();
-								paragraph.append(node);
-								return paragraph;
-						  })
-						: fileNodes;
-
-					$insertAfter(selectedNode, nodes);
-				} else {
+				if (!selectedNode || $isRootNode(selectedNode)) {
 					const root = $getRoot();
 
 					const paragraph = $createParagraphNode();
 					root.append(paragraph);
 
 					paragraph.append(...fileNodes);
+					return;
 				}
+
+				const nodes = $isBlockElementNode(selectedNode)
+					? fileNodes.map((node) => {
+							const paragraph = $createParagraphNode();
+							paragraph.append(node);
+							return paragraph;
+					  })
+					: fileNodes;
+
+				$insertAfter(selectedNode, nodes);
 			});
 		},
 		[editor, filesRegistry],
