@@ -92,13 +92,6 @@ export const ContextMenuPlugin = ({
 		);
 	}, [close, editor, menuContext]);
 
-	// Fix popup position
-	// useEffect(() => {
-	// 	return editor.registerUpdateListener(() => {
-	// 		popper?.forceUpdate?.();
-	// 	});
-	// }, [editor, popper]);
-
 	const children = menuContext ? (
 		<RendererComponent {...{ ...menuContext, editor, close }} />
 	) : null;
