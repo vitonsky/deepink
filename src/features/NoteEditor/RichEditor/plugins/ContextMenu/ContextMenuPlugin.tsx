@@ -1,11 +1,10 @@
 /* eslint-disable spellcheck/spell-checker */
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { usePopper } from 'react-popper';
 import { $getNearestNodeFromDOMNode, LexicalEditor, LexicalNode } from 'lexical';
-import { Box, BoxProps, Portal } from '@chakra-ui/react';
+import { BoxProps, Portal } from '@chakra-ui/react';
+import { Popper } from '@features/NotesContainer/EditorModePicker/Popper';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
-import { computeStyles, flip, offset, preventOverflow } from '@popperjs/core';
 
 export type ContextMenuRendererProps = {
 	node: LexicalNode;
@@ -27,7 +26,7 @@ export const ContextMenuPlugin = ({
 
 	const [menuContext, setMenuContext] = useState<{
 		node: LexicalNode;
-		element: Element;
+		element: HTMLElement;
 	} | null>(null);
 
 	const close = useCallback(() => {
@@ -93,57 +92,12 @@ export const ContextMenuPlugin = ({
 		);
 	}, [close, editor, menuContext]);
 
-	// Manage popper
-	const [popperRef, setPopperRef] = useState<HTMLElement | null>(null);
-	const popper = usePopper(menuContext?.element, popperRef, {
-		placement: 'auto',
-		modifiers: [
-			{
-				...computeStyles,
-				options: {
-					// Prevent scroll body
-					gpuAcceleration: false,
-				},
-			},
-			{ ...flip, options: { fallbackPlacements: ['bottom', 'top'] } },
-			{ ...offset, options: { offset: [0, 10] } },
-			{
-				...preventOverflow,
-				options: {
-					mainAxis: true,
-					altAxis: true,
-					boundary: 'clippingParents',
-					padding: 10,
-				},
-			} as const,
-		],
-	});
-
 	// Fix popup position
-	useEffect(() => {
-		return editor.registerUpdateListener(() => {
-			popper?.forceUpdate?.();
-		});
-	}, [editor, popper]);
-
-	// Close popup by click outside
-	useEffect(() => {
-		if (!popperRef) return;
-
-		const onMouseDown = (evt: MouseEvent) => {
-			const target = evt.target;
-			if (!(target instanceof HTMLElement)) return;
-
-			if (target !== popperRef && !popperRef.contains(target)) {
-				close();
-			}
-		};
-
-		document.addEventListener('mousedown', onMouseDown);
-		return () => {
-			document.removeEventListener('mousedown', onMouseDown);
-		};
-	}, [close, popperRef, setMenuContext]);
+	// useEffect(() => {
+	// 	return editor.registerUpdateListener(() => {
+	// 		popper?.forceUpdate?.();
+	// 	});
+	// }, [editor, popper]);
 
 	const children = menuContext ? (
 		<RendererComponent {...{ ...menuContext, editor, close }} />
@@ -151,20 +105,9 @@ export const ContextMenuPlugin = ({
 
 	return children ? (
 		<Portal>
-			<Box
-				ref={setPopperRef}
-				tabIndex={0}
-				{...props}
-				style={{ ...popper.styles.popper, ...props.style }}
-				onKeyUp={(evt) => {
-					// Close by escape
-					if (evt.key === 'Escape') {
-						close();
-					}
-				}}
-			>
+			<Popper referenceRef={menuContext?.element} onClose={close} {...props}>
 				{children}
-			</Box>
+			</Popper>
 		</Portal>
 	) : null;
 };
