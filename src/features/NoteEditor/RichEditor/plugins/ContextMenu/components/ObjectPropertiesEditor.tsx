@@ -53,10 +53,15 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	}, [getValues, optionsValues, reset, setValue]);
 
 	return (
-		<VStack as="form" gap="1rem" w="100%" {...props}>
-			<VStack w="100%" gap="0.5rem">
+		<VStack as="form" gap="2rem" w="100%" {...props}>
+			<VStack align="start" w="100%" gap="1rem">
 				{options.map(({ id, label }) => {
-					return <Input key={id} placeholder={label} {...register(id)} />;
+					return (
+						<VStack key={id} as="label" align="start" w="100%" gap="0.3rem">
+							{<Text>{label}</Text>}
+							<Input {...register(id)} />
+						</VStack>
+					);
 				})}
 			</VStack>
 
