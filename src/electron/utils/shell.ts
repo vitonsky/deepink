@@ -14,6 +14,6 @@ export const openUrlWithExternalBrowser = async (url: string) => {
 	}
 
 	return shell.openExternal(url).catch((error) => {
-		console.error('Failed to open link:', error);
+		console.error(`Failed to open link ${url}`, error);
 	});
 };
