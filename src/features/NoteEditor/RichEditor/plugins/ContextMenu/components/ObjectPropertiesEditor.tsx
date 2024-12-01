@@ -53,7 +53,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	}, [getValues, optionsValues, reset, setValue]);
 
 	return (
-		<VStack as="form" gap="2rem" w="100%" {...props}>
+		<VStack as="form" gap="1.5rem" w="100%" minW="350px" {...props}>
 			<VStack align="start" w="100%" gap="1rem">
 				{options.map(({ id, label }) => {
 					return (
@@ -66,7 +66,6 @@ export const PropertiesForm = <T extends OptionObject[]>({
 			</VStack>
 
 			<HStack w="100%" justifyContent="end">
-				{onCancel && <Button onClick={onCancel}>{cancelButtonText}</Button>}
 				<Button
 					variant="primary"
 					onClick={() => {
@@ -75,6 +74,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 				>
 					{submitButtonText}
 				</Button>
+				{onCancel && <Button onClick={onCancel}>{cancelButtonText}</Button>}
 			</HStack>
 		</VStack>
 	);
