@@ -4,6 +4,15 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 
 import { $convertFromMarkdownString, $convertToMarkdownString } from './markdownParser';
 
+export const isFocusedElement = (element: HTMLElement | null) => {
+	if (!element || !document.activeElement) return false;
+
+	if (element !== document.activeElement && !element.contains(document.activeElement))
+		return false;
+
+	return true;
+};
+
 export type MarkdownSerializePluginProps = {
 	value: string;
 	onChanged?: (value: string) => void;
@@ -20,9 +29,28 @@ export const MarkdownSerializePlugin = ({
 		// Skip updates sent from this component, based on value equality
 		if (serializedValueRef.current === value) return;
 
-		editor.update(() => {
-			$convertFromMarkdownString(value);
-		});
+		const isEditable = editor.isEditable();
+
+		// Disable editable mode while update if editor is not active,
+		// to prevent forced focus on editor
+		const isActiveBeforeUpdate = isFocusedElement(editor.getRootElement());
+		if (!isActiveBeforeUpdate && isEditable) {
+			editor.setEditable(false);
+		}
+
+		editor.update(
+			() => {
+				$convertFromMarkdownString(value);
+			},
+			{
+				onUpdate() {
+					// Restore editable state once update completed
+					if (isEditable !== editor.isEditable()) {
+						editor.setEditable(isEditable);
+					}
+				},
+			},
+		);
 	}, [editor, value]);
 
 	const onChange = (value: string) => {

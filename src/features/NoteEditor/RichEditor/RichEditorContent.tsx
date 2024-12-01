@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -38,35 +37,7 @@ export const RichEditorContent = ({
 	placeholder,
 	...props
 }: RichEditorContentProps) => {
-	const [editor] = useLexicalComposerContext();
 	const styles = useMultiStyleConfig('RichEditor');
-
-	const containerRef = useRef<HTMLDivElement | null>(null);
-	const isActive = () => {
-		const container = containerRef.current;
-		if (!container || !document.activeElement) return false;
-		if (
-			container !== document.activeElement &&
-			!container.contains(document.activeElement)
-		)
-			return false;
-
-		return true;
-	};
-
-	// toggle `editable` based on focus
-	useEffect(() => {
-		const onFocus = () => {
-			const editable = isActive();
-			console.log('Change editable state', editable);
-			editor.setEditable(editable);
-		};
-
-		document.addEventListener('focusin', onFocus);
-		return () => {
-			document.removeEventListener('focusin', onFocus);
-		};
-	}, [editor]);
 
 	return (
 		<Box
@@ -82,14 +53,10 @@ export const RichEditorContent = ({
 			<RichTextPlugin
 				contentEditable={
 					<Box
-						ref={containerRef}
 						w="100%"
 						maxH="100%"
 						overflow="auto"
 						padding="1rem"
-						onMouseDown={() => {
-							editor.setEditable(true);
-						}}
 						{...props}
 						as={ContentEditable}
 					/>
