@@ -2,7 +2,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { $getNearestNodeFromDOMNode, LexicalEditor, LexicalNode } from 'lexical';
 import { BoxProps, Portal } from '@chakra-ui/react';
-import { Popper } from '@features/NotesContainer/EditorModePicker/Popper';
+import { Popper } from '@components/Popper';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
 

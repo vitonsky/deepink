@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaFeather } from 'react-icons/fa6';
 import { Box, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
+import { Popper } from '@components/Popper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	GlobalSettings,
@@ -10,8 +11,6 @@ import {
 } from '@state/redux/settings/settings';
 
 import { useStatusBarManager } from '../../MainScreen/StatusBar/StatusBarProvider';
-
-import { Popper } from './Popper';
 
 export const useStatusBarButton = () => {};
 
