@@ -2,8 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
 
+export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
+
 export type GlobalSettings = {
-	editorMode: 'plaintext' | 'richtext' | 'split-screen';
+	editorMode: EditorMode;
 	theme: 'zen' | 'light';
 };
 

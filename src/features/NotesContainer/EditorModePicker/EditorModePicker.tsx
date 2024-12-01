@@ -5,14 +5,18 @@ import { NestedList } from '@components/NestedList';
 import { Popper } from '@components/Popper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
-	GlobalSettings,
+	EditorMode,
 	selectEditorMode,
 	settingsApi,
 } from '@state/redux/settings/settings';
 
 import { useStatusBarManager } from '../../MainScreen/StatusBar/StatusBarProvider';
 
-export const useStatusBarButton = () => {};
+export const editorModes = {
+	plaintext: 'Plain text',
+	richtext: 'Rich text',
+	'split-screen': 'Split screen',
+} satisfies Record<EditorMode, string>;
 
 export const EditorModePicker = () => {
 	const { controls } = useStatusBarManager();
@@ -28,7 +32,8 @@ export const EditorModePicker = () => {
 			'editor-mode',
 			{
 				visible: true,
-				text: `Editor mode: ${editorMode}`,
+				title: 'Editor mode',
+				text: editorModes[editorMode],
 				icon: (
 					<Box ref={setReferenceRef}>
 						<FaFeather />
@@ -62,24 +67,14 @@ export const EditorModePicker = () => {
 			borderColor="surface.border"
 		>
 			<NestedList
-				items={[
-					{
-						id: 'plaintext',
-						content: <Text p=".5rem">Text editor</Text>,
-					},
-					{
-						id: 'richtext',
-						content: <Text p=".5rem">Rich-text editor</Text>,
-					},
-					{
-						id: 'split-screen',
-						content: <Text p=".5rem">Split editor</Text>,
-					},
-				]}
+				items={(['plaintext', 'richtext', 'split-screen'] as EditorMode[]).map(
+					(id) => ({
+						id,
+						content: <Text p=".5rem">{editorModes[id]}</Text>,
+					}),
+				)}
 				onPick={(id) => {
-					dispatch(
-						settingsApi.setEditorMode(id as GlobalSettings['editorMode']),
-					);
+					dispatch(settingsApi.setEditorMode(id as EditorMode));
 					onClose();
 				}}
 			/>
