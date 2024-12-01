@@ -128,7 +128,7 @@ export const EditorPanel = () => {
 					variant="ghost"
 					title="Insert or wrap text with code block"
 					onClick={() => {
-						onInserting({ type: 'code', data: {} });
+						onInserting({ type: 'code' });
 					}}
 				>
 					<FaCode />
@@ -138,7 +138,7 @@ export const EditorPanel = () => {
 					variant="ghost"
 					title="Insert or wrap text with quote block"
 					onClick={() => {
-						onInserting({ type: 'quote', data: {} });
+						onInserting({ type: 'quote' });
 					}}
 				>
 					<FaQuoteLeft />

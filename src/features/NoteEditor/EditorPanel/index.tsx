@@ -20,12 +20,8 @@ export type InsertingPayloadMap = {
 		url: string;
 		altText: string;
 	};
-	code: {
-		text?: string;
-	};
-	quote: {
-		text?: string;
-	};
+	code: void;
+	quote: void;
 	horizontalRule: void;
 	date: {
 		date: string;
