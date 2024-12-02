@@ -265,13 +265,6 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 	const rootNode = $getRoot();
 	rootNode.clear();
 	rootNode.append(...lexicalNodes);
-
-	console.log('Import', {
-		rawMarkdown,
-		mdTree,
-		transformedNodes: lexicalNodes,
-		rootNode: rootNode.exportJSON(),
-	});
 };
 
 export const $convertToMarkdownString = () => {
@@ -444,13 +437,5 @@ export const $convertToMarkdownString = () => {
 		children: children.map(convertToMarkdownNode),
 	}) satisfies Root;
 
-	const serializedData = markdownProcessor.stringify(mdTree);
-
-	console.log('EXPORT', {
-		serializedData,
-		rootNode: rootNode.exportJSON(),
-		children,
-		mdTree,
-	});
-	return serializedData;
+	return markdownProcessor.stringify(mdTree);
 };

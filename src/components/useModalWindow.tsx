@@ -45,7 +45,6 @@ export const ModalWindowProvider: FC<PropsWithChildren> = ({ children }) => {
 
 		const cleanups = [
 			show.watch((payload) => {
-				console.log('Open modal window', payload);
 				setModalContexts((payloads) => [payload, ...payloads]);
 			}),
 		];
