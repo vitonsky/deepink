@@ -4,6 +4,8 @@ import { Box, Divider, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { Popper } from '@components/Popper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectOpenedNotes } from '@state/redux/profiles/profiles';
 import {
 	EditorMode,
 	selectEditorMode,
@@ -27,11 +29,17 @@ export const EditorModePicker = () => {
 	const [isVisible, setIsVisible] = useState(false);
 	const [referenceRef, setReferenceRef] = useState<HTMLElement | null>(null);
 
+	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
+	const isNotesOpened = openedNotes.length > 0;
+
 	useEffect(() => {
+		// Update state by close notes
+		setIsVisible((state) => (isNotesOpened ? state : false));
+
 		controls.update(
 			'editor-mode',
 			{
-				visible: true,
+				visible: isNotesOpened,
 				title: 'Editor mode',
 				text: editorModes[editorMode],
 				icon: (
@@ -46,7 +54,7 @@ export const EditorModePicker = () => {
 				priority: 100000,
 			},
 		);
-	}, [controls, editorMode]);
+	}, [controls, editorMode, isNotesOpened]);
 
 	useEffect(() => {
 		return () => {
