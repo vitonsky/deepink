@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaFeather } from 'react-icons/fa6';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Divider, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { Popper } from '@components/Popper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -65,19 +65,26 @@ export const EditorModePicker = () => {
 			backgroundColor="surface.background"
 			border="1px solid"
 			borderColor="surface.border"
+			minW="150px"
 		>
-			<NestedList
-				items={(['plaintext', 'richtext', 'split-screen'] as EditorMode[]).map(
-					(id) => ({
+			<VStack gap={0} align="start">
+				<Text padding=".5rem" fontWeight="bold">
+					Editor mode
+				</Text>
+				<Divider />
+				<NestedList
+					items={(
+						['plaintext', 'richtext', 'split-screen'] as EditorMode[]
+					).map((id) => ({
 						id,
 						content: <Text p=".5rem">{editorModes[id]}</Text>,
-					}),
-				)}
-				onPick={(id) => {
-					dispatch(settingsApi.setEditorMode(id as EditorMode));
-					onClose();
-				}}
-			/>
+					}))}
+					onPick={(id) => {
+						dispatch(settingsApi.setEditorMode(id as EditorMode));
+						onClose();
+					}}
+				/>
+			</VStack>
 		</Popper>
 	);
 };
