@@ -64,7 +64,8 @@ export const MarkdownSerializePlugin = ({
 	return (
 		<OnChangePlugin
 			onChange={(_, editor) => {
-				if (!editor.isEditable()) return;
+				const isActive = isFocusedElement(editor.getRootElement());
+				if (!isActive) return;
 
 				// TODO: debounce for 1-3 seconds
 				editor.read(() => {
