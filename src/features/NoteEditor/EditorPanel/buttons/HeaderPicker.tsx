@@ -56,6 +56,7 @@ export const HeaderPicker = ({
 			<MenuList minW="auto">
 				{([1, 2, 3, 4, 5, 6] as const).map((level) => (
 					<MenuItem
+						key={level}
 						paddingInlineEnd="1rem"
 						onMouseDown={(evt) => {
 							evt.preventDefault();
