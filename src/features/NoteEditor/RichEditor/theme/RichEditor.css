@@ -1,0 +1,556 @@
+/* stylelint-disable max-line-length */
+/* stylelint-disable declaration-block-no-redundant-longhand-properties */
+/* stylelint-disable function-url-quotes */
+/* stylelint-disable no-descending-specificity */
+
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ *
+ */
+.RichEditor__ltr {
+	text-align: left;
+}
+
+.RichEditor__rtl {
+	text-align: right;
+}
+
+.RichEditor__paragraph {
+	margin: 0;
+	position: relative;
+}
+
+.RichEditor__quote {
+	margin: 0;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	font-size: 15px;
+	color: var(--chakra-colors-typography-secondary);
+	border-left-color: var(--chakra-colors-surface-border);
+	border-left-width: 4px;
+	border-left-style: solid;
+	padding-left: 16px;
+}
+
+.RichEditor__h1 {
+	padding-bottom: 0.3em;
+	font-size: 2em;
+	border-bottom: 1px solid var(--chakra-colors-surface-border);
+}
+
+.RichEditor__h2 {
+	padding-bottom: 0.3em;
+	font-size: 1.5em;
+	border-bottom: 1px solid var(--chakra-colors-surface-border);
+}
+
+.RichEditor__h3 {
+	font-size: 1.25em;
+}
+
+.RichEditor__h4 {
+	font-size: 1em;
+}
+
+.RichEditor__h5 {
+	font-size: 0.875em;
+}
+
+.RichEditor__h6 {
+	font-size: 0.85em;
+}
+
+.RichEditor__indent {
+	--lexical-indent-base-value: 40px;
+}
+
+.RichEditor__textBold {
+	font-weight: bold;
+}
+
+.RichEditor__textItalic {
+	font-style: italic;
+}
+
+.RichEditor__textUnderline {
+	text-decoration: underline;
+}
+
+.RichEditor__textStrikethrough {
+	text-decoration: line-through;
+}
+
+.RichEditor__textUnderlineStrikethrough {
+	text-decoration: underline line-through;
+}
+
+.RichEditor__textSubscript {
+	font-size: 0.8em;
+	vertical-align: sub !important;
+}
+
+.RichEditor__textSuperscript {
+	font-size: 0.8em;
+	vertical-align: super;
+}
+
+.RichEditor__textCode {
+	background-color: var(--chakra-colors-dim-100);
+	color: var(--chakra-colors-typography-primary);
+	padding: 1px 0.25rem;
+	font-family: Menlo, Consolas, Monaco, monospace;
+	font-size: 94%;
+}
+
+.RichEditor__hashtag {
+	background-color: rgb(88 144 255 / 15%);
+	border-bottom: 1px solid rgb(88 144 255 / 30%);
+}
+
+.RichEditor__link {
+	display: inline-block;
+	color: rgb(33 111 219);
+	text-decoration: inherit;
+}
+
+.RichEditor__link:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.RichEditor__code {
+	--block-padding: 0.8rem;
+
+	background-color: var(--chakra-colors-dim-100);
+	color: var(--chakra-colors-typography-primary);
+	font-family: Menlo, Consolas, Monaco, monospace;
+	display: block;
+	padding: var(--block-padding);
+	line-height: 1.53;
+	font-size: 13px;
+	margin: 0;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	overflow-x: auto;
+	position: relative;
+	tab-size: 2;
+	border-radius: 4px;
+	white-space: pre;
+}
+
+.RichEditor__code::before {
+	display: block;
+	float: left;
+	box-sizing: border-box;
+	content: attr(data-gutter);
+	background: #00000012;
+	padding-block: var(--block-padding);
+	padding-inline: var(--block-padding);
+	margin: calc(-1 * var(--block-padding));
+	margin-inline-end: var(--block-padding);
+}
+
+.RichEditor__table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	overflow-y: scroll;
+	overflow-x: scroll;
+	table-layout: fixed;
+	width: inherit;
+}
+
+.RichEditor__tableRowStriping tr:nth-child(even) {
+	background-color: #f2f5fb;
+}
+
+.RichEditor__tableSelection *::selection {
+	background-color: transparent;
+}
+
+.RichEditor__tableSelected {
+	outline: 2px solid rgb(60 132 244);
+}
+
+.RichEditor__tableCell {
+	border: 1px solid #bbb;
+	width: 75px;
+	vertical-align: top;
+	text-align: start;
+	padding: 6px 8px;
+	position: relative;
+	outline: none;
+}
+
+.RichEditor__tableCellSortedIndicator {
+	display: block;
+	opacity: 0.5;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	background-color: #999;
+}
+
+.RichEditor__tableCellResizer {
+	position: absolute;
+	right: -4px;
+	height: 100%;
+	width: 8px;
+	cursor: ew-resize;
+	z-index: 10;
+	top: 0;
+}
+
+.RichEditor__tableCellHeader {
+	background-color: #f2f3f5;
+	text-align: start;
+}
+
+.RichEditor__tableCellSelected {
+	background-color: #c9dbf0;
+}
+
+.RichEditor__tableCellPrimarySelected {
+	border: 2px solid rgb(60 132 244);
+	display: block;
+	height: calc(100% - 2px);
+	position: absolute;
+	width: calc(100% - 2px);
+	left: -1px;
+	top: -1px;
+	z-index: 2;
+}
+
+.RichEditor__tableCellEditing {
+	box-shadow: 0 0 5px rgb(0 0 0 / 40%);
+	border-radius: 3px;
+}
+
+.RichEditor__tableAddColumns {
+	position: absolute;
+	background-color: #eee;
+	height: 100%;
+	animation: table-controls 0.2s ease;
+	border: 0;
+	cursor: pointer;
+}
+
+.RichEditor__tableAddColumns::after {
+	/* background-image: url(../images/icons/plus.svg); */
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	display: block;
+	content: ' ';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.4;
+}
+
+.RichEditor__tableAddColumns:hover,
+.RichEditor__tableAddRows:hover {
+	background-color: #c9dbf0;
+}
+
+.RichEditor__tableAddRows {
+	position: absolute;
+	width: calc(100% - 25px);
+	background-color: #eee;
+	animation: table-controls 0.2s ease;
+	border: 0;
+	cursor: pointer;
+}
+
+.RichEditor__tableAddRows::after {
+	/* background-image: url(../images/icons/plus.svg); */
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	display: block;
+	content: ' ';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.4;
+}
+
+@keyframes table-controls {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+.RichEditor__tableCellResizeRuler {
+	display: block;
+	position: absolute;
+	width: 1px;
+	background-color: rgb(60 132 244);
+	height: 100%;
+	top: 0;
+}
+
+.RichEditor__tableCellActionButtonContainer {
+	display: block;
+	right: 5px;
+	top: 6px;
+	position: absolute;
+	z-index: 4;
+	width: 20px;
+	height: 20px;
+}
+
+.RichEditor__tableCellActionButton {
+	background-color: #eee;
+	display: block;
+	border: 0;
+	border-radius: 20px;
+	width: 20px;
+	height: 20px;
+	color: #222;
+	cursor: pointer;
+}
+
+.RichEditor__tableCellActionButton:hover {
+	background-color: #ddd;
+}
+
+.RichEditor__characterLimit {
+	display: inline;
+	background-color: #fbb !important;
+}
+
+.RichEditor__ol1 {
+	padding: 0;
+	margin: 0;
+	list-style-position: outside;
+}
+
+.RichEditor__ol2 {
+	padding: 0;
+	margin: 0;
+	list-style-type: upper-alpha;
+	list-style-position: outside;
+}
+
+.RichEditor__ol3 {
+	padding: 0;
+	margin: 0;
+	list-style-type: lower-alpha;
+	list-style-position: outside;
+}
+
+.RichEditor__ol4 {
+	padding: 0;
+	margin: 0;
+	list-style-type: upper-roman;
+	list-style-position: outside;
+}
+
+.RichEditor__ol5 {
+	padding: 0;
+	margin: 0;
+	list-style-type: lower-roman;
+	list-style-position: outside;
+}
+
+.RichEditor__ul {
+	padding: 0;
+	margin: 0;
+	list-style-position: outside;
+}
+
+.RichEditor__listItem {
+	margin: 0 32px;
+}
+
+.RichEditor__listItemChecked,
+.RichEditor__listItemUnchecked {
+	position: relative;
+	margin-left: 8px;
+	margin-right: 8px;
+	padding-left: 24px;
+	padding-right: 24px;
+	list-style-type: none;
+	outline: none;
+}
+
+.RichEditor__listItemChecked {
+	text-decoration: line-through;
+}
+
+.RichEditor__listItemUnchecked::before,
+.RichEditor__listItemChecked::before {
+	content: '';
+	width: 16px;
+	height: 16px;
+	top: 2px;
+	left: 0;
+	cursor: pointer;
+	display: block;
+	background-size: cover;
+	position: absolute;
+}
+
+.RichEditor__listItemUnchecked[dir='rtl']::before,
+.RichEditor__listItemChecked[dir='rtl']::before {
+	left: auto;
+	right: 0;
+}
+
+.RichEditor__listItemUnchecked:focus::before,
+.RichEditor__listItemChecked:focus::before {
+	box-shadow: 0 0 0 2px #a6cdfe;
+	border-radius: 2px;
+}
+
+.RichEditor__listItemUnchecked::before {
+	border: 1px solid #999;
+	border-radius: 2px;
+}
+
+.RichEditor__listItemChecked::before {
+	border: 1px solid rgb(61 135 245);
+	border-radius: 2px;
+	background-color: #3d87f5;
+	background-repeat: no-repeat;
+}
+
+.RichEditor__listItemChecked::after {
+	content: '';
+	cursor: pointer;
+	border-color: #fff;
+	border-style: solid;
+	position: absolute;
+	display: block;
+	top: 6px;
+	width: 3px;
+	left: 7px;
+	right: 7px;
+	height: 6px;
+	transform: rotate(45deg);
+	border-width: 0 2px 2px 0;
+}
+
+.RichEditor__nestedListItem {
+	list-style-type: none;
+}
+
+.RichEditor__nestedListItem::before,
+.RichEditor__nestedListItem::after {
+	display: none;
+}
+
+/*
+* Based on "Gruvbox light" theme
+*
+* Source: https://github.com/PrismJS/prism-themes/blob/447479fc7b2be2051fe27e561aceed7cc87a589f/themes/prism-gruvbox-light.css
+*/
+.RichEditor__tokenComment {
+	color: #7c6f64;
+}
+
+.RichEditor__tokenPunctuation {
+	color: #b57614;
+}
+
+.RichEditor__tokenProperty {
+	color: #9d0006;
+}
+
+.RichEditor__tokenSelector {
+	color: #797403;
+}
+
+.RichEditor__tokenOperator {
+	color: #9a6e3a;
+}
+
+.RichEditor__tokenAttr {
+	color: #9d0006;
+}
+
+.RichEditor__tokenVariable {
+	color: #e90;
+}
+
+.RichEditor__tokenFunction {
+	color: #b57614;
+}
+
+.RichEditor__mark {
+	background: rgb(255 212 0 / 14%);
+	border-bottom: 2px solid rgb(255 212 0 / 30%);
+	padding-bottom: 2px;
+}
+
+.RichEditor__markOverlap {
+	background: rgb(255 212 0 / 30%);
+	border-bottom: 2px solid rgb(255 212 0 / 70%);
+}
+
+.RichEditor__mark.selected {
+	background: rgb(255 212 0 / 50%);
+	border-bottom: 2px solid rgb(255 212 0 / 100%);
+}
+
+.RichEditor__markOverlap.selected {
+	background: rgb(255 212 0 / 70%);
+	border-bottom: 2px solid rgb(255 212 0 / 70%);
+}
+
+.RichEditor__embedBlock {
+	user-select: none;
+}
+
+.RichEditor__embedBlockFocus {
+	outline: 2px solid rgb(60 132 244);
+}
+
+.RichEditor__layoutContainer {
+	display: grid;
+	gap: 10px;
+	margin: 10px 0;
+}
+
+.RichEditor__layoutItem {
+	border: 1px dashed #ddd;
+	padding: 8px 16px;
+}
+
+.RichEditor__autocomplete {
+	color: #ccc;
+}
+
+.RichEditor__hr {
+	padding: 2px;
+	border: none;
+	margin: 1em 0;
+	cursor: pointer;
+}
+
+.RichEditor__hr::after {
+	content: '';
+	display: block;
+	height: 2px;
+	background-color: #ccc;
+	line-height: 2px;
+}
+
+.RichEditor__hr.selected {
+	outline: 2px solid rgb(60 132 244);
+	user-select: none;
+}

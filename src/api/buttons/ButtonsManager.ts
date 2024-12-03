@@ -92,7 +92,9 @@ export class ButtonsManager {
 		this.updateState();
 	}
 
-	public update(id: string, button: ButtonObject, { priority }: ButtonOptions) {
+	public update(id: string, button: ButtonObject, options: ButtonOptions) {
+		const { priority } = options;
+
 		// Find button
 		let existsButton: [Placement, number] | null = null;
 		for (const sideName in this.buttons) {
@@ -105,16 +107,18 @@ export class ButtonsManager {
 			}
 		}
 
-		if (existsButton === null) return;
+		if (existsButton === null) {
+			this.register(id, button, options);
+		} else {
+			const [placement, index] = existsButton;
+			this.buttons[placement][index] = {
+				...this.buttons[placement][index],
+				...(priority === undefined ? {} : { priority }),
+				id,
+				button,
+			};
 
-		const [placement, index] = existsButton;
-		this.buttons[placement][index] = {
-			...this.buttons[placement][index],
-			...(priority === undefined ? {} : { priority }),
-			id,
-			button,
-		};
-
-		this.updateState();
+			this.updateState();
+		}
 	}
 }

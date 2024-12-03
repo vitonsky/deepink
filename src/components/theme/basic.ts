@@ -8,6 +8,7 @@ import { ModalScreenTheme } from '@components/ModalScreen/ModalScreen.theme';
 import { NestedListTheme } from '@components/NestedList/NestedList.theme';
 import { NotePreviewTheme } from '@components/NotePreview/NotePreview.theme';
 import { NotificationsTheme } from '@components/Notifications/Notifications.theme';
+import { RichEditorTheme } from '@features/NoteEditor/RichEditor/RichEditor.theme';
 
 export const getScrollBarStyles = ({
 	trackColor = '#f1f1f1',
@@ -20,6 +21,8 @@ export const getScrollBarStyles = ({
 } = {}) => ({
 	'::-webkit-scrollbar': {
 		width: '10px',
+		// For horizontal scroll
+		height: '10px',
 	},
 
 	'::-webkit-scrollbar-track': {
@@ -131,7 +134,7 @@ export const basicTheme = extendTheme({
 				},
 				ghost: {
 					color: 'typography.primary',
-					'&:hover, &:active': {
+					'&:hover, &:active, &[data-active]': {
 						backgroundColor: 'dim.400',
 					},
 				},
@@ -140,7 +143,11 @@ export const basicTheme = extendTheme({
 				variant: 'secondary',
 			},
 		}),
-		Menu: createMultiStyleConfigHelpers(['list', 'item']).defineMultiStyleConfig({
+		Menu: createMultiStyleConfigHelpers([
+			'button',
+			'list',
+			'item',
+		]).defineMultiStyleConfig({
 			baseStyle: {
 				list: {
 					borderColor: 'surface.border',
@@ -380,5 +387,6 @@ export const basicTheme = extendTheme({
 		ModalScreen: ModalScreenTheme,
 		NotePreview: NotePreviewTheme,
 		NestedList: NestedListTheme,
+		RichEditor: RichEditorTheme,
 	},
 });
