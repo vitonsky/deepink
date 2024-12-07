@@ -1,5 +1,6 @@
 import DB, { Database } from 'better-sqlite3';
-import debounce from 'debounce';
+import { createEvent, Event } from 'effector';
+import { debounce } from 'lodash';
 import { IFileController } from '@core/features/files';
 
 import { IEncryptionController } from '../../../encryption';
@@ -65,10 +66,120 @@ export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 50
 	});
 };
 
-export const openDatabase = async (
+type SyncRequest = {
+	resolve(): void;
+	reject(err: Error): void;
+};
+
+export class ManagedDatabase implements SQLiteDatabase {
+	public readonly db: Database;
+	public readonly onChanged;
+	private readonly dbFile: IFileController;
+	private readonly options;
+	private readonly debouncedSync;
+	constructor(
+		{
+			db,
+			onChanged,
+		}: {
+			db: Database;
+			onChanged: Event<void>;
+		},
+		dbFile: IFileController,
+		options: Options = {},
+	) {
+		this.db = db;
+		this.onChanged = onChanged;
+		this.dbFile = dbFile;
+		this.options = options;
+
+		// Auto sync changes
+		this.debouncedSync = debounce(
+			() => {
+				console.warn('Debounced sync');
+				this.sync();
+			},
+			300,
+			{ leading: true, maxWait: 5000 },
+		);
+
+		onChanged.watch(this.debouncedSync);
+	}
+
+	private syncRequests: SyncRequest[] = [];
+
+	private isSyncWorkerRun = false;
+	private syncWorker = async () => {
+		const { encryption, verbose } = this.options;
+
+		if (this.isSyncWorkerRun) return;
+
+		this.isSyncWorkerRun = true;
+		while (this.syncRequests.length > 0) {
+			// Get requests to handle and flush array
+			const syncRequestsInProgress = this.syncRequests;
+			this.syncRequests = [];
+
+			// Control execution and forward exceptions to promises
+			try {
+				console.log('DBG: dump...');
+				// Dump data
+				const buffer = await waitDatabaseLock(() => this.db.serialize());
+
+				console.log('DBG: write file...');
+				// Write file
+				const dbDump = encryption ? await encryption.encrypt(buffer) : buffer;
+				await this.dbFile.write(dbDump);
+
+				if (verbose) {
+					console.info('DB saved');
+					console.debug({ dbDump });
+				}
+
+				console.log('DBG: resolve...');
+				// Resolve requests
+				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
+			} catch (err) {
+				const errorToThrow =
+					err instanceof Error ? err : new Error('Unknown error');
+				syncRequestsInProgress.forEach((syncRequest) =>
+					syncRequest.reject(errorToThrow),
+				);
+			}
+		}
+
+		this.isSyncWorkerRun = false;
+	};
+
+	// Update database file
+	public sync = () => {
+		if (!this.db.open) throw new Error('Database are closed');
+
+		return new Promise<void>((resolve, reject) => {
+			console.warn('Sync call');
+			// Add task
+			this.syncRequests.push({ resolve, reject });
+
+			// Run worker if not started
+			this.syncWorker();
+		});
+	};
+
+	public close = async () => {
+		// Sync latest changes
+		this.debouncedSync.cancel();
+
+		// TODO: FIXME:
+		await this.sync();
+
+		await waitDatabaseLock(() => this.db.close());
+	};
+}
+
+export const getWrappedDb = async (
 	dbFile: IFileController,
 	{ verbose: verboseLog = false, encryption }: Options = {},
-): Promise<SQLiteDatabase> => {
+) => {
 	// Create DB
 	let db: Database;
 	const tracingCallbacks: Array<(command: string) => void> = [];
@@ -120,67 +231,7 @@ export const openDatabase = async (
 		db.exec(setupSQL);
 	}
 
-	type SyncRequest = {
-		resolve(): void;
-		reject(err: Error): void;
-	};
-
-	let syncRequests: SyncRequest[] = [];
-
-	let isSyncWorkerRun = false;
-	const syncWorker = async () => {
-		if (isSyncWorkerRun) return;
-
-		isSyncWorkerRun = true;
-		while (syncRequests.length > 0) {
-			// Get requests to handle and flush array
-			const syncRequestsInProgress = syncRequests;
-			syncRequests = [];
-
-			// Control execution and forward exceptions to promises
-			try {
-				// Dump data
-				const buffer = await waitDatabaseLock(() => db.serialize());
-
-				// Write file
-				const dbDump = encryption ? await encryption.encrypt(buffer) : buffer;
-				await dbFile.write(dbDump);
-
-				if (verboseLog) {
-					console.info('DB saved');
-					console.debug({ dbDump });
-				}
-
-				// Resolve requests
-				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
-			} catch (err) {
-				const errorToThrow =
-					err instanceof Error ? err : new Error('Unknown error');
-				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(errorToThrow),
-				);
-			}
-		}
-
-		isSyncWorkerRun = false;
-	};
-
-	// Update database file
-	const sync = () => {
-		if (!db.open) throw new Error('Database are closed');
-
-		return new Promise<void>((resolve, reject) => {
-			// Add task
-			syncRequests.push({ resolve, reject });
-
-			// Run worker if not started
-			syncWorker();
-		});
-	};
-
-	// Auto sync changes
-	const debouncedSync = debounce(sync, 10000);
-	let isHaveChangesFromLastCommit = false;
+	const onChanged = createEvent();
 	tracingCallbacks.push(async (command: string) => {
 		// Skip for closed DB
 		if (!db.open) return;
@@ -194,31 +245,21 @@ export const openDatabase = async (
 			(commandName) => command.includes(commandName),
 		);
 		if (isMutableCommand) {
-			isHaveChangesFromLastCommit = true;
-			await debouncedSync();
-		}
-
-		// Sync by transaction operations
-		const isCommit = command.endsWith('COMMIT');
-		if (isCommit && isHaveChangesFromLastCommit) {
-			isHaveChangesFromLastCommit = false;
-			await debouncedSync();
+			onChanged();
 		}
 	});
 
-	const close = async () => {
-		// Sync latest changes
-		debouncedSync.clear();
-		await sync();
+	return { db, onChanged };
+};
 
-		await waitDatabaseLock(() => db.close());
-	};
+export const openDatabase = async (
+	dbFile: IFileController,
+	options: Options = {},
+): Promise<SQLiteDatabase> => {
+	const wrappedDb = await getWrappedDb(dbFile, options);
+	const managedDb = new ManagedDatabase(wrappedDb, dbFile, options);
 
-	await sync();
+	await managedDb.sync();
 
-	return {
-		db,
-		sync,
-		close,
-	};
+	return managedDb;
 };
