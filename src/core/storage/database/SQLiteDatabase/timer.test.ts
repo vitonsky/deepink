@@ -1,9 +1,14 @@
 import { debounce } from 'lodash';
+import { NotesController } from '@core/features/notes/controller/NotesController';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+
+import { openDatabase } from './SQLiteDatabase';
 
 Object.defineProperty(global, 'performance', {
 	writable: true,
 });
-jest.useFakeTimers();
+
+export const wait = (time: number) => new Promise((res) => setTimeout(res, time));
 
 // The purpose of this test is to demonstrate cases and ensure correct behavior
 // of scheduler logic, since it based on proper delay implementation.
@@ -17,6 +22,13 @@ describe('Sync scheduling with debounce and deadline', () => {
 		deadline: 10000,
 		delay: 300,
 	};
+
+	beforeAll(() => {
+		jest.useFakeTimers();
+	});
+	afterAll(() => {
+		jest.useRealTimers();
+	});
 
 	afterEach(() => {
 		jest.clearAllTimers();
@@ -92,4 +104,60 @@ describe('Sync scheduling with debounce and deadline', () => {
 
 		expect(callback).toHaveBeenCalledTimes(2);
 	});
+});
+
+describe('Database synchronization', () => {
+	// beforeAll(() => {
+	// 	jest.useFakeTimers();
+	// });
+	// afterAll(() => {
+	// 	jest.useRealTimers();
+	// });
+
+	test('DB synchronization scheduler', async () => {
+		const dbFile = createFileControllerMock();
+
+		const spyWrite = jest.spyOn(dbFile, 'write');
+
+		// Open DB
+		const db = await openDatabase(dbFile, { verbose: false });
+
+		const tablesList = db.db
+			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
+			.all();
+		console.warn(tablesList);
+		expect(tablesList).toEqual(
+			expect.arrayContaining(
+				['notes', 'files', 'attachments'].map((name) => ({ name })),
+			),
+		);
+
+		// Check forced sync that has been called while DB opening
+		expect(spyWrite).toBeCalledTimes(1);
+
+		const notes = new NotesController(db);
+
+		// First data mutation will be synchronized immediately
+		await notes.add({ title: 'Demo title', text: 'Demo text' });
+		await wait(50);
+		expect(spyWrite).toBeCalledTimes(2);
+
+		// Batch sync calls
+		for (let i = 0; i < 100; i++) {
+			await notes.add({ title: 'Demo title', text: 'Demo text' });
+		}
+
+		await wait(400);
+		expect(spyWrite).toBeCalledTimes(3);
+
+		// TODO: implement deadline
+		// // Deadline sync
+		// for (const startTime = Date.now(); Date.now() - startTime < 6000;) {
+		// 	await notes.add({ title: 'Demo title', text: 'Demo text' });
+		// }
+		// await wait(10);
+		// expect(spyWrite).toBeCalledTimes(4);
+
+		await db.close();
+	}, 10000);
 });
