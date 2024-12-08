@@ -1,10 +1,10 @@
 import DB, { Database } from 'better-sqlite3';
 import { createEvent, Event } from 'effector';
-import { debounce } from 'lodash';
 import { IFileController } from '@core/features/files';
 
 import { IEncryptionController } from '../../../encryption';
 
+import { debounce } from './debounce';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 
@@ -99,8 +99,7 @@ export class ManagedDatabase implements SQLiteDatabase {
 				console.warn('Debounced sync');
 				this.sync();
 			},
-			300,
-			{ leading: true, maxWait: 5000 },
+			{ wait: 300, deadline: 800 },
 		);
 
 		onChanged.watch(this.debouncedSync);
