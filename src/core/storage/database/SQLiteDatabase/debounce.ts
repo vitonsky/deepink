@@ -13,30 +13,43 @@ export function debounce<T extends(...args: any[]) => any>(
 	let deadlineTimerId: ReturnType<typeof setTimeout> | null = null;
 	let lastCallTime: number | null = null;
 
+	let run: (() => void) | null = null;
+
 	function debouncedFunction(...args: Parameters<T>): void {
-		const now = Date.now();
-
-		if (lastCallTime === null) {
+		// Update task (to update arguments to the latest)
+		run = () => {
+			lastCallTime = Date.now();
 			clearTimers();
-			func(...args); // Call immediately on first invocation or after wait time has passed
-			lastCallTime = now;
-		} else {
-			if (timerId) {
-				clearTimeout(timerId);
-			}
+			func(...args);
+		};
 
-			timerId = setTimeout(() => {
-				func(...args);
-				lastCallTime = Date.now();
-				clearTimers();
-			}, wait - (now - lastCallTime));
+		// Run immediately
+		if (lastCallTime === null) {
+			console.warn('>>> DBG: IMMEDIATE CALL');
+			run();
+			return;
 		}
 
+		// Schedule run
+		if (timerId) {
+			clearTimeout(timerId);
+		}
+
+		timerId = setTimeout(() => {
+			if (run) {
+				console.warn('>>> DBG: SCHEDULED CALL');
+				run();
+			}
+		}, wait);
+
+		// Set deadline once
 		if (deadline && !deadlineTimerId) {
 			deadlineTimerId = setTimeout(() => {
-				func(...args);
-				lastCallTime = Date.now();
-				clearTimers();
+				// Run latest task, instead of task at moment of scheduling time
+				if (run) {
+					console.warn('>>> DBG: DEADLINE CALL');
+					run();
+				}
 			}, deadline);
 		}
 	}

@@ -139,7 +139,7 @@ describe('Database synchronization', () => {
 
 		// First data mutation will be synchronized immediately
 		await notes.add({ title: 'Demo title', text: 'Demo text' });
-		await wait(50);
+		await wait(10);
 		expect(spyWrite).toBeCalledTimes(2);
 
 		// Batch sync calls
@@ -153,9 +153,8 @@ describe('Database synchronization', () => {
 		// Deadline sync
 		for (const startTime = Date.now(); Date.now() - startTime < 900; ) {
 			await notes.add({ title: 'Demo title', text: 'Demo text' });
+			await wait(0);
 		}
-		// TODO: remove wait time
-		await wait(1);
 		expect(spyWrite).toBeCalledTimes(4);
 
 		await db.close();
