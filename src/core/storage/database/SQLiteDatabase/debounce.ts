@@ -16,7 +16,8 @@ export function debounce<T extends(...args: any[]) => any>(
 	function debouncedFunction(...args: Parameters<T>): void {
 		const now = Date.now();
 
-		if (lastCallTime === null || now - lastCallTime >= wait) {
+		if (lastCallTime === null) {
+			clearTimers();
 			func(...args); // Call immediately on first invocation or after wait time has passed
 			lastCallTime = now;
 		} else {
@@ -41,14 +42,7 @@ export function debounce<T extends(...args: any[]) => any>(
 	}
 
 	debouncedFunction.cancel = () => {
-		if (timerId) {
-			clearTimeout(timerId);
-			timerId = null;
-		}
-		if (deadlineTimerId) {
-			clearTimeout(deadlineTimerId);
-			deadlineTimerId = null;
-		}
+		clearTimers();
 		lastCallTime = null;
 	};
 

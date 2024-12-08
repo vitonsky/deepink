@@ -150,13 +150,13 @@ describe('Database synchronization', () => {
 		await wait(400);
 		expect(spyWrite).toBeCalledTimes(3);
 
-		// TODO: implement deadline
-		// // Deadline sync
-		// for (const startTime = Date.now(); Date.now() - startTime < 6000;) {
-		// 	await notes.add({ title: 'Demo title', text: 'Demo text' });
-		// }
-		// await wait(10);
-		// expect(spyWrite).toBeCalledTimes(4);
+		// Deadline sync
+		for (const startTime = Date.now(); Date.now() - startTime < 900; ) {
+			await notes.add({ title: 'Demo title', text: 'Demo text' });
+		}
+		// TODO: remove wait time
+		await wait(1);
+		expect(spyWrite).toBeCalledTimes(4);
 
 		await db.close();
 	}, 10000);
