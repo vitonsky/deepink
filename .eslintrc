@@ -81,6 +81,7 @@
 					"Unordered",
 					"endregion",
 					"esm",
+					"debounce",
 					"evt",
 					"formatter",
 					"gcm",
