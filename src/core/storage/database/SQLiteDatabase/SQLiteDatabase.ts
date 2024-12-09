@@ -3,8 +3,6 @@ import { createEvent, Event } from 'effector';
 import { IFileController } from '@core/features/files';
 import { debounce } from '@utils/debounce/debounce';
 
-import { IEncryptionController } from '../../../encryption';
-
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 
@@ -32,8 +30,6 @@ type Options = {
 	 * Option to disable verbose logs
 	 */
 	verbose?: boolean;
-
-	encryption?: IEncryptionController;
 
 	sync?: {
 		delay: number;
@@ -115,7 +111,7 @@ export class ManagedDatabase implements SQLiteDatabase {
 
 	private isSyncWorkerRun = false;
 	private syncWorker = async () => {
-		const { encryption, verbose } = this.options;
+		const { verbose } = this.options;
 
 		if (this.isSyncWorkerRun) return;
 
@@ -133,12 +129,11 @@ export class ManagedDatabase implements SQLiteDatabase {
 
 				console.log('DBG: write file...');
 				// Write file
-				const dbDump = encryption ? await encryption.encrypt(buffer) : buffer;
-				await this.dbFile.write(dbDump);
+				await this.dbFile.write(buffer);
 
 				if (verbose) {
 					console.info('DB saved');
-					console.debug({ dbDump });
+					console.debug({ buffer });
 				}
 
 				console.log('DBG: resolve...');
@@ -183,7 +178,7 @@ export class ManagedDatabase implements SQLiteDatabase {
 
 export const getWrappedDb = async (
 	dbFile: IFileController,
-	{ verbose: verboseLog = false, encryption }: Options = {},
+	{ verbose: verboseLog = false }: Options = {},
 ) => {
 	// Create DB
 	let db: Database;
@@ -201,21 +196,17 @@ export const getWrappedDb = async (
 	const dbFileBuffer = await dbFile.get();
 	if (dbFileBuffer && dbFileBuffer.byteLength > 0) {
 		// Load DB
-		const dumpBuffer = encryption
-			? await encryption.decrypt(dbFileBuffer)
-			: dbFileBuffer;
-
 		// Check header signature, to detect a database file https://www.sqlite.org/fileformat.html#the_database_header
 		const isDatabaseFile = new TextDecoder()
-			.decode(dumpBuffer.slice(0, 16))
+			.decode(dbFileBuffer.slice(0, 16))
 			.startsWith(`SQLite format 3`);
 		if (isDatabaseFile) {
-			db = new DB(Buffer.from(dumpBuffer), dbOptions);
+			db = new DB(Buffer.from(dbFileBuffer), dbOptions);
 		} else {
 			// If no database file, load buffer as string with SQL commands
 			db = new DB(':memory:', dbOptions);
 
-			const sqlText = new TextDecoder().decode(dumpBuffer);
+			const sqlText = new TextDecoder().decode(dbFileBuffer);
 			db.exec(sqlText);
 		}
 

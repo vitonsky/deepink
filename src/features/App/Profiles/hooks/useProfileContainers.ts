@@ -5,6 +5,7 @@ import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEnc
 import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { FileController } from '@core/features/files/FileController';
+import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import {
 	openDatabase,
 	SQLiteDatabase,
@@ -83,10 +84,10 @@ export const useProfileContainers = () => {
 
 			// Setup DB
 			const db = await openDatabase(
-				new FileController('deepink.db', profileFilesController),
-				{
-					encryption: encryptionController,
-				},
+				new FileControllerWithEncryption(
+					new FileController('deepink.db', profileFilesController),
+					encryptionController,
+				),
 			);
 
 			// TODO: close DB first and close encryption last

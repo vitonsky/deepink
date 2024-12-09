@@ -1,3 +1,4 @@
+import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { wait } from '@utils/tests';
@@ -56,19 +57,22 @@ describe('options', () => {
 			};
 		};
 
-		const dbFile = createFileControllerMock();
+		const dbFile = new FileControllerWithEncryption(
+			createFileControllerMock(),
+			createEncryption(7),
+		);
 		await dbFile.get().then((file) => {
 			expect(file).toBe(null);
 		});
 
-		const db1 = await openDatabase(dbFile, { encryption: createEncryption(7) });
+		const db1 = await openDatabase(dbFile);
 		await db1.close();
 		await dbFile.get().then((file) => {
 			expect(file).toBeInstanceOf(Buffer);
 			expect(file!.byteLength).toBeGreaterThan(0);
 		});
 
-		const db2 = await openDatabase(dbFile, { encryption: createEncryption(7) });
+		const db2 = await openDatabase(dbFile);
 		await db2.close();
 		await dbFile.get().then((file) => {
 			expect(file).toBeInstanceOf(Buffer);
