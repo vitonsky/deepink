@@ -34,6 +34,11 @@ type Options = {
 	verbose?: boolean;
 
 	encryption?: IEncryptionController;
+
+	sync?: {
+		delay: number;
+		deadline: number;
+	};
 };
 
 export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
@@ -94,12 +99,13 @@ export class ManagedDatabase implements SQLiteDatabase {
 		this.options = options;
 
 		// Auto sync changes
+		const sync = options.sync ?? { delay: 300, deadline: 800 };
 		this.debouncedSync = debounce(
 			() => {
 				console.warn('Debounced sync');
 				this.sync();
 			},
-			{ wait: 300, deadline: 800 },
+			{ wait: sync.delay, deadline: sync.deadline },
 		);
 
 		onChanged.watch(this.debouncedSync);

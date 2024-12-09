@@ -114,13 +114,18 @@ describe('Database synchronization', () => {
 	// 	jest.useRealTimers();
 	// });
 
+	const syncOptions = {
+		delay: 50,
+		deadline: 120,
+	};
+
 	test('DB synchronization scheduler', async () => {
 		const dbFile = createFileControllerMock();
 
 		const spyWrite = jest.spyOn(dbFile, 'write');
 
 		// Open DB
-		const db = await openDatabase(dbFile, { verbose: false });
+		const db = await openDatabase(dbFile, { verbose: false, sync: syncOptions });
 
 		// Check forced sync that has been called while DB opening
 		expect(spyWrite).toBeCalledTimes(1);
@@ -150,12 +155,16 @@ describe('Database synchronization', () => {
 		}
 
 		expect(spyWrite).toBeCalledTimes(0);
-		await wait(300);
+		await wait(syncOptions.delay);
 		expect(spyWrite).toBeCalledTimes(1);
 
 		// Deadline sync
 		spyWrite.mockClear();
-		for (const startTime = Date.now(); Date.now() - startTime < 900; ) {
+		for (
+			const startTime = Date.now();
+			Date.now() - startTime < syncOptions.deadline * 1.1;
+
+		) {
 			await notes.add({ title: 'Demo title', text: 'Demo text' });
 			await wait(0);
 		}
@@ -163,7 +172,7 @@ describe('Database synchronization', () => {
 
 		// One more sync must be called after delay
 		spyWrite.mockClear();
-		await wait(300);
+		await wait(syncOptions.delay);
 		expect(spyWrite).toBeCalledTimes(1);
 
 		spyWrite.mockClear();
