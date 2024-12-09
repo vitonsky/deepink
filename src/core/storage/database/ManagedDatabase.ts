@@ -50,13 +50,10 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 		this.dbFile = dbFile;
 
 		// Auto sync changes
-		this.debouncedSync = debounce(
-			() => {
-				console.warn('Debounced sync');
-				this.sync();
-			},
-			{ wait: sync.delay, deadline: sync.deadline },
-		);
+		this.debouncedSync = debounce(this.sync, {
+			wait: sync.delay,
+			deadline: sync.deadline,
+		});
 
 		// TODO: cleanup by close db
 		dbContainer.onChanged.watch(this.debouncedSync);
@@ -66,49 +63,10 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 		return this.dbContainer.getDatabase();
 	};
 
-	private syncRequests: SyncRequest[] = [];
-
-	private isSyncWorkerRun = false;
-	private syncWorker = async () => {
-		if (this.isSyncWorkerRun) return;
-
-		this.isSyncWorkerRun = true;
-		while (this.syncRequests.length > 0) {
-			// Get requests to handle and flush array
-			const syncRequestsInProgress = this.syncRequests;
-			this.syncRequests = [];
-
-			// Control execution and forward exceptions to promises
-			try {
-				console.log('DBG: dump...');
-				// Dump data
-				const buffer = await this.dbContainer.getData();
-
-				console.log('DBG: write file...');
-				// Write file
-				await this.dbFile.write(buffer);
-
-				console.log('DBG: resolve...');
-				// Resolve requests
-				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
-			} catch (err) {
-				const errorToThrow =
-					err instanceof Error ? err : new Error('Unknown error');
-				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(errorToThrow),
-				);
-			}
-		}
-
-		this.isSyncWorkerRun = false;
-	};
-
-	// Update database file
 	public sync = () => {
 		if (!this.dbContainer.isOpened()) throw new Error('Database are closed');
 
 		return new Promise<void>((resolve, reject) => {
-			console.warn('Sync call');
 			// Add task
 			this.syncRequests.push({ resolve, reject });
 
@@ -123,5 +81,36 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 
 		await this.sync();
 		await this.dbContainer.close();
+	};
+
+	private isSyncWorkerRun = false;
+	private syncRequests: SyncRequest[] = [];
+	private syncWorker = async () => {
+		if (this.isSyncWorkerRun) return;
+
+		this.isSyncWorkerRun = true;
+		while (this.syncRequests.length > 0) {
+			// Get requests to handle and flush array
+			const syncRequestsInProgress = this.syncRequests;
+			this.syncRequests = [];
+
+			// Control execution and forward exceptions to promises
+			try {
+				// Dump data to file
+				const buffer = await this.dbContainer.getData();
+				await this.dbFile.write(buffer);
+
+				// Resolve requests
+				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
+			} catch (err) {
+				const errorToThrow =
+					err instanceof Error ? err : new Error('Unknown error');
+				syncRequestsInProgress.forEach((syncRequest) =>
+					syncRequest.reject(errorToThrow),
+				);
+			}
+		}
+
+		this.isSyncWorkerRun = false;
 	};
 }
