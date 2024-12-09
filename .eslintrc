@@ -226,14 +226,6 @@
 					":": "before"
 				}
 			}
-		],
-		"space-before-function-paren": [
-			"error",
-			{
-				"asyncArrow": "always",
-				"anonymous": "always",
-				"named": "never"
-			}
 		]
 	},
 	"settings": {

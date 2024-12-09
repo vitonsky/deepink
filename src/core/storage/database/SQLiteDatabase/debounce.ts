@@ -4,7 +4,7 @@ type DebounceOptions = {
 	deadline?: number; // Maximum time in milliseconds to force invocation
 };
 
-export function debounce<T extends(...args: any[]) => any>(
+export function debounce<T extends (...args: any[]) => any>(
 	func: T,
 	options: DebounceOptions,
 ): ((...args: Parameters<T>) => void) & { cancel: () => void } {
