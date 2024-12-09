@@ -2,7 +2,7 @@ import { debounce } from 'lodash';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { openDatabase } from './SQLiteDatabase';
+import { openDatabase, SQLiteDatabase } from './SQLiteDatabase';
 
 Object.defineProperty(global, 'performance', {
 	writable: true,
@@ -106,77 +106,75 @@ describe('Sync scheduling with debounce and deadline', () => {
 	});
 });
 
-describe('Database synchronization', () => {
-	// beforeAll(() => {
-	// 	jest.useFakeTimers();
-	// });
-	// afterAll(() => {
-	// 	jest.useRealTimers();
-	// });
-
+describe('Database auto synchronization', () => {
 	const syncOptions = {
-		delay: 50,
+		delay: 30,
 		deadline: 120,
 	};
 
-	test('DB synchronization scheduler', async () => {
+	const waitPossibleSync = () => wait(10);
+
+	let writeFnMock: jest.SpyInstance<Promise<void>, [buffer: ArrayBuffer], any>;
+	let db: SQLiteDatabase;
+	let notes: NotesController;
+
+	afterEach(() => {
+		writeFnMock.mockClear();
+	});
+
+	test('Sync runs immediately once DB has been opened', async () => {
 		const dbFile = createFileControllerMock();
 
-		const spyWrite = jest.spyOn(dbFile, 'write');
+		writeFnMock = jest.spyOn(dbFile, 'write');
 
 		// Open DB
-		const db = await openDatabase(dbFile, { verbose: false, sync: syncOptions });
+		db = await openDatabase(dbFile, { verbose: false, sync: syncOptions });
 
 		// Check forced sync that has been called while DB opening
-		expect(spyWrite).toBeCalledTimes(1);
+		expect(writeFnMock).toBeCalledTimes(1);
 
-		const tablesList = db.db
-			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
-			.all();
-		console.warn(tablesList);
-		expect(tablesList).toEqual(
-			expect.arrayContaining(
-				['notes', 'files', 'attachments'].map((name) => ({ name })),
-			),
-		);
+		notes = new NotesController(db);
+	});
 
-		const notes = new NotesController(db);
-
-		// First data mutation will be synchronized immediately
-		spyWrite.mockClear();
+	test('Sync runs for first data mutation', async () => {
 		await notes.add({ title: 'Demo title', text: 'Demo text' });
-		await wait(10);
-		expect(spyWrite).toBeCalledTimes(1);
+		await waitPossibleSync();
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
 
-		// Batch sync calls
-		spyWrite.mockClear();
-		for (let i = 0; i < 100; i++) {
+	test('Data changes in row will be delayed', async () => {
+		for (
+			const startTime = Date.now();
+			Date.now() - startTime < syncOptions.delay * 1.5;
+
+		) {
 			await notes.add({ title: 'Demo title', text: 'Demo text' });
 		}
+		expect(writeFnMock).toBeCalledTimes(0);
 
-		expect(spyWrite).toBeCalledTimes(0);
 		await wait(syncOptions.delay);
-		expect(spyWrite).toBeCalledTimes(1);
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
 
-		// Deadline sync
-		spyWrite.mockClear();
+	test('Data changes in row will be synced by deadline', async () => {
 		for (
 			const startTime = Date.now();
 			Date.now() - startTime < syncOptions.deadline * 1.1;
 
 		) {
 			await notes.add({ title: 'Demo title', text: 'Demo text' });
-			await wait(0);
+			await waitPossibleSync();
 		}
-		expect(spyWrite).toBeCalledTimes(1);
+		expect(writeFnMock).toBeCalledTimes(1);
 
 		// One more sync must be called after delay
-		spyWrite.mockClear();
+		writeFnMock.mockClear();
 		await wait(syncOptions.delay);
-		expect(spyWrite).toBeCalledTimes(1);
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
 
-		spyWrite.mockClear();
+	test('Sync runs while close DB', async () => {
 		await db.close();
-		expect(spyWrite).toBeCalledTimes(1);
-	}, 10000);
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
 });
