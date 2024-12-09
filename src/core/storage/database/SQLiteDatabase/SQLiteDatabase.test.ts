@@ -24,7 +24,8 @@ describe('migrations', () => {
 		// Test structure
 		const db = await openDatabase(dbFile);
 
-		const tablesList = db.db
+		const tablesList = db
+			.get()
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
 			.all();
 		expect(tablesList).toEqual(

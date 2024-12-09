@@ -1,31 +1,17 @@
 import DB, { Database } from 'better-sqlite3';
-import { createEvent, Event } from 'effector';
+import { createEvent } from 'effector';
 import { IFileController } from '@core/features/files';
-import { debounce } from '@utils/debounce/debounce';
 
+import { IManagedDatabase, ManagedDatabase } from '../ManagedDatabase';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
+import { IDatabaseContainer } from '..';
 
-export type SQLiteDatabase = {
-	/**
-	 * Configured database with extensions
-	 */
-	db: Database;
+export type SQLiteDatabaseContainer = IDatabaseContainer<Database>;
 
-	/**
-	 * Write database to file
-	 *
-	 * DB automatically sync with updates, call this method to force sync
-	 */
-	sync: () => Promise<void>;
+export type SQLiteDatabase = IManagedDatabase<Database>;
 
-	/**
-	 * Sync DB and close
-	 */
-	close: () => Promise<void>;
-};
-
-type Options = {
+export type Options = {
 	/**
 	 * Option to disable verbose logs
 	 */
@@ -67,119 +53,10 @@ export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 50
 	});
 };
 
-type SyncRequest = {
-	resolve(): void;
-	reject(err: Error): void;
-};
-
-export class ManagedDatabase implements SQLiteDatabase {
-	public readonly db: Database;
-	public readonly onChanged;
-	private readonly dbFile: IFileController;
-	private readonly options;
-	private readonly debouncedSync;
-	constructor(
-		{
-			db,
-			onChanged,
-		}: {
-			db: Database;
-			onChanged: Event<void>;
-		},
-		dbFile: IFileController,
-		options: Options = {},
-	) {
-		this.db = db;
-		this.onChanged = onChanged;
-		this.dbFile = dbFile;
-		this.options = options;
-
-		// Auto sync changes
-		const sync = options.sync ?? { delay: 300, deadline: 800 };
-		this.debouncedSync = debounce(
-			() => {
-				console.warn('Debounced sync');
-				this.sync();
-			},
-			{ wait: sync.delay, deadline: sync.deadline },
-		);
-
-		onChanged.watch(this.debouncedSync);
-	}
-
-	private syncRequests: SyncRequest[] = [];
-
-	private isSyncWorkerRun = false;
-	private syncWorker = async () => {
-		const { verbose } = this.options;
-
-		if (this.isSyncWorkerRun) return;
-
-		this.isSyncWorkerRun = true;
-		while (this.syncRequests.length > 0) {
-			// Get requests to handle and flush array
-			const syncRequestsInProgress = this.syncRequests;
-			this.syncRequests = [];
-
-			// Control execution and forward exceptions to promises
-			try {
-				console.log('DBG: dump...');
-				// Dump data
-				const buffer = await waitDatabaseLock(() => this.db.serialize());
-
-				console.log('DBG: write file...');
-				// Write file
-				await this.dbFile.write(buffer);
-
-				if (verbose) {
-					console.info('DB saved');
-					console.debug({ buffer });
-				}
-
-				console.log('DBG: resolve...');
-				// Resolve requests
-				syncRequestsInProgress.forEach((syncRequest) => syncRequest.resolve());
-			} catch (err) {
-				const errorToThrow =
-					err instanceof Error ? err : new Error('Unknown error');
-				syncRequestsInProgress.forEach((syncRequest) =>
-					syncRequest.reject(errorToThrow),
-				);
-			}
-		}
-
-		this.isSyncWorkerRun = false;
-	};
-
-	// Update database file
-	public sync = () => {
-		if (!this.db.open) throw new Error('Database are closed');
-
-		return new Promise<void>((resolve, reject) => {
-			console.warn('Sync call');
-			// Add task
-			this.syncRequests.push({ resolve, reject });
-
-			// Run worker if not started
-			this.syncWorker();
-		});
-	};
-
-	public close = async () => {
-		// Sync latest changes
-		this.debouncedSync.cancel();
-
-		// TODO: FIXME:
-		await this.sync();
-
-		await waitDatabaseLock(() => this.db.close());
-	};
-}
-
 export const getWrappedDb = async (
 	dbFile: IFileController,
 	{ verbose: verboseLog = false }: Options = {},
-) => {
+): Promise<SQLiteDatabaseContainer> => {
 	// Create DB
 	let db: Database;
 	const tracingCallbacks: Array<(command: string) => void> = [];
@@ -245,7 +122,23 @@ export const getWrappedDb = async (
 		}
 	});
 
-	return { db, onChanged };
+	return {
+		onChanged,
+		getDatabase() {
+			return db;
+		},
+		getData() {
+			return waitDatabaseLock(() => db.serialize());
+		},
+		isOpened() {
+			return db.open;
+		},
+		close() {
+			return waitDatabaseLock(() => {
+				db.close();
+			});
+		},
+	};
 };
 
 export const openDatabase = async (

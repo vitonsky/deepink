@@ -26,7 +26,7 @@ export class FilesController {
 	}
 
 	public async add(file: File) {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		// Insert in DB
 		const insertResult = db
@@ -59,7 +59,7 @@ export class FilesController {
 	}
 
 	public async get(id: string) {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		// Insert in DB
 		const fileEntry = db.prepare('SELECT * FROM files WHERE id=?').get(id) as any;
@@ -76,7 +76,7 @@ export class FilesController {
 	}
 
 	public async delete(filesId: string[]) {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		// Delete in database
 		const placeholders = Array(filesId.length).fill('?').join(',');
@@ -87,7 +87,7 @@ export class FilesController {
 	}
 
 	public async clearOrphaned() {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const files = db.prepare('SELECT id FROM files').all() as Array<{ id: string }>;
 

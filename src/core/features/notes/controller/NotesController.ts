@@ -30,13 +30,13 @@ export class NotesController implements INotesController {
 	}
 
 	public async getById(id: NoteId): Promise<INote | null> {
-		const { db } = this.db;
+		const db = this.db.get();
 		const note = db.prepare('SELECT * FROM notes WHERE id=?').get(id);
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
 	public async getLength(): Promise<number> {
-		const { db } = this.db;
+		const db = this.db.get();
 		const { length } = db.prepare('SELECT COUNT(id) as length FROM notes').get() as {
 			length?: number;
 		};
@@ -50,7 +50,7 @@ export class NotesController implements INotesController {
 	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const notes: INote[] = [];
 
@@ -82,7 +82,7 @@ export class NotesController implements INotesController {
 	}
 
 	public async add(note: INoteContent): Promise<NoteId> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const creationTime = new Date().getTime();
 
@@ -113,7 +113,7 @@ export class NotesController implements INotesController {
 	}
 
 	public async update(id: string, updatedNote: INoteContent) {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const updateTime = new Date().getTime();
 		const result = db
@@ -133,7 +133,7 @@ export class NotesController implements INotesController {
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const placeholders = Array(ids.length).fill('?').join(',');
 		const result = db
