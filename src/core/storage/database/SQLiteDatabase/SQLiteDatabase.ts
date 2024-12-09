@@ -1,10 +1,10 @@
 import DB, { Database } from 'better-sqlite3';
 import { createEvent, Event } from 'effector';
 import { IFileController } from '@core/features/files';
+import { debounce } from '@utils/debounce/debounce';
 
 import { IEncryptionController } from '../../../encryption';
 
-import { debounce } from './debounce';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 

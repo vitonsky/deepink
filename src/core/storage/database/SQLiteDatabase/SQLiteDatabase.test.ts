@@ -1,6 +1,8 @@
+import { NotesController } from '@core/features/notes/controller/NotesController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { wait } from '@utils/tests';
 
-import { openDatabase } from './SQLiteDatabase';
+import { openDatabase, SQLiteDatabase } from './SQLiteDatabase';
 
 describe('migrations', () => {
 	test('from most old version to latest', async () => {
@@ -88,5 +90,78 @@ describe('concurrency', () => {
 		await expect(async () => {
 			await db.sync();
 		}).rejects.toThrow();
+	});
+});
+
+describe('Database auto synchronization', () => {
+	const syncOptions = {
+		delay: 30,
+		deadline: 120,
+	};
+
+	const waitPossibleSync = () => wait(10);
+
+	let writeFnMock: jest.SpyInstance<Promise<void>, [buffer: ArrayBuffer], any>;
+	let db: SQLiteDatabase;
+	let notes: NotesController;
+
+	afterEach(() => {
+		writeFnMock.mockClear();
+	});
+
+	test('Sync runs immediately once DB has been opened', async () => {
+		const dbFile = createFileControllerMock();
+
+		writeFnMock = jest.spyOn(dbFile, 'write');
+
+		// Open DB
+		db = await openDatabase(dbFile, { verbose: false, sync: syncOptions });
+
+		// Check forced sync that has been called while DB opening
+		expect(writeFnMock).toBeCalledTimes(1);
+
+		notes = new NotesController(db);
+	});
+
+	test('Sync runs for first data mutation', async () => {
+		await notes.add({ title: 'Demo title', text: 'Demo text' });
+		await waitPossibleSync();
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
+
+	test('Data changes in row will be delayed', async () => {
+		for (
+			const startTime = Date.now();
+			Date.now() - startTime < syncOptions.delay * 1.5;
+
+		) {
+			await notes.add({ title: 'Demo title', text: 'Demo text' });
+		}
+		expect(writeFnMock).toBeCalledTimes(0);
+
+		await wait(syncOptions.delay);
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
+
+	test('Data changes in row will be synced by deadline', async () => {
+		for (
+			const startTime = Date.now();
+			Date.now() - startTime < syncOptions.deadline * 1.1;
+
+		) {
+			await notes.add({ title: 'Demo title', text: 'Demo text' });
+			await waitPossibleSync();
+		}
+		expect(writeFnMock).toBeCalledTimes(1);
+
+		// One more sync must be called after delay
+		writeFnMock.mockClear();
+		await wait(syncOptions.delay);
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
+
+	test('Sync runs while close DB', async () => {
+		await db.close();
+		expect(writeFnMock).toBeCalledTimes(1);
 	});
 });

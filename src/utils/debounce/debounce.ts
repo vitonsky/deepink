@@ -24,8 +24,10 @@ export function debounce<T extends (...args: any[]) => any>(
 		};
 
 		// Run immediately
-		if (lastCallTime === null) {
-			console.warn('>>> DBG: IMMEDIATE CALL');
+		if (
+			lastCallTime === null ||
+			(!deadlineTimerId && Date.now() - lastCallTime >= wait)
+		) {
 			run();
 			return;
 		}
@@ -35,19 +37,13 @@ export function debounce<T extends (...args: any[]) => any>(
 			clearTimeout(timerId);
 		}
 
-		timerId = setTimeout(() => {
-			if (run) {
-				console.warn('>>> DBG: SCHEDULED CALL');
-				run();
-			}
-		}, wait);
+		timerId = setTimeout(run, wait);
 
 		// Set deadline once
 		if (deadline && !deadlineTimerId) {
 			deadlineTimerId = setTimeout(() => {
 				// Run latest task, instead of task at moment of scheduling time
 				if (run) {
-					console.warn('>>> DBG: DEADLINE CALL');
 					run();
 				}
 			}, deadline);
