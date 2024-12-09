@@ -95,8 +95,8 @@ describe('concurrency', () => {
 
 describe('Database auto synchronization', () => {
 	const syncOptions = {
-		delay: 30,
-		deadline: 120,
+		delay: 80,
+		deadline: 80 * 4,
 	};
 
 	const waitPossibleSync = () => wait(10);
