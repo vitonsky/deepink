@@ -2,7 +2,11 @@ import DB, { Database } from 'better-sqlite3';
 import { createEvent } from 'effector';
 import { IFileController } from '@core/features/files';
 
-import { IManagedDatabase, ManagedDatabase } from '../ManagedDatabase';
+import {
+	IManagedDatabase,
+	ManagedDatabase,
+	Options as ManagedDatabaseOptions,
+} from '../ManagedDatabase';
 import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
 import setupSQL from './setup.sql';
 import { IDatabaseContainer } from '..';
@@ -11,16 +15,11 @@ export type SQLiteDatabaseContainer = IDatabaseContainer<Database>;
 
 export type SQLiteDatabase = IManagedDatabase<Database>;
 
-export type Options = {
+export type Options = ManagedDatabaseOptions & {
 	/**
 	 * Option to disable verbose logs
 	 */
 	verbose?: boolean;
-
-	sync?: {
-		delay: number;
-		deadline: number;
-	};
 };
 
 export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
@@ -57,16 +56,31 @@ export const getWrappedDb = async (
 	dbFile: IFileController,
 	{ verbose: verboseLog = false }: Options = {},
 ): Promise<SQLiteDatabaseContainer> => {
+	const onChanged = createEvent();
+
 	// Create DB
 	let db: Database;
-	const tracingCallbacks: Array<(command: string) => void> = [];
 	const dbOptions = {
 		// We use this way, because loader can't automatically find a native module
 		nativeBinding:
 			require('better-sqlite3/build/Release/better_sqlite3.node') as string,
-		verbose: (message?: unknown, ..._additionalArgs: unknown[]) => {
-			if (typeof message !== 'string') return;
-			tracingCallbacks.forEach((cb) => cb(message));
+		verbose: (command?: unknown, ..._additionalArgs: unknown[]) => {
+			if (typeof command !== 'string') return;
+
+			// Skip for closed DB
+			if (!db.open) return;
+
+			if (verboseLog) {
+				console.debug(command);
+			}
+
+			// Track changes
+			const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
+				(commandName) => command.includes(commandName),
+			);
+			if (isMutableCommand) {
+				onChanged();
+			}
 		},
 	};
 
@@ -90,6 +104,7 @@ export const getWrappedDb = async (
 		// Migrate data
 		await migrateToLatestSchema(db, verboseLog);
 	} else {
+		// Create new DB
 		db = new DB(':memory:', dbOptions);
 
 		// Setup pragma
@@ -104,34 +119,21 @@ export const getWrappedDb = async (
 		db.exec(setupSQL);
 	}
 
-	const onChanged = createEvent();
-	tracingCallbacks.push(async (command: string) => {
-		// Skip for closed DB
-		if (!db.open) return;
+	const dumpData = () => waitDatabaseLock(() => db.serialize());
 
-		if (verboseLog) {
-			console.debug(command);
-		}
-
-		// Track changes
-		const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
-			(commandName) => command.includes(commandName),
-		);
-		if (isMutableCommand) {
-			onChanged();
-		}
-	});
+	// Write latest data
+	dbFile.write(await dumpData());
 
 	return {
 		onChanged,
 		getDatabase() {
 			return db;
 		},
-		getData() {
-			return waitDatabaseLock(() => db.serialize());
-		},
 		isOpened() {
 			return db.open;
+		},
+		getData() {
+			return dumpData();
 		},
 		close() {
 			return waitDatabaseLock(() => {
@@ -146,9 +148,5 @@ export const openDatabase = async (
 	options: Options = {},
 ): Promise<SQLiteDatabase> => {
 	const wrappedDb = await getWrappedDb(dbFile, options);
-	const managedDb = new ManagedDatabase(wrappedDb, dbFile, options);
-
-	await managedDb.sync();
-
-	return managedDb;
+	return new ManagedDatabase(wrappedDb, dbFile, options);
 };
