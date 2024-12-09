@@ -122,6 +122,9 @@ describe('Database synchronization', () => {
 		// Open DB
 		const db = await openDatabase(dbFile, { verbose: false });
 
+		// Check forced sync that has been called while DB opening
+		expect(spyWrite).toBeCalledTimes(1);
+
 		const tablesList = db.db
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
 			.all();
@@ -132,31 +135,39 @@ describe('Database synchronization', () => {
 			),
 		);
 
-		// Check forced sync that has been called while DB opening
-		expect(spyWrite).toBeCalledTimes(1);
-
 		const notes = new NotesController(db);
 
 		// First data mutation will be synchronized immediately
+		spyWrite.mockClear();
 		await notes.add({ title: 'Demo title', text: 'Demo text' });
 		await wait(10);
-		expect(spyWrite).toBeCalledTimes(2);
+		expect(spyWrite).toBeCalledTimes(1);
 
 		// Batch sync calls
+		spyWrite.mockClear();
 		for (let i = 0; i < 100; i++) {
 			await notes.add({ title: 'Demo title', text: 'Demo text' });
 		}
 
-		await wait(400);
-		expect(spyWrite).toBeCalledTimes(3);
+		expect(spyWrite).toBeCalledTimes(0);
+		await wait(300);
+		expect(spyWrite).toBeCalledTimes(1);
 
 		// Deadline sync
+		spyWrite.mockClear();
 		for (const startTime = Date.now(); Date.now() - startTime < 900; ) {
 			await notes.add({ title: 'Demo title', text: 'Demo text' });
 			await wait(0);
 		}
-		expect(spyWrite).toBeCalledTimes(4);
+		expect(spyWrite).toBeCalledTimes(1);
 
+		// One more sync must be called after delay
+		spyWrite.mockClear();
+		await wait(300);
+		expect(spyWrite).toBeCalledTimes(1);
+
+		spyWrite.mockClear();
 		await db.close();
+		expect(spyWrite).toBeCalledTimes(1);
 	}, 10000);
 });
