@@ -12,7 +12,7 @@ export class AttachmentsController {
 	}
 
 	public async set(targetId: string, attachments: string[]) {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		if (attachments.length === 0) {
 			db.prepare('DELETE FROM attachments WHERE note=?').run(targetId);
@@ -36,7 +36,7 @@ export class AttachmentsController {
 	}
 
 	public async get(targetId: string): Promise<string[]> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		return db
 			.prepare('SELECT file FROM attachments WHERE note=? ORDER BY rowid')
@@ -45,7 +45,7 @@ export class AttachmentsController {
 	}
 
 	public async delete(resources: string[]) {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const placeholders = Array(resources.length).fill('?').join(',');
 		db.prepare(`DELETE FROM attachments WHERE file IN (${placeholders})`).run(
@@ -57,7 +57,7 @@ export class AttachmentsController {
 	 * Return array with ids of resources that not in use
 	 */
 	public async findOrphanedResources(resources: string[]) {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const placeholders = Array(resources.length).fill('?').join(',');
 		const attached = db

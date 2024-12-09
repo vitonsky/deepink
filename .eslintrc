@@ -81,6 +81,7 @@
 					"Unordered",
 					"endregion",
 					"esm",
+					"debounce",
 					"evt",
 					"formatter",
 					"gcm",
@@ -224,14 +225,6 @@
 					"?": "before",
 					":": "before"
 				}
-			}
-		],
-		"space-before-function-paren": [
-			"error",
-			{
-				"asyncArrow": "always",
-				"anonymous": "always",
-				"named": "never"
 			}
 		]
 	},

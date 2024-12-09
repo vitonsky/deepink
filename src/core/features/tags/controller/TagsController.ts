@@ -25,7 +25,7 @@ export class TagsController {
 	 * Returns tags  list
 	 */
 	public async getTags(): Promise<IResolvedTag[]> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		return (db.prepare(tagsQuery).all() as any[]).map(
 			({ id, name, resolvedName, parent }) => ({
@@ -38,7 +38,7 @@ export class TagsController {
 	}
 
 	public async add(name: string, parent: null | string): Promise<string> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		let lastId: number;
 
@@ -90,7 +90,7 @@ export class TagsController {
 	}
 
 	public async update(tag: ITag): Promise<void> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		db.prepare('UPDATE tags SET name=?, parent=? WHERE id=?').run(
 			tag.name,
@@ -102,7 +102,7 @@ export class TagsController {
 	}
 
 	public async delete(id: string): Promise<void> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const tagsIdForRemove = (
 			db
@@ -146,7 +146,7 @@ export class TagsController {
 	 * Returns tags attached to a entity
 	 */
 	public async getAttachedTags(target: string): Promise<IResolvedTag[]> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		const query = [
 			tagsQuery,
@@ -164,7 +164,7 @@ export class TagsController {
 	}
 
 	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
-		const { db } = this.db;
+		const db = this.db.get();
 
 		db.transaction(() => {
 			db.prepare(`DELETE FROM attachedTags WHERE target=?`).run(target);
