@@ -5,9 +5,11 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
+import { ProfileStatusBar } from './ProfileStatusBar';
 import { useProfileSyncButton } from './useProfileSyncButton';
 
 export type ProfileControls = {
+	profile: ProfileContainer;
 	close: () => void;
 };
 
@@ -74,6 +76,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					<Workspace profile={currentProfile} />
 				</WorkspaceContext.Provider>
 			))}
+			<ProfileStatusBar />
 		</ProfileControlsContext.Provider>
 	);
 };

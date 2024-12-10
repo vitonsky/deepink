@@ -19,6 +19,7 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 
 				const profile = profileContainer.getContent();
 				const controls = {
+					profile,
 					close: () => profilesApi.events.profileClosed(profileContainer),
 				};
 
