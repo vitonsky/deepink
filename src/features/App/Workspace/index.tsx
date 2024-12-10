@@ -1,7 +1,6 @@
 import React, { createContext, FC, useEffect } from 'react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
-import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -99,10 +98,8 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					),
 			}}
 		>
-			<StatusBarProvider>
-				<MainScreen />
-				<WorkspaceStatusBarItems />
-			</StatusBarProvider>
+			<MainScreen />
+			<WorkspaceStatusBarItems />
 		</WorkspaceProvider>
 	);
 };

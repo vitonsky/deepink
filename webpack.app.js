@@ -58,25 +58,14 @@ module.exports = merge(commonConfig, {
 				test: /\.css$/,
 				use: [
 					MiniCssExtractPlugin.loader,
-					'css-loader',
 					{
-						loader: 'postcss-loader',
+						loader: 'css-loader',
 						options: {
-							postcssOptions: {
-								plugins: [
-									[
-										'postcss-rem-to-pixel',
-										{
-											rootValue: 16,
-											unitPrecision: 5,
-											propList: ['*'],
-											selectorBlackList: [],
-											replace: true,
-											mediaQuery: false,
-											minUnitValue: 0,
-										},
-									],
-								],
+							modules: {
+								mode: (resourcePath) => {
+									const isModule = resourcePath.endsWith('.module.css');
+									return isModule ? 'local' : 'global';
+								},
 							},
 						},
 					},

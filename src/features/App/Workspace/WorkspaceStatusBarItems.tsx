@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaArrowsRotate, FaLock, FaUserLarge } from 'react-icons/fa6';
+import { FaLock, FaUserLarge } from 'react-icons/fa6';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
 
@@ -34,18 +34,6 @@ export const WorkspaceStatusBarItems = () => {
 			{
 				placement: 'start',
 				priority: 2,
-			},
-		);
-		statusBarButtons.controls.register(
-			'sync',
-			{
-				visible: true,
-				title: 'Sync changes',
-				icon: <FaArrowsRotate />,
-			},
-			{
-				placement: 'start',
-				priority: 3,
 			},
 		);
 	});
