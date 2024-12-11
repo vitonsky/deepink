@@ -165,6 +165,52 @@ describe('Database auto synchronization', () => {
 		expect(writeFnMock).toBeCalledTimes(1);
 	});
 
+	describe('Auto sync for mutation commands', () => {
+		test('Sync for CREATE TABLE', async () => {
+			expect(() =>
+				db.get().exec(`CREATE TABLE "test_table" (
+				"id" TEXT NOT NULL UNIQUE,
+				"text" TEXT NOT NULL,
+				PRIMARY KEY("id")
+			);`),
+			).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+
+		test('Sync for create table (lower case)', async () => {
+			expect(() =>
+				db.get().exec(`create table "test_table2" (
+				"id" TEXT NOT NULL UNIQUE,
+				"text" TEXT NOT NULL,
+				PRIMARY KEY("id")
+			);`),
+			).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+
+		test('Sync for ALTER TABLE', async () => {
+			expect(() =>
+				db
+					.get()
+					.exec(`ALTER TABLE "test_table" RENAME COLUMN text TO renamed_text;`),
+			).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+
+		test('Sync for DROP TABLE', async () => {
+			expect(() => db.get().exec(`DROP TABLE "test_table";`)).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+	});
+
 	test('Sync runs while close DB', async () => {
 		await db.close();
 		expect(writeFnMock).toBeCalledTimes(1);

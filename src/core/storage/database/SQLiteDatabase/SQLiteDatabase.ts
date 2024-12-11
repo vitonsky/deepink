@@ -58,6 +58,23 @@ export const getWrappedDb = async (
 ): Promise<SQLiteDatabaseContainer> => {
 	const onChanged = createEvent();
 
+	const mutableCommands = [
+		'INSERT',
+		'UPDATE',
+		'DELETE',
+		'REPLACE',
+		'CREATE TABLE',
+		'CREATE INDEX',
+		'CREATE VIEW',
+		'CREATE TRIGGER',
+		'DROP TABLE',
+		'DROP INDEX',
+		'DROP VIEW',
+		'DROP TRIGGER',
+		'ALTER TABLE',
+		'PRAGMA',
+	];
+
 	// Create DB
 	let db: Database;
 	const dbOptions = {
@@ -74,11 +91,13 @@ export const getWrappedDb = async (
 				console.debug(command);
 			}
 
-			// Track changes
-			const isMutableCommand = ['INSERT', 'UPDATE', 'DELETE', 'DROP'].some(
-				(commandName) => command.includes(commandName),
-			);
-			if (isMutableCommand) {
+			// Track mutable changes
+			const capitalizedCommand = command.toUpperCase();
+			if (
+				mutableCommands.some((commandName) =>
+					capitalizedCommand.includes(commandName),
+				)
+			) {
 				onChanged();
 			}
 		},
