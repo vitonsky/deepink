@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { FaArrowsRotate } from 'react-icons/fa6';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
@@ -11,16 +11,20 @@ import styles from './profile.module.css';
 export const useProfileSyncButton = () => {
 	const { controls } = useStatusBarManager();
 
-	const [isPending, setIsPending] = useDebounce(false, 800);
-
 	const {
 		profile: { db },
 	} = useProfileControls();
-	const sync = useCallback(() => {
-		setIsPending(true);
-		setIsPending.flush();
 
-		db.sync().finally(() => setIsPending(false));
+	const [isPending, setIsPending] = useDebounce(false, 900);
+	useEffect(() => {
+		return db.onSync((status) => {
+			if (status === 'pending') {
+				setIsPending(true);
+				setIsPending.flush();
+			} else {
+				setIsPending(false);
+			}
+		});
 	}, [db, setIsPending]);
 
 	useEffect(() => {
@@ -28,8 +32,8 @@ export const useProfileSyncButton = () => {
 			'sync',
 			{
 				visible: true,
-				title: 'Sync profile data',
-				text: 'Synchronization',
+				title: 'Synchronize profile data',
+				text: 'Synchronize',
 				icon: (
 					<Box
 						sx={{
@@ -41,12 +45,14 @@ export const useProfileSyncButton = () => {
 						<FaArrowsRotate />
 					</Box>
 				),
-				onClick: sync,
+				onClick: () => {
+					db.sync();
+				},
 			},
 			{
 				placement: 'start',
 				priority: 100000,
 			},
 		);
-	}, [controls, isPending, sync]);
+	}, [controls, db, isPending]);
 };

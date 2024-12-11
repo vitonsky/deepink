@@ -1,3 +1,4 @@
+import { createEvent } from 'effector';
 import { IFileController } from '@core/features/files';
 import { debounce } from '@utils/debounce/debounce';
 
@@ -20,7 +21,16 @@ export type IManagedDatabase<T> = {
 	 * Sync DB and close
 	 */
 	close: () => Promise<void>;
+
+	/**
+	 * Event listener for sync
+	 */
+	onSync: (handler: SyncEventHandler) => () => void;
 };
+
+export type SyncStatus = 'pending' | 'complete';
+
+export type SyncEventHandler = (status: SyncStatus) => void;
 
 export type SyncRequest = {
 	resolve(): void;
@@ -66,6 +76,8 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 	public sync = () => {
 		if (!this.dbContainer.isOpened()) throw new Error('Database are closed');
 
+		this.onSyncStateUpdated('pending');
+
 		return new Promise<void>((resolve, reject) => {
 			// Add task
 			this.syncRequests.push({ resolve, reject });
@@ -83,6 +95,12 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 		await this.dbContainer.close();
 	};
 
+	public onSync = (handler: SyncEventHandler) => {
+		const cleanup = this.onSyncStateUpdated.watch(handler);
+		return () => cleanup();
+	};
+
+	private readonly onSyncStateUpdated = createEvent<SyncStatus>();
 	private isSyncWorkerRun = false;
 	private syncRequests: SyncRequest[] = [];
 	private syncWorker = async () => {
@@ -112,5 +130,6 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 		}
 
 		this.isSyncWorkerRun = false;
+		this.onSyncStateUpdated('complete');
 	};
 }
