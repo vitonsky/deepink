@@ -25,6 +25,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 							size="xs"
 							variant="ghost"
 							borderRadius="0"
+							fontWeight="normal"
 							title={item.title}
 							onClick={item.onClick}
 						>
@@ -45,6 +46,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 							size="xs"
 							variant="ghost"
 							borderRadius="0"
+							fontWeight="normal"
 							title={item.title}
 							onClick={item.onClick}
 						>
