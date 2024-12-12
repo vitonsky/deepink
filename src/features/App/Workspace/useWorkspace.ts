@@ -20,6 +20,10 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 
 	useEffect(() => {
 		const { db, profile, encryptionController } = currentProfile;
+
+		// TODO: replace to workspace ID
+		const workspaceId = 'fake-id';
+
 		// Setup files
 		// TODO: implement methods to close the objects after use
 		const attachmentsController = new AttachmentsController(db);
@@ -32,7 +36,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 			filesController,
 			attachmentsController,
 		);
-		const tagsRegistry = new TagsController(db);
+		const tagsRegistry = new TagsController(db, workspaceId);
 		const notesRegistry = new NotesController(db);
 
 		setState({

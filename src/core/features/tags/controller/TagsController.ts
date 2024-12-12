@@ -9,10 +9,12 @@ import { IResolvedTag, ITag } from '..';
 type ChangeEvent = 'tags' | 'noteTags';
 
 export class TagsController {
-	private db;
+	private readonly db;
+	private readonly workspace;
 	private readonly onChanged;
-	constructor(db: SQLiteDatabase) {
+	constructor(db: SQLiteDatabase, workspace: string) {
 		this.db = db;
+		this.workspace = workspace;
 		this.onChanged = createEvent<ChangeEvent>();
 	}
 
@@ -27,14 +29,14 @@ export class TagsController {
 	public async getTags(): Promise<IResolvedTag[]> {
 		const db = this.db.get();
 
-		return (db.prepare(tagsQuery).all() as any[]).map(
-			({ id, name, resolvedName, parent }) => ({
-				id,
-				name,
-				resolvedName,
-				parent: parent ?? null,
-			}),
-		);
+		return (
+			db.prepare(`${tagsQuery} WHERE workspace_id=?`).all(this.workspace) as any[]
+		).map(({ id, name, resolvedName, parent }) => ({
+			id,
+			name,
+			resolvedName,
+			parent: parent ?? null,
+		}));
 	}
 
 	public async add(name: string, parent: null | string): Promise<string> {
@@ -51,24 +53,26 @@ export class TagsController {
 					if (isFirstItem) {
 						return db
 							.prepare(
-								'INSERT INTO tags ("id", "name", "parent") VALUES (?, ?, ?)',
+								'INSERT INTO tags ("id", "workspace_id", "name", "parent") VALUES (?, ?, ?, ?)',
 							)
-							.run(uuid4(), name, parent);
+							.run(uuid4(), this.workspace, name, parent);
 					}
 
 					return db
 						.prepare(
-							'INSERT INTO tags ("id", "name", "parent") VALUES (?, ?, (SELECT id FROM tags WHERE ROWID=last_insert_rowid()))',
+							'INSERT INTO tags ("id", "workspace_id", "name", "parent") VALUES (?, ?, ?, (SELECT id FROM tags WHERE ROWID=last_insert_rowid()))',
 						)
-						.run(uuid4(), name);
+						.run(uuid4(), this.workspace, name);
 				}),
 			)();
 
 			lastId = Number(results[results.length - 1].lastInsertRowid);
 		} else {
 			const insertResult = db
-				.prepare('INSERT INTO tags ("id", "name", "parent") VALUES (?, ?, ?)')
-				.run(uuid4(), name, parent);
+				.prepare(
+					'INSERT INTO tags ("id", "workspace_id", "name", "parent") VALUES (?, ?, ?, ?)',
+				)
+				.run(uuid4(), this.workspace, name, parent);
 			if (insertResult.lastInsertRowid === undefined) {
 				throw new Error('Last insert id not found');
 			}
@@ -92,10 +96,11 @@ export class TagsController {
 	public async update(tag: ITag): Promise<void> {
 		const db = this.db.get();
 
-		db.prepare('UPDATE tags SET name=?, parent=? WHERE id=?').run(
+		db.prepare('UPDATE tags SET name=?, parent=? WHERE id=? AND workspace_id=?').run(
 			tag.name,
 			tag.parent,
 			tag.id,
+			this.workspace,
 		);
 
 		this.onChanged('tags');
@@ -127,16 +132,20 @@ export class TagsController {
 
 		db.transaction(() => {
 			db.prepare(
-				`DELETE FROM tags WHERE id IN (${Array(tagsIdForRemove.length)
+				`DELETE FROM tags WHERE workspace_id=? AND id IN (${Array(
+					tagsIdForRemove.length,
+				)
 					.fill('?')
 					.join(',')})`,
-			).run(tagsIdForRemove);
+			).run(this.workspace, ...tagsIdForRemove);
 
 			db.prepare(
-				`DELETE FROM attachedTags WHERE source IN (${Array(tagsIdForRemove.length)
+				`DELETE FROM attachedTags WHERE workspace_id=? AND source IN (${Array(
+					tagsIdForRemove.length,
+				)
 					.fill('?')
 					.join(',')})`,
-			).run(tagsIdForRemove);
+			).run(this.workspace, ...tagsIdForRemove);
 		})();
 
 		this.onChanged('tags');
@@ -150,10 +159,10 @@ export class TagsController {
 
 		const query = [
 			tagsQuery,
-			`WHERE t.id IN (SELECT source FROM attachedTags WHERE target = ?)`,
+			`WHERE t.id IN (SELECT source FROM attachedTags WHERE workspace_id=? AND target = ?)`,
 		].join(' ');
 
-		return (db.prepare(query).all(target) as any[]).map(
+		return (db.prepare(query).all(this.workspace, target) as any[]).map(
 			({ id, name, resolvedName, parent }) => ({
 				id,
 				name,
@@ -167,15 +176,20 @@ export class TagsController {
 		const db = this.db.get();
 
 		db.transaction(() => {
-			db.prepare(`DELETE FROM attachedTags WHERE target=?`).run(target);
+			db.prepare(`DELETE FROM attachedTags WHERE workspace_id=? AND target=?`).run(
+				this.workspace,
+				target,
+			);
 			if (tags.length > 0) {
 				db.prepare(
-					`INSERT INTO attachedTags(id,source,target) VALUES ${Array(
+					`INSERT INTO attachedTags(id,workspace_id,source,target) VALUES ${Array(
 						tags.length,
 					)
-						.fill('(?, ?, ?)')
+						.fill('(?, ?, ?, ?)')
 						.join(',')}`,
-				).run(tags.map((tagId) => [uuid4(), tagId, target]).flat());
+				).run(
+					tags.map((tagId) => [uuid4(), this.workspace, tagId, target]).flat(),
+				);
 			}
 		})();
 
