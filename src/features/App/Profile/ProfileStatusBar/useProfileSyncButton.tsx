@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { FaArrowsRotate } from 'react-icons/fa6';
+import { FaHardDrive } from 'react-icons/fa6';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
-import { useProfileControls } from '.';
+import { useProfileControls } from '..';
 
-import styles from './profile.module.css';
+import styles from './ProfileStatusBar.module.css';
 
 export const useProfileSyncButton = () => {
 	const { controls } = useStatusBarManager();
@@ -32,17 +32,17 @@ export const useProfileSyncButton = () => {
 			'sync',
 			{
 				visible: true,
-				title: 'Synchronize profile data',
-				text: 'Synchronize',
+				title: 'Click to force save changes on disk',
+				text: isPending ? 'Saving changes' : undefined,
 				icon: (
 					<Box
 						sx={{
 							animation: isPending
-								? `${styles.spinner} 700ms linear infinite`
+								? `${styles.blink} 900ms linear infinite`
 								: undefined,
 						}}
 					>
-						<FaArrowsRotate />
+						<FaHardDrive />
 					</Box>
 				),
 				onClick: () => {
