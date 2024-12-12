@@ -30,3 +30,8 @@ CREATE TABLE "attachedTags" (
 	"target" TEXT NOT NULL,
 	PRIMARY KEY("id") UNIQUE(source, target)
 );
+CREATE TABLE "workspaces" (
+	"id"	TEXT NOT NULL UNIQUE,
+	"name"	TEXT NOT NULL,
+	PRIMARY KEY("id")
+);
