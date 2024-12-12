@@ -15,7 +15,7 @@ describe('CRUD operations', () => {
 
 	test('insertion multiple entries', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		const entries = [
 			{ title: 'Title 1', text: 'Text 1' },
@@ -39,7 +39,7 @@ describe('CRUD operations', () => {
 
 	test('update entry and get by id', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		// Entries match data
 		const entries = await registry.get();
@@ -58,7 +58,7 @@ describe('CRUD operations', () => {
 	test('delete entries', async () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		// Insert entries to test
 		const notesSample = Array(300)
@@ -107,7 +107,7 @@ describe('data fetching', () => {
 
 	test('insert sample entries', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		for (const note of notesSample) {
 			await registry.add(note);
@@ -118,7 +118,7 @@ describe('data fetching', () => {
 
 	test('get entries by pages', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		await registry.getLength().then((length) => {
 			expect(length).toBe(notesSample.length);
@@ -143,7 +143,7 @@ describe('multi instances', () => {
 
 	test('insertion multiple entries and close with sync data', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		const notes = [
 			{ title: 'Title 1', text: 'Text 1' },
@@ -157,7 +157,7 @@ describe('multi instances', () => {
 
 	test('read entries from previous step', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		// Entries match data
 		const entries = await registry.get();

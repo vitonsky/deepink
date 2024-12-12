@@ -25,19 +25,25 @@ const mappers = {
  */
 export class NotesController implements INotesController {
 	private db;
-	constructor(db: SQLiteDatabase) {
+	private readonly workspace;
+	constructor(db: SQLiteDatabase, workspace: string) {
 		this.db = db;
+		this.workspace = workspace;
 	}
 
 	public async getById(id: NoteId): Promise<INote | null> {
 		const db = this.db.get();
-		const note = db.prepare('SELECT * FROM notes WHERE id=?').get(id);
+		const note = db
+			.prepare('SELECT * FROM notes WHERE workspace_id=? AND id=?')
+			.get(this.workspace, id);
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
 	public async getLength(): Promise<number> {
 		const db = this.db.get();
-		const { length } = db.prepare('SELECT COUNT(id) as length FROM notes').get() as {
+		const { length } = db
+			.prepare('SELECT COUNT(id) as length FROM notes WHERE workspace_id=?')
+			.get(this.workspace) as {
 			length?: number;
 		};
 		return length ?? 0;
@@ -61,9 +67,9 @@ export class NotesController implements INotesController {
 			const placeholders = Array(tags.length).fill('?').join(',');
 
 			fetchQuery.push(
-				`WHERE id IN (SELECT target FROM attachedTags WHERE source IN (${placeholders}))`,
+				`WHERE workspace_id=? AND id IN (SELECT target FROM attachedTags WHERE source IN (${placeholders}))`,
 			);
-			fetchParams.push(...tags);
+			fetchParams.push(this.workspace, ...tags);
 		}
 
 		const offset = (page - 1) * limit;
@@ -90,10 +96,11 @@ export class NotesController implements INotesController {
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
 		const insertResult = db
 			.prepare(
-				'INSERT INTO notes ("id","title","text","creationTime","lastUpdateTime") VALUES (@id,@title,@text,@created,@updated)',
+				'INSERT INTO notes ("id","workspace_id","title","text","creationTime","lastUpdateTime") VALUES (@id,@workspace,@title,@text,@created,@updated)',
 			)
 			.run({
 				id: uuid4(),
+				workspace: this.workspace,
 				title: note.title,
 				text: note.text,
 				created: creationTime,
@@ -102,8 +109,8 @@ export class NotesController implements INotesController {
 
 		// Get generated id
 		const selectWithId = (await db
-			.prepare('SELECT `id` FROM notes WHERE rowid=?')
-			.get(insertResult.lastInsertRowid)) as { id: string };
+			.prepare('SELECT `id` FROM notes WHERE workspace_id=? AND rowid=?')
+			.get(this.workspace, insertResult.lastInsertRowid)) as { id: string };
 
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
@@ -118,13 +125,14 @@ export class NotesController implements INotesController {
 		const updateTime = new Date().getTime();
 		const result = db
 			.prepare(
-				'UPDATE notes SET "title"=@title, "text"=@text, "lastUpdateTime"=@updateTime WHERE "id"=@id',
+				'UPDATE notes SET "title"=@title, "text"=@text, "lastUpdateTime"=@updateTime WHERE "workspace_id"=@workspace AND "id"=@id',
 			)
 			.run({
 				title: updatedNote.title,
 				text: updatedNote.text,
 				updateTime: updateTime,
 				id: id,
+				workspace: this.workspace,
 			});
 
 		if (!result.changes || result.changes < 1) {
@@ -137,8 +145,8 @@ export class NotesController implements INotesController {
 
 		const placeholders = Array(ids.length).fill('?').join(',');
 		const result = db
-			.prepare(`DELETE FROM notes WHERE id IN (${placeholders})`)
-			.run(ids);
+			.prepare(`DELETE FROM notes WHERE workspace_id=? AND id IN (${placeholders})`)
+			.run(this.workspace, ...ids);
 
 		if (result.changes !== ids.length) {
 			console.warn(
