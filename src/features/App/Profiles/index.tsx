@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
+import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
-import { Profile } from '../Profile';
+import { Profile, ProfileControlsContext } from '../Profile';
 import { ProfilesApi } from './hooks/useProfileContainers';
 
 export type ProfilesProps = {
@@ -17,15 +18,21 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				if (profileContainer.isDisposed()) return;
 
 				const profile = profileContainer.getContent();
+				const controls = {
+					profile,
+					close: () => profilesApi.events.profileClosed(profileContainer),
+				};
+
 				return (
-					<Profile
-						profile={profile}
-						key={profile.profile.id}
-						controls={{
-							close: () =>
-								profilesApi.events.profileClosed(profileContainer),
-						}}
-					/>
+					<StatusBarProvider>
+						<ProfileControlsContext.Provider value={controls}>
+							<Profile
+								profile={profile}
+								key={profile.profile.id}
+								controls={controls}
+							/>
+						</ProfileControlsContext.Provider>
+					</StatusBarProvider>
 				);
 			})}
 		</>

@@ -5,8 +5,11 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
+import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
+import { useProfileSyncButton } from './ProfileStatusBar/useProfileSyncButton';
 
 export type ProfileControls = {
+	profile: ProfileContainer;
 	close: () => void;
 };
 
@@ -60,6 +63,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		};
 	}, [dispatch, profileId]);
 
+	useProfileSyncButton();
+
 	// TODO: support multiple opened workspaces
 	return (
 		<ProfileControlsContext.Provider value={controls}>
@@ -71,6 +76,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					<Workspace profile={currentProfile} />
 				</WorkspaceContext.Provider>
 			))}
+			<ProfileStatusBar />
 		</ProfileControlsContext.Provider>
 	);
 };

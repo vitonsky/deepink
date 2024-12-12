@@ -1,6 +1,9 @@
+import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
+import { NotesController } from '@core/features/notes/controller/NotesController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { wait } from '@utils/tests';
 
-import { openDatabase } from './SQLiteDatabase';
+import { openDatabase, SQLiteDatabase } from './SQLiteDatabase';
 
 describe('migrations', () => {
 	test('from most old version to latest', async () => {
@@ -21,7 +24,8 @@ describe('migrations', () => {
 		// Test structure
 		const db = await openDatabase(dbFile);
 
-		const tablesList = db.db
+		const tablesList = db
+			.get()
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
 			.all();
 		expect(tablesList).toEqual(
@@ -54,19 +58,22 @@ describe('options', () => {
 			};
 		};
 
-		const dbFile = createFileControllerMock();
+		const dbFile = new FileControllerWithEncryption(
+			createFileControllerMock(),
+			createEncryption(7),
+		);
 		await dbFile.get().then((file) => {
 			expect(file).toBe(null);
 		});
 
-		const db1 = await openDatabase(dbFile, { encryption: createEncryption(7) });
+		const db1 = await openDatabase(dbFile);
 		await db1.close();
 		await dbFile.get().then((file) => {
 			expect(file).toBeInstanceOf(Buffer);
 			expect(file!.byteLength).toBeGreaterThan(0);
 		});
 
-		const db2 = await openDatabase(dbFile, { encryption: createEncryption(7) });
+		const db2 = await openDatabase(dbFile);
 		await db2.close();
 		await dbFile.get().then((file) => {
 			expect(file).toBeInstanceOf(Buffer);
@@ -88,5 +95,124 @@ describe('concurrency', () => {
 		await expect(async () => {
 			await db.sync();
 		}).rejects.toThrow();
+	});
+});
+
+describe('Database auto synchronization', () => {
+	const syncOptions = {
+		delay: 80,
+		deadline: 80 * 4,
+	};
+
+	const waitPossibleSync = () => wait(10);
+
+	let writeFnMock: jest.SpyInstance<Promise<void>, [buffer: ArrayBuffer], any>;
+	let db: SQLiteDatabase;
+	let notes: NotesController;
+
+	afterEach(() => {
+		writeFnMock.mockClear();
+	});
+
+	test('Sync runs immediately once DB has been opened', async () => {
+		const dbFile = createFileControllerMock();
+
+		writeFnMock = jest.spyOn(dbFile, 'write');
+
+		// Open DB
+		db = await openDatabase(dbFile, { verbose: false, sync: syncOptions });
+
+		// Check forced sync that has been called while DB opening
+		expect(writeFnMock).toBeCalledTimes(1);
+
+		notes = new NotesController(db);
+	});
+
+	test('Sync runs for first data mutation', async () => {
+		await notes.add({ title: 'Demo title', text: 'Demo text' });
+		await waitPossibleSync();
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
+
+	test('Data changes in row will be delayed', async () => {
+		for (
+			const startTime = Date.now();
+			Date.now() - startTime < syncOptions.delay * 1.5;
+
+		) {
+			await notes.add({ title: 'Demo title', text: 'Demo text' });
+		}
+		expect(writeFnMock).toBeCalledTimes(0);
+
+		await wait(syncOptions.delay);
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
+
+	test('Data changes in row will be synced by deadline', async () => {
+		for (
+			const startTime = Date.now();
+			Date.now() - startTime < syncOptions.deadline * 1.1;
+
+		) {
+			await notes.add({ title: 'Demo title', text: 'Demo text' });
+			await waitPossibleSync();
+		}
+		expect(writeFnMock).toBeCalledTimes(1);
+
+		// One more sync must be called after delay
+		writeFnMock.mockClear();
+		await wait(syncOptions.delay);
+		expect(writeFnMock).toBeCalledTimes(1);
+	});
+
+	describe('Auto sync for mutation commands', () => {
+		test('Sync for CREATE TABLE', async () => {
+			expect(() =>
+				db.get().exec(`CREATE TABLE "test_table" (
+				"id" TEXT NOT NULL UNIQUE,
+				"text" TEXT NOT NULL,
+				PRIMARY KEY("id")
+			);`),
+			).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+
+		test('Sync for create table (lower case)', async () => {
+			expect(() =>
+				db.get().exec(`create table "test_table2" (
+				"id" TEXT NOT NULL UNIQUE,
+				"text" TEXT NOT NULL,
+				PRIMARY KEY("id")
+			);`),
+			).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+
+		test('Sync for ALTER TABLE', async () => {
+			expect(() =>
+				db
+					.get()
+					.exec(`ALTER TABLE "test_table" RENAME COLUMN text TO renamed_text;`),
+			).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+
+		test('Sync for DROP TABLE', async () => {
+			expect(() => db.get().exec(`DROP TABLE "test_table";`)).not.toThrow();
+
+			await wait(syncOptions.delay);
+			expect(writeFnMock).toBeCalledTimes(1);
+		});
+	});
+
+	test('Sync runs while close DB', async () => {
+		await db.close();
+		expect(writeFnMock).toBeCalledTimes(1);
 	});
 });
