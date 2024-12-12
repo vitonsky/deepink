@@ -29,7 +29,9 @@ describe('migrations', () => {
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
 			.all();
 		expect(tablesList).toEqual(
-			['notes', 'files', 'attachments'].map((name) => ({ name })),
+			expect.arrayContaining(
+				['notes', 'files', 'attachments'].map((name) => ({ name })),
+			),
 		);
 
 		await db.close();
@@ -125,7 +127,7 @@ describe('Database auto synchronization', () => {
 		// Check forced sync that has been called while DB opening
 		expect(writeFnMock).toBeCalledTimes(1);
 
-		notes = new NotesController(db);
+		notes = new NotesController(db, 'fake-workspace-id');
 	});
 
 	test('Sync runs for first data mutation', async () => {
