@@ -44,7 +44,7 @@ test('clear orphaned files', async () => {
 	const db = await openDatabase(dbFile);
 	const fileManager = createFileManagerMock();
 	const attachments = new AttachmentsController(db);
-	const files = new FilesController(db, fileManager, attachments);
+	const files = new FilesController(db, fileManager, attachments, 'fake-workspace-id');
 
 	// Upload file and attach
 	const fileToAttach = createTextFile('Attached file');

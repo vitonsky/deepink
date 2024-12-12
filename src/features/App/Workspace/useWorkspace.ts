@@ -35,6 +35,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 			db,
 			filesController,
 			attachmentsController,
+			workspaceId,
 		);
 		const tagsRegistry = new TagsController(db, workspaceId);
 		const notesRegistry = new NotesController(db);
