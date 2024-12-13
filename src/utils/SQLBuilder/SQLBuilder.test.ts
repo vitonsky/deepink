@@ -2,6 +2,7 @@ import { ConditionClause } from './ConditionClause';
 import { PreparedValue } from './core/PreparedValue';
 import { GroupExpression } from './GroupExpression';
 import { LimitClause } from './LimitClause';
+import { SelectStatement } from './SelectStatement';
 import { SetExpression } from './SetExpression';
 import { qb } from './utils/builder';
 import { QueryConstructor } from './utils/QueryConstructor';
@@ -215,6 +216,39 @@ describe('Basic clauses', () => {
 			expect(new WhereClause().toSQL()).toEqual({
 				sql: '',
 				bindings: [],
+			});
+		});
+	});
+});
+
+describe('Statements', () => {
+	describe('Select', () => {
+		test('Trivial select', () => {
+			expect(
+				new SelectStatement()
+					.from('foo')
+					.select('x', 'y', 'z')
+					.where(['bar=', new PreparedValue(100)])
+					.toSQL(),
+			).toEqual({
+				sql: 'SELECT x,y,z FROM foo WHERE bar=?',
+				bindings: [100],
+			});
+		});
+
+		test('Aliases in select', () => {
+			expect(
+				new SelectStatement()
+					.from('foo AS f')
+					.select(
+						'x AS alias',
+						new QueryConstructor({ join: ' ' }).value(123).raw('AS value'),
+					)
+					.where(['bar=', new PreparedValue(100)])
+					.toSQL(),
+			).toEqual({
+				sql: 'SELECT x AS alias,? AS value FROM foo AS f WHERE bar=?',
+				bindings: [123, 100],
 			});
 		});
 	});
