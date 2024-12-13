@@ -1,6 +1,9 @@
 import { RawQuery } from './core/RawQuery';
 import { QuerySegment, QuerySegmentOrPrimitive } from '.';
 
+const filterOutEmptySegments = (segments: (QuerySegmentOrPrimitive | undefined)[]) =>
+	segments.filter((segment) => segment !== undefined) as QuerySegmentOrPrimitive[];
+
 export class ConditionClause extends RawQuery {
 	protected readonly clauses: Array<{
 		clause: QuerySegment;
@@ -10,20 +13,26 @@ export class ConditionClause extends RawQuery {
 		super();
 	}
 
-	public and(...query: QuerySegmentOrPrimitive[]) {
-		this.clauses.push({
-			join: 'AND',
-			clause: new RawQuery(...query),
-		});
+	public and(...query: (QuerySegmentOrPrimitive | undefined)[]) {
+		const filteredQuery = filterOutEmptySegments(query);
+		if (filteredQuery.length > 0) {
+			this.clauses.push({
+				join: 'AND',
+				clause: new RawQuery(...filteredQuery),
+			});
+		}
 
 		return this;
 	}
 
-	public or(...query: QuerySegmentOrPrimitive[]) {
-		this.clauses.push({
-			join: 'OR',
-			clause: new RawQuery(...query),
-		});
+	public or(...query: (QuerySegmentOrPrimitive | undefined)[]) {
+		const filteredQuery = filterOutEmptySegments(query);
+		if (filteredQuery.length > 0) {
+			this.clauses.push({
+				join: 'OR',
+				clause: new RawQuery(...filteredQuery),
+			});
+		}
 
 		return this;
 	}

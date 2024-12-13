@@ -210,40 +210,48 @@ describe('Basic clauses', () => {
 	});
 });
 
-describe('utils', () => {
+describe('Query builder', () => {
 	test('Complex query building', () => {
-		expect(
-			qb
-				.line(
-					qb.raw('SELECT * FROM notes'),
-					qb.where(
-						qb
-							.condition(qb.raw('workspace_id=').value('fake-uuid'))
-							.and(
-								qb
-									.line('id IN')
-									.raw(
-										qb.group(
-											qb
-												.line('SELECT target FROM attachedTags')
-												.raw(
-													qb.where(
-														qb
-															.line('source IN')
-															.raw(qb.values([1, 2, 3])),
+		const query = (sources: (string | number)[]) =>
+			qb.line(
+				qb.raw('SELECT * FROM notes'),
+				qb.where(
+					qb
+						.condition(qb.raw('workspace_id=').value('fake-uuid'))
+						.and(
+							sources.length === 0
+								? undefined
+								: qb
+										.line('id IN')
+										.raw(
+											qb.group(
+												qb
+													.line(
+														'SELECT target FROM attachedTags',
+													)
+													.raw(
+														qb.where(
+															qb
+																.line('source IN')
+																.raw(qb.values(sources)),
+														),
 													),
-												),
+											),
 										),
-									),
-							),
-					),
-					qb.limit(20),
-					qb.offset(10),
-				)
-				.toSQL(),
-		).toEqual({
+						),
+				),
+				qb.limit(20),
+				qb.offset(10),
+			);
+
+		expect(query(['foo', 'bar', 123]).toSQL()).toEqual({
 			sql: 'SELECT * FROM notes WHERE workspace_id=? AND id IN (SELECT target FROM attachedTags WHERE source IN (?,?,?)) LIMIT 20 OFFSET 10',
-			bindings: ['fake-uuid', 1, 2, 3],
+			bindings: ['fake-uuid', 'foo', 'bar', 123],
+		});
+
+		expect(query([]).toSQL()).toEqual({
+			sql: 'SELECT * FROM notes WHERE workspace_id=? LIMIT 20 OFFSET 10',
+			bindings: ['fake-uuid'],
 		});
 	});
 });
