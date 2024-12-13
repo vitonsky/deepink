@@ -1,3 +1,4 @@
+import { PreparedValue } from './core/PreparedValue';
 import { RawQuery } from './core/RawQuery';
 
 export class LimitClause extends RawQuery {
@@ -5,7 +6,7 @@ export class LimitClause extends RawQuery {
 		super();
 
 		if (limit) {
-			this.push(`LIMIT ${limit}`);
+			this.push(`LIMIT `, new PreparedValue(limit));
 		}
 
 		if (offset) {
@@ -13,7 +14,7 @@ export class LimitClause extends RawQuery {
 				this.push(' ');
 			}
 
-			this.push(`OFFSET ${offset}`);
+			this.push(`OFFSET `, new PreparedValue(offset));
 		}
 	}
 }

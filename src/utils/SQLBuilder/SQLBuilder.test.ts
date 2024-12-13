@@ -98,20 +98,20 @@ describe('Basic clauses', () => {
 	describe('Limit expression', () => {
 		test('Limit', () => {
 			expect(new LimitClause({ limit: 10 }).toSQL()).toEqual({
-				sql: 'LIMIT 10',
-				bindings: [],
+				sql: 'LIMIT ?',
+				bindings: [10],
 			});
 		});
 		test('Offset', () => {
 			expect(new LimitClause({ offset: 20 }).toSQL()).toEqual({
-				sql: 'OFFSET 20',
-				bindings: [],
+				sql: 'OFFSET ?',
+				bindings: [20],
 			});
 		});
 		test('Limit and offset', () => {
 			expect(new LimitClause({ limit: 10, offset: 20 }).toSQL()).toEqual({
-				sql: 'LIMIT 10 OFFSET 20',
-				bindings: [],
+				sql: 'LIMIT ? OFFSET ?',
+				bindings: [10, 20],
 			});
 		});
 	});
@@ -245,13 +245,13 @@ describe('Query builder', () => {
 			);
 
 		expect(query(['foo', 'bar', 123]).toSQL()).toEqual({
-			sql: 'SELECT * FROM notes WHERE workspace_id=? AND id IN (SELECT target FROM attachedTags WHERE source IN (?,?,?)) LIMIT 20 OFFSET 10',
-			bindings: ['fake-uuid', 'foo', 'bar', 123],
+			sql: 'SELECT * FROM notes WHERE workspace_id=? AND id IN (SELECT target FROM attachedTags WHERE source IN (?,?,?)) LIMIT ? OFFSET ?',
+			bindings: ['fake-uuid', 'foo', 'bar', 123, 20, 10],
 		});
 
 		expect(query([]).toSQL()).toEqual({
-			sql: 'SELECT * FROM notes WHERE workspace_id=? LIMIT 20 OFFSET 10',
-			bindings: ['fake-uuid'],
+			sql: 'SELECT * FROM notes WHERE workspace_id=? LIMIT ? OFFSET ?',
+			bindings: ['fake-uuid', 20, 10],
 		});
 	});
 
@@ -266,8 +266,8 @@ describe('Query builder', () => {
 				)
 				.toSQL(),
 		).toEqual({
-			sql: 'SELECT * FROM notes LIMIT 20 OFFSET 10',
-			bindings: [],
+			sql: 'SELECT * FROM notes LIMIT ? OFFSET ?',
+			bindings: [20, 10],
 		});
 
 		expect(
