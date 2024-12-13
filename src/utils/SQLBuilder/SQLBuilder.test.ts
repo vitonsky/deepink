@@ -1,4 +1,5 @@
 import { ConditionClause } from './ConditionClause';
+import { qb } from './constructor';
 import { PreparedValue } from './core/PreparedValue';
 import { GroupExpression } from './GroupExpression';
 import { LimitClause } from './LimitClause';
@@ -205,6 +206,44 @@ describe('Basic clauses', () => {
 				sql: '',
 				bindings: [],
 			});
+		});
+	});
+});
+
+describe('utils', () => {
+	test('Complex query building', () => {
+		expect(
+			qb
+				.line(
+					qb.raw('SELECT * FROM notes'),
+					qb.where(
+						qb
+							.condition(qb.raw('workspace_id=').value('fake-uuid'))
+							.and(
+								qb
+									.line('id IN')
+									.raw(
+										qb.group(
+											qb
+												.line('SELECT target FROM attachedTags')
+												.raw(
+													qb.where(
+														qb
+															.line('source IN')
+															.raw(qb.values([1, 2, 3])),
+													),
+												),
+										),
+									),
+							),
+					),
+					qb.limit(20),
+					qb.offset(10),
+				)
+				.toSQL(),
+		).toEqual({
+			sql: 'SELECT * FROM notes WHERE workspace_id=? AND id IN (SELECT target FROM attachedTags WHERE source IN (?,?,?)) LIMIT 20 OFFSET 10',
+			bindings: ['fake-uuid', 1, 2, 3],
 		});
 	});
 });
