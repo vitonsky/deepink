@@ -1,5 +1,6 @@
 import { PreparedValue } from '../core/PreparedValue';
 import { RawQuery } from '../core/RawQuery';
+import { RawValue } from '../core/RawValue';
 import { QuerySegment } from '..';
 
 export type QueryConstructorOptions = {
@@ -15,20 +16,27 @@ export class QueryConstructor extends RawQuery {
 	}
 
 	public value = (value: string | number) => {
-		return new PreparedValue(value);
+		return this.raw(new PreparedValue(value));
 	};
 
-	public add(...queries: (QuerySegment | string)[]) {
+	public raw(...queries: (QuerySegment | string)[]) {
+		this.push(...queries);
+		return this;
+	}
+
+	public exportQuery() {
 		const { join } = this.options;
-		queries.forEach((segment, index) => {
+
+		const preparedQuery: QuerySegment[] = [];
+		this.query.forEach((segment, index) => {
 			// Add divider between segments
 			if (index > 0 && join !== null) {
-				this.push(join);
+				preparedQuery.push(new RawValue(join));
 			}
 
-			this.push(segment);
+			preparedQuery.push(segment);
 		});
 
-		return this;
+		return preparedQuery;
 	}
 }

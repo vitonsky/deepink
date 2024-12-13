@@ -17,14 +17,28 @@ export class RawQuery {
 		}
 	}
 
+	/**
+	 * Returns query segments number
+	 */
 	public size() {
 		return this.query.length;
 	}
 
+	/**
+	 * Returns final query that may be preprocessed
+	 * Returned query will be used while compile SQL
+	 */
+	public exportQuery() {
+		return this.query;
+	}
+
+	/**
+	 * Compile query to SQL string and bindings
+	 */
 	public toSQL() {
 		let sql = '';
 		const bindings: Array<string | number> = [];
-		for (const segment of this.query) {
+		for (const segment of this.exportQuery()) {
 			if (segment instanceof RawQuery) {
 				const data = segment.toSQL();
 				sql += data.sql;
