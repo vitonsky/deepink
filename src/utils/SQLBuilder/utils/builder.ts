@@ -24,5 +24,5 @@ export const qb = {
 		new ConditionClause().and(...segments),
 	limit: (limit?: number) => new LimitClause({ limit }),
 	offset: (offset?: number) => new LimitClause({ offset }),
-	select: (params?: SelectStatementOptions) => new SelectStatement(params),
+	select: (...params: SelectStatementOptions) => new SelectStatement(...params),
 };

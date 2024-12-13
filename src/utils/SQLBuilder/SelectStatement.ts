@@ -5,22 +5,20 @@ import { IQuery, QueryParameter, QuerySegment, RawQueryParameter } from './types
 import { QueryConstructor } from './utils/QueryConstructor';
 import { WhereClause } from './WhereClause';
 
-export type SelectStatementOptions = {
-	select?: QueryParameter[];
-	from?: QueryParameter[];
-};
+export type SelectStatementOptions = QueryParameter[];
 
 export class SelectStatement extends RawQuery implements IQuery {
 	private readonly _select: QueryParameter[];
 	private readonly _from: QueryParameter[];
-	private readonly _limit: { limit?: number; offset?: number } = {};
+	private readonly _limit: { limit?: number; offset?: number };
 	private readonly _where;
 
-	constructor(options: SelectStatementOptions = {}) {
+	constructor(...select: SelectStatementOptions) {
 		super();
 
-		this._select = options.select ?? [];
-		this._from = options.from ?? [];
+		this._select = select;
+		this._from = [];
+		this._limit = {};
 
 		this._where = new WhereClause();
 	}

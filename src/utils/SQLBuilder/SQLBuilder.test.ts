@@ -240,10 +240,8 @@ describe('Statements', () => {
 
 		test('Parameters in constructor', () => {
 			expect(
-				new SelectStatement({
-					select: ['x', 'y'],
-					from: ['foo f', 'LEFT JOIN bar b'],
-				})
+				new SelectStatement('x', 'y')
+					.from('foo f', 'LEFT JOIN bar b')
 					.select('z')
 					.toSQL(),
 			).toEqual({
