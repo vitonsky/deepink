@@ -3,8 +3,8 @@ import { PreparedValue } from '../core/PreparedValue';
 import { GroupExpression } from '../GroupExpression';
 import { LimitClause } from '../LimitClause';
 import { SetExpression } from '../SetExpression';
-import { QueryConstructor } from '../utils/QueryConstructor';
 import { WhereClause } from '../WhereClause';
+import { QueryConstructor } from './QueryConstructor';
 import { RawQueryParameter } from '..';
 
 /**

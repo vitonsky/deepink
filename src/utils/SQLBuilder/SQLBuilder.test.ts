@@ -1,9 +1,9 @@
 import { ConditionClause } from './ConditionClause';
-import { qb } from './constructor';
 import { PreparedValue } from './core/PreparedValue';
 import { GroupExpression } from './GroupExpression';
 import { LimitClause } from './LimitClause';
 import { SetExpression } from './SetExpression';
+import { qb } from './utils/builder';
 import { QueryConstructor } from './utils/QueryConstructor';
 import { WhereClause } from './WhereClause';
 
