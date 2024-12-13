@@ -228,11 +228,13 @@ describe('Statements', () => {
 				new SelectStatement()
 					.from('foo')
 					.select('x', 'y', 'z')
-					.where(['bar=', new PreparedValue(100)])
+					.where(new QueryConstructor().raw('bar=').value(100))
+					.limit(50)
+					.offset(200)
 					.toSQL(),
 			).toEqual({
-				sql: 'SELECT x,y,z FROM foo WHERE bar=?',
-				bindings: [100],
+				sql: 'SELECT x,y,z FROM foo WHERE bar=? LIMIT ? OFFSET ?',
+				bindings: [100, 50, 200],
 			});
 		});
 
@@ -258,7 +260,7 @@ describe('Statements', () => {
 						'x AS alias',
 						new QueryConstructor({ join: ' ' }).value(123).raw('AS value'),
 					)
-					.where(['bar=', new PreparedValue(100)])
+					.where(new QueryConstructor().raw('bar=').value(100))
 					.toSQL(),
 			).toEqual({
 				sql: 'SELECT x AS alias,? AS value FROM foo AS f WHERE bar=?',

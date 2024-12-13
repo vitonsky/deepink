@@ -1,6 +1,7 @@
 import { RawQuery } from './core/RawQuery';
+import { LimitClause } from './LimitClause';
 import { SetExpression } from './SetExpression';
-import { IQuery, QueryParameter, QuerySegment } from './types';
+import { IQuery, QueryParameter, QuerySegment, RawQueryParameter } from './types';
 import { QueryConstructor } from './utils/QueryConstructor';
 import { WhereClause } from './WhereClause';
 
@@ -12,6 +13,7 @@ export type SelectStatementOptions = {
 export class SelectStatement extends RawQuery implements IQuery {
 	private readonly _select: QueryParameter[];
 	private readonly _from: QueryParameter[];
+	private readonly _limit: { limit?: number; offset?: number } = {};
 	private readonly _where;
 
 	constructor(options: SelectStatementOptions = {}) {
@@ -33,8 +35,18 @@ export class SelectStatement extends RawQuery implements IQuery {
 		return this;
 	}
 
-	public where(params: QueryParameter[], condition: 'and' | 'or' = 'and') {
-		this._where[condition](...params);
+	public offset(offset?: number) {
+		this._limit.offset = offset;
+		return this;
+	}
+
+	public limit(limit?: number) {
+		this._limit.limit = limit;
+		return this;
+	}
+
+	public where(param: RawQueryParameter, condition: 'and' | 'or' = 'and') {
+		this._where[condition](param);
 		return this;
 	}
 
@@ -53,6 +65,8 @@ export class SelectStatement extends RawQuery implements IQuery {
 		query.raw('FROM', ...this._from);
 
 		query.raw(this._where);
+
+		query.raw(new LimitClause(this._limit));
 
 		return query.exportQuery();
 	}
