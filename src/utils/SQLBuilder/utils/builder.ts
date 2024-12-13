@@ -4,7 +4,7 @@ import { GroupExpression } from '../GroupExpression';
 import { LimitClause } from '../LimitClause';
 import { SelectStatement, SelectStatementOptions } from '../SelectStatement';
 import { SetExpression } from '../SetExpression';
-import { RawQueryParameter } from '../types';
+import { QueryBindings, RawQueryParameter } from '../types';
 import { WhereClause } from '../WhereClause';
 import { QueryConstructor } from './QueryConstructor';
 
@@ -17,8 +17,17 @@ export const qb = {
 		new QueryConstructor({ join: ' ' }).raw(...segments),
 	group: (...segments: RawQueryParameter[]) => new GroupExpression(...segments),
 	set: (segments: RawQueryParameter[]) => new SetExpression(...segments),
-	values: (values: Array<string | number>) =>
-		new SetExpression(...values.map((value) => new PreparedValue(value))),
+	values: (values: Array<QueryBindings> | Record<string, QueryBindings>) => {
+		if (Array.isArray(values)) {
+			return new SetExpression(...values.map((value) => new PreparedValue(value)));
+		}
+
+		return new SetExpression(
+			...Object.entries(values).map(([key, value]) =>
+				new QueryConstructor().raw(key, '=').value(value),
+			),
+		);
+	},
 	where: (...segments: RawQueryParameter[]) => new WhereClause().and(...segments),
 	condition: (...segments: RawQueryParameter[]) =>
 		new ConditionClause().and(...segments),

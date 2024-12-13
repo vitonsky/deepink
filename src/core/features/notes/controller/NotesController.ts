@@ -41,8 +41,12 @@ export class NotesController implements INotesController {
 			qb
 				.select('*')
 				.from('notes')
-				.where(qb.raw('workspace_id=').value(this.workspace))
-				.where(qb.raw('id=').value(id)),
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				)
+				.where(qb.values({ id })),
 		);
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
@@ -54,7 +58,11 @@ export class NotesController implements INotesController {
 			qb
 				.select('COUNT(id) as length')
 				.from('notes')
-				.where(qb.raw('workspace_id=').value(this.workspace)),
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				),
 		) as {
 			length?: number;
 		};
@@ -76,7 +84,11 @@ export class NotesController implements INotesController {
 			qb
 				.select('*')
 				.from('notes')
-				.where(qb.raw('workspace_id=').value(this.workspace))
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				)
 				.where(
 					tags.length > 0
 						? qb.raw(
@@ -130,8 +142,16 @@ export class NotesController implements INotesController {
 			qb
 				.select('id')
 				.from('notes')
-				.where(qb.raw('workspace_id=').value(this.workspace))
-				.where(qb.raw('rowid=').value(Number(insertResult.lastInsertRowid))),
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				)
+				.where(
+					qb.values({
+						rowid: Number(insertResult.lastInsertRowid),
+					}),
+				),
 		) as { id: string };
 
 		if (!selectWithId || !selectWithId.id) {
@@ -148,14 +168,14 @@ export class NotesController implements INotesController {
 		const result = db.run(
 			qb.line(
 				'UPDATE notes SET',
-				qb.set([
-					qb.raw('title=').value(updatedNote.title),
-					qb.raw('text=').value(updatedNote.text),
-					qb.raw('lastUpdateTime=').value(updateTime),
-				]),
+				qb.values({
+					title: updatedNote.title,
+					text: updatedNote.text,
+					lastUpdateTime: updateTime,
+				}),
 				qb
-					.where(qb.raw('id=').value(id))
-					.and(qb.raw('workspace_id=').value(this.workspace)),
+					.where(qb.values({ id }))
+					.and(qb.values({ workspace_id: this.workspace })),
 			),
 		);
 
@@ -171,7 +191,11 @@ export class NotesController implements INotesController {
 			qb.line(
 				'DELETE FROM notes',
 				qb
-					.where(qb.raw('workspace_id=').value(this.workspace))
+					.where(
+						qb.values({
+							workspace_id: this.workspace,
+						}),
+					)
 					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
 			),
 		);
