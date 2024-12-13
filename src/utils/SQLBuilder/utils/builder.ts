@@ -2,6 +2,7 @@ import { ConditionClause } from '../ConditionClause';
 import { PreparedValue } from '../core/PreparedValue';
 import { GroupExpression } from '../GroupExpression';
 import { LimitClause } from '../LimitClause';
+import { SelectStatement, SelectStatementOptions } from '../SelectStatement';
 import { SetExpression } from '../SetExpression';
 import { RawQueryParameter } from '../types';
 import { WhereClause } from '../WhereClause';
@@ -23,4 +24,5 @@ export const qb = {
 		new ConditionClause().and(...segments),
 	limit: (limit?: number) => new LimitClause({ limit }),
 	offset: (offset?: number) => new LimitClause({ offset }),
+	select: (params?: SelectStatementOptions) => new SelectStatement(params),
 };

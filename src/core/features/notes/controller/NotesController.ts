@@ -1,11 +1,6 @@
 /* eslint-disable camelcase */
 import { v4 as uuid4 } from 'uuid';
-import { PreparedValue } from '@utils/SQLBuilder/core/PreparedValue';
-import { GroupExpression } from '@utils/SQLBuilder/GroupExpression';
-import { LimitClause } from '@utils/SQLBuilder/LimitClause';
-import { SetExpression } from '@utils/SQLBuilder/SetExpression';
-import { QueryConstructor } from '@utils/SQLBuilder/utils/QueryConstructor';
-import { WhereClause } from '@utils/SQLBuilder/WhereClause';
+import { qb } from '@utils/SQLBuilder/utils/builder';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -67,22 +62,28 @@ export class NotesController implements INotesController {
 
 		const notes: INote[] = [];
 
-		const where = new WhereClause();
-		const query = new QueryConstructor({ join: ' ' })
-			.raw('SELECT * FROM notes')
-			.raw(where)
-			.raw(new LimitClause({ limit, offset: (page - 1) * limit }));
-
-		where.and('workspace_id=', new PreparedValue(this.workspace));
-		if (tags.length > 0) {
-			where.and(
-				'id IN',
-				new GroupExpression(
-					'SELECT target FROM attachedTags ',
-					new WhereClause().and('source IN ', new SetExpression(...tags)),
-				),
-			);
-		}
+		const query = qb
+			.select({
+				select: ['*'],
+				from: ['notes'],
+			})
+			.where(qb.raw('workspace_id=').value(this.workspace))
+			.where(
+				tags.length > 0
+					? qb.raw(
+							'id IN',
+							qb.group(
+								qb
+									.select()
+									.select('target')
+									.from('attachedTags')
+									.where(qb.raw('source IN', qb.values(tags))),
+							),
+					  )
+					: undefined,
+			)
+			.limit(limit)
+			.offset((page - 1) * limit);
 
 		const { sql, bindings } = query.toSQL();
 
