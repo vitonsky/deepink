@@ -1,6 +1,6 @@
 import { ConditionClause } from './ConditionClause';
 import { RawQuery } from './core/RawQuery';
-import { QuerySegmentOrPrimitive } from '.';
+import { RawQueryParameter } from '.';
 
 export class WhereClause extends RawQuery {
 	protected readonly condition = new ConditionClause();
@@ -8,13 +8,17 @@ export class WhereClause extends RawQuery {
 		super();
 	}
 
-	public and(...query: QuerySegmentOrPrimitive[]) {
+	public size() {
+		return this.condition.size();
+	}
+
+	public and(...query: RawQueryParameter[]) {
 		this.condition.and(...query);
 
 		return this;
 	}
 
-	public or(...query: QuerySegmentOrPrimitive[]) {
+	public or(...query: RawQueryParameter[]) {
 		this.condition.or(...query);
 
 		return this;

@@ -3,5 +3,6 @@ import { RawQuery } from './core/RawQuery';
 import { RawValue } from './core/RawValue';
 
 export type QuerySegment = RawValue | RawQuery | PreparedValue;
+export type QueryParameter = QuerySegment | string | number | null;
 
-export type QuerySegmentOrPrimitive = QuerySegment | string | number;
+export type RawQueryParameter = QueryParameter | undefined;

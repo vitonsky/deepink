@@ -254,4 +254,36 @@ describe('Query builder', () => {
 			bindings: ['fake-uuid'],
 		});
 	});
+
+	test('Empty blocks yields nothing', () => {
+		expect(
+			qb
+				.line(
+					qb.raw('SELECT * FROM notes'),
+					qb.where(undefined),
+					qb.limit(20),
+					qb.offset(10),
+				)
+				.toSQL(),
+		).toEqual({
+			sql: 'SELECT * FROM notes LIMIT 20 OFFSET 10',
+			bindings: [],
+		});
+
+		expect(
+			qb
+				.line(
+					qb.raw(undefined, null),
+					qb.condition(undefined),
+					qb.group(undefined),
+					qb.where(undefined),
+					qb.limit(undefined),
+					qb.offset(undefined),
+				)
+				.toSQL(),
+		).toEqual({
+			sql: '',
+			bindings: [],
+		});
+	});
 });

@@ -1,17 +1,13 @@
 import { PreparedValue } from './PreparedValue';
 import { RawValue } from './RawValue';
-import { QuerySegment, QuerySegmentOrPrimitive } from '..';
+import { QueryParameter, QuerySegment, RawQueryParameter } from '..';
 
-// export type CompilerOptions = {
-// 	getPlaceholder?: () => string;
-// }
-/**
- * Trivial query builder that return SQL and bindings
- */
+export const filterOutEmptySegments = (segments: RawQueryParameter[]) =>
+	segments.filter((segment) => segment !== undefined) as QueryParameter[];
 
 export class RawQuery {
 	protected readonly query: QuerySegment[] = [];
-	constructor(...query: QuerySegmentOrPrimitive[]) {
+	constructor(...query: RawQueryParameter[]) {
 		if (query) {
 			this.push(...query);
 		}
@@ -37,7 +33,7 @@ export class RawQuery {
 	 */
 	public toSQL() {
 		let sql = '';
-		const bindings: Array<string | number> = [];
+		const bindings: Array<string | number | null> = [];
 		for (const segment of this.exportQuery()) {
 			if (segment instanceof RawQuery) {
 				const data = segment.toSQL();
@@ -58,16 +54,16 @@ export class RawQuery {
 		return { sql, bindings };
 	}
 
-	protected push(...queries: QuerySegmentOrPrimitive[]) {
+	protected push(...queries: RawQueryParameter[]) {
 		this.query.push(
-			...queries.map((segment) => {
+			...filterOutEmptySegments(queries).map((segment) => {
 				switch (typeof segment) {
 					case 'string':
 					case 'number':
 						return new RawValue(segment);
 
 					default:
-						return segment;
+						return segment === null ? new RawValue(null) : segment;
 				}
 			}),
 		);

@@ -1,8 +1,5 @@
-import { RawQuery } from './core/RawQuery';
-import { QuerySegment, QuerySegmentOrPrimitive } from '.';
-
-const filterOutEmptySegments = (segments: (QuerySegmentOrPrimitive | undefined)[]) =>
-	segments.filter((segment) => segment !== undefined) as QuerySegmentOrPrimitive[];
+import { filterOutEmptySegments, RawQuery } from './core/RawQuery';
+import { QuerySegment, RawQueryParameter } from '.';
 
 export class ConditionClause extends RawQuery {
 	protected readonly clauses: Array<{
@@ -13,7 +10,7 @@ export class ConditionClause extends RawQuery {
 		super();
 	}
 
-	public and(...query: (QuerySegmentOrPrimitive | undefined)[]) {
+	public and(...query: RawQueryParameter[]) {
 		const filteredQuery = filterOutEmptySegments(query);
 		if (filteredQuery.length > 0) {
 			this.clauses.push({
@@ -25,7 +22,7 @@ export class ConditionClause extends RawQuery {
 		return this;
 	}
 
-	public or(...query: (QuerySegmentOrPrimitive | undefined)[]) {
+	public or(...query: RawQueryParameter[]) {
 		const filteredQuery = filterOutEmptySegments(query);
 		if (filteredQuery.length > 0) {
 			this.clauses.push({

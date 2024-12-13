@@ -1,6 +1,6 @@
 export class RawValue {
 	protected readonly value;
-	constructor(value: string | number) {
+	constructor(value: string | number | null) {
 		this.value = value;
 	}
 

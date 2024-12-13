@@ -1,7 +1,22 @@
 import { PreparedValue } from '../core/PreparedValue';
 import { RawQuery } from '../core/RawQuery';
 import { RawValue } from '../core/RawValue';
-import { QuerySegment, QuerySegmentOrPrimitive } from '..';
+import { QuerySegment, RawQueryParameter } from '..';
+
+export const isEmptySegment = (segment: QuerySegment): boolean => {
+	if (segment instanceof PreparedValue) return false;
+
+	if (segment instanceof RawValue) {
+		const value = segment.getValue();
+		return value === '' || value === null;
+	}
+
+	if (segment instanceof RawQuery) {
+		return segment.size() === 0;
+	}
+
+	return false;
+};
 
 export type QueryConstructorOptions = {
 	join?: string | null;
@@ -15,11 +30,11 @@ export class QueryConstructor extends RawQuery {
 		this.options = { join };
 	}
 
-	public value = (value: string | number) => {
+	public value = (value: string | number | null) => {
 		return this.raw(new PreparedValue(value));
 	};
 
-	public raw(...queries: QuerySegmentOrPrimitive[]) {
+	public raw(...queries: RawQueryParameter[]) {
 		this.push(...queries);
 		return this;
 	}
@@ -28,9 +43,11 @@ export class QueryConstructor extends RawQuery {
 		const { join } = this.options;
 
 		const preparedQuery: QuerySegment[] = [];
-		this.query.forEach((segment, index) => {
+		this.query.forEach((segment) => {
+			if (isEmptySegment(segment)) return;
+
 			// Add divider between segments
-			if (index > 0 && join !== null) {
+			if (preparedQuery.length > 0 && join !== null) {
 				preparedQuery.push(new RawValue(join));
 			}
 

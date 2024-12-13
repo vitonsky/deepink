@@ -1,8 +1,8 @@
 import { RawQuery } from './core/RawQuery';
-import { QuerySegmentOrPrimitive } from '.';
+import { RawQueryParameter } from '.';
 
 export class SetExpression extends RawQuery {
-	constructor(...query: QuerySegmentOrPrimitive[]) {
+	constructor(...query: RawQueryParameter[]) {
 		super();
 
 		if (query.length > 0) {
