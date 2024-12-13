@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { v4 as uuid4 } from 'uuid';
+import { wrapDB } from '@utils/db/wrapDB';
 import { qb } from '@utils/SQLBuilder/utils/builder';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
@@ -34,18 +35,27 @@ export class NotesController implements INotesController {
 	}
 
 	public async getById(id: NoteId): Promise<INote | null> {
-		const db = this.db.get();
-		const note = db
-			.prepare('SELECT * FROM notes WHERE workspace_id=? AND id=?')
-			.get(this.workspace, id);
+		const db = wrapDB(this.db.get());
+
+		const note = db.get(
+			qb
+				.select('*')
+				.from('notes')
+				.where(qb.raw('workspace_id=').value(this.workspace))
+				.where(qb.raw('id=').value(id)),
+		);
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
 	public async getLength(): Promise<number> {
-		const db = this.db.get();
-		const { length } = db
-			.prepare('SELECT COUNT(id) as length FROM notes WHERE workspace_id=?')
-			.get(this.workspace) as {
+		const db = wrapDB(this.db.get());
+
+		const { length } = db.get(
+			qb
+				.select('COUNT(id) as length')
+				.from('notes')
+				.where(qb.raw('workspace_id=').value(this.workspace)),
+		) as {
 			length?: number;
 		};
 		return length ?? 0;
@@ -58,66 +68,71 @@ export class NotesController implements INotesController {
 	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		const notes: INote[] = [];
 
-		const query = qb
-			.select('*')
-			.where(qb.raw('workspace_id=').value(this.workspace))
-			.where(
-				tags.length > 0
-					? qb.raw(
-							'id IN',
-							qb.group(
-								qb
-									.select('target')
-									.from('attachedTags')
-									.where(qb.raw('source IN', qb.values(tags))),
-							),
-					  )
-					: undefined,
-			)
-			.limit(limit)
-			.offset((page - 1) * limit);
+		db.all(
+			qb
+				.select('*')
+				.from('notes')
+				.where(qb.raw('workspace_id=').value(this.workspace))
+				.where(
+					tags.length > 0
+						? qb.raw(
+								'id IN',
+								qb.group(
+									qb
+										.select('target')
+										.from('attachedTags')
+										.where(qb.raw('source IN', qb.values(tags))),
+								),
+						  )
+						: undefined,
+				)
+				.limit(limit)
+				.offset((page - 1) * limit),
+		).map((row) => {
+			// TODO: validate data for first note
 
-		const { sql, bindings } = query.toSQL();
-
-		db.prepare(sql)
-			.all(bindings)
-			.map((row) => {
-				// TODO: validate data for first note
-
-				notes.push(mappers.rowToNoteObject(row));
-			});
+			notes.push(mappers.rowToNoteObject(row));
+		});
 
 		return notes;
 	}
 
 	public async add(note: INoteContent): Promise<NoteId> {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		const creationTime = new Date().getTime();
 
 		// Insert data
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
-		const insertResult = db
-			.prepare(
-				'INSERT INTO notes ("id","workspace_id","title","text","creationTime","lastUpdateTime") VALUES (@id,@workspace,@title,@text,@created,@updated)',
-			)
-			.run({
-				id: uuid4(),
-				workspace: this.workspace,
-				title: note.title,
-				text: note.text,
-				created: creationTime,
-				updated: creationTime,
-			});
+
+		const insertResult = db.run(
+			qb.line(
+				'INSERT INTO notes ("id","workspace_id","title","text","creationTime","lastUpdateTime") VALUES',
+				qb
+					.values([
+						uuid4(),
+						this.workspace,
+						note.title,
+						note.text,
+						creationTime,
+						creationTime,
+					])
+					.withParenthesis(),
+			),
+		);
 
 		// Get generated id
-		const selectWithId = (await db
-			.prepare('SELECT `id` FROM notes WHERE workspace_id=? AND rowid=?')
-			.get(this.workspace, insertResult.lastInsertRowid)) as { id: string };
+		const selectWithId = db.get(
+			qb
+				.select('id')
+				.from('notes')
+				.where(qb.raw('workspace_id=').value(this.workspace))
+				.where(qb.raw('rowid=').value(Number(insertResult.lastInsertRowid))),
+		) as { id: string };
 
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
@@ -127,20 +142,22 @@ export class NotesController implements INotesController {
 	}
 
 	public async update(id: string, updatedNote: INoteContent) {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		const updateTime = new Date().getTime();
-		const result = db
-			.prepare(
-				'UPDATE notes SET "title"=@title, "text"=@text, "lastUpdateTime"=@updateTime WHERE "workspace_id"=@workspace AND "id"=@id',
-			)
-			.run({
-				title: updatedNote.title,
-				text: updatedNote.text,
-				updateTime: updateTime,
-				id: id,
-				workspace: this.workspace,
-			});
+		const result = db.run(
+			qb.line(
+				'UPDATE notes SET',
+				qb.set([
+					qb.raw('title=').value(updatedNote.title),
+					qb.raw('text=').value(updatedNote.text),
+					qb.raw('lastUpdateTime=').value(updateTime),
+				]),
+				qb
+					.where(qb.raw('id=').value(id))
+					.and(qb.raw('workspace_id=').value(this.workspace)),
+			),
+		);
 
 		if (!result.changes || result.changes < 1) {
 			throw new Error('Note did not updated');
@@ -148,12 +165,16 @@ export class NotesController implements INotesController {
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
-		const placeholders = Array(ids.length).fill('?').join(',');
-		const result = db
-			.prepare(`DELETE FROM notes WHERE workspace_id=? AND id IN (${placeholders})`)
-			.run(this.workspace, ...ids);
+		const result = db.run(
+			qb.line(
+				'DELETE FROM notes',
+				qb
+					.where(qb.raw('workspace_id=').value(this.workspace))
+					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
+			),
+		);
 
 		if (result.changes !== ids.length) {
 			console.warn(
