@@ -63,10 +63,7 @@ export class NotesController implements INotesController {
 		const notes: INote[] = [];
 
 		const query = qb
-			.select({
-				select: ['*'],
-				from: ['notes'],
-			})
+			.select('*')
 			.where(qb.raw('workspace_id=').value(this.workspace))
 			.where(
 				tags.length > 0
@@ -74,7 +71,6 @@ export class NotesController implements INotesController {
 							'id IN',
 							qb.group(
 								qb
-									.select()
 									.select('target')
 									.from('attachedTags')
 									.where(qb.raw('source IN', qb.values(tags))),
