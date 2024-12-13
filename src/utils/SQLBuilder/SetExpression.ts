@@ -1,20 +1,17 @@
 import { RawQuery } from './core/RawQuery';
-import { RawQueryParameter } from '.';
+import { QueryConstructor } from './utils/QueryConstructor';
+import { QuerySegment } from '.';
 
 export class SetExpression extends RawQuery {
-	constructor(...query: RawQueryParameter[]) {
-		super();
+	public exportQuery(): QuerySegment[] {
+		const query = new QueryConstructor();
 
-		if (query.length > 0) {
-			this.push('(');
-			query.forEach((item, index) => {
-				if (index > 0) {
-					this.push(',');
-				}
+		query.raw('(');
+		super.exportQuery().forEach((item, index) => {
+			query.raw(index > 0 ? ',' : undefined, item);
+		});
+		query.raw(')');
 
-				this.push(item);
-			});
-			this.push(')');
-		}
+		return query.exportQuery();
 	}
 }
