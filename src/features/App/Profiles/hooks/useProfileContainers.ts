@@ -6,6 +6,7 @@ import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { FileController } from '@core/features/files/FileController';
 import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
+import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import {
 	openDatabase,
 	SQLiteDatabase,
@@ -89,6 +90,18 @@ export const useProfileContainers = () => {
 					encryptionController,
 				),
 			);
+
+			// Ensure at least one workspace exists
+			const workspaces = new WorkspacesController(db);
+			const isWorkspacesExists = await workspaces.getList().then((workspaces) => {
+				return workspaces.length > 0;
+			});
+			if (!isWorkspacesExists) {
+				await Promise.all([
+					workspaces.create({ name: 'Notes' }),
+					workspaces.create({ name: 'Personal' }),
+				]);
+			}
 
 			// TODO: close DB first and close encryption last
 			cleanups.push(() => db.close());

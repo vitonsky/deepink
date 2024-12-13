@@ -1,6 +1,11 @@
-import React, { createContext, FC, useEffect } from 'react';
+import React, { createContext, FC, useEffect, useMemo } from 'react';
+import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	selectActiveWorkspace,
+	selectWorkspaces,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -25,34 +30,48 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const dispatch = useAppDispatch();
 
 	const profileId = currentProfile.profile.id;
+	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
 
 	const workspaces = useAppSelector(selectWorkspaces({ profileId }));
 
+	const workspacesManager = useMemo(
+		() => new WorkspacesController(currentProfile.db),
+		[currentProfile.db],
+	);
 	useEffect(() => {
-		dispatch(
-			workspacesApi.addProfile({
-				profileId,
-				profile: {
-					activeWorkspace: 'default',
-					workspaces: {
-						default: {
-							id: 'default',
-							name: 'Default workspace',
+		workspacesManager.getList().then((workspaces) => {
+			const [defaultWorkspace] = workspaces;
 
-							activeNote: null,
-							openedNotes: [],
-							notes: [],
+			if (!defaultWorkspace) return;
 
-							tags: {
-								selected: null,
-								list: [],
-							},
-						},
+			dispatch(
+				workspacesApi.addProfile({
+					profileId,
+					profile: {
+						activeWorkspace: defaultWorkspace.id,
+						workspaces: Object.fromEntries(
+							workspaces.map((workspace) => [
+								workspace.id,
+								{
+									id: workspace.id,
+									name: workspace.name,
+
+									activeNote: null,
+									openedNotes: [],
+									notes: [],
+
+									tags: {
+										selected: null,
+										list: [],
+									},
+								},
+							]),
+						),
 					},
-				},
-			}),
-		);
-		dispatch(workspacesApi.setActiveProfile(profileId));
+				}),
+			);
+			dispatch(workspacesApi.setActiveProfile(profileId));
+		});
 
 		return () => {
 			dispatch(
@@ -61,21 +80,22 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				}),
 			);
 		};
-	}, [dispatch, profileId]);
+	}, [dispatch, profileId, workspacesManager]);
 
 	useProfileSyncButton();
 
-	// TODO: support multiple opened workspaces
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{workspaces.map((workspace) => (
-				<WorkspaceContext.Provider
-					key={workspace.id}
-					value={{ profileId: profileId, workspaceId: workspace.id }}
-				>
-					<Workspace profile={currentProfile} />
-				</WorkspaceContext.Provider>
-			))}
+			{workspaces.map((workspace) =>
+				activeWorkspace && activeWorkspace.id === workspace.id ? (
+					<WorkspaceContext.Provider
+						key={workspace.id}
+						value={{ profileId: profileId, workspaceId: workspace.id }}
+					>
+						<Workspace profile={currentProfile} />
+					</WorkspaceContext.Provider>
+				) : undefined,
+			)}
 			<ProfileStatusBar />
 		</ProfileControlsContext.Provider>
 	);

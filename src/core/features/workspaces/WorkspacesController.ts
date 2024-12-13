@@ -1,6 +1,12 @@
 import { v4 as uuid4 } from 'uuid';
+import { z } from 'zod';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+
+const workspaceType = z.object({
+	id: z.string(),
+	name: z.string(),
+});
 
 // TODO: add zod validator
 export class WorkspacesController {
@@ -24,16 +30,19 @@ export class WorkspacesController {
 	public async get(id: string) {
 		const db = this.db.get();
 
-		return (
-			db.prepare('SELECT * FROM workspaces WHERE id=? ORDER BY rowid').get(id) ??
-			null
-		);
+		return workspaceType
+			.or(z.null())
+			.parse(
+				db
+					.prepare('SELECT * FROM workspaces WHERE id=? ORDER BY rowid')
+					.get(id) ?? null,
+			);
 	}
 
 	public async getList() {
 		const db = this.db.get();
 
-		return db.prepare('SELECT * FROM workspaces').all();
+		return workspaceType.array().parse(db.prepare('SELECT * FROM workspaces').all());
 	}
 
 	public async delete(ids: string[]) {
