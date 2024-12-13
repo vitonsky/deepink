@@ -8,7 +8,7 @@ import { WhereClause } from './WhereClause';
 
 describe('Primitives', () => {
 	test('Query constructor able to add queries one by one', () => {
-		const query = new QueryConstructor();
+		const query = new QueryConstructor({ join: null });
 		query.add('SELECT * FROM foo WHERE foo=', query.value(1));
 		query.add(' LIMIT 2');
 
@@ -19,9 +19,9 @@ describe('Primitives', () => {
 	});
 
 	test('Query constructors may be nested', () => {
-		const query1 = new QueryConstructor();
+		const query1 = new QueryConstructor({ join: null });
 
-		const query2 = new QueryConstructor();
+		const query2 = new QueryConstructor({ join: null });
 		query2.add('(SELECT id FROM bar WHERE x > ', query2.value(100), ')');
 		query1.add('SELECT * FROM foo WHERE foo IN ', query2);
 
@@ -32,9 +32,9 @@ describe('Primitives', () => {
 	});
 
 	test('Query constructors may be nested with no introduce a variables', () => {
-		const query = new QueryConstructor(
+		const query = new QueryConstructor({ join: null }).add(
 			'SELECT * FROM foo WHERE foo IN ',
-			new QueryConstructor(
+			new QueryConstructor({ join: null }).add(
 				'(SELECT id FROM bar WHERE x > ',
 				new PreparedValue(100),
 				')',
@@ -149,7 +149,7 @@ describe('Basic clauses', () => {
 		});
 
 		test('Complex condition expression consider a grouping', () => {
-			const query = new QueryConstructor(
+			const query = new QueryConstructor({ join: null }).add(
 				'SELECT * FROM foo WHERE ',
 				new ConditionClause()
 					.and('x > ', new PreparedValue(0))
@@ -172,7 +172,10 @@ describe('Basic clauses', () => {
 	describe('Where clause', () => {
 		test('Where clause may be filled after join', () => {
 			const where = new WhereClause();
-			const query = new QueryConstructor('SELECT * FROM foo ', where);
+			const query = new QueryConstructor({ join: null }).add(
+				'SELECT * FROM foo ',
+				where,
+			);
 
 			// Fill where after build a query object
 			where
