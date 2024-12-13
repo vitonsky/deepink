@@ -1,4 +1,5 @@
 import { filterOutEmptySegments, RawQuery } from './core/RawQuery';
+import { QueryConstructor } from './utils/QueryConstructor';
 import { QuerySegment, RawQueryParameter } from '.';
 
 export class ConditionClause extends RawQuery {
@@ -34,19 +35,16 @@ export class ConditionClause extends RawQuery {
 		return this;
 	}
 
-	public toSQL() {
+	public exportQuery(): QuerySegment[] {
+		const query = new QueryConstructor({ join: ' ' });
+
 		if (this.clauses.length > 0) {
 			this.clauses.forEach((clause, index) => {
-				if (index === 0) {
-					this.push(clause.clause);
-					return;
-				}
-
-				this.push(` ${clause.join} `, clause.clause);
+				query.raw(index > 0 ? clause.join : undefined, clause.clause);
 			});
 		}
 
-		return super.toSQL();
+		return query.exportQuery();
 	}
 
 	public size() {
