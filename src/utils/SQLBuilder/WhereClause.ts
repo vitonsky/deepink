@@ -1,6 +1,7 @@
 import { ConditionClause } from './ConditionClause';
 import { RawQuery } from './core/RawQuery';
-import { RawQueryParameter } from '.';
+import { QueryConstructor } from './utils/QueryConstructor';
+import { QuerySegment, RawQueryParameter } from '.';
 
 export class WhereClause extends RawQuery {
 	protected readonly condition = new ConditionClause();
@@ -24,11 +25,11 @@ export class WhereClause extends RawQuery {
 		return this;
 	}
 
-	public toSQL() {
-		if (this.condition.size() > 0) {
-			this.push('WHERE ', this.condition);
-		}
+	public exportQuery(): QuerySegment[] {
+		if (this.condition.size() === 0) return [];
 
-		return super.toSQL();
+		return new QueryConstructor({ join: ' ' })
+			.raw('WHERE', this.condition)
+			.exportQuery();
 	}
 }
