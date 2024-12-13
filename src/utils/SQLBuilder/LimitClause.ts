@@ -1,20 +1,27 @@
-import { PreparedValue } from './core/PreparedValue';
 import { RawQuery } from './core/RawQuery';
+import { QueryConstructor } from './utils/QueryConstructor';
+import { QuerySegment } from '.';
 
 export class LimitClause extends RawQuery {
-	constructor({ limit, offset }: { limit?: number; offset?: number }) {
+	private readonly state;
+	constructor(state: { limit?: number; offset?: number }) {
 		super();
+		this.state = state;
+	}
+
+	public exportQuery(): QuerySegment[] {
+		const { limit, offset } = this.state;
+
+		const query = new QueryConstructor({ join: ' ' });
 
 		if (limit) {
-			this.push(`LIMIT `, new PreparedValue(limit));
+			query.raw('LIMIT').value(limit);
 		}
 
 		if (offset) {
-			if (limit) {
-				this.push(' ');
-			}
-
-			this.push(`OFFSET `, new PreparedValue(offset));
+			query.raw('OFFSET').value(offset);
 		}
+
+		return query.exportQuery();
 	}
 }

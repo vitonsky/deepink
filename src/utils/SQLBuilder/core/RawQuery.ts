@@ -17,7 +17,7 @@ export class RawQuery {
 	 * Returns query segments number
 	 */
 	public size() {
-		return this.query.length;
+		return this.exportQuery().length;
 	}
 
 	/**
