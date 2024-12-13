@@ -1,6 +1,6 @@
 import { PreparedValue } from './PreparedValue';
 import { RawValue } from './RawValue';
-import { QuerySegment } from '..';
+import { QuerySegment, QuerySegmentOrPrimitive } from '..';
 
 // export type CompilerOptions = {
 // 	getPlaceholder?: () => string;
@@ -11,7 +11,7 @@ import { QuerySegment } from '..';
 
 export class RawQuery {
 	protected readonly query: QuerySegment[] = [];
-	constructor(...query: (QuerySegment | string)[]) {
+	constructor(...query: QuerySegmentOrPrimitive[]) {
 		if (query) {
 			this.push(...query);
 		}
@@ -58,11 +58,18 @@ export class RawQuery {
 		return { sql, bindings };
 	}
 
-	protected push(...queries: (QuerySegment | string)[]) {
+	protected push(...queries: QuerySegmentOrPrimitive[]) {
 		this.query.push(
-			...queries.map((segment) =>
-				typeof segment === 'string' ? new RawValue(segment) : segment,
-			),
+			...queries.map((segment) => {
+				switch (typeof segment) {
+					case 'string':
+					case 'number':
+						return new RawValue(segment);
+
+					default:
+						return segment;
+				}
+			}),
 		);
 	}
 }

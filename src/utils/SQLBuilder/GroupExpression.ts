@@ -1,8 +1,8 @@
 import { RawQuery } from './core/RawQuery';
-import { QuerySegment } from '.';
+import { QuerySegmentOrPrimitive } from '.';
 
 export class GroupExpression extends RawQuery {
-	constructor(...query: (QuerySegment | string)[]) {
+	constructor(...query: QuerySegmentOrPrimitive[]) {
 		if (query.length === 0) {
 			super();
 		} else {

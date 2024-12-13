@@ -1,7 +1,7 @@
 import { PreparedValue } from '../core/PreparedValue';
 import { RawQuery } from '../core/RawQuery';
 import { RawValue } from '../core/RawValue';
-import { QuerySegment } from '..';
+import { QuerySegment, QuerySegmentOrPrimitive } from '..';
 
 export type QueryConstructorOptions = {
 	join?: string | null;
@@ -19,7 +19,7 @@ export class QueryConstructor extends RawQuery {
 		return this.raw(new PreparedValue(value));
 	};
 
-	public raw(...queries: (QuerySegment | string)[]) {
+	public raw(...queries: QuerySegmentOrPrimitive[]) {
 		this.push(...queries);
 		return this;
 	}

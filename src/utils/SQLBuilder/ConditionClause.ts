@@ -1,5 +1,5 @@
 import { RawQuery } from './core/RawQuery';
-import { QuerySegment } from '.';
+import { QuerySegment, QuerySegmentOrPrimitive } from '.';
 
 export class ConditionClause extends RawQuery {
 	protected readonly clauses: Array<{
@@ -10,7 +10,7 @@ export class ConditionClause extends RawQuery {
 		super();
 	}
 
-	public and(...query: (QuerySegment | string)[]) {
+	public and(...query: QuerySegmentOrPrimitive[]) {
 		this.clauses.push({
 			join: 'AND',
 			clause: new RawQuery(...query),
@@ -19,7 +19,7 @@ export class ConditionClause extends RawQuery {
 		return this;
 	}
 
-	public or(...query: (QuerySegment | string)[]) {
+	public or(...query: QuerySegmentOrPrimitive[]) {
 		this.clauses.push({
 			join: 'OR',
 			clause: new RawQuery(...query),
