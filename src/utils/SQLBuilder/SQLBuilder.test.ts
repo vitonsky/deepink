@@ -81,15 +81,25 @@ describe('Basic clauses', () => {
 	describe('Set expression', () => {
 		test('Set with literals', () => {
 			expect(new SetExpression('foo', 'bar', 'baz').toSQL()).toEqual({
-				sql: '(foo,bar,baz)',
+				sql: 'foo,bar,baz',
 				bindings: [],
 			});
 		});
+
 		test('Nested sets', () => {
 			expect(
 				new SetExpression('foo', new SetExpression('bar', 'baz')).toSQL(),
 			).toEqual({
-				sql: '(foo,(bar,baz))',
+				sql: 'foo,(bar,baz)',
+				bindings: [],
+			});
+		});
+
+		test('Set with parenthesis', () => {
+			expect(
+				new SetExpression('foo', 'bar', 'baz').withParenthesis().toSQL(),
+			).toEqual({
+				sql: '(foo,bar,baz)',
 				bindings: [],
 			});
 		});
@@ -233,7 +243,11 @@ describe('Query builder', () => {
 														qb.where(
 															qb
 																.line('source IN')
-																.raw(qb.values(sources)),
+																.raw(
+																	qb
+																		.values(sources)
+																		.withParenthesis(),
+																),
 														),
 													),
 											),
