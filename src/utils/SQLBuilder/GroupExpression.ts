@@ -1,6 +1,7 @@
 import { RawQuery } from './core/RawQuery';
+import { IQuery } from './types';
 
-export class GroupExpression extends RawQuery {
+export class GroupExpression extends RawQuery implements IQuery {
 	public exportQuery() {
 		const segments = super.exportQuery();
 

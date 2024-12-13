@@ -1,11 +1,11 @@
+import { IQuery, QueryParameter, QuerySegment, RawQueryParameter } from '../types';
 import { PreparedValue } from './PreparedValue';
 import { RawValue } from './RawValue';
-import { QueryParameter, QuerySegment, RawQueryParameter } from '..';
 
 export const filterOutEmptySegments = (segments: RawQueryParameter[]) =>
 	segments.filter((segment) => segment !== undefined) as QueryParameter[];
 
-export class RawQuery {
+export class RawQuery implements IQuery {
 	protected readonly query: QuerySegment[] = [];
 	constructor(...query: RawQueryParameter[]) {
 		if (query) {

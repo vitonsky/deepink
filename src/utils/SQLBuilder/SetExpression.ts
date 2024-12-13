@@ -1,8 +1,8 @@
 import { RawQuery } from './core/RawQuery';
+import { IQuery, QuerySegment } from './types';
 import { QueryConstructor } from './utils/QueryConstructor';
-import { QuerySegment } from '.';
 
-export class SetExpression extends RawQuery {
+export class SetExpression extends RawQuery implements IQuery {
 	public exportQuery(): QuerySegment[] {
 		const query = new QueryConstructor();
 

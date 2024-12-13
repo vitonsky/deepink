@@ -1,9 +1,9 @@
 import { ConditionClause } from './ConditionClause';
 import { RawQuery } from './core/RawQuery';
+import { IQuery, QuerySegment, RawQueryParameter } from './types';
 import { QueryConstructor } from './utils/QueryConstructor';
-import { QuerySegment, RawQueryParameter } from '.';
 
-export class WhereClause extends RawQuery {
+export class WhereClause extends RawQuery implements IQuery {
 	protected readonly condition = new ConditionClause();
 	constructor() {
 		super();

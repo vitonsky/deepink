@@ -1,8 +1,8 @@
 import { filterOutEmptySegments, RawQuery } from './core/RawQuery';
+import { IQuery, QuerySegment, RawQueryParameter } from './types';
 import { QueryConstructor } from './utils/QueryConstructor';
-import { QuerySegment, RawQueryParameter } from '.';
 
-export class ConditionClause extends RawQuery {
+export class ConditionClause extends RawQuery implements IQuery {
 	protected readonly clauses: Array<{
 		clause: QuerySegment;
 		join: 'AND' | 'OR';

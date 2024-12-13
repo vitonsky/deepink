@@ -1,8 +1,8 @@
 import { RawQuery } from './core/RawQuery';
+import { IQuery, QuerySegment } from './types';
 import { QueryConstructor } from './utils/QueryConstructor';
-import { QuerySegment } from '.';
 
-export class LimitClause extends RawQuery {
+export class LimitClause extends RawQuery implements IQuery {
 	private readonly state;
 	constructor(state: { limit?: number; offset?: number }) {
 		super();
