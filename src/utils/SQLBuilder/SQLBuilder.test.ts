@@ -236,6 +236,20 @@ describe('Statements', () => {
 			});
 		});
 
+		test('Parameters in constructor', () => {
+			expect(
+				new SelectStatement({
+					select: ['x', 'y'],
+					from: ['foo f', 'LEFT JOIN bar b'],
+				})
+					.select('z')
+					.toSQL(),
+			).toEqual({
+				sql: 'SELECT x,y,z FROM foo f LEFT JOIN bar b',
+				bindings: [],
+			});
+		});
+
 		test('Aliases in select', () => {
 			expect(
 				new SelectStatement()
