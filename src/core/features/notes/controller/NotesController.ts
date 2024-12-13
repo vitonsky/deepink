@@ -1,4 +1,11 @@
+/* eslint-disable camelcase */
 import { v4 as uuid4 } from 'uuid';
+import { PreparedValue } from '@utils/SQLBuilder/core/PreparedValue';
+import { GroupExpression } from '@utils/SQLBuilder/GroupExpression';
+import { LimitClause } from '@utils/SQLBuilder/LimitClause';
+import { SetExpression } from '@utils/SQLBuilder/SetExpression';
+import { QueryConstructor } from '@utils/SQLBuilder/utils/QueryConstructor';
+import { WhereClause } from '@utils/SQLBuilder/WhereClause';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -60,24 +67,27 @@ export class NotesController implements INotesController {
 
 		const notes: INote[] = [];
 
-		const fetchQuery = ['SELECT * FROM notes'];
-		const fetchParams: (number | string)[] = [];
+		const where = new WhereClause();
+		const query = new QueryConstructor({ join: ' ' })
+			.raw('SELECT * FROM notes')
+			.raw(where)
+			.raw(new LimitClause({ limit, offset: (page - 1) * limit }));
 
+		where.and('workspace_id=', new PreparedValue(this.workspace));
 		if (tags.length > 0) {
-			const placeholders = Array(tags.length).fill('?').join(',');
-
-			fetchQuery.push(
-				`WHERE workspace_id=? AND id IN (SELECT target FROM attachedTags WHERE source IN (${placeholders}))`,
+			where.and(
+				'id IN',
+				new GroupExpression(
+					'SELECT target FROM attachedTags ',
+					new WhereClause().and('source IN ', new SetExpression(...tags)),
+				),
 			);
-			fetchParams.push(this.workspace, ...tags);
 		}
 
-		const offset = (page - 1) * limit;
-		fetchQuery.push(`LIMIT ? OFFSET ?`);
-		fetchParams.push(limit, offset);
+		const { sql, bindings } = query.toSQL();
 
-		db.prepare(fetchQuery.join(' '))
-			.all(fetchParams)
+		db.prepare(sql)
+			.all(bindings)
 			.map((row) => {
 				// TODO: validate data for first note
 

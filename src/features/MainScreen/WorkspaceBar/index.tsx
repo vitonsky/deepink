@@ -3,17 +3,19 @@ import { FaGear } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
 import { Button, HStack, Select } from '@chakra-ui/react';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
-import { useAppSelector } from '@state/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspaces } from '@state/redux/profiles/profiles';
+import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
 
 export const WorkspaceBar = () => {
+	const dispatch = useAppDispatch();
+
 	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
 	const editWorkspace = useCallback(() => {
 		setIsWorkspaceEditing(true);
 	}, []);
 
-	const { profileId } = useWorkspaceData();
+	const { profileId, workspaceId } = useWorkspaceData();
 
 	const selectWorkspacesWithMemo = useMemo(
 		() =>
@@ -33,8 +35,16 @@ export const WorkspaceBar = () => {
 				<Select
 					size="sm"
 					variant="secondary"
-					defaultValue="default"
 					borderRadius="6px"
+					value={workspaceId}
+					onChange={(evt) => {
+						dispatch(
+							workspacesApi.setActiveWorkspace({
+								profileId,
+								workspaceId: evt.target.value,
+							}),
+						);
+					}}
 				>
 					{workspaces.map((workspace) => (
 						<option key={workspace.id} value={workspace.id}>

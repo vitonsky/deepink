@@ -1,11 +1,7 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import {
-	selectActiveWorkspace,
-	selectWorkspaces,
-	workspacesApi,
-} from '@state/redux/profiles/profiles';
+import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -30,7 +26,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const dispatch = useAppDispatch();
 
 	const profileId = currentProfile.profile.id;
-	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
 
 	const workspaces = useAppSelector(selectWorkspaces({ profileId }));
 
@@ -86,16 +81,14 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{workspaces.map((workspace) =>
-				activeWorkspace && activeWorkspace.id === workspace.id ? (
-					<WorkspaceContext.Provider
-						key={workspace.id}
-						value={{ profileId: profileId, workspaceId: workspace.id }}
-					>
-						<Workspace profile={currentProfile} />
-					</WorkspaceContext.Provider>
-				) : undefined,
-			)}
+			{workspaces.map((workspace) => (
+				<WorkspaceContext.Provider
+					key={workspace.id}
+					value={{ profileId: profileId, workspaceId: workspace.id }}
+				>
+					<Workspace profile={currentProfile} />
+				</WorkspaceContext.Provider>
+			))}
 			<ProfileStatusBar />
 		</ProfileControlsContext.Provider>
 	);
