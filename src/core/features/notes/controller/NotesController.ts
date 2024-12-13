@@ -91,13 +91,18 @@ export class NotesController implements INotesController {
 				)
 				.where(
 					tags.length > 0
-						? qb.raw(
+						? qb.line(
 								'id IN',
 								qb.group(
 									qb
 										.select('target')
 										.from('attachedTags')
-										.where(qb.raw('source IN', qb.values(tags))),
+										.where(
+											qb.line(
+												'source IN',
+												qb.values(tags).withParenthesis(),
+											),
+										),
 								),
 						  )
 						: undefined,
