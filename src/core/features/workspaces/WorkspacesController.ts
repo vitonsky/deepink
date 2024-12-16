@@ -1,5 +1,6 @@
 import { v4 as uuid4 } from 'uuid';
 import { z } from 'zod';
+import { qb } from '@utils/SQLBuilder/utils/builder';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -37,6 +38,23 @@ export class WorkspacesController {
 					.prepare('SELECT * FROM workspaces WHERE id=? ORDER BY rowid')
 					.get(id) ?? null,
 			);
+	}
+
+	public async update(id: string, options: { name?: string }) {
+		const db = this.db.get();
+
+		if (Object.values(options).length === 0) return;
+
+		const { sql, bindings } = qb
+			.line(
+				'UPDATE workspaces SET',
+				qb.values(options),
+				qb.where(qb.values({ id })),
+			)
+			.toSQL();
+		db.prepare(sql).run(bindings);
+
+		return id;
 	}
 
 	public async getList() {

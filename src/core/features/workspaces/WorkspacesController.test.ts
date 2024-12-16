@@ -42,3 +42,24 @@ test('basic usage', async () => {
 
 	await db.close();
 });
+
+test('update workspace', async () => {
+	const dbFile = createFileControllerMock();
+	const db = await openDatabase(dbFile);
+
+	const workspaces = new WorkspacesController(db);
+
+	const id = await workspaces.create({ name: 'Workspace name' });
+	expect(workspaces.get(id)).resolves.toEqual({
+		id,
+		name: 'Workspace name',
+	});
+
+	await workspaces.update(id, { name: 'Updated name' });
+	expect(workspaces.get(id)).resolves.toEqual({
+		id,
+		name: 'Updated name',
+	});
+
+	await db.close();
+});
