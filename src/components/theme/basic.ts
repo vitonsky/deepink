@@ -108,6 +108,9 @@ export const basicTheme = extendTheme({
 		overlay: {
 			500: '#00000075',
 		},
+		message: {
+			error: '#b30606',
+		},
 	},
 	components: {
 		Button: defineStyleConfig({

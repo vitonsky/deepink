@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
+import { z } from 'zod';
 import {
 	Box,
 	ModalBody,
@@ -40,7 +41,7 @@ export const WorkspaceCreatePopup = () => {
 				<Text>Add new workspace</Text>
 			</ModalHeader>
 			<ModalBody paddingBottom="1rem">
-				<VStack w="100%" gap="1rem" align="start">
+				<VStack w="100%" gap="2rem" align="start">
 					<Text color="typography.secondary">
 						Create a new workspace to manage your notes even better. Separate
 						your notes by scope.
@@ -50,14 +51,16 @@ export const WorkspaceCreatePopup = () => {
 						<PropertiesForm
 							options={[
 								{
-									// TODO: add placeholders for inputs
 									id: 'name',
 									value: '',
 									label: 'Workspace name',
+									placeholder: 'e.g., Personal',
 								},
 							]}
+							validatorScheme={z.object({
+								name: z.string().min(1, 'Name must not be empty'),
+							})}
 							onUpdate={({ name }) => {
-								// TODO: validate fields. Ensure name is not empty
 								onClose();
 
 								workspacesManager

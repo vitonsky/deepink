@@ -95,6 +95,7 @@
 					"regexrange",
 					"repo",
 					"rowid",
+					"zod",
 					"sql",
 					"sqlite",
 					"stringified",
