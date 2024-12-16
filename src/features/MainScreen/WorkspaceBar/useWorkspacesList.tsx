@@ -25,32 +25,39 @@ export const useWorkspacesList = () => {
 			(workspace) => !workspaces.some(({ id }) => id === workspace.id),
 		);
 
+		const mergedWorkspaces = structuredClone({
+			...Object.fromEntries(
+				workspaces.map((workspace) => [workspace.id, workspace]),
+			),
+			...Object.fromEntries(
+				newWorkspaces.map((workspace) => [
+					workspace.id,
+					{
+						id: workspace.id,
+						name: workspace.name,
+
+						activeNote: null,
+						openedNotes: [],
+						notes: [],
+
+						tags: {
+							selected: null,
+							list: [],
+						},
+					},
+				]),
+			),
+		});
+
+		// Update names
+		updatedWorkspaces.forEach((workspace) => {
+			mergedWorkspaces[workspace.id].name = workspace.name;
+		});
+
 		dispatch(
 			workspacesApi.setWorkspaces({
 				profileId,
-				workspaces: {
-					...Object.fromEntries(
-						workspaces.map((workspace) => [workspace.id, workspace]),
-					),
-					...Object.fromEntries(
-						newWorkspaces.map((workspace) => [
-							workspace.id,
-							{
-								id: workspace.id,
-								name: workspace.name,
-
-								activeNote: null,
-								openedNotes: [],
-								notes: [],
-
-								tags: {
-									selected: null,
-									list: [],
-								},
-							},
-						]),
-					),
-				},
+				workspaces: mergedWorkspaces,
 			}),
 		);
 	}, [dispatch, profileId, workspaces, workspacesManager]);

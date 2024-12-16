@@ -19,6 +19,10 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useWorkspacesList } from './useWorkspacesList';
 
+export const workspacePropsValidator = z.object({
+	name: z.string().min(1, 'Name must not be empty'),
+});
+
 export const WorkspaceCreatePopup = () => {
 	const dispatch = useAppDispatch();
 
@@ -57,9 +61,7 @@ export const WorkspaceCreatePopup = () => {
 									placeholder: 'e.g., Personal',
 								},
 							]}
-							validatorScheme={z.object({
-								name: z.string().min(1, 'Name must not be empty'),
-							})}
+							validatorScheme={workspacePropsValidator}
 							onUpdate={({ name }) => {
 								onClose();
 
