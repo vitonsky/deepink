@@ -15,11 +15,10 @@ import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 
 export interface WorkspaceSettingsProps {
-	isVisible?: boolean;
 	onClose?: () => void;
 }
 
-export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ isVisible, onClose }) => {
+export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const {
 		profile: { db },
 	} = useProfileControls();
@@ -39,7 +38,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ isVisible, onClo
 	const workspaces = useWorkspacesList();
 
 	return (
-		<ModalScreen isVisible={isVisible} onClose={onClose} title="Workspace settings">
+		<ModalScreen isVisible onClose={onClose} title="Workspace settings">
 			<VStack w="100%" minH="100%" p="2rem 5rem" justifyContent="center">
 				<Features>
 					<FeaturesOption title="Workspace name">

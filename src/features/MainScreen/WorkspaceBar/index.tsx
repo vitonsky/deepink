@@ -94,10 +94,9 @@ export const WorkspaceBar = () => {
 				</Button>
 			</HStack>
 
-			<WorkspaceSettings
-				isVisible={isWorkspaceEditing}
-				onClose={() => setIsWorkspaceEditing(false)}
-			/>
+			{isWorkspaceEditing && (
+				<WorkspaceSettings onClose={() => setIsWorkspaceEditing(false)} />
+			)}
 		</VStack>
 	);
 };
