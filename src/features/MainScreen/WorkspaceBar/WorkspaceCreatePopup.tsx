@@ -1,0 +1,85 @@
+import React, { useMemo } from 'react';
+import { AutoFocusInside } from 'react-focus-lock';
+import {
+	Box,
+	ModalBody,
+	ModalCloseButton,
+	ModalHeader,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
+import { useModalWindowApi } from '@components/useModalWindow';
+import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { useProfileControls } from '@features/App/Profile';
+import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { workspacesApi } from '@state/redux/profiles/profiles';
+
+import { useWorkspacesList } from './useWorkspacesList';
+
+export const WorkspaceCreatePopup = () => {
+	const dispatch = useAppDispatch();
+
+	const { onClose } = useModalWindowApi();
+
+	const { profileId } = useWorkspaceData();
+
+	const {
+		profile: { db },
+	} = useProfileControls();
+
+	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
+
+	const { update: updateWorkspaces } = useWorkspacesList();
+
+	return (
+		<>
+			<ModalCloseButton />
+			<ModalHeader>
+				<Text>Add new workspace</Text>
+			</ModalHeader>
+			<ModalBody paddingBottom="1rem">
+				<VStack w="100%" gap="1rem" align="start">
+					<Text color="typography.secondary">
+						Create a new workspace to manage your notes even better. Separate
+						your notes by scope.
+					</Text>
+
+					<Box as={AutoFocusInside} w="100%">
+						<PropertiesForm
+							options={[
+								{
+									// TODO: add placeholders for inputs
+									id: 'name',
+									value: '',
+									label: 'Workspace name',
+								},
+							]}
+							onUpdate={({ name }) => {
+								// TODO: validate fields. Ensure name is not empty
+								onClose();
+
+								workspacesManager
+									.create({ name })
+									.then(async (workspaceId) => {
+										await updateWorkspaces();
+
+										dispatch(
+											workspacesApi.setActiveWorkspace({
+												workspaceId,
+												profileId,
+											}),
+										);
+									});
+							}}
+							submitButtonText="Add"
+							cancelButtonText="Cancel"
+							onCancel={onClose}
+						/>
+					</Box>
+				</VStack>
+			</ModalBody>
+		</>
+	);
+};

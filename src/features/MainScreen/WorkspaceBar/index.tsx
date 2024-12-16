@@ -1,11 +1,14 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { FaGear } from 'react-icons/fa6';
+import { FaGear, FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
-import { Button, HStack, Select } from '@chakra-ui/react';
+import { Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
+import { useModalWindow } from '@components/useModalWindow';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+
+import { WorkspaceCreatePopup } from './WorkspaceCreatePopup';
 
 export const WorkspaceBar = () => {
 	const dispatch = useAppDispatch();
@@ -29,8 +32,36 @@ export const WorkspaceBar = () => {
 	);
 	const workspaces = useAppSelector(selectWorkspacesWithMemo);
 
+	const modal = useModalWindow();
+
 	return (
-		<>
+		<VStack w="100%">
+			<HStack w="100%">
+				<Text
+					as="h2"
+					fontWeight="bold"
+					fontSize="16px"
+					color="typography.secondary"
+				>
+					Workspaces
+				</Text>
+
+				<Button
+					variant="ghost"
+					size="xs"
+					marginLeft="auto"
+					onClick={() => {
+						modal.show({
+							content: () => <WorkspaceCreatePopup />,
+						});
+					}}
+				>
+					<FaPlus />
+				</Button>
+			</HStack>
+
+			<Divider />
+
 			<HStack w="100%" marginTop="auto">
 				<Select
 					size="sm"
@@ -38,10 +69,11 @@ export const WorkspaceBar = () => {
 					borderRadius="6px"
 					value={workspaceId}
 					onChange={(evt) => {
+						const workspaceId = evt.target.value;
 						dispatch(
 							workspacesApi.setActiveWorkspace({
 								profileId,
-								workspaceId: evt.target.value,
+								workspaceId,
 							}),
 						);
 					}}
@@ -66,6 +98,6 @@ export const WorkspaceBar = () => {
 				isVisible={isWorkspaceEditing}
 				onClose={() => setIsWorkspaceEditing(false)}
 			/>
-		</>
+		</VStack>
 	);
 };

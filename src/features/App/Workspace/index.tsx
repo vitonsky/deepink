@@ -1,4 +1,5 @@
 import React, { createContext, FC, useEffect } from 'react';
+import { ModalWindowProvider } from '@components/useModalWindow';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
@@ -98,8 +99,10 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					),
 			}}
 		>
-			<MainScreen />
-			<WorkspaceStatusBarItems />
+			<ModalWindowProvider>
+				<MainScreen />
+				<WorkspaceStatusBarItems />
+			</ModalWindowProvider>
 		</WorkspaceProvider>
 	);
 };

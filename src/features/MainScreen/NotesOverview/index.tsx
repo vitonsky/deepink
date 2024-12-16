@@ -178,7 +178,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						onClick={() => {
 							setIsAddTagPopupOpened(true);
 						}}
-						size="sm"
+						size="xs"
 						marginLeft="auto"
 					>
 						<FaPlus />
