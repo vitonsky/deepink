@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { FaXmark } from 'react-icons/fa6';
 import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
@@ -47,6 +47,11 @@ export const TopBar: FC<TopBarProps> = ({
 		return tabId >= 0 ? tabId : 0;
 	}, [activeTab, existsTabs]);
 
+	const activeTabRef = useRef<HTMLButtonElement>(null);
+	useEffect(() => {
+		activeTabRef.current?.scrollIntoView();
+	}, [tabIndex]);
+
 	return (
 		<Tabs
 			index={tabIndex}
@@ -65,7 +70,9 @@ export const TopBar: FC<TopBarProps> = ({
 				display="grid"
 				gridTemplateColumns="repeat(auto-fit, minmax(150px, 1fr))"
 			>
-				{existsTabs.map((noteId) => {
+				{existsTabs.map((noteId, index) => {
+					const isActiveTab = index === tabIndex;
+
 					// TODO: handle case when object not found
 					const note = notes.find((note) => note.id === noteId);
 					if (!note) {
@@ -77,6 +84,7 @@ export const TopBar: FC<TopBarProps> = ({
 					return (
 						<Tab
 							key={note.id}
+							ref={isActiveTab ? activeTabRef : undefined}
 							padding="0.4rem 0.7rem"
 							border="none"
 							fontWeight="600"
