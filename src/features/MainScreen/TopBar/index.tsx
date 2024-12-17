@@ -60,6 +60,8 @@ export const TopBar: FC<TopBarProps> = ({
 				flexWrap="wrap"
 				borderBottom="1px solid"
 				borderColor="surface.border"
+				display="grid"
+				gridTemplateColumns="repeat(auto-fit, minmax(150px, 1fr))"
 			>
 				{existsTabs.map((noteId) => {
 					// TODO: handle case when object not found
@@ -77,6 +79,7 @@ export const TopBar: FC<TopBarProps> = ({
 							border="none"
 							fontWeight="600"
 							fontSize="14"
+							maxW="250px"
 							marginBottom={0}
 							title={title}
 							onMouseDown={(evt) => {
@@ -93,7 +96,7 @@ export const TopBar: FC<TopBarProps> = ({
 								onClose(note.id);
 							}}
 						>
-							<HStack gap=".5rem">
+							<HStack gap=".5rem" w="100%" justifyContent="space-between">
 								<Text
 									maxW="180px"
 									whiteSpace="nowrap"
@@ -109,6 +112,7 @@ export const TopBar: FC<TopBarProps> = ({
 									{title}
 								</Text>
 								<Box
+									title="Close tab"
 									sx={{
 										'&:not(:hover)': {
 											opacity: '0.7',
