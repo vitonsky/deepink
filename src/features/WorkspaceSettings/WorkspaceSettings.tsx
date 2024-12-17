@@ -16,8 +16,12 @@ import { useWorkspacesList } from '@features/MainScreen/WorkspaceBar/useWorkspac
 import { workspacePropsValidator } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	selectWorkspace,
+	selectWorkspaceName,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;
@@ -29,6 +33,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	} = useProfileControls();
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
+
+	const workspaceInfo = useWorkspaceSelector(selectWorkspaceName);
 
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
@@ -47,13 +53,17 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const tags = useTagsRegistry();
 	const files = useFilesRegistry();
 
-	// TODO: ask for confirmation
 	// TODO: prevent deletion for last workspace, or create new workspace
 	const onDelete = useCallback(async () => {
 		const nextWorkspace = workspaces.workspaces.find(
 			(workspace) => workspace.id !== currentWorkspace.workspaceId,
 		);
 		if (!nextWorkspace) return;
+
+		const isConfirmed = confirm(
+			`You are about to delete workspace "${workspaceInfo.name}". Are you sure you want to do it?\n\nIf you will continue, all data related to this workspace will be deleted, including notes, tags and files.`,
+		);
+		if (!isConfirmed) return;
 
 		const tagsList = await tags.getTags();
 		const notesList = await notes.get();
