@@ -86,6 +86,14 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 					<FeaturesOption description="Move notes to recycle bin, instead of instant deletion">
 						<Checkbox>Use recycle bin</Checkbox>
 					</FeaturesOption>
+
+					<FeaturesHeader view="section">Dangerous zone</FeaturesHeader>
+
+					<FeaturesOption description="Delete workspace with all notes, tags and files">
+						<Button variant="primary" colorScheme="alert">
+							Delete workspace
+						</Button>
+					</FeaturesOption>
 				</Features>
 			</VStack>
 		</ModalScreen>

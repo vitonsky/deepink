@@ -3,6 +3,7 @@ import {
 	createMultiStyleConfigHelpers,
 	defineStyleConfig,
 	extendTheme,
+	StyleFunctionProps,
 } from '@chakra-ui/react';
 import { ModalScreenTheme } from '@components/ModalScreen/ModalScreen.theme';
 import { NestedListTheme } from '@components/NestedList/NestedList.theme';
@@ -112,21 +113,47 @@ export const basicTheme = extendTheme({
 			error: '#b30606',
 		},
 	},
+	semanticTokens: {
+		schemes: {
+			alert: {
+				text: '#fff',
+				base: '#C53030',
+				hover: '#9B2C2C',
+				disabled: '#FEB2B2',
+			},
+		},
+	},
 	components: {
 		Button: defineStyleConfig({
 			baseStyle: {
 				transition: 'transform .20ms ease',
-				'&:active': {
+				'&:not(:disabled):active': {
 					transform: 'scale(.95)',
 				},
 			},
 			variants: {
-				primary: {
-					backgroundColor: 'primary.200',
-					color: 'primary.500',
-					'&:hover': {
-						backgroundColor: 'primary.300',
-					},
+				primary(props: StyleFunctionProps) {
+					const scheme = props.theme.semanticTokens.schemes[props.colorScheme];
+					const colors: {
+						text: string;
+						base: string;
+						hover: string;
+					} = scheme || {
+						text: 'primary.500',
+						base: 'primary.200',
+						hover: 'primary.300',
+					};
+
+					return {
+						backgroundColor: colors.base,
+						color: colors.text,
+						'&:hover': {
+							backgroundColor: colors.hover,
+						},
+						'&:disabled, &:hover[disabled]': {
+							backgroundColor: colors.base,
+						},
+					};
 				},
 				secondary: {
 					backgroundColor: 'dim.100',
@@ -144,6 +171,7 @@ export const basicTheme = extendTheme({
 			},
 			defaultProps: {
 				variant: 'secondary',
+				colorScheme: 'primary',
 			},
 		}),
 		Menu: createMultiStyleConfigHelpers([
