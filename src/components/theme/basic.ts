@@ -123,6 +123,14 @@ export const basicTheme = extendTheme({
 		},
 	},
 	components: {
+		Link: defineStyleConfig({
+			baseStyle: {
+				color: 'link.base',
+				'&:hover, &:active': {
+					color: 'link.hover',
+				},
+			},
+		}),
 		Button: defineStyleConfig({
 			baseStyle: {
 				transition: 'transform .20ms ease',

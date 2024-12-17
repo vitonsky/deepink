@@ -1,10 +1,11 @@
 import React, { FC, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Checkbox, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import { Button, Checkbox, HStack, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
+import { useModalWindow } from '@components/useModalWindow';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
 import {
@@ -13,7 +14,10 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspacesList } from '@features/MainScreen/WorkspaceBar/useWorkspacesList';
-import { workspacePropsValidator } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
+import {
+	WorkspaceCreatePopup,
+	workspacePropsValidator,
+} from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -53,7 +57,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const tags = useTagsRegistry();
 	const files = useFilesRegistry();
 
-	// TODO: prevent deletion for last workspace, or create new workspace
+	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
 		const nextWorkspace = workspaces.workspaces.find(
 			(workspace) => workspace.id !== currentWorkspace.workspaceId,
@@ -88,9 +92,12 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		files,
 		notes,
 		tags,
+		workspaceInfo.name,
 		workspaces,
 		workspacesManager,
 	]);
+
+	const modal = useModalWindow();
 
 	return (
 		<ModalScreen isVisible onClose={onClose} title="Workspace settings">
@@ -144,10 +151,32 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 					<FeaturesHeader view="section">Dangerous zone</FeaturesHeader>
 
-					<FeaturesOption description="Delete workspace with all notes, tags and files">
-						<Button variant="primary" colorScheme="alert" onClick={onDelete}>
+					<FeaturesOption description="Delete workspace and all related data, including notes, tags and files">
+						<Button
+							variant="primary"
+							colorScheme="alert"
+							onClick={onDelete}
+							isDisabled={!isOtherWorkspacesExists}
+						>
 							Delete workspace
 						</Button>
+
+						{!isOtherWorkspacesExists && (
+							<Text>
+								It is not possible to delete last workspace in profile.{' '}
+								<Link
+									href="#"
+									onClick={() => {
+										modal.show({
+											content: () => <WorkspaceCreatePopup />,
+										});
+									}}
+								>
+									Create
+								</Link>{' '}
+								another workspace first.
+							</Text>
+						)}
 					</FeaturesOption>
 				</Features>
 			</VStack>
