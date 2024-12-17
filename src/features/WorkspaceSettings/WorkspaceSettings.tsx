@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button, Checkbox, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
@@ -7,12 +7,17 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
+import {
+	useFilesRegistry,
+	useNotesRegistry,
+	useTagsRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspacesList } from '@features/MainScreen/WorkspaceBar/useWorkspacesList';
 import { workspacePropsValidator } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAppSelector } from '@state/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspace } from '@state/redux/profiles/profiles';
+import { selectWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
 
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;
@@ -35,7 +40,47 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		resolver: zodResolver(workspacePropsValidator),
 	});
 
+	const dispatch = useAppDispatch();
 	const workspaces = useWorkspacesList();
+
+	const notes = useNotesRegistry();
+	const tags = useTagsRegistry();
+	const files = useFilesRegistry();
+
+	// TODO: ask for confirmation
+	// TODO: prevent deletion for last workspace, or create new workspace
+	const onDelete = useCallback(async () => {
+		const nextWorkspace = workspaces.workspaces.find(
+			(workspace) => workspace.id !== currentWorkspace.workspaceId,
+		);
+		if (!nextWorkspace) return;
+
+		const tagsList = await tags.getTags();
+		const notesList = await notes.get();
+
+		await notes.delete(notesList.map((note) => note.id));
+		await Promise.all(tagsList.map((note) => tags.delete(note.id)));
+		await files.clearOrphaned();
+
+		dispatch(
+			workspacesApi.setActiveWorkspace({
+				workspaceId: nextWorkspace.id,
+				profileId: currentWorkspace.profileId,
+			}),
+		);
+
+		await workspacesManager.delete([currentWorkspace.workspaceId]);
+		await workspaces.update();
+	}, [
+		currentWorkspace.profileId,
+		currentWorkspace.workspaceId,
+		dispatch,
+		files,
+		notes,
+		tags,
+		workspaces,
+		workspacesManager,
+	]);
 
 	return (
 		<ModalScreen isVisible onClose={onClose} title="Workspace settings">
@@ -90,7 +135,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 					<FeaturesHeader view="section">Dangerous zone</FeaturesHeader>
 
 					<FeaturesOption description="Delete workspace with all notes, tags and files">
-						<Button variant="primary" colorScheme="alert">
+						<Button variant="primary" colorScheme="alert" onClick={onDelete}>
 							Delete workspace
 						</Button>
 					</FeaturesOption>

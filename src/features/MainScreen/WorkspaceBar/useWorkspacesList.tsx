@@ -54,6 +54,16 @@ export const useWorkspacesList = () => {
 			mergedWorkspaces[workspace.id].name = workspace.name;
 		});
 
+		// Delete workspaces that no more exists
+		for (const id in mergedWorkspaces) {
+			const isWorkspaceExists = updatedWorkspaces.some(
+				(workspace) => workspace.id === id,
+			);
+			if (!isWorkspaceExists) {
+				delete mergedWorkspaces[id];
+			}
+		}
+
 		dispatch(
 			workspacesApi.setWorkspaces({
 				profileId,
