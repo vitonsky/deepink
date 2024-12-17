@@ -54,6 +54,8 @@ export const TopBar: FC<TopBarProps> = ({
 				onPick(existsTabs[index]);
 			}}
 			w="100%"
+			maxH="100px"
+			overflow="auto"
 			bgColor="surface.panel"
 		>
 			<TabList
