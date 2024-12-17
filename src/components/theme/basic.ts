@@ -119,7 +119,6 @@ export const basicTheme = extendTheme({
 				text: '#fff',
 				base: '#C53030',
 				hover: '#9B2C2C',
-				disabled: '#FEB2B2',
 			},
 		},
 	},
