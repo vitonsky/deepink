@@ -3,7 +3,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const { mode, isProduction, isFastBuild } = require('./scripts/webpack');
 
-const devtool = isProduction ? undefined : 'inline-source-map';
+const devtool = isProduction ? undefined : 'source-map';
 
 const outputPath = path.join(__dirname, 'dist');
 

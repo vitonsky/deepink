@@ -11,16 +11,20 @@ import { createEvent, EventCallable } from 'effector';
 import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/react';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
+export type ModalWindowApi = { onClose: () => void };
+
 export type ModalWindowShowPayload = {
 	onClose?: () => void;
-	content: (props: { onClose: () => void }) => ReactNode;
+	content: (props: ModalWindowApi) => ReactNode;
 };
 
 const modalWindowContext = createContext<{
 	show: EventCallable<ModalWindowShowPayload>;
 }>(null as any);
-
 export const useModalWindow = createContextGetterHook(modalWindowContext);
+
+const modalWindowApiContext = createContext<ModalWindowApi>(null as any);
+export const useModalWindowApi = createContextGetterHook(modalWindowApiContext);
 
 export const ModalWindowProvider: FC<PropsWithChildren> = ({ children }) => {
 	const [context] = useState(() => ({
@@ -54,13 +58,17 @@ export const ModalWindowProvider: FC<PropsWithChildren> = ({ children }) => {
 		};
 	});
 
+	const api = { onClose };
+
 	return (
 		<modalWindowContext.Provider value={context}>
 			{children}
 			{modalContext && (
 				<Modal isOpen isCentered onClose={onClose}>
 					<ModalOverlay />
-					<ModalContent>{modalContext.content({ onClose })}</ModalContent>
+					<modalWindowApiContext.Provider value={api}>
+						<ModalContent>{modalContext.content(api)}</ModalContent>
+					</modalWindowApiContext.Provider>
 				</Modal>
 			)}
 		</modalWindowContext.Provider>

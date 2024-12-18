@@ -18,7 +18,7 @@ describe('stress tests', () => {
 	// Gzipped data takes ~800kb. We must to compress data
 	test('insert 10k notes contains 150k chars', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		const requests: Promise<string>[] = [];
 
@@ -44,7 +44,7 @@ describe('stress tests', () => {
 
 	test('update random notes 10k times', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db);
+		const registry = new NotesController(db, 'fake-workspace-id');
 
 		const noteIds = await registry.get().then((notes) => notes.map(({ id }) => id));
 

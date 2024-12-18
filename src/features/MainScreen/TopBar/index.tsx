@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { FaXmark } from 'react-icons/fa6';
 import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
@@ -47,6 +47,11 @@ export const TopBar: FC<TopBarProps> = ({
 		return tabId >= 0 ? tabId : 0;
 	}, [activeTab, existsTabs]);
 
+	const activeTabRef = useRef<HTMLButtonElement>(null);
+	useEffect(() => {
+		activeTabRef.current?.scrollIntoView();
+	}, [tabIndex]);
+
 	return (
 		<Tabs
 			index={tabIndex}
@@ -54,14 +59,20 @@ export const TopBar: FC<TopBarProps> = ({
 				onPick(existsTabs[index]);
 			}}
 			w="100%"
+			maxH="100px"
+			overflow="auto"
 			bgColor="surface.panel"
 		>
 			<TabList
 				flexWrap="wrap"
 				borderBottom="1px solid"
 				borderColor="surface.border"
+				display="grid"
+				gridTemplateColumns="repeat(auto-fit, minmax(150px, 1fr))"
 			>
-				{existsTabs.map((noteId) => {
+				{existsTabs.map((noteId, index) => {
+					const isActiveTab = index === tabIndex;
+
 					// TODO: handle case when object not found
 					const note = notes.find((note) => note.id === noteId);
 					if (!note) {
@@ -73,10 +84,12 @@ export const TopBar: FC<TopBarProps> = ({
 					return (
 						<Tab
 							key={note.id}
+							ref={isActiveTab ? activeTabRef : undefined}
 							padding="0.4rem 0.7rem"
 							border="none"
 							fontWeight="600"
 							fontSize="14"
+							maxW="250px"
 							marginBottom={0}
 							title={title}
 							onMouseDown={(evt) => {
@@ -93,7 +106,7 @@ export const TopBar: FC<TopBarProps> = ({
 								onClose(note.id);
 							}}
 						>
-							<HStack gap=".5rem">
+							<HStack gap=".5rem" w="100%" justifyContent="space-between">
 								<Text
 									maxW="180px"
 									whiteSpace="nowrap"
@@ -109,6 +122,7 @@ export const TopBar: FC<TopBarProps> = ({
 									{title}
 								</Text>
 								<Box
+									title="Close tab"
 									sx={{
 										'&:not(:hover)': {
 											opacity: '0.7',
