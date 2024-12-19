@@ -24,13 +24,9 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				};
 
 				return (
-					<StatusBarProvider>
+					<StatusBarProvider key={profile.profile.id}>
 						<ProfileControlsContext.Provider value={controls}>
-							<Profile
-								profile={profile}
-								key={profile.profile.id}
-								controls={controls}
-							/>
+							<Profile profile={profile} controls={controls} />
 						</ProfileControlsContext.Provider>
 					</StatusBarProvider>
 				);
