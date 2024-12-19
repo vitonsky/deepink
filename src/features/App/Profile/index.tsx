@@ -1,7 +1,12 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
+import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	createWorkspaceObject,
+	selectWorkspacesInfo,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -27,7 +32,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	const profileId = currentProfile.profile.id;
 
-	const workspaces = useAppSelector(selectWorkspaces({ profileId }));
+	const workspaces = useAppSelector(
+		useMemo(() => selectWorkspacesInfo({ profileId }), [profileId]),
+		isEqual,
+	);
 
 	const workspacesManager = useMemo(
 		() => new WorkspacesController(currentProfile.db),
@@ -43,29 +51,23 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				workspacesApi.addProfile({
 					profileId,
 					profile: {
-						activeWorkspace: defaultWorkspace.id,
+						activeWorkspace: null,
 						workspaces: Object.fromEntries(
 							workspaces.map((workspace) => [
 								workspace.id,
-								{
-									id: workspace.id,
-									name: workspace.name,
-
-									activeNote: null,
-									openedNotes: [],
-									notes: [],
-
-									tags: {
-										selected: null,
-										list: [],
-									},
-								},
+								createWorkspaceObject(workspace),
 							]),
 						),
 					},
 				}),
 			);
 			dispatch(workspacesApi.setActiveProfile(profileId));
+			dispatch(
+				workspacesApi.setActiveWorkspace({
+					profileId,
+					workspaceId: defaultWorkspace.id,
+				}),
+			);
 		});
 
 		return () => {
@@ -81,14 +83,16 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{workspaces.map((workspace) => (
-				<WorkspaceContext.Provider
-					key={workspace.id}
-					value={{ profileId: profileId, workspaceId: workspace.id }}
-				>
-					<Workspace profile={currentProfile} />
-				</WorkspaceContext.Provider>
-			))}
+			{workspaces.map((workspace) =>
+				workspace.touched ? (
+					<WorkspaceContext.Provider
+						key={workspace.id}
+						value={{ profileId: profileId, workspaceId: workspace.id }}
+					>
+						<Workspace profile={currentProfile} />
+					</WorkspaceContext.Provider>
+				) : null,
+			)}
 			<ProfileStatusBar />
 		</ProfileControlsContext.Provider>
 	);

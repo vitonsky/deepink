@@ -1,4 +1,5 @@
-import React, { createContext, FC, useEffect } from 'react';
+import React, { createContext, FC, useEffect, useMemo } from 'react';
+import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { ModalWindowProvider } from '@components/useModalWindow';
 import { INote } from '@core/features/notes';
@@ -6,7 +7,7 @@ import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectActiveWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
+import { selectActiveWorkspaceInfo, workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -71,7 +72,10 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 
 	const { profileId } = useWorkspaceData();
 
-	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
+	const activeWorkspace = useAppSelector(
+		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
+		isEqual,
+	);
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 

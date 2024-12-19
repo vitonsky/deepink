@@ -3,7 +3,11 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { useProfileControls } from '@features/App/Profile';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	createWorkspaceObject,
+	selectWorkspaces,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 export const useWorkspacesList = () => {
 	const dispatch = useAppDispatch();
@@ -32,19 +36,7 @@ export const useWorkspacesList = () => {
 			...Object.fromEntries(
 				newWorkspaces.map((workspace) => [
 					workspace.id,
-					{
-						id: workspace.id,
-						name: workspace.name,
-
-						activeNote: null,
-						openedNotes: [],
-						notes: [],
-
-						tags: {
-							selected: null,
-							list: [],
-						},
-					},
+					createWorkspaceObject(workspace),
 				]),
 			),
 		});
