@@ -71,19 +71,7 @@ export const MainScreen: FC = () => {
 	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
 
 	return (
-		<VStack
-			gap={0}
-			sx={{
-				flexDirection: 'column',
-				flexGrow: '100',
-				width: '100%',
-				height: '100vh',
-				maxWidth: '100%',
-				maxHeight: '100%',
-				backgroundColor: 'surface.background',
-				color: 'typography.primary',
-			}}
-		>
+		<VStack gap={0} w="100%" h="100%">
 			<HStack
 				align="start"
 				gap={0}

@@ -78,8 +78,15 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	return (
 		<Box
 			sx={{
-				all: 'inherit',
-				display: isVisibleWorkspace ? 'inherit' : 'none',
+				display: isVisibleWorkspace ? 'flex' : 'none',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				backgroundColor: 'surface.background',
+				color: 'typography.primary',
 			}}
 		>
 			{workspace ? (
