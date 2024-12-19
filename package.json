@@ -87,6 +87,7 @@
 		"@chakra-ui/react": "^2.8.2",
 		"@emotion/react": "^11.13.3",
 		"@emotion/styled": "^11.13.0",
+		"@hookform/resolvers": "^3.9.1",
 		"@lexical/react": "^0.19.0",
 		"@popperjs/core": "^2.11.8",
 		"@reduxjs/toolkit": "^2.2.7",

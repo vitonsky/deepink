@@ -1,5 +1,15 @@
 import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
 
+export const selectWorkspaceName = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) throw new Error('Workspace selector used out of workspace scope');
+
+		const { id, name } = workspace;
+		return { id, name };
+	},
+);
+
 export const selectNotes = createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
 	if (!workspace) return [];
 	return workspace.notes;

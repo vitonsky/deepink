@@ -15,14 +15,17 @@ export class FilesController {
 	private db;
 	private fileController;
 	private attachments;
+	private readonly workspace;
 	constructor(
 		db: SQLiteDatabase,
 		fileController: IFilesStorage,
 		attachments: AttachmentsController,
+		workspace: string,
 	) {
 		this.db = db;
 		this.fileController = fileController;
 		this.attachments = attachments;
+		this.workspace = workspace;
 	}
 
 	public async add(file: File) {
@@ -31,17 +34,18 @@ export class FilesController {
 		// Insert in DB
 		const insertResult = db
 			.prepare(
-				'INSERT INTO files ("id","name","mimetype") VALUES (@id,@name,@mimetype)',
+				'INSERT INTO files ("id","workspace_id","name","mimetype") VALUES (@id,@workspace,@name,@mimetype)',
 			)
 			.run({
 				id: uuid4(),
+				workspace: this.workspace,
 				name: file.name,
 				mimetype: file.type,
 			});
 
 		const selectWithId = db
-			.prepare('SELECT `id` FROM files WHERE rowid=?')
-			.get(insertResult.lastInsertRowid) as any;
+			.prepare('SELECT `id` FROM files WHERE workspace_id=? AND rowid=?')
+			.get(this.workspace, insertResult.lastInsertRowid) as any;
 
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
@@ -62,7 +66,9 @@ export class FilesController {
 		const db = this.db.get();
 
 		// Insert in DB
-		const fileEntry = db.prepare('SELECT * FROM files WHERE id=?').get(id) as any;
+		const fileEntry = db
+			.prepare('SELECT * FROM files WHERE workspace_id=? AND id=?')
+			.get(this.workspace, id) as any;
 
 		if (!fileEntry) return null;
 
@@ -80,7 +86,9 @@ export class FilesController {
 
 		// Delete in database
 		const placeholders = Array(filesId.length).fill('?').join(',');
-		db.prepare(`DELETE FROM files WHERE id IN (${placeholders})`).run(filesId);
+		db.prepare(
+			`DELETE FROM files WHERE workspace_id=? AND id IN (${placeholders})`,
+		).run(this.workspace, ...filesId);
 
 		// Delete files
 		await this.fileController.delete(filesId);
@@ -89,7 +97,9 @@ export class FilesController {
 	public async clearOrphaned() {
 		const db = this.db.get();
 
-		const files = db.prepare('SELECT id FROM files').all() as Array<{ id: string }>;
+		const files = db
+			.prepare('SELECT id FROM files WHERE workspace_id=?')
+			.all(this.workspace) as Array<{ id: string }>;
 
 		// Remove orphaned files in FS
 		const filesInStorage = await this.fileController.list();
