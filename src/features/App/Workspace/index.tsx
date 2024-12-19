@@ -1,4 +1,5 @@
 import React, { createContext, FC, useEffect } from 'react';
+import { Box } from '@chakra-ui/react';
 import { ModalWindowProvider } from '@components/useModalWindow';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
@@ -69,40 +70,60 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	}, [dispatch, workspace, workspaceData]);
 
 	const { profileId } = useWorkspaceData();
-	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
 
-	if (!workspace || !activeWorkspace) {
-		return <SplashScreen />;
-	}
+	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
+	const isVisibleWorkspace =
+		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
 	return (
-		<WorkspaceProvider
-			{...workspace}
-			notesApi={{
-				openNote: (note: INote, focus = true) => {
-					dispatch(workspacesApi.addOpenedNote({ ...workspaceData, note }));
-
-					if (focus) {
-						dispatch(
-							workspacesApi.setActiveNote({
-								...workspaceData,
-								noteId: note.id,
-							}),
-						);
-					}
-				},
-				noteUpdated: (note: INote) =>
-					dispatch(workspacesApi.updateOpenedNote({ ...workspaceData, note })),
-				noteClosed: (noteId: string) =>
-					dispatch(
-						workspacesApi.removeOpenedNote({ ...workspaceData, noteId }),
-					),
+		<Box
+			sx={{
+				all: 'inherit',
+				display: isVisibleWorkspace ? 'inherit' : 'none',
 			}}
 		>
-			<ModalWindowProvider>
-				<MainScreen />
-				<WorkspaceStatusBarItems />
-			</ModalWindowProvider>
-		</WorkspaceProvider>
+			{workspace ? (
+				<WorkspaceProvider
+					{...workspace}
+					notesApi={{
+						openNote: (note: INote, focus = true) => {
+							dispatch(
+								workspacesApi.addOpenedNote({ ...workspaceData, note }),
+							);
+
+							if (focus) {
+								dispatch(
+									workspacesApi.setActiveNote({
+										...workspaceData,
+										noteId: note.id,
+									}),
+								);
+							}
+						},
+						noteUpdated: (note: INote) =>
+							dispatch(
+								workspacesApi.updateOpenedNote({
+									...workspaceData,
+									note,
+								}),
+							),
+						noteClosed: (noteId: string) =>
+							dispatch(
+								workspacesApi.removeOpenedNote({
+									...workspaceData,
+									noteId,
+								}),
+							),
+					}}
+				>
+					<ModalWindowProvider>
+						<MainScreen />
+						<WorkspaceStatusBarItems />
+					</ModalWindowProvider>
+				</WorkspaceProvider>
+			) : (
+				<SplashScreen />
+			)}
+		</Box>
 	);
 };

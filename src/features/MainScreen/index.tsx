@@ -8,13 +8,8 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
-import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import {
-	selectActiveNoteId,
-	selectActiveWorkspace,
-	selectOpenedNotes,
-} from '@state/redux/profiles/profiles';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NotesOverview } from './NotesOverview';
@@ -22,10 +17,6 @@ import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
 export const MainScreen: FC = () => {
-	const { workspaceId, profileId } = useWorkspaceData();
-	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
-	const isActiveWorkspace = activeWorkspace && activeWorkspace.id === workspaceId;
-
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
 	const tagsRegistry = useTagsRegistry();
@@ -83,7 +74,6 @@ export const MainScreen: FC = () => {
 		<VStack
 			gap={0}
 			sx={{
-				display: isActiveWorkspace ? 'flex' : 'none',
 				flexDirection: 'column',
 				flexGrow: '100',
 				width: '100%',
