@@ -92,7 +92,7 @@
 		"@popperjs/core": "^2.11.8",
 		"@reduxjs/toolkit": "^2.2.7",
 		"@types/mdast": "^4.0.4",
-		"better-sqlite3": "^9.3.0",
+		"better-sqlite3": "^11.7.0",
 		"crc": "^4.3.2",
 		"debounce": "^2.0.0",
 		"downshift": "^9.0.8",
