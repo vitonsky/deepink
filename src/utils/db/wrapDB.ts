@@ -1,17 +1,22 @@
 import Database from 'better-sqlite3';
-import { RawQuery } from '@utils/SQLBuilder/core/RawQuery';
+import { SQLCompiler } from 'nano-queries/compilers/SQLCompiler';
+import { Query } from 'nano-queries/core/Query';
+import { ConfigurableSQLBuilder } from 'nano-queries/sql/ConfigurableSQLBuilder';
+
+export const qb = new ConfigurableSQLBuilder(new SQLCompiler());
 
 type ProxyMethods = keyof Pick<Database.Statement, 'all' | 'run' | 'get'>;
 type WrappedDbMethods = {
-	[K in ProxyMethods]: (query: RawQuery) => ReturnType<Database.Statement[K]>;
+	[K in ProxyMethods]: (query: Query) => ReturnType<Database.Statement[K]>;
 };
 export const wrapDB = (db: Database.Database): WrappedDbMethods => {
+	const compiler = new SQLCompiler();
 	return new Proxy<any>(
 		{},
 		{
 			get(_target, p: keyof WrappedDbMethods) {
-				return (query: RawQuery) => {
-					const { sql, bindings } = query.toSQL();
+				return (query: Query) => {
+					const { sql, bindings } = compiler.toSQL(query);
 					try {
 						return db.prepare(sql)[p](bindings);
 					} catch (error) {

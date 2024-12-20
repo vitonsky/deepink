@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from 'uuid';
 import { z } from 'zod';
-import { qb } from '@utils/SQLBuilder/utils/builder';
+import { qb } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -45,13 +45,13 @@ export class WorkspacesController {
 
 		if (Object.values(options).length === 0) return;
 
-		const { sql, bindings } = qb
-			.line(
+		const { sql, bindings } = qb.toSQL(
+			qb.line(
 				'UPDATE workspaces SET',
 				qb.values(options),
 				qb.where(qb.values({ id })),
-			)
-			.toSQL();
+			),
+		);
 		db.prepare(sql).run(bindings);
 
 		return id;

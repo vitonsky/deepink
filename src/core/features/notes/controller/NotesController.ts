@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import { v4 as uuid4 } from 'uuid';
-import { wrapDB } from '@utils/db/wrapDB';
-import { qb } from '@utils/SQLBuilder/utils/builder';
+import { qb, wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
