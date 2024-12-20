@@ -15,6 +15,20 @@ const selectWorkspaceObject = (
 	return profile.workspaces[workspaceId] ?? null;
 };
 
+export const createWorkspaceObject = (workspace: { id: string; name: string }) => ({
+	...workspace,
+	touched: false,
+
+	activeNote: null,
+	openedNotes: [],
+	notes: [],
+
+	tags: {
+		selected: null,
+		list: [],
+	},
+});
+
 export type ProfileScoped<T extends {} = {}> = T & {
 	profileId: string;
 };
@@ -26,6 +40,14 @@ export type WorkspaceScoped<T extends {} = {}> = T &
 export type WorkspaceData = {
 	id: string;
 	name: string;
+
+	/**
+	 * Defines were workspace opened by user or not
+	 *
+	 * Not touched workspaces will not be rendered,
+	 * to optimize performance
+	 */
+	touched: boolean;
 
 	activeNote: NoteId | null;
 	openedNotes: INote[];
@@ -75,7 +97,7 @@ export const profilesSlice = createSlice({
 		},
 
 		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
-			return { ...state, activeProfile: payload } as ProfilesState;
+			state.activeProfile = payload;
 		},
 
 		setWorkspaces: (
@@ -102,6 +124,14 @@ export const profilesSlice = createSlice({
 			if (!profile) return;
 
 			profile.activeWorkspace = workspaceId;
+
+			// Touch workspace
+			if (workspaceId) {
+				const workspace = profile.workspaces[workspaceId];
+				if (workspace && !workspace.touched) {
+					workspace.touched = true;
+				}
+			}
 		},
 
 		setActiveNote: (
@@ -277,6 +307,20 @@ export const selectWorkspaces = ({ profileId }: ProfileScoped) =>
 		return Object.values(profile.workspaces ?? {}).filter(Boolean) as WorkspaceData[];
 	});
 
+/**
+ * Workspace info subset that will be persistent for notes changes
+ */
+export const getWorkspaceInfo = ({ id, name, touched }: WorkspaceData) => ({
+	id,
+	name,
+	touched,
+});
+
+export const selectWorkspacesInfo = (scope: ProfileScoped) =>
+	createAppSelector(selectWorkspaces(scope), (workspaces) =>
+		workspaces.map(getWorkspaceInfo),
+	);
+
 export const selectWorkspace = ({ profileId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
 		const profile = state.profiles[profileId];
@@ -292,6 +336,11 @@ export const selectActiveWorkspace = ({ profileId }: ProfileScoped) =>
 
 		return profile.workspaces[profile.activeWorkspace] ?? null;
 	});
+
+export const selectActiveWorkspaceInfo = (scope: ProfileScoped) =>
+	createAppSelector(selectActiveWorkspace(scope), (workspace) =>
+		workspace ? getWorkspaceInfo(workspace) : null,
+	);
 
 export * from './selectors/notes';
 export * from './selectors/tags';

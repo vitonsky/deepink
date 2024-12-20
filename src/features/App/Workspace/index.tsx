@@ -1,10 +1,13 @@
-import React, { createContext, FC, useEffect } from 'react';
+import React, { createContext, FC, useEffect, useMemo } from 'react';
+import { isEqual } from 'lodash';
+import { Box } from '@chakra-ui/react';
+import { ModalWindowProvider } from '@components/useModalWindow';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectActiveWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
+import { selectActiveWorkspaceInfo, workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -68,38 +71,70 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	}, [dispatch, workspace, workspaceData]);
 
 	const { profileId } = useWorkspaceData();
-	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
 
-	if (!workspace || !activeWorkspace) {
-		return <SplashScreen />;
-	}
+	const activeWorkspace = useAppSelector(
+		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
+		isEqual,
+	);
+	const isVisibleWorkspace =
+		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
 	return (
-		<WorkspaceProvider
-			{...workspace}
-			notesApi={{
-				openNote: (note: INote, focus = true) => {
-					dispatch(workspacesApi.addOpenedNote({ ...workspaceData, note }));
-
-					if (focus) {
-						dispatch(
-							workspacesApi.setActiveNote({
-								...workspaceData,
-								noteId: note.id,
-							}),
-						);
-					}
-				},
-				noteUpdated: (note: INote) =>
-					dispatch(workspacesApi.updateOpenedNote({ ...workspaceData, note })),
-				noteClosed: (noteId: string) =>
-					dispatch(
-						workspacesApi.removeOpenedNote({ ...workspaceData, noteId }),
-					),
+		<Box
+			sx={{
+				display: isVisibleWorkspace ? 'flex' : 'none',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				backgroundColor: 'surface.background',
+				color: 'typography.primary',
 			}}
 		>
-			<MainScreen />
-			<WorkspaceStatusBarItems />
-		</WorkspaceProvider>
+			{workspace ? (
+				<WorkspaceProvider
+					{...workspace}
+					notesApi={{
+						openNote: (note: INote, focus = true) => {
+							dispatch(
+								workspacesApi.addOpenedNote({ ...workspaceData, note }),
+							);
+
+							if (focus) {
+								dispatch(
+									workspacesApi.setActiveNote({
+										...workspaceData,
+										noteId: note.id,
+									}),
+								);
+							}
+						},
+						noteUpdated: (note: INote) =>
+							dispatch(
+								workspacesApi.updateOpenedNote({
+									...workspaceData,
+									note,
+								}),
+							),
+						noteClosed: (noteId: string) =>
+							dispatch(
+								workspacesApi.removeOpenedNote({
+									...workspaceData,
+									noteId,
+								}),
+							),
+					}}
+				>
+					<ModalWindowProvider>
+						<MainScreen />
+						<WorkspaceStatusBarItems />
+					</ModalWindowProvider>
+				</WorkspaceProvider>
+			) : (
+				<SplashScreen />
+			)}
+		</Box>
 	);
 };
