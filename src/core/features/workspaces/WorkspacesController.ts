@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from 'uuid';
 import { z } from 'zod';
-import { qb } from '@utils/db/wrapDB';
+import { qb } from '@utils/db/query-builder';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 

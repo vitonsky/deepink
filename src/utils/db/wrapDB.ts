@@ -1,9 +1,6 @@
 import Database from 'better-sqlite3';
 import { SQLCompiler } from 'nano-queries/compilers/SQLCompiler';
 import { Query } from 'nano-queries/core/Query';
-import { ConfigurableSQLBuilder } from 'nano-queries/sql/ConfigurableSQLBuilder';
-
-export const qb = new ConfigurableSQLBuilder(new SQLCompiler());
 
 type ProxyMethods = keyof Pick<Database.Statement, 'all' | 'run' | 'get'>;
 type WrappedDbMethods = {
