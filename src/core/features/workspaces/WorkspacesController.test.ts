@@ -50,13 +50,13 @@ test('update workspace', async () => {
 	const workspaces = new WorkspacesController(db);
 
 	const id = await workspaces.create({ name: 'Workspace name' });
-	expect(workspaces.get(id)).resolves.toEqual({
+	await expect(workspaces.get(id)).resolves.toEqual({
 		id,
 		name: 'Workspace name',
 	});
 
 	await workspaces.update(id, { name: 'Updated name' });
-	expect(workspaces.get(id)).resolves.toEqual({
+	await expect(workspaces.get(id)).resolves.toEqual({
 		id,
 		name: 'Updated name',
 	});

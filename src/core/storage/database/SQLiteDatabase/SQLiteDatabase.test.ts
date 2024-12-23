@@ -1,3 +1,4 @@
+import type { MockInstance } from 'vitest';
 import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
@@ -108,7 +109,7 @@ describe('Database auto synchronization', () => {
 
 	const waitPossibleSync = () => wait(10);
 
-	let writeFnMock: jest.SpyInstance<Promise<void>, [buffer: ArrayBuffer], any>;
+	let writeFnMock: MockInstance<(buffer: ArrayBuffer) => Promise<void>>;
 	let db: SQLiteDatabase;
 	let notes: NotesController;
 
@@ -119,7 +120,7 @@ describe('Database auto synchronization', () => {
 	test('Sync runs immediately once DB has been opened', async () => {
 		const dbFile = createFileControllerMock();
 
-		writeFnMock = jest.spyOn(dbFile, 'write');
+		writeFnMock = vi.spyOn(dbFile, 'write');
 
 		// Open DB
 		db = await openDatabase(dbFile, { verbose: false, sync: syncOptions });

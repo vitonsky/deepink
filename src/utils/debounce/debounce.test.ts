@@ -7,19 +7,19 @@ describe('Debounce functions basic usage', () => {
 	};
 
 	beforeAll(() => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 	});
 	afterAll(() => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	});
 
 	afterEach(() => {
-		jest.clearAllTimers();
-		jest.clearAllMocks();
+		vi.clearAllTimers();
+		vi.clearAllMocks();
 	});
 
 	test('call function immediately when queue is empty', () => {
-		const callback = jest.fn();
+		const callback = vi.fn();
 		const debouncedCallback = debounce(callback, times);
 
 		// First call
@@ -27,13 +27,13 @@ describe('Debounce functions basic usage', () => {
 		expect(callback).toHaveBeenCalledTimes(1);
 
 		// One more call after delay time must be executed immediately
-		jest.advanceTimersByTime(times.wait);
+		vi.advanceTimersByTime(times.wait);
 		debouncedCallback();
 		expect(callback).toHaveBeenCalledTimes(2);
 	});
 
 	test('delay function calls in row', () => {
-		const callback = jest.fn();
+		const callback = vi.fn();
 		const debouncedCallback = debounce(callback, times);
 
 		// First call
@@ -45,17 +45,17 @@ describe('Debounce functions basic usage', () => {
 		debouncedCallback();
 		debouncedCallback();
 		expect(callback).toHaveBeenCalledTimes(1);
-		jest.advanceTimersByTime(times.wait);
+		vi.advanceTimersByTime(times.wait);
 		expect(callback).toHaveBeenCalledTimes(2);
 
 		// Execute call immediately, in case queue is empty
-		jest.advanceTimersByTime(times.wait);
+		vi.advanceTimersByTime(times.wait);
 		debouncedCallback();
 		expect(callback).toHaveBeenCalledTimes(3);
 	});
 
 	test('call function by deadline', () => {
-		const callback = jest.fn();
+		const callback = vi.fn();
 		const debouncedCallback = debounce(callback, times);
 
 		// First call
@@ -72,7 +72,7 @@ describe('Debounce functions basic usage', () => {
 		const stepTime = times.wait / 2;
 		const iterations = Math.ceil(times.deadline / stepTime);
 		for (let i = 0; i < iterations; i++) {
-			jest.advanceTimersByTime(stepTime);
+			vi.advanceTimersByTime(stepTime);
 			debouncedCallback();
 		}
 
