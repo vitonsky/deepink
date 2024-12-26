@@ -8,7 +8,8 @@ import React, {
 	useState,
 } from 'react';
 import { createEvent, EventCallable } from 'effector';
-import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/react';
+import { ModalContent, ModalOverlay } from '@chakra-ui/react';
+import { WorkspaceModal } from '@features/App/Workspace/WorkspaceModal';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export type ModalWindowApi = { onClose: () => void };
@@ -26,14 +27,21 @@ export const useModalWindow = createContextGetterHook(modalWindowContext);
 const modalWindowApiContext = createContext<ModalWindowApi>(null as any);
 export const useModalWindowApi = createContextGetterHook(modalWindowApiContext);
 
-export const ModalWindowProvider: FC<PropsWithChildren> = ({ children }) => {
+export type ModalWindowProviderProps = PropsWithChildren<{
+	isVisible?: boolean;
+}>;
+
+export const ModalWindowProvider: FC<ModalWindowProviderProps> = ({
+	isVisible = true,
+	children,
+}) => {
 	const [context] = useState(() => ({
 		show: createEvent<ModalWindowShowPayload>(),
 	}));
 
 	const [modalContexts, setModalContexts] = useState<ModalWindowShowPayload[]>([]);
 
-	const modalContext = modalContexts[0] ?? null;
+	const modalContext = (modalContexts[0] ?? null) as ModalWindowShowPayload | null;
 	const onClose = useCallback(() => {
 		if (!modalContext) return;
 
@@ -64,12 +72,12 @@ export const ModalWindowProvider: FC<PropsWithChildren> = ({ children }) => {
 		<modalWindowContext.Provider value={context}>
 			{children}
 			{modalContext && (
-				<Modal isOpen isCentered onClose={onClose}>
+				<WorkspaceModal isOpen={isVisible} isCentered onClose={onClose}>
 					<ModalOverlay />
 					<modalWindowApiContext.Provider value={api}>
 						<ModalContent>{modalContext.content(api)}</ModalContent>
 					</modalWindowApiContext.Provider>
-				</Modal>
+				</WorkspaceModal>
 			)}
 		</modalWindowContext.Provider>
 	);

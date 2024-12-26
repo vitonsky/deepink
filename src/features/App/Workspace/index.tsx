@@ -6,8 +6,12 @@ import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectActiveWorkspaceInfo, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	selectActiveWorkspaceInfo,
+	selectWorkspaceName,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -32,6 +36,8 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
+
+	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
 	// Close notes by unmount
 	useEffect(() => {
@@ -81,6 +87,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 
 	return (
 		<Box
+			data-workspace={workspaceName}
 			sx={{
 				display: isVisibleWorkspace ? 'flex' : 'none',
 				flexDirection: 'column',
@@ -127,7 +134,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 							),
 					}}
 				>
-					<ModalWindowProvider>
+					<ModalWindowProvider isVisible={isVisibleWorkspace ?? false}>
 						<MainScreen />
 						<WorkspaceStatusBarItems />
 					</ModalWindowProvider>
