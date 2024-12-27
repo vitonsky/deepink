@@ -3,8 +3,8 @@ import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
-import { ModalWindowProvider } from '@features/ModalWindow/useModalWindow';
 import { SplashScreen } from '@features/SplashScreen';
+import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -137,10 +137,10 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 							),
 					}}
 				>
-					<ModalWindowProvider isVisible={isVisibleWorkspace ?? false}>
+					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
 						<MainScreen />
 						<WorkspaceStatusBarItems />
-					</ModalWindowProvider>
+					</WorkspaceModalProvider>
 				</WorkspaceProvider>
 			) : (
 				<SplashScreen />

@@ -11,7 +11,7 @@ import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
  * Window automatically will be hidden if workspace will be inactive,
  * and become visible back when workspace will be active again.
  */
-export const ModalWindow = (props: ModalProps) => {
+export const WorkspaceModal = (props: ModalProps) => {
 	const workspaceData = useWorkspaceData();
 	const { profileId } = useWorkspaceData();
 

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FaGear, FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
 import { Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
-import { useModalWindow } from '@features/ModalWindow/useModalWindow';
+import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -32,7 +32,7 @@ export const WorkspaceBar = () => {
 	);
 	const workspaces = useAppSelector(selectWorkspacesWithMemo);
 
-	const modal = useModalWindow();
+	const modal = useWorkspaceModal();
 
 	return (
 		<VStack w="100%">

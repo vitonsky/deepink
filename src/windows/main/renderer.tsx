@@ -6,7 +6,6 @@ import z from 'zod';
 import { ChakraProvider } from '@chakra-ui/react';
 import { theme } from '@components/theme';
 import { App } from '@features/App/index';
-import { ModalWindowProvider } from '@features/ModalWindow/useModalWindow';
 import { selectSettings, settingsApi } from '@state/redux/settings/settings';
 import { store } from '@state/redux/store';
 
@@ -49,9 +48,7 @@ const reactRoot = createRoot(rootNode);
 reactRoot.render(
 	<Provider store={store}>
 		<ChakraProvider theme={theme}>
-			<ModalWindowProvider>
-				<App />
-			</ModalWindowProvider>
+			<App />
 		</ChakraProvider>
 	</Provider>,
 );

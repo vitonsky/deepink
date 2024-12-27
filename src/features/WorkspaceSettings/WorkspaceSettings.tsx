@@ -17,7 +17,7 @@ import {
 	WorkspaceCreatePopup,
 	workspacePropsValidator,
 } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
-import { useModalWindow } from '@features/ModalWindow/useModalWindow';
+import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -97,7 +97,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		workspacesManager,
 	]);
 
-	const modal = useModalWindow();
+	const modal = useWorkspaceModal();
 
 	return (
 		<ModalScreen isVisible onClose={onClose} title="Workspace settings">

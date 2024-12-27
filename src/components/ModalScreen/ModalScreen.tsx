@@ -9,7 +9,7 @@ import {
 	useMultiStyleConfig,
 	VStack,
 } from '@chakra-ui/react';
-import { ModalWindow } from '@features/ModalWindow';
+import { WorkspaceModal } from '@features/WorkspaceModal';
 
 export interface ModalScreenProps extends HTMLAttributes<HTMLDivElement> {
 	isVisible?: boolean;
@@ -27,7 +27,7 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 	const styles = useMultiStyleConfig('ModalScreen');
 
 	return (
-		<ModalWindow
+		<WorkspaceModal
 			size="full"
 			isOpen={Boolean(isVisible)}
 			scrollBehavior="inside"
@@ -67,6 +67,6 @@ export const ModalScreen: FC<ModalScreenProps> = ({
 					</Box>
 				</VStack>
 			</ModalContent>
-		</ModalWindow>
+		</WorkspaceModal>
 	);
 };

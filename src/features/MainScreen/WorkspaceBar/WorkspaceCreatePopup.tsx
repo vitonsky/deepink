@@ -11,8 +11,8 @@ import {
 } from '@chakra-ui/react';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
-import { useModalWindowApi } from '@features/ModalWindow/useModalWindow';
 import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
+import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
@@ -26,7 +26,7 @@ export const workspacePropsValidator = z.object({
 export const WorkspaceCreatePopup = () => {
 	const dispatch = useAppDispatch();
 
-	const { onClose } = useModalWindowApi();
+	const { onClose } = useModalApi();
 
 	const { profileId } = useWorkspaceData();
 

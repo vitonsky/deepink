@@ -11,7 +11,7 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
-import { useModalWindow } from '@features/ModalWindow/useModalWindow';
+import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 
 import { PropertiesForm } from '../../RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 
@@ -22,7 +22,7 @@ export const LinkButton: FC<
 		onPick: (payload: InsertingPayloadMap['link']) => void;
 	}
 > = ({ onPick }) => {
-	const { show } = useModalWindow();
+	const { show } = useWorkspaceModal();
 
 	return (
 		<>
