@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 import { Profile, ProfileControlsContext } from '../Profile';
 import { ProfilesApi } from './hooks/useProfileContainers';
@@ -24,11 +23,9 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				};
 
 				return (
-					<StatusBarProvider key={profile.profile.id}>
-						<ProfileControlsContext.Provider value={controls}>
-							<Profile profile={profile} controls={controls} />
-						</ProfileControlsContext.Provider>
-					</StatusBarProvider>
+					<ProfileControlsContext.Provider value={controls}>
+						<Profile profile={profile} controls={controls} />
+					</ProfileControlsContext.Provider>
 				);
 			})}
 		</>

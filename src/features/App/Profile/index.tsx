@@ -1,6 +1,7 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
@@ -12,7 +13,6 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
-import { useProfileSyncButton } from './ProfileStatusBar/useProfileSyncButton';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
@@ -79,8 +79,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		};
 	}, [dispatch, profileId, workspacesManager]);
 
-	useProfileSyncButton();
-
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{workspaces.map((workspace) =>
@@ -89,11 +87,13 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						key={workspace.id}
 						value={{ profileId: profileId, workspaceId: workspace.id }}
 					>
-						<Workspace profile={currentProfile} />
+						<StatusBarProvider>
+							<Workspace profile={currentProfile} />
+							<ProfileStatusBar />
+						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				) : null,
 			)}
-			<ProfileStatusBar />
 		</ProfileControlsContext.Provider>
 	);
 };
