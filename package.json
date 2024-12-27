@@ -6,7 +6,6 @@
 	"license": "MIT",
 	"scripts": {
 		"test": "npm rebuild && vitest",
-		"test-fast": "npm rebuild && TEST_FAST=true vitest",
 		"clean": "rm -Rf dist out",
 		"build:dev": "npm run prepare-electron-deps && webpack -w",
 		"start": "electron-forge start -- --no-sandbox",
