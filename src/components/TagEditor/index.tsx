@@ -14,7 +14,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
-import { WorkspaceModal } from '@features/App/Workspace/WorkspaceModal';
+import { ModalWindow } from '@features/ModalWindow';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
 
@@ -90,7 +90,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	}, [parentTagId, tags]);
 
 	return (
-		<WorkspaceModal isOpen onClose={onCancel} isCentered>
+		<ModalWindow isOpen onClose={onCancel} isCentered>
 			<ModalOverlay />
 			<ModalContent>
 				<ModalCloseButton />
@@ -183,6 +183,6 @@ export const TagEditor: FC<ITagEditorProps> = ({
 					</HStack>
 				</ModalFooter>
 			</ModalContent>
-		</WorkspaceModal>
+		</ModalWindow>
 	);
 };

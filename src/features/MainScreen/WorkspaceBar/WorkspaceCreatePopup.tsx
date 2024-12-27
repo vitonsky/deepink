@@ -9,9 +9,9 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
-import { useModalWindowApi } from '@components/useModalWindow';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
+import { useModalWindowApi } from '@features/ModalWindow/useModalWindow';
 import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';

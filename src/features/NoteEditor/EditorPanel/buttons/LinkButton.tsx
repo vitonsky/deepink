@@ -11,7 +11,7 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
-import { useModalWindow } from '@components/useModalWindow';
+import { useModalWindow } from '@features/ModalWindow/useModalWindow';
 
 import { PropertiesForm } from '../../RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 

@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { createEvent, EventCallable } from 'effector';
 import { ModalContent, ModalOverlay } from '@chakra-ui/react';
-import { WorkspaceModal } from '@features/App/Workspace/WorkspaceModal';
+import { ModalWindow } from '@features/ModalWindow';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export type ModalWindowApi = { onClose: () => void };
@@ -72,12 +72,12 @@ export const ModalWindowProvider: FC<ModalWindowProviderProps> = ({
 		<modalWindowContext.Provider value={context}>
 			{children}
 			{modalContext && (
-				<WorkspaceModal isOpen={isVisible} isCentered onClose={onClose}>
+				<ModalWindow isOpen={isVisible} isCentered onClose={onClose}>
 					<ModalOverlay />
 					<modalWindowApiContext.Provider value={api}>
 						<ModalContent>{modalContext.content(api)}</ModalContent>
 					</modalWindowApiContext.Provider>
-				</WorkspaceModal>
+				</ModalWindow>
 			)}
 		</modalWindowContext.Provider>
 	);

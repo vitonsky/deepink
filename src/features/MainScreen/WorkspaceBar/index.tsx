@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FaGear, FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
 import { Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
-import { useModalWindow } from '@components/useModalWindow';
+import { useModalWindow } from '@features/ModalWindow/useModalWindow';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';

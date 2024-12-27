@@ -1,9 +1,9 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
-import { ModalWindowProvider } from '@components/useModalWindow';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
+import { ModalWindowProvider } from '@features/ModalWindow/useModalWindow';
 import { SplashScreen } from '@features/SplashScreen';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';

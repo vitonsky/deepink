@@ -5,7 +5,6 @@ import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
-import { useModalWindow } from '@components/useModalWindow';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
 import {
@@ -18,6 +17,7 @@ import {
 	WorkspaceCreatePopup,
 	workspacePropsValidator,
 } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
+import { useModalWindow } from '@features/ModalWindow/useModalWindow';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
