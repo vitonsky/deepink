@@ -97,10 +97,7 @@ export const useProfileContainers = () => {
 				return workspaces.length > 0;
 			});
 			if (!isWorkspacesExists) {
-				await Promise.all([
-					workspaces.create({ name: 'Notes' }),
-					workspaces.create({ name: 'Personal' }),
-				]);
+				await Promise.all([workspaces.create({ name: 'Notes' })]);
 			}
 
 			// TODO: close DB first and close encryption last
