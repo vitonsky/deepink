@@ -93,11 +93,11 @@ export const useProfileContainers = () => {
 
 			// Ensure at least one workspace exists
 			const workspaces = new WorkspacesController(db);
-			const isWorkspacesExists = await workspaces.getList().then((workspaces) => {
-				return workspaces.length > 0;
-			});
+			const isWorkspacesExists = await workspaces
+				.getList()
+				.then((workspaces) => workspaces.length > 0);
 			if (!isWorkspacesExists) {
-				await Promise.all([workspaces.create({ name: 'Notes' })]);
+				await workspaces.create({ name: 'Notes' });
 			}
 
 			// TODO: close DB first and close encryption last
