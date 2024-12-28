@@ -49,7 +49,6 @@ export const useProfilesList = (): ProfilesListApi => {
 					name: profile.name,
 					encryption: null,
 				});
-				return;
 			} else {
 				// Create encrypted profile
 				const salt = getRandomBytes(96);
@@ -75,7 +74,7 @@ export const useProfilesList = (): ProfilesListApi => {
 				});
 			}
 
-			updateProfiles();
+			await updateProfiles();
 		},
 		[profilesManager, updateProfiles],
 	);
