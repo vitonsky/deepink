@@ -1,19 +1,24 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { FaGear } from 'react-icons/fa6';
+import { FaGear, FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
-import { Button, HStack, Select } from '@chakra-ui/react';
+import { Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
+import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
-import { useAppSelector } from '@state/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspaces } from '@state/redux/profiles/profiles';
+import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+
+import { WorkspaceCreatePopup } from './WorkspaceCreatePopup';
 
 export const WorkspaceBar = () => {
+	const dispatch = useAppDispatch();
+
 	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
 	const editWorkspace = useCallback(() => {
 		setIsWorkspaceEditing(true);
 	}, []);
 
-	const { profileId } = useWorkspaceData();
+	const { profileId, workspaceId } = useWorkspaceData();
 
 	const selectWorkspacesWithMemo = useMemo(
 		() =>
@@ -27,14 +32,51 @@ export const WorkspaceBar = () => {
 	);
 	const workspaces = useAppSelector(selectWorkspacesWithMemo);
 
+	const modal = useWorkspaceModal();
+
 	return (
-		<>
+		<VStack w="100%">
+			<HStack w="100%">
+				<Text
+					as="h2"
+					fontWeight="bold"
+					fontSize="16px"
+					color="typography.secondary"
+				>
+					Workspaces
+				</Text>
+
+				<Button
+					variant="ghost"
+					size="xs"
+					marginLeft="auto"
+					onClick={() => {
+						modal.show({
+							content: () => <WorkspaceCreatePopup />,
+						});
+					}}
+				>
+					<FaPlus />
+				</Button>
+			</HStack>
+
+			<Divider />
+
 			<HStack w="100%" marginTop="auto">
 				<Select
 					size="sm"
 					variant="secondary"
-					defaultValue="default"
 					borderRadius="6px"
+					value={workspaceId}
+					onChange={(evt) => {
+						const workspaceId = evt.target.value;
+						dispatch(
+							workspacesApi.setActiveWorkspace({
+								profileId,
+								workspaceId,
+							}),
+						);
+					}}
 				>
 					{workspaces.map((workspace) => (
 						<option key={workspace.id} value={workspace.id}>
@@ -52,10 +94,9 @@ export const WorkspaceBar = () => {
 				</Button>
 			</HStack>
 
-			<WorkspaceSettings
-				isVisible={isWorkspaceEditing}
-				onClose={() => setIsWorkspaceEditing(false)}
-			/>
-		</>
+			{isWorkspaceEditing && (
+				<WorkspaceSettings onClose={() => setIsWorkspaceEditing(false)} />
+			)}
+		</VStack>
 	);
 };

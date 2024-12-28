@@ -8,7 +8,7 @@ test('basic usage', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
 
-	const attachments = new AttachmentsController(db);
+	const attachments = new AttachmentsController(db, 'fake-workspace-id');
 	await attachments.set('target1', ['foo', 'bar']);
 	await attachments.set('target2', ['foo', 'bar', 'qux']);
 

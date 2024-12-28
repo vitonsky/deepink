@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
-import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { useAppDispatch } from '@state/redux/hooks';
+import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { Profile, ProfileControlsContext } from '../Profile';
 import { ProfilesApi } from './hooks/useProfileContainers';
@@ -9,6 +10,7 @@ export type ProfilesProps = {
 };
 
 export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
+	const dispatch = useAppDispatch();
 	return (
 		<>
 			{profilesApi.profiles.map((profileContainer) => {
@@ -20,19 +22,21 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				const profile = profileContainer.getContent();
 				const controls = {
 					profile,
-					close: () => profilesApi.events.profileClosed(profileContainer),
+					close: () => {
+						profilesApi.events.profileClosed(profileContainer);
+
+						dispatch(
+							workspacesApi.removeProfile({
+								profileId: profile.profile.id,
+							}),
+						);
+					},
 				};
 
 				return (
-					<StatusBarProvider>
-						<ProfileControlsContext.Provider value={controls}>
-							<Profile
-								profile={profile}
-								key={profile.profile.id}
-								controls={controls}
-							/>
-						</ProfileControlsContext.Provider>
-					</StatusBarProvider>
+					<ProfileControlsContext.Provider value={controls}>
+						<Profile profile={profile} controls={controls} />
+					</ProfileControlsContext.Provider>
 				);
 			})}
 		</>

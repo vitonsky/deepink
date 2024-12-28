@@ -5,7 +5,6 @@ import {
 	FormErrorMessage,
 	HStack,
 	Input,
-	Modal,
 	ModalBody,
 	ModalCloseButton,
 	ModalContent,
@@ -15,6 +14,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
+import { WorkspaceModal } from '@features/WorkspaceModal';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
 
@@ -90,7 +90,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	}, [parentTagId, tags]);
 
 	return (
-		<Modal isOpen onClose={onCancel} isCentered>
+		<WorkspaceModal isOpen onClose={onCancel} isCentered>
 			<ModalOverlay />
 			<ModalContent>
 				<ModalCloseButton />
@@ -183,6 +183,6 @@ export const TagEditor: FC<ITagEditorProps> = ({
 					</HStack>
 				</ModalFooter>
 			</ModalContent>
-		</Modal>
+		</WorkspaceModal>
 	);
 };

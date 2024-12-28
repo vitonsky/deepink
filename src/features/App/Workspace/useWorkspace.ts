@@ -4,6 +4,7 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { useWorkspaceData } from '@state/redux/profiles/hooks';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 
@@ -18,11 +19,14 @@ export type WorkspaceContainer = {
 export const useWorkspace = (currentProfile: ProfileContainer) => {
 	const [state, setState] = useState<WorkspaceContainer | null>(null);
 
+	const { workspaceId } = useWorkspaceData();
+
 	useEffect(() => {
 		const { db, profile, encryptionController } = currentProfile;
+
 		// Setup files
 		// TODO: implement methods to close the objects after use
-		const attachmentsController = new AttachmentsController(db);
+		const attachmentsController = new AttachmentsController(db, workspaceId);
 		const filesController = new ElectronFilesController(
 			[profile.id, 'files'].join('/'),
 			encryptionController,
@@ -31,9 +35,10 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 			db,
 			filesController,
 			attachmentsController,
+			workspaceId,
 		);
-		const tagsRegistry = new TagsController(db);
-		const notesRegistry = new NotesController(db);
+		const tagsRegistry = new TagsController(db, workspaceId);
+		const notesRegistry = new NotesController(db, workspaceId);
 
 		setState({
 			attachmentsController,
@@ -42,7 +47,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 			tagsRegistry,
 			notesRegistry,
 		});
-	}, [currentProfile]);
+	}, [currentProfile, workspaceId]);
 
 	return state;
 };

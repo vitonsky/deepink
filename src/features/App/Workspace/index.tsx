@@ -1,12 +1,20 @@
-import React, { createContext, FC, useEffect } from 'react';
+import React, { createContext, FC, useEffect, useMemo } from 'react';
+import { isEqual } from 'lodash';
+import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
+import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectActiveWorkspace, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	selectActiveWorkspaceInfo,
+	selectWorkspaceName,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
+import { useProfileSyncButton } from '../Profile/ProfileStatusBar/useProfileSyncButton';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -29,6 +37,10 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
+
+	useProfileSyncButton();
+
+	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
 	// Close notes by unmount
 	useEffect(() => {
@@ -68,38 +80,71 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	}, [dispatch, workspace, workspaceData]);
 
 	const { profileId } = useWorkspaceData();
-	const activeWorkspace = useAppSelector(selectActiveWorkspace({ profileId }));
 
-	if (!workspace || !activeWorkspace) {
-		return <SplashScreen />;
-	}
+	const activeWorkspace = useAppSelector(
+		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
+		isEqual,
+	);
+	const isVisibleWorkspace =
+		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
 	return (
-		<WorkspaceProvider
-			{...workspace}
-			notesApi={{
-				openNote: (note: INote, focus = true) => {
-					dispatch(workspacesApi.addOpenedNote({ ...workspaceData, note }));
-
-					if (focus) {
-						dispatch(
-							workspacesApi.setActiveNote({
-								...workspaceData,
-								noteId: note.id,
-							}),
-						);
-					}
-				},
-				noteUpdated: (note: INote) =>
-					dispatch(workspacesApi.updateOpenedNote({ ...workspaceData, note })),
-				noteClosed: (noteId: string) =>
-					dispatch(
-						workspacesApi.removeOpenedNote({ ...workspaceData, noteId }),
-					),
+		<Box
+			data-workspace={workspaceName}
+			sx={{
+				display: isVisibleWorkspace ? 'flex' : 'none',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				backgroundColor: 'surface.background',
+				color: 'typography.primary',
 			}}
 		>
-			<MainScreen />
-			<WorkspaceStatusBarItems />
-		</WorkspaceProvider>
+			{workspace ? (
+				<WorkspaceProvider
+					{...workspace}
+					notesApi={{
+						openNote: (note: INote, focus = true) => {
+							dispatch(
+								workspacesApi.addOpenedNote({ ...workspaceData, note }),
+							);
+
+							if (focus) {
+								dispatch(
+									workspacesApi.setActiveNote({
+										...workspaceData,
+										noteId: note.id,
+									}),
+								);
+							}
+						},
+						noteUpdated: (note: INote) =>
+							dispatch(
+								workspacesApi.updateOpenedNote({
+									...workspaceData,
+									note,
+								}),
+							),
+						noteClosed: (noteId: string) =>
+							dispatch(
+								workspacesApi.removeOpenedNote({
+									...workspaceData,
+									noteId,
+								}),
+							),
+					}}
+				>
+					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
+						<MainScreen />
+						<WorkspaceStatusBarItems />
+					</WorkspaceModalProvider>
+				</WorkspaceProvider>
+			) : (
+				<SplashScreen />
+			)}
+		</Box>
 	);
 };

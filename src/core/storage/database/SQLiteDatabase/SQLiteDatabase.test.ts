@@ -1,3 +1,4 @@
+import type { MockInstance } from 'vitest';
 import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
@@ -29,7 +30,9 @@ describe('migrations', () => {
 			.prepare(`SELECT name FROM main.sqlite_master WHERE type='table'`)
 			.all();
 		expect(tablesList).toEqual(
-			['notes', 'files', 'attachments'].map((name) => ({ name })),
+			expect.arrayContaining(
+				['notes', 'files', 'attachments'].map((name) => ({ name })),
+			),
 		);
 
 		await db.close();
@@ -106,7 +109,7 @@ describe('Database auto synchronization', () => {
 
 	const waitPossibleSync = () => wait(10);
 
-	let writeFnMock: jest.SpyInstance<Promise<void>, [buffer: ArrayBuffer], any>;
+	let writeFnMock: MockInstance<(buffer: ArrayBuffer) => Promise<void>>;
 	let db: SQLiteDatabase;
 	let notes: NotesController;
 
@@ -117,7 +120,7 @@ describe('Database auto synchronization', () => {
 	test('Sync runs immediately once DB has been opened', async () => {
 		const dbFile = createFileControllerMock();
 
-		writeFnMock = jest.spyOn(dbFile, 'write');
+		writeFnMock = vi.spyOn(dbFile, 'write');
 
 		// Open DB
 		db = await openDatabase(dbFile, { verbose: false, sync: syncOptions });
@@ -125,7 +128,7 @@ describe('Database auto synchronization', () => {
 		// Check forced sync that has been called while DB opening
 		expect(writeFnMock).toBeCalledTimes(1);
 
-		notes = new NotesController(db);
+		notes = new NotesController(db, 'fake-workspace-id');
 	});
 
 	test('Sync runs for first data mutation', async () => {

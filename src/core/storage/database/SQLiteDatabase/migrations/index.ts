@@ -40,6 +40,18 @@ const migrations = [
 			})();
 		},
 	},
+	{
+		version: 4,
+		up: async (db: MigrationsTarget) => {
+			db.transaction(() => {
+				db.exec(`CREATE TABLE "workspaces" (
+					"id"	TEXT NOT NULL UNIQUE,
+					"name"	TEXT NOT NULL,
+					PRIMARY KEY("id")
+					)`);
+			})();
+		},
+	},
 ] as const;
 
 export const latestSchemaVersion = migrations[migrations.length - 1].version;

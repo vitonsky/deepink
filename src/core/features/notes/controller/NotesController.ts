@@ -1,4 +1,7 @@
+/* eslint-disable camelcase */
 import { v4 as uuid4 } from 'uuid';
+import { qb } from '@utils/db/query-builder';
+import { wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -25,19 +28,42 @@ const mappers = {
  */
 export class NotesController implements INotesController {
 	private db;
-	constructor(db: SQLiteDatabase) {
+	private readonly workspace;
+	constructor(db: SQLiteDatabase, workspace: string) {
 		this.db = db;
+		this.workspace = workspace;
 	}
 
 	public async getById(id: NoteId): Promise<INote | null> {
-		const db = this.db.get();
-		const note = db.prepare('SELECT * FROM notes WHERE id=?').get(id);
+		const db = wrapDB(this.db.get());
+
+		const note = db.get(
+			qb
+				.select('*')
+				.from('notes')
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				)
+				.where(qb.values({ id })),
+		);
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
 	public async getLength(): Promise<number> {
-		const db = this.db.get();
-		const { length } = db.prepare('SELECT COUNT(id) as length FROM notes').get() as {
+		const db = wrapDB(this.db.get());
+
+		const { length } = db.get(
+			qb
+				.select('COUNT(id) as length')
+				.from('notes')
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				),
+		) as {
 			length?: number;
 		};
 		return length ?? 0;
@@ -50,60 +76,88 @@ export class NotesController implements INotesController {
 	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		const notes: INote[] = [];
 
-		const fetchQuery = ['SELECT * FROM notes'];
-		const fetchParams: (number | string)[] = [];
+		db.all(
+			qb
+				.select('*')
+				.from('notes')
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				)
+				.where(
+					tags.length > 0
+						? qb.line(
+								'id IN',
+								qb.group(
+									qb
+										.select('target')
+										.from('attachedTags')
+										.where(
+											qb.line(
+												'source IN',
+												qb.values(tags).withParenthesis(),
+											),
+										),
+								),
+						  )
+						: undefined,
+				)
+				.limit(limit)
+				.offset((page - 1) * limit),
+		).map((row) => {
+			// TODO: validate data for first note
 
-		if (tags.length > 0) {
-			const placeholders = Array(tags.length).fill('?').join(',');
-
-			fetchQuery.push(
-				`WHERE id IN (SELECT target FROM attachedTags WHERE source IN (${placeholders}))`,
-			);
-			fetchParams.push(...tags);
-		}
-
-		const offset = (page - 1) * limit;
-		fetchQuery.push(`LIMIT ? OFFSET ?`);
-		fetchParams.push(limit, offset);
-
-		db.prepare(fetchQuery.join(' '))
-			.all(fetchParams)
-			.map((row) => {
-				// TODO: validate data for first note
-
-				notes.push(mappers.rowToNoteObject(row));
-			});
+			notes.push(mappers.rowToNoteObject(row));
+		});
 
 		return notes;
 	}
 
 	public async add(note: INoteContent): Promise<NoteId> {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		const creationTime = new Date().getTime();
 
 		// Insert data
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
-		const insertResult = db
-			.prepare(
-				'INSERT INTO notes ("id","title","text","creationTime","lastUpdateTime") VALUES (@id,@title,@text,@created,@updated)',
-			)
-			.run({
-				id: uuid4(),
-				title: note.title,
-				text: note.text,
-				created: creationTime,
-				updated: creationTime,
-			});
+
+		const insertResult = db.run(
+			qb.line(
+				'INSERT INTO notes ("id","workspace_id","title","text","creationTime","lastUpdateTime") VALUES',
+				qb
+					.values([
+						uuid4(),
+						this.workspace,
+						note.title,
+						note.text,
+						creationTime,
+						creationTime,
+					])
+					.withParenthesis(),
+			),
+		);
 
 		// Get generated id
-		const selectWithId = (await db
-			.prepare('SELECT `id` FROM notes WHERE rowid=?')
-			.get(insertResult.lastInsertRowid)) as { id: string };
+		const selectWithId = db.get(
+			qb
+				.select('id')
+				.from('notes')
+				.where(
+					qb.values({
+						workspace_id: this.workspace,
+					}),
+				)
+				.where(
+					qb.values({
+						rowid: Number(insertResult.lastInsertRowid),
+					}),
+				),
+		) as { id: string };
 
 		if (!selectWithId || !selectWithId.id) {
 			throw new Error("Can't get id of inserted row");
@@ -113,19 +167,22 @@ export class NotesController implements INotesController {
 	}
 
 	public async update(id: string, updatedNote: INoteContent) {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		const updateTime = new Date().getTime();
-		const result = db
-			.prepare(
-				'UPDATE notes SET "title"=@title, "text"=@text, "lastUpdateTime"=@updateTime WHERE "id"=@id',
-			)
-			.run({
-				title: updatedNote.title,
-				text: updatedNote.text,
-				updateTime: updateTime,
-				id: id,
-			});
+		const result = db.run(
+			qb.line(
+				'UPDATE notes SET',
+				qb.values({
+					title: updatedNote.title,
+					text: updatedNote.text,
+					lastUpdateTime: updateTime,
+				}),
+				qb
+					.where(qb.values({ id }))
+					.and(qb.values({ workspace_id: this.workspace })),
+			),
+		);
 
 		if (!result.changes || result.changes < 1) {
 			throw new Error('Note did not updated');
@@ -133,12 +190,20 @@ export class NotesController implements INotesController {
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
-		const placeholders = Array(ids.length).fill('?').join(',');
-		const result = db
-			.prepare(`DELETE FROM notes WHERE id IN (${placeholders})`)
-			.run(ids);
+		const result = db.run(
+			qb.line(
+				'DELETE FROM notes',
+				qb
+					.where(
+						qb.values({
+							workspace_id: this.workspace,
+						}),
+					)
+					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
+			),
+		);
 
 		if (result.changes !== ids.length) {
 			console.warn(

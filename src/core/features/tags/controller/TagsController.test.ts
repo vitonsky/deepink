@@ -9,7 +9,7 @@ describe('manage tags', () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 
-		const tags = new TagsController(db);
+		const tags = new TagsController(db, 'workspace-fake-id');
 
 		await tags.add('foo', null);
 		await tags.add('bar', null).then((tagId) => tags.add('baz', tagId));
@@ -42,7 +42,7 @@ describe('manage tags', () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 
-		const tags = new TagsController(db);
+		const tags = new TagsController(db, 'workspace-fake-id');
 
 		await tags.add('foo', null).then(async (tagId) => {
 			await tags.update({
@@ -90,7 +90,7 @@ describe('manage tags', () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 
-		const tags = new TagsController(db);
+		const tags = new TagsController(db, 'workspace-fake-id');
 
 		await tags.add('foo', null);
 
@@ -117,7 +117,7 @@ describe('manage attachments', () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 
-		const tags = new TagsController(db);
+		const tags = new TagsController(db, 'workspace-fake-id');
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
@@ -162,7 +162,7 @@ describe('manage attachments', () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 
-		const tags = new TagsController(db);
+		const tags = new TagsController(db, 'workspace-fake-id');
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
