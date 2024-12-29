@@ -9,7 +9,7 @@ import { NewProfile } from '@features/App/WorkspaceManager/ProfileCreator';
 export type ProfilesListApi = {
 	isProfilesLoaded: boolean;
 	profiles: ProfileObject[];
-	createProfile: (profile: NewProfile) => Promise<void>;
+	createProfile: (profile: NewProfile) => Promise<ProfileObject>;
 };
 
 /**
@@ -43,13 +43,13 @@ export const useProfilesList = (): ProfilesListApi => {
 
 	const createProfile = useCallback(
 		async (profile: NewProfile) => {
+			let profileData;
 			if (profile.password === null) {
 				// Create profile with no encryption
-				await profilesManager.add({
+				profileData = await profilesManager.add({
 					name: profile.name,
 					encryption: null,
 				});
-				return;
 			} else {
 				// Create encrypted profile
 				const salt = getRandomBytes(96);
@@ -65,7 +65,7 @@ export const useProfilesList = (): ProfilesListApi => {
 					.encrypt(key)
 					.finally(() => encryption.dispose());
 
-				await profilesManager.add({
+				profileData = await profilesManager.add({
 					name: profile.name,
 					encryption: {
 						algorithm: 'default',
@@ -75,7 +75,9 @@ export const useProfilesList = (): ProfilesListApi => {
 				});
 			}
 
-			updateProfiles();
+			await updateProfiles();
+
+			return profileData;
 		},
 		[profilesManager, updateProfiles],
 	);
