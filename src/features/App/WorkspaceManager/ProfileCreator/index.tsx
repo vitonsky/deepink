@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
 import { Button, Input, Text, VStack } from '@chakra-ui/react';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
@@ -18,6 +18,9 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	onCreateProfile,
 	onCancel,
 }) => {
+	const profileNameInputRef = useFocusableRef<HTMLInputElement>();
+	const passwordInputRef = createRef<HTMLInputElement>();
+
 	const [isPending, setIsPending] = useState(false);
 
 	const [profileName, setProfileName] = useState('');
@@ -36,11 +39,13 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		async (usePassword = true) => {
 			if (!profileName) {
 				setProfileNameError('Enter profile name');
+				profileNameInputRef.current?.focus();
 				return;
 			}
 
 			if (usePassword && !password) {
 				setPasswordError('Enter the password');
+				passwordInputRef.current?.focus();
 				return;
 			}
 
@@ -59,10 +64,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				setProfileNameError(response);
 			}
 		},
-		[onCreateProfile, password, profileName],
+		[onCreateProfile, password, passwordInputRef, profileName, profileNameInputRef],
 	);
-
-	const firstInputRef = useFocusableRef<HTMLInputElement>();
 
 	return (
 		<ProfilesForm
@@ -99,7 +102,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			<VStack w="100%" alignItems="start">
 				<VStack w="100%" alignItems="start">
 					<Input
-						ref={firstInputRef}
+						ref={profileNameInputRef}
 						variant="filled"
 						size="lg"
 						placeholder="Profile name"
@@ -114,6 +117,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 				<VStack w="100%" alignItems="start">
 					<Input
+						ref={passwordInputRef}
 						variant="filled"
 						size="lg"
 						type="password"
