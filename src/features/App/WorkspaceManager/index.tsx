@@ -2,6 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
+import { ProfileObject } from '@core/storage/ProfilesManager';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -15,7 +16,7 @@ type PickProfileResponse = {
 };
 
 export type OnPickProfile = (
-	id: string,
+	profile: ProfileObject,
 	password?: string,
 ) => Promise<PickProfileResponse>;
 
@@ -37,12 +38,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	onChooseProfile,
 }) => {
 	const onOpenProfile: OnPickProfile = useCallback(
-		async (id: string, password?: string) => {
-			const profile =
-				profilesManager.profiles &&
-				profilesManager.profiles.find((profile) => profile.id === id);
-			if (!profile) return { status: 'error', message: 'Profile not exists' };
-
+		async (profile: ProfileObject, password?: string) => {
 			// Profiles with no password
 			if (!profile.encryption) {
 				await profiles.openProfile({ profile }, true);
@@ -62,7 +58,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				return { status: 'error', message: 'Invalid password' };
 			}
 		},
-		[profilesManager.profiles, profiles],
+		[profiles],
 	);
 
 	const currentProfileObject = useMemo(
@@ -79,8 +75,11 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
-						profilesManager.createProfile(profile).then(() => {
+						profilesManager.createProfile(profile).then((newProfile) => {
 							setScreenName('main');
+							onOpenProfile(newProfile, profile.password ?? undefined).then(
+								console.warn,
+							);
 						})
 					}
 					onCancel={() => setScreenName('main')}
@@ -144,7 +143,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 								onClick={() => {
 									onChooseProfile(profile.id);
 									if (profile.encryption === null) {
-										onOpenProfile(profile.id);
+										onOpenProfile(profile);
 									}
 								}}
 							>

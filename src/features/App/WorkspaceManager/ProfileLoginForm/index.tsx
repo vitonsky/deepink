@@ -29,14 +29,14 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		setErrorMessage(null);
 		setIsPending(true);
 
-		const response = await onLogin(profile.id, secret || undefined).finally(() => {
+		const response = await onLogin(profile, secret || undefined).finally(() => {
 			setIsPending(false);
 		});
 
 		if (response.status === 'error') {
 			setErrorMessage(response.message ?? 'Unknown error');
 		}
-	}, [onLogin, profile.id, secret]);
+	}, [onLogin, profile, secret]);
 
 	const firstInputRef = useFocusableRef<HTMLInputElement>();
 
