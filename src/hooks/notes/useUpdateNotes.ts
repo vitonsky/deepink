@@ -11,6 +11,8 @@ export const useUpdateNotes = () => {
 	const notesRegistry = useNotesRegistry();
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 
+	console.log('>> useUpdateNotes');
+
 	return useCallback(async () => {
 		const tags = activeTag === null ? [] : [activeTag.id];
 		const notes = await notesRegistry.get({ limit: 10000, tags });

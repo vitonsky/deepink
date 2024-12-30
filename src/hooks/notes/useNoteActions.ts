@@ -1,13 +1,16 @@
 import { useCallback } from 'react';
+import { useStore } from 'react-redux';
 import { NoteId } from '@core/features/notes';
 import { useNotesContext } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import {
+	selectIsNoteOpened,
 	selectNotes,
-	selectOpenedNotes,
+	selectWorkspace,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { RootState } from '@state/redux/store';
 
 export const useNoteActions = () => {
 	const dispatch = useAppDispatch();
@@ -15,13 +18,19 @@ export const useNoteActions = () => {
 
 	const { openNote, noteClosed } = useNotesContext();
 
-	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
-	const notes = useWorkspaceSelector(selectNotes);
+	const store = useStore<RootState>();
 
-	// TODO: focus on note input
 	const click = useCallback(
 		(id: NoteId) => {
-			const isNoteOpened = openedNotes.some((note) => note.id === id);
+			const workspace = selectWorkspace(workspaceData)(store.getState());
+			const notes = selectNotes(workspace);
+			const isNoteOpened = selectIsNoteOpened(id)(workspace);
+
+			console.log('DBG 1', {
+				isNoteOpened,
+				clickedNote: notes.find((note) => note.id === id),
+			});
+
 			if (isNoteOpened) {
 				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: id }));
 			} else {
@@ -31,7 +40,7 @@ export const useNoteActions = () => {
 				}
 			}
 		},
-		[dispatch, notes, openNote, openedNotes, workspaceData],
+		[dispatch, openNote, store, workspaceData],
 	);
 
 	const close = useCallback(
