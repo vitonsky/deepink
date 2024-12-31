@@ -8,20 +8,9 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
-
-function isElementInViewport(node: HTMLElement) {
-	// eslint-disable-next-line spellcheck/spell-checker
-	const rect = node.getBoundingClientRect();
-
-	return (
-		rect.top >= 0 &&
-		rect.left >= 0 &&
-		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-	);
-}
 
 export type NotesListProps = {};
 
