@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { isEqual } from 'lodash';
 import { useWorkspaceContext } from '@features/App/Workspace';
 import { Selector } from '@reduxjs/toolkit';
 
@@ -24,7 +25,5 @@ export const useWorkspaceSelector = <T>(
 	selector: Selector<WorkspaceData | null, T>,
 ): T => {
 	const selectWorkspace = useWorkspaceRootSelector();
-	const state = useAppSelector(selectWorkspace);
-
-	return selector(state);
+	return useAppSelector((state) => selector(selectWorkspace(state)), isEqual);
 };

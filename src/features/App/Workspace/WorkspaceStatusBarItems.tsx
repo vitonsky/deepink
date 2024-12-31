@@ -4,6 +4,7 @@ import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarPro
 import { useFirstRender } from '@hooks/useFirstRender';
 
 import { useProfileControls } from '../Profile';
+import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
 
 export const WorkspaceStatusBarItems = () => {
 	const statusBarButtons = useStatusBarManager();
@@ -37,6 +38,8 @@ export const WorkspaceStatusBarItems = () => {
 			},
 		);
 	});
+
+	useActiveNoteHistoryButton();
 
 	return null;
 };

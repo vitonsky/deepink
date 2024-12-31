@@ -1,18 +1,22 @@
-import React, { FC, ReactNode } from 'react';
+import React, { forwardRef, ReactNode } from 'react';
 import { Box, StackProps, Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
 
-export const NotePreview: FC<
+export const NotePreview = forwardRef<
+	HTMLDivElement,
 	{
 		title: string;
 		text: string;
 		meta?: ReactNode;
 		isSelected?: boolean;
 	} & StackProps
-> = ({ title, text, meta, isSelected, ...props }) => {
+>(({ title, text, meta, isSelected, ...props }, ref) => {
+	console.log('Render NotePreview');
+
 	const styles = useMultiStyleConfig('NotePreview');
 
 	return (
 		<VStack
+			ref={ref}
 			aria-selected={isSelected}
 			{...props}
 			sx={{
@@ -31,4 +35,4 @@ export const NotePreview: FC<
 			{meta && <Box sx={styles.meta}>{meta}</Box>}
 		</VStack>
 	);
-};
+});
