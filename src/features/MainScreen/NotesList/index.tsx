@@ -33,7 +33,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const virtualizer = useVirtualizer({
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 200,
+		estimateSize: () => 70,
 		overscan: 5,
 	});
 
@@ -85,6 +85,7 @@ export const NotesList: FC<NotesListProps> = () => {
 							top: 0,
 							left: 0,
 							transform: `translateY(${items[0]?.start ?? 0}px)`,
+							gap: '4px',
 						}}
 					>
 						{virtualizer.getVirtualItems().map((virtualRow) => {
