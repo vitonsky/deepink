@@ -12,6 +12,8 @@ import { $createHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleN
 import { MarkdownShortcutPlugin as ExternalMarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { mergeRegister } from '@lexical/utils';
 
+import { $createImageNode } from '../Image/ImageNode';
+
 const customTransformers = [LINK, CHECK_LIST, ...TRANSFORMERS];
 
 // TODO: fix bug with multiple checkbox items
@@ -89,6 +91,31 @@ export const $transformTextToHorizontalRule = (node: TextNode) => {
 	parent.replace($createHorizontalRuleNode()).selectEnd();
 };
 
+export const $transformTextToImage = (node: TextNode) => {
+	const text = node.getTextContent();
+	const match = text.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+	if (!match || match.index === undefined) return;
+
+	const imageSrc = match[2];
+	const startText = text.slice(0, match.index);
+	const endText = text.slice(match.index + match[0].length);
+
+	const newNodes = [];
+	//TODO: we should not dependce on order call
+	newNodes.push($createTextNode(startText));
+	const imageNode = $createImageNode({ src: imageSrc, altText: '' });
+	newNodes.push(imageNode);
+	newNodes.push($createTextNode(endText));
+
+	for (const newNode of newNodes.reverse()) {
+		node.insertAfter(newNode);
+	}
+	// remove old node
+	node.remove();
+	// set cursor to image end
+	imageNode.selectNext();
+};
+
 export const MarkdownShortcutPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
@@ -97,6 +124,7 @@ export const MarkdownShortcutPlugin = () => {
 			mergeRegister(
 				editor.registerNodeTransform(TextNode, $transformTextToCheckbox),
 				editor.registerNodeTransform(TextNode, $transformTextToHorizontalRule),
+				editor.registerNodeTransform(TextNode, $transformTextToImage),
 			),
 		[editor],
 	);
