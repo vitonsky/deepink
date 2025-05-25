@@ -23,12 +23,18 @@ export type ProfileContainer = {
 	encryptionController: EncryptionController;
 };
 
-const decryptKey = async (
-	encryptedKey: ArrayBuffer,
-	password: string,
-	salt: ArrayBuffer,
-) => {
-	const encryption = await createEncryption({ key: password, salt });
+const decryptKey = async ({
+	encryptedKey,
+	password,
+	salt,
+	algorithm,
+}: {
+	encryptedKey: ArrayBuffer;
+	password: string;
+	salt: ArrayBuffer;
+	algorithm: string;
+}) => {
+	const encryption = await createEncryption({ key: password, salt, algorithm });
 	return encryption
 		.getContent()
 		.decrypt(encryptedKey)
@@ -75,9 +81,18 @@ export const useProfileContainers = () => {
 				}
 
 				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
-				const key = await decryptKey(encryptedKeyBuffer, password, salt);
+				const key = await decryptKey({
+					encryptedKey: encryptedKeyBuffer,
+					password: password,
+					salt,
+					algorithm: profile.encryption.algorithm,
+				});
 
-				const encryption = await createEncryption({ key, salt });
+				const encryption = await createEncryption({
+					key,
+					salt,
+					algorithm: profile.encryption.algorithm,
+				});
 
 				encryptionCleanup = () => encryption.dispose();
 				encryptionController = encryption.getContent();

@@ -21,7 +21,7 @@ const messenger = new WorkerMessenger(self);
 const requests = new WorkerRPC(messenger);
 
 const workerId = performance.now();
-requests.addHandler('init', async ({ secretKey, salt }) => {
+requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
 	// Convert `ArrayBuffer`
@@ -36,20 +36,36 @@ requests.addHandler('init', async ({ secretKey, salt }) => {
 		getDerivedKeysManager(masterKey, salt),
 	);
 
-	const aesKey = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-		name: 'AES-GCM',
-		length: 256,
-	});
-	const twofishKey = await derivedKeys
-		.getDerivedBytes('twofish-ctr-cipher', 256)
-		.then((buffer) => new Uint8Array(buffer));
+	const getAESCipher = async () => {
+		const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
+			name: 'AES-GCM',
+			length: 256,
+		});
+		return new AESGCMCipher(key, getRandomBytes);
+	};
+	const getTwofishCipher = async () => {
+		const key = await derivedKeys
+			.getDerivedBytes('twofish-ctr-cipher', 256)
+			.then((buffer) => new Uint8Array(buffer));
+		return new TwofishCTRCipher(key, getRandomBytes);
+	};
+
+	const cipher = [];
+	if (algorithm === 'AES') {
+		cipher.push(await getAESCipher());
+	} else if (algorithm === 'Twofish') {
+		cipher.push(await getTwofishCipher());
+	} else {
+		const aes = await getAESCipher();
+		const twofish = await getTwofishCipher();
+		cipher.push(aes, twofish);
+	}
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
 			new BufferIntegrityProcessor(),
 			new BufferSizeObfuscationProcessor(getRandomBytes),
-			new AESGCMCipher(aesKey, getRandomBytes),
-			new TwofishCTRCipher(twofishKey, getRandomBytes),
+			...cipher,
 		]),
 	);
 });

@@ -12,10 +12,12 @@ import { WorkerEncryptionProxyProcessor } from './workers/WorkerEncryptionProxyP
 export const createEncryption = async (authData: {
 	key: string | ArrayBuffer;
 	salt: ArrayBuffer;
+	algorithm: string;
 }): Promise<DisposableBox<EncryptionController>> => {
 	const workerEncryption = new WorkerEncryptionProxyProcessor(
 		authData.key,
 		authData.salt,
+		authData.algorithm,
 	);
 	const encryptionController = new EncryptionController(workerEncryption);
 
