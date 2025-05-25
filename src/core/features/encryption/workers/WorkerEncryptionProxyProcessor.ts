@@ -7,7 +7,6 @@ import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
 import EncryptionWorker from './Cryptography.worker';
 
-// TODO: provide algorithm parameters
 /**
  * Transparent proxy an encryption requests to a worker
  * Useful to prevent main thread blocking for a long-term cryptographic operations
