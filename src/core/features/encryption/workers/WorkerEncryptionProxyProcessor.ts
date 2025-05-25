@@ -16,12 +16,12 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly worker;
 	private readonly messenger;
 	private readonly requests;
-	constructor(secretKey: string | ArrayBuffer, salt: ArrayBuffer) {
+	constructor(secretKey: string | ArrayBuffer, salt: ArrayBuffer, algorithm: string) {
 		const worker = new EncryptionWorker();
 		this.messenger = new WorkerMessenger(worker);
 		this.requests = new WorkerRPC(this.messenger);
 		this.worker = this.requests
-			.sendRequest('init', { secretKey, salt })
+			.sendRequest('init', { secretKey, salt, algorithm })
 			.then(() => worker);
 	}
 
