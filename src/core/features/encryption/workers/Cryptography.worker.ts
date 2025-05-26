@@ -55,7 +55,7 @@ requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 		cipher.push(await getAESCipher());
 	} else if (algorithm === 'twofish') {
 		cipher.push(await getTwofishCipher());
-	} else if (algorithm === 'both') {
+	} else {
 		const aes = await getAESCipher();
 		const twofish = await getTwofishCipher();
 		cipher.push(aes, twofish);

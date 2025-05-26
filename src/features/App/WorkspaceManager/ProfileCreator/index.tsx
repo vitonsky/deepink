@@ -60,7 +60,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			const response = await onCreateProfile({
 				name: profileName,
 				password: usePassword ? password : null,
-				algorithm: algorithm,
+				algorithm,
 			}).finally(() => {
 				setIsPending(false);
 			});
