@@ -33,7 +33,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
 
-	const [algorithm, setAlgorithm] = useState('');
+	const [algorithm, setAlgorithm] = useState('aes');
 
 	useEffect(() => {
 		setPasswordError(null);
@@ -57,6 +57,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			setProfileNameError(null);
 			setPasswordError(null);
 
+			console.log('set algorithm', algorithm);
 			const response = await onCreateProfile({
 				name: profileName,
 				password: usePassword ? password : null,
@@ -153,7 +154,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						Encryption algorithm
 					</Text>
 					<Select
-						flex="2.5"
+						flex="3"
 						variant="secondary"
 						defaultValue="aes"
 						onChange={(evt) => setAlgorithm(evt.target.value)}
