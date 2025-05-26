@@ -92,14 +92,19 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Create profile
 					</Button>
-					<Button
-						variant="secondary"
-						w="100%"
-						onClick={() => onPressCreate(false)}
-						disabled={isPending}
-					>
-						Continue with no encryption
-					</Button>
+					<VStack w="100%" gap={'0rem'}>
+						<Button
+							variant="secondary"
+							w="100%"
+							onClick={() => onPressCreate(false)}
+							disabled={isPending}
+						>
+							Continue with no encryption
+						</Button>
+						<Text color={'typography.additional'} fontSize={'15px'}>
+							Your data will not be encrypted, which may be insecure
+						</Text>
+					</VStack>
 					<Button
 						variant="secondary"
 						w="100%"
