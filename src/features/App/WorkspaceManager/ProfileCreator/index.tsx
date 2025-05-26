@@ -57,7 +57,6 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			setProfileNameError(null);
 			setPasswordError(null);
 
-			console.log('set algorithm', algorithm);
 			const response = await onCreateProfile({
 				name: profileName,
 				password: usePassword ? password : null,
