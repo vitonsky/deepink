@@ -101,8 +101,12 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						>
 							Continue with no encryption
 						</Button>
-						<Text color={'typography.additional'} fontSize={'15px'}>
-							Your data will not be encrypted, which may be insecure
+						<Text
+							alignSelf={'start'}
+							color={'typography.additional'}
+							fontSize={'14px'}
+						>
+							Insecure: your data will not be encrypted
 						</Text>
 					</VStack>
 					<Button
@@ -153,7 +157,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						Encryption algorithm
 					</Text>
 					<Select
-						flex="3"
+						flex="2.7"
 						variant="secondary"
 						defaultValue="aes"
 						onChange={(evt) => setAlgorithm(evt.target.value)}
@@ -170,7 +174,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 							},
 							{
 								value: 'both',
-								text: 'AES-Twofish',
+								text: 'AES - Twofish',
 							},
 						].map(({ value, text }) => (
 							<option key={value} value={value}>
