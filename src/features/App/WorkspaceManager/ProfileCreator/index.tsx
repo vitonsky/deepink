@@ -33,7 +33,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
 
-	const [algorithm, setAlgorithm] = useState('aes');
+	const [algorithm, setAlgorithm] = useState('');
 
 	useEffect(() => {
 		setPasswordError(null);
@@ -98,7 +98,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						onClick={() => onPressCreate(false)}
 						disabled={isPending}
 					>
-						Continue with no password
+						Continue with no encryption
 					</Button>
 					<Button
 						variant="secondary"
