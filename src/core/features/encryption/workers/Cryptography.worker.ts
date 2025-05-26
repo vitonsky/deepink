@@ -51,11 +51,11 @@ requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 	};
 
 	const cipher = [];
-	if (algorithm === 'AES') {
+	if (algorithm === 'aes') {
 		cipher.push(await getAESCipher());
-	} else if (algorithm === 'Twofish') {
+	} else if (algorithm === 'twofish') {
 		cipher.push(await getTwofishCipher());
-	} else {
+	} else if (algorithm === 'both') {
 		const aes = await getAESCipher();
 		const twofish = await getTwofishCipher();
 		cipher.push(aes, twofish);
