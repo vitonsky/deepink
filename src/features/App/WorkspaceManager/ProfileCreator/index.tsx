@@ -153,11 +153,14 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				</VStack>
 
 				<HStack w="100%">
-					<Text flex="3" color="typography.secondary" fontSize="18px">
+					<Text
+						minW={'max-content'}
+						color="typography.additional"
+						fontSize="18px"
+					>
 						Encryption algorithm
 					</Text>
 					<Select
-						flex="2.7"
 						variant="secondary"
 						defaultValue="aes"
 						onChange={(evt) => setAlgorithm(evt.target.value)}
