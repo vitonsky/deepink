@@ -14,11 +14,11 @@ export const createEncryption = async (authData: {
 	salt: ArrayBuffer;
 	algorithm: string;
 }): Promise<DisposableBox<EncryptionController>> => {
-	const workerEncryption = new WorkerEncryptionProxyProcessor(
-		authData.key,
-		authData.salt,
-		authData.algorithm,
-	);
+	const workerEncryption = new WorkerEncryptionProxyProcessor({
+		secretKey: authData.key,
+		salt: authData.salt,
+		algorithm: authData.algorithm,
+	});
 	const encryptionController = new EncryptionController(workerEncryption);
 
 	return new DisposableBox(encryptionController, () => {
