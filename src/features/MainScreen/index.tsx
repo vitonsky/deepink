@@ -15,12 +15,14 @@ import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
+import { useHotKey } from './useHotKey';
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
+	useHotKey();
 
 	useEffect(() => {
 		return tagsRegistry.onChange((scope) => {
