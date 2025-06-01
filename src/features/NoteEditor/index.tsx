@@ -152,7 +152,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
 	return (
-		<VStack w="100%" align="start">
+		<VStack w="100%" align="start" minW="300px">
 			<HStack w="100%" align="start">
 				<HStack w="100%" align="start">
 					<Input
