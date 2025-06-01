@@ -11,10 +11,12 @@ import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
+import { useHotKey } from './useHotKey';
 
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
+	useHotKey();
 
 	// Init notes list
 	useEffect(() => {
