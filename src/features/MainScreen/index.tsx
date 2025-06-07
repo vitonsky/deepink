@@ -6,13 +6,13 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
+import { useHotKeyEvents } from '../App/hotkey/HotkeyProvaider';
+import { useEventSubscribe, useHotKey } from '../App/hotkey/useHotKey';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
-import { useEventSubscribe, useHotKey } from './useHotKey';
-import { useHotKeyEvents } from './HotkeyProvaider';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
