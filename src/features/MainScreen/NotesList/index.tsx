@@ -8,6 +8,8 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 
+import { useHotKeyEvents } from '../HotkeyProvaider';
+import { useEventSubscribe } from '../useHotKey';
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
 export type NotesListProps = {};
@@ -24,6 +26,12 @@ export const NotesList: FC<NotesListProps> = () => {
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
+	});
+
+	const { closeNoteEvent } = useHotKeyEvents();
+	useEventSubscribe(closeNoteEvent, (event) => {
+		const nodeId = event.payload?.noteId;
+		if (nodeId) noteActions.close(nodeId);
 	});
 
 	// TODO: implement dragging and moving items

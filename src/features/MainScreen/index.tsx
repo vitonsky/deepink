@@ -12,17 +12,17 @@ import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
+import { useHotKeyEvents } from './HotkeyProvaider';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
-import { useHotKey } from './useHotKey';
+import { useEventSubscribe, useHotKey } from './useHotKey';
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
-	useHotKey();
 
 	useEffect(() => {
 		return tagsRegistry.onChange((scope) => {
@@ -40,6 +40,12 @@ export const MainScreen: FC = () => {
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
 	const createNote = useCreateNote();
+
+	useHotKey({ noteId: activeNoteId });
+	const { createNoteEvent } = useHotKeyEvents();
+	useEventSubscribe(createNoteEvent, () => {
+		createNote();
+	});
 
 	// Note items on status bar
 	const statusBarButtons = useStatusBarManager();
