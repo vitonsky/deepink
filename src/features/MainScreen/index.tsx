@@ -11,12 +11,17 @@ import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
-import { useHotKey } from './useHotKey';
+import { useEventSubscribe, useHotKey } from './useHotKey';
+import { useHotKeyEvents } from './HotkeyProvaider';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveNoteId } from '@state/redux/profiles/profiles';
+import { useCreateNote } from '@hooks/notes/useCreateNote';
 
 export const MainScreen: FC = () => {
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
-	useHotKey();
 
 	// Init notes list
 	useEffect(() => {
@@ -31,6 +36,13 @@ export const MainScreen: FC = () => {
 			}
 		});
 	}, [tagsRegistry, updateNotes]);
+	const createNote = useCreateNote();
+
+	useHotKey({ noteId: activeNoteId });
+	const { createNoteEvent } = useHotKeyEvents();
+	useEventSubscribe(createNoteEvent, () => {
+		createNote();
+	});
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
