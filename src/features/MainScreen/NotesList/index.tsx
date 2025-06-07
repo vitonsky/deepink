@@ -10,8 +10,9 @@ import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles'
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useHotKeyEvents } from '../HotkeyProvaider';
-import { useEventSubscribe } from '../useHotKey';
+import { useHotKeyEvents } from '../../App/hotkey/HotkeyProvaider';
+import { useEventSubscribe } from '../../App/hotkey/useHotKey';
+
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
 export type NotesListProps = {};
