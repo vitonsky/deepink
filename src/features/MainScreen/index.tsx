@@ -11,12 +11,12 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
+import { useHotKeyEvents } from '../App/hotkey/HotkeyProvaider';
+import { useEventSubscribe, useHotKey } from '../App/hotkey/useHotKey';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
-import { useHotKeyEvents } from './HotkeyProvaider';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
-import { useEventSubscribe, useHotKey } from './useHotKey';
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);

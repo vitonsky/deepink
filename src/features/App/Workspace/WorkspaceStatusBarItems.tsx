@@ -1,8 +1,8 @@
 import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
-import { useHotKeyEvents } from '@features/MainScreen/HotkeyProvaider';
+import { useHotKeyEvents } from '@features/App/hotkey/HotkeyProvaider';
+import { useEventSubscribe } from '@features/App/hotkey/useHotKey';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
-import { useEventSubscribe } from '@features/MainScreen/useHotKey';
 import { useFirstRender } from '@hooks/useFirstRender';
 
 import { useProfileControls } from '../Profile';
