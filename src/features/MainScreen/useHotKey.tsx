@@ -1,49 +1,42 @@
 import { useEffect } from 'react';
-import { createEvent, Event } from 'effector';
+import { Event } from 'effector';
 import hotkeys from 'hotkeys-js';
 
-// the example how store key data in setting
-// const userHotkeys = {
-// 	createNote: 'Control+N',
-// 	lockProfile: 'Control+L',
-// 	closeNote: 'Control+W',
-// 	reopenClosedNote: 'Control+Alt+T',
-// };
+import { CommandEvent, CommandPayloadMap, useHotKeyEvents } from './HotkeyProvaider';
 
-type CommandPayloadMap = {
-	closeNote: { noteId: string };
-	createNote: {};
-};
-
-type CommandEvent<K extends keyof CommandPayloadMap = keyof CommandPayloadMap> =
-	CommandPayloadMap[K] extends undefined | void
-		? { id: K }
-		: { id: K; payload?: CommandPayloadMap[K] };
-
-export const useHotKey = () => {
-	// auto create event
-	const createNoteEvent = createEvent<CommandEvent<'createNote'>>();
-	const closeNoteEvent = createEvent<CommandEvent<'closeNote'>>();
+export const useHotKey = ({
+	noteId,
+	profileId,
+}: {
+	noteId: string | null;
+	profileId?: string;
+}) => {
+	const events = useHotKeyEvents();
 
 	useEffect(() => {
+		// TODO: read from redux the hotkey setting
 		hotkeys('ctrl+n', () => {
-			createNoteEvent({ id: 'createNote' });
+			events.createNoteEvent({ id: 'createNote' });
 		});
 
 		hotkeys('ctrl+w', () => {
-			closeNoteEvent({
+			if (!noteId) throw new Error('node id not provide');
+			events.closeNoteEvent({
 				id: 'closeNote',
-				payload: { noteId: '123' },
+				payload: { noteId },
 			});
+		});
+
+		hotkeys('ctrl+L', () => {
+			events.lockProfileEvent({ id: 'lockProfile', payload: { profileId } });
 		});
 
 		return () => {
 			hotkeys.unbind('ctrl+n');
 			hotkeys.unbind('ctrl+w');
+			hotkeys.unbind('ctrl+l');
 		};
-	}, [closeNoteEvent, createNoteEvent]);
-
-	return { closeNoteEvent, createNoteEvent };
+	}, [noteId, profileId, events]);
 };
 
 export function useEventSubscribe<K extends keyof CommandPayloadMap>(

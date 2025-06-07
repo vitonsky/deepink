@@ -11,6 +11,8 @@ import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles'
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
+import { useHotKeyEvents } from '../HotkeyProvaider';
+import { useEventSubscribe } from '../useHotKey';
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
 export type NotesListProps = {};
@@ -58,6 +60,12 @@ export const NotesList: FC<NotesListProps> = () => {
 		// We only need scroll to active note once by its change
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId]);
+
+	const { closeNoteEvent } = useHotKeyEvents();
+	useEventSubscribe(closeNoteEvent, (event) => {
+		const nodeId = event.payload?.noteId;
+		if (nodeId) noteActions.close(nodeId);
+	});
 
 	// TODO: implement dragging and moving items
 	return (

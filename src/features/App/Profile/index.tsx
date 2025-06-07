@@ -1,6 +1,7 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { HotkeyEventsProvider } from '@features/MainScreen/HotkeyProvaider';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -94,14 +95,16 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId: profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<Workspace profile={currentProfile} />
-							<ProfileStatusBar />
-							{isDevMode && (
-								<ToggleSQLConsole
-									isVisible={isDBConsoleVisible}
-									onVisibilityChange={setIsDBConsoleVisible}
-								/>
-							)}
+							<HotkeyEventsProvider>
+								<Workspace profile={currentProfile} />
+								<ProfileStatusBar />
+								{isDevMode && (
+									<ToggleSQLConsole
+										isVisible={isDBConsoleVisible}
+										onVisibilityChange={setIsDBConsoleVisible}
+									/>
+								)}
+							</HotkeyEventsProvider>
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				) : null,
