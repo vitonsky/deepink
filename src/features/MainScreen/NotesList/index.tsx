@@ -8,7 +8,7 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 
-import { useHotKeyEvents } from '../../App/hotkey/HotkeyProvaider';
+import { useHotkeyEvents } from '../../App/hotkey/HotKeyEventsProvider';
 import { useEventSubscribe } from '../../App/hotkey/useHotKey';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
@@ -29,7 +29,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		updateNotes,
 	});
 
-	const { closeNote } = useHotKeyEvents();
+	const { closeNote } = useHotkeyEvents();
 	useEventSubscribe(closeNote, (event) => {
 		const nodeId = event.payload?.noteId;
 		if (nodeId) noteActions.close(nodeId);
