@@ -38,11 +38,9 @@ export const MainScreen: FC = () => {
 	}, [tagsRegistry, updateNotes]);
 	const createNote = useCreateNote();
 
-	useHotKey({ noteId: activeNoteId });
-	const { createNoteEvent } = useHotKeyEvents();
-	useEventSubscribe(createNoteEvent, () => {
-		createNote();
-	});
+	useHotKey({ noteId: activeNoteId ?? undefined });
+	const { createNote: createNoteEvent } = useHotKeyEvents();
+	useEventSubscribe(createNoteEvent, createNote);
 
 	return (
 		<VStack gap={0} w="100%" h="100%">

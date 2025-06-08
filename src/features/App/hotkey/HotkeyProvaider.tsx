@@ -2,36 +2,31 @@ import React, { createContext, useMemo } from 'react';
 import { createEvent } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-// the example how store key data in setting
-// const userHotkeys = {
-// 	createNote: 'Control+N',
-// 	lockProfile: 'Control+L',
-// 	closeNote: 'Control+W',
-// 	reopenClosedNote: 'Control+Alt+T',
-// };
-
 // TODO: read from redux the hotkey command
 export type CommandPayloadMap = {
+	createNote: undefined;
 	closeNote: { noteId: string };
-	createNote: {};
-	lockProfile: {};
+	reopenClosedNote: { noteId: string };
+	lockProfile: undefined;
 };
 
 export type CommandEvent<K extends keyof CommandPayloadMap = keyof CommandPayloadMap> =
-	CommandPayloadMap[K] extends undefined | void
+	CommandPayloadMap[K] extends undefined
 		? { id: K }
-		: { id: K; payload?: CommandPayloadMap[K] };
+		: { id: K; payload: CommandPayloadMap[K] };
 
 function createEvents() {
-	//TODO: auto create event
-	const createNoteEvent = createEvent<CommandEvent<'createNote'>>();
-	const closeNoteEvent = createEvent<CommandEvent<'closeNote'>>();
-	const lockProfileEvent = createEvent<CommandEvent<'lockProfile'>>();
+	// TODO: auto create event
+	const createNote = createEvent<CommandEvent<'createNote'>>();
+	const closeNote = createEvent<CommandEvent<'closeNote'>>();
+	const lockProfile = createEvent<CommandEvent<'lockProfile'>>();
+	const reopenClosedNote = createEvent<CommandEvent<'reopenClosedNote'>>();
 
 	return {
-		createNoteEvent,
-		closeNoteEvent,
-		lockProfileEvent,
+		createNote,
+		closeNote,
+		lockProfile,
+		reopenClosedNote,
 	};
 }
 
