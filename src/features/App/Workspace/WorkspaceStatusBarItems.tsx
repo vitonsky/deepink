@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
-import { useHotKeyEvents } from '@features/App/hotkey/HotkeyProvaider';
+import { useHotkeyEvents } from '@features/App/hotkey/HotKeyEventsProvider';
 import { useEventSubscribe } from '@features/App/hotkey/useHotKey';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
@@ -14,7 +14,7 @@ export const WorkspaceStatusBarItems = () => {
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
 
-	const { lockProfile } = useHotKeyEvents();
+	const { lockProfile } = useHotkeyEvents();
 	useEventSubscribe(lockProfile, () => {
 		profileControls.close();
 	});
