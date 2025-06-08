@@ -4,9 +4,17 @@ import { createAppSelector } from '../utils';
 
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
+export type Hotkeys = {
+	createNote: string;
+	lockProfile: string;
+	closeNote: string;
+	reopenClosedNote: string;
+};
+
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
+	hotkeys: Hotkeys;
 };
 
 export const settingsSlice = createSlice({
@@ -14,6 +22,12 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
+		hotkeys: {
+			createNote: 'ctrl+n',
+			lockProfile: 'ctrl+l',
+			closeNote: 'ctrl+w',
+			reopenClosedNote: 'ctrl+Alt+t',
+		},
 	} as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
@@ -27,6 +41,9 @@ export const settingsSlice = createSlice({
 		},
 		setTheme: (state, { payload }: PayloadAction<GlobalSettings['theme']>) => {
 			return { ...state, theme: payload } as GlobalSettings;
+		},
+		setHotkeys: (state, { payload }: PayloadAction<GlobalSettings['hotkeys']>) => {
+			return { ...state, hotkeys: payload } as GlobalSettings;
 		},
 	},
 });
@@ -43,4 +60,9 @@ export const selectEditorMode = createAppSelector(
 export const selectTheme = createAppSelector(
 	selectSettings,
 	(settings) => settings.theme,
+);
+
+export const selectHotkeys = createAppSelector(
+	selectSettings,
+	(settings) => settings.hotkeys,
 );
