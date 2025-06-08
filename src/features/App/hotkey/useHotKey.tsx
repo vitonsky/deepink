@@ -4,7 +4,11 @@ import { Event } from 'effector';
 import hotkeys from 'hotkeys-js';
 import { selectHotkeys } from '@state/redux/settings/settings';
 
-import { CommandEvent, CommandPayloadMap, useHotKeyEvents } from './HotkeyProvaider';
+import {
+	CommandEventPayload,
+	CommandPayloadMap,
+	useHotkeyEvents,
+} from './HotKeyEventsProvider';
 
 export const useHotKey = ({
 	noteId,
@@ -16,7 +20,7 @@ export const useHotKey = ({
 	idLastClosedNote?: string;
 }) => {
 	const hotkeysSetting = useSelector(selectHotkeys);
-	const events = useHotKeyEvents();
+	const events = useHotkeyEvents();
 
 	useEffect(() => {
 		const entries = Object.entries(hotkeysSetting) as [
@@ -65,8 +69,8 @@ export const useHotKey = ({
 };
 
 export function useEventSubscribe<K extends keyof CommandPayloadMap>(
-	event: Event<CommandEvent<K>>,
-	callback: (payload: CommandEvent<K>) => void,
+	event: Event<CommandEventPayload<K>>,
+	callback: (payload: CommandEventPayload<K>) => void,
 ) {
 	useEffect(() => {
 		const unsubscribe = event.watch(callback);

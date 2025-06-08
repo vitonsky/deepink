@@ -15,10 +15,10 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useHotKeyEvents } from '../../App/hotkey/HotkeyProvaider';
 import { useEventSubscribe } from '../../App/hotkey/useHotKey';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
+import { useHotkeyEvents } from '@features/App/hotkey/HotKeyEventsProvider';
 
 export type NotesListProps = {};
 
@@ -68,7 +68,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId]);
 
-	const { closeNote } = useHotKeyEvents();
+	const { closeNote } = useHotkeyEvents();
 	useEventSubscribe(closeNote, (event) => {
 		const nodeId = event.payload?.noteId;
 		if (nodeId) noteActions.close(nodeId);
