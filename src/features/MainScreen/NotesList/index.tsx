@@ -68,8 +68,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId]);
 
-	const { closeNoteEvent } = useHotKeyEvents();
-	useEventSubscribe(closeNoteEvent, (event) => {
+	const { closeNote } = useHotKeyEvents();
+	useEventSubscribe(closeNote, (event) => {
 		const nodeId = event.payload?.noteId;
 		if (nodeId) noteActions.close(nodeId);
 	});

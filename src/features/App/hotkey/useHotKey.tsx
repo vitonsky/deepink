@@ -1,42 +1,67 @@
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Event } from 'effector';
 import hotkeys from 'hotkeys-js';
+import { selectHotkeys } from '@state/redux/settings/settings';
 
 import { CommandEvent, CommandPayloadMap, useHotKeyEvents } from './HotkeyProvaider';
 
 export const useHotKey = ({
 	noteId,
 	profileId,
+	idLastClosedNote,
 }: {
-	noteId: string | null;
+	noteId?: string;
 	profileId?: string;
+	idLastClosedNote?: string;
 }) => {
+	const hotkeysSetting = useSelector(selectHotkeys);
 	const events = useHotKeyEvents();
 
 	useEffect(() => {
-		// TODO: read from redux the hotkey setting
-		hotkeys('ctrl+n', () => {
-			events.createNoteEvent({ id: 'createNote' });
-		});
+		const entries = Object.entries(hotkeysSetting) as [
+			keyof CommandPayloadMap,
+			string,
+		][];
 
-		hotkeys('ctrl+w', () => {
-			if (!noteId) throw new Error('node id not provide');
-			events.closeNoteEvent({
-				id: 'closeNote',
-				payload: { noteId },
+		for (const [commandName, hotkey] of entries) {
+			hotkeys(hotkey, () => {
+				switch (commandName) {
+					case 'createNote': {
+						events[commandName]({ id: commandName });
+						break;
+					}
+					case 'closeNote': {
+						if (!noteId) throw new Error('noteId not provided');
+						events[commandName]({
+							id: commandName,
+							payload: { noteId },
+						});
+						break;
+					}
+					case 'reopenClosedNote': {
+						if (!idLastClosedNote)
+							throw new Error('lastCloseNoteId not provided');
+						events[commandName]({
+							id: commandName,
+							payload: { noteId: idLastClosedNote },
+						});
+						break;
+					}
+					case 'lockProfile': {
+						events[commandName]({ id: commandName });
+						break;
+					}
+				}
 			});
-		});
-
-		hotkeys('ctrl+L', () => {
-			events.lockProfileEvent({ id: 'lockProfile', payload: { profileId } });
-		});
+		}
 
 		return () => {
-			hotkeys.unbind('ctrl+n');
-			hotkeys.unbind('ctrl+w');
-			hotkeys.unbind('ctrl+l');
+			for (const hotkey of Object.values(hotkeysSetting)) {
+				hotkeys.unbind(hotkey);
+			}
 		};
-	}, [noteId, profileId, events]);
+	}, [noteId, profileId, hotkeysSetting, events, idLastClosedNote]);
 };
 
 export function useEventSubscribe<K extends keyof CommandPayloadMap>(
