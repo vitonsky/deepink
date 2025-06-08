@@ -29,8 +29,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		updateNotes,
 	});
 
-	const { closeNoteEvent } = useHotKeyEvents();
-	useEventSubscribe(closeNoteEvent, (event) => {
+	const { closeNote } = useHotKeyEvents();
+	useEventSubscribe(closeNote, (event) => {
 		const nodeId = event.payload?.noteId;
 		if (nodeId) noteActions.close(nodeId);
 	});

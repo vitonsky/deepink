@@ -13,8 +13,8 @@ export const WorkspaceStatusBarItems = () => {
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
 
-	const { lockProfileEvent } = useHotKeyEvents();
-	useEventSubscribe(lockProfileEvent, () => {
+	const { lockProfile } = useHotKeyEvents();
+	useEventSubscribe(lockProfile, () => {
 		profileControls.close();
 	});
 

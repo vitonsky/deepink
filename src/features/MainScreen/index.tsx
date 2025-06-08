@@ -41,11 +41,9 @@ export const MainScreen: FC = () => {
 
 	const createNote = useCreateNote();
 
-	useHotKey({ noteId: activeNoteId });
-	const { createNoteEvent } = useHotKeyEvents();
-	useEventSubscribe(createNoteEvent, () => {
-		createNote();
-	});
+	useHotKey({ noteId: activeNoteId ?? undefined });
+	const { createNote: createNoteEvent } = useHotKeyEvents();
+	useEventSubscribe(createNoteEvent, createNote);
 
 	// Note items on status bar
 	const statusBarButtons = useStatusBarManager();
