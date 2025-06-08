@@ -1,7 +1,7 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { HotkeyEventsProvider } from '@features/App/hotkey/HotkeyProvaider';
+import { HotKeyEventsProvider } from '@features/App/hotkey/HotKeyEventsProvider';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
@@ -89,10 +89,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId: profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<HotkeyEventsProvider>
+							<HotKeyEventsProvider>
 								<Workspace profile={currentProfile} />
 								<ProfileStatusBar />
-							</HotkeyEventsProvider>
+							</HotKeyEventsProvider>
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				) : null,

@@ -10,17 +10,18 @@ export type CommandPayloadMap = {
 	lockProfile: undefined;
 };
 
-export type CommandEvent<K extends keyof CommandPayloadMap = keyof CommandPayloadMap> =
-	CommandPayloadMap[K] extends undefined
-		? { id: K }
-		: { id: K; payload: CommandPayloadMap[K] };
+export type CommandEventPayload<
+	K extends keyof CommandPayloadMap = keyof CommandPayloadMap,
+> = CommandPayloadMap[K] extends undefined
+	? { id: K }
+	: { id: K; payload: CommandPayloadMap[K] };
 
 function createEvents() {
 	// TODO: auto create event
-	const createNote = createEvent<CommandEvent<'createNote'>>();
-	const closeNote = createEvent<CommandEvent<'closeNote'>>();
-	const lockProfile = createEvent<CommandEvent<'lockProfile'>>();
-	const reopenClosedNote = createEvent<CommandEvent<'reopenClosedNote'>>();
+	const createNote = createEvent<CommandEventPayload<'createNote'>>();
+	const closeNote = createEvent<CommandEventPayload<'closeNote'>>();
+	const lockProfile = createEvent<CommandEventPayload<'lockProfile'>>();
+	const reopenClosedNote = createEvent<CommandEventPayload<'reopenClosedNote'>>();
 
 	return {
 		createNote,
@@ -31,9 +32,9 @@ function createEvents() {
 }
 
 const HotKeyEventsContext = createContext<ReturnType<typeof createEvents> | null>(null);
-export const useHotKeyEvents = createContextGetterHook(HotKeyEventsContext);
+export const useHotkeyEvents = createContextGetterHook(HotKeyEventsContext);
 
-export const HotkeyEventsProvider: React.FC<{ children: React.ReactNode }> = ({
+export const HotKeyEventsProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
 	const events = useMemo(() => createEvents(), []);

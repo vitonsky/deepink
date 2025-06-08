@@ -6,7 +6,7 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { useHotKeyEvents } from '../App/hotkey/HotkeyProvaider';
+import { useHotkeyEvents } from '../App/hotkey/HotKeyEventsProvider';
 import { useEventSubscribe, useHotKey } from '../App/hotkey/useHotKey';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
@@ -39,7 +39,7 @@ export const MainScreen: FC = () => {
 	const createNote = useCreateNote();
 
 	useHotKey({ noteId: activeNoteId ?? undefined });
-	const { createNote: createNoteEvent } = useHotKeyEvents();
+	const { createNote: createNoteEvent } = useHotkeyEvents();
 	useEventSubscribe(createNoteEvent, createNote);
 
 	return (
