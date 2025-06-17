@@ -1,5 +1,7 @@
 import React, { createContext, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { createEvent } from 'effector';
+import { Hotkeys, selectHotkeys } from '@state/redux/settings/settings';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 // TODO: read from redux the hotkey command
@@ -16,28 +18,47 @@ export type CommandEventPayload<
 	? { id: K }
 	: { id: K; payload: CommandPayloadMap[K] };
 
-function createEvents() {
-	// TODO: auto create event
-	const createNote = createEvent<CommandEventPayload<'createNote'>>();
-	const closeNote = createEvent<CommandEventPayload<'closeNote'>>();
-	const lockProfile = createEvent<CommandEventPayload<'lockProfile'>>();
-	const reopenClosedNote = createEvent<CommandEventPayload<'reopenClosedNote'>>();
+type EventsMap = {
+	[K in keyof CommandPayloadMap]: ReturnType<
+		typeof createEvent<CommandEventPayload<K>>
+	>;
+};
 
-	return {
-		createNote,
-		closeNote,
-		lockProfile,
-		reopenClosedNote,
-	};
+function createEvents(command: Hotkeys) {
+	const events = {} as EventsMap;
+
+	for (const key of Object.keys(command) as (keyof CommandPayloadMap)[]) {
+		switch (key) {
+			case 'createNote': {
+				events[key] = createEvent<CommandEventPayload<typeof key>>();
+				break;
+			}
+			case 'closeNote': {
+				events[key] = createEvent<CommandEventPayload<typeof key>>();
+				break;
+			}
+			case 'reopenClosedNote': {
+				events[key] = createEvent<CommandEventPayload<typeof key>>();
+				break;
+			}
+			case 'lockProfile': {
+				events[key] = createEvent<CommandEventPayload<typeof key>>();
+				break;
+			}
+		}
+	}
+	return events;
 }
 
-const HotKeyEventsContext = createContext<ReturnType<typeof createEvents> | null>(null);
+const HotKeyEventsContext = createContext<EventsMap | null>(null);
 export const useHotkeyEvents = createContextGetterHook(HotKeyEventsContext);
 
 export const HotKeyEventsProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const events = useMemo(() => createEvents(), []);
+	const hotkeysSetting = useSelector(selectHotkeys);
+
+	const events = useMemo(() => createEvents(hotkeysSetting), [hotkeysSetting]);
 	return (
 		<HotKeyEventsContext.Provider value={events}>
 			{children}
