@@ -14,11 +14,15 @@ import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId } from '@state/redux/profiles/profiles';
+import {
+	selectActiveNoteId,
+	selectRecentlyClosedNote,
+} from '@state/redux/profiles/profiles';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+	const closedNoteId = useWorkspaceSelector(selectRecentlyClosedNote);
 
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
@@ -38,7 +42,10 @@ export const MainScreen: FC = () => {
 	}, [tagsRegistry, updateNotes]);
 	const createNote = useCreateNote();
 
-	useHotKey({ noteId: activeNoteId ?? undefined });
+	useHotKey({
+		noteId: activeNoteId ?? undefined,
+		closedNoteId: closedNoteId ?? undefined,
+	});
 	const { createNote: createNoteEvent } = useHotkeyEvents();
 	useEventSubscribe(createNoteEvent, createNote);
 
