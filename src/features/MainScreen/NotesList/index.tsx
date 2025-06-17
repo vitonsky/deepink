@@ -68,10 +68,14 @@ export const NotesList: FC<NotesListProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId]);
 
-	const { closeNote } = useHotkeyEvents();
+	const { closeNote, openClosedNote: openRecentlyClosedNote } = useHotkeyEvents();
 	useEventSubscribe(closeNote, (event) => {
 		const nodeId = event.payload?.noteId;
 		if (nodeId) noteActions.close(nodeId);
+	});
+	useEventSubscribe(openRecentlyClosedNote, (event) => {
+		const nodeId = event.payload?.noteId;
+		if (nodeId) noteActions.click(nodeId);
 	});
 
 	// TODO: implement dragging and moving items

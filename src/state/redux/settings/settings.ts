@@ -8,7 +8,7 @@ export type Hotkeys = {
 	createNote: string;
 	lockProfile: string;
 	closeNote: string;
-	reopenClosedNote: string;
+	openClosedNote: string;
 };
 
 export type GlobalSettings = {
@@ -26,7 +26,7 @@ export const settingsSlice = createSlice({
 			createNote: 'ctrl+n',
 			lockProfile: 'ctrl+l',
 			closeNote: 'ctrl+w',
-			reopenClosedNote: 'ctrl+Alt+t',
+			openClosedNote: 'ctrl+shift+t',
 		},
 	} as GlobalSettings,
 	reducers: {
