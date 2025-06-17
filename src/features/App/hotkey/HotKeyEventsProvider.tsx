@@ -1,14 +1,13 @@
-import React, { createContext, useMemo } from 'react';
+import React, { createContext, FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { createEvent } from 'effector';
 import { Hotkeys, selectHotkeys } from '@state/redux/settings/settings';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-// TODO: read from redux the hotkey command
 export type CommandPayloadMap = {
 	createNote: undefined;
 	closeNote: { noteId: string };
-	reopenClosedNote: { noteId: string };
+	openClosedNote: { noteId: string };
 	lockProfile: undefined;
 };
 
@@ -37,7 +36,7 @@ function createEvents(command: Hotkeys) {
 				events[key] = createEvent<CommandEventPayload<typeof key>>();
 				break;
 			}
-			case 'reopenClosedNote': {
+			case 'openClosedNote': {
 				events[key] = createEvent<CommandEventPayload<typeof key>>();
 				break;
 			}
@@ -53,9 +52,7 @@ function createEvents(command: Hotkeys) {
 const HotKeyEventsContext = createContext<EventsMap | null>(null);
 export const useHotkeyEvents = createContextGetterHook(HotKeyEventsContext);
 
-export const HotKeyEventsProvider: React.FC<{ children: React.ReactNode }> = ({
-	children,
-}) => {
+export const HotKeyEventsProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 	const hotkeysSetting = useSelector(selectHotkeys);
 
 	const events = useMemo(() => createEvents(hotkeysSetting), [hotkeysSetting]);
