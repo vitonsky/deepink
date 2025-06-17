@@ -13,11 +13,11 @@ import {
 export const useHotKey = ({
 	noteId,
 	profileId,
-	idLastClosedNote,
+	lastCloseNoteId,
 }: {
 	noteId?: string;
 	profileId?: string;
-	idLastClosedNote?: string;
+	lastCloseNoteId?: string;
 }) => {
 	const hotkeysSetting = useSelector(selectHotkeys);
 	const events = useHotkeyEvents();
@@ -44,11 +44,11 @@ export const useHotKey = ({
 						break;
 					}
 					case 'reopenClosedNote': {
-						if (!idLastClosedNote)
+						if (!lastCloseNoteId)
 							throw new Error('lastCloseNoteId not provided');
 						events[commandName]({
 							id: commandName,
-							payload: { noteId: idLastClosedNote },
+							payload: { noteId: lastCloseNoteId },
 						});
 						break;
 					}
@@ -65,7 +65,7 @@ export const useHotKey = ({
 				hotkeys.unbind(hotkey);
 			}
 		};
-	}, [noteId, profileId, hotkeysSetting, events, idLastClosedNote]);
+	}, [noteId, profileId, hotkeysSetting, events, lastCloseNoteId]);
 };
 
 export function useEventSubscribe<K extends keyof CommandPayloadMap>(
