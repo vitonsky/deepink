@@ -44,8 +44,7 @@ export const useHotKey = ({
 						break;
 					}
 					case 'openClosedNote': {
-						if (!closedNoteId)
-							throw new Error('recentlyClosedNote not provided');
+						if (!closedNoteId) throw new Error('closedNoteId not provided');
 						events[commandName]({
 							id: commandName,
 							payload: { noteId: closedNoteId },
