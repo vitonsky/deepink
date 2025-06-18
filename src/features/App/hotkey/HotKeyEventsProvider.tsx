@@ -1,7 +1,7 @@
 import React, { createContext, FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { createEvent } from 'effector';
-import { Hotkeys, selectHotkeys } from '@state/redux/settings/settings';
+import { selectHotkeys } from '@state/redux/settings/settings';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export type CommandPayloadMap = {
@@ -17,39 +17,28 @@ export type CommandEventPayload<
 	? { id: K }
 	: { id: K; payload: CommandPayloadMap[K] };
 
-type EventsMap = {
-	[K in keyof CommandPayloadMap]: ReturnType<
-		typeof createEvent<CommandEventPayload<K>>
-	>;
-};
+/**
+ * Creates an event object typed by keys from command
+ */
+function createEvents<K extends keyof CommandPayloadMap>(
+	command: Record<K, string>,
+): {
+	[P in K]: ReturnType<typeof createEvent<CommandEventPayload<P>>>;
+} {
+	const events = {} as {
+		[P in K]: ReturnType<typeof createEvent<CommandEventPayload<P>>>;
+	};
 
-function createEvents(command: Hotkeys) {
-	const events = {} as EventsMap;
+	(Object.keys(command) as Array<K>).forEach((key) => {
+		events[key] = createEvent<CommandEventPayload<typeof key>>();
+	});
 
-	for (const key of Object.keys(command) as (keyof CommandPayloadMap)[]) {
-		switch (key) {
-			case 'createNote': {
-				events[key] = createEvent<CommandEventPayload<typeof key>>();
-				break;
-			}
-			case 'closeNote': {
-				events[key] = createEvent<CommandEventPayload<typeof key>>();
-				break;
-			}
-			case 'openClosedNote': {
-				events[key] = createEvent<CommandEventPayload<typeof key>>();
-				break;
-			}
-			case 'lockProfile': {
-				events[key] = createEvent<CommandEventPayload<typeof key>>();
-				break;
-			}
-		}
-	}
 	return events;
 }
 
-const HotKeyEventsContext = createContext<EventsMap | null>(null);
+const HotKeyEventsContext = createContext<ReturnType<
+	typeof createEvents<keyof CommandPayloadMap>
+> | null>(null);
 export const useHotkeyEvents = createContextGetterHook(HotKeyEventsContext);
 
 export const HotKeyEventsProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
