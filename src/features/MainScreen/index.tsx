@@ -6,7 +6,7 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { useCommandSubscription, useHotKey } from '../App/hotkey/useHotKey';
+import { useCommandSubscription, useHotkeyBindings } from '../App/hotkey/useHotKey';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
@@ -40,7 +40,7 @@ export const MainScreen: FC = () => {
 	}, [tagsRegistry, updateNotes]);
 	const createNote = useCreateNote();
 
-	useHotKey();
+	useHotkeyBindings();
 	useCommandSubscription('createNote', createNote);
 
 	return (
