@@ -6,7 +6,11 @@ import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
+import {
+	selectActiveNoteId,
+	selectNotes,
+	selectRecentlyClosedNote,
+} from '@state/redux/profiles/profiles';
 
 import { useHotkeyEvents } from '../../App/hotkey/HotKeyEventsProvider';
 import { useEventSubscribe } from '../../App/hotkey/useHotKey';
@@ -20,6 +24,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
+	const closedNoteId = useWorkspaceSelector(selectRecentlyClosedNote);
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
 
@@ -30,13 +35,13 @@ export const NotesList: FC<NotesListProps> = () => {
 	});
 
 	const { closeNote, openClosedNote: openRecentlyClosedNote } = useHotkeyEvents();
-	useEventSubscribe(closeNote, (event) => {
-		const nodeId = event.payload?.noteId;
-		if (nodeId) noteActions.close(nodeId);
+	useEventSubscribe(closeNote, () => {
+		if (!activeNoteId) throw new Error('NoteId not found');
+		noteActions.close(activeNoteId);
 	});
-	useEventSubscribe(openRecentlyClosedNote, (event) => {
-		const nodeId = event.payload?.noteId;
-		if (nodeId) noteActions.click(nodeId);
+	useEventSubscribe(openRecentlyClosedNote, () => {
+		if (!closedNoteId) throw new Error('NoteId not found');
+		noteActions.click(closedNoteId);
 	});
 
 	// TODO: implement dragging and moving items
