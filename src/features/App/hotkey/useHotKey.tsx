@@ -25,21 +25,24 @@ export function useCommandExecutor() {
 	};
 }
 
+function typedCommands<T extends Record<string, unknown>>(
+	obj: T,
+): [keyof T, T[keyof T]][] {
+	return Object.entries(obj) as [keyof T, T[keyof T]][];
+}
+
 /**
  * Hook to bind hotkeys to commands
  */
-export const useHotKey = () => {
+export const useHotkeyBindings = () => {
 	const hotkeysSetting = useSelector(selectHotkeys);
 
 	const execute = useCommandExecutor();
 
 	useEffect(() => {
-		const command = Object.entries(hotkeysSetting) as [
-			keyof CommandPayloadMap,
-			string,
-		][];
+		const commands = typedCommands(hotkeysSetting);
 
-		command.forEach(([name, hotkey]) => {
+		commands.forEach(([name, hotkey]) => {
 			hotkeys(hotkey, () => {
 				execute(name);
 			});
