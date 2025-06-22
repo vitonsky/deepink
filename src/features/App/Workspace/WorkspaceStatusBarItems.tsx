@@ -1,10 +1,9 @@
 import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
-import { useHotkeyEvents } from '@features/App/hotkey/HotKeyEventsProvider';
-import { useEventSubscribe } from '@features/App/hotkey/useHotKey';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
 
+import { useCommandSubscription } from '../hotkey/useHotKey';
 import { useProfileControls } from '../Profile';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
 
@@ -14,8 +13,7 @@ export const WorkspaceStatusBarItems = () => {
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
 
-	const { lockProfile } = useHotkeyEvents();
-	useEventSubscribe(lockProfile, () => {
+	useCommandSubscription('lockProfile', () => {
 		profileControls.close();
 	});
 
