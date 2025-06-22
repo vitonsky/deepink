@@ -27,6 +27,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
+	const closedNoteId = useWorkspaceSelector(selectRecentlyClosedNote);
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
 
@@ -69,13 +70,13 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [activeNoteId]);
 
 	const { closeNote, openClosedNote: openRecentlyClosedNote } = useHotkeyEvents();
-	useEventSubscribe(closeNote, (event) => {
-		const nodeId = event.payload?.noteId;
-		if (nodeId) noteActions.close(nodeId);
+	useEventSubscribe(closeNote, () => {
+		if (!activeNoteId) throw new Error('NoteId not found');
+		noteActions.close(activeNoteId);
 	});
-	useEventSubscribe(openRecentlyClosedNote, (event) => {
-		const nodeId = event.payload?.noteId;
-		if (nodeId) noteActions.click(nodeId);
+	useEventSubscribe(openRecentlyClosedNote, () => {
+		if (!closedNoteId) throw new Error('NoteId not found');
+		noteActions.click(closedNoteId);
 	});
 
 	// TODO: implement dragging and moving items

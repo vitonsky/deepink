@@ -10,49 +10,33 @@ import {
 	useHotkeyEvents,
 } from './HotKeyEventsProvider';
 
-export const useHotKey = ({
-	noteId,
-	profileId,
-	closedNoteId,
-}: {
-	noteId?: string;
-	profileId?: string;
-	closedNoteId?: string;
-}) => {
+export const useHotKey = () => {
 	const hotkeysSetting = useSelector(selectHotkeys);
 	const events = useHotkeyEvents();
 
 	useEffect(() => {
-		const entries = Object.entries(hotkeysSetting) as [
+		const command = Object.entries(hotkeysSetting) as [
 			keyof CommandPayloadMap,
 			string,
 		][];
 
-		for (const [commandName, hotkey] of entries) {
+		for (const [name, hotkey] of command) {
 			hotkeys(hotkey, () => {
-				switch (commandName) {
+				switch (name) {
 					case 'createNote': {
-						events[commandName]({ id: commandName });
+						events[name]({ id: name });
 						break;
 					}
 					case 'closeNote': {
-						if (!noteId) throw new Error('noteId not provided');
-						events[commandName]({
-							id: commandName,
-							payload: { noteId },
-						});
+						events[name]({ id: name });
 						break;
 					}
 					case 'openClosedNote': {
-						if (!closedNoteId) throw new Error('closedNoteId not provided');
-						events[commandName]({
-							id: commandName,
-							payload: { noteId: closedNoteId },
-						});
+						events[name]({ id: name });
 						break;
 					}
 					case 'lockProfile': {
-						events[commandName]({ id: commandName });
+						events[name]({ id: name });
 						break;
 					}
 				}
@@ -64,7 +48,7 @@ export const useHotKey = ({
 				hotkeys.unbind(hotkey);
 			}
 		};
-	}, [noteId, profileId, hotkeysSetting, events, closedNoteId]);
+	}, [events, hotkeysSetting]);
 };
 
 export function useEventSubscribe<K extends keyof CommandPayloadMap>(
