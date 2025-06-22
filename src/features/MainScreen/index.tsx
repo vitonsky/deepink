@@ -6,8 +6,7 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { useHotkeyEvents } from '../App/hotkey/HotKeyEventsProvider';
-import { useEventSubscribe, useHotKey } from '../App/hotkey/useHotKey';
+import { useCommandSubscription, useHotKey } from '../App/hotkey/useHotKey';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
@@ -42,8 +41,7 @@ export const MainScreen: FC = () => {
 	const createNote = useCreateNote();
 
 	useHotKey();
-	const { createNote: createNoteEvent } = useHotkeyEvents();
-	useEventSubscribe(createNoteEvent, createNote);
+	useCommandSubscription('createNote', createNote);
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
