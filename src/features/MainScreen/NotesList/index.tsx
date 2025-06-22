@@ -2,6 +2,7 @@ import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
+import { useCommandSubscription } from '@features/App/hotkey/useHotKey';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -15,10 +16,7 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useEventSubscribe } from '../../App/hotkey/useHotKey';
-
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
-import { useHotkeyEvents } from '@features/App/hotkey/HotKeyEventsProvider';
 
 export type NotesListProps = {};
 
@@ -69,12 +67,11 @@ export const NotesList: FC<NotesListProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId]);
 
-	const { closeNote, openClosedNote: openRecentlyClosedNote } = useHotkeyEvents();
-	useEventSubscribe(closeNote, () => {
+	useCommandSubscription('closeNote', () => {
 		if (!activeNoteId) throw new Error('NoteId not found');
 		noteActions.close(activeNoteId);
 	});
-	useEventSubscribe(openRecentlyClosedNote, () => {
+	useCommandSubscription('openClosedNote', () => {
 		if (!closedNoteId) throw new Error('NoteId not found');
 		noteActions.click(closedNoteId);
 	});

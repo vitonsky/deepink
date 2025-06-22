@@ -1,18 +1,37 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Event } from 'effector';
 import hotkeys from 'hotkeys-js';
 import { selectHotkeys } from '@state/redux/settings/settings';
 
 import {
 	CommandEventPayload,
+	CommandName,
 	CommandPayloadMap,
-	useExecuteCommand,
+	useCommandEvents,
 } from './HotKeyEventsProvider';
 
+/**
+ * Hook to execute commands by name with optional payload
+ */
+export function useCommandExecutor() {
+	const event = useCommandEvents();
+
+	return <K extends CommandName>(id: K, payload?: CommandPayloadMap[K]) => {
+		if (payload === undefined || payload === null) {
+			event[id]({ id } as CommandEventPayload<K>);
+		} else {
+			event[id]({ id, payload } as CommandEventPayload<K>);
+		}
+	};
+}
+
+/**
+ * Hook to bind hotkeys to commands
+ */
 export const useHotKey = () => {
 	const hotkeysSetting = useSelector(selectHotkeys);
-	const executeCommand = useExecuteCommand();
+
+	const execute = useCommandExecutor();
 
 	useEffect(() => {
 		const command = Object.entries(hotkeysSetting) as [
@@ -20,26 +39,31 @@ export const useHotKey = () => {
 			string,
 		][];
 
-		for (const [name, hotkey] of command) {
+		command.forEach(([name, hotkey]) => {
 			hotkeys(hotkey, () => {
-				executeCommand(name);
+				execute(name);
 			});
-		}
+		});
 
 		return () => {
-			for (const hotkey of Object.values(hotkeysSetting)) {
+			Object.values(hotkeysSetting).forEach((hotkey) => {
 				hotkeys.unbind(hotkey);
-			}
+			});
 		};
-	}, [executeCommand, hotkeysSetting]);
+	}, [hotkeysSetting, execute]);
 };
 
-export function useEventSubscribe<K extends keyof CommandPayloadMap>(
-	event: Event<CommandEventPayload<K>>,
+/**
+ * Hook to subscribe to command events
+ */
+export function useCommandSubscription<K extends CommandName>(
+	id: K,
 	callback: (payload: CommandEventPayload<K>) => void,
 ) {
+	const commandEvents = useCommandEvents();
+
 	useEffect(() => {
-		const unsubscribe = event.watch(callback);
+		const unsubscribe = commandEvents[id].watch(callback);
 		return () => unsubscribe();
-	}, [event, callback]);
+	}, [id, callback, commandEvents]);
 }

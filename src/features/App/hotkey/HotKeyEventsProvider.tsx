@@ -1,8 +1,13 @@
 import React, { createContext, FC, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { createEvent } from 'effector';
-import { selectHotkeys } from '@state/redux/settings/settings';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
+
+const commandNames = [
+	'createNote',
+	'closeNote',
+	'openClosedNote',
+	'lockProfile',
+] as const;
 
 export type CommandPayloadMap = {
 	createNote: undefined;
@@ -11,6 +16,8 @@ export type CommandPayloadMap = {
 	lockProfile: undefined;
 };
 
+export type CommandName = (typeof commandNames)[number];
+
 export type CommandEventPayload<
 	K extends keyof CommandPayloadMap = keyof CommandPayloadMap,
 > = CommandPayloadMap[K] extends undefined
@@ -18,10 +25,10 @@ export type CommandEventPayload<
 	: { id: K; payload: CommandPayloadMap[K] };
 
 /**
- * Creates an event object typed by keys from command
+ * Creates events from command name
  */
-function createEvents<K extends keyof CommandPayloadMap>(
-	command: Record<K, string>,
+function createCommandEvents<K extends CommandName>(
+	commands: readonly K[],
 ): {
 	[P in K]: ReturnType<typeof createEvent<CommandEventPayload<P>>>;
 } {
@@ -29,39 +36,26 @@ function createEvents<K extends keyof CommandPayloadMap>(
 		[P in K]: ReturnType<typeof createEvent<CommandEventPayload<P>>>;
 	};
 
-	(Object.keys(command) as Array<K>).forEach((key) => {
+	commands.forEach((key) => {
 		events[key] = createEvent<CommandEventPayload<typeof key>>();
 	});
 
 	return events;
 }
 
-const HotKeyEventsContext = createContext<ReturnType<
-	typeof createEvents<keyof CommandPayloadMap>
+const CommandEventsContext = createContext<ReturnType<
+	typeof createCommandEvents<keyof CommandPayloadMap>
 > | null>(null);
-export const useHotkeyEvents = createContextGetterHook(HotKeyEventsContext);
+export const useCommandEvents = createContextGetterHook(CommandEventsContext);
 
-/**
- */
-export function useExecuteCommand() {
-	const events = useHotkeyEvents();
+export const CommandEventsProvider: FC<{ children: React.ReactNode }> = ({
+	children,
+}) => {
+	const commandEvents = useMemo(() => createCommandEvents(commandNames), []);
 
-	return <K extends keyof CommandPayloadMap>(id: K, payload?: CommandPayloadMap[K]) => {
-		if (payload === undefined) {
-			events[id]({ id } as CommandEventPayload<K>);
-		} else {
-			events[id]({ id, payload } as CommandEventPayload<K>);
-		}
-	};
-}
-
-export const HotKeyEventsProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-	const hotkeysSetting = useSelector(selectHotkeys);
-
-	const events = useMemo(() => createEvents(hotkeysSetting), [hotkeysSetting]);
 	return (
-		<HotKeyEventsContext.Provider value={events}>
+		<CommandEventsContext.Provider value={commandEvents}>
 			{children}
-		</HotKeyEventsContext.Provider>
+		</CommandEventsContext.Provider>
 	);
 };
