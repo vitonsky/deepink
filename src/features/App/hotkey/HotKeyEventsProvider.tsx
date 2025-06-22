@@ -2,19 +2,16 @@ import React, { createContext, FC, useMemo } from 'react';
 import { createEvent } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-const commandNames = [
-	'createNote',
-	'closeNote',
-	'openClosedNote',
-	'lockProfile',
-] as const;
-
 export type CommandPayloadMap = {
 	createNote: undefined;
 	closeNote: undefined;
 	openClosedNote: undefined;
 	lockProfile: undefined;
 };
+
+export const commandNames = Object.keys({} as CommandPayloadMap) as Array<
+	keyof CommandPayloadMap
+>;
 
 export type CommandName = (typeof commandNames)[number];
 
