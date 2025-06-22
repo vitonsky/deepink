@@ -2,18 +2,16 @@ import React, { createContext, FC, useMemo } from 'react';
 import { createEvent } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export type CommandPayloadMap = {
-	createNote: undefined;
-	closeNote: undefined;
-	openClosedNote: undefined;
-	lockProfile: undefined;
-};
+const commandPayloadMap = {
+	createNote: undefined,
+	closeNote: undefined,
+	openClosedNote: undefined,
+	lockProfile: undefined,
+} as const;
 
-export const commandNames = Object.keys({} as CommandPayloadMap) as Array<
-	keyof CommandPayloadMap
->;
+export type CommandPayloadMap = typeof commandPayloadMap;
 
-export type CommandName = (typeof commandNames)[number];
+export type CommandName = keyof CommandPayloadMap;
 
 export type CommandEventPayload<
 	K extends keyof CommandPayloadMap = keyof CommandPayloadMap,
@@ -48,7 +46,11 @@ export const useCommandEvents = createContextGetterHook(CommandEventsContext);
 export const CommandEventsProvider: FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const commandEvents = useMemo(() => createCommandEvents(commandNames), []);
+	const commandNames = Object.keys(commandPayloadMap) as CommandName[];
+	const commandEvents = useMemo(
+		() => createCommandEvents(commandNames),
+		[commandNames],
+	);
 
 	return (
 		<CommandEventsContext.Provider value={commandEvents}>
