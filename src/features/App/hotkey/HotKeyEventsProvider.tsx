@@ -6,8 +6,8 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export type CommandPayloadMap = {
 	createNote: undefined;
-	closeNote: { noteId: string };
-	openClosedNote: { noteId: string };
+	closeNote: undefined;
+	openClosedNote: undefined;
 	lockProfile: undefined;
 };
 
