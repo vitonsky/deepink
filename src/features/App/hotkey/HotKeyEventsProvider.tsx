@@ -41,6 +41,20 @@ const HotKeyEventsContext = createContext<ReturnType<
 > | null>(null);
 export const useHotkeyEvents = createContextGetterHook(HotKeyEventsContext);
 
+/**
+ */
+export function useExecuteCommand() {
+	const events = useHotkeyEvents();
+
+	return <K extends keyof CommandPayloadMap>(id: K, payload?: CommandPayloadMap[K]) => {
+		if (payload === undefined) {
+			events[id]({ id } as CommandEventPayload<K>);
+		} else {
+			events[id]({ id, payload } as CommandEventPayload<K>);
+		}
+	};
+}
+
 export const HotKeyEventsProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 	const hotkeysSetting = useSelector(selectHotkeys);
 

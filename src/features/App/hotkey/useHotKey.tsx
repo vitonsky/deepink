@@ -7,12 +7,12 @@ import { selectHotkeys } from '@state/redux/settings/settings';
 import {
 	CommandEventPayload,
 	CommandPayloadMap,
-	useHotkeyEvents,
+	useExecuteCommand,
 } from './HotKeyEventsProvider';
 
 export const useHotKey = () => {
 	const hotkeysSetting = useSelector(selectHotkeys);
-	const events = useHotkeyEvents();
+	const executeCommand = useExecuteCommand();
 
 	useEffect(() => {
 		const command = Object.entries(hotkeysSetting) as [
@@ -22,24 +22,7 @@ export const useHotKey = () => {
 
 		for (const [name, hotkey] of command) {
 			hotkeys(hotkey, () => {
-				switch (name) {
-					case 'createNote': {
-						events[name]({ id: name });
-						break;
-					}
-					case 'closeNote': {
-						events[name]({ id: name });
-						break;
-					}
-					case 'openClosedNote': {
-						events[name]({ id: name });
-						break;
-					}
-					case 'lockProfile': {
-						events[name]({ id: name });
-						break;
-					}
-				}
+				executeCommand(name);
 			});
 		}
 
@@ -48,7 +31,7 @@ export const useHotKey = () => {
 				hotkeys.unbind(hotkey);
 			}
 		};
-	}, [events, hotkeysSetting]);
+	}, [executeCommand, hotkeysSetting]);
 };
 
 export function useEventSubscribe<K extends keyof CommandPayloadMap>(
