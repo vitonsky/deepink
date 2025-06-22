@@ -68,11 +68,11 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [activeNoteId]);
 
 	useCommandSubscription('closeNote', () => {
-		if (!activeNoteId) throw new Error('NoteId not found');
+		if (!activeNoteId) return;
 		noteActions.close(activeNoteId);
 	});
 	useCommandSubscription('openClosedNote', () => {
-		if (!closedNoteId) throw new Error('NoteId not found');
+		if (!closedNoteId) return;
 		noteActions.click(closedNoteId);
 	});
 
