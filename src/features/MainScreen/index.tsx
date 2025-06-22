@@ -22,7 +22,6 @@ import { useCreateNote } from '@hooks/notes/useCreateNote';
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	const closedNoteId = useWorkspaceSelector(selectRecentlyClosedNote);
 
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
@@ -42,10 +41,7 @@ export const MainScreen: FC = () => {
 	}, [tagsRegistry, updateNotes]);
 	const createNote = useCreateNote();
 
-	useHotKey({
-		noteId: activeNoteId ?? undefined,
-		closedNoteId: closedNoteId ?? undefined,
-	});
+	useHotKey();
 	const { createNote: createNoteEvent } = useHotkeyEvents();
 	useEventSubscribe(createNoteEvent, createNote);
 
