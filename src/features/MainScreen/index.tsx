@@ -11,8 +11,7 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
-import { useHotkeyEvents } from '../App/hotkey/HotKeyEventsProvider';
-import { useEventSubscribe, useHotKey } from '../App/hotkey/useHotKey';
+import { useCommandSubscription, useHotKey } from '../App/hotkey/useHotKey';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
@@ -42,8 +41,7 @@ export const MainScreen: FC = () => {
 	const createNote = useCreateNote();
 
 	useHotKey();
-	const { createNote: createNoteEvent } = useHotkeyEvents();
-	useEventSubscribe(createNoteEvent, createNote);
+	useCommandSubscription('createNote', createNote);
 
 	// Note items on status bar
 	const statusBarButtons = useStatusBarManager();

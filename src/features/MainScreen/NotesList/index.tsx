@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
+import { useCommandSubscription } from '@features/App/hotkey/useHotKey';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -11,9 +12,6 @@ import {
 	selectNotes,
 	selectRecentlyClosedNote,
 } from '@state/redux/profiles/profiles';
-
-import { useHotkeyEvents } from '../../App/hotkey/HotKeyEventsProvider';
-import { useEventSubscribe } from '../../App/hotkey/useHotKey';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
@@ -34,12 +32,11 @@ export const NotesList: FC<NotesListProps> = () => {
 		updateNotes,
 	});
 
-	const { closeNote, openClosedNote: openRecentlyClosedNote } = useHotkeyEvents();
-	useEventSubscribe(closeNote, () => {
+	useCommandSubscription('closeNote', () => {
 		if (!activeNoteId) throw new Error('NoteId not found');
 		noteActions.close(activeNoteId);
 	});
-	useEventSubscribe(openRecentlyClosedNote, () => {
+	useCommandSubscription('openClosedNote', () => {
 		if (!closedNoteId) throw new Error('NoteId not found');
 		noteActions.click(closedNoteId);
 	});
