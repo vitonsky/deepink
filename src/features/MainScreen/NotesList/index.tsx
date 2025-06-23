@@ -2,7 +2,7 @@ import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useCommandSubscription } from '@features/App/hotkey/useHotKey';
+import { useCommandSubscription } from '@features/App/hotkey/commandHooks';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
