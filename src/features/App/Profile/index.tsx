@@ -1,7 +1,7 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { CommandEventsProvider } from '@features/App/hotkey/HotKeyEventsProvider';
+import { CommandEventsProvider } from '@features/App/hotkey/CommandEventsProvider';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
