@@ -11,7 +11,7 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
-import { useCommandSubscription, useHotkeyBindings } from '../App/hotkey/useHotKey';
+import { useCommandSubscription, useHotkeyBindings } from '../App/hotkey/commandHooks';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
