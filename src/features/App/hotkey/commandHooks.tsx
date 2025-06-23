@@ -8,7 +8,7 @@ import {
 	CommandName,
 	CommandPayloadMap,
 	useCommandEvents,
-} from './HotKeyEventsProvider';
+} from './CommandEventsProvider';
 
 /**
  * Hook to execute commands by name with optional payload
