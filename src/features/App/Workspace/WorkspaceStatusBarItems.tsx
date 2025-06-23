@@ -3,7 +3,7 @@ import { FaLock, FaUserLarge } from 'react-icons/fa6';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
 
-import { useCommandSubscription } from '../hotkey/useHotKey';
+import { useCommandSubscription } from '../hotkey/commandHooks';
 import { useProfileControls } from '../Profile';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
 

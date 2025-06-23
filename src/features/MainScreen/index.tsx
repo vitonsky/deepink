@@ -6,7 +6,7 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { useCommandSubscription, useHotkeyBindings } from '../App/hotkey/useHotKey';
+import { useCommandSubscription, useHotkeyBindings } from '../App/hotkey/commandHooks';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
