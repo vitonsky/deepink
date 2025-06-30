@@ -4,17 +4,18 @@ import { createAppSelector } from '../utils';
 
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
-export type Hotkeys = {
-	createNote: string;
-	lockProfile: string;
-	closeNote: string;
-	openClosedNote: string;
-};
+export type ShortcutCommand =
+	| 'createNote'
+	| 'lockProfile'
+	| 'closeNote'
+	| 'openClosedNote';
+
+export type ShortcutMap = Record<string, ShortcutCommand>;
 
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
-	hotkeys: Hotkeys;
+	shortcuts: ShortcutMap;
 };
 
 export const settingsSlice = createSlice({
@@ -22,11 +23,11 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
-		hotkeys: {
-			createNote: 'ctrl+n',
-			lockProfile: 'ctrl+l',
-			closeNote: 'ctrl+w',
-			openClosedNote: 'ctrl+shift+t',
+		shortcuts: {
+			'ctrl+n': 'createNote',
+			'ctrl+l': 'lockProfile',
+			'ctrl+w': 'closeNote',
+			'ctrl+shift+t': 'openClosedNote',
 		},
 	} as GlobalSettings,
 	reducers: {
@@ -42,8 +43,11 @@ export const settingsSlice = createSlice({
 		setTheme: (state, { payload }: PayloadAction<GlobalSettings['theme']>) => {
 			return { ...state, theme: payload } as GlobalSettings;
 		},
-		setHotkeys: (state, { payload }: PayloadAction<GlobalSettings['hotkeys']>) => {
-			return { ...state, hotkeys: payload } as GlobalSettings;
+		setShortcuts: (
+			state,
+			{ payload }: PayloadAction<GlobalSettings['shortcuts']>,
+		) => {
+			return { ...state, shortcuts: payload } as GlobalSettings;
 		},
 	},
 });
@@ -64,5 +68,5 @@ export const selectTheme = createAppSelector(
 
 export const selectHotkeys = createAppSelector(
 	selectSettings,
-	(settings) => settings.hotkeys,
+	(settings) => settings.shortcuts,
 );

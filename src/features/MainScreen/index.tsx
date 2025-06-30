@@ -41,7 +41,10 @@ export const MainScreen: FC = () => {
 	const createNote = useCreateNote();
 
 	useHotkeyBindings();
-	useCommandSubscription('createNote', createNote);
+	useCommandSubscription((data) => {
+		if (data.id !== 'createNote') return;
+		createNote();
+	});
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
