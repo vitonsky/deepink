@@ -41,7 +41,10 @@ export const MainScreen: FC = () => {
 	const createNote = useCreateNote();
 
 	useHotkeyBindings();
-	useCommandSubscription('createNote', createNote);
+	useCommandSubscription((data) => {
+		if (data.id !== 'createNote') return;
+		createNote();
+	});
 
 	// Note items on status bar
 	const statusBarButtons = useStatusBarManager();
