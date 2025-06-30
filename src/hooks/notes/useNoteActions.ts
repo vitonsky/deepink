@@ -40,12 +40,9 @@ export const useNoteActions = () => {
 
 	const close = useCallback(
 		(id: NoteId) => {
-			dispatch(
-				workspacesApi.setRecentlyClosedNote({ ...workspaceData, noteId: id }),
-			);
 			noteClosed(id);
 		},
-		[noteClosed, dispatch, workspaceData],
+		[noteClosed],
 	);
 
 	return { click, close };

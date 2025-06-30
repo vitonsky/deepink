@@ -67,6 +67,6 @@ export const selectRecentlyClosedNote = createWorkspaceSelector(
 	(workspace) => {
 		if (!workspace) return null;
 
-		return workspace.closedNoteId ?? null;
+		return workspace.recentlyClosedNotes ?? null;
 	},
 );
