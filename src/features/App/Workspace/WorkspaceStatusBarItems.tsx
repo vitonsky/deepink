@@ -13,7 +13,8 @@ export const WorkspaceStatusBarItems = () => {
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
 
-	useCommandSubscription('lockProfile', () => {
+	useCommandSubscription((data) => {
+		if (data.id !== 'lockProfile') return;
 		profileControls.close();
 	});
 
