@@ -1,34 +1,19 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import hotkeys from 'hotkeys-js';
-import { selectHotkeys } from '@state/redux/settings/settings';
+import { selectHotkeys, ShortcutCommand } from '@state/redux/settings/settings';
 
-import {
-	CommandEventPayload,
-	CommandName,
-	CommandPayloadMap,
-	useCommandEvents,
-} from './CommandEventsProvider';
+import { CommandEventPayload, useCommandEvent } from './CommandEventsProvider';
 
 /**
- * Hook to execute commands by name with optional payload
+ * Hook to execute command by name with optional payload
  */
 export function useCommandExecutor() {
-	const event = useCommandEvents();
+	const event = useCommandEvent();
 
-	return <K extends CommandName>(id: K, payload?: CommandPayloadMap[K]) => {
-		if (payload === undefined || payload === null) {
-			event[id]({ id } as CommandEventPayload<K>);
-		} else {
-			event[id]({ id, payload } as CommandEventPayload<K>);
-		}
+	return (id: ShortcutCommand, payload?: {}) => {
+		event({ id, payload });
 	};
-}
-
-function typedCommands<T extends Record<string, unknown>>(
-	obj: T,
-): [keyof T, T[keyof T]][] {
-	return Object.entries(obj) as [keyof T, T[keyof T]][];
 }
 
 /**
@@ -40,11 +25,9 @@ export const useHotkeyBindings = () => {
 	const execute = useCommandExecutor();
 
 	useEffect(() => {
-		const commands = typedCommands(hotkeysSetting);
-
-		commands.forEach(([name, hotkey]) => {
-			hotkeys(hotkey, () => {
-				execute(name);
+		Object.entries(hotkeysSetting).forEach(([keys, shortcutName]) => {
+			hotkeys(keys, () => {
+				execute(shortcutName);
 			});
 		});
 
@@ -59,14 +42,11 @@ export const useHotkeyBindings = () => {
 /**
  * Hook to subscribe to command events
  */
-export function useCommandSubscription<K extends CommandName>(
-	id: K,
-	callback: (payload: CommandEventPayload<K>) => void,
-) {
-	const commandEvents = useCommandEvents();
+export function useCommandSubscription(callback: (data: CommandEventPayload) => void) {
+	const commandEvent = useCommandEvent();
 
 	useEffect(() => {
-		const unsubscribe = commandEvents[id].watch(callback);
+		const unsubscribe = commandEvent.watch(callback);
 		return () => unsubscribe();
-	}, [id, callback, commandEvents]);
+	}, [callback, commandEvent]);
 }
