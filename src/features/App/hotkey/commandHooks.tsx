@@ -32,7 +32,7 @@ export const useHotkeyBindings = () => {
 		});
 
 		return () => {
-			Object.values(hotkeysSetting).forEach((hotkey) => {
+			Object.keys(hotkeysSetting).forEach((hotkey) => {
 				hotkeys.unbind(hotkey);
 			});
 		};
