@@ -66,7 +66,7 @@ export const selectTheme = createAppSelector(
 	(settings) => settings.theme,
 );
 
-export const selectHotkeys = createAppSelector(
+export const selectShortcuts = createAppSelector(
 	selectSettings,
 	(settings) => settings.shortcuts,
 );
