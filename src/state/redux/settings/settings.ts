@@ -8,7 +8,7 @@ export type ShortcutCommand =
 	| 'createNote'
 	| 'lockProfile'
 	| 'closeNote'
-	| 'openClosedNote';
+	| 'restoreClosedNote';
 
 export type ShortcutMap = Record<string, ShortcutCommand>;
 
@@ -27,7 +27,7 @@ export const settingsSlice = createSlice({
 			'ctrl+n': 'createNote',
 			'ctrl+l': 'lockProfile',
 			'ctrl+w': 'closeNote',
-			'ctrl+shift+t': 'openClosedNote',
+			'ctrl+shift+t': 'restoreClosedNote',
 		},
 	} as GlobalSettings,
 	reducers: {
