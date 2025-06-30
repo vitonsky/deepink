@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import hotkeys from 'hotkeys-js';
-import { selectHotkeys, ShortcutCommand } from '@state/redux/settings/settings';
+import { selectShortcuts, ShortcutCommand } from '@state/redux/settings/settings';
 
 import { CommandEventPayload, useCommandEvent } from './CommandEventsProvider';
 
@@ -20,23 +20,23 @@ export function useCommandExecutor() {
  * Hook to bind hotkeys to commands
  */
 export const useHotkeyBindings = () => {
-	const hotkeysSetting = useSelector(selectHotkeys);
+	const shortcuts = useSelector(selectShortcuts);
 
 	const execute = useCommandExecutor();
 
 	useEffect(() => {
-		Object.entries(hotkeysSetting).forEach(([keys, shortcutName]) => {
-			hotkeys(keys, () => {
+		Object.entries(shortcuts).forEach(([keyCombination, shortcutName]) => {
+			hotkeys(keyCombination, () => {
 				execute(shortcutName);
 			});
 		});
 
 		return () => {
-			Object.keys(hotkeysSetting).forEach((hotkey) => {
-				hotkeys.unbind(hotkey);
+			Object.keys(shortcuts).forEach((keyCombination) => {
+				hotkeys.unbind(keyCombination);
 			});
 		};
-	}, [hotkeysSetting, execute]);
+	}, [shortcuts, execute]);
 };
 
 /**

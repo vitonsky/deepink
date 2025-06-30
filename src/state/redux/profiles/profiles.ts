@@ -23,7 +23,7 @@ export const createWorkspaceObject = (workspace: {
 	touched: false,
 
 	activeNote: null,
-	closedNoteId: null,
+	recentlyClosedNotes: [],
 	openedNotes: [],
 	notes: [],
 
@@ -56,7 +56,7 @@ export type WorkspaceData = {
 	touched: boolean;
 
 	activeNote: NoteId | null;
-	closedNoteId: NoteId | null;
+	recentlyClosedNotes: NoteId[];
 	openedNotes: INote[];
 	notes: INote[];
 
@@ -194,6 +194,14 @@ export const profilesSlice = createSlice({
 			if (foundNoteInList) return;
 
 			workspace.openedNotes.push(note);
+
+			// remove the note from recentlyClosed only if it's the most recently closed (last in the array)
+			if (
+				workspace.recentlyClosedNotes[workspace.recentlyClosedNotes.length - 1] ==
+				note.id
+			) {
+				workspace.recentlyClosedNotes.pop();
+			}
 		},
 
 		removeOpenedNote: (
@@ -215,6 +223,8 @@ export const profilesSlice = createSlice({
 					: findNearNote(openedNotes, activeNote)?.id ?? null;
 			workspace.openedNotes =
 				filteredNotes.length !== openedNotes.length ? filteredNotes : openedNotes;
+
+			workspace.recentlyClosedNotes.push(noteId);
 		},
 
 		updateOpenedNote: (
@@ -249,18 +259,6 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.openedNotes = notes;
-		},
-
-		setRecentlyClosedNote: (
-			state,
-			{
-				payload: { profileId, workspaceId, noteId },
-			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId }>>,
-		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
-			if (!workspace) return;
-
-			workspace.closedNoteId = noteId;
 		},
 
 		setSelectedTag: (

@@ -25,7 +25,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
-	const closedNoteId = useWorkspaceSelector(selectRecentlyClosedNote);
+	const recentlyClosedNotes = useWorkspaceSelector(selectRecentlyClosedNote);
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
 
@@ -73,10 +73,10 @@ export const NotesList: FC<NotesListProps> = () => {
 		noteActions.close(activeNoteId);
 	});
 	useCommandSubscription((data) => {
-		if (data.id !== 'openClosedNote') return;
+		if (data.id !== 'restoreClosedNote') return;
 
-		if (!closedNoteId) return;
-		noteActions.click(closedNoteId);
+		if (!recentlyClosedNotes) return;
+		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
 
 	// TODO: implement dragging and moving items
