@@ -43,11 +43,19 @@ export const useHotkeyBindings = () => {
 /**
  * Hook to subscribe to command events
  */
-export function useCommandSubscription(callback: (data: CommandEvent) => void) {
+export function useCommandSubscription(
+	commandName: SHORTCUT_COMMANDS,
+	callback: (data: CommandEvent) => void,
+) {
 	const commandEvent = useCommandEvent();
 
 	useEffect(() => {
-		const unsubscribe = commandEvent.watch(callback);
+		const unsubscribe = commandEvent.watch((data) => {
+			if (data.id !== commandName) {
+				return;
+			}
+			callback(data);
+		});
 		return () => unsubscribe();
-	}, [callback, commandEvent]);
+	}, [callback, commandEvent, commandName]);
 }

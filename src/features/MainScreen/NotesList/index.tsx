@@ -68,14 +68,11 @@ export const NotesList: FC<NotesListProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId]);
 
-	useCommandSubscription((data) => {
-		if (data.id !== SHORTCUT_COMMANDS.CLOSE_NOTE) return;
+	useCommandSubscription(SHORTCUT_COMMANDS.CLOSE_NOTE, () => {
 		if (!activeNoteId) return;
 		noteActions.close(activeNoteId);
 	});
-	useCommandSubscription((data) => {
-		if (data.id !== SHORTCUT_COMMANDS.RESTORE_CLOSED_NOTE) return;
-
+	useCommandSubscription(SHORTCUT_COMMANDS.RESTORE_CLOSED_NOTE, () => {
 		if (!recentlyClosedNotes) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
