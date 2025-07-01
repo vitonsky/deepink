@@ -4,6 +4,7 @@ import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarPro
 import { useFirstRender } from '@hooks/useFirstRender';
 
 import { useCommandSubscription } from '../hotkey/commandHooks';
+import { SHORTCUT_COMMANDS } from '../hotkey/shortcuts';
 import { useProfileControls } from '../Profile';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
 
@@ -14,7 +15,7 @@ export const WorkspaceStatusBarItems = () => {
 	const profileControls = useProfileControls();
 
 	useCommandSubscription((data) => {
-		if (data.id !== 'lockProfile') return;
+		if (data.id !== SHORTCUT_COMMANDS.LOCK_PROFILE) return;
 		profileControls.close();
 	});
 

@@ -1,21 +1,14 @@
+import { shortcuts, ShortcutsMap } from '@features/App/hotkey/shortcuts';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
 
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
-export type ShortcutCommand =
-	| 'createNote'
-	| 'lockProfile'
-	| 'closeNote'
-	| 'restoreClosedNote';
-
-export type ShortcutMap = Record<string, ShortcutCommand>;
-
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
-	shortcuts: ShortcutMap;
+	shortcuts: ShortcutsMap;
 };
 
 export const settingsSlice = createSlice({
@@ -23,12 +16,7 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
-		shortcuts: {
-			'ctrl+n': 'createNote',
-			'ctrl+l': 'lockProfile',
-			'ctrl+w': 'closeNote',
-			'ctrl+shift+t': 'restoreClosedNote',
-		},
+		shortcuts: shortcuts,
 	} as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
