@@ -14,10 +14,7 @@ export const WorkspaceStatusBarItems = () => {
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
 
-	useCommandSubscription((data) => {
-		if (data.id !== SHORTCUT_COMMANDS.LOCK_PROFILE) return;
-		profileControls.close();
-	});
+	useCommandSubscription(SHORTCUT_COMMANDS.LOCK_PROFILE, profileControls.close);
 
 	useFirstRender(() => {
 		statusBarButtons.controls.register(
