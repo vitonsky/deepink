@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
 import { Button, HStack, Text, VStack } from '@chakra-ui/react';
+import { SHORTCUT_COMMANDS } from '@features/App/hotkey/shortcuts';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -42,7 +43,7 @@ export const MainScreen: FC = () => {
 
 	useHotkeyBindings();
 	useCommandSubscription((data) => {
-		if (data.id !== 'createNote') return;
+		if (data.id !== SHORTCUT_COMMANDS.CREATE_NOTE) return;
 		createNote();
 	});
 

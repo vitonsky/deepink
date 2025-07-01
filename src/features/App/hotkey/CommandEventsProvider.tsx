@@ -1,23 +1,20 @@
 import React, { createContext, FC, useMemo } from 'react';
 import { createEvent, EventCallable } from 'effector';
-import { ShortcutCommand } from '@state/redux/settings/settings';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export type CommandEventPayload = {
-	id: ShortcutCommand;
-	payload?: {};
+import { SHORTCUT_COMMANDS } from './shortcuts';
+
+export type CommandEvent = {
+	id: SHORTCUT_COMMANDS;
 };
 
-const CommandEventsContext = createContext<EventCallable<CommandEventPayload> | null>(
-	null,
-);
+const CommandEventsContext = createContext<EventCallable<CommandEvent> | null>(null);
 export const useCommandEvent = createContextGetterHook(CommandEventsContext);
 
 export const CommandEventsProvider: FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	// Creates event from command name
-	const commandEvent = useMemo(() => createEvent<CommandEventPayload>(), []);
+	const commandEvent = useMemo(() => createEvent<CommandEvent>(), []);
 
 	return (
 		<CommandEventsContext.Provider value={commandEvent}>
