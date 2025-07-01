@@ -12,16 +12,11 @@ import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import {
-	selectActiveNoteId,
-	selectRecentlyClosedNote,
-} from '@state/redux/profiles/profiles';
+
 import { useCreateNote } from '@hooks/notes/useCreateNote';
+import { SHORTCUT_COMMANDS } from '@features/App/hotkey/shortcuts';
 
 export const MainScreen: FC = () => {
-	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
 
@@ -42,7 +37,7 @@ export const MainScreen: FC = () => {
 
 	useHotkeyBindings();
 	useCommandSubscription((data) => {
-		if (data.id !== 'createNote') return;
+		if (data.id !== SHORTCUT_COMMANDS.CREATE_NOTE) return;
 		createNote();
 	});
 
