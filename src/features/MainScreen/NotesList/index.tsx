@@ -3,6 +3,7 @@ import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useCommandSubscription } from '@features/App/hotkey/commandHooks';
+import { SHORTCUT_COMMANDS } from '@features/App/hotkey/shortcuts';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -68,12 +69,12 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [activeNoteId]);
 
 	useCommandSubscription((data) => {
-		if (data.id !== 'closeNote') return;
+		if (data.id !== SHORTCUT_COMMANDS.CLOSE_NOTE) return;
 		if (!activeNoteId) return;
 		noteActions.close(activeNoteId);
 	});
 	useCommandSubscription((data) => {
-		if (data.id !== 'restoreClosedNote') return;
+		if (data.id !== SHORTCUT_COMMANDS.RESTORE_CLOSED_NOTE) return;
 
 		if (!recentlyClosedNotes) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);

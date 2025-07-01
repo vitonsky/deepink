@@ -1,18 +1,19 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import hotkeys from 'hotkeys-js';
-import { selectShortcuts, ShortcutCommand } from '@state/redux/settings/settings';
+import { selectShortcuts } from '@state/redux/settings/settings';
 
-import { CommandEventPayload, useCommandEvent } from './CommandEventsProvider';
+import { CommandEvent, useCommandEvent } from './CommandEventsProvider';
+import { SHORTCUT_COMMANDS } from './shortcuts';
 
 /**
- * Hook to execute command by name with optional payload
+ * Hook to execute command by name
  */
 export function useCommandExecutor() {
 	const event = useCommandEvent();
 
-	return (id: ShortcutCommand, payload?: {}) => {
-		event({ id, payload });
+	return <T extends SHORTCUT_COMMANDS>(commandName: T) => {
+		event({ id: commandName });
 	};
 }
 
@@ -25,9 +26,9 @@ export const useHotkeyBindings = () => {
 	const execute = useCommandExecutor();
 
 	useEffect(() => {
-		Object.entries(shortcuts).forEach(([keyCombination, shortcutName]) => {
+		Object.entries(shortcuts).forEach(([keyCombination, commandName]) => {
 			hotkeys(keyCombination, () => {
-				execute(shortcutName);
+				execute(commandName);
 			});
 		});
 
@@ -42,7 +43,7 @@ export const useHotkeyBindings = () => {
 /**
  * Hook to subscribe to command events
  */
-export function useCommandSubscription(callback: (data: CommandEventPayload) => void) {
+export function useCommandSubscription(callback: (data: CommandEvent) => void) {
 	const commandEvent = useCommandEvent();
 
 	useEffect(() => {
