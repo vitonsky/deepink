@@ -1,4 +1,4 @@
-import { shortcuts, ShortcutsMap } from '@features/App/hotkey/shortcuts';
+import { KeyboardShortcutMap, shortcuts } from '@features/App/hotkey/shortcuts';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
@@ -8,7 +8,7 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
-	shortcuts: ShortcutsMap;
+	shortcuts: KeyboardShortcutMap;
 };
 
 export const settingsSlice = createSlice({
