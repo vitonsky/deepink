@@ -195,10 +195,10 @@ export const profilesSlice = createSlice({
 
 			workspace.openedNotes.push(note);
 
-			// remove the note from recentlyClosed only if it's the most recently closed (last in the array)
 			if (
-				workspace.recentlyClosedNotes[workspace.recentlyClosedNotes.length - 1] ==
-				note.id
+				workspace.recentlyClosedNotes[
+					workspace.recentlyClosedNotes.length - 1
+				] === note.id
 			) {
 				workspace.recentlyClosedNotes.pop();
 			}
