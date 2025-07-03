@@ -141,9 +141,6 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 
 		setEditorObject(monacoEditor);
 
-		// Set focus
-		monacoEditor.focus();
-
 		return () => {
 			editorContainer.removeEventListener('keydown', onKeyPress);
 			editorContainer.removeEventListener('keyup', onKeyPress);
