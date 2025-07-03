@@ -26,6 +26,10 @@ export const useHotkeyBindings = () => {
 	const execute = useCommandExecutor();
 
 	useEffect(() => {
+		// by default hotkeys are not enabled for INPUT SELECT TEXTAREA elements
+		// handle hotkey regardless of focused element
+		hotkeys.filter = () => true;
+
 		Object.entries(shortcuts).forEach(([keyCombination, commandName]) => {
 			hotkeys(keyCombination, () => {
 				execute(commandName);
