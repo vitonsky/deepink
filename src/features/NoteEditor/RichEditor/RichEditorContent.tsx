@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
+import { useFocusableRef } from '@hooks/useFocusableRef';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
@@ -45,6 +46,8 @@ export const RichEditorContent = ({
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
 
+	const contentEditableRef = useFocusableRef<HTMLDivElement>();
+
 	return (
 		<Box
 			position="relative"
@@ -59,6 +62,7 @@ export const RichEditorContent = ({
 			<RichTextPlugin
 				contentEditable={
 					<Box
+						ref={contentEditableRef}
 						w="100%"
 						maxH="100%"
 						outline="none"
