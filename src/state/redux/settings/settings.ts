@@ -1,4 +1,4 @@
-import { KeyboardShortcutMap, shortcuts } from '@features/App/hotkey/shortcuts';
+import { KeyboardShortcutMap, keyboardShortcuts } from '@features/App/hotkey/shortcuts';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
@@ -16,7 +16,7 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
-		shortcuts: shortcuts,
+		shortcuts: keyboardShortcuts,
 	} as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {

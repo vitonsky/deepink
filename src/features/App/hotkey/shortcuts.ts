@@ -13,7 +13,7 @@ export type KeyboardShortcutMap = {
 	[key: string]: GLOBAL_COMMANDS;
 };
 
-export const shortcuts: KeyboardShortcutMap = {
+export const keyboardShortcuts: KeyboardShortcutMap = {
 	'ctrl+n': GLOBAL_COMMANDS.CREATE_NOTE,
 	'ctrl+w': GLOBAL_COMMANDS.CLOSE_NOTE,
 	'ctrl+shift+t': GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE,

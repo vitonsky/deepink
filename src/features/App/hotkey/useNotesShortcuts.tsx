@@ -35,9 +35,9 @@ export const useNotesShortcuts = () => {
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		const isLastNote = currentIndex + 1 === openedNotes.length;
-		const nextIndex = isLastNote ? 0 : currentIndex + 1;
 
 		// If the current note is the last in the array, go back to the first
+		const nextIndex = isLastNote ? 0 : currentIndex + 1;
 		noteActions.click(openedNotes[nextIndex].id);
 	});
 
@@ -46,9 +46,9 @@ export const useNotesShortcuts = () => {
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		const isFirstNote = currentIndex === 0;
-		const previouslyIndex = isFirstNote ? openedNotes.length - 1 : currentIndex - 1;
 
 		// If the current note is the first in the array, go to the last
+		const previouslyIndex = isFirstNote ? openedNotes.length - 1 : currentIndex - 1;
 		noteActions.click(openedNotes[previouslyIndex].id);
 	});
 };
