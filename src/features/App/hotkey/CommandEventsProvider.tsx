@@ -2,10 +2,10 @@ import React, { createContext, FC, useMemo } from 'react';
 import { createEvent, EventCallable } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { SHORTCUT_COMMANDS } from './shortcuts';
+import { GLOBAL_COMMANDS } from './shortcuts';
 
 export type CommandEvent = {
-	id: SHORTCUT_COMMANDS;
+	id: GLOBAL_COMMANDS;
 };
 
 const ShortcutEventContext = createContext<EventCallable<CommandEvent> | null>(null);
