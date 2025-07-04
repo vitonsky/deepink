@@ -6,14 +6,14 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { useShortcutBinding } from '../App/hotkey/commandHooks';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
-import { useNotesShortcuts } from '@features/App/hotkey/useNotesShortcuts';
+import { useShortcutBinding } from '@features/shortcuts/commandHooks';
+import { useNotesShortcuts } from '@features/shortcuts/useNotesShortcuts';
 
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();

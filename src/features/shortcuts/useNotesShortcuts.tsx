@@ -7,8 +7,8 @@ import {
 	selectRecentlyClosedNote,
 } from '@state/redux/profiles/profiles';
 
+import { GLOBAL_COMMANDS } from './command';
 import { useCommandSubscription } from './commandHooks';
-import { GLOBAL_COMMANDS } from './shortcuts';
 
 export const useNotesShortcuts = () => {
 	const noteActions = useNoteActions();
