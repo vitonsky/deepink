@@ -4,7 +4,7 @@ import hotkeys from 'hotkeys-js';
 import { selectShortcuts } from '@state/redux/settings/settings';
 
 import { CommandEvent, useCommandEvent } from './CommandEventsProvider';
-import { SHORTCUT_COMMANDS } from './shortcuts';
+import { GLOBAL_COMMANDS } from './shortcuts';
 
 /**
  * Executes a command by name
@@ -12,7 +12,7 @@ import { SHORTCUT_COMMANDS } from './shortcuts';
 export function useCommandExecutor() {
 	const event = useCommandEvent();
 
-	return <T extends SHORTCUT_COMMANDS>(commandName: T) => {
+	return <T extends GLOBAL_COMMANDS>(commandName: T) => {
 		event({ id: commandName });
 	};
 }
@@ -47,7 +47,7 @@ export const useShortcutBinding = () => {
  * Subscribes to command event
  */
 export function useCommandSubscription(
-	command: SHORTCUT_COMMANDS,
+	command: GLOBAL_COMMANDS,
 	callback: (data: CommandEvent) => void,
 ) {
 	const commandEvent = useCommandEvent();

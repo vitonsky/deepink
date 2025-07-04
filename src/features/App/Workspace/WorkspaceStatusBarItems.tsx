@@ -4,7 +4,7 @@ import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarPro
 import { useFirstRender } from '@hooks/useFirstRender';
 
 import { useCommandSubscription } from '../hotkey/commandHooks';
-import { SHORTCUT_COMMANDS } from '../hotkey/shortcuts';
+import { GLOBAL_COMMANDS } from '../hotkey/shortcuts';
 import { useProfileControls } from '../Profile';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
 
@@ -14,7 +14,7 @@ export const WorkspaceStatusBarItems = () => {
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
 
-	useCommandSubscription(SHORTCUT_COMMANDS.LOCK_PROFILE, profileControls.close);
+	useCommandSubscription(GLOBAL_COMMANDS.LOCK_PROFILE, profileControls.close);
 
 	useFirstRender(() => {
 		statusBarButtons.controls.register(

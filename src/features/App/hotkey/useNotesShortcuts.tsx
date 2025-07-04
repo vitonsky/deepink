@@ -8,7 +8,7 @@ import {
 } from '@state/redux/profiles/profiles';
 
 import { useCommandSubscription } from './commandHooks';
-import { SHORTCUT_COMMANDS } from './shortcuts';
+import { GLOBAL_COMMANDS } from './shortcuts';
 
 export const useNotesShortcuts = () => {
 	const noteActions = useNoteActions();
@@ -18,19 +18,19 @@ export const useNotesShortcuts = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
-	useCommandSubscription(SHORTCUT_COMMANDS.CREATE_NOTE, createNote);
+	useCommandSubscription(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
 
-	useCommandSubscription(SHORTCUT_COMMANDS.CLOSE_NOTE, () => {
+	useCommandSubscription(GLOBAL_COMMANDS.CLOSE_NOTE, () => {
 		if (!activeNoteId) return;
 		noteActions.close(activeNoteId);
 	});
 
-	useCommandSubscription(SHORTCUT_COMMANDS.RESTORE_CLOSED_NOTE, () => {
+	useCommandSubscription(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
 		if (!recentlyClosedNotes || !recentlyClosedNotes.length) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
 
-	useCommandSubscription(SHORTCUT_COMMANDS.OPEN_NEXT_NOTE, () => {
+	useCommandSubscription(GLOBAL_COMMANDS.OPEN_NEXT_NOTE, () => {
 		if (openedNotes.length <= 1 || !activeNoteId) return;
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
@@ -41,7 +41,7 @@ export const useNotesShortcuts = () => {
 		noteActions.click(openedNotes[nextIndex].id);
 	});
 
-	useCommandSubscription(SHORTCUT_COMMANDS.OPEN_PREVIOUSLY_NOTE, () => {
+	useCommandSubscription(GLOBAL_COMMANDS.OPEN_PREVIOUSLY_NOTE, () => {
 		if (openedNotes.length <= 1 || !activeNoteId) return;
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
