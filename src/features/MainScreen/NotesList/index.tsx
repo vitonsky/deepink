@@ -75,7 +75,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		noteActions.close(activeNoteId);
 	});
 	useCommandSubscription(SHORTCUT_COMMANDS.RESTORE_CLOSED_NOTE, () => {
-		if (!recentlyClosedNotes) return;
+		if (!recentlyClosedNotes || !recentlyClosedNotes.length) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
 
@@ -83,22 +83,20 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (openedNotes.length <= 1 || !activeNoteId) return;
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
-		const isLastIndex = currentIndex + 1 === openedNotes.length;
+		const isLastNote = currentIndex + 1 === openedNotes.length;
+		const nextIndex = isLastNote ? 0 : currentIndex + 1;
 
-		// if the current note is the last in array, go back to the first
-		const nextIndex = isLastIndex ? 0 : currentIndex + 1;
-
+		// If the current note is the last in the array, go back to the first
 		noteActions.click(openedNotes[nextIndex].id);
 	});
 	useCommandSubscription(SHORTCUT_COMMANDS.OPEN_PREVIOUSLY_NOTE, () => {
 		if (openedNotes.length <= 1 || !activeNoteId) return;
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+		const isFirstNote = currentIndex === 0;
+		const previouslyIndex = isFirstNote ? openedNotes.length - 1 : currentIndex - 1;
 
-		// if the current note is the first in array, go to the last
-		const previouslyIndex =
-			currentIndex === 0 ? openedNotes.length - 1 : currentIndex - 1;
-
+		// If the current note is the first in the array, go to the last
 		noteActions.click(openedNotes[previouslyIndex].id);
 	});
 
