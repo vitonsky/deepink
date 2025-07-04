@@ -6,7 +6,7 @@ export enum GLOBAL_COMMANDS {
 	OPEN_PREVIOUSLY_NOTE = 'openPreviouslyNote',
 	OPEN_NEXT_NOTE = 'openNextNote',
 
-	LOCK_PROFILE = 'lock Profile',
+	LOCK_PROFILE = 'lockProfile',
 }
 
 export type KeyboardShortcutMap = {
