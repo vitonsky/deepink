@@ -6,7 +6,7 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { useHotkeyBindings } from '../App/hotkey/commandHooks';
+import { useShortcutBinding } from '../App/hotkey/commandHooks';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
@@ -33,7 +33,7 @@ export const MainScreen: FC = () => {
 		});
 	}, [tagsRegistry, updateNotes]);
 
-	useHotkeyBindings();
+	useShortcutBinding();
 	useNotesShortcuts();
 
 	return (
