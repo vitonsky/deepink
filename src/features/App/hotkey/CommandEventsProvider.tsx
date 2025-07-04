@@ -8,15 +8,15 @@ export type CommandEvent = {
 	id: GLOBAL_COMMANDS;
 };
 
-const ShortcutEventContext = createContext<EventCallable<CommandEvent> | null>(null);
-export const useCommandEvent = createContextGetterHook(ShortcutEventContext);
+const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(null);
+export const useCommandEvent = createContextGetterHook(CommandEventContext);
 
 export const CommandEventProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 	const commandEvent = useMemo(() => createEvent<CommandEvent>(), []);
 
 	return (
-		<ShortcutEventContext.Provider value={commandEvent}>
+		<CommandEventContext.Provider value={commandEvent}>
 			{children}
-		</ShortcutEventContext.Provider>
+		</CommandEventContext.Provider>
 	);
 };
