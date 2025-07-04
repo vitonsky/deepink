@@ -1,19 +1,19 @@
 import React, { FC, useEffect } from 'react';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
 import { Button, HStack, Text, VStack } from '@chakra-ui/react';
-import { useNotesShortcuts } from '@features/App/hotkey/useNotesShortcuts';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
+import { useNotesShortcuts } from '@features/shortcuts/useNotesShortcuts';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
-import { useShortcutBinding } from '../App/hotkey/commandHooks';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
+import { useShortcutBinding } from '../shortcuts/commandHooks';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
