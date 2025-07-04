@@ -3,8 +3,8 @@ export enum GLOBAL_COMMANDS {
 	CLOSE_NOTE = 'closeNote',
 	RESTORE_CLOSED_NOTE = 'restoreNote',
 
-	OPEN_PREVIOUSLY_NOTE = 'previouslyNote',
-	OPEN_NEXT_NOTE = 'nextNote',
+	OPEN_PREVIOUSLY_NOTE = 'openPreviouslyNote',
+	OPEN_NEXT_NOTE = 'openNextNote',
 
 	LOCK_PROFILE = 'lock Profile',
 }
