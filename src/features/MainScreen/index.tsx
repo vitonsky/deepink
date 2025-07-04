@@ -6,15 +6,14 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { useCommandSubscription, useHotkeyBindings } from '../App/hotkey/commandHooks';
+import { useHotkeyBindings } from '../App/hotkey/commandHooks';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
-import { useCreateNote } from '@hooks/notes/useCreateNote';
-import { SHORTCUT_COMMANDS } from '@features/App/hotkey/shortcuts';
+import { useNotesShortcuts } from '@features/App/hotkey/useNotesShortcuts';
 
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
@@ -33,10 +32,9 @@ export const MainScreen: FC = () => {
 			}
 		});
 	}, [tagsRegistry, updateNotes]);
-	const createNote = useCreateNote();
 
 	useHotkeyBindings();
-	useCommandSubscription(SHORTCUT_COMMANDS.CREATE_NOTE, createNote);
+	useNotesShortcuts();
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
