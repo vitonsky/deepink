@@ -2,7 +2,7 @@ import React, { createContext, FC, useMemo } from 'react';
 import { createEvent, EventCallable } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { GLOBAL_COMMANDS } from './shortcuts';
+import { GLOBAL_COMMANDS } from './command';
 
 export type CommandEvent = {
 	id: GLOBAL_COMMANDS;
