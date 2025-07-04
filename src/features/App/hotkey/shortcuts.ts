@@ -1,4 +1,4 @@
-export enum SHORTCUT_COMMANDS {
+export enum GLOBAL_COMMANDS {
 	CREATE_NOTE = 'createNote',
 	CLOSE_NOTE = 'closeNote',
 	RESTORE_CLOSED_NOTE = 'restoreNote',
@@ -10,19 +10,19 @@ export enum SHORTCUT_COMMANDS {
 }
 
 export type KeyboardShortcutMap = {
-	[key: string]: SHORTCUT_COMMANDS;
+	[key: string]: GLOBAL_COMMANDS;
 };
 
 export const shortcuts: KeyboardShortcutMap = {
-	'ctrl+n': SHORTCUT_COMMANDS.CREATE_NOTE,
-	'ctrl+w': SHORTCUT_COMMANDS.CLOSE_NOTE,
-	'ctrl+shift+t': SHORTCUT_COMMANDS.RESTORE_CLOSED_NOTE,
+	'ctrl+n': GLOBAL_COMMANDS.CREATE_NOTE,
+	'ctrl+w': GLOBAL_COMMANDS.CLOSE_NOTE,
+	'ctrl+shift+t': GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE,
 
-	'ctrl+shift+tab': SHORTCUT_COMMANDS.OPEN_PREVIOUSLY_NOTE,
-	'ctrl+down': SHORTCUT_COMMANDS.OPEN_PREVIOUSLY_NOTE,
+	'ctrl+shift+tab': GLOBAL_COMMANDS.OPEN_PREVIOUSLY_NOTE,
+	'ctrl+down': GLOBAL_COMMANDS.OPEN_PREVIOUSLY_NOTE,
 
-	'ctrl+tab': SHORTCUT_COMMANDS.OPEN_NEXT_NOTE,
-	'ctrl+up': SHORTCUT_COMMANDS.OPEN_NEXT_NOTE,
+	'ctrl+tab': GLOBAL_COMMANDS.OPEN_NEXT_NOTE,
+	'ctrl+up': GLOBAL_COMMANDS.OPEN_NEXT_NOTE,
 
-	'ctrl+l': SHORTCUT_COMMANDS.LOCK_PROFILE,
+	'ctrl+l': GLOBAL_COMMANDS.LOCK_PROFILE,
 };
