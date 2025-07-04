@@ -1,4 +1,4 @@
-import { KeyboardShortcutMap, keyboardShortcuts } from '@features/App/hotkey/shortcuts';
+import { KeyboardShortcutMap, keyboardShortcuts } from '@features/shortcuts/command';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
