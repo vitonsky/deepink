@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { FaClockRotateLeft, FaPenToSquare } from 'react-icons/fa6';
 import { Button, HStack, Text, VStack } from '@chakra-ui/react';
-import { SHORTCUT_COMMANDS } from '@features/App/hotkey/shortcuts';
+import { useNotesShortcuts } from '@features/App/hotkey/useNotesShortcuts';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -12,7 +12,7 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
-import { useCommandSubscription, useHotkeyBindings } from '../App/hotkey/commandHooks';
+import { useHotkeyBindings } from '../App/hotkey/commandHooks';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
@@ -42,7 +42,7 @@ export const MainScreen: FC = () => {
 	const createNote = useCreateNote();
 
 	useHotkeyBindings();
-	useCommandSubscription(SHORTCUT_COMMANDS.CREATE_NOTE, createNote);
+	useNotesShortcuts();
 
 	// Note items on status bar
 	const statusBarButtons = useStatusBarManager();
