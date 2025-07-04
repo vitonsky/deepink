@@ -12,6 +12,7 @@ import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
 	selectNotes,
+	selectOpenedNotes,
 	selectSearch,
 } from '@state/redux/profiles/profiles';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -31,6 +32,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const notes = useWorkspaceSelector(selectNotes);
 
 	const search = useWorkspaceSelector(selectSearch);
+	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
 	const openNoteContextMenu = useDefaultNoteContextMenu({
 		closeNote: noteActions.close,
@@ -75,6 +77,29 @@ export const NotesList: FC<NotesListProps> = () => {
 	useCommandSubscription(SHORTCUT_COMMANDS.RESTORE_CLOSED_NOTE, () => {
 		if (!recentlyClosedNotes) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
+	});
+
+	useCommandSubscription(SHORTCUT_COMMANDS.OPEN_NEXT_NOTE, () => {
+		if (openedNotes.length <= 1 || !activeNoteId) return;
+
+		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+		const isLastIndex = currentIndex + 1 === openedNotes.length;
+
+		// if the current note is the last in array, go back to the first
+		const nextIndex = isLastIndex ? 0 : currentIndex + 1;
+
+		noteActions.click(openedNotes[nextIndex].id);
+	});
+	useCommandSubscription(SHORTCUT_COMMANDS.OPEN_PREVIOUSLY_NOTE, () => {
+		if (openedNotes.length <= 1 || !activeNoteId) return;
+
+		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+
+		// if the current note is the first in array, go to the last
+		const previouslyIndex =
+			currentIndex === 0 ? openedNotes.length - 1 : currentIndex - 1;
+
+		noteActions.click(openedNotes[previouslyIndex].id);
 	});
 
 	// TODO: implement dragging and moving items
