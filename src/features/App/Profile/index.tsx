@@ -2,7 +2,7 @@ import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
-import { CommandEventProvider } from '@features/shortcuts/CommandEventsProvider';
+import { CommandEventProvider } from '@features/shortcuts/CommandEventProvider';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
