@@ -11,9 +11,8 @@ import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
-
-import { useShortcutBinding } from '@features/shortcuts/commandHooks';
-import { useNotesShortcuts } from '@features/shortcuts/useNotesShortcuts';
+import { useShortcutBinding } from '@core/features/shortcuts/commandHooks';
+import { useNotesShortcuts } from '@hooks/notes/useNotesShortcuts';
 
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();

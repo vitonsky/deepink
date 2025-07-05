@@ -1,10 +1,9 @@
 import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
+import { GLOBAL_COMMANDS } from '@core/features/shortcuts/command';
+import { useCommandSubscription } from '@core/features/shortcuts/commandHooks';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
-
-import { GLOBAL_COMMANDS } from '../../shortcuts/command';
-import { useCommandSubscription } from '../../shortcuts/commandHooks';
 
 import { useProfileControls } from '../Profile';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
