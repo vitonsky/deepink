@@ -12,10 +12,10 @@ const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(nu
 export const useCommandEvent = createContextGetterHook(CommandEventContext);
 
 export const CommandEventProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-	const commandEvent = useMemo(() => createEvent<CommandEvent>(), []);
+	const event = useMemo(() => createEvent<CommandEvent>(), []);
 
 	return (
-		<CommandEventContext.Provider value={commandEvent}>
+		<CommandEventContext.Provider value={event}>
 			{children}
 		</CommandEventContext.Provider>
 	);

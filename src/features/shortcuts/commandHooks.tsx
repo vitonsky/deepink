@@ -4,7 +4,7 @@ import hotkeys from 'hotkeys-js';
 import { selectShortcuts } from '@state/redux/settings/settings';
 
 import { GLOBAL_COMMANDS } from './command';
-import { CommandEvent, useCommandEvent } from './CommandEventsProvider';
+import { CommandEvent, useCommandEvent } from './CommandEventProvider';
 
 /**
  * Executes a command by name
