@@ -1,9 +1,9 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
+import { CommandEventProvider } from '@core/features/shortcuts/CommandEventProvider';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
-import { CommandEventProvider } from '@features/shortcuts/CommandEventProvider';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
