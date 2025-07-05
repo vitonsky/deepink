@@ -1,3 +1,5 @@
+import { GLOBAL_COMMANDS } from '@core/features/shortcuts/command';
+import { useCommandSubscription } from '@core/features/shortcuts/commandHooks';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -6,9 +8,6 @@ import {
 	selectOpenedNotes,
 	selectRecentlyClosedNotes,
 } from '@state/redux/profiles/profiles';
-
-import { GLOBAL_COMMANDS } from './command';
-import { useCommandSubscription } from './commandHooks';
 
 export const useNotesShortcuts = () => {
 	const noteActions = useNoteActions();
