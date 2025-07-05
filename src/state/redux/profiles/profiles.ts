@@ -195,12 +195,10 @@ export const profilesSlice = createSlice({
 
 			workspace.openedNotes.push(note);
 
-			if (
-				workspace.recentlyClosedNotes[
-					workspace.recentlyClosedNotes.length - 1
-				] === note.id
-			) {
-				workspace.recentlyClosedNotes.pop();
+			if (workspace.recentlyClosedNotes.includes(note.id)) {
+				workspace.recentlyClosedNotes = workspace.recentlyClosedNotes.filter(
+					(id) => id !== note.id,
+				);
 			}
 		},
 
