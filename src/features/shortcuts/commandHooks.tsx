@@ -12,8 +12,8 @@ import { CommandEvent, useCommandEvent } from './CommandEventProvider';
 export function useCommandExecutor() {
 	const event = useCommandEvent();
 
-	return <T extends GLOBAL_COMMANDS>(commandName: T) => {
-		event({ id: commandName });
+	return <T extends GLOBAL_COMMANDS>(command: T) => {
+		event({ id: command });
 	};
 }
 
@@ -29,15 +29,15 @@ export const useShortcutBinding = () => {
 		// force handling shortcuts regardless of focus
 		hotkeys.filter = () => true;
 
-		Object.entries(shortcuts).forEach(([shortcutKey, commandName]) => {
-			hotkeys(shortcutKey, () => {
+		Object.entries(shortcuts).forEach(([shortcut, commandName]) => {
+			hotkeys(shortcut, () => {
 				execute(commandName);
 			});
 		});
 
 		return () => {
-			Object.keys(shortcuts).forEach((shortcutKey) => {
-				hotkeys.unbind(shortcutKey);
+			Object.keys(shortcuts).forEach((shortcut) => {
+				hotkeys.unbind(shortcut);
 			});
 		};
 	}, [shortcuts, execute]);
@@ -55,9 +55,9 @@ export function useCommandSubscription(
 	useEffect(() => {
 		const unsubscribe = commandEvent.watch((data) => {
 			if (data.id !== command) return;
-
 			callback(data);
 		});
+
 		return () => unsubscribe();
 	}, [callback, commandEvent, command]);
 }
