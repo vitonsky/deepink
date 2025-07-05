@@ -26,12 +26,13 @@ export const useNotesShortcuts = () => {
 	});
 
 	useCommandSubscription(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
-		if (!recentlyClosedNotes || !recentlyClosedNotes.length) return;
+		if (!recentlyClosedNotes || recentlyClosedNotes.length === 0) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
 
 	useCommandSubscription(GLOBAL_COMMANDS.OPEN_NEXT_NOTE, () => {
-		if (openedNotes.length <= 1 || !activeNoteId) return;
+		// switch only if 2 or more notes are opened
+		if (!activeNoteId || openedNotes.length < 2) return;
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		const isLastNote = currentIndex + 1 === openedNotes.length;
@@ -42,7 +43,8 @@ export const useNotesShortcuts = () => {
 	});
 
 	useCommandSubscription(GLOBAL_COMMANDS.OPEN_PREVIOUSLY_NOTE, () => {
-		if (openedNotes.length <= 1 || !activeNoteId) return;
+		// switch only if 2 or more notes are opened
+		if (!activeNoteId || openedNotes.length < 2) return;
 
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		const isFirstNote = currentIndex === 0;
