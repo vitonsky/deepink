@@ -4,7 +4,7 @@ import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
 	selectOpenedNotes,
-	selectRecentlyClosedNote,
+	selectRecentlyClosedNotes,
 } from '@state/redux/profiles/profiles';
 
 import { GLOBAL_COMMANDS } from './command';
@@ -14,7 +14,7 @@ export const useNotesShortcuts = () => {
 	const noteActions = useNoteActions();
 	const createNote = useCreateNote();
 
-	const recentlyClosedNotes = useWorkspaceSelector(selectRecentlyClosedNote);
+	const recentlyClosedNotes = useWorkspaceSelector(selectRecentlyClosedNotes);
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
