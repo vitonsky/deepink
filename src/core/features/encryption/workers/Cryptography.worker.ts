@@ -50,22 +50,32 @@ requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 		return new TwofishCTRCipher(key, getRandomBytes);
 	};
 
-	const cipher = [];
-	if (algorithm === 'aes') {
-		cipher.push(await getAESCipher());
-	} else if (algorithm === 'twofish') {
-		cipher.push(await getTwofishCipher());
-	} else {
-		const aes = await getAESCipher();
-		const twofish = await getTwofishCipher();
-		cipher.push(aes, twofish);
+	const ciphers = [];
+
+	switch (algorithm) {
+		case 'aes':
+			ciphers.push(await getAESCipher());
+			break;
+		case 'twofish':
+			ciphers.push(await getTwofishCipher());
+			break;
+		case 'aes-twofish':
+			ciphers.push(await getAESCipher());
+			ciphers.push(await getTwofishCipher());
+			break;
+		case 'twofish-aes':
+			ciphers.push(await getTwofishCipher());
+			ciphers.push(await getAESCipher());
+			break;
+		default:
+			throw new Error('The encryption algorithm was expected');
 	}
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
 			new BufferIntegrityProcessor(),
 			new BufferSizeObfuscationProcessor(getRandomBytes),
-			...cipher,
+			...ciphers,
 		]),
 	);
 });
