@@ -1,5 +1,6 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
 import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
+import { EncryptionAlgorithm } from '@core/features/encryption/workers/WorkerEncryptionProxyProcessor';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -7,7 +8,7 @@ import { ProfilesForm } from '../ProfilesForm';
 export type NewProfile = {
 	name: string;
 	password: string | null;
-	algorithm: string;
+	algorithm: EncryptionAlgorithm;
 };
 
 export type ProfileCreatorProps = {
@@ -60,7 +61,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			const response = await onCreateProfile({
 				name: profileName,
 				password: usePassword ? password : null,
-				algorithm,
+				algorithm: algorithm as EncryptionAlgorithm,
 			}).finally(() => {
 				setIsPending(false);
 			});
@@ -176,8 +177,12 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 								text: 'Twofish',
 							},
 							{
-								value: 'both',
+								value: 'aes-twofish',
 								text: 'AES - Twofish',
+							},
+							{
+								value: 'twofish-aes',
+								text: 'Twofish - AES',
 							},
 						].map(({ value, text }) => (
 							<option key={value} value={value}>

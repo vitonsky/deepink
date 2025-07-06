@@ -4,6 +4,7 @@ import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { createEncryption } from '@core/features/encryption/createEncryption';
+import { EncryptionAlgorithm } from '@core/features/encryption/workers/WorkerEncryptionProxyProcessor';
 import { FileController } from '@core/features/files/FileController';
 import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
@@ -32,7 +33,7 @@ const decryptKey = async ({
 	encryptedKey: ArrayBuffer;
 	password: string;
 	salt: ArrayBuffer;
-	algorithm: string;
+	algorithm: EncryptionAlgorithm;
 }) => {
 	const encryption = await createEncryption({ key: password, salt, algorithm });
 	return encryption
@@ -85,13 +86,13 @@ export const useProfileContainers = () => {
 					encryptedKey: encryptedKeyBuffer,
 					password: password,
 					salt,
-					algorithm: profile.encryption.algorithm,
+					algorithm: profile.encryption.algorithm as EncryptionAlgorithm,
 				});
 
 				const encryption = await createEncryption({
 					key,
 					salt,
-					algorithm: profile.encryption.algorithm,
+					algorithm: profile.encryption.algorithm as EncryptionAlgorithm,
 				});
 
 				encryptionCleanup = () => encryption.dispose();

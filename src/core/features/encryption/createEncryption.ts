@@ -2,7 +2,10 @@ import { DisposableBox } from '@utils/disposable';
 
 import { EncryptionController } from '../../encryption/EncryptionController';
 
-import { WorkerEncryptionProxyProcessor } from './workers/WorkerEncryptionProxyProcessor';
+import {
+	EncryptionAlgorithm,
+	WorkerEncryptionProxyProcessor,
+} from './workers/WorkerEncryptionProxyProcessor';
 
 /**
  * Encryption entrypoint for application
@@ -12,7 +15,7 @@ import { WorkerEncryptionProxyProcessor } from './workers/WorkerEncryptionProxyP
 export const createEncryption = async (authData: {
 	key: string | ArrayBuffer;
 	salt: ArrayBuffer;
-	algorithm: string;
+	algorithm: EncryptionAlgorithm;
 }): Promise<DisposableBox<EncryptionController>> => {
 	const workerEncryption = new WorkerEncryptionProxyProcessor({
 		secretKey: authData.key,

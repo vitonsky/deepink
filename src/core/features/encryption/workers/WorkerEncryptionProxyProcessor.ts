@@ -7,6 +7,8 @@ import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
 import EncryptionWorker from './Cryptography.worker';
 
+export type EncryptionAlgorithm = 'aes' | 'twofish' | 'aes-twofish' | 'twofish-aes';
+
 /**
  * Transparent proxy an encryption requests to a worker
  * Useful to prevent main thread blocking for a long-term cryptographic operations
@@ -22,7 +24,7 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	}: {
 		secretKey: string | ArrayBuffer;
 		salt: ArrayBuffer;
-		algorithm: string;
+		algorithm: EncryptionAlgorithm;
 	}) {
 		const worker = new EncryptionWorker();
 		this.messenger = new WorkerMessenger(worker);
