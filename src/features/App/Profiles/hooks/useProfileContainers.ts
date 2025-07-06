@@ -4,7 +4,7 @@ import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { createEncryption } from '@core/features/encryption/createEncryption';
-import { EncryptionAlgorithm } from '@core/features/encryption/workers/WorkerEncryptionProxyProcessor';
+import { EncryptionAlgorithm } from '@core/features/encryption/EncryptionAlgorithm';
 import { FileController } from '@core/features/files/FileController';
 import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
