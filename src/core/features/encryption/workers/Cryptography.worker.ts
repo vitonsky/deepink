@@ -10,6 +10,7 @@ import { PipelineProcessor } from '../../../encryption/processors/PipelineProces
 import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
 import { getRandomBytes } from '../../../encryption/utils/random';
 
+import { EncryptionAlgorithm } from './WorkerEncryptionProxyProcessor';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -53,17 +54,17 @@ requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 	const ciphers = [];
 
 	switch (algorithm) {
-		case 'aes':
+		case EncryptionAlgorithm.AES:
 			ciphers.push(await getAESCipher());
 			break;
-		case 'twofish':
+		case EncryptionAlgorithm.TWOFISH:
 			ciphers.push(await getTwofishCipher());
 			break;
-		case 'aes-twofish':
+		case EncryptionAlgorithm.AES_TWOFISH:
 			ciphers.push(await getAESCipher());
 			ciphers.push(await getTwofishCipher());
 			break;
-		case 'twofish-aes':
+		case EncryptionAlgorithm.TWOFISH_AES:
 			ciphers.push(await getTwofishCipher());
 			ciphers.push(await getAESCipher());
 			break;

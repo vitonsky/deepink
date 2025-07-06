@@ -34,7 +34,9 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
 
-	const [algorithm, setAlgorithm] = useState('aes');
+	const [algorithm, setAlgorithm] = useState<EncryptionAlgorithm>(
+		EncryptionAlgorithm.AES,
+	);
 
 	useEffect(() => {
 		setPasswordError(null);
@@ -61,7 +63,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			const response = await onCreateProfile({
 				name: profileName,
 				password: usePassword ? password : null,
-				algorithm: algorithm as EncryptionAlgorithm,
+				algorithm: algorithm,
 			}).finally(() => {
 				setIsPending(false);
 			});
@@ -164,24 +166,26 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Select
 						variant="secondary"
 						defaultValue="aes"
-						onChange={(evt) => setAlgorithm(evt.target.value)}
+						onChange={(evt) =>
+							setAlgorithm(evt.target.value as EncryptionAlgorithm)
+						}
 						disabled={isPending}
 					>
 						{[
 							{
-								value: 'aes',
+								value: EncryptionAlgorithm.AES,
 								text: 'AES',
 							},
 							{
-								value: 'twofish',
+								value: EncryptionAlgorithm.TWOFISH,
 								text: 'Twofish',
 							},
 							{
-								value: 'aes-twofish',
+								value: EncryptionAlgorithm.AES_TWOFISH,
 								text: 'AES - Twofish',
 							},
 							{
-								value: 'twofish-aes',
+								value: EncryptionAlgorithm.TWOFISH_AES,
 								text: 'Twofish - AES',
 							},
 						].map(({ value, text }) => (

@@ -7,7 +7,12 @@ import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
 import EncryptionWorker from './Cryptography.worker';
 
-export type EncryptionAlgorithm = 'aes' | 'twofish' | 'aes-twofish' | 'twofish-aes';
+export enum EncryptionAlgorithm {
+	AES = 'aes',
+	TWOFISH = 'twofish',
+	AES_TWOFISH = 'aes-twofish',
+	TWOFISH_AES = 'twofish-aes',
+}
 
 /**
  * Transparent proxy an encryption requests to a worker
