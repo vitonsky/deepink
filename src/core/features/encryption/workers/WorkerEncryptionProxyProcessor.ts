@@ -5,14 +5,8 @@ import { WorkerRPC } from '@utils/workers/WorkerRPC';
 import { IEncryptionProcessor } from '../../../encryption';
 import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
+import { EncryptionAlgorithm } from '../EncryptionAlgorithm';
 import EncryptionWorker from './Cryptography.worker';
-
-export enum EncryptionAlgorithm {
-	AES = 'aes',
-	TWOFISH = 'twofish',
-	AES_TWOFISH = 'aes-twofish',
-	TWOFISH_AES = 'twofish-aes',
-}
 
 /**
  * Transparent proxy an encryption requests to a worker

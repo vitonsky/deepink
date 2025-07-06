@@ -10,7 +10,7 @@ import { PipelineProcessor } from '../../../encryption/processors/PipelineProces
 import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
 import { getRandomBytes } from '../../../encryption/utils/random';
 
-import { EncryptionAlgorithm } from './WorkerEncryptionProxyProcessor';
+import { ENCRYPTION_ALGORITHM } from '../EncryptionAlgorithm';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -54,22 +54,20 @@ requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 	const ciphers = [];
 
 	switch (algorithm) {
-		case EncryptionAlgorithm.AES:
+		case ENCRYPTION_ALGORITHM.AES:
 			ciphers.push(await getAESCipher());
 			break;
-		case EncryptionAlgorithm.TWOFISH:
+		case ENCRYPTION_ALGORITHM.TWOFISH:
 			ciphers.push(await getTwofishCipher());
 			break;
-		case EncryptionAlgorithm.AES_TWOFISH:
-			ciphers.push(await getAESCipher());
-			ciphers.push(await getTwofishCipher());
+		case ENCRYPTION_ALGORITHM.AES_TWOFISH:
+			ciphers.push(await getAESCipher(), await getTwofishCipher());
 			break;
-		case EncryptionAlgorithm.TWOFISH_AES:
-			ciphers.push(await getTwofishCipher());
-			ciphers.push(await getAESCipher());
+		case ENCRYPTION_ALGORITHM.TWOFISH_AES:
+			ciphers.push(await getTwofishCipher(), await getAESCipher());
 			break;
 		default:
-			throw new Error('The encryption algorithm was expected');
+			throw new Error('The encryption algorithm was expected but not received');
 	}
 
 	encryptionController = new EncryptionController(

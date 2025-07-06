@@ -1,6 +1,9 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
 import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
-import { EncryptionAlgorithm } from '@core/features/encryption/workers/WorkerEncryptionProxyProcessor';
+import {
+	ENCRYPTION_ALGORITHM,
+	EncryptionAlgorithm,
+} from '@core/features/encryption/EncryptionAlgorithm';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -35,7 +38,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const [passwordError, setPasswordError] = useState<null | string>(null);
 
 	const [algorithm, setAlgorithm] = useState<EncryptionAlgorithm>(
-		EncryptionAlgorithm.AES,
+		ENCRYPTION_ALGORITHM.AES,
 	);
 
 	useEffect(() => {
@@ -173,19 +176,19 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						{[
 							{
-								value: EncryptionAlgorithm.AES,
+								value: ENCRYPTION_ALGORITHM.AES,
 								text: 'AES',
 							},
 							{
-								value: EncryptionAlgorithm.TWOFISH,
+								value: ENCRYPTION_ALGORITHM.TWOFISH,
 								text: 'Twofish',
 							},
 							{
-								value: EncryptionAlgorithm.AES_TWOFISH,
+								value: ENCRYPTION_ALGORITHM.AES_TWOFISH,
 								text: 'AES - Twofish',
 							},
 							{
-								value: EncryptionAlgorithm.TWOFISH_AES,
+								value: ENCRYPTION_ALGORITHM.TWOFISH_AES,
 								text: 'Twofish - AES',
 							},
 						].map(({ value, text }) => (
