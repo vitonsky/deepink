@@ -133,7 +133,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	}, []);
 
 	return (
-		<VStack w="100%" align="start" minW="300px">
+		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
 				<HStack w="100%" align="start">
 					<Input
