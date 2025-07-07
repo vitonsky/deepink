@@ -397,6 +397,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							uploadFile={uploadFile}
 							width="100%"
 							height="100%"
+							minW="0"
 						/>
 					)}
 					{(editorMode === 'richtext' || editorMode === 'split-screen') && (
