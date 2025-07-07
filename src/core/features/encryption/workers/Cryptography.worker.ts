@@ -1,8 +1,8 @@
+import { AESGCMCipher } from '@core/encryption/ciphers/AES';
+import { TwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
 import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
 import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
-import { AESGCMCipher } from '../../../encryption/ciphers/AES';
-import { TwofishCTRCipher } from '../../../encryption/ciphers/Twofish';
 import { EncryptionController } from '../../../encryption/EncryptionController';
 import { BufferIntegrityProcessor } from '../../../encryption/processors/BufferIntegrityProcessor';
 import { BufferSizeObfuscationProcessor } from '../../../encryption/processors/BufferSizeObfuscationProcessor';
@@ -45,30 +45,34 @@ requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 		return new AESGCMCipher(key, getRandomBytes);
 	};
 	const getTwofishCipher = async () => {
-		const key = await derivedKeys
-			.getDerivedBytes('twofish-ctr-cipher', 256)
-			.then((buffer) => new Uint8Array(buffer));
-		return new TwofishCTRCipher(key, getRandomBytes);
+		const key = await derivedKeys.getDerivedBytes('twofish-ctr-cipher', 256);
+		const twofishKey = new Uint8Array(key);
+		return new TwofishCTRCipher(twofishKey, getRandomBytes);
 	};
 
-	const ciphers = [];
-
+	const cipherPromises = [];
 	switch (algorithm) {
 		case ENCRYPTION_ALGORITHM.AES:
-			ciphers.push(await getAESCipher());
+			cipherPromises.push(getAESCipher());
 			break;
 		case ENCRYPTION_ALGORITHM.TWOFISH:
-			ciphers.push(await getTwofishCipher());
+			cipherPromises.push(getTwofishCipher());
 			break;
 		case ENCRYPTION_ALGORITHM.AES_TWOFISH:
-			ciphers.push(await getAESCipher(), await getTwofishCipher());
+			cipherPromises.push(getAESCipher(), getTwofishCipher());
 			break;
 		case ENCRYPTION_ALGORITHM.TWOFISH_AES:
-			ciphers.push(await getTwofishCipher(), await getAESCipher());
+			cipherPromises.push(getTwofishCipher(), getAESCipher());
 			break;
 		default:
-			throw new Error('The encryption algorithm was expected but not received');
+			throw new Error(
+				`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${Object.values(
+					ENCRYPTION_ALGORITHM,
+				).join(', ')}`,
+			);
 	}
+
+	const ciphers = await Promise.all(cipherPromises);
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
