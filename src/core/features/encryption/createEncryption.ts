@@ -2,7 +2,7 @@ import { DisposableBox } from '@utils/disposable';
 
 import { EncryptionController } from '../../encryption/EncryptionController';
 
-import { EncryptionAlgorithm } from './EncryptionAlgorithm';
+import { EncryptionAlgorithm } from './algorithms';
 import { WorkerEncryptionProxyProcessor } from './workers/WorkerEncryptionProxyProcessor';
 
 /**
