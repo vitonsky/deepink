@@ -3,7 +3,7 @@ import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
 import {
 	ENCRYPTION_ALGORITHM,
 	EncryptionAlgorithm,
-} from '@core/features/encryption/EncryptionAlgorithm';
+} from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';

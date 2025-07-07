@@ -5,7 +5,7 @@ import { WorkerRPC } from '@utils/workers/WorkerRPC';
 import { IEncryptionProcessor } from '../../../encryption';
 import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
-import { EncryptionAlgorithm } from '../EncryptionAlgorithm';
+import { EncryptionAlgorithm } from '../algorithms';
 import EncryptionWorker from './Cryptography.worker';
 
 /**

@@ -10,7 +10,7 @@ import { PipelineProcessor } from '../../../encryption/processors/PipelineProces
 import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
 import { getRandomBytes } from '../../../encryption/utils/random';
 
-import { ENCRYPTION_ALGORITHM } from '../EncryptionAlgorithm';
+import { ENCRYPTION_ALGORITHM } from '../algorithms';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
