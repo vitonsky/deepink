@@ -86,13 +86,13 @@ export const useProfileContainers = () => {
 					encryptedKey: encryptedKeyBuffer,
 					password: password,
 					salt,
-					algorithm: profile.encryption.algorithm as EncryptionAlgorithm,
+					algorithm: profile.encryption.algorithm,
 				});
 
 				const encryption = await createEncryption({
 					key,
 					salt,
-					algorithm: profile.encryption.algorithm as EncryptionAlgorithm,
+					algorithm: profile.encryption.algorithm,
 				});
 
 				encryptionCleanup = () => encryption.dispose();
