@@ -22,7 +22,7 @@ const messenger = new WorkerMessenger(self);
 const requests = new WorkerRPC(messenger);
 
 const workerId = performance.now();
-requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
+requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
 	// Convert `ArrayBuffer`
@@ -33,7 +33,7 @@ requests.addHandler('init', async ({ secretKey, salt, algorithm }) => {
 	if (!(salt instanceof Uint8Array))
 		throw new Error('Salt is not instance of Uint8Array');
 
-	const derivedKeys = await getMasterKey(secretKey, salt).then((masterKey) =>
+	const derivedKeys = await getMasterKey(key, salt).then((masterKey) =>
 		getDerivedKeysManager(masterKey, salt),
 	);
 
