@@ -6,6 +6,7 @@ CREATE TABLE "notes" (
 	"text" TEXT NOT NULL,
 	"creationTime" INTEGER NOT NULL DEFAULT 0,
 	"lastUpdateTime" INTEGER NOT NULL DEFAULT 0,
+	"isDeleted" INTEGER,
 	PRIMARY KEY("id")
 );
 CREATE TABLE "files" (
