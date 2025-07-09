@@ -21,6 +21,11 @@ export type NotesControllerFetchOptions = {
 	 * Filter notes by tags
 	 */
 	tags?: string[];
+
+	/**
+	 * Filter notes by `deleted` status
+	 */
+	includeDeleted?: boolean;
 };
 
 /**
@@ -54,6 +59,8 @@ export interface INotesController {
 
 	/**
 	 * Deletes all notes with specified ids
+	 *
+	 * permanent – defines whether to delete a note permanently or mark it as deleted
 	 */
-	delete(ids: NoteId[]): Promise<void>;
+	delete(ids: NoteId[], options?: { permanent?: boolean }): Promise<void>;
 }

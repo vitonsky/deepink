@@ -13,11 +13,12 @@ import { INotesController, NotesControllerFetchOptions } from '.';
  */
 const mappers = {
 	rowToNoteObject(row: any): INote {
-		const { id, title, text, creationTime, lastUpdateTime } = row;
+		const { id, title, text, creationTime, lastUpdateTime, isDeleted } = row;
 		return {
 			id,
 			createdTimestamp: creationTime,
 			updatedTimestamp: lastUpdateTime,
+			isDeleted: isDeleted ? true : false,
 			content: { title, text },
 		};
 	},
@@ -73,6 +74,7 @@ export class NotesController implements INotesController {
 		limit = 100,
 		page = 1,
 		tags = [],
+		includeDeleted,
 	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
@@ -105,6 +107,13 @@ export class NotesController implements INotesController {
 										),
 								),
 						  )
+						: undefined,
+				)
+				.where(
+					includeDeleted === true
+						? qb.line('isDeleted = 1')
+						: includeDeleted === false
+						? qb.line('isDeleted IS NULL')
 						: undefined,
 				)
 				.limit(limit)
@@ -189,21 +198,31 @@ export class NotesController implements INotesController {
 		}
 	}
 
-	public async delete(ids: NoteId[]): Promise<void> {
+	public async delete(
+		ids: NoteId[],
+		{ permanent = true }: { permanent?: boolean } = {},
+	): Promise<void> {
 		const db = wrapDB(this.db.get());
 
-		const result = db.run(
-			qb.line(
-				'DELETE FROM notes',
-				qb
-					.where(
+		const where = qb
+			.where(
+				qb.values({
+					workspace_id: this.workspace,
+				}),
+			)
+			.and(qb.line('id IN', qb.values(ids).withParenthesis()));
+
+		const result = permanent
+			? db.run(qb.line('DELETE FROM notes', where))
+			: db.run(
+					qb.line(
+						'UPDATE notes SET',
 						qb.values({
-							workspace_id: this.workspace,
+							isDeleted: 1,
 						}),
-					)
-					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
-			),
-		);
+						where,
+					),
+			  );
 
 		if (result.changes !== ids.length) {
 			console.warn(
