@@ -78,7 +78,6 @@ export const useDefaultNoteContextMenu = ({
 					if (!isConfirmed) return;
 
 					closeNote(id);
-					await notesRegistry.delete([id]);
 
 					await tagsRegistry.setAttachedTags(id, []);
 
