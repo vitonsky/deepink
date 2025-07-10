@@ -9,6 +9,8 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectIsPermanentDeleteNotes } from '@state/redux/settings/settings';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
@@ -56,6 +58,7 @@ export const useDefaultNoteContextMenu = ({
 }: DefaultContextMenuOptions) => {
 	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
+	const isPermanentDeleteNotes = useAppSelector(selectIsPermanentDeleteNotes);
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
@@ -65,7 +68,10 @@ export const useDefaultNoteContextMenu = ({
 					if (!isConfirmed) return;
 
 					closeNote(id);
-					await notesRegistry.delete([id]);
+
+					isPermanentDeleteNotes
+						? await notesRegistry.delete([id])
+						: await notesRegistry.delete([id], { permanent: false });
 
 					await tagsRegistry.setAttachedTags(id, []);
 
@@ -148,7 +154,14 @@ export const useDefaultNoteContextMenu = ({
 				}
 			}
 		},
-		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
+		[
+			closeNote,
+			filesRegistry,
+			isPermanentDeleteNotes,
+			notesRegistry,
+			tagsRegistry,
+			updateNotes,
+		],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);
