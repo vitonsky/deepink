@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
+import { INote } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
@@ -8,6 +9,10 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 
+import {
+	NOTES_OVERVIEW_OPTIONS,
+	useNotesOverview,
+} from '../NotesOverview/NotesOverviewProvider';
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
 export type NotesListProps = {};
@@ -18,7 +23,20 @@ export const NotesList: FC<NotesListProps> = () => {
 	const noteActions = useNoteActions();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	const notes = useWorkspaceSelector(selectNotes);
+
+	const notesOverviewMode = useNotesOverview();
+
+	const allNotes = useWorkspaceSelector(selectNotes);
+	const [filteredNotes, setFilteredNotes] = useState<INote[]>([]);
+
+	useEffect(() => {
+		if (notesOverviewMode.noteOverview === NOTES_OVERVIEW_OPTIONS.BIN) {
+			setFilteredNotes(allNotes.filter((note) => note.isDeleted));
+			return;
+		}
+
+		setFilteredNotes(allNotes.filter((note) => !note.isDeleted));
+	}, [notesOverviewMode, allNotes]);
 
 	const openNoteContextMenu = useDefaultNoteContextMenu({
 		closeNote: noteActions.close,
@@ -37,7 +55,7 @@ export const NotesList: FC<NotesListProps> = () => {
 				userSelect: 'none',
 			}}
 		>
-			{notes.length === 0 ? (
+			{filteredNotes.length === 0 ? (
 				<Text pos="relative" top="40%">
 					Nothing added yet
 				</Text>
@@ -49,7 +67,7 @@ export const NotesList: FC<NotesListProps> = () => {
 						gap: '4px',
 					}}
 				>
-					{notes.map((note) => {
+					{filteredNotes.map((note) => {
 						const date = note.createdTimestamp ?? note.updatedTimestamp;
 						const text = note.content.text.slice(0, 80).trim();
 
