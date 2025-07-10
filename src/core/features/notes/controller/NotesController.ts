@@ -328,4 +328,24 @@ export class NotesController implements INotesController {
 			);
 		}
 	}
+
+	public async restore(id: NoteId): Promise<void> {
+		const db = wrapDB(this.db.get());
+
+		const result = db.run(
+			qb.line(
+				'UPDATE notes SET',
+				qb.values({
+					isDeleted: null,
+				}),
+				qb
+					.where(qb.values({ id }))
+					.and(qb.values({ workspace_id: this.workspace })),
+			),
+		);
+
+		if (!result.changes || result.changes < 1) {
+			throw new Error('Note did not restored');
+		}
+	}
 }
