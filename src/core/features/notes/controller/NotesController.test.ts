@@ -138,6 +138,47 @@ describe('CRUD operations', () => {
 
 		await db.close();
 	});
+
+	test('restore note', async () => {
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, 'fake-workspace-id');
+
+		const entries = [
+			{ title: 'Title 1', text: 'Text 1' },
+			{ title: 'Title 2', text: 'Text 2' },
+			{ title: 'Title 3', text: 'Text 3' },
+		];
+
+		const ids = await Promise.all(entries.map((note) => registry.add(note)));
+		expect(ids).toHaveLength(entries.length);
+		const lengthBeforeDelete = await registry.getLength();
+
+		const note = ids[0];
+
+		// delete note
+		await registry.delete([note], { permanent: false });
+
+		await registry.get({ includeDeleted: true }).then((dbEntries) => {
+			expect(dbEntries).toHaveLength(lengthBeforeDelete - 2);
+			dbEntries.forEach((dbEntry) => {
+				expect(dbEntry.isDeleted).toBe(true);
+			});
+		});
+
+		// restore
+		await registry.restore(note);
+
+		const restoredNote = await registry.getById(note);
+		expect(restoredNote?.isDeleted).toBe(false);
+
+		await registry.get({ includeDeleted: true }).then((dbEntries) => {
+			expect(dbEntries).toHaveLength(0);
+			dbEntries.forEach((dbEntry) => {
+				expect(dbEntry.isDeleted).toBe(false);
+			});
+		});
+	});
 });
 
 describe('data fetching', () => {
