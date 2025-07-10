@@ -24,9 +24,18 @@ import {
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 
+import {
+	NOTES_OVERVIEW_OPTIONS,
+	NotesOverviewOption,
+	useNotesOverview,
+} from './NotesOverviewProvider';
 import { TagsList } from './TagsList';
 
 export type NotesOverviewProps = {};
+
+const isNotesOverviewOption = (id: string): id is NotesOverviewOption => {
+	return Object.values(NOTES_OVERVIEW_OPTIONS).includes(id as NotesOverviewOption);
+};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const telemetry = useTelemetryTracker();
@@ -37,6 +46,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 	const tags = useWorkspaceSelector(selectTags);
 	const tagsTree = useWorkspaceSelector(selectTagsTree);
+
+	const chooseNotesOverview = useNotesOverview();
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -117,7 +128,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'all',
+						id: NOTES_OVERVIEW_OPTIONS.ALL,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBookOpen />
@@ -153,7 +164,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'bin',
+						id: NOTES_OVERVIEW_OPTIONS.BIN,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaTrash />
@@ -162,16 +173,22 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 				]}
-				activeItem={activeTag === null ? 'all' : undefined}
+				activeItem={
+					activeTag === null
+						? chooseNotesOverview.noteOverview || NOTES_OVERVIEW_OPTIONS.ALL
+						: undefined
+				}
 				onPick={(id) => {
-					if (id === 'all') {
-						dispatch(
-							workspacesApi.setSelectedTag({
-								...workspaceData,
-								tag: null,
-							}),
-						);
+					if (isNotesOverviewOption(id)) {
+						chooseNotesOverview.setNoteOverview(id);
 					}
+
+					dispatch(
+						workspacesApi.setSelectedTag({
+							...workspaceData,
+							tag: null,
+						}),
+					);
 				}}
 			/>
 
