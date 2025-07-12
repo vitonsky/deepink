@@ -113,7 +113,7 @@ export class NotesController implements INotesController {
 					includeDeleted === true
 						? qb.line('isDeleted = 1')
 						: includeDeleted === false
-						? qb.line('isDeleted IS NULL')
+						? qb.line('isDeleted = 0')
 						: undefined,
 				)
 				.limit(limit)
@@ -238,7 +238,7 @@ export class NotesController implements INotesController {
 			qb.line(
 				'UPDATE notes SET',
 				qb.values({
-					isDeleted: null,
+					isDeleted: 0,
 				}),
 				qb
 					.where(qb.values({ id }))
