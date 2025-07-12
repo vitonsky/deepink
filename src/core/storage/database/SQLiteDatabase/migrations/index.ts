@@ -57,7 +57,7 @@ const migrations = [
 		up: async (db: MigrationsTarget) => {
 			db.transaction(() => {
 				db.exec(`ALTER TABLE notes
-					ADD COLUMN isDeleted INTEGER`);
+					ADD COLUMN isDeleted INTEGER NOT NULL DEFAULT 0`);
 			})();
 		},
 	},
