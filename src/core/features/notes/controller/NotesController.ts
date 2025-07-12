@@ -198,31 +198,21 @@ export class NotesController implements INotesController {
 		}
 	}
 
-	public async delete(
-		ids: NoteId[],
-		{ permanent = true }: { permanent?: boolean } = {},
-	): Promise<void> {
+	public async delete(ids: NoteId[]): Promise<void> {
 		const db = wrapDB(this.db.get());
 
-		const where = qb
-			.where(
-				qb.values({
-					workspace_id: this.workspace,
-				}),
-			)
-			.and(qb.line('id IN', qb.values(ids).withParenthesis()));
-
-		const result = permanent
-			? db.run(qb.line('DELETE FROM notes', where))
-			: db.run(
-					qb.line(
-						'UPDATE notes SET',
+		const result = db.run(
+			qb.line(
+				'DELETE FROM notes',
+				qb
+					.where(
 						qb.values({
-							isDeleted: 1,
+							workspace_id: this.workspace,
 						}),
-						where,
-					),
-			  );
+					)
+					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
+			),
+		);
 
 		if (result.changes !== ids.length) {
 			console.warn(
@@ -231,23 +221,32 @@ export class NotesController implements INotesController {
 		}
 	}
 
-	public async restore(id: NoteId): Promise<void> {
+	public async updateStatus(
+		ids: NoteId[],
+		status: { deleted: boolean },
+	): Promise<void> {
 		const db = wrapDB(this.db.get());
 
 		const result = db.run(
 			qb.line(
 				'UPDATE notes SET',
 				qb.values({
-					isDeleted: 0,
+					isDeleted: status.deleted ? 1 : 0,
 				}),
 				qb
-					.where(qb.values({ id }))
-					.and(qb.values({ workspace_id: this.workspace })),
+					.where(
+						qb.values({
+							workspace_id: this.workspace,
+						}),
+					)
+					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
 			),
 		);
 
 		if (!result.changes || result.changes < 1) {
-			throw new Error('Note did not restored');
+			console.warn(
+				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
+			);
 		}
 	}
 }
