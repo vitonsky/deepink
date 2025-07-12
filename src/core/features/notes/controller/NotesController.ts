@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { QueryBuilder } from 'nano-queries/QueryBuilder';
 import { v4 as uuid4 } from 'uuid';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
@@ -74,13 +75,20 @@ export class NotesController implements INotesController {
 		limit = 100,
 		page = 1,
 		tags = [],
-		includeDeleted,
+		deleted,
 	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
 		const db = wrapDB(this.db.get());
 
 		const notes: INote[] = [];
+
+		let isDeleted: undefined | QueryBuilder;
+		if (deleted === true) {
+			isDeleted = qb.line('isDeleted = 1');
+		} else if (deleted === false) {
+			isDeleted = qb.line('isDeleted = 0');
+		}
 
 		db.all(
 			qb
@@ -109,13 +117,7 @@ export class NotesController implements INotesController {
 						  )
 						: undefined,
 				)
-				.where(
-					includeDeleted === true
-						? qb.line('isDeleted = 1')
-						: includeDeleted === false
-						? qb.line('isDeleted = 0')
-						: undefined,
-				)
+				.where(isDeleted)
 				.limit(limit)
 				.offset((page - 1) * limit),
 		).map((row) => {
