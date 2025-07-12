@@ -23,9 +23,9 @@ export type NotesControllerFetchOptions = {
 	tags?: string[];
 
 	/**
-	 * Filter notes by `deleted` status
+	 * Filter notes by deleted status
 	 */
-	includeDeleted?: boolean;
+	deleted?: boolean;
 };
 
 /**
