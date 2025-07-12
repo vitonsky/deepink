@@ -97,7 +97,7 @@ describe('CRUD operations', () => {
 		await db.close();
 	});
 
-	test('to mark notes as deleted', async () => {
+	test('Updating notes status to deleted does not change the number of notes', async () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, 'fake-workspace-id');
@@ -111,35 +111,28 @@ describe('CRUD operations', () => {
 					text: 'Note text #' + idx,
 				};
 			});
+
 		await Promise.all(notesSample.map((note) => registry.add(note)));
+		const notes = await registry.get({ limit: 100 });
+		const notesId = notes.map((note) => note.id);
 
-		// deleted a set of notes to the bin; the quantity should not change
-		await registry.get({ limit: 100 }).then(async (notes) => {
-			const lengthBeforeDelete = await registry.getLength();
-			await registry.delete(
-				notes.map((note) => note.id),
-				{ permanent: false },
-			);
+		// update the status of notes
+		await registry.updateStatus(notesId, { deleted: true });
 
-			await registry.getLength().then((length) => {
-				expect(length).toBe(lengthBeforeDelete);
-			});
-		});
+		// notes were updated
+		const result = await registry.get({ includeDeleted: true });
+		expect(result).toHaveLength(100);
+		expect(result).toEqual(
+			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
+		);
 
-		//  deleted one note
-		await registry.get({ limit: 1 }).then(async (notes) => {
-			const lengthBeforeDelete = await registry.getLength();
-			await registry.delete([notes[0].id], { permanent: false });
-
-			await registry.getLength().then((length) => {
-				expect(length).toBe(lengthBeforeDelete);
-			});
-		});
+		// the number of notes did not change
+		await expect(registry.getLength()).resolves.toBe(300);
 
 		await db.close();
 	});
 
-	test('restore note', async () => {
+	test('Update note status toggles deleted status correctly', async () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, 'fake-workspace-id');
@@ -151,33 +144,19 @@ describe('CRUD operations', () => {
 		];
 
 		const ids = await Promise.all(entries.map((note) => registry.add(note)));
-		expect(ids).toHaveLength(entries.length);
-		const lengthBeforeDelete = await registry.getLength();
-
 		const note = ids[0];
 
 		// delete note
-		await registry.delete([note], { permanent: false });
-
-		await registry.get({ includeDeleted: true }).then((dbEntries) => {
-			expect(dbEntries).toHaveLength(lengthBeforeDelete - 2);
-			dbEntries.forEach((dbEntry) => {
-				expect(dbEntry.isDeleted).toBe(true);
-			});
-		});
+		await registry.updateStatus([note], { deleted: true });
+		await expect(registry.getById(note)).resolves.toEqual(
+			expect.objectContaining({ isDeleted: true }),
+		);
 
 		// restore
-		await registry.restore(note);
-
-		const restoredNote = await registry.getById(note);
-		expect(restoredNote?.isDeleted).toBe(false);
-
-		await registry.get({ includeDeleted: true }).then((dbEntries) => {
-			expect(dbEntries).toHaveLength(0);
-			dbEntries.forEach((dbEntry) => {
-				expect(dbEntry.isDeleted).toBe(false);
-			});
-		});
+		await registry.updateStatus([note], { deleted: false });
+		await expect(registry.getById(note)).resolves.toEqual(
+			expect.objectContaining({ isDeleted: false }),
+		);
 	});
 });
 
@@ -283,33 +262,26 @@ describe('data fetching', () => {
 		];
 
 		const ids = await Promise.all(entries.map((note) => registry.add(note)));
-		expect(ids).toHaveLength(entries.length);
 
-		const lengthBeforeDelete = await registry.getLength();
-
-		// mark notes as deleted
-		await registry.delete([ids[0]], { permanent: false });
+		// update status
+		await registry.updateStatus([ids[0]], { deleted: true });
 
 		// get all notes
-		await registry.get().then(async (dbEntries) => {
-			expect(dbEntries).toHaveLength(lengthBeforeDelete);
-		});
+		await expect(registry.get()).resolves.toHaveLength(3);
 
 		// get only deleted notes
-		await registry.get({ includeDeleted: true }).then((dbEntries) => {
-			expect(dbEntries).toHaveLength(lengthBeforeDelete - 2);
-			dbEntries.forEach((dbEntry) => {
-				expect(dbEntry.isDeleted).toBe(true);
-			});
-		});
+		const deletedNotes = await registry.get({ includeDeleted: true });
+		expect(deletedNotes).toHaveLength(1);
+		expect(deletedNotes).toEqual(
+			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
+		);
 
 		// get only non-deleted notes
-		await registry.get({ includeDeleted: false }).then((dbEntries) => {
-			expect(dbEntries).toHaveLength(lengthBeforeDelete - 1);
-			dbEntries.forEach((dbEntry) => {
-				expect(dbEntry.isDeleted).toBe(false);
-			});
-		});
+		const notDeletedNotes = await registry.get({ includeDeleted: false });
+		expect(notDeletedNotes).toHaveLength(2);
+		expect(notDeletedNotes).toEqual(
+			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
+		);
 
 		await db.close();
 	});

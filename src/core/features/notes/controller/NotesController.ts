@@ -329,7 +329,10 @@ export class NotesController implements INotesController {
 		}
 	}
 
-	public async restore(id: NoteId): Promise<void> {
+	public async updateStatus(
+		ids: NoteId[],
+		status: { deleted: boolean },
+	): Promise<void> {
 		const db = wrapDB(this.db.get());
 
 		const result = db.run(
@@ -339,13 +342,19 @@ export class NotesController implements INotesController {
 					isDeleted: null,
 				}),
 				qb
-					.where(qb.values({ id }))
-					.and(qb.values({ workspace_id: this.workspace })),
+					.where(
+						qb.values({
+							workspace_id: this.workspace,
+						}),
+					)
+					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
 			),
 		);
 
 		if (!result.changes || result.changes < 1) {
-			throw new Error('Note did not restored');
+			console.warn(
+				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
+			);
 		}
 	}
 }

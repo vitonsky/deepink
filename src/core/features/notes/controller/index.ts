@@ -83,8 +83,11 @@ export interface INotesController {
 
 	/**
 	 * Deletes all notes with specified ids
-	 *
-	 * permanent – defines whether to delete a note permanently or mark it as deleted
 	 */
-	delete(ids: NoteId[], options?: { permanent?: boolean }): Promise<void>;
+	delete(ids: NoteId[]): Promise<void>;
+
+	/**
+	 * Update the deletion status of notes with the specified ids
+	 */
+	updateStatus(ids: NoteId[], status: { deleted: boolean }): Promise<void>;
 }
