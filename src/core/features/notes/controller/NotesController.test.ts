@@ -120,7 +120,7 @@ describe('CRUD operations', () => {
 		await registry.updateStatus(notesId, { deleted: true });
 
 		// notes were updated
-		const result = await registry.get({ includeDeleted: true });
+		const result = await registry.get({ deleted: true });
 		expect(result).toHaveLength(100);
 		expect(result).toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
@@ -270,14 +270,14 @@ describe('data fetching', () => {
 		await expect(registry.get()).resolves.toHaveLength(3);
 
 		// get only deleted notes
-		const deletedNotes = await registry.get({ includeDeleted: true });
+		const deletedNotes = await registry.get({ deleted: true });
 		expect(deletedNotes).toHaveLength(1);
 		expect(deletedNotes).toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
 		);
 
 		// get only non-deleted notes
-		const notDeletedNotes = await registry.get({ includeDeleted: false });
+		const notDeletedNotes = await registry.get({ deleted: false });
 		expect(notDeletedNotes).toHaveLength(2);
 		expect(notDeletedNotes).toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
