@@ -58,6 +58,7 @@ export const useDefaultNoteContextMenu = ({
 }: DefaultContextMenuOptions) => {
 	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
+
 	const isPermanentDeleteNotes = useAppSelector(selectIsPermanentDeleteNotes);
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
@@ -74,6 +75,15 @@ export const useDefaultNoteContextMenu = ({
 						: await notesRegistry.updateStatus([id], { deleted: true });
 
 					await tagsRegistry.setAttachedTags(id, []);
+
+					updateNotes();
+					break;
+				}
+				case NoteActions.RESTORE: {
+					const isConfirmed = confirm('Are you sure to restore note?');
+					if (!isConfirmed) return;
+
+					await notesRegistry.updateStatus([id], { deleted: false });
 
 					updateNotes();
 					break;
