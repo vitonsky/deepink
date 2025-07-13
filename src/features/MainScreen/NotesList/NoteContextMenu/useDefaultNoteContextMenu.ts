@@ -79,6 +79,10 @@ export const useDefaultNoteContextMenu = ({
 
 					closeNote(id);
 
+					isPermanentDeleteNotes
+						? await notesRegistry.delete([id])
+						: await notesRegistry.updateStatus([id], { deleted: true });
+
 					await tagsRegistry.setAttachedTags(id, []);
 
 					updateNotes();
