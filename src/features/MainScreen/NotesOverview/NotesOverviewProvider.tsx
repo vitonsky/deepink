@@ -11,7 +11,7 @@ export type NotesOverviewOption =
 
 type NotesOverviewContextType = {
 	noteOverview: NotesOverviewOption | null;
-	setNoteOverview: (options: NotesOverviewOption) => void;
+	setNoteOverview: (options: NotesOverviewOption | null) => void;
 };
 
 const NotesOverviewContext = createContext<NotesOverviewContextType | null>(null);

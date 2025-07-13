@@ -47,7 +47,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const tags = useWorkspaceSelector(selectTags);
 	const tagsTree = useWorkspaceSelector(selectTagsTree);
 
-	const chooseNotesOverview = useNotesOverview();
+	const notesOverviewMode = useNotesOverview();
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -175,12 +175,12 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				]}
 				activeItem={
 					activeTag === null
-						? chooseNotesOverview.noteOverview || NOTES_OVERVIEW_OPTIONS.ALL
+						? notesOverviewMode.noteOverview || NOTES_OVERVIEW_OPTIONS.ALL
 						: undefined
 				}
 				onPick={(id) => {
 					if (isNotesOverviewOption(id)) {
-						chooseNotesOverview.setNoteOverview(id);
+						notesOverviewMode.setNoteOverview(id);
 					}
 
 					dispatch(
@@ -221,14 +221,15 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					<TagsList
 						tags={tagsTree}
 						activeTag={activeTag ? activeTag.id : undefined}
-						onTagClick={(tagId) =>
+						onTagClick={(tagId) => {
+							notesOverviewMode.setNoteOverview(null);
 							dispatch(
 								workspacesApi.setSelectedTag({
 									...workspaceData,
 									tag: tagId,
 								}),
-							)
-						}
+							);
+						}}
 						contextMenu={{
 							onAdd(id) {
 								const tag = tags.find((tag) => id === tag.id);

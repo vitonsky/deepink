@@ -44,10 +44,9 @@ export const NotesList: FC<NotesListProps> = () => {
 	useEffect(() => {
 		if (notesOverviewMode.noteOverview === NOTES_OVERVIEW_OPTIONS.BIN) {
 			setFilteredNotes(allNotes.filter((note) => note.isDeleted));
-			return;
+		} else {
+			setFilteredNotes(allNotes.filter((note) => !note.isDeleted));
 		}
-
-		setFilteredNotes(allNotes.filter((note) => !note.isDeleted));
 	}, [notesOverviewMode, allNotes]);
 
 	const search = useWorkspaceSelector(selectSearch);
