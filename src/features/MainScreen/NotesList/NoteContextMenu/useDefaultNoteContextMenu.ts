@@ -90,6 +90,15 @@ export const useDefaultNoteContextMenu = ({
 					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED);
 					break;
 				}
+				case NoteActions.RESTORE: {
+					const isConfirmed = confirm('Are you sure to restore note?');
+					if (!isConfirmed) return;
+
+					await notesRegistry.updateStatus([id], { deleted: false });
+
+					updateNotes();
+					break;
+				}
 				case NoteActions.DUPLICATE: {
 					const sourceNote = await notesRegistry.getById(id);
 
