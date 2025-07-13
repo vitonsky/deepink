@@ -3,4 +3,5 @@ export enum NoteActions {
 	EXPORT = 'export',
 	COPY_MARKDOWN_LINK = 'copyMdLink',
 	DELETE = 'delete',
+	RESTORE = 'restore',
 }

@@ -46,6 +46,22 @@ export const noteMenu: ContextMenu = [
 	},
 ];
 
+const deletedNoteMenu: ContextMenu = [
+	{
+		id: NoteActions.RESTORE,
+		label: 'Restore',
+	},
+	{
+		id: NoteActions.EXPORT,
+		label: 'Export',
+	},
+	{ type: 'separator' },
+	{
+		id: NoteActions.DELETE,
+		label: 'Delete',
+	},
+];
+
 const mdCharsForEscape = ['\\', '[', ']'];
 const mdCharsForEscapeRegEx = new RegExp(
 	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
@@ -165,5 +181,28 @@ export const useDefaultNoteContextMenu = ({
 		],
 	);
 
-	return useContextMenu(noteMenu, noteContextMenuCallback);
+	const openDefaultMenu = useContextMenu(noteMenu, noteContextMenuCallback);
+	const openDeletedMenu = useContextMenu(deletedNoteMenu, noteContextMenuCallback);
+
+	const openNoteContextMenu = useCallback(
+		(
+			id: string,
+			point: {
+				x: number;
+				y: number;
+			},
+		) => {
+			notesRegistry.getById(id).then((note) => {
+				if (note?.isDeleted) {
+					openDeletedMenu(id, point);
+					return;
+				} else {
+					openDefaultMenu(id, point);
+				}
+			});
+		},
+		[notesRegistry, openDefaultMenu, openDeletedMenu],
+	);
+
+	return openNoteContextMenu;
 };
