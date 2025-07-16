@@ -30,6 +30,7 @@ import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNote,
+	selectDeletedNotes,
 	selectTags,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -200,9 +201,16 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 	const activeNote = useWorkspaceSelector(selectActiveNote);
 	const [readOnlyMode, setReadOnlyMode] = useState<boolean>(false);
 
+	const deletedNotes = useWorkspaceSelector(selectDeletedNotes);
+
 	useEffect(() => {
 		activeNote?.isDeleted === true ? setReadOnlyMode(true) : setReadOnlyMode(false);
-	}, [activeNote]);
+
+		// If the active note is not found in deletedNotes, the note was restored
+		if (activeNote && !deletedNotes.some((note) => note.id === activeNote.id)) {
+			setReadOnlyMode(false);
+		}
+	}, [activeNote, deletedNotes]);
 
 	return (
 		<VStack w="100%" align="start">
