@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { $setSelection } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useDebouncedCallback } from '@utils/debounce/useDebouncedCallback';
+
+import { useRichEditorLock } from '../../useRichEditorLock';
 
 import { $convertFromMarkdownString, $convertToMarkdownString } from './markdownParser';
 
@@ -26,6 +28,9 @@ export const MarkdownSerializePlugin = ({
 }: MarkdownSerializePluginProps) => {
 	const [editor] = useLexicalComposerContext();
 
+	const [isEditable, setIsEditable] = useState(false);
+	useRichEditorLock(editor, isEditable);
+
 	const serializedValueRef = useRef<string | null>(null);
 	useEffect(() => {
 		// Skip updates sent from this component, based on value equality
@@ -39,6 +44,26 @@ export const MarkdownSerializePlugin = ({
 			$convertFromMarkdownString(value);
 			$setSelection(null);
 		});
+		const isEditable = editor.isEditable();
+
+		// Disable editable mode while update if editor is not active,
+		// to prevent forced focus on editor
+		const isActiveBeforeUpdate = isFocusedElement(editor.getRootElement());
+		if (!isActiveBeforeUpdate && isEditable) {
+			setIsEditable(true);
+		}
+
+		editor.update(
+			() => {
+				$convertFromMarkdownString(value);
+			},
+			{
+				onUpdate() {
+					// Restore editable state once update completed
+					setIsEditable(isEditable);
+				},
+			},
+		);
 	}, [editor, value]);
 
 	const onChange = (value: string) => {

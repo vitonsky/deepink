@@ -28,7 +28,11 @@ import {
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	selectActiveNote,
+	selectTags,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
@@ -192,6 +196,13 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 	}, [sidePanel, telemetry]);
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
+
+	const activeNote = useWorkspaceSelector(selectActiveNote);
+	const [readOnlyMode, setReadOnlyMode] = useState<boolean>(false);
+
+	useEffect(() => {
+		activeNote?.isDeleted === true ? setReadOnlyMode(true) : setReadOnlyMode(false);
+	}, [activeNote]);
 
 	return (
 		<VStack w="100%" align="start">
