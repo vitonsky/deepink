@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -27,6 +28,7 @@ import {
 } from './plugins/Markdown/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
 import { ReadOnlyPlugin } from './plugins/ReadOnlyPlugin';
+import { useRichEditorLock } from './useRichEditorLock';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
@@ -44,6 +46,9 @@ export const RichEditorContent = ({
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
+
+	const [editor] = useLexicalComposerContext();
+	useRichEditorLock(editor, Boolean(isReadOnly));
 
 	return (
 		<Box
