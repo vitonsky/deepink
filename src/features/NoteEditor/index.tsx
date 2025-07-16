@@ -13,7 +13,11 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	selectActiveNote,
+	selectTags,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 import { selectEditorMode } from '@state/redux/settings/settings';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
@@ -131,6 +135,13 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 				break;
 		}
 	}, []);
+
+	const activeNote = useWorkspaceSelector(selectActiveNote);
+	const [readOnlyMode, setReadOnlyMode] = useState<boolean>(false);
+
+	useEffect(() => {
+		activeNote?.isDeleted === true ? setReadOnlyMode(true) : setReadOnlyMode(false);
+	}, [activeNote]);
 
 	return (
 		<VStack w="100%" align="start">
@@ -299,6 +310,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 							uploadFile={uploadFile}
 							width="100%"
 							height="100%"
+							readOnly={readOnlyMode}
 						/>
 					)}
 					{(editorMode === 'richtext' || editorMode === 'split-screen') && (
@@ -306,6 +318,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 							placeholder="Write your thoughts here..."
 							value={text}
 							onChanged={setText}
+							isEditable={!readOnlyMode}
 						/>
 					)}
 				</HStack>
