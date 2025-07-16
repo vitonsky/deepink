@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+
+import { useRichEditorLock } from '../../useRichEditorLock';
 
 import { $convertFromMarkdownString, $convertToMarkdownString } from './markdownParser';
 
@@ -24,6 +26,9 @@ export const MarkdownSerializePlugin = ({
 }: MarkdownSerializePluginProps) => {
 	const [editor] = useLexicalComposerContext();
 
+	const [isEditable, setIsEditable] = useState(false);
+	useRichEditorLock(editor, isEditable);
+
 	const serializedValueRef = useRef<string | null>(null);
 	useEffect(() => {
 		// Skip updates sent from this component, based on value equality
@@ -35,7 +40,7 @@ export const MarkdownSerializePlugin = ({
 		// to prevent forced focus on editor
 		const isActiveBeforeUpdate = isFocusedElement(editor.getRootElement());
 		if (!isActiveBeforeUpdate && isEditable) {
-			editor.setEditable(false);
+			setIsEditable(true);
 		}
 
 		editor.update(
@@ -45,9 +50,7 @@ export const MarkdownSerializePlugin = ({
 			{
 				onUpdate() {
 					// Restore editable state once update completed
-					if (isEditable !== editor.isEditable()) {
-						editor.setEditable(isEditable);
-					}
+					setIsEditable(isEditable);
 				},
 			},
 		);

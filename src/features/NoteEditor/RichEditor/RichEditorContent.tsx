@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -25,19 +26,25 @@ import {
 	MarkdownSerializePluginProps,
 } from './plugins/Markdown/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
+import { useRichEditorLock } from './useRichEditorLock';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
 		placeholder?: string;
+		isEditable: boolean;
 	};
 
 export const RichEditorContent = ({
 	value,
 	onChanged,
 	placeholder,
+	isEditable,
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
+
+	const [editor] = useLexicalComposerContext();
+	useRichEditorLock(editor, isEditable);
 
 	return (
 		<Box
