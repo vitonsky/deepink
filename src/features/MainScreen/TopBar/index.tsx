@@ -4,6 +4,8 @@ import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectDeletedNotes } from '@state/redux/profiles/profiles';
 
 import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
 
@@ -36,6 +38,8 @@ export const TopBar: FC<TopBarProps> = ({
 		notesRegistry,
 		updateNotes,
 	});
+
+	const deletedNotes = useWorkspaceSelector(selectDeletedNotes);
 
 	const existsTabs = useMemo(
 		() => tabs.filter((noteId) => notes.some((note) => note.id === noteId)),
@@ -74,6 +78,8 @@ export const TopBar: FC<TopBarProps> = ({
 				{existsTabs.map((noteId, index) => {
 					const isActiveTab = index === tabIndex;
 
+					const isDeletedNote = deletedNotes.some((note) => note.id === noteId);
+
 					// TODO: handle case when object not found
 					const note = notes.find((note) => note.id === noteId);
 					if (!note) {
@@ -94,6 +100,9 @@ export const TopBar: FC<TopBarProps> = ({
 							flex="1 1 auto"
 							marginBottom={0}
 							title={getNoteTitle(note.content)}
+							textDecorationLine={
+								isDeletedNote ? 'line-through' : undefined
+							}
 							onMouseDown={(evt) => {
 								const isLeftButton = evt.button === 0;
 								if (isLeftButton) return;
