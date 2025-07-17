@@ -8,6 +8,10 @@ import {
 	useFilesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import {
+	NOTES_OVERVIEW_OPTIONS,
+	useNotesOverview,
+} from '@features/MainScreen/NotesOverview/NotesOverviewProvider';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectIsPermanentDeleteNotes } from '@state/redux/settings/settings';
@@ -76,6 +80,7 @@ export const useDefaultNoteContextMenu = ({
 	const tagsRegistry = useTagsRegistry();
 
 	const isPermanentDeleteNotes = useAppSelector(selectIsPermanentDeleteNotes);
+	const notesOverviewMode = useNotesOverview();
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
@@ -86,9 +91,14 @@ export const useDefaultNoteContextMenu = ({
 
 					closeNote(id);
 
-					isPermanentDeleteNotes
-						? await notesRegistry.delete([id])
-						: await notesRegistry.updateStatus([id], { deleted: true });
+					if (
+						notesOverviewMode.noteOverview === NOTES_OVERVIEW_OPTIONS.BIN ||
+						isPermanentDeleteNotes
+					) {
+						await notesRegistry.delete([id]);
+					} else {
+						await notesRegistry.updateStatus([id], { deleted: true });
+					}
 
 					await tagsRegistry.setAttachedTags(id, []);
 
@@ -184,6 +194,7 @@ export const useDefaultNoteContextMenu = ({
 			closeNote,
 			filesRegistry,
 			isPermanentDeleteNotes,
+			notesOverviewMode,
 			notesRegistry,
 			tagsRegistry,
 			updateNotes,
