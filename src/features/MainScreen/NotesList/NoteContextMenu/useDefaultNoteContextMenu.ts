@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
@@ -26,7 +26,7 @@ type DefaultContextMenuOptions = {
 	notesRegistry: INotesController;
 };
 
-export const noteMenu: ContextMenu = [
+export const defaultNoteMenu: ContextMenu = [
 	{
 		id: NoteActions.DUPLICATE,
 		label: 'Duplicate',
@@ -67,6 +67,48 @@ const mdCharsForEscapeRegEx = new RegExp(
 	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
 	'g',
 );
+
+const useSwitchNoteContextMenu = (
+	notesRegistry: INotesController,
+	noteContextMenuCallback: ContextMenuCallback<NoteActions>,
+) => {
+	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
+	const showActiveMenu = useContextMenu(activeMenu, noteContextMenuCallback);
+
+	const [readyToShow, setReadyToShow] = useState(false);
+	const [menuTarget, setMenuTarget] = useState<{
+		id: string;
+		point: { x: number; y: number };
+	} | null>(null);
+
+	const openNoteContextMenu = useCallback(
+		(id: string, point: { x: number; y: number }) => {
+			notesRegistry.getById(id).then((note) => {
+				const menu = note?.isDeleted ? deletedNoteMenu : defaultNoteMenu;
+
+				setActiveMenu(menu);
+				setMenuTarget({ id, point });
+				setReadyToShow(false);
+			});
+		},
+		[notesRegistry],
+	);
+
+	useEffect(() => {
+		setReadyToShow(true);
+	}, [menuTarget, showActiveMenu]);
+
+	useEffect(() => {
+		if (!readyToShow || !menuTarget) return;
+
+		showActiveMenu(menuTarget.id, menuTarget.point);
+
+		setMenuTarget(null);
+		setReadyToShow(false);
+	}, [readyToShow, menuTarget, showActiveMenu]);
+
+	return openNoteContextMenu;
+};
 
 export const useDefaultNoteContextMenu = ({
 	closeNote,
@@ -184,28 +226,5 @@ export const useDefaultNoteContextMenu = ({
 		],
 	);
 
-	const openDefaultMenu = useContextMenu(noteMenu, noteContextMenuCallback);
-	const openDeletedMenu = useContextMenu(deletedNoteMenu, noteContextMenuCallback);
-
-	const openNoteContextMenu = useCallback(
-		(
-			id: string,
-			point: {
-				x: number;
-				y: number;
-			},
-		) => {
-			notesRegistry.getById(id).then((note) => {
-				if (note?.isDeleted) {
-					openDeletedMenu(id, point);
-					return;
-				} else {
-					openDefaultMenu(id, point);
-				}
-			});
-		},
-		[notesRegistry, openDefaultMenu, openDeletedMenu],
-	);
-
-	return openNoteContextMenu;
+	return useSwitchNoteContextMenu(notesRegistry, noteContextMenuCallback);
 };
