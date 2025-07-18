@@ -8,10 +8,6 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
-import {
-	NOTES_OVERVIEW_OPTIONS,
-	useNotesOverview,
-} from '@features/MainScreen/NotesOverview/NotesOverviewProvider';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -81,7 +77,6 @@ export const useDefaultNoteContextMenu = ({
 	const notesExport = useNotesExport();
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
-	const notesOverviewMode = useNotesOverview();
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
@@ -92,10 +87,8 @@ export const useDefaultNoteContextMenu = ({
 
 					closeNote(id);
 
-					if (
-						notesOverviewMode.noteOverview === NOTES_OVERVIEW_OPTIONS.BIN ||
-						isPermanentDeleteNotes
-					) {
+					const targetNote = await notesRegistry.getById(id);
+					if (isPermanentDeleteNotes || targetNote?.isDeleted) {
 						await notesRegistry.delete([id]);
 					} else {
 						await notesRegistry.updateStatus([id], { deleted: true });
@@ -173,7 +166,6 @@ export const useDefaultNoteContextMenu = ({
 			closeNote,
 			notes,
 			notesExport,
-			notesOverviewMode,
 			notesRegistry,
 			tagsRegistry,
 			updateNotes,
