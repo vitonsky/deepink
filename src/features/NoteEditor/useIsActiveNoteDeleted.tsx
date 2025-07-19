@@ -7,8 +7,7 @@ export const useIsActiveNoteDeleted = () => {
 	const deletedNotes = useWorkspaceSelector(selectDeletedNotes);
 
 	const isDeleted = useMemo(() => {
-		if (!activeNote) return;
-
+		if (!activeNote) return false;
 		if (activeNote.isDeleted) return true;
 
 		// if the active note is not found in deletedNotes, the note was restored
