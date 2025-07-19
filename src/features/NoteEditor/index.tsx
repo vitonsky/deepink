@@ -296,7 +296,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 
 			<EditorPanelContext>
 				<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
-					<EditorPanel />
+					<EditorPanel readOnlyMode={readOnlyMode} />
 				</HStack>
 
 				<HStack
