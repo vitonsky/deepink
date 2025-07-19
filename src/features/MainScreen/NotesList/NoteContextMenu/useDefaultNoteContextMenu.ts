@@ -44,7 +44,7 @@ export const defaultNoteMenu: ContextMenu = [
 	},
 ];
 
-const deletedNoteMenu: ContextMenu = [
+export const deletedNoteMenu: ContextMenu = [
 	{
 		id: NoteActions.RESTORE,
 		label: 'Restore',
@@ -124,12 +124,16 @@ export const useDefaultNoteContextMenu = ({
 		async ({ id, action }) => {
 			switch (action) {
 				case NoteActions.DELETE: {
-					const isConfirmed = confirm('Are you sure to delete note?');
+					const targetNote = await notesRegistry.getById(id);
+					const isConfirmed = confirm(
+						`Are you sure to ${
+							targetNote?.isDeleted ? 'permanently delete' : 'delete'
+						} note?`,
+					);
 					if (!isConfirmed) return;
 
 					closeNote(id);
 
-					const targetNote = await notesRegistry.getById(id);
 					if (isPermanentDeleteNotes || targetNote?.isDeleted) {
 						await notesRegistry.delete([id]);
 						await tagsRegistry.setAttachedTags(id, []);
