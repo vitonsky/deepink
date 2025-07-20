@@ -19,7 +19,7 @@ import { ImageButton } from './buttons/ImageButton';
 import { LinkButton } from './buttons/LinkButton';
 import { useEditorPanelContext } from '.';
 
-type EditorPanelProps = {
+export type EditorPanelProps = {
 	readOnlyMode: boolean;
 };
 
