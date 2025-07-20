@@ -68,14 +68,22 @@ const mdCharsForEscapeRegEx = new RegExp(
 	'g',
 );
 
-const useSwitchNoteContextMenu = (
-	notesRegistry: INotesController,
-	noteContextMenuCallback: ContextMenuCallback<NoteActions>,
-) => {
-	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
-	const showActiveMenu = useContextMenu(activeMenu, noteContextMenuCallback);
-
+/**
+ * Switch the menu depending on which note it was invoked for
+ */
+const useNoteContextMenuSwitcher = ({
+	notesRegistry,
+	noteContextMenuCallback,
+	menus,
+}: {
+	notesRegistry: INotesController;
+	noteContextMenuCallback: ContextMenuCallback<NoteActions>;
+	menus: { default: ContextMenu; deleted: ContextMenu };
+}) => {
 	const [readyToShow, setReadyToShow] = useState(false);
+	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
+	const triggerContextMenu = useContextMenu(activeMenu, noteContextMenuCallback);
+
 	const [menuTarget, setMenuTarget] = useState<{
 		id: string;
 		point: { x: number; y: number };
@@ -84,28 +92,27 @@ const useSwitchNoteContextMenu = (
 	const openNoteContextMenu = useCallback(
 		(id: string, point: { x: number; y: number }) => {
 			notesRegistry.getById(id).then((note) => {
-				const menu = note?.isDeleted ? deletedNoteMenu : defaultNoteMenu;
+				const menu = note?.isDeleted ? menus.deleted : menus.default;
 
-				setActiveMenu(menu);
 				setMenuTarget({ id, point });
+				setActiveMenu(menu);
 				setReadyToShow(false);
 			});
 		},
-		[notesRegistry],
+		[menus, notesRegistry],
 	);
 
 	useEffect(() => {
 		setReadyToShow(true);
-	}, [menuTarget, showActiveMenu]);
+	}, [menuTarget, triggerContextMenu]);
 
 	useEffect(() => {
 		if (!readyToShow || !menuTarget) return;
-
-		showActiveMenu(menuTarget.id, menuTarget.point);
+		triggerContextMenu(menuTarget.id, menuTarget.point);
 
 		setMenuTarget(null);
 		setReadyToShow(false);
-	}, [readyToShow, menuTarget, showActiveMenu]);
+	}, [readyToShow, menuTarget, triggerContextMenu]);
 
 	return openNoteContextMenu;
 };
@@ -229,5 +236,12 @@ export const useDefaultNoteContextMenu = ({
 		],
 	);
 
-	return useSwitchNoteContextMenu(notesRegistry, noteContextMenuCallback);
+	return useNoteContextMenuSwitcher({
+		notesRegistry,
+		noteContextMenuCallback,
+		menus: {
+			default: defaultNoteMenu,
+			deleted: deletedNoteMenu,
+		},
+	});
 };
