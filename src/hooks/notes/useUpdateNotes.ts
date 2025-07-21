@@ -52,5 +52,5 @@ export const useUpdateNotes = () => {
 		if (isRequestCanceled()) return;
 
 		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
-	}, [activeTag, dispatch, lexemes, notesRegistry, search, workspaceData]);
+	}, [activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData]);
 };
