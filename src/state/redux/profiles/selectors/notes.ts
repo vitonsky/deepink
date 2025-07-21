@@ -80,3 +80,11 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 		return workspace.recentlyClosedNotes;
 	},
 );
+
+export const selectNotesView = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return null;
+		return workspace.view;
+	},
+);

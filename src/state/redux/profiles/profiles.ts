@@ -15,6 +15,11 @@ const selectWorkspaceObject = (
 	return profile.workspaces[workspaceId] ?? null;
 };
 
+export enum NOTES_VIEW {
+	All_NOTES = 'all',
+	BIN = 'bin',
+}
+
 export const createWorkspaceObject = (workspace: {
 	id: string;
 	name: string;
@@ -28,6 +33,8 @@ export const createWorkspaceObject = (workspace: {
 	notes: [],
 
 	search: '',
+
+	view: NOTES_VIEW.All_NOTES,
 
 	tags: {
 		selected: null,
@@ -61,6 +68,8 @@ export type WorkspaceData = {
 	notes: INote[];
 
 	search: string;
+
+	view: NOTES_VIEW;
 
 	tags: {
 		selected: string | null;
@@ -310,6 +319,17 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.search = search;
+		},
+		setView: (
+			state,
+			{
+				payload: { profileId, workspaceId, view },
+			}: PayloadAction<WorkspaceScoped<{ view: NOTES_VIEW }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.view = view;
 		},
 	},
 });
