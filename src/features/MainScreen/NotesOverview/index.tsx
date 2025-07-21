@@ -16,24 +16,17 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
+	NOTES_VIEW,
 	selectActiveTag,
 	selectTags,
 	selectTagsTree,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/notes';
 
-import {
-	NOTES_OVERVIEW_OPTIONS,
-	NotesOverviewOption,
-	useNotesOverview,
-} from './NotesOverviewProvider';
 import { TagsList } from './TagsList';
 
 export type NotesOverviewProps = {};
-
-const isNotesOverviewOption = (id: string): id is NotesOverviewOption => {
-	return Object.values(NOTES_OVERVIEW_OPTIONS).includes(id as NotesOverviewOption);
-};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const dispatch = useAppDispatch();
@@ -43,7 +36,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const tags = useWorkspaceSelector(selectTags);
 	const tagsTree = useWorkspaceSelector(selectTagsTree);
 
-	const notesOverviewMode = useNotesOverview();
+	const notesOverviewMode = useWorkspaceSelector(selectNotesView);
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -115,7 +108,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: NOTES_OVERVIEW_OPTIONS.ALL,
+						id: NOTES_VIEW.All_NOTES,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBookOpen />
@@ -151,7 +144,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: NOTES_OVERVIEW_OPTIONS.BIN,
+						id: NOTES_VIEW.BIN,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaTrash />
@@ -162,13 +155,16 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				]}
 				activeItem={
 					activeTag === null
-						? notesOverviewMode.noteOverview || NOTES_OVERVIEW_OPTIONS.ALL
+						? notesOverviewMode || NOTES_VIEW.All_NOTES
 						: undefined
 				}
 				onPick={(id) => {
-					if (isNotesOverviewOption(id)) {
-						notesOverviewMode.setNoteOverview(id);
-					}
+					dispatch(
+						workspacesApi.setView({
+							...workspaceData,
+							view: id as NOTES_VIEW,
+						}),
+					);
 
 					dispatch(
 						workspacesApi.setSelectedTag({
@@ -209,7 +205,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						tags={tagsTree}
 						activeTag={activeTag ? activeTag.id : undefined}
 						onTagClick={(tagId) => {
-							notesOverviewMode.setNoteOverview(null);
 							dispatch(
 								workspacesApi.setSelectedTag({
 									...workspaceData,
