@@ -193,7 +193,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	const readOnlyMode = note.isDeleted || false;
+	const readOnlyMode = note.isDeleted;
 
 	return (
 		<VStack w="100%" align="start">
