@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -48,7 +48,11 @@ export const RichEditorContent = ({
 	const styles = useMultiStyleConfig('RichEditor');
 
 	const [editor] = useLexicalComposerContext();
-	useRichEditorLock(editor, Boolean(isReadOnly));
+	const [temporarilyReadOnly, setTemporarilyReadOnly] = useState(false);
+
+	useEffect(() => {
+		editor.setEditable(Boolean(isReadOnly) && temporarilyReadOnly);
+	}, [editor, Boolean(isReadOnly), temporarilyReadOnly]);
 
 	return (
 		<Box
