@@ -23,14 +23,6 @@ export const selectOpenedNotes = createWorkspaceSelector(
 	},
 );
 
-export const selectDeletedNotes = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) return [];
-		return workspace.notes.filter((note) => note.isDeleted === true) ?? null;
-	},
-);
-
 export const selectNote = (noteId: string | null) =>
 	createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
 		if (!workspace) return null;
