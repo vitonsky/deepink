@@ -52,7 +52,6 @@ import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { EditorPanelContext } from './EditorPanel';
 import { EditorPanel } from './EditorPanel/EditorPanel';
 import { RichEditor } from './RichEditor/RichEditor';
-import { useIsActiveNoteDeleted } from './useIsActiveNoteDeleted';
 
 export type NoteEditorProps = {
 	note: INote;
@@ -152,7 +151,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
-	const readOnlyMode = useIsActiveNoteDeleted();
+	const readOnlyMode = note.isDeleted || false;
 
 	return (
 		<VStack w="100%" align="start">

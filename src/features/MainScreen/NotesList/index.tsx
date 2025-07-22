@@ -2,7 +2,10 @@ import React, { FC } from 'react';
 import { Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import {
+	useNotesContext,
+	useNotesRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -16,6 +19,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const notesRegistry = useNotesRegistry();
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
+	const { noteUpdated } = useNotesContext();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
@@ -25,6 +29,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
+		noteUpdated: noteUpdated,
 	});
 
 	// TODO: implement dragging and moving items
