@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { formatNoteLink } from '@core/features/links';
-import { NoteId } from '@core/features/notes';
+import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
@@ -19,6 +19,7 @@ import { NoteActions } from '.';
 type DefaultContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
+	noteUpdated: (note: INote) => void;
 
 	// TODO: receive with react context
 	notesRegistry: INotesController;
@@ -119,6 +120,7 @@ export const useDefaultNoteContextMenu = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
+	noteUpdated,
 }: DefaultContextMenuOptions) => {
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
@@ -146,6 +148,9 @@ export const useDefaultNoteContextMenu = ({
 						await tagsRegistry.setAttachedTags(id, []);
 					} else {
 						await notesRegistry.updateStatus([id], { deleted: true });
+
+						const updatedNote = await notesRegistry.getById(id);
+						if (updatedNote) noteUpdated(updatedNote);
 					}
 
 					updateNotes();
@@ -156,6 +161,9 @@ export const useDefaultNoteContextMenu = ({
 					if (!isConfirmed) return;
 
 					await notesRegistry.updateStatus([id], { deleted: false });
+
+					const updatedNote = await notesRegistry.getById(id);
+					if (updatedNote) noteUpdated(updatedNote);
 
 					updateNotes();
 					break;
@@ -218,6 +226,7 @@ export const useDefaultNoteContextMenu = ({
 			closeNote,
 			notes,
 			notesExport,
+			noteUpdated,
 			notesRegistry,
 			tagsRegistry,
 			updateNotes,

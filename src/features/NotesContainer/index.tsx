@@ -96,6 +96,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					activeTab: activeNoteId ?? null,
 					onClose: noteActions.close,
 					onPick: noteActions.click,
+					noteUpdated,
 				}}
 			/>
 			<Box
