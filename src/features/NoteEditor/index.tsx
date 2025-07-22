@@ -153,7 +153,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 			</HStack>
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				{readOnlyMode ? null : (
+				{!readOnlyMode && (
 					<>
 						<HStack>
 							<Button variant="ghost" size="xs">
@@ -189,7 +189,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 							<Text>{tag.resolvedName}</Text>
 						</HStack>
 
-						{readOnlyMode ? null : (
+						{!readOnlyMode && (
 							<Box
 								sx={{
 									'&:not(:hover)': {
@@ -220,7 +220,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 					</Tag>
 				))}
 
-				{readOnlyMode ? null : (
+				{!readOnlyMode && (
 					<SuggestedTagsList
 						tags={notAttachedTags}
 						selectedTag={attachTagName ?? undefined}
@@ -294,9 +294,11 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 			</HStack>
 
 			<EditorPanelContext>
-				<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
-					<EditorPanel readOnlyMode={readOnlyMode} />
-				</HStack>
+				{!readOnlyMode && (
+					<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
+						<EditorPanel />
+					</HStack>
+				)}
 
 				<HStack
 					sx={{
