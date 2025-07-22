@@ -151,7 +151,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
-	const readOnlyMode = note.isDeleted || false;
+	const readOnlyMode = note.isDeleted;
 
 	return (
 		<VStack w="100%" align="start">
