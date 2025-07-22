@@ -39,7 +39,6 @@ export enum NoteSidebarTabs {
 	HISTORY = 'HISTORY',
 	BACKLINKS = 'BACKLINKS',
 }
-import { useIsActiveNoteDeleted } from './useIsActiveNoteDeleted';
 
 export type NoteEditorProps = {
 	note: INote;
@@ -194,7 +193,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	const readOnlyMode = useIsActiveNoteDeleted();
+	const readOnlyMode = note.isDeleted || false;
 
 	return (
 		<VStack w="100%" align="start">
