@@ -81,8 +81,7 @@ const useNoteContextMenuSwitcher = ({
 	noteContextMenuCallback: ContextMenuCallback<NoteActions>;
 	menus: { default: ContextMenu; deleted: ContextMenu };
 }) => {
-	const [readyToShow, setReadyToShow] = useState(false);
-	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
+	const [activeMenu, setActiveMenu] = useState<ContextMenu>(menus.default);
 	const triggerContextMenu = useContextMenu(activeMenu, noteContextMenuCallback);
 
 	const [menuTarget, setMenuTarget] = useState<{
@@ -91,29 +90,22 @@ const useNoteContextMenuSwitcher = ({
 	} | null>(null);
 
 	const openNoteContextMenu = useCallback(
-		(id: string, point: { x: number; y: number }) => {
-			notesRegistry.getById(id).then((note) => {
-				const menu = note?.isDeleted ? menus.deleted : menus.default;
+		async (id: string, point: { x: number; y: number }) => {
+			const note = await notesRegistry.getById(id);
+			const menu = note?.isDeleted ? menus.deleted : menus.default;
 
-				setMenuTarget({ id, point });
-				setActiveMenu(menu);
-				setReadyToShow(false);
-			});
+			setActiveMenu(menu);
+			setMenuTarget({ id, point });
 		},
 		[menus, notesRegistry],
 	);
 
 	useEffect(() => {
-		setReadyToShow(true);
-	}, [menuTarget, triggerContextMenu]);
+		if (!menuTarget) return;
 
-	useEffect(() => {
-		if (!readyToShow || !menuTarget) return;
 		triggerContextMenu(menuTarget.id, menuTarget.point);
-
 		setMenuTarget(null);
-		setReadyToShow(false);
-	}, [readyToShow, menuTarget, triggerContextMenu]);
+	}, [menuTarget, triggerContextMenu]);
 
 	return openNoteContextMenu;
 };
