@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -26,7 +26,6 @@ import {
 	MarkdownSerializePluginProps,
 } from './plugins/Markdown/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
-import { useRichEditorLock } from './useRichEditorLock';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
@@ -44,7 +43,11 @@ export const RichEditorContent = ({
 	const styles = useMultiStyleConfig('RichEditor');
 
 	const [editor] = useLexicalComposerContext();
-	useRichEditorLock(editor, isEditable);
+	const [temporarilyReadOnly, setTemporarilyReadOnly] = useState(false);
+
+	useEffect(() => {
+		editor.setEditable(isEditable && temporarilyReadOnly);
+	}, [editor, isEditable, temporarilyReadOnly]);
 
 	return (
 		<Box
@@ -85,7 +88,11 @@ export const RichEditorContent = ({
 				}
 				ErrorBoundary={LexicalErrorBoundary}
 			/>
-			<MarkdownSerializePlugin value={value} onChanged={onChanged} />
+			<MarkdownSerializePlugin
+				value={value}
+				onChanged={onChanged}
+				setEditableMode={setTemporarilyReadOnly}
+			/>
 			<MarkdownShortcutPlugin />
 			<FormattingPlugin />
 
