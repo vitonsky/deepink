@@ -33,7 +33,6 @@ export const NotesList: FC<NotesListProps> = () => {
 	const { noteUpdated } = useNotesContext();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-
 	const notes = useWorkspaceSelector(selectNotes);
 
 	const search = useWorkspaceSelector(selectSearch);
