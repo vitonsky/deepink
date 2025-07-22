@@ -22,7 +22,6 @@ import { EditorPanelContext } from './EditorPanel';
 import { EditorPanel } from './EditorPanel/EditorPanel';
 import { NoteMenu, NoteMenuItems } from './NoteMenuItems';
 import { RichEditor } from './RichEditor/RichEditor';
-import { useIsActiveNoteDeleted } from './useIsActiveNoteDeleted';
 
 export type NoteEditorProps = {
 	note: INote;
@@ -133,7 +132,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 		}
 	}, []);
 
-	const readOnlyMode = useIsActiveNoteDeleted();
+	const readOnlyMode = note.isDeleted || false;
 
 	return (
 		<VStack w="100%" align="start">
