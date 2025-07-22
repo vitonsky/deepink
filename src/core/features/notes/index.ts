@@ -15,6 +15,6 @@ export type INote = {
 	id: NoteId;
 	createdTimestamp?: number;
 	updatedTimestamp?: number;
-	isDeleted?: boolean;
+	isDeleted: boolean;
 	content: INoteContent;
 };

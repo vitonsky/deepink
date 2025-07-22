@@ -132,7 +132,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 		}
 	}, []);
 
-	const readOnlyMode = note.isDeleted || false;
+	const readOnlyMode = note.isDeleted;
 
 	return (
 		<VStack w="100%" align="start">
