@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { formatNoteLink } from '@core/features/links';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
@@ -10,12 +10,13 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
-import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
+import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
+import { useNoteContextMenuSwitcher } from './useNoteContextMenuSwitcher';
 import { NoteActions } from '.';
 
 type DefaultContextMenuOptions = {
@@ -68,47 +69,6 @@ const mdCharsForEscapeRegEx = new RegExp(
 	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
 	'g',
 );
-
-/**
- * Switch the menu depending on which note it was invoked for
- */
-const useNoteContextMenuSwitcher = ({
-	notesRegistry,
-	noteContextMenuCallback,
-	menus,
-}: {
-	notesRegistry: INotesController;
-	noteContextMenuCallback: ContextMenuCallback<NoteActions>;
-	menus: { default: ContextMenu; deleted: ContextMenu };
-}) => {
-	const [activeMenu, setActiveMenu] = useState<ContextMenu>(menus.default);
-	const triggerContextMenu = useContextMenu(activeMenu, noteContextMenuCallback);
-
-	const [menuTarget, setMenuTarget] = useState<{
-		id: string;
-		point: { x: number; y: number };
-	} | null>(null);
-
-	const openNoteContextMenu = useCallback(
-		async (id: string, point: { x: number; y: number }) => {
-			const note = await notesRegistry.getById(id);
-			const menu = note?.isDeleted ? menus.deleted : menus.default;
-
-			setActiveMenu(menu);
-			setMenuTarget({ id, point });
-		},
-		[menus, notesRegistry],
-	);
-
-	useEffect(() => {
-		if (!menuTarget) return;
-
-		triggerContextMenu(menuTarget.id, menuTarget.point);
-		setMenuTarget(null);
-	}, [menuTarget, triggerContextMenu]);
-
-	return openNoteContextMenu;
-};
 
 export const useDefaultNoteContextMenu = ({
 	closeNote,
