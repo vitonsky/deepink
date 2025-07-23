@@ -170,11 +170,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 				]}
-				activeItem={
-					activeTag === null
-						? notesOverviewMode || NOTES_VIEW.All_NOTES
-						: undefined
-				}
+				activeItem={notesOverviewMode || NOTES_VIEW.All_NOTES}
 				onPick={(id) => {
 					if (!isNotesView(id)) return;
 
