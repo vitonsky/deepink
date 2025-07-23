@@ -28,7 +28,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
-		noteUpdated: noteUpdated,
+		noteUpdated,
 	});
 
 	// TODO: implement dragging and moving items
