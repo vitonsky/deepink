@@ -20,7 +20,7 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
+import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
 export type NotesListProps = {};
 
@@ -37,7 +37,7 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const search = useWorkspaceSelector(selectSearch);
 
-	const openNoteContextMenu = useDefaultNoteContextMenu({
+	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,

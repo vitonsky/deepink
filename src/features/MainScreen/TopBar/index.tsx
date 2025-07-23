@@ -5,7 +5,7 @@ import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
-import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
+import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -34,7 +34,7 @@ export const TopBar: FC<TopBarProps> = ({
 	notesRegistry,
 	noteUpdated,
 }) => {
-	const openNoteContextMenu = useDefaultNoteContextMenu({
+	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: onClose,
 		notesRegistry,
 		updateNotes,

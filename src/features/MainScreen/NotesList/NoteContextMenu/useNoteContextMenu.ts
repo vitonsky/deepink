@@ -69,7 +69,7 @@ const mdCharsForEscapeRegEx = new RegExp(
 	'g',
 );
 
-export const useDefaultNoteContextMenu = ({
+export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
