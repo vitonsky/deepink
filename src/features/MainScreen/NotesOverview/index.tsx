@@ -28,6 +28,10 @@ import { TagsList } from './TagsList';
 
 export type NotesOverviewProps = {};
 
+const isNotesView = (id: string): id is NOTES_VIEW => {
+	return Object.values(NOTES_VIEW).includes(id as NOTES_VIEW);
+};
+
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -159,10 +163,12 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						: undefined
 				}
 				onPick={(id) => {
+					if (!isNotesView(id)) return;
+
 					dispatch(
 						workspacesApi.setView({
 							...workspaceData,
-							view: id as NOTES_VIEW,
+							view: id,
 						}),
 					);
 
@@ -204,14 +210,14 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					<TagsList
 						tags={tagsTree}
 						activeTag={activeTag ? activeTag.id : undefined}
-						onTagClick={(tagId) => {
+						onTagClick={(tagId) =>
 							dispatch(
 								workspacesApi.setSelectedTag({
 									...workspaceData,
 									tag: tagId,
 								}),
-							);
-						}}
+							)
+						}
 						contextMenu={{
 							onAdd(id) {
 								const tag = tags.find((tag) => id === tag.id);
