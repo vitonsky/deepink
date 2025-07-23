@@ -14,7 +14,7 @@ import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles'
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
+import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
 export type NotesListProps = {};
 
@@ -27,7 +27,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
 
-	const openNoteContextMenu = useDefaultNoteContextMenu({
+	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
