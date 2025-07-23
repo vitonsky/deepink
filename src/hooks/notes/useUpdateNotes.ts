@@ -7,7 +7,7 @@ import {
 	selectActiveTag,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectNotesView } from '@state/redux/profiles/selectors/notes';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 
 export const useUpdateNotes = () => {
 	const dispatch = useAppDispatch();
