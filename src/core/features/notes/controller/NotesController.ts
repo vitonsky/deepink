@@ -351,7 +351,7 @@ export class NotesController implements INotesController {
 			),
 		);
 
-		if (!result.changes || result.changes < 1) {
+		if (result.changes !== ids.length) {
 			console.warn(
 				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
 			);
