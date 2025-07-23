@@ -2,6 +2,7 @@
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { LexemesRegistry } from './LexemesRegistry';
@@ -263,6 +264,36 @@ describe('data fetching', () => {
 		);
 
 		await db.close();
+	});
+
+	test('get notes filtered by tags and the deleted flag', async () => {
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, 'fake-workspace-id');
+		const tags = new TagsController(db, 'workspace-fake-id');
+
+		const entries = [
+			{ title: 'Title 1', text: 'Text 1' },
+			{ title: 'Title 2', text: 'Text 2' },
+			{ title: 'Title 3', text: 'Text 3' },
+		];
+
+		const ids = await Promise.all(entries.map((note) => registry.add(note)));
+		const note = ids[0];
+
+		const fooTag = await tags.add('foo', null);
+		await tags.setAttachedTags(note, [fooTag]);
+
+		await registry.updateStatus([note], { deleted: true });
+
+		// deleted note with tag
+		await expect(
+			registry.get({ tags: [fooTag], deleted: true }),
+		).resolves.toHaveLength(1);
+
+		await expect(
+			registry.get({ tags: [fooTag], deleted: false }),
+		).resolves.toHaveLength(0);
 	});
 });
 
