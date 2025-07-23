@@ -11,7 +11,7 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 
-import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
+import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
 export type NotesListProps = {};
 
@@ -24,7 +24,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
 
-	const openNoteContextMenu = useDefaultNoteContextMenu({
+	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
