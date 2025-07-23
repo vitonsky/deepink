@@ -29,8 +29,8 @@ import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugi
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
-		placeholder?: string;
 		isEditable: boolean;
+		placeholder?: string;
 	};
 
 export const RichEditorContent = ({
@@ -43,11 +43,11 @@ export const RichEditorContent = ({
 	const styles = useMultiStyleConfig('RichEditor');
 
 	const [editor] = useLexicalComposerContext();
-	const [temporarilyReadOnly, setTemporarilyReadOnly] = useState(false);
+	const [temporarilyEditable, setTemporarilyEditable] = useState(false);
 
 	useEffect(() => {
-		editor.setEditable(isEditable && temporarilyReadOnly);
-	}, [editor, isEditable, temporarilyReadOnly]);
+		editor.setEditable(isEditable && temporarilyEditable);
+	}, [editor, isEditable, temporarilyEditable]);
 
 	return (
 		<Box
@@ -91,7 +91,7 @@ export const RichEditorContent = ({
 			<MarkdownSerializePlugin
 				value={value}
 				onChanged={onChanged}
-				setEditableMode={setTemporarilyReadOnly}
+				setEditableMode={setTemporarilyEditable}
 			/>
 			<MarkdownShortcutPlugin />
 			<FormattingPlugin />
