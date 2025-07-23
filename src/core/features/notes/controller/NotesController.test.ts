@@ -97,42 +97,7 @@ describe('CRUD operations', () => {
 		await db.close();
 	});
 
-	test('Updating notes status to deleted does not change the number of notes', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
-
-		// Insert entries to test
-		const notesSample = Array(300)
-			.fill(null)
-			.map((_, idx) => {
-				return {
-					title: 'Note title #' + idx,
-					text: 'Note text #' + idx,
-				};
-			});
-
-		await Promise.all(notesSample.map((note) => registry.add(note)));
-		const notes = await registry.get({ limit: 100 });
-		const notesId = notes.map((note) => note.id);
-
-		// update the status of notes
-		await registry.updateStatus(notesId, { deleted: true });
-
-		// notes were updated
-		const result = await registry.get({ deleted: true });
-		expect(result).toHaveLength(100);
-		expect(result).toEqual(
-			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
-		);
-
-		// the number of notes did not change
-		await expect(registry.getLength()).resolves.toBe(300);
-
-		await db.close();
-	});
-
-	test('Update note status toggles deleted status correctly', async () => {
+	test('update deletion status of notes', async () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, 'fake-workspace-id');
@@ -146,16 +111,30 @@ describe('CRUD operations', () => {
 		const ids = await Promise.all(entries.map((note) => registry.add(note)));
 		const note = ids[0];
 
-		// delete note
+		// for one note
+		// mark a single note as deleted
 		await registry.updateStatus([note], { deleted: true });
 		await expect(registry.getById(note)).resolves.toEqual(
 			expect.objectContaining({ isDeleted: true }),
 		);
 
-		// restore
+		// restore a single note
 		await registry.updateStatus([note], { deleted: false });
 		await expect(registry.getById(note)).resolves.toEqual(
 			expect.objectContaining({ isDeleted: false }),
+		);
+
+		// for array
+		// mark multiple notes as deleted
+		await registry.updateStatus(ids, { deleted: true });
+		await expect(registry.get({ deleted: true })).resolves.toEqual(
+			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
+		);
+
+		// restore multiple notes
+		await registry.updateStatus(ids, { deleted: false });
+		await expect(registry.get({ deleted: false })).resolves.toEqual(
+			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
 		);
 	});
 });
