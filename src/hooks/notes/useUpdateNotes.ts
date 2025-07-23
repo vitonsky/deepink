@@ -18,9 +18,10 @@ export const useUpdateNotes = () => {
 	const notesView = useWorkspaceSelector(selectNotesView);
 
 	return useCallback(async () => {
-		const isDeleted = notesView === NOTES_VIEW.BIN ? true : false;
+		const deleted = notesView === NOTES_VIEW.BIN ? true : false;
 		const tags = activeTag === null ? [] : [activeTag.id];
-		const notes = await notesRegistry.get({ limit: 10000, tags, deleted: isDeleted });
+		const notes = await notesRegistry.get({ limit: 10000, tags, deleted });
+
 		notes.sort((a, b) => {
 			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
 			const timeB = b.updatedTimestamp ?? b.createdTimestamp ?? 0;
