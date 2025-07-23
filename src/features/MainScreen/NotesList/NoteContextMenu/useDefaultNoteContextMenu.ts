@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { formatNoteLink } from '@core/features/links';
 import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
@@ -10,13 +10,12 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
-import { ContextMenuCallback } from '@hooks/useContextMenu';
+import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
-import { useNoteContextMenuSwitcher } from './useNoteContextMenuSwitcher';
 import { NoteActions } from '.';
 
 type DefaultContextMenuOptions = {
@@ -109,8 +108,8 @@ export const useDefaultNoteContextMenu = ({
 					} else {
 						await notesRegistry.updateStatus([id], { deleted: true });
 
-						const updatedNote = await notesRegistry.getById(id);
-						if (updatedNote) noteUpdated(updatedNote);
+						const deletedNote = await notesRegistry.getById(id);
+						if (deletedNote) noteUpdated(deletedNote);
 					}
 
 					updateNotes();
@@ -124,8 +123,8 @@ export const useDefaultNoteContextMenu = ({
 
 					await notesRegistry.updateStatus([id], { deleted: false });
 
-					const updatedNote = await notesRegistry.getById(id);
-					if (updatedNote) noteUpdated(updatedNote);
+					const restoredNote = await notesRegistry.getById(id);
+					if (restoredNote) noteUpdated(restoredNote);
 
 					updateNotes();
 					break;
@@ -197,12 +196,33 @@ export const useDefaultNoteContextMenu = ({
 		],
 	);
 
-	return useNoteContextMenuSwitcher({
-		notesRegistry,
-		noteContextMenuCallback,
-		menus: {
-			default: defaultNoteMenu,
-			deleted: deletedNoteMenu,
+	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
+	const triggerContextMenu = useContextMenu(activeMenu, noteContextMenuCallback);
+
+	const [menuTarget, setMenuTarget] = useState<{
+		id: string;
+		point: { x: number; y: number };
+	} | null>(null);
+
+	// define which menu should be open
+	const openNoteContextMenu = useCallback(
+		async (id: string, point: { x: number; y: number }) => {
+			const note = await notesRegistry.getById(id);
+			if (!note) return;
+			const menu = note.isDeleted ? deletedNoteMenu : defaultNoteMenu;
+
+			setActiveMenu(menu);
+			setMenuTarget({ id, point });
 		},
-	});
+		[notesRegistry],
+	);
+
+	useEffect(() => {
+		if (!menuTarget) return;
+
+		triggerContextMenu(menuTarget.id, menuTarget.point);
+		setMenuTarget(null);
+	}, [menuTarget, triggerContextMenu]);
+
+	return openNoteContextMenu;
 };
