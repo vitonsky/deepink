@@ -83,11 +83,10 @@ export class NotesController implements INotesController {
 
 		const notes: INote[] = [];
 
-		let isDeleted: undefined | QueryBuilder;
-		if (deleted === true) {
-			isDeleted = qb.line('isDeleted = 1');
-		} else if (deleted === false) {
-			isDeleted = qb.line('isDeleted = 0');
+		let deletedFilter: undefined | QueryBuilder;
+		if (typeof deleted === 'boolean') {
+			const status = deleted ? 1 : 0;
+			deletedFilter = qb.line(`isDeleted = ${status}`);
 		}
 
 		db.all(
@@ -117,7 +116,7 @@ export class NotesController implements INotesController {
 						  )
 						: undefined,
 				)
-				.where(isDeleted)
+				.where(deletedFilter)
 				.limit(limit)
 				.offset((page - 1) * limit),
 		).map((row) => {
@@ -245,7 +244,7 @@ export class NotesController implements INotesController {
 			),
 		);
 
-		if (!result.changes || result.changes < 1) {
+		if (result.changes !== ids.length) {
 			console.warn(
 				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
 			);
