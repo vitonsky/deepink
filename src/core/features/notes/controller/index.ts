@@ -87,7 +87,7 @@ export interface INotesController {
 	delete(ids: NoteId[]): Promise<void>;
 
 	/**
-	 * Update the deletion status of notes with the specified ids
+	 * Updates the status of specific notes
 	 */
 	updateStatus(ids: NoteId[], status: { deleted: boolean }): Promise<void>;
 }
