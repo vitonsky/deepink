@@ -24,7 +24,7 @@ import {
 	selectTagsTree,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectNotesView } from '@state/redux/profiles/selectors/notes';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 
 import { TagsList } from './TagsList';
 
