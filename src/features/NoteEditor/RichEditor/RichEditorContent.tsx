@@ -32,6 +32,7 @@ import { useRichEditorLock } from './useRichEditorLock';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
+		isEditable: boolean;
 		placeholder?: string;
 		isReadOnly?: boolean;
 		search?: string;
