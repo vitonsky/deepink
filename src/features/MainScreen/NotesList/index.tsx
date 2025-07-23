@@ -31,7 +31,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
-		noteUpdated: noteUpdated,
+		noteUpdated,
 	});
 
 	const parentRef = useRef<HTMLDivElement>(null);
