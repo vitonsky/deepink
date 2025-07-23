@@ -19,7 +19,7 @@ import { NoteActions } from '.';
 type DefaultContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
-	noteUpdated: (note: INote) => void;
+	noteUpdated: (id: INote) => void;
 
 	// TODO: receive with react context
 	notesRegistry: INotesController;
