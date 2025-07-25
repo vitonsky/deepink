@@ -113,23 +113,6 @@ describe('CRUD operations', () => {
 				};
 			});
 		const ids = await Promise.all(notesSample.map((note) => registry.add(note)));
-
-		// for one note
-		const note = ids[0];
-
-		// set deleted status
-		await registry.updateStatus([note], { deleted: true });
-		await expect(registry.getById(note)).resolves.toEqual(
-			expect.objectContaining({ isDeleted: true }),
-		);
-
-		// reset deleted status
-		await registry.updateStatus([note], { deleted: false });
-		await expect(registry.getById(note)).resolves.toEqual(
-			expect.objectContaining({ isDeleted: false }),
-		);
-
-		// for array
 		const notes = ids.slice(0, 100);
 
 		// set deleted status
