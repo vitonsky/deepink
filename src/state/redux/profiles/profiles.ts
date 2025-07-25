@@ -16,8 +16,8 @@ const selectWorkspaceObject = (
 };
 
 export enum NOTES_VIEW {
-	All_NOTES = 'all',
-	BIN = 'bin',
+	All_NOTES = 'All notes',
+	BIN = 'Bin',
 }
 
 export const createWorkspaceObject = (workspace: {
