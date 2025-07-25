@@ -129,7 +129,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBookOpen />
-								<Text>All notes</Text>
+								<Text>{NOTES_VIEW.All_NOTES}</Text>
 							</HStack>
 						),
 					},
@@ -165,7 +165,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaTrash />
-								<Text>Bin</Text>
+								<Text>{NOTES_VIEW.BIN}</Text>
 							</HStack>
 						),
 					},
