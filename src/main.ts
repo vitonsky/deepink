@@ -23,7 +23,9 @@ app.whenReady().then(async () => {
 
 		await Promise.all(
 			[REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS].map((extension) =>
-				installExtension(extension)
+				installExtension(extension, {
+					loadExtensionOptions: { allowFileAccess: true },
+				})
 					.then((ext) => console.log(`Added Extension:  ${ext.name}`))
 					.catch((err) => console.log('An error occurred: ', err)),
 			),
