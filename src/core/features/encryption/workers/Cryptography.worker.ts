@@ -46,23 +46,22 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	};
 	const getTwofishCipher = async () => {
 		const key = await derivedKeys.getDerivedBytes('twofish-ctr-cipher', 256);
-		const twofishKey = new Uint8Array(key);
-		return new TwofishCTRCipher(twofishKey, getRandomBytes);
+		return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
 	};
 
-	const cipherPromises = [];
+	let ciphers;
 	switch (algorithm) {
 		case ENCRYPTION_ALGORITHM.AES:
-			cipherPromises.push(getAESCipher());
+			ciphers = await Promise.all([getAESCipher()]);
 			break;
 		case ENCRYPTION_ALGORITHM.TWOFISH:
-			cipherPromises.push(getTwofishCipher());
+			ciphers = await Promise.all([getTwofishCipher()]);
 			break;
 		case ENCRYPTION_ALGORITHM.AES_TWOFISH:
-			cipherPromises.push(getAESCipher(), getTwofishCipher());
+			ciphers = await Promise.all([getAESCipher(), getTwofishCipher()]);
 			break;
 		case ENCRYPTION_ALGORITHM.TWOFISH_AES:
-			cipherPromises.push(getTwofishCipher(), getAESCipher());
+			ciphers = await Promise.all([getTwofishCipher(), getAESCipher()]);
 			break;
 		default:
 			throw new Error(
@@ -71,8 +70,6 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 				).join(', ')}`,
 			);
 	}
-
-	const ciphers = await Promise.all(cipherPromises);
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
