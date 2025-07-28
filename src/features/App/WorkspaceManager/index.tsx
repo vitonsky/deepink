@@ -27,7 +27,6 @@ export type IWorkspacePickerProps = {
 	onChooseProfile: (id: string | null) => void;
 };
 
-// TODO: allow to choose algorithm
 /**
  * Manages a workspace profiles
  */

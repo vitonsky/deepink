@@ -57,6 +57,7 @@ export const useProfilesList = (): ProfilesListApi => {
 				const encryption = await createEncryption({
 					key: profile.password,
 					salt,
+					algorithm: profile.algorithm,
 				});
 
 				const key = getRandomBytes(32);
@@ -68,7 +69,7 @@ export const useProfilesList = (): ProfilesListApi => {
 				profileData = await profilesManager.add({
 					name: profile.name,
 					encryption: {
-						algorithm: 'default',
+						algorithm: profile.algorithm,
 						salt: bytesToBase64(salt),
 						key: encryptedKey,
 					},
