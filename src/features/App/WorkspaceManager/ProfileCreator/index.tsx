@@ -171,26 +171,9 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						}
 						disabled={isPending}
 					>
-						{[
-							{
-								value: ENCRYPTION_ALGORITHM.AES,
-								text: 'AES',
-							},
-							{
-								value: ENCRYPTION_ALGORITHM.TWOFISH,
-								text: 'Twofish',
-							},
-							{
-								value: ENCRYPTION_ALGORITHM.AES_TWOFISH,
-								text: 'AES - Twofish',
-							},
-							{
-								value: ENCRYPTION_ALGORITHM.TWOFISH_AES,
-								text: 'Twofish - AES',
-							},
-						].map(({ value, text }) => (
-							<option key={value} value={value}>
-								{text}
+						{[...Object.values(ENCRYPTION_ALGORITHM)].map((algorithm) => (
+							<option key={algorithm} value={algorithm}>
+								{algorithm}
 							</option>
 						))}
 					</Select>
