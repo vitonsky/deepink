@@ -52,10 +52,10 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	let ciphers;
 	switch (algorithm) {
 		case ENCRYPTION_ALGORITHM.AES:
-			ciphers = await Promise.all([getAESCipher()]);
+			ciphers = [await getAESCipher()];
 			break;
 		case ENCRYPTION_ALGORITHM.TWOFISH:
-			ciphers = await Promise.all([getTwofishCipher()]);
+			ciphers = [await getTwofishCipher()];
 			break;
 		case ENCRYPTION_ALGORITHM.AES_TWOFISH:
 			ciphers = await Promise.all([getAESCipher(), getTwofishCipher()]);
