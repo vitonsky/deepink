@@ -1,9 +1,6 @@
-export const ENCRYPTION_ALGORITHM = {
-	AES: 'aes',
-	TWOFISH: 'twofish',
-	AES_TWOFISH: 'aes-twofish',
-	TWOFISH_AES: 'twofish-aes',
-} as const;
-
-type EncryptionAlgorithmMap = typeof ENCRYPTION_ALGORITHM;
-export type EncryptionAlgorithm = EncryptionAlgorithmMap[keyof EncryptionAlgorithmMap];
+export enum ENCRYPTION_ALGORITHM {
+	AES = 'Aes',
+	TWOFISH = 'Twofish',
+	AES_TWOFISH = 'Aes-Twofish',
+	TWOFISH_AES = 'Twofish-Aes',
+}
