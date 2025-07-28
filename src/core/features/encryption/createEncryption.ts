@@ -15,11 +15,7 @@ import {
 export const createEncryption = async (
 	authData: EncryptionConfig,
 ): Promise<DisposableBox<EncryptionController>> => {
-	const workerEncryption = new WorkerEncryptionProxyProcessor({
-		key: authData.key,
-		salt: authData.salt,
-		algorithm: authData.algorithm,
-	});
+	const workerEncryption = new WorkerEncryptionProxyProcessor(authData);
 	const encryptionController = new EncryptionController(workerEncryption);
 
 	return new DisposableBox(encryptionController, () => {
