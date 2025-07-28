@@ -1,6 +1,9 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
 import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
-import { ENCRYPTION_ALGORITHM } from '@core/features/encryption/algorithms';
+import {
+	ENCRYPTION_ALGORITHM,
+	ENCRYPTION_ALGORITHM_NAMES,
+} from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -173,7 +176,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						{[...Object.values(ENCRYPTION_ALGORITHM)].map((algorithm) => (
 							<option key={algorithm} value={algorithm}>
-								{algorithm}
+								{ENCRYPTION_ALGORITHM_NAMES[algorithm]}
 							</option>
 						))}
 					</Select>
