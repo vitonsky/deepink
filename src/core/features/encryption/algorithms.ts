@@ -1,6 +1,6 @@
 export enum ENCRYPTION_ALGORITHM {
-	AES = 'Aes',
+	AES = 'AES',
 	TWOFISH = 'Twofish',
-	AES_TWOFISH = 'Aes-Twofish',
-	TWOFISH_AES = 'Twofish-Aes',
+	AES_TWOFISH = 'AES-Twofish',
+	TWOFISH_AES = 'Twofish-AES',
 }
