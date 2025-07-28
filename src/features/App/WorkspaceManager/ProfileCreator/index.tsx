@@ -1,9 +1,6 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
 import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
-import {
-	ENCRYPTION_ALGORITHM,
-	EncryptionAlgorithm,
-} from '@core/features/encryption/algorithms';
+import { ENCRYPTION_ALGORITHM } from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -11,7 +8,7 @@ import { ProfilesForm } from '../ProfilesForm';
 export type NewProfile = {
 	name: string;
 	password: string | null;
-	algorithm: EncryptionAlgorithm;
+	algorithm: ENCRYPTION_ALGORITHM;
 };
 
 export type ProfileCreatorProps = {
@@ -37,7 +34,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
 
-	const [algorithm, setAlgorithm] = useState<EncryptionAlgorithm>(
+	const [algorithm, setAlgorithm] = useState<ENCRYPTION_ALGORITHM>(
 		ENCRYPTION_ALGORITHM.AES,
 	);
 
@@ -170,7 +167,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						variant="secondary"
 						defaultValue="aes"
 						onChange={(evt) =>
-							setAlgorithm(evt.target.value as EncryptionAlgorithm)
+							setAlgorithm(evt.target.value as ENCRYPTION_ALGORITHM)
 						}
 						disabled={isPending}
 					>
