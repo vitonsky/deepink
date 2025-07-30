@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { ElectronContextMenu } from '@features/MainScreen/NotesList/NoteContextMenu/ElectronContextMenu';
 
@@ -15,22 +15,21 @@ export const useContextMenu = <T extends string>(
 	menu: ContextMenu,
 	callback: ContextMenuCallback<T>,
 ) => {
-	const contextMenuRef = useRef<ElectronContextMenu<T> | null>(null);
+	const contextMenu = useMemo(() => {
+		// TODO: provide constructor in react context
+		return new ElectronContextMenu<T>(menu);
+	}, [menu]);
 
 	const contextMenuTargetRef = useRef<string | null>(null);
-	const show = useCallback((id: string, point: { x: number; y: number }) => {
-		const contextMenu = contextMenuRef.current;
-		if (!contextMenu) return;
-
-		contextMenu.open(point);
-		contextMenuTargetRef.current = id;
-	}, []);
+	const show = useCallback(
+		(id: string, point: { x: number; y: number }) => {
+			contextMenu.open(point);
+			contextMenuTargetRef.current = id;
+		},
+		[contextMenu],
+	);
 
 	useEffect(() => {
-		// TODO: provide constructor in react context
-		const contextMenu = new ElectronContextMenu<T>(menu);
-		contextMenuRef.current = contextMenu;
-
 		const unsubscribeOnClose = contextMenu.onClose(() => {
 			contextMenuTargetRef.current = null;
 		});
@@ -47,7 +46,7 @@ export const useContextMenu = <T extends string>(
 			unsubscribeOnClose();
 			unsubscribeOnClick();
 		};
-	}, [callback, menu]);
+	}, [callback, contextMenu]);
 
 	return show;
 };
