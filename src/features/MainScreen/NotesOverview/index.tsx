@@ -16,15 +16,21 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
+	NOTES_VIEW,
 	selectActiveTag,
 	selectTags,
 	selectTagsTree,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 
 import { TagsList } from './TagsList';
 
 export type NotesOverviewProps = {};
+
+const isNotesView = (id: string): id is NOTES_VIEW => {
+	return Object.values(NOTES_VIEW).includes(id as NOTES_VIEW);
+};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const dispatch = useAppDispatch();
@@ -33,6 +39,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 	const tags = useWorkspaceSelector(selectTags);
 	const tagsTree = useWorkspaceSelector(selectTagsTree);
+
+	const notesOverviewMode = useWorkspaceSelector(selectNotesView);
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -104,11 +112,11 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'all',
+						id: NOTES_VIEW.All_NOTES,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBookOpen />
-								<Text>All notes</Text>
+								<Text>{NOTES_VIEW.All_NOTES}</Text>
 							</HStack>
 						),
 					},
@@ -140,25 +148,32 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'bin',
+						id: NOTES_VIEW.BIN,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaTrash />
-								<Text>Bin</Text>
+								<Text>{NOTES_VIEW.BIN}</Text>
 							</HStack>
 						),
 					},
 				]}
-				activeItem={activeTag === null ? 'all' : undefined}
+				activeItem={notesOverviewMode || NOTES_VIEW.All_NOTES}
 				onPick={(id) => {
-					if (id === 'all') {
-						dispatch(
-							workspacesApi.setSelectedTag({
-								...workspaceData,
-								tag: null,
-							}),
-						);
-					}
+					if (!isNotesView(id)) return;
+
+					dispatch(
+						workspacesApi.setView({
+							...workspaceData,
+							view: id,
+						}),
+					);
+
+					dispatch(
+						workspacesApi.setSelectedTag({
+							...workspaceData,
+							tag: null,
+						}),
+					);
 				}}
 			/>
 

@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { formatNoteLink } from '@core/features/links';
-import { NoteId } from '@core/features/notes';
+import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { selectDirectory } from '@electron/requests/files/renderer';
@@ -9,6 +9,8 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectIsPermanentDeleteNotes } from '@state/redux/settings/settings';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
@@ -18,12 +20,13 @@ import { NoteActions } from '.';
 type DefaultContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
+	noteUpdated: (id: INote) => void;
 
 	// TODO: receive with react context
 	notesRegistry: INotesController;
 };
 
-export const noteMenu: ContextMenu = [
+export const defaultNoteMenu: ContextMenu = [
 	{
 		id: NoteActions.DUPLICATE,
 		label: 'Duplicate',
@@ -43,31 +46,74 @@ export const noteMenu: ContextMenu = [
 	},
 ];
 
+export const deletedNoteMenu: ContextMenu = [
+	{
+		id: NoteActions.RESTORE,
+		label: 'Restore',
+	},
+	{
+		id: NoteActions.EXPORT,
+		label: 'Export',
+	},
+	{ type: 'separator' },
+	{
+		id: NoteActions.DELETE,
+		label: 'Delete',
+	},
+];
+
 const mdCharsForEscape = ['\\', '[', ']'];
 const mdCharsForEscapeRegEx = new RegExp(
 	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
 	'g',
 );
 
-export const useDefaultNoteContextMenu = ({
+export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
+	noteUpdated,
 }: DefaultContextMenuOptions) => {
 	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
+
+	const isPermanentDeleteNotes = useAppSelector(selectIsPermanentDeleteNotes);
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
 			switch (action) {
 				case NoteActions.DELETE: {
-					const isConfirmed = confirm('Are you sure to delete note?');
+					const targetNote = await notesRegistry.getById(id);
+					const isConfirmed = confirm(
+						`Are you sure to ${
+							targetNote?.isDeleted ? 'permanently delete' : 'delete'
+						} note?`,
+					);
 					if (!isConfirmed) return;
 
 					closeNote(id);
-					await notesRegistry.delete([id]);
 
-					await tagsRegistry.setAttachedTags(id, []);
+					if (isPermanentDeleteNotes || targetNote?.isDeleted) {
+						await notesRegistry.delete([id]);
+						await tagsRegistry.setAttachedTags(id, []);
+					} else {
+						await notesRegistry.updateStatus([id], { deleted: true });
+
+						const deletedNote = await notesRegistry.getById(id);
+						if (deletedNote) noteUpdated(deletedNote);
+					}
+
+					updateNotes();
+					break;
+				}
+				case NoteActions.RESTORE: {
+					const isConfirmed = confirm('Are you sure to restore note?');
+					if (!isConfirmed) return;
+
+					await notesRegistry.updateStatus([id], { deleted: false });
+
+					const restoredNote = await notesRegistry.getById(id);
+					if (restoredNote) noteUpdated(restoredNote);
 
 					updateNotes();
 					break;
@@ -148,8 +194,44 @@ export const useDefaultNoteContextMenu = ({
 				}
 			}
 		},
-		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
+		[
+			closeNote,
+			filesRegistry,
+			isPermanentDeleteNotes,
+			noteUpdated,
+			notesRegistry,
+			tagsRegistry,
+			updateNotes,
+		],
 	);
 
-	return useContextMenu(noteMenu, noteContextMenuCallback);
+	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
+	const triggerContextMenu = useContextMenu(activeMenu, noteContextMenuCallback);
+
+	const [menuTarget, setMenuTarget] = useState<{
+		id: string;
+		point: { x: number; y: number };
+	} | null>(null);
+
+	// define which menu should be open
+	const openNoteContextMenu = useCallback(
+		async (id: string, point: { x: number; y: number }) => {
+			const note = await notesRegistry.getById(id);
+			if (!note) return;
+			const menu = note.isDeleted ? deletedNoteMenu : defaultNoteMenu;
+
+			setActiveMenu(menu);
+			setMenuTarget({ id, point });
+		},
+		[notesRegistry],
+	);
+
+	useEffect(() => {
+		if (!menuTarget) return;
+
+		triggerContextMenu(menuTarget.id, menuTarget.point);
+		setMenuTarget(null);
+	}, [menuTarget, triggerContextMenu]);
+
+	return openNoteContextMenu;
 };

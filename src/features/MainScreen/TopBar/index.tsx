@@ -5,7 +5,7 @@ import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
-import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
+import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -19,6 +19,8 @@ export type TopBarProps = {
 
 	// TODO: receive with react context
 	notesRegistry: INotesController;
+
+	noteUpdated: (id: INote) => void;
 };
 
 // TODO: improve tabs style
@@ -30,11 +32,13 @@ export const TopBar: FC<TopBarProps> = ({
 	onPick,
 	updateNotes,
 	notesRegistry,
+	noteUpdated,
 }) => {
-	const openNoteContextMenu = useDefaultNoteContextMenu({
+	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: onClose,
 		notesRegistry,
 		updateNotes,
+		noteUpdated,
 	});
 
 	const existsTabs = useMemo(
@@ -92,6 +96,9 @@ export const TopBar: FC<TopBarProps> = ({
 							maxW="250px"
 							marginBottom={0}
 							title={title}
+							textDecorationLine={
+								note.isDeleted ? 'line-through' : undefined
+							}
 							onMouseDown={(evt) => {
 								const isLeftButton = evt.button === 0;
 								if (isLeftButton) return;

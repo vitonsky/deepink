@@ -151,11 +151,14 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
+	const readOnlyMode = note.isDeleted;
+
 	return (
 		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
 				<HStack w="100%" align="start">
 					<Input
+						isReadOnly={readOnlyMode}
 						placeholder="Note title"
 						size="sm"
 						borderRadius="6px"
@@ -248,16 +251,20 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 			</HStack>
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				<HStack>
-					<Button variant="ghost" size="xs">
-						<FaBookmark />
-					</Button>
-					<Button variant="ghost" size="xs">
-						<FaFlag />
-					</Button>
-				</HStack>
+				{!readOnlyMode && (
+					<>
+						<HStack>
+							<Button variant="ghost" size="xs">
+								<FaBookmark />
+							</Button>
+							<Button variant="ghost" size="xs">
+								<FaFlag />
+							</Button>
+						</HStack>
 
-				<Divider orientation="vertical" h="1em" />
+						<Divider orientation="vertical" h="1em" />
+					</>
+				)}
 
 				{attachedTags.map((tag) => (
 					<Tag
@@ -279,106 +286,117 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							<FaHashtag />
 							<Text>{tag.resolvedName}</Text>
 						</HStack>
-						<Box
-							sx={{
-								'&:not(:hover)': {
-									opacity: '.6',
-								},
-							}}
-						>
-							<FaXmark
-								onClick={async (evt) => {
-									evt.stopPropagation();
-									console.warn('Remove attached tag', tag.resolvedName);
 
-									const updatedTags = attachedTags
-										.filter(({ id }) => id !== tag.id)
-										.map(({ id }) => id);
-									await tagsRegistry.setAttachedTags(
-										noteId,
-										updatedTags,
-									);
-									await updateTags();
+						{!readOnlyMode && (
+							<Box
+								sx={{
+									'&:not(:hover)': {
+										opacity: '.6',
+									},
 								}}
-							/>
-						</Box>
+							>
+								<FaXmark
+									onClick={async (evt) => {
+										evt.stopPropagation();
+										console.warn(
+											'Remove attached tag',
+											tag.resolvedName,
+										);
+
+										const updatedTags = attachedTags
+											.filter(({ id }) => id !== tag.id)
+											.map(({ id }) => id);
+										await tagsRegistry.setAttachedTags(
+											noteId,
+											updatedTags,
+										);
+										await updateTags();
+									}}
+								/>
+							</Box>
+						)}
 					</Tag>
 				))}
 
-				<SuggestedTagsList
-					tags={notAttachedTags}
-					selectedTag={attachTagName ?? undefined}
-					inputValue={tagSearch}
-					onInputChange={setTagSearch}
-					sx={{
-						display: 'inline',
-						w: 'auto',
-						maxW: '150px',
-					}}
-					inputProps={{
-						variant: 'ghost',
-						placeholder: 'Add some tags...',
-						// size: 'sm',
-						size: 'xs',
-					}}
-					hasTagName={(tagName) =>
-						tags.some(({ resolvedName }) => resolvedName === tagName)
-					}
-					onPick={async (tag) => {
-						setAttachTagName(tag);
-						await tagsRegistry.setAttachedTags(noteId, [
-							...attachedTags.map(({ id }) => id),
-							tag.id,
-						]);
-
-						setTagSearch('');
-
-						await updateTags();
-					}}
-					onCreateTag={async (tagName) => {
-						setAttachTagName(null);
-
-						let shortenedTagName = tagName;
-						let parentTagId: string | null = null;
-						const tagSegments = tagName.split('/');
-						for (
-							let lastSegmentIndex = tagSegments.length - 1;
-							lastSegmentIndex > 0;
-							lastSegmentIndex--
-						) {
-							const resolvedParentTag = tagSegments
-								.slice(0, lastSegmentIndex)
-								.join('/');
-							const foundTag = tags.find(
-								({ resolvedName }) => resolvedName === resolvedParentTag,
-							);
-							if (foundTag) {
-								parentTagId = foundTag.id;
-								shortenedTagName = tagSegments
-									.slice(lastSegmentIndex)
-									.join('/');
-								break;
-							}
+				{!readOnlyMode && (
+					<SuggestedTagsList
+						tags={notAttachedTags}
+						selectedTag={attachTagName ?? undefined}
+						inputValue={tagSearch}
+						onInputChange={setTagSearch}
+						sx={{
+							display: 'inline',
+							w: 'auto',
+							maxW: '150px',
+						}}
+						inputProps={{
+							variant: 'ghost',
+							placeholder: 'Add some tags...',
+							// size: 'sm',
+							size: 'xs',
+						}}
+						hasTagName={(tagName) =>
+							tags.some(({ resolvedName }) => resolvedName === tagName)
 						}
+						onPick={async (tag) => {
+							setAttachTagName(tag);
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								tag.id,
+							]);
 
-						const tagId = await tagsRegistry.add(
-							shortenedTagName,
-							parentTagId,
-						);
-						await tagsRegistry.setAttachedTags(noteId, [
-							...attachedTags.map(({ id }) => id),
-							tagId,
-						]);
+							setTagSearch('');
 
-						await updateTags();
-					}}
-				/>
+							await updateTags();
+						}}
+						onCreateTag={async (tagName) => {
+							setAttachTagName(null);
+
+							let shortenedTagName = tagName;
+							let parentTagId: string | null = null;
+							const tagSegments = tagName.split('/');
+							for (
+								let lastSegmentIndex = tagSegments.length - 1;
+								lastSegmentIndex > 0;
+								lastSegmentIndex--
+							) {
+								const resolvedParentTag = tagSegments
+									.slice(0, lastSegmentIndex)
+									.join('/');
+								const foundTag = tags.find(
+									({ resolvedName }) =>
+										resolvedName === resolvedParentTag,
+								);
+								if (foundTag) {
+									parentTagId = foundTag.id;
+									shortenedTagName = tagSegments
+										.slice(lastSegmentIndex)
+										.join('/');
+									break;
+								}
+							}
+
+							const tagId = await tagsRegistry.add(
+								shortenedTagName,
+								parentTagId,
+							);
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								tagId,
+							]);
+
+							await updateTags();
+						}}
+					/>
+				)}
 			</HStack>
 
 			<EditorPanelContext>
-				<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
-					<EditorPanel />
-				</HStack>
+				{!readOnlyMode && (
+					<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
+						<EditorPanel />
+					</HStack>
+				)}
 
 				<HStack
 					sx={{
@@ -397,6 +415,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							uploadFile={uploadFile}
 							width="100%"
 							height="100%"
+							readOnly={readOnlyMode}
 						/>
 					)}
 					{(editorMode === 'richtext' || editorMode === 'split-screen') && (
@@ -404,6 +423,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 							placeholder="Write your thoughts here..."
 							value={text}
 							onChanged={setText}
+							isEditable={!readOnlyMode}
 						/>
 					)}
 				</HStack>

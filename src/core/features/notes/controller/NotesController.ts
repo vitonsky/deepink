@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { QueryBuilder } from 'nano-queries/QueryBuilder';
 import { v4 as uuid4 } from 'uuid';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
@@ -13,11 +14,12 @@ import { INotesController, NotesControllerFetchOptions } from '.';
  */
 const mappers = {
 	rowToNoteObject(row: any): INote {
-		const { id, title, text, creationTime, lastUpdateTime } = row;
+		const { id, title, text, creationTime, lastUpdateTime, isDeleted } = row;
 		return {
 			id,
 			createdTimestamp: creationTime,
 			updatedTimestamp: lastUpdateTime,
+			isDeleted: isDeleted ? true : false,
 			content: { title, text },
 		};
 	},
@@ -73,12 +75,19 @@ export class NotesController implements INotesController {
 		limit = 100,
 		page = 1,
 		tags = [],
+		deleted,
 	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
 		const db = wrapDB(this.db.get());
 
 		const notes: INote[] = [];
+
+		let deletedFilter: undefined | QueryBuilder;
+		if (typeof deleted === 'boolean') {
+			const status = deleted ? 1 : 0;
+			deletedFilter = qb.line(`isDeleted = ${status}`);
+		}
 
 		db.all(
 			qb
@@ -107,6 +116,7 @@ export class NotesController implements INotesController {
 						  )
 						: undefined,
 				)
+				.where(deletedFilter)
 				.limit(limit)
 				.offset((page - 1) * limit),
 		).map((row) => {
@@ -208,6 +218,35 @@ export class NotesController implements INotesController {
 		if (result.changes !== ids.length) {
 			console.warn(
 				`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${result.changes}`,
+			);
+		}
+	}
+
+	public async updateStatus(
+		ids: NoteId[],
+		status: { deleted: boolean },
+	): Promise<void> {
+		const db = wrapDB(this.db.get());
+
+		const result = db.run(
+			qb.line(
+				'UPDATE notes SET',
+				qb.values({
+					isDeleted: status.deleted ? 1 : 0,
+				}),
+				qb
+					.where(
+						qb.values({
+							workspace_id: this.workspace,
+						}),
+					)
+					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
+			),
+		);
+
+		if (result.changes !== ids.length) {
+			console.warn(
+				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
 			);
 		}
 	}
