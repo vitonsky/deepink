@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo, useRef } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
-import { INote, NoteId } from '@core/features/notes';
+import { INote, INoteContent, NoteId } from '@core/features/notes';
 
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
@@ -16,6 +16,35 @@ export type NotesProps = {
 
 export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) => {
 	useEditorLinks();
+
+	const notesRef = useRef(notes);
+	notesRef.current = notes;
+
+	const updateHooks = useMemo(
+		() =>
+			Object.fromEntries(
+				tabs
+					.filter((id) => notesRef.current.some((note) => note.id === id))
+					.map((id) => {
+						return [
+							id,
+							(content: INoteContent) => {
+								const note = notesRef.current.find(
+									(note) => note.id === id,
+								) as INote;
+
+								// Skip updates with not changed data
+								if (isEqual(note.content, content)) {
+									return;
+								}
+
+								updateNote({ ...note, content });
+							},
+						];
+					}),
+			),
+		[tabs, updateNote],
+	);
 
 	return (
 		<Box
@@ -41,14 +70,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 							<NoteEditor
 								key={note.id}
 								note={note}
-								updateNote={(content) => {
-									// Skip updates with not changed data
-									if (isEqual(note.content, content)) {
-										return;
-									}
-
-									updateNote({ ...note, content });
-								}}
+								updateNote={updateHooks[note.id]}
 							/>
 						</Box>
 					);

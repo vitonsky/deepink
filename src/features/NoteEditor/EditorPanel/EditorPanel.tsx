@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
 	FaBold,
 	FaCalendarDay,
@@ -21,7 +21,7 @@ import { useEditorPanelContext } from '.';
 
 // TODO: add hotkeys to trigger panel commands
 // TODO: implement notifications from editor to panel, to render current state for formatting buttons
-export const EditorPanel = () => {
+export const EditorPanel = memo(() => {
 	const { onInserting, onFormatting } = useEditorPanelContext();
 
 	return (
@@ -200,4 +200,6 @@ export const EditorPanel = () => {
 			</HStack>
 		</HStack>
 	);
-};
+});
+
+EditorPanel.displayName = 'EditorPanel';

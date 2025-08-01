@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
 	FaBell,
 	FaBookmark,
@@ -58,7 +58,98 @@ export type NoteEditorProps = {
 	updateNote: (note: INoteContent) => void;
 };
 
-export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
+export enum NoteMenuItems {
+	TOGGLE_BACKLINKS,
+}
+
+export const NoteMenu = memo(
+	({ onClick }: { onClick?: (command: NoteMenuItems) => void }) => {
+		return (
+			<Menu>
+				<MenuButton as={Button} variant="primary" size="sm">
+					<FaEllipsis />
+				</MenuButton>
+				<MenuList>
+					<MenuItem>
+						<HStack>
+							<FaCopy />
+							<Text>Copy reference on note</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaBell />
+							<Text>Remind me</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaClock />
+							<Text>History</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem onClick={() => onClick?.(NoteMenuItems.TOGGLE_BACKLINKS)}>
+						<HStack>
+							<FaLink />
+							<Text>Back links</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaEye />
+							<Text>Readonly mode</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaDownload />
+							<Text>Download and convert a network media</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaSpellCheck />
+							<Text>Spellcheck</Text>
+						</HStack>
+					</MenuItem>
+
+					<MenuItem>
+						<HStack>
+							<FaFileExport />
+							<Text>Export...</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaShield />
+							<Text>Password protection...</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaRotate />
+							<Text>Disable sync</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaBoxArchive />
+							<Text>Archive</Text>
+						</HStack>
+					</MenuItem>
+					<MenuItem>
+						<HStack>
+							<FaTrashCan />
+							<Text>Delete</Text>
+						</HStack>
+					</MenuItem>
+				</MenuList>
+			</Menu>
+		);
+	},
+);
+
+export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
@@ -151,6 +242,17 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 
 	const [sidePanel, setSidePanel] = useState<string | null>(null);
 
+	const onNoteMenuClick = useCallback((command: NoteMenuItems) => {
+		switch (command) {
+			case NoteMenuItems.TOGGLE_BACKLINKS:
+				setSidePanel((state) => (state ? null : 'backlinks'));
+				break;
+
+			default:
+				break;
+		}
+	}, []);
+
 	return (
 		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
@@ -164,86 +266,7 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 					/>
 
 					{/* TODO: add options that may be toggled */}
-					<Menu>
-						<MenuButton as={Button} variant="primary" size="sm">
-							<FaEllipsis />
-						</MenuButton>
-						<MenuList>
-							<MenuItem>
-								<HStack>
-									<FaCopy />
-									<Text>Copy reference on note</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaBell />
-									<Text>Remind me</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaClock />
-									<Text>History</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem onClick={() => setSidePanel('backlinks')}>
-								<HStack>
-									<FaLink />
-									<Text>Back links</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaEye />
-									<Text>Readonly mode</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaDownload />
-									<Text>Download and convert a network media</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaSpellCheck />
-									<Text>Spellcheck</Text>
-								</HStack>
-							</MenuItem>
-
-							<MenuItem>
-								<HStack>
-									<FaFileExport />
-									<Text>Export...</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaShield />
-									<Text>Password protection...</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaRotate />
-									<Text>Disable sync</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaBoxArchive />
-									<Text>Archive</Text>
-								</HStack>
-							</MenuItem>
-							<MenuItem>
-								<HStack>
-									<FaTrashCan />
-									<Text>Delete</Text>
-								</HStack>
-							</MenuItem>
-						</MenuList>
-					</Menu>
+					<NoteMenu onClick={onNoteMenuClick} />
 				</HStack>
 			</HStack>
 
@@ -437,4 +460,6 @@ export const NoteEditor: FC<NoteEditorProps> = ({ note, updateNote }) => {
 			)}
 		</VStack>
 	);
-};
+});
+
+NoteEditor.displayName = 'NoteEditor';
