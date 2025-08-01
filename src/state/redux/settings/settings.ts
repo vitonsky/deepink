@@ -1,3 +1,4 @@
+import { KeyboardShortcutMap, keyboardShortcuts } from '@core/features/shortcuts/command';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
@@ -7,6 +8,7 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
+	shortcuts: KeyboardShortcutMap;
 };
 
 export const settingsSlice = createSlice({
@@ -14,6 +16,7 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
+		shortcuts: keyboardShortcuts,
 	} as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
@@ -27,6 +30,12 @@ export const settingsSlice = createSlice({
 		},
 		setTheme: (state, { payload }: PayloadAction<GlobalSettings['theme']>) => {
 			return { ...state, theme: payload } as GlobalSettings;
+		},
+		setShortcuts: (
+			state,
+			{ payload }: PayloadAction<GlobalSettings['shortcuts']>,
+		) => {
+			return { ...state, shortcuts: payload } as GlobalSettings;
 		},
 	},
 });
@@ -43,4 +52,9 @@ export const selectEditorMode = createAppSelector(
 export const selectTheme = createAppSelector(
 	selectSettings,
 	(settings) => settings.theme,
+);
+
+export const selectShortcuts = createAppSelector(
+	selectSettings,
+	(settings) => settings.shortcuts,
 );

@@ -1,5 +1,7 @@
 import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
+import { GLOBAL_COMMANDS } from '@core/features/shortcuts/command';
+import { useCommandSubscription } from '@core/features/shortcuts/commandHooks';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
 
@@ -10,6 +12,9 @@ export const WorkspaceStatusBarItems = () => {
 
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
+
+	useCommandSubscription(GLOBAL_COMMANDS.LOCK_PROFILE, profileControls.close);
+
 	useFirstRender(() => {
 		statusBarButtons.controls.register(
 			'dbChange',
