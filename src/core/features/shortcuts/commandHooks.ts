@@ -30,9 +30,15 @@ export const useShortcutBinding = () => {
 		hotkeys.filter = () => true;
 
 		Object.entries(shortcuts).forEach(([shortcut, commandName]) => {
-			hotkeys(shortcut, () => {
-				execute(commandName);
-			});
+			hotkeys(
+				shortcut,
+				{
+					capture: true,
+				},
+				() => {
+					execute(commandName);
+				},
+			);
 		});
 
 		return () => {
