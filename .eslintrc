@@ -28,6 +28,13 @@
 		"plugin:react-hooks/recommended"
 	],
 	"rules": {
+		"react-hooks/exhaustive-deps": [
+			"warn",
+			{
+				// custom hooks with deps
+				"additionalHooks": "(useImmutableCallback)"
+			}
+		],
 		// turn on errors for missing imports
 		"local-rules/proper-import-aliases": "error",
 		"import/no-unresolved": "error",
