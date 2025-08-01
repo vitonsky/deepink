@@ -1,38 +1,7 @@
 import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
-import {
-	FaBell,
-	FaBookmark,
-	FaBoxArchive,
-	FaClock,
-	FaCopy,
-	FaDownload,
-	FaEllipsis,
-	FaEye,
-	FaFileExport,
-	FaFlag,
-	FaHashtag,
-	FaLink,
-	FaRotate,
-	FaShield,
-	FaSpellCheck,
-	FaTrashCan,
-	FaXmark,
-} from 'react-icons/fa6';
+import { FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
 import { debounce } from 'lodash';
-import {
-	Box,
-	Button,
-	Divider,
-	HStack,
-	Input,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuList,
-	Tag,
-	Text,
-	VStack,
-} from '@chakra-ui/react';
+import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
@@ -51,103 +20,13 @@ import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { EditorPanelContext } from './EditorPanel';
 import { EditorPanel } from './EditorPanel/EditorPanel';
+import { NoteMenu, NoteMenuItems } from './NoteMenuItems';
 import { RichEditor } from './RichEditor/RichEditor';
 
 export type NoteEditorProps = {
 	note: INote;
 	updateNote: (note: INoteContent) => void;
 };
-
-export enum NoteMenuItems {
-	TOGGLE_BACKLINKS,
-}
-
-export const NoteMenu = memo(
-	({ onClick }: { onClick?: (command: NoteMenuItems) => void }) => {
-		return (
-			<Menu>
-				<MenuButton as={Button} variant="primary" size="sm">
-					<FaEllipsis />
-				</MenuButton>
-				<MenuList>
-					<MenuItem>
-						<HStack>
-							<FaCopy />
-							<Text>Copy reference on note</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaBell />
-							<Text>Remind me</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaClock />
-							<Text>History</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem onClick={() => onClick?.(NoteMenuItems.TOGGLE_BACKLINKS)}>
-						<HStack>
-							<FaLink />
-							<Text>Back links</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaEye />
-							<Text>Readonly mode</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaDownload />
-							<Text>Download and convert a network media</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaSpellCheck />
-							<Text>Spellcheck</Text>
-						</HStack>
-					</MenuItem>
-
-					<MenuItem>
-						<HStack>
-							<FaFileExport />
-							<Text>Export...</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaShield />
-							<Text>Password protection...</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaRotate />
-							<Text>Disable sync</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaBoxArchive />
-							<Text>Archive</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaTrashCan />
-							<Text>Delete</Text>
-						</HStack>
-					</MenuItem>
-				</MenuList>
-			</Menu>
-		);
-	},
-);
 
 export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	const dispatch = useAppDispatch();
