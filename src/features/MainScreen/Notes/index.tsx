@@ -1,7 +1,8 @@
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FC, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote, INoteContent, NoteId } from '@core/features/notes';
+import { useAsRef } from '@hooks/useAsRef';
 
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
 import { NoteEditor } from '../../NoteEditor';
@@ -17,9 +18,7 @@ export type NotesProps = {
 export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) => {
 	useEditorLinks();
 
-	const notesRef = useRef(notes);
-	notesRef.current = notes;
-
+	const notesRef = useAsRef(notes);
 	const updateHooks = useMemo(
 		() =>
 			Object.fromEntries(
@@ -43,7 +42,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 						];
 					}),
 			),
-		[tabs, updateNote],
+		[notesRef, tabs, updateNote],
 	);
 
 	return (
