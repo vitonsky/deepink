@@ -16,8 +16,6 @@ export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
 
-	console.log('> RENDER MainScreen');
-
 	// Init notes list
 	useEffect(() => {
 		updateNotes();

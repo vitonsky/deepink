@@ -10,7 +10,6 @@ export type ProfilesProps = {
 };
 
 export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
-	console.log('> RENDER Profiles');
 	const dispatch = useAppDispatch();
 	return (
 		<>

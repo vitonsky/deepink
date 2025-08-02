@@ -49,7 +49,6 @@ export class WorkerMessenger {
 
 		// Send message
 		if (this.target instanceof Worker) {
-			console.log('TO', payload, transferObjects);
 			this.target.postMessage(payload, transferObjects ?? []);
 		} else {
 			this.target.postMessage(payload, {

@@ -37,8 +37,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
-	console.log('> RENDER Workspace');
-
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
 	// Close notes by unmount

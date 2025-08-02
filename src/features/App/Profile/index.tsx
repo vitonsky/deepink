@@ -37,8 +37,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
-	console.log('> RENDER Profile');
-
 	const workspacesManager = useMemo(
 		() => new WorkspacesController(currentProfile.db),
 		[currentProfile.db],

@@ -10,8 +10,6 @@ export const NotePreview = forwardRef<
 		isSelected?: boolean;
 	} & StackProps
 >(({ title, text, meta, isSelected, ...props }, ref) => {
-	console.log('Render NotePreview');
-
 	const styles = useMultiStyleConfig('NotePreview');
 
 	return (

@@ -15,8 +15,6 @@ import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteConte
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
-	console.log('> Render NotesList');
-
 	const notesRegistry = useNotesRegistry();
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();

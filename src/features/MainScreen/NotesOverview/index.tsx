@@ -209,8 +209,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								setIsAddTagPopupOpened(true);
 							},
 							async onDelete(id) {
-								console.log('Delete tag', id);
-
 								const tag = tags.find((tag) => id === tag.id);
 								if (!tag) return;
 
@@ -222,8 +220,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								await tagsRegistry.delete(id);
 							},
 							onEdit(id) {
-								console.log('Edit tag', id);
-
 								const tag = tags.find((tag) => id === tag.id);
 
 								if (!tag) return;

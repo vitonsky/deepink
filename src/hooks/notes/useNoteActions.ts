@@ -26,11 +26,6 @@ export const useNoteActions = () => {
 			const notes = selectNotes(workspace);
 			const isNoteOpened = selectIsNoteOpened(id)(workspace);
 
-			console.log('DBG 1', {
-				isNoteOpened,
-				clickedNote: notes.find((note) => note.id === id),
-			});
-
 			if (isNoteOpened) {
 				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: id }));
 			} else {
