@@ -34,3 +34,5 @@ export const NotePreview = forwardRef<
 		</VStack>
 	);
 });
+
+NotePreview.displayName = 'NotePreview';
