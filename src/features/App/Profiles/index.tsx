@@ -34,7 +34,10 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				};
 
 				return (
-					<ProfileControlsContext.Provider value={controls}>
+					<ProfileControlsContext.Provider
+						value={controls}
+						key={profile.profile.id}
+					>
 						<Profile profile={profile} controls={controls} />
 					</ProfileControlsContext.Provider>
 				);

@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import {
@@ -9,6 +9,7 @@ import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
+import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 import { createWorkspaceSelector } from '@state/redux/profiles/utils';
@@ -34,7 +35,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	);
 
 	// Simulate note update
-	const updateNote = useCallback(
+	const updateNote = useImmutableCallback(
 		async (note: INote) => {
 			noteUpdated(note);
 			await notesRegistry.update(note.id, note.content);

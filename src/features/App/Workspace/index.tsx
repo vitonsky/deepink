@@ -14,7 +14,6 @@ import {
 } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { useProfileSyncButton } from '../Profile/ProfileStatusBar/useProfileSyncButton';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -37,8 +36,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
-
-	useProfileSyncButton();
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 

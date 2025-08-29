@@ -64,11 +64,11 @@ export const TopBar: FC<TopBarProps> = ({
 			bgColor="surface.panel"
 		>
 			<TabList
+				display="flex"
 				flexWrap="wrap"
+				overflow="hidden"
 				borderBottom="1px solid"
 				borderColor="surface.border"
-				display="grid"
-				gridTemplateColumns="repeat(auto-fit, minmax(150px, 1fr))"
 			>
 				{existsTabs.map((noteId, index) => {
 					const isActiveTab = index === tabIndex;
@@ -90,6 +90,9 @@ export const TopBar: FC<TopBarProps> = ({
 							fontWeight="600"
 							fontSize="14"
 							maxW="250px"
+							minW="150px"
+							whiteSpace="nowrap"
+							flex="1 1 auto"
 							marginBottom={0}
 							title={title}
 							onMouseDown={(evt) => {

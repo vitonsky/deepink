@@ -23,6 +23,12 @@ export const selectOpenedNotes = createWorkspaceSelector(
 	},
 );
 
+export const selectIsNoteOpened = (noteId: string) =>
+	createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
+		if (!workspace) return false;
+		return workspace.openedNotes.some((note) => note.id === noteId);
+	});
+
 export const selectNote = (noteId: string | null) =>
 	createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
 		if (!workspace) return null;

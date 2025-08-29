@@ -1,5 +1,5 @@
 /* eslint-disable spellcheck/spell-checker */
-import React from 'react';
+import React, { memo } from 'react';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
@@ -20,7 +20,7 @@ import { theme } from './theme/RichEditor';
 // TODO: support videos
 // TODO: copy markdown text by selection, not rich text
 // TODO: when user start remove markdown element - transform it to markdown and remove single char instead
-export const RichEditor = (props: RichEditorContentProps) => {
+export const RichEditor = memo((props: RichEditorContentProps) => {
 	return (
 		<LexicalComposer
 			initialConfig={{
@@ -59,4 +59,6 @@ export const RichEditor = (props: RichEditorContentProps) => {
 			<RichEditorContent {...props} />
 		</LexicalComposer>
 	);
-};
+});
+
+RichEditor.displayName = 'RichEditor';

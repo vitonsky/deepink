@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Text, VStack } from '@chakra-ui/react';
+import React, { FC, useEffect, useRef } from 'react';
+import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
@@ -7,6 +7,8 @@ import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
 
@@ -26,9 +28,38 @@ export const NotesList: FC<NotesListProps> = () => {
 		updateNotes,
 	});
 
+	const parentRef = useRef<HTMLDivElement>(null);
+	const virtualizer = useVirtualizer({
+		count: notes.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 70,
+		overscan: 5,
+	});
+
+	const items = virtualizer.getVirtualItems();
+
+	// Scroll to active note
+	const activeNoteRef = useRef<HTMLDivElement | null>(null);
+	useEffect(() => {
+		if (!activeNoteId) return;
+
+		// Skip if active note is in viewport
+		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
+			return;
+
+		const noteIndex = notes.findIndex((note) => note.id === activeNoteId);
+		if (noteIndex === -1) return;
+
+		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
+
+		// We only need scroll to active note once by its change
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [activeNoteId]);
+
 	// TODO: implement dragging and moving items
 	return (
 		<VStack
+			ref={parentRef}
 			sx={{
 				w: '100%',
 				h: '100%',
@@ -42,41 +73,67 @@ export const NotesList: FC<NotesListProps> = () => {
 					Nothing added yet
 				</Text>
 			) : (
-				<VStack
+				<Box
 					sx={{
-						w: '100%',
-						align: 'start',
-						gap: '4px',
+						display: 'block',
+						position: 'relative',
+						width: '100%',
+						height: virtualizer.getTotalSize(),
+						flexShrink: 0,
 					}}
 				>
-					{notes.map((note) => {
-						const date = note.createdTimestamp ?? note.updatedTimestamp;
-						const text = note.content.text.slice(0, 80).trim();
+					<VStack
+						sx={{
+							position: 'absolute',
+							width: '100%',
+							top: 0,
+							left: 0,
+							transform: `translateY(${items[0]?.start ?? 0}px)`,
+							gap: '4px',
+						}}
+					>
+						{virtualizer.getVirtualItems().map((virtualRow) => {
+							const note = notes[virtualRow.index];
 
-						// TODO: get preview text from DB as prepared value
-						// TODO: show attachments
-						return (
-							<NotePreview
-								key={note.id}
-								isSelected={note.id === activeNoteId}
-								title={getNoteTitle(note.content)}
-								text={text}
-								meta={
-									date && <Text>{new Date(date).toDateString()}</Text>
-								}
-								onContextMenu={(evt) => {
-									openNoteContextMenu(note.id, {
-										x: evt.pageX,
-										y: evt.pageY,
-									});
-								}}
-								onClick={() => {
-									noteActions.click(note.id);
-								}}
-							/>
-						);
-					})}
-				</VStack>
+							const date = note.createdTimestamp ?? note.updatedTimestamp;
+							const text = note.content.text.slice(0, 80).trim();
+							const isActive = note.id === activeNoteId;
+
+							// TODO: get preview text from DB as prepared value
+							// TODO: show attachments
+							return (
+								<NotePreview
+									key={note.id}
+									ref={(node) => {
+										if (isActive) {
+											activeNoteRef.current = node;
+										}
+
+										virtualizer.measureElement(node);
+									}}
+									data-index={virtualRow.index}
+									isSelected={isActive}
+									title={getNoteTitle(note.content)}
+									text={text}
+									meta={
+										date && (
+											<Text>{new Date(date).toDateString()}</Text>
+										)
+									}
+									onContextMenu={(evt) => {
+										openNoteContextMenu(note.id, {
+											x: evt.pageX,
+											y: evt.pageY,
+										});
+									}}
+									onClick={() => {
+										noteActions.click(note.id);
+									}}
+								/>
+							);
+						})}
+					</VStack>
+				</Box>
 			)}
 		</VStack>
 	);
