@@ -1,5 +1,9 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
-import { Button, Input, Text, VStack } from '@chakra-ui/react';
+import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
+import {
+	ENCRYPTION_ALGORITHM,
+	ENCRYPTION_ALGORITHM_NAMES,
+} from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -7,6 +11,7 @@ import { ProfilesForm } from '../ProfilesForm';
 export type NewProfile = {
 	name: string;
 	password: string | null;
+	algorithm: ENCRYPTION_ALGORITHM;
 };
 
 export type ProfileCreatorProps = {
@@ -31,6 +36,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
+
+	const [algorithm, setAlgorithm] = useState<ENCRYPTION_ALGORITHM>(
+		ENCRYPTION_ALGORITHM.AES,
+	);
+
 	useEffect(() => {
 		setPasswordError(null);
 	}, [password]);
@@ -56,6 +66,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			const response = await onCreateProfile({
 				name: profileName,
 				password: usePassword ? password : null,
+				algorithm: algorithm,
 			}).finally(() => {
 				setIsPending(false);
 			});
@@ -64,7 +75,14 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				setProfileNameError(response);
 			}
 		},
-		[onCreateProfile, password, passwordInputRef, profileName, profileNameInputRef],
+		[
+			onCreateProfile,
+			password,
+			passwordInputRef,
+			profileName,
+			profileNameInputRef,
+			algorithm,
+		],
 	);
 
 	return (
@@ -80,14 +98,23 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Create profile
 					</Button>
-					<Button
-						variant="secondary"
-						w="100%"
-						onClick={() => onPressCreate(false)}
-						disabled={isPending}
-					>
-						Continue with no password
-					</Button>
+					<VStack w="100%" gap={'0rem'}>
+						<Button
+							variant="secondary"
+							w="100%"
+							onClick={() => onPressCreate(false)}
+							disabled={isPending}
+						>
+							Continue with no encryption
+						</Button>
+						<Text
+							alignSelf={'start'}
+							color={'typography.additional'}
+							fontSize={'14px'}
+						>
+							Insecure: your data will not be encrypted
+						</Text>
+					</VStack>
 					<Button
 						variant="secondary"
 						w="100%"
@@ -130,6 +157,30 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 					{passwordError && <Text color="red.500">{passwordError}</Text>}
 				</VStack>
+
+				<HStack w="100%">
+					<Text
+						minW={'max-content'}
+						color="typography.additional"
+						fontSize="18px"
+					>
+						Encryption algorithm
+					</Text>
+					<Select
+						variant="secondary"
+						defaultValue="aes"
+						onChange={(evt) =>
+							setAlgorithm(evt.target.value as ENCRYPTION_ALGORITHM)
+						}
+						disabled={isPending}
+					>
+						{[...Object.values(ENCRYPTION_ALGORITHM)].map((algorithm) => (
+							<option key={algorithm} value={algorithm}>
+								{ENCRYPTION_ALGORITHM_NAMES[algorithm]}
+							</option>
+						))}
+					</Select>
+				</HStack>
 			</VStack>
 		</ProfilesForm>
 	);

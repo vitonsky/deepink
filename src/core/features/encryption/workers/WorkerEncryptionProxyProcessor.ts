@@ -5,9 +5,15 @@ import { WorkerRPC } from '@utils/workers/WorkerRPC';
 import { IEncryptionProcessor } from '../../../encryption';
 import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
+import { ENCRYPTION_ALGORITHM } from '../algorithms';
 import EncryptionWorker from './Cryptography.worker';
 
-// TODO: provide algorithm parameters
+export type EncryptionConfig = {
+	key: string | ArrayBuffer;
+	salt: ArrayBuffer;
+	algorithm: ENCRYPTION_ALGORITHM;
+};
+
 /**
  * Transparent proxy an encryption requests to a worker
  * Useful to prevent main thread blocking for a long-term cryptographic operations
@@ -16,12 +22,12 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly worker;
 	private readonly messenger;
 	private readonly requests;
-	constructor(secretKey: string | ArrayBuffer, salt: ArrayBuffer) {
+	constructor({ key, salt, algorithm }: EncryptionConfig) {
 		const worker = new EncryptionWorker();
 		this.messenger = new WorkerMessenger(worker);
 		this.requests = new WorkerRPC(this.messenger);
 		this.worker = this.requests
-			.sendRequest('init', { secretKey, salt })
+			.sendRequest('init', { key, salt, algorithm })
 			.then(() => worker);
 	}
 
