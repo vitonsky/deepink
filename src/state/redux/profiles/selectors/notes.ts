@@ -61,3 +61,12 @@ export const selectActiveNote = createWorkspaceSelector(
 		return notes.find((note) => note.id === activeNote) ?? null;
 	},
 );
+
+export const selectRecentlyClosedNotes = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return null;
+
+		return workspace.recentlyClosedNotes ?? null;
+	},
+);

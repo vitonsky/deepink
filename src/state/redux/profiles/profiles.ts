@@ -20,6 +20,7 @@ export const createWorkspaceObject = (workspace: { id: string; name: string }) =
 	touched: false,
 
 	activeNote: null,
+	recentlyClosedNotes: [],
 	openedNotes: [],
 	notes: [],
 
@@ -50,6 +51,7 @@ export type WorkspaceData = {
 	touched: boolean;
 
 	activeNote: NoteId | null;
+	recentlyClosedNotes: NoteId[];
 	openedNotes: INote[];
 	notes: INote[];
 
@@ -185,6 +187,12 @@ export const profilesSlice = createSlice({
 			if (foundNoteInList) return;
 
 			workspace.openedNotes.push(note);
+
+			if (workspace.recentlyClosedNotes.includes(note.id)) {
+				workspace.recentlyClosedNotes = workspace.recentlyClosedNotes.filter(
+					(id) => id !== note.id,
+				);
+			}
 		},
 
 		removeOpenedNote: (
@@ -206,6 +214,8 @@ export const profilesSlice = createSlice({
 					: findNearNote(openedNotes, activeNote)?.id ?? null;
 			workspace.openedNotes =
 				filteredNotes.length !== openedNotes.length ? filteredNotes : openedNotes;
+
+			workspace.recentlyClosedNotes.push(noteId);
 		},
 
 		updateOpenedNote: (
