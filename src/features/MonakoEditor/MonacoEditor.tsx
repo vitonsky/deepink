@@ -55,6 +55,7 @@ export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	setValue?: (value: string) => void;
 	editorObjectRef?: RefObject<EditorObject>;
 	uploadFile: FileUploader;
+	readOnly: boolean;
 };
 
 /**
@@ -66,6 +67,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	setValue,
 	editorObjectRef,
 	uploadFile,
+	readOnly,
 	...props
 }) => {
 	const setValueRef = useRef(setValue);
@@ -106,6 +108,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			quickSuggestions: false,
 			unicodeHighlight: { ambiguousCharacters: false, invisibleCharacters: true },
 			folding: false,
+			readOnly,
 		});
 
 		editorRef.current = monacoEditor;
@@ -167,6 +170,12 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			editor.setValue(value);
 		}
 	});
+
+	useEffect(() => {
+		if (editorRef.current) {
+			editorRef.current.updateOptions({ readOnly });
+		}
+	}, [readOnly]);
 
 	// Handle drop file
 	useDropFiles({ editor: editorObject, uploadFile });

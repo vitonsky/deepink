@@ -52,6 +52,15 @@ const migrations = [
 			})();
 		},
 	},
+	{
+		version: 5,
+		up: async (db: MigrationsTarget) => {
+			db.transaction(() => {
+				db.exec(`ALTER TABLE notes
+					ADD COLUMN isDeleted INTEGER NOT NULL DEFAULT 0`);
+			})();
+		},
+	},
 ] as const;
 
 export const latestSchemaVersion = migrations[migrations.length - 1].version;

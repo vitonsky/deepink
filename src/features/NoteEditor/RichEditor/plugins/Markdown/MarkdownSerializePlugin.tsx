@@ -16,11 +16,13 @@ export const isFocusedElement = (element: HTMLElement | null) => {
 export type MarkdownSerializePluginProps = {
 	value: string;
 	onChanged?: (value: string) => void;
+	setEditableMode?: (editable: boolean) => void;
 };
 
 export const MarkdownSerializePlugin = ({
 	value,
 	onChanged,
+	setEditableMode,
 }: MarkdownSerializePluginProps) => {
 	const [editor] = useLexicalComposerContext();
 
@@ -35,7 +37,7 @@ export const MarkdownSerializePlugin = ({
 		// to prevent forced focus on editor
 		const isActiveBeforeUpdate = isFocusedElement(editor.getRootElement());
 		if (!isActiveBeforeUpdate && isEditable) {
-			editor.setEditable(false);
+			if (setEditableMode) setEditableMode(false);
 		}
 
 		editor.update(
@@ -45,13 +47,11 @@ export const MarkdownSerializePlugin = ({
 			{
 				onUpdate() {
 					// Restore editable state once update completed
-					if (isEditable !== editor.isEditable()) {
-						editor.setEditable(isEditable);
-					}
+					if (setEditableMode) setEditableMode(isEditable);
 				},
 			},
 		);
-	}, [editor, value]);
+	}, [editor, setEditableMode, value]);
 
 	const onChange = (value: string) => {
 		serializedValueRef.current = value;
