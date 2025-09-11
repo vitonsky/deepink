@@ -57,7 +57,7 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	for (const algorithm of algorithmList) {
 		if (algorithm === ENCRYPTION_ALGORITHM.AES) {
 			ciphers.push(await getAESCipher());
-		} else if (ENCRYPTION_ALGORITHM.TWOFISH) {
+		} else if (algorithm === ENCRYPTION_ALGORITHM.TWOFISH) {
 			ciphers.push(await getTwofishCipher());
 		} else {
 			throw new Error(
