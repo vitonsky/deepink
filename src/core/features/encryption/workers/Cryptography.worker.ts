@@ -51,22 +51,20 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 
 	const ciphers = [];
 
-	if (typeof algorithm !== 'string') return;
+	if (typeof algorithm !== 'string') throw new Error('Algorithm is not a String');
+
 	const algorithmList = algorithm.split('-').map((a) => a.trim());
 	for (const algorithm of algorithmList) {
-		switch (algorithm) {
-			case ENCRYPTION_ALGORITHM.AES:
-				ciphers.push(await getAESCipher());
-				break;
-			case ENCRYPTION_ALGORITHM.TWOFISH:
-				ciphers.push(await getTwofishCipher());
-				break;
-			default:
-				throw new Error(
-					`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${Object.values(
-						ENCRYPTION_ALGORITHM,
-					).join(', ')}`,
-				);
+		if (algorithm === ENCRYPTION_ALGORITHM.AES) {
+			ciphers.push(await getAESCipher());
+		} else if (ENCRYPTION_ALGORITHM.TWOFISH) {
+			ciphers.push(await getTwofishCipher());
+		} else {
+			throw new Error(
+				`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${Object.values(
+					ENCRYPTION_ALGORITHM,
+				).join(', ')}`,
+			);
 		}
 	}
 
