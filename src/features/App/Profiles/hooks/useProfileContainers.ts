@@ -3,7 +3,7 @@ import { useUnit } from 'effector-react';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
-import { ENCRYPTION_ALGORITHM } from '@core/features/encryption/algorithms';
+import { ENCRYPTION_ALGORITHM_LIST } from '@core/features/encryption/algorithms';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { FileController } from '@core/features/files/FileController';
 import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
@@ -33,7 +33,7 @@ const decryptKey = async ({
 	encryptedKey: ArrayBuffer;
 	password: string;
 	salt: ArrayBuffer;
-	algorithm: ENCRYPTION_ALGORITHM;
+	algorithm: ENCRYPTION_ALGORITHM_LIST;
 }) => {
 	const encryption = await createEncryption({ key: password, salt, algorithm });
 	return encryption

@@ -10,7 +10,7 @@ import { PipelineProcessor } from '../../../encryption/processors/PipelineProces
 import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
 import { getRandomBytes } from '../../../encryption/utils/random';
 
-import { ENCRYPTION_ALGORITHM } from '../algorithms';
+import { ENCRYPTION_ALGORITHM, ENCRYPTION_ALGORITHM_NAMES } from '../algorithms';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -52,18 +52,18 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	const ciphers = [];
 
 	if (typeof algorithm !== 'string') throw new Error('Algorithm is not a String');
-
 	const algorithmList = algorithm.split('-').map((a) => a.trim());
-	for (const algorithm of algorithmList) {
-		if (algorithm === ENCRYPTION_ALGORITHM.AES) {
+
+	for (const algorithmName of algorithmList) {
+		if (algorithmName === ENCRYPTION_ALGORITHM.AES) {
 			ciphers.push(await getAESCipher());
-		} else if (algorithm === ENCRYPTION_ALGORITHM.TWOFISH) {
+		} else if (algorithmName === ENCRYPTION_ALGORITHM.TWOFISH) {
 			ciphers.push(await getTwofishCipher());
 		} else {
 			throw new Error(
-				`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${Object.values(
-					ENCRYPTION_ALGORITHM,
-				).join(', ')}`,
+				`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${ENCRYPTION_ALGORITHM_NAMES.join(
+					', ',
+				)}`,
 			);
 		}
 	}

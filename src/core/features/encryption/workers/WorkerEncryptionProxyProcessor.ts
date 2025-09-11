@@ -5,13 +5,13 @@ import { WorkerRPC } from '@utils/workers/WorkerRPC';
 import { IEncryptionProcessor } from '../../../encryption';
 import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
-import { ENCRYPTION_ALGORITHM } from '../algorithms';
+import { ENCRYPTION_ALGORITHM_LIST } from '../algorithms';
 import EncryptionWorker from './Cryptography.worker';
 
 export type EncryptionConfig = {
 	key: string | ArrayBuffer;
 	salt: ArrayBuffer;
-	algorithm: ENCRYPTION_ALGORITHM;
+	algorithm: ENCRYPTION_ALGORITHM_LIST;
 };
 
 /**

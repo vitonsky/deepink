@@ -1,7 +1,7 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
 import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
 import {
-	ENCRYPTION_ALGORITHM,
+	ENCRYPTION_ALGORITHM_LIST,
 	ENCRYPTION_ALGORITHM_NAMES,
 } from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
@@ -11,7 +11,7 @@ import { ProfilesForm } from '../ProfilesForm';
 export type NewProfile = {
 	name: string;
 	password: string | null;
-	algorithm: ENCRYPTION_ALGORITHM;
+	algorithm: ENCRYPTION_ALGORITHM_LIST;
 };
 
 export type ProfileCreatorProps = {
@@ -37,8 +37,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
 
-	const [algorithm, setAlgorithm] = useState<ENCRYPTION_ALGORITHM>(
-		ENCRYPTION_ALGORITHM.AES,
+	const [algorithm, setAlgorithm] = useState<ENCRYPTION_ALGORITHM_LIST>(
+		ENCRYPTION_ALGORITHM_NAMES[0],
 	);
 
 	useEffect(() => {
@@ -84,6 +84,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			algorithm,
 		],
 	);
+
+	// console.log(ENCRYPTION_LIST_NAMES);
 
 	return (
 		<ProfilesForm
@@ -170,13 +172,13 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						variant="secondary"
 						defaultValue="aes"
 						onChange={(evt) =>
-							setAlgorithm(evt.target.value as ENCRYPTION_ALGORITHM)
+							setAlgorithm(evt.target.value as ENCRYPTION_ALGORITHM_LIST)
 						}
 						disabled={isPending}
 					>
-						{[...Object.values(ENCRYPTION_ALGORITHM)].map((algorithm) => (
+						{ENCRYPTION_ALGORITHM_NAMES.map((algorithm) => (
 							<option key={algorithm} value={algorithm}>
-								{ENCRYPTION_ALGORITHM_NAMES[algorithm]}
+								{algorithm.split('-').join(' -> ')}
 							</option>
 						))}
 					</Select>
