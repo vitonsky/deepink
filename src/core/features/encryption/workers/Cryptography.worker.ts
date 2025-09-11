@@ -49,24 +49,28 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 		return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
 	};
 
-	const ciphers = [];
-
-	if (typeof algorithm !== 'string') throw new Error('Algorithm is not a String');
+	if (typeof algorithm !== 'string') {
+		throw new Error('Algorithm is not a string');
+	}
 	const algorithmList = algorithm.split('-').map((a) => a.trim());
 
-	for (const algorithmName of algorithmList) {
-		if (algorithmName === ENCRYPTION_ALGORITHM.AES) {
-			ciphers.push(await getAESCipher());
-		} else if (algorithmName === ENCRYPTION_ALGORITHM.TWOFISH) {
-			ciphers.push(await getTwofishCipher());
-		} else {
-			throw new Error(
-				`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${ENCRYPTION_ALGORITHM_NAMES.join(
-					', ',
-				)}`,
-			);
-		}
-	}
+	const cipherMap: Record<string, () => Promise<AESGCMCipher | TwofishCTRCipher>> = {
+		[ENCRYPTION_ALGORITHM.AES]: getAESCipher,
+		[ENCRYPTION_ALGORITHM.TWOFISH]: getTwofishCipher,
+	};
+	const ciphers = await Promise.all(
+		algorithmList.map((name) => {
+			const getCipher = cipherMap[name];
+			if (!getCipher) {
+				throw new Error(
+					`Unsupported encryption algorithm: ${algorithm}. Supported: ${ENCRYPTION_ALGORITHM_NAMES.join(
+						', ',
+					)}`,
+				);
+			}
+			return getCipher();
+		}),
+	);
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
