@@ -49,26 +49,25 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 		return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
 	};
 
-	let ciphers;
-	switch (algorithm) {
-		case ENCRYPTION_ALGORITHM.AES:
-			ciphers = [await getAESCipher()];
-			break;
-		case ENCRYPTION_ALGORITHM.TWOFISH:
-			ciphers = [await getTwofishCipher()];
-			break;
-		case ENCRYPTION_ALGORITHM.AES_TWOFISH:
-			ciphers = await Promise.all([getAESCipher(), getTwofishCipher()]);
-			break;
-		case ENCRYPTION_ALGORITHM.TWOFISH_AES:
-			ciphers = await Promise.all([getTwofishCipher(), getAESCipher()]);
-			break;
-		default:
-			throw new Error(
-				`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${Object.values(
-					ENCRYPTION_ALGORITHM,
-				).join(', ')}`,
-			);
+	const ciphers = [];
+
+	if (typeof algorithm !== 'string') return;
+	const algorithmList = algorithm.split('-').map((a) => a.trim());
+	for (const algorithm of algorithmList) {
+		switch (algorithm) {
+			case ENCRYPTION_ALGORITHM.AES:
+				ciphers.push(await getAESCipher());
+				break;
+			case ENCRYPTION_ALGORITHM.TWOFISH:
+				ciphers.push(await getTwofishCipher());
+				break;
+			default:
+				throw new Error(
+					`Provided unsupported encryption algorithm: ${algorithm}. Supported algorithms are: ${Object.values(
+						ENCRYPTION_ALGORITHM,
+					).join(', ')}`,
+				);
+		}
 	}
 
 	encryptionController = new EncryptionController(
