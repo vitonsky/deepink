@@ -2,7 +2,12 @@ import { useCallback } from 'react';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveTag, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	NOTES_VIEW,
+	selectActiveTag,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 
 export const useUpdateNotes = () => {
 	const dispatch = useAppDispatch();
@@ -10,10 +15,21 @@ export const useUpdateNotes = () => {
 
 	const notesRegistry = useNotesRegistry();
 	const activeTag = useWorkspaceSelector(selectActiveTag);
+	const notesView = useWorkspaceSelector(selectNotesView);
 
 	return useCallback(async () => {
-		const tags = activeTag === null ? [] : [activeTag.id];
-		const notes = await notesRegistry.get({ limit: 10000, tags });
+		const deleted = notesView === NOTES_VIEW.BIN ? true : false;
+		const tags =
+			activeTag !== null && notesView === NOTES_VIEW.All_NOTES
+				? [activeTag.id]
+				: [];
+
+		const notes = await notesRegistry.get({
+			limit: 10000,
+			tags,
+			deleted,
+		});
+
 		notes.sort((a, b) => {
 			const timeA = a.updatedTimestamp ?? a.createdTimestamp ?? 0;
 			const timeB = b.updatedTimestamp ?? b.createdTimestamp ?? 0;
@@ -24,5 +40,5 @@ export const useUpdateNotes = () => {
 		});
 
 		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
-	}, [activeTag, dispatch, notesRegistry, workspaceData]);
+	}, [activeTag, dispatch, notesView, notesRegistry, workspaceData]);
 };

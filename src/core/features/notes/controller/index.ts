@@ -21,6 +21,11 @@ export type NotesControllerFetchOptions = {
 	 * Filter notes by tags
 	 */
 	tags?: string[];
+
+	/**
+	 * Filter notes by deleted status
+	 */
+	deleted?: boolean;
 };
 
 /**
@@ -56,4 +61,9 @@ export interface INotesController {
 	 * Deletes all notes with specified ids
 	 */
 	delete(ids: NoteId[]): Promise<void>;
+
+	/**
+	 * Updates the status of specific notes
+	 */
+	updateStatus(ids: NoteId[], status: { deleted: boolean }): Promise<void>;
 }

@@ -15,6 +15,11 @@ const selectWorkspaceObject = (
 	return profile.workspaces[workspaceId] ?? null;
 };
 
+export enum NOTES_VIEW {
+	All_NOTES = 'All notes',
+	BIN = 'Bin',
+}
+
 export const createWorkspaceObject = (workspace: { id: string; name: string }) => ({
 	...workspace,
 	touched: false,
@@ -22,6 +27,8 @@ export const createWorkspaceObject = (workspace: { id: string; name: string }) =
 	activeNote: null,
 	openedNotes: [],
 	notes: [],
+
+	view: NOTES_VIEW.All_NOTES,
 
 	tags: {
 		selected: null,
@@ -52,6 +59,8 @@ export type WorkspaceData = {
 	activeNote: NoteId | null;
 	openedNotes: INote[];
 	notes: INote[];
+
+	view: NOTES_VIEW;
 
 	tags: {
 		selected: string | null;
@@ -251,14 +260,13 @@ export const profilesSlice = createSlice({
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
-			workspace.tags.selected = tag;
-
 			// Reset selected if no tag exist
-			const isSelectedTagExists = workspace.tags.list.some(
-				({ id }) => id === workspace.tags.selected,
-			);
-			if (!isSelectedTagExists) {
-				workspace.tags.selected = null;
+			workspace.tags.selected =
+				tag && workspace.tags.list.some(({ id }) => id === tag) ? tag : null;
+
+			// Only all notes list may be filtered by tags
+			if (workspace.tags.selected) {
+				workspace.view = NOTES_VIEW.All_NOTES;
 			}
 		},
 
@@ -278,6 +286,20 @@ export const profilesSlice = createSlice({
 				({ id }) => id === workspace.tags.selected,
 			);
 			if (!isSelectedTagExists) {
+				workspace.tags.selected = null;
+			}
+		},
+		setView: (
+			state,
+			{
+				payload: { profileId, workspaceId, view },
+			}: PayloadAction<WorkspaceScoped<{ view: NOTES_VIEW }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.view = view;
+			if (view !== NOTES_VIEW.All_NOTES) {
 				workspace.tags.selected = null;
 			}
 		},
