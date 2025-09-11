@@ -19,6 +19,10 @@ export type ProfileCreatorProps = {
 	onCancel: () => void;
 };
 
+function isValidAlgorithm(value: string): value is ENCRYPTION_ALGORITHM_LIST {
+	return ENCRYPTION_ALGORITHM_NAMES.includes(value as ENCRYPTION_ALGORITHM_LIST);
+}
+
 export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	onCreateProfile,
 	onCancel,
@@ -84,8 +88,6 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			algorithm,
 		],
 	);
-
-	// console.log(ENCRYPTION_LIST_NAMES);
 
 	return (
 		<ProfilesForm
@@ -171,9 +173,10 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Select
 						variant="secondary"
 						defaultValue="aes"
-						onChange={(evt) =>
-							setAlgorithm(evt.target.value as ENCRYPTION_ALGORITHM_LIST)
-						}
+						onChange={(evt) => {
+							if (isValidAlgorithm(evt.target.value))
+								setAlgorithm(evt.target.value);
+						}}
 						disabled={isPending}
 					>
 						{ENCRYPTION_ALGORITHM_NAMES.map((algorithm) => (
