@@ -29,7 +29,7 @@ export const useNotesShortcuts = () => {
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
 
-	useCommandSubscription(GLOBAL_COMMANDS.OPEN_NEXT_NOTE, () => {
+	useCommandSubscription(GLOBAL_COMMANDS.NAVIGATE_NOTE_RIGHT, () => {
 		// switch only if 2 or more notes are opened
 		if (!activeNoteId || openedNotes.length < 2) return;
 
@@ -41,7 +41,7 @@ export const useNotesShortcuts = () => {
 		noteActions.click(openedNotes[nextIndex].id);
 	});
 
-	useCommandSubscription(GLOBAL_COMMANDS.OPEN_PREVIOUSLY_NOTE, () => {
+	useCommandSubscription(GLOBAL_COMMANDS.NAVIGATE_NOTE_LEFT, () => {
 		// switch only if 2 or more notes are opened
 		if (!activeNoteId || openedNotes.length < 2) return;
 
