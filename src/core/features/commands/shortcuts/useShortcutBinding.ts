@@ -12,7 +12,7 @@ import { useCallNamedCommand } from '../commandHooks';
  */
 export const useShortcutBinding = () => {
 	const shortcuts = useSelector(selectShortcuts);
-	const call = useCallNamedCommand();
+	const callCommand = useCallNamedCommand();
 
 	useEffect(() => {
 		// by default hotkeys library ignores INPUT, SELECT, and TEXTAREA elements, force handling of shortcuts
@@ -25,7 +25,7 @@ export const useShortcutBinding = () => {
 				{
 					capture: true,
 				},
-				() => call(commandName),
+				() => callCommand(commandName),
 			);
 		});
 
@@ -34,5 +34,5 @@ export const useShortcutBinding = () => {
 				hotkeys.unbind(shortcut);
 			});
 		};
-	}, [shortcuts, call]);
+	}, [shortcuts, callCommand]);
 };
