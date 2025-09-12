@@ -1,14 +1,12 @@
 import { TextEncoder } from 'node:util';
 
-import { ENCRYPTION_ALGORITHM_LIST } from '@core/features/encryption/algorithms';
-
 import { IFilesStorage } from '../features/files';
 
 export type ProfileObject = {
 	id: string;
 	name: string;
 	encryption: null | {
-		algorithm: ENCRYPTION_ALGORITHM_LIST;
+		algorithm: string;
 		salt: string;
 		key: ArrayBuffer;
 	};
