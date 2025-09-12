@@ -27,7 +27,7 @@ export const useNoteShortcutActions = () => {
 		noteActions.close(activeNoteId);
 	});
 
-	useCommandSubscription(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
+	useCommandSubscription(GLOBAL_COMMANDS.REOPEN_CLOSED_NOTE, () => {
 		if (recentlyClosedNotes.length === 0) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
