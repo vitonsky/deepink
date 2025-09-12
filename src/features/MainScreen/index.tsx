@@ -1,9 +1,11 @@
 import React, { FC, useEffect } from 'react';
 import { HStack, VStack } from '@chakra-ui/react';
+import { useShortcutBinding } from '@core/features/commands/shortcuts/useShortcutBinding';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
+import { useNoteShortcutActions } from '@hooks/notes/useNoteShortcutActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
@@ -29,6 +31,9 @@ export const MainScreen: FC = () => {
 			}
 		});
 	}, [tagsRegistry, updateNotes]);
+
+	useShortcutBinding();
+	useNoteShortcutActions();
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
