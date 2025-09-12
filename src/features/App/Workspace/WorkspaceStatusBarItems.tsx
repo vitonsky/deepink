@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
 import { GLOBAL_COMMANDS } from '@core/features/commands';
-import { useCommandSubscription } from '@core/features/commands/shortcuts/commandHooks';
+import { useCommandSubscription } from '@core/features/commands/commandHooks';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
 
