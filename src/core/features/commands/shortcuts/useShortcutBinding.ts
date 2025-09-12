@@ -7,14 +7,16 @@ import { useCallNamedCommand } from '../commandHooks';
 
 /**
  * Binds keyboard shortcuts to commands
+ *
+ * Pressing a shortcut executes the corresponding command
  */
 export const useShortcutBinding = () => {
 	const shortcuts = useSelector(selectShortcuts);
-	const execute = useCallNamedCommand();
+	const call = useCallNamedCommand();
 
 	useEffect(() => {
-		// Hotkeys are normally disabled on INPUT, SELECT, and TEXTAREA elements
-		// force handling shortcuts regardless of focus
+		// by default hotkeys library ignores INPUT, SELECT, and TEXTAREA elements, force handling of shortcuts
+		// https://github.com/jaywcjlove/hotkeys-js?tab=readme-ov-file#filter
 		hotkeys.filter = () => true;
 
 		Object.entries(shortcuts).forEach(([shortcut, commandName]) => {
@@ -23,9 +25,7 @@ export const useShortcutBinding = () => {
 				{
 					capture: true,
 				},
-				() => {
-					execute(commandName);
-				},
+				() => call(commandName),
 			);
 		});
 
@@ -34,5 +34,5 @@ export const useShortcutBinding = () => {
 				hotkeys.unbind(shortcut);
 			});
 		};
-	}, [shortcuts, execute]);
+	}, [shortcuts, call]);
 };
