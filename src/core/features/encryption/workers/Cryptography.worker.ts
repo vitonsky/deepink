@@ -53,8 +53,9 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 		},
 	};
 
-	const algorithmList = parseAlgorithmList(algorithm);
-	const ciphers = await Promise.all(algorithmList.map((name) => cipherMap[name]()));
+	const ciphers = await Promise.all(
+		parseAlgorithmList(algorithm).map((name) => cipherMap[name]()),
+	);
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
