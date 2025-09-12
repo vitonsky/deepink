@@ -9,7 +9,10 @@ import {
 	selectRecentlyClosedNotes,
 } from '@state/redux/profiles/profiles';
 
-export const useNotesShortcuts = () => {
+/**
+ * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore, and navigation
+ */
+export const useNoteShortcutActions = () => {
 	const noteActions = useNoteActions();
 	const createNote = useCreateNote();
 
@@ -25,7 +28,7 @@ export const useNotesShortcuts = () => {
 	});
 
 	useCommandSubscription(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
-		if (!recentlyClosedNotes || recentlyClosedNotes.length === 0) return;
+		if (recentlyClosedNotes.length === 0) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
 
@@ -36,7 +39,7 @@ export const useNotesShortcuts = () => {
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		const isLastNote = currentIndex + 1 === openedNotes.length;
 
-		// If the current note is the last in the array, go back to the first
+		// If the current note is the last in the array, go back to the first note
 		const nextIndex = isLastNote ? 0 : currentIndex + 1;
 		noteActions.click(openedNotes[nextIndex].id);
 	});
@@ -48,7 +51,7 @@ export const useNotesShortcuts = () => {
 		const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		const isFirstNote = currentIndex === 0;
 
-		// If the current note is the first in the array, go to the last
+		// If the current note is the first in the array, go to the last note
 		const previouslyIndex = isFirstNote ? openedNotes.length - 1 : currentIndex - 1;
 		noteActions.click(openedNotes[previouslyIndex].id);
 	});
