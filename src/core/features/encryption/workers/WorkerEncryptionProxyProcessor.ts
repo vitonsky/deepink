@@ -21,13 +21,11 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly worker;
 	private readonly messenger;
 	private readonly requests;
-	constructor({ key, salt, algorithm }: EncryptionConfig) {
+	constructor(config: EncryptionConfig) {
 		const worker = new EncryptionWorker();
 		this.messenger = new WorkerMessenger(worker);
 		this.requests = new WorkerRPC(this.messenger);
-		this.worker = this.requests
-			.sendRequest('init', { key, salt, algorithm })
-			.then(() => worker);
+		this.worker = this.requests.sendRequest('init', config).then(() => worker);
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
