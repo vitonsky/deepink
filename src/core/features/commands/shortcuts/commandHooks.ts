@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import hotkeys from 'hotkeys-js';
 import { selectShortcuts } from '@state/redux/settings/settings';
 
-import { CommandEvent, useCommandEvent } from './CommandEventProvider';
+import { CommandEvent, useCommandEvent } from '../CommandEventProvider';
 import { GLOBAL_COMMANDS } from '..';
 
 /**
