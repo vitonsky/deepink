@@ -1,7 +1,7 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
-import { CommandEventProvider } from '@core/features/shortcuts/CommandEventProvider';
+import { CommandEventProvider } from '@core/features/commands/shortcuts/CommandEventProvider';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
