@@ -1,6 +1,6 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
 import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
-import { AVAILABLE_ENCRYPTION_ALGORITHMS } from '@core/features/encryption/algorithms';
+import { ENCRYPTION_ALGORITHMS_LIST } from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -34,7 +34,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
 
-	const [algorithm, setAlgorithm] = useState(AVAILABLE_ENCRYPTION_ALGORITHMS[0]);
+	const [algorithm, setAlgorithm] = useState(ENCRYPTION_ALGORITHMS_LIST[0]);
 
 	useEffect(() => {
 		setPasswordError(null);
@@ -167,7 +167,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						onChange={(evt) => setAlgorithm(evt.target.value)}
 						disabled={isPending}
 					>
-						{AVAILABLE_ENCRYPTION_ALGORITHMS.map((algorithm) => (
+						{ENCRYPTION_ALGORITHMS_LIST.map((algorithm) => (
 							<option key={algorithm} value={algorithm}>
 								{algorithm.split('-').join(' -> ')}
 							</option>

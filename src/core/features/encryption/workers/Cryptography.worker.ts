@@ -12,7 +12,7 @@ import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/k
 import { getRandomBytes } from '../../../encryption/utils/random';
 
 import { ENCRYPTION_ALGORITHM } from '../algorithms';
-import { parseAlgorithmList } from '../utils';
+import { parseAlgorithms } from '../utils';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -54,7 +54,7 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	};
 
 	const ciphers = await Promise.all(
-		parseAlgorithmList(algorithm).map((name) => cipherMap[name]()),
+		parseAlgorithms(algorithm).map((name) => cipherMap[name]()),
 	);
 
 	encryptionController = new EncryptionController(
