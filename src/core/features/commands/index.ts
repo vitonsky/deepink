@@ -12,17 +12,17 @@ export enum GLOBAL_COMMANDS {
 	/**
 	 * Reopen the last closed note
 	 */
-	RESTORE_CLOSED_NOTE = 'restoreNote',
+	REOPEN_CLOSED_NOTE = 'reopenClosedNote',
 
 	/**
 	 * Move to the note on the left
 	 */
-	NAVIGATE_NOTE_LEFT = 'openPreviouslyNote',
+	NAVIGATE_NOTE_LEFT = 'navigateNoteLeft',
 
 	/**
 	 * Move to the note on the right
 	 */
-	NAVIGATE_NOTE_RIGHT = 'openNextNote',
+	NAVIGATE_NOTE_RIGHT = 'navigateNoteRight',
 
 	/**
 	 * Lock the user profile
