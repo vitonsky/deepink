@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { HStack, VStack } from '@chakra-ui/react';
-import { useShortcutBinding } from '@core/features/shortcuts/commandHooks';
+import { useShortcutBinding } from '@core/features/commands/shortcuts/commandHooks';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
