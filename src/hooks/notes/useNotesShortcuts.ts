@@ -1,5 +1,5 @@
 import { GLOBAL_COMMANDS } from '@core/features/commands';
-import { useCommandSubscription } from '@core/features/commands/shortcuts/commandHooks';
+import { useCommandSubscription } from '@core/features/commands/commandHooks';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
