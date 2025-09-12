@@ -11,7 +11,8 @@ import { PipelineProcessor } from '../../../encryption/processors/PipelineProces
 import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
 import { getRandomBytes } from '../../../encryption/utils/random';
 
-import { ENCRYPTION_ALGORITHM, ENCRYPTION_ALGORITHM_LIST } from '../algorithms';
+import { ENCRYPTION_ALGORITHM } from '../algorithms';
+import { parseAlgorithms } from '../utils';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -21,24 +22,6 @@ console.log('Hello world from worker');
 let encryptionController: EncryptionController | null = null;
 const messenger = new WorkerMessenger(self);
 const requests = new WorkerRPC(messenger);
-
-function isValidAlgorithm(algorithm: string): algorithm is ENCRYPTION_ALGORITHM {
-	return Object.values(ENCRYPTION_ALGORITHM).includes(
-		algorithm as ENCRYPTION_ALGORITHM,
-	);
-}
-function parseAlgorithms(algorithms: string) {
-	return algorithms.split('-').map((name) => {
-		if (!isValidAlgorithm(name)) {
-			throw new Error(
-				`Unsupported encryption algorithm: ${algorithms}. Supported: ${ENCRYPTION_ALGORITHM_LIST.join(
-					', ',
-				)}`,
-			);
-		}
-		return name;
-	});
-}
 
 const workerId = performance.now();
 requests.addHandler('init', async ({ key, salt, algorithm }) => {
