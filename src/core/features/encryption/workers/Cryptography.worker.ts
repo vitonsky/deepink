@@ -1,3 +1,4 @@
+import { IEncryptionProcessor } from '@core/encryption';
 import { AESGCMCipher } from '@core/encryption/ciphers/AES';
 import { TwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
 import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
@@ -10,7 +11,7 @@ import { PipelineProcessor } from '../../../encryption/processors/PipelineProces
 import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
 import { getRandomBytes } from '../../../encryption/utils/random';
 
-import { ENCRYPTION_ALGORITHM, ENCRYPTION_ALGORITHM_NAMES } from '../algorithms';
+import { ENCRYPTION_ALGORITHM, ENCRYPTION_ALGORITHM_LIST } from '../algorithms';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -20,6 +21,24 @@ console.log('Hello world from worker');
 let encryptionController: EncryptionController | null = null;
 const messenger = new WorkerMessenger(self);
 const requests = new WorkerRPC(messenger);
+
+function isValidAlgorithm(algorithm: string): algorithm is ENCRYPTION_ALGORITHM {
+	return Object.values(ENCRYPTION_ALGORITHM).includes(
+		algorithm as ENCRYPTION_ALGORITHM,
+	);
+}
+function parseAlgorithms(algorithms: string) {
+	return algorithms.split('-').map((name) => {
+		if (!isValidAlgorithm(name)) {
+			throw new Error(
+				`Unsupported encryption algorithm: ${algorithms}. Supported: ${ENCRYPTION_ALGORITHM_LIST.join(
+					', ',
+				)}`,
+			);
+		}
+		return name;
+	});
+}
 
 const workerId = performance.now();
 requests.addHandler('init', async ({ key, salt, algorithm }) => {
@@ -37,40 +56,22 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 		getDerivedKeysManager(masterKey, salt),
 	);
 
-	const getAESCipher = async () => {
-		const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-			name: 'AES-GCM',
-			length: 256,
-		});
-		return new AESGCMCipher(key, getRandomBytes);
-	};
-	const getTwofishCipher = async () => {
-		const key = await derivedKeys.getDerivedBytes('twofish-ctr-cipher', 256);
-		return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
+	const cipherMap: Record<string, () => Promise<IEncryptionProcessor>> = {
+		[ENCRYPTION_ALGORITHM.AES]: async () => {
+			const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
+				name: 'AES-GCM',
+				length: 256,
+			});
+			return new AESGCMCipher(key, getRandomBytes);
+		},
+		[ENCRYPTION_ALGORITHM.TWOFISH]: async () => {
+			const key = await derivedKeys.getDerivedBytes('twofish-ctr-cipher', 256);
+			return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
+		},
 	};
 
-	if (typeof algorithm !== 'string') {
-		throw new Error('Algorithm is not a string');
-	}
-	const algorithmList = algorithm.split('-').map((a) => a.trim());
-
-	const cipherMap: Record<string, () => Promise<AESGCMCipher | TwofishCTRCipher>> = {
-		[ENCRYPTION_ALGORITHM.AES]: getAESCipher,
-		[ENCRYPTION_ALGORITHM.TWOFISH]: getTwofishCipher,
-	};
-	const ciphers = await Promise.all(
-		algorithmList.map((name) => {
-			const getCipher = cipherMap[name];
-			if (!getCipher) {
-				throw new Error(
-					`Unsupported encryption algorithm: ${algorithm}. Supported: ${ENCRYPTION_ALGORITHM_NAMES.join(
-						', ',
-					)}`,
-				);
-			}
-			return getCipher();
-		}),
-	);
+	const algorithmList = parseAlgorithms(algorithm);
+	const ciphers = await Promise.all(algorithmList.map((name) => cipherMap[name]()));
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
