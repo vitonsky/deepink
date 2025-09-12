@@ -10,7 +10,7 @@ export function isValidAlgorithm(algorithm: string): algorithm is ENCRYPTION_ALG
 	);
 }
 
-export function parseAlgorithms(algorithms: string) {
+export function parseAlgorithmList(algorithms: string) {
 	return algorithms.split('-').map((name) => {
 		if (!isValidAlgorithm(name)) {
 			throw new Error(

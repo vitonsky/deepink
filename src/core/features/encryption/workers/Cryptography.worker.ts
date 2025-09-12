@@ -12,7 +12,7 @@ import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/k
 import { getRandomBytes } from '../../../encryption/utils/random';
 
 import { ENCRYPTION_ALGORITHM } from '../algorithms';
-import { parseAlgorithms } from '../utils';
+import { parseAlgorithmList } from '../utils';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -39,7 +39,7 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 		getDerivedKeysManager(masterKey, salt),
 	);
 
-	const cipherMap: Record<string, () => Promise<IEncryptionProcessor>> = {
+	const cipherMap: Record<ENCRYPTION_ALGORITHM, () => Promise<IEncryptionProcessor>> = {
 		[ENCRYPTION_ALGORITHM.AES]: async () => {
 			const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
 				name: 'AES-GCM',
@@ -53,7 +53,7 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 		},
 	};
 
-	const algorithmList = parseAlgorithms(algorithm);
+	const algorithmList = parseAlgorithmList(algorithm);
 	const ciphers = await Promise.all(algorithmList.map((name) => cipherMap[name]()));
 
 	encryptionController = new EncryptionController(
