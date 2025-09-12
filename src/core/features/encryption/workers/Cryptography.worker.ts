@@ -12,7 +12,6 @@ import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/k
 import { getRandomBytes } from '../../../encryption/utils/random';
 
 import { ENCRYPTION_ALGORITHM } from '../algorithms';
-import { parseAlgorithms } from '../utils';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -22,6 +21,21 @@ console.log('Hello world from worker');
 let encryptionController: EncryptionController | null = null;
 const messenger = new WorkerMessenger(self);
 const requests = new WorkerRPC(messenger);
+
+const parseAlgorithms = (algorithms: string): ENCRYPTION_ALGORITHM[] => {
+	const validAlgorithms = Object.values(ENCRYPTION_ALGORITHM);
+	return algorithms.split('-').map((name) => {
+		const algorithm = validAlgorithms.find((alg) => alg === name);
+		if (!algorithm) {
+			throw new Error(
+				`Unsupported encryption algorithm: "${name}". Supported: ${validAlgorithms.join(
+					', ',
+				)}`,
+			);
+		}
+		return algorithm;
+	});
+};
 
 const workerId = performance.now();
 requests.addHandler('init', async ({ key, salt, algorithm }) => {
