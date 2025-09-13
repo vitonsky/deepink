@@ -1,7 +1,7 @@
 import { formatAlgorithmsToString } from './utils';
 import { ENCRYPTION_ALGORITHM } from '.';
 
-export const ENCRYPTION_ALGORITHMS_LIST = [
+export const ENCRYPTION_ALGORITHM_OPTIONS = [
 	ENCRYPTION_ALGORITHM.AES,
 	ENCRYPTION_ALGORITHM.TWOFISH,
 	formatAlgorithmsToString([ENCRYPTION_ALGORITHM.AES, ENCRYPTION_ALGORITHM.TWOFISH]),
