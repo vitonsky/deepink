@@ -1,6 +1,6 @@
 import { ENCRYPTION_ALGORITHM } from '.';
 
-export const formatAlgorithmsToString = (algorithms: ENCRYPTION_ALGORITHM[]) => {
+export const formatAlgorithms = (algorithms: ENCRYPTION_ALGORITHM[]) => {
 	return algorithms.join('-');
 };
 
