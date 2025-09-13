@@ -7,14 +7,13 @@ export const formatAlgorithmsToString = (algorithms: ENCRYPTION_ALGORITHM[]) => 
 export const parseAlgorithms = (algorithms: string): ENCRYPTION_ALGORITHM[] => {
 	const validAlgorithms = Object.values(ENCRYPTION_ALGORITHM);
 	return algorithms.split('-').map((name) => {
-		const algorithm = validAlgorithms.find((alg) => alg === name);
-		if (!algorithm) {
+		if (!validAlgorithms.includes(name as ENCRYPTION_ALGORITHM)) {
 			throw new Error(
 				`Unsupported encryption algorithm: "${name}". Supported: ${validAlgorithms.join(
 					', ',
 				)}`,
 			);
 		}
-		return algorithm;
+		return name as ENCRYPTION_ALGORITHM;
 	});
 };
