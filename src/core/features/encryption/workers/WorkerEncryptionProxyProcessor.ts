@@ -7,7 +7,12 @@ import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
 import EncryptionWorker from './Cryptography.worker';
 
-// TODO: provide algorithm parameters
+export type EncryptionConfig = {
+	key: string | ArrayBuffer;
+	salt: ArrayBuffer;
+	algorithm: string;
+};
+
 /**
  * Transparent proxy an encryption requests to a worker
  * Useful to prevent main thread blocking for a long-term cryptographic operations
@@ -16,13 +21,11 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly worker;
 	private readonly messenger;
 	private readonly requests;
-	constructor(secretKey: string | ArrayBuffer, salt: ArrayBuffer) {
+	constructor(config: EncryptionConfig) {
 		const worker = new EncryptionWorker();
 		this.messenger = new WorkerMessenger(worker);
 		this.requests = new WorkerRPC(this.messenger);
-		this.worker = this.requests
-			.sendRequest('init', { secretKey, salt })
-			.then(() => worker);
+		this.worker = this.requests.sendRequest('init', config).then(() => worker);
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
