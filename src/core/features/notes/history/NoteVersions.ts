@@ -45,13 +45,64 @@ export class NoteVersions {
 		this.workspace = workspace;
 	}
 
-	public async snapshot(noteId: string) {
+	/**
+	 * Create note snapshot. Snapshot contains a latest note data.
+	 *
+	 * In case a most recent snapshot is match latest note data, snapshot will not be created.
+	 * Use option `force` to control this behaviour.
+	 */
+	public async snapshot(
+		noteId: string,
+		options: {
+			/**
+			 * Force snapshot creation.
+			 *
+			 * Creates snapshot even if most recent snapshot match latest note data
+			 */
+			force?: boolean;
+		} = {},
+	) {
 		const db = wrapDB(this.db.get());
 
+		if (options.force) {
+			db.run(
+				qb.sql`
+					INSERT INTO note_versions (id, note_id, created_at, title, text)
+					SELECT
+						${uuid4()} as id,
+						${noteId} as note_id,
+						${Date.now()} as created_at,
+						title,
+						text
+					FROM notes
+					WHERE id = ${noteId} AND workspace_id = ${this.workspace}
+				`,
+			);
+
+			return;
+		}
+
 		db.run(
-			qb.sql`INSERT INTO note_versions (id, note_id, created_at, title, text) SELECT ${uuid4()} as id, ${noteId} as note_id, ${new Date().getTime()} as created_at, title, text FROM notes WHERE id = ${noteId} AND workspace_id = ${
-				this.workspace
-			}`,
+			qb.sql`
+				INSERT INTO note_versions (id, note_id, created_at, title, text)
+				SELECT
+					${uuid4()} as id,
+					${noteId} as note_id,
+					${Date.now()} as created_at,
+					n.title,
+					n.text
+				FROM notes n
+				LEFT JOIN (
+					SELECT v.title, v.text, v.note_id
+					FROM note_versions v
+					-- Order by monotonic "rowid" in case of timestamp collisions
+					ORDER BY v.created_at DESC, rowid DESC
+					LIMIT 1
+				) last ON last.note_id = n.id
+				WHERE
+					n.id = ${noteId} AND workspace_id = ${this.workspace}
+					AND (last.note_id IS NULL OR last.title != n.title OR last.text != n.text)
+			`,
 		);
 	}
 
@@ -60,7 +111,8 @@ export class NoteVersions {
 
 		return NoteVersionMapScheme.array().parse(
 			db.all(
-				qb.sql`SELECT * FROM note_versions WHERE note_id = ${noteId} ORDER BY created_at DESC`,
+				// Order by monotonic "rowid" in case of timestamp collisions
+				qb.sql`SELECT * FROM note_versions WHERE note_id = ${noteId} ORDER BY created_at DESC, rowid DESC`,
 			),
 		);
 	}
