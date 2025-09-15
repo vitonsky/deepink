@@ -4,8 +4,9 @@ import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDat
 
 import { NotesController } from '../controller/NotesController';
 import { NoteVersions } from './NoteVersions';
+import { INote } from '..';
 
-describe('Snapshots of current note version', () => {
+describe('Note version control', () => {
 	const dbFile = createFileControllerMock();
 	const dbPromise = openDatabase(dbFile);
 
@@ -14,35 +15,61 @@ describe('Snapshots of current note version', () => {
 		await db.close();
 	});
 
-	test('create few notes', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, 'fake-workspace-id');
-
-		await Promise.all(
-			[
-				{ title: 'Title 1', text: 'Text 1' },
-				{ title: 'Title 2', text: 'Text 2' },
-				{ title: 'Title 3', text: 'Text 3' },
-			].map((note) => registry.add(note)),
-		);
-	});
-
-	test('snapshot note', async () => {
+	test('snapshot must be created only if latest version have changes with latest note data', async () => {
 		const db = await dbPromise;
 		const registry = new NotesController(db, 'fake-workspace-id');
 		const history = new NoteVersions(db, 'fake-workspace-id');
 
-		// Fetch any note
-		const notes = await registry.get();
-
-		const noteDataV1 = notes[1];
-		const noteId = noteDataV1.id;
+		// Fetch note
+		const dataV1 = { title: 'Title', text: 'Text' };
+		const noteId = await registry.add(dataV1);
 
 		// No snapshots yet
 		await expect(history.getList(noteId)).resolves.toHaveLength(0);
 
 		// Make snapshot
 		await history.snapshot(noteId);
+
+		// Snapshot is created
+		await expect(history.getList(noteId)).resolves.toEqual([
+			expect.objectContaining(dataV1),
+		]);
+
+		// Any calls for snapshot creation must be ignored
+		// since no changes with latest snapshot
+		await history.snapshot(noteId);
+		await history.snapshot(noteId);
+		await history.snapshot(noteId);
+
+		await expect(history.getList(noteId)).resolves.toHaveLength(1);
+
+		// Update note
+		const dataV2 = { title: 'Modified title', text: 'Modified text' };
+		await registry.update(noteId, dataV2);
+
+		// Make another snapshot
+		await history.snapshot(noteId);
+
+		await expect(history.getList(noteId)).resolves.toEqual([
+			expect.objectContaining(dataV2),
+			expect.objectContaining(dataV1),
+		]);
+	});
+
+	test('snapshot must always be created when parameter `force` is set', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, 'fake-workspace-id');
+		const history = new NoteVersions(db, 'fake-workspace-id');
+
+		// Fetch note
+		const noteId = await registry.add({ title: 'Title 1', text: 'Text 1' });
+		const noteDataV1 = (await registry.getById(noteId)) as INote;
+
+		// No snapshots yet
+		await expect(history.getList(noteId)).resolves.toHaveLength(0);
+
+		// Make snapshot
+		await history.snapshot(noteId, { force: true });
 
 		// Snapshot is created
 		await expect(history.getList(noteId)).resolves.toEqual([
@@ -59,14 +86,14 @@ describe('Snapshots of current note version', () => {
 		]);
 
 		// Make another snapshot
-		await history.snapshot(noteId);
+		await history.snapshot(noteId, { force: true });
 		await expect(history.getList(noteId)).resolves.toEqual([
 			expect.objectContaining(contentV2),
 			expect.objectContaining(noteDataV1.content),
 		]);
 
 		// Make another snapshot
-		await history.snapshot(noteId);
+		await history.snapshot(noteId, { force: true });
 		await expect(history.getList(noteId)).resolves.toEqual([
 			expect.objectContaining(contentV2),
 			expect.objectContaining(contentV2),
@@ -74,15 +101,17 @@ describe('Snapshots of current note version', () => {
 		]);
 	});
 
-	test('history auto deleted when note is deleted', async () => {
+	test('when note is deleted, all versions must be deleted too', async () => {
 		const db = await dbPromise;
 		const registry = new NotesController(db, 'fake-workspace-id');
 		const history = new NoteVersions(db, 'fake-workspace-id');
 
-		// Fetch any note
-		const notes = await registry.get();
+		// Fetch note
+		const noteId = await registry.add({ title: 'Title 1', text: 'Text 1' });
 
-		const noteId = notes[1].id;
+		await history.snapshot(noteId, { force: true });
+		await history.snapshot(noteId, { force: true });
+		await history.snapshot(noteId, { force: true });
 
 		// Note have versions
 		await expect(
@@ -94,6 +123,51 @@ describe('Snapshots of current note version', () => {
 		await expect(
 			history.getList(noteId).then((object) => object.length),
 		).resolves.toBe(0);
+	});
+
+	test('snapshot may be created with empty text', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, 'fake-workspace-id');
+		const history = new NoteVersions(db, 'fake-workspace-id');
+
+		// Fetch note
+		const dataV1 = { title: '', text: '' };
+		const noteId = await registry.add(dataV1);
+
+		// Make snapshot
+		await history.snapshot(noteId);
+		await expect(history.getList(noteId)).resolves.toEqual([
+			expect.objectContaining(dataV1),
+		]);
+
+		// Next snapshot calls will be ignored, since no changes
+		await history.snapshot(noteId);
+		await expect(history.getList(noteId)).resolves.toEqual([
+			expect.objectContaining(dataV1),
+		]);
+
+		// Update note
+		const dataV2 = { title: 'Modified title', text: 'Modified text' };
+		await registry.update(noteId, dataV2);
+
+		// Make another snapshot
+		await history.snapshot(noteId);
+		await expect(history.getList(noteId)).resolves.toEqual([
+			expect.objectContaining(dataV2),
+			expect.objectContaining(dataV1),
+		]);
+
+		// Update note with empty text
+		const dataV3 = { title: '', text: '' };
+		await registry.update(noteId, dataV3);
+
+		// Make another snapshot
+		await history.snapshot(noteId);
+		await expect(history.getList(noteId)).resolves.toEqual([
+			expect.objectContaining(dataV3),
+			expect.objectContaining(dataV2),
+			expect.objectContaining(dataV1),
+		]);
 	});
 });
 
@@ -132,9 +206,9 @@ describe('Delete note versions', () => {
 		await expect(history.getList(noteId)).resolves.toHaveLength(0);
 
 		// Make snapshots
-		await history.snapshot(noteId);
-		await history.snapshot(noteId);
-		await history.snapshot(noteId);
+		await history.snapshot(noteId, { force: true });
+		await history.snapshot(noteId, { force: true });
+		await history.snapshot(noteId, { force: true });
 
 		// Note have versions
 		await expect(history.getList(noteId)).resolves.toHaveLength(3);
@@ -156,9 +230,9 @@ describe('Delete note versions', () => {
 		await expect(history.getList(noteId)).resolves.toHaveLength(0);
 
 		// Make snapshots
-		await history.snapshot(noteId);
-		await history.snapshot(noteId);
-		await history.snapshot(noteId);
+		await history.snapshot(noteId, { force: true });
+		await history.snapshot(noteId, { force: true });
+		await history.snapshot(noteId, { force: true });
 
 		// Versions now exists
 		const versions1 = await history.getList(noteId);
