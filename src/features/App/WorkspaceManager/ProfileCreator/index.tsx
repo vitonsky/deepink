@@ -1,9 +1,18 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
-import { Button, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
+import {
+	Button,
+	HStack,
+	Input,
+	Select,
+	Text,
+	useDisclosure,
+	VStack,
+} from '@chakra-ui/react';
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
+import { UnencryptedProfileModal } from './UnencryptedProfileModal';
 
 export type NewProfile = {
 	name: string;
@@ -80,6 +89,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		],
 	);
 
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
 	return (
 		<ProfilesForm
 			title="Create a new profile"
@@ -97,18 +108,17 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						<Button
 							variant="secondary"
 							w="100%"
-							onClick={() => onPressCreate(false)}
+							onClick={onOpen}
 							disabled={isPending}
 						>
 							Continue with no encryption
 						</Button>
-						<Text
-							alignSelf={'start'}
-							color={'typography.additional'}
-							fontSize={'14px'}
-						>
-							Insecure: your data will not be encrypted
-						</Text>
+
+						<UnencryptedProfileModal
+							isOpen={isOpen}
+							onClose={onClose}
+							onPressCreate={onPressCreate}
+						/>
 					</VStack>
 					<Button
 						variant="secondary"
@@ -163,7 +173,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					</Text>
 					<Select
 						variant="secondary"
-						defaultValue="aes"
+						value={algorithm}
 						onChange={(evt) => setAlgorithm(evt.target.value)}
 						disabled={isPending}
 					>
