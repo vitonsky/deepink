@@ -1,21 +1,21 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import hotkeys from 'hotkeys-js';
-import { selectShortcuts } from '@state/redux/settings/settings';
 
 import { useCallNamedCommand } from '../commandHooks';
+import { shortcuts } from '.';
 
 /**
- * Binds keyboard shortcuts to commands
+ * Registers global keyboard shortcuts for commands
  *
  * Pressing a shortcut executes the corresponding command
  */
-export const useShortcutBinding = () => {
-	const shortcuts = useSelector(selectShortcuts);
+export const useRegisterGlobalCommandShortcuts = () => {
 	const callCommand = useCallNamedCommand();
 
 	useEffect(() => {
-		// by default hotkeys library ignores INPUT, SELECT, and TEXTAREA elements, force handling of shortcuts
+		// By default, the hotkeys library ignores INPUT, SELECT, and TEXTAREA elements,
+		// so when the user is focused on the note editor or any other input field, shortcuts won't work
+		// We force handling of shortcuts in these cases
 		// https://github.com/jaywcjlove/hotkeys-js?tab=readme-ov-file#filter
 		hotkeys.filter = () => true;
 
@@ -34,5 +34,5 @@ export const useShortcutBinding = () => {
 				hotkeys.unbind(shortcut);
 			});
 		};
-	}, [shortcuts, callCommand]);
+	}, [callCommand]);
 };
