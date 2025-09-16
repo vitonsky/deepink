@@ -1,5 +1,5 @@
 import { GLOBAL_COMMANDS } from '@core/features/commands';
-import { useCommandSubscription } from '@core/features/commands/commandHooks';
+import { useCommandListener } from '@core/features/commands/useCommandListener';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -20,19 +20,19 @@ export const useNoteShortcutActions = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
-	useCommandSubscription(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
+	useCommandListener(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
 
-	useCommandSubscription(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE, () => {
+	useCommandListener(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE, () => {
 		if (!activeNoteId) return;
 		noteActions.close(activeNoteId);
 	});
 
-	useCommandSubscription(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
+	useCommandListener(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
 		if (recentlyClosedNotes.length === 0) return;
 		noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
 	});
 
-	useCommandSubscription(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE, () => {
+	useCommandListener(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE, () => {
 		// switch only if 2 or more notes are opened
 		if (!activeNoteId || openedNotes.length < 2) return;
 
@@ -44,7 +44,7 @@ export const useNoteShortcutActions = () => {
 		noteActions.click(openedNotes[nextIndex].id);
 	});
 
-	useCommandSubscription(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE, () => {
+	useCommandListener(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE, () => {
 		// switch only if 2 or more notes are opened
 		if (!activeNoteId || openedNotes.length < 2) return;
 

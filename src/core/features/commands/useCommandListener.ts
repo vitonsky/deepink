@@ -4,22 +4,20 @@ import { CommandEvent, useCommandEvent } from './CommandEventProvider';
 import { GLOBAL_COMMANDS } from '.';
 
 /**
- * Subscribes to command by its name
+ * Registers a listener for the specified command
  *
  * Calls the provided callback whenever the given command is triggered
  */
-export function useCommandSubscription(
+export function useCommandListener(
 	command: GLOBAL_COMMANDS,
 	callback: (data: CommandEvent) => void,
 ) {
 	const commandEvent = useCommandEvent();
 
 	useEffect(() => {
-		const unsubscribe = commandEvent.watch((data) => {
+		return commandEvent.watch((data) => {
 			if (data.id !== command) return;
 			callback(data);
 		});
-
-		return () => unsubscribe();
 	}, [callback, commandEvent, command]);
 }
