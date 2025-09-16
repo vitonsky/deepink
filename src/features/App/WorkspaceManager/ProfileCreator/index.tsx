@@ -12,7 +12,7 @@ import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorith
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
-import { UnencryptedProfileModal } from './UnencryptedProfileModal';
+import { ConfirmDialog } from './ConfirmDialog';
 
 export type NewProfile = {
 	name: string;
@@ -113,12 +113,6 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						>
 							Continue with no encryption
 						</Button>
-
-						<UnencryptedProfileModal
-							isOpen={isOpen}
-							onClose={onClose}
-							onPressCreate={onPressCreate}
-						/>
 					</VStack>
 					<Button
 						variant="secondary"
@@ -128,6 +122,16 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Cancel
 					</Button>
+					<ConfirmDialog
+						isOpen={isOpen}
+						onClose={onClose}
+						title="Unencrypted Profile Warning"
+						description="Creating a profile without encryption may be unsafe"
+						confirmButtonText="Encrypt profile"
+						cancelButtonText="Continue without encryption"
+						onConfirm={() => onPressCreate(true)}
+						onCancel={() => onPressCreate(false)}
+					/>
 				</>
 			}
 		>
