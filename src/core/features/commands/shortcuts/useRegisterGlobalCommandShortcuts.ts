@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
 
-import { useCallNamedCommand } from '../commandHooks';
+import { useCommandEvent } from '../CommandEventProvider';
 import { shortcuts } from '.';
 
 /**
@@ -10,7 +10,7 @@ import { shortcuts } from '.';
  * Pressing a shortcut executes the corresponding command
  */
 export const useRegisterGlobalCommandShortcuts = () => {
-	const callCommand = useCallNamedCommand();
+	const callCommand = useCommandEvent();
 
 	useEffect(() => {
 		// By default, the hotkeys library ignores INPUT, SELECT, and TEXTAREA elements,
@@ -25,7 +25,9 @@ export const useRegisterGlobalCommandShortcuts = () => {
 				{
 					capture: true,
 				},
-				() => callCommand(commandName),
+				() => {
+					callCommand({ id: commandName });
+				},
 			);
 		});
 
