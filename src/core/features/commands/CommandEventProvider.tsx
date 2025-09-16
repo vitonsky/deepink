@@ -1,4 +1,4 @@
-import React, { createContext, FC, useMemo } from 'react';
+import React, { createContext, FC } from 'react';
 import { createEvent, EventCallable } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
@@ -12,7 +12,7 @@ const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(nu
 export const useCommandEvent = createContextGetterHook(CommandEventContext);
 
 export const CommandEventProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-	const event = useMemo(() => createEvent<CommandEvent>(), []);
+	const event = createEvent<CommandEvent>();
 
 	return (
 		<CommandEventContext.Provider value={event}>
