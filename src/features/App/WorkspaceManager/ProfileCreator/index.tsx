@@ -125,8 +125,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<ConfirmDialog
 						isOpen={isOpen}
 						onClose={onClose}
-						title="Unencrypted Profile Warning"
-						description="Creating a profile without encryption may be unsafe"
+						title="Creating a profile without encryption"
+						description="This may be unsafe, creating a profile without encryption means your data will be stored in plain text."
 						confirmButtonText="Encrypt profile"
 						cancelButtonText="Continue without encryption"
 						onConfirm={() => onPressCreate(true)}
