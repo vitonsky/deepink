@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import {
-	Box,
 	Button,
 	HStack,
 	Modal,
@@ -40,36 +39,32 @@ export const ModalDialog: FC<ModalDialogProps> = ({
 			<ModalOverlay />
 			<ModalContent>
 				<ModalCloseButton />
-				<ModalHeader>
-					<Text>{title}</Text>
-				</ModalHeader>
+				<ModalHeader>{title}</ModalHeader>
 				<ModalBody>
 					<Text color="typography.secondary">{description}</Text>
 				</ModalBody>
 				<ModalFooter>
-					<Box as={AutoFocusInside} w="100%">
-						<HStack w="100%" justifyContent="end">
-							{cancelButtonText && onCancel && (
-								<Button
-									onClick={() => {
-										onCancel();
-										onClose();
-									}}
-								>
-									{cancelButtonText}
-								</Button>
-							)}
+					<HStack w="100%" justifyContent="end" as={AutoFocusInside}>
+						{cancelButtonText && onCancel && (
 							<Button
-								variant="primary"
 								onClick={() => {
-									onConfirm();
+									onCancel();
 									onClose();
 								}}
 							>
-								{confirmButtonText}
+								{cancelButtonText}
 							</Button>
-						</HStack>
-					</Box>
+						)}
+						<Button
+							variant="primary"
+							onClick={() => {
+								onConfirm();
+								onClose();
+							}}
+						>
+							{confirmButtonText}
+						</Button>
+					</HStack>
 				</ModalFooter>
 			</ModalContent>
 		</Modal>

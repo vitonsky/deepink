@@ -104,16 +104,14 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Create profile
 					</Button>
-					<VStack w="100%" gap={'0rem'}>
-						<Button
-							variant="secondary"
-							w="100%"
-							onClick={onOpen}
-							disabled={isPending}
-						>
-							Continue with no encryption
-						</Button>
-					</VStack>
+					<Button
+						variant="secondary"
+						w="100%"
+						onClick={onOpen}
+						disabled={isPending}
+					>
+						Continue with no encryption
+					</Button>
 					<Button
 						variant="secondary"
 						w="100%"
@@ -126,7 +124,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						isOpen={isOpen}
 						onClose={onClose}
 						title="Creating a profile without encryption"
-						description="This may be unsafe, creating a profile without encryption means your data will be stored in plain text."
+						description="This may be unsafe. Creating a profile without encryption means your data will be stored in plain text."
 						confirmButtonText="Encrypt profile"
 						cancelButtonText="Continue without encryption"
 						onConfirm={() => onPressCreate(true)}
