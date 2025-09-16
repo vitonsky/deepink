@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
 import { GLOBAL_COMMANDS } from '@core/features/commands';
-import { useCommandSubscription } from '@core/features/commands/commandHooks';
+import { useCommandListener } from '@core/features/commands/useCommandListener';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
 
@@ -14,7 +14,7 @@ export const WorkspaceStatusBarItems = () => {
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
 
-	useCommandSubscription(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, profileControls.close);
+	useCommandListener(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, profileControls.close);
 
 	useFirstRender(() => {
 		statusBarButtons.controls.register(
