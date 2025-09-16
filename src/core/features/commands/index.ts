@@ -7,25 +7,25 @@ export enum GLOBAL_COMMANDS {
 	/**
 	 * Close the current note
 	 */
-	CLOSE_NOTE = 'closeNote',
+	CLOSE_CURRENT_NOTE = 'closeCurrentNote',
 
 	/**
 	 * Reopen the last closed note
 	 */
-	REOPEN_CLOSED_NOTE = 'reopenClosedNote',
+	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
 
 	/**
-	 * Move to the note on the left
+	 * Switch focus to the next open note
 	 */
-	NAVIGATE_NOTE_LEFT = 'navigateNoteLeft',
+	FOCUS_NEXT_NOTE = 'focusNextNote',
 
 	/**
-	 * Move to the note on the right
+	 * Switch focus to the previous open note
 	 */
-	NAVIGATE_NOTE_RIGHT = 'navigateNoteRight',
+	FOCUS_PREVIOUS_NOTE = 'focusPreviousNote',
 
 	/**
-	 * Lock the user profile
+	 * Lock the currently active user profile
 	 */
-	LOCK_PROFILE = 'lockProfile',
+	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
 }
