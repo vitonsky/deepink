@@ -4,17 +4,6 @@ import { CommandEvent, useCommandEvent } from './CommandEventProvider';
 import { GLOBAL_COMMANDS } from '.';
 
 /**
- * Returns a function that calls a command by name
- */
-export function useCallNamedCommand() {
-	const event = useCommandEvent();
-
-	return <T extends GLOBAL_COMMANDS>(command: T) => {
-		event({ id: command });
-	};
-}
-
-/**
  * Subscribes to command by its name
  *
  * Calls the provided callback whenever the given command is triggered
