@@ -70,7 +70,7 @@ export class NoteVersions {
 					INSERT INTO note_versions (id, note_id, created_at, title, text)
 					SELECT
 						${uuid4()} as id,
-						${noteId} as note_id,
+						id as note_id, 
 						${Date.now()} as created_at,
 						title,
 						text
@@ -87,7 +87,7 @@ export class NoteVersions {
 				INSERT INTO note_versions (id, note_id, created_at, title, text)
 				SELECT
 					${uuid4()} as id,
-					${noteId} as note_id,
+					id as note_id,
 					${Date.now()} as created_at,
 					n.title,
 					n.text
@@ -125,13 +125,15 @@ export class NoteVersions {
 		);
 	}
 
-	public async delete(versionId: string) {
+	public async delete(versionIds: string[]) {
 		const db = wrapDB(this.db.get());
-		db.run(qb.sql`DELETE FROM note_versions WHERE id = ${versionId}`);
+		db.run(qb.sql`DELETE FROM note_versions WHERE id IN (${qb.values(versionIds)})`);
 	}
 
-	public async purge(noteId: string) {
+	public async purge(noteIds: string[]) {
 		const db = wrapDB(this.db.get());
-		db.run(qb.sql`DELETE FROM note_versions WHERE note_id = ${noteId}`);
+		db.run(
+			qb.sql`DELETE FROM note_versions WHERE note_id IN (${qb.values(noteIds)})`,
+		);
 	}
 }

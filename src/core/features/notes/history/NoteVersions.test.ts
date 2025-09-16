@@ -213,7 +213,7 @@ describe('Delete note versions', () => {
 		// Note have versions
 		await expect(history.getList(noteId)).resolves.toHaveLength(3);
 
-		await history.purge(noteId);
+		await history.purge([noteId]);
 		await expect(history.getList(noteId)).resolves.toHaveLength(0);
 	});
 
@@ -245,7 +245,7 @@ describe('Delete note versions', () => {
 		expect(versions1).toContainEqual(versionY);
 
 		// Deleted version must not to be in list
-		await history.delete(versionY.id);
+		await history.delete([versionY.id]);
 
 		const versions2 = await history.getList(noteId);
 		expect(versions2).toHaveLength(2);
@@ -253,7 +253,7 @@ describe('Delete note versions', () => {
 		expect(versions2).not.toContainEqual(versionY);
 
 		// Another deleted version must not to be in list too
-		await history.delete(versionX.id);
+		await history.delete([versionX.id]);
 
 		const versions3 = await history.getList(noteId);
 		expect(versions3).toHaveLength(1);
