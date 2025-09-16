@@ -14,7 +14,7 @@ import {
 	Text,
 } from '@chakra-ui/react';
 
-export type ConfirmDialogProps = {
+export type ModalDialogProps = {
 	isOpen: boolean;
 	onClose: () => void;
 	title: string;
@@ -25,7 +25,7 @@ export type ConfirmDialogProps = {
 	onCancel: () => void;
 };
 
-export const ConfirmDialog: FC<ConfirmDialogProps> = ({
+export const ModalDialog: FC<ModalDialogProps> = ({
 	isOpen,
 	onClose,
 	title,

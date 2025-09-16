@@ -8,11 +8,11 @@ import {
 	useDisclosure,
 	VStack,
 } from '@chakra-ui/react';
+import { ModalDialog } from '@components/ModalDialog';
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
-import { ConfirmDialog } from './ConfirmDialog';
 
 export type NewProfile = {
 	name: string;
@@ -122,7 +122,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Cancel
 					</Button>
-					<ConfirmDialog
+					<ModalDialog
 						isOpen={isOpen}
 						onClose={onClose}
 						title="Creating a profile without encryption"
