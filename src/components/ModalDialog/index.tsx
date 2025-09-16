@@ -20,9 +20,9 @@ export type ModalDialogProps = {
 	title: string;
 	description: string;
 	confirmButtonText: string;
-	cancelButtonText?: string;
 	onConfirm: () => void;
-	onCancel: () => void;
+	cancelButtonText?: string;
+	onCancel?: () => void;
 };
 
 export const ModalDialog: FC<ModalDialogProps> = ({
@@ -31,8 +31,8 @@ export const ModalDialog: FC<ModalDialogProps> = ({
 	title,
 	description,
 	confirmButtonText,
-	cancelButtonText,
 	onConfirm,
+	cancelButtonText,
 	onCancel,
 }) => {
 	return (
@@ -49,7 +49,7 @@ export const ModalDialog: FC<ModalDialogProps> = ({
 				<ModalFooter>
 					<Box as={AutoFocusInside} w="100%">
 						<HStack w="100%" justifyContent="end">
-							{cancelButtonText && (
+							{cancelButtonText && onCancel && (
 								<Button
 									onClick={() => {
 										onCancel();
