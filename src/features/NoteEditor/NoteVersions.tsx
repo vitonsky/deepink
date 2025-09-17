@@ -8,10 +8,12 @@ export const NoteVersions = ({
 	noteId,
 	onClose,
 	onVersionApply,
+	onShowVersion,
 }: {
 	noteId: string;
 	onClose: () => void;
 	onVersionApply?: (version: NoteVersion) => void;
+	onShowVersion?: (version: NoteVersion) => void;
 }) => {
 	const noteHistory = useNotesHistory();
 
@@ -69,7 +71,11 @@ export const NoteVersions = ({
 									>
 										<FaCheck />
 									</Button>
-									<Button size="sm" title="Open version">
+									<Button
+										size="sm"
+										title="Open version"
+										onClick={() => onShowVersion?.(version)}
+									>
 										<FaGlasses />
 									</Button>
 									<Button size="sm" title="Delete version">

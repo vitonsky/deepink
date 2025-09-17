@@ -13,9 +13,11 @@ import { RichEditor } from './RichEditor/RichEditor';
 export const NoteEditor = ({
 	text,
 	setText,
+	isReadOnly,
 }: {
 	text: string;
 	setText: (text: string) => void;
+	isReadOnly?: boolean;
 }) => {
 	const editorMode = useAppSelector(selectEditorMode);
 
@@ -29,9 +31,11 @@ export const NoteEditor = ({
 
 	return (
 		<EditorPanelContext>
-			<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
-				<EditorPanel />
-			</HStack>
+			{!isReadOnly && (
+				<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
+					<EditorPanel />
+				</HStack>
+			)}
 
 			<HStack
 				sx={{
@@ -51,6 +55,7 @@ export const NoteEditor = ({
 						width="100%"
 						height="100%"
 						minW="0"
+						readOnly={isReadOnly}
 					/>
 				)}
 				{(editorMode === 'richtext' || editorMode === 'split-screen') && (
@@ -58,6 +63,7 @@ export const NoteEditor = ({
 						placeholder="Write your thoughts here..."
 						value={text}
 						onChanged={setText}
+						isReadOnly={isReadOnly}
 					/>
 				)}
 			</HStack>

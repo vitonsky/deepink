@@ -1,10 +1,11 @@
 import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
-import { FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
+import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
 import { debounce } from 'lodash';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
+import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { IResolvedTag } from '@core/features/tags';
 import {
 	useAttachmentsController,
@@ -151,6 +152,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 		}
 	}, []);
 
+	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
+
 	return (
 		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
@@ -170,6 +173,18 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
 				<HStack>
+					{versionPreview && (
+						<Button
+							variant="ghost"
+							size="xs"
+							title="Go back to editing"
+							onClick={() => {
+								setVersionPreview(null);
+							}}
+						>
+							<FaArrowLeft />
+						</Button>
+					)}
 					<Button variant="ghost" size="xs">
 						<FaBookmark />
 					</Button>
@@ -296,7 +311,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 				/>
 			</HStack>
 
-			<NoteEditor text={text} setText={setText} />
+			{versionPreview ? (
+				<NoteEditor text={versionPreview.text} setText={() => {}} isReadOnly />
+			) : (
+				<NoteEditor text={text} setText={setText} />
+			)}
 
 			{sidePanel === NoteMenuItems.TOGGLE_BACKLINKS && (
 				<BackLinksTree onClose={() => setSidePanel(null)} />
@@ -305,6 +324,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 				<NoteVersions
 					noteId={note.id}
 					onClose={() => setSidePanel(null)}
+					onShowVersion={(version) => setVersionPreview(version)}
 					onVersionApply={(version) => {
 						// TODO: apply changes in single transaction + make new snapshot
 						setTitle(version.title);
