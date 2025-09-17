@@ -158,12 +158,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 									>
 										Continue with no encryption
 									</Button>
-									<Button
-										onClick={() => {
-											onPressCreate(true);
-											modalControls.onClose();
-										}}
-									>
+									<Button onClick={modalControls.onClose}>
 										Cancel
 									</Button>
 								</HStack>
