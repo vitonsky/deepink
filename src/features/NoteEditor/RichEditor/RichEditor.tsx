@@ -26,6 +26,7 @@ export const RichEditor = memo((props: RichEditorContentProps) => {
 			initialConfig={{
 				namespace: 'RichEditor',
 				theme,
+				editable: !props.isReadOnly,
 				nodes: [
 					// App specific nodes
 					RawNode,
