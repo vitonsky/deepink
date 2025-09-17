@@ -1,4 +1,4 @@
-import React, { createContext, FC } from 'react';
+import React, { createContext, FC, PropsWithChildren } from 'react';
 import { createEvent, EventCallable } from 'effector';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
@@ -11,7 +11,7 @@ export type CommandEvent = {
 const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(null);
 export const useCommandEvent = createContextGetterHook(CommandEventContext);
 
-export const CommandEventProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CommandEventProvider: FC<PropsWithChildren> = ({ children }) => {
 	const event = createEvent<CommandEvent>();
 
 	return (
