@@ -37,6 +37,8 @@ const NoteVersionMapScheme = NoteVersionRowScheme.omit({ note_id: true }).transf
 	rename({ created_at: 'createdAt' } as const),
 );
 
+export type NoteVersion = z.TypeOf<typeof NoteVersionMapScheme>;
+
 export class NoteVersions {
 	private db;
 	private readonly workspace;
