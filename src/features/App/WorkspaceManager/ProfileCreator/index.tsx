@@ -96,7 +96,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		],
 	);
 
-	const modalControls = useDisclosure();
+	const noPasswordDialogState = useDisclosure();
 
 	return (
 		<ProfilesForm
@@ -114,7 +114,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Button
 						variant="secondary"
 						w="100%"
-						onClick={modalControls.onOpen}
+						onClick={noPasswordDialogState.onOpen}
 						disabled={isPending}
 					>
 						Continue with no encryption
@@ -129,8 +129,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					</Button>
 
 					<Modal
-						isOpen={modalControls.isOpen}
-						onClose={modalControls.onClose}
+						isOpen={noPasswordDialogState.isOpen}
+						onClose={noPasswordDialogState.onClose}
 						isCentered
 					>
 						<ModalOverlay />
@@ -153,12 +153,12 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 										variant="primary"
 										onClick={() => {
 											onPressCreate(false);
-											modalControls.onClose();
+											noPasswordDialogState.onClose();
 										}}
 									>
-										Continue with no encryption
+										Continue with no password
 									</Button>
-									<Button onClick={modalControls.onClose}>
+									<Button onClick={noPasswordDialogState.onClose}>
 										Cancel
 									</Button>
 								</HStack>
