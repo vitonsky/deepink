@@ -205,11 +205,12 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					{passwordError && <Text color="red.500">{passwordError}</Text>}
 				</VStack>
 
-				<HStack w="100%">
+				<VStack w="100%" gap="0.1rem">
 					<Text
-						minW={'max-content'}
+						minW="max-content"
 						color="typography.additional"
 						fontSize="18px"
+						alignSelf="start"
 					>
 						Encryption algorithm
 					</Text>
@@ -225,7 +226,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 							</option>
 						))}
 					</Select>
-				</HStack>
+				</VStack>
 			</VStack>
 		</ProfilesForm>
 	);
