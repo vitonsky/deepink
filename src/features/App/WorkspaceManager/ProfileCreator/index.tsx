@@ -136,11 +136,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						<ModalOverlay />
 						<ModalContent>
 							<ModalCloseButton />
-							<ModalHeader>Create profile without encryption</ModalHeader>
+							<ModalHeader>Create profile with no encryption</ModalHeader>
 							<ModalBody>
 								<Text color="typography.secondary">
-									Your profile data will be stored without encryption
-									and visible as plain text.
+									All your data and notes will be stored with no
+									encryption.
 								</Text>
 							</ModalBody>
 							<ModalFooter>
