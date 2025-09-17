@@ -1,14 +1,21 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
+import { AutoFocusInside } from 'react-focus-lock';
 import {
 	Button,
 	HStack,
 	Input,
+	Modal,
+	ModalBody,
+	ModalCloseButton,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
 	Select,
 	Text,
 	useDisclosure,
 	VStack,
 } from '@chakra-ui/react';
-import { ModalDialog } from '@components/ModalDialog';
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
@@ -89,7 +96,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		],
 	);
 
-	const { isOpen, onOpen, onClose } = useDisclosure();
+	const modalControls = useDisclosure();
 
 	return (
 		<ProfilesForm
@@ -107,7 +114,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Button
 						variant="secondary"
 						w="100%"
-						onClick={onOpen}
+						onClick={modalControls.onOpen}
 						disabled={isPending}
 					>
 						Continue with no encryption
@@ -120,16 +127,49 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Cancel
 					</Button>
-					<ModalDialog
-						isOpen={isOpen}
-						onClose={onClose}
-						title="Creating a profile without encryption"
-						description="This may be unsafe. Creating a profile without encryption means your data will be stored in plain text."
-						confirmButtonText="Encrypt profile"
-						cancelButtonText="Continue without encryption"
-						onConfirm={() => onPressCreate(true)}
-						onCancel={() => onPressCreate(false)}
-					/>
+
+					<Modal
+						isOpen={modalControls.isOpen}
+						onClose={modalControls.onClose}
+						isCentered
+					>
+						<ModalOverlay />
+						<ModalContent>
+							<ModalCloseButton />
+							<ModalHeader>Create profile without encryption</ModalHeader>
+							<ModalBody>
+								<Text color="typography.secondary">
+									Your profile data will be stored without encryption
+									and visible as plain text.
+								</Text>
+							</ModalBody>
+							<ModalFooter>
+								<HStack
+									w="100%"
+									justifyContent="end"
+									as={AutoFocusInside}
+								>
+									<Button
+										variant="primary"
+										onClick={() => {
+											onPressCreate(false);
+											modalControls.onClose();
+										}}
+									>
+										Continue with no encryption
+									</Button>
+									<Button
+										onClick={() => {
+											onPressCreate(true);
+											modalControls.onClose();
+										}}
+									>
+										Cancel
+									</Button>
+								</HStack>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
 				</>
 			}
 		>
