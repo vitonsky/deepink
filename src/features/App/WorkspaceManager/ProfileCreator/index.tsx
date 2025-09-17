@@ -1,5 +1,22 @@
 import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
-import { Button, Input, Text, VStack } from '@chakra-ui/react';
+import { AutoFocusInside } from 'react-focus-lock';
+import {
+	Button,
+	HStack,
+	Input,
+	Modal,
+	ModalBody,
+	ModalCloseButton,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
+	Select,
+	Text,
+	useDisclosure,
+	VStack,
+} from '@chakra-ui/react';
+import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -7,6 +24,7 @@ import { ProfilesForm } from '../ProfilesForm';
 export type NewProfile = {
 	name: string;
 	password: string | null;
+	algorithm: string;
 };
 
 export type ProfileCreatorProps = {
@@ -31,6 +49,9 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
+
+	const [algorithm, setAlgorithm] = useState(ENCRYPTION_ALGORITHM_OPTIONS[0]);
+
 	useEffect(() => {
 		setPasswordError(null);
 	}, [password]);
@@ -56,6 +77,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			const response = await onCreateProfile({
 				name: profileName,
 				password: usePassword ? password : null,
+				algorithm,
 			}).finally(() => {
 				setIsPending(false);
 			});
@@ -64,8 +86,17 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				setProfileNameError(response);
 			}
 		},
-		[onCreateProfile, password, passwordInputRef, profileName, profileNameInputRef],
+		[
+			onCreateProfile,
+			password,
+			passwordInputRef,
+			profileName,
+			profileNameInputRef,
+			algorithm,
+		],
 	);
+
+	const noPasswordDialogState = useDisclosure();
 
 	return (
 		<ProfilesForm
@@ -83,7 +114,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Button
 						variant="secondary"
 						w="100%"
-						onClick={() => onPressCreate(false)}
+						onClick={noPasswordDialogState.onOpen}
 						disabled={isPending}
 					>
 						Continue with no password
@@ -96,6 +127,44 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Cancel
 					</Button>
+
+					<Modal
+						isOpen={noPasswordDialogState.isOpen}
+						onClose={noPasswordDialogState.onClose}
+						isCentered
+					>
+						<ModalOverlay />
+						<ModalContent>
+							<ModalCloseButton />
+							<ModalHeader>Create profile with no encryption</ModalHeader>
+							<ModalBody>
+								<Text color="typography.secondary">
+									All your data and notes will be stored with no
+									encryption.
+								</Text>
+							</ModalBody>
+							<ModalFooter>
+								<HStack
+									w="100%"
+									justifyContent="end"
+									as={AutoFocusInside}
+								>
+									<Button
+										variant="primary"
+										onClick={() => {
+											onPressCreate(false);
+											noPasswordDialogState.onClose();
+										}}
+									>
+										Continue with no encryption
+									</Button>
+									<Button onClick={noPasswordDialogState.onClose}>
+										Cancel
+									</Button>
+								</HStack>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
 				</>
 			}
 		>
@@ -129,6 +198,24 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					/>
 
 					{passwordError && <Text color="red.500">{passwordError}</Text>}
+				</VStack>
+
+				<VStack w="100%" gap="0.1rem">
+					<Text color="typography.additional" fontSize="18px" alignSelf="start">
+						Encryption algorithm
+					</Text>
+					<Select
+						variant="secondary"
+						value={algorithm}
+						onChange={(evt) => setAlgorithm(evt.target.value)}
+						disabled={isPending}
+					>
+						{ENCRYPTION_ALGORITHM_OPTIONS.map((algorithm) => (
+							<option key={algorithm} value={algorithm}>
+								{algorithm.split('-').join('->')}
+							</option>
+						))}
+					</Select>
 				</VStack>
 			</VStack>
 		</ProfilesForm>

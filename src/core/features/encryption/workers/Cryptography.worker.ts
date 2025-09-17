@@ -1,8 +1,9 @@
+import { IEncryptionProcessor } from '@core/encryption';
+import { AESGCMCipher } from '@core/encryption/ciphers/AES';
+import { TwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
 import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
 import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
-import { AESGCMCipher } from '../../../encryption/ciphers/AES';
-import { TwofishCTRCipher } from '../../../encryption/ciphers/Twofish';
 import { EncryptionController } from '../../../encryption/EncryptionController';
 import { BufferIntegrityProcessor } from '../../../encryption/processors/BufferIntegrityProcessor';
 import { BufferSizeObfuscationProcessor } from '../../../encryption/processors/BufferSizeObfuscationProcessor';
@@ -10,6 +11,8 @@ import { PipelineProcessor } from '../../../encryption/processors/PipelineProces
 import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
 import { getRandomBytes } from '../../../encryption/utils/random';
 
+import { parseAlgorithms } from '../utils';
+import { ENCRYPTION_ALGORITHM } from '..';
 import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
@@ -21,7 +24,7 @@ const messenger = new WorkerMessenger(self);
 const requests = new WorkerRPC(messenger);
 
 const workerId = performance.now();
-requests.addHandler('init', async ({ secretKey, salt }) => {
+requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
 
 	// Convert `ArrayBuffer`
@@ -32,24 +35,33 @@ requests.addHandler('init', async ({ secretKey, salt }) => {
 	if (!(salt instanceof Uint8Array))
 		throw new Error('Salt is not instance of Uint8Array');
 
-	const derivedKeys = await getMasterKey(secretKey, salt).then((masterKey) =>
+	const derivedKeys = await getMasterKey(key, salt).then((masterKey) =>
 		getDerivedKeysManager(masterKey, salt),
 	);
 
-	const aesKey = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-		name: 'AES-GCM',
-		length: 256,
-	});
-	const twofishKey = await derivedKeys
-		.getDerivedBytes('twofish-ctr-cipher', 256)
-		.then((buffer) => new Uint8Array(buffer));
+	const cipherMap: Record<ENCRYPTION_ALGORITHM, () => Promise<IEncryptionProcessor>> = {
+		[ENCRYPTION_ALGORITHM.AES]: async () => {
+			const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
+				name: 'AES-GCM',
+				length: 256,
+			});
+			return new AESGCMCipher(key, getRandomBytes);
+		},
+		[ENCRYPTION_ALGORITHM.TWOFISH]: async () => {
+			const key = await derivedKeys.getDerivedBytes('twofish-ctr-cipher', 256);
+			return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
+		},
+	};
+
+	const ciphers = await Promise.all(
+		parseAlgorithms(algorithm).map((name) => cipherMap[name]()),
+	);
 
 	encryptionController = new EncryptionController(
 		new PipelineProcessor([
 			new BufferIntegrityProcessor(),
 			new BufferSizeObfuscationProcessor(getRandomBytes),
-			new AESGCMCipher(aesKey, getRandomBytes),
-			new TwofishCTRCipher(twofishKey, getRandomBytes),
+			...ciphers,
 		]),
 	);
 });
