@@ -7,9 +7,11 @@ import { useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
 export const NoteVersions = ({
 	noteId,
 	onClose,
+	onVersionApply,
 }: {
 	noteId: string;
 	onClose: () => void;
+	onVersionApply?: (version: NoteVersion) => void;
 }) => {
 	const noteHistory = useNotesHistory();
 
@@ -44,17 +46,27 @@ export const NoteVersions = ({
 					<VStack w="100%" gap={0}>
 						{versions.map((version) => (
 							<HStack
+								key={version.id}
 								w="100%"
 								align="start"
 								padding="0.3rem"
 								alignItems="center"
 								_hover={{ backgroundColor: 'dim.50' }}
 							>
-								<Text>
-									{new Date(version.createdAt).toLocaleString()}
-								</Text>
+								<HStack>
+									<Text>
+										{new Date(version.createdAt).toLocaleString()}
+									</Text>
+									<Text color="typography.secondary">
+										{version.text.length} chars
+									</Text>
+								</HStack>
 								<HStack marginLeft="auto">
-									<Button size="sm" title="Apply version">
+									<Button
+										size="sm"
+										title="Apply version"
+										onClick={() => onVersionApply?.(version)}
+									>
 										<FaCheck />
 									</Button>
 									<Button size="sm" title="Open version">

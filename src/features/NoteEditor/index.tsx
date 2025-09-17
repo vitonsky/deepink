@@ -302,7 +302,15 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 				<BackLinksTree onClose={() => setSidePanel(null)} />
 			)}
 			{sidePanel === NoteMenuItems.TOGGLE_HISTORY && (
-				<NoteVersions noteId={note.id} onClose={() => setSidePanel(null)} />
+				<NoteVersions
+					noteId={note.id}
+					onClose={() => setSidePanel(null)}
+					onVersionApply={(version) => {
+						// TODO: apply changes in single transaction + make new snapshot
+						setTitle(version.title);
+						setText(version.text);
+					}}
+				/>
 			)}
 		</VStack>
 	);
