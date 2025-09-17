@@ -117,7 +117,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						onClick={noPasswordDialogState.onOpen}
 						disabled={isPending}
 					>
-						Continue with no encryption
+						Continue with no password
 					</Button>
 					<Button
 						variant="secondary"
@@ -156,7 +156,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 											noPasswordDialogState.onClose();
 										}}
 									>
-										Continue with no password
+										Continue with no encryption
 									</Button>
 									<Button onClick={noPasswordDialogState.onClose}>
 										Cancel
