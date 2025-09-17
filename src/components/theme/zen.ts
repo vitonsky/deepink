@@ -46,6 +46,7 @@ export const zenTheme = extendTheme(basicTheme, {
 			alternativeBorder: '#c0c4c9',
 		},
 		dim: {
+			50: '#fdf4ea',
 			100: '#ece3da',
 			400: '#e0d4c8',
 		},
