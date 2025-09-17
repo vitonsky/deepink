@@ -5,7 +5,7 @@ import { INote, INoteContent, NoteId } from '@core/features/notes';
 import { useAsRef } from '@hooks/useAsRef';
 
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
-import { NoteEditor } from '../../NoteEditor';
+import { Note } from '../../NoteEditor';
 
 export type NotesProps = {
 	tabs: NoteId[];
@@ -66,7 +66,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 							w="100%"
 							h="100%"
 						>
-							<NoteEditor
+							<Note
 								key={note.id}
 								note={note}
 								updateNote={updateHooks[note.id]}

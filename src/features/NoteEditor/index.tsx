@@ -8,34 +8,29 @@ import { INote, INoteContent } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
 import {
 	useAttachmentsController,
-	useFilesRegistry,
 	useNotesHistory,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
-import { selectEditorMode } from '@state/redux/settings/settings';
 
-import { FileUploader } from '../MonakoEditor/features/useDropFiles';
-import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
 import { BackLinksTree } from './BackLinksTree';
-import { EditorPanelContext } from './EditorPanel';
-import { EditorPanel } from './EditorPanel/EditorPanel';
+import { NoteEditor } from './NoteEditor';
 import { NoteMenu, NoteMenuItems } from './NoteMenuItems';
 import { NoteVersions } from './NoteVersions';
-import { RichEditor } from './RichEditor/RichEditor';
 
 export type NoteEditorProps = {
 	note: INote;
 	updateNote: (note: INoteContent) => void;
 };
 
-export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
+/**
+ * TODO: rename directory of component
+ */
+export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
-
-	const editorMode = useAppSelector(selectEditorMode);
 
 	const [title, setTitle] = useState(note.content.title);
 	const [text, setText] = useState(note.content.text);
@@ -108,14 +103,6 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 			});
 		}
 	}, [title, text, debouncedUpdateNote]);
-
-	const filesRegistry = useFilesRegistry();
-	const uploadFile: FileUploader = useCallback(
-		async (file) => {
-			return filesRegistry.add(file);
-		},
-		[filesRegistry],
-	);
 
 	const attachments = useAttachmentsController();
 
@@ -309,40 +296,7 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 				/>
 			</HStack>
 
-			<EditorPanelContext>
-				<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
-					<EditorPanel />
-				</HStack>
-
-				<HStack
-					sx={{
-						display: 'flex',
-						width: '100%',
-						height: '100%',
-						overflow: 'hidden',
-					}}
-				>
-					{(editorMode === 'plaintext' || editorMode === 'split-screen') && (
-						<Box
-							as={MonacoEditor}
-							value={text}
-							setValue={setText}
-							flexGrow="100"
-							uploadFile={uploadFile}
-							width="100%"
-							height="100%"
-							minW="0"
-						/>
-					)}
-					{(editorMode === 'richtext' || editorMode === 'split-screen') && (
-						<RichEditor
-							placeholder="Write your thoughts here..."
-							value={text}
-							onChanged={setText}
-						/>
-					)}
-				</HStack>
-			</EditorPanelContext>
+			<NoteEditor text={text} setText={setText} />
 
 			{sidePanel === NoteMenuItems.TOGGLE_BACKLINKS && (
 				<BackLinksTree onClose={() => setSidePanel(null)} />
@@ -354,4 +308,4 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	);
 });
 
-NoteEditor.displayName = 'NoteEditor';
+Note.displayName = 'Note';
