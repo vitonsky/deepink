@@ -26,6 +26,7 @@ import {
 
 export enum NoteMenuItems {
 	TOGGLE_BACKLINKS,
+	TOGGLE_HISTORY,
 }
 
 export const NoteMenu = memo(
@@ -48,7 +49,7 @@ export const NoteMenu = memo(
 							<Text>Remind me</Text>
 						</HStack>
 					</MenuItem>
-					<MenuItem>
+					<MenuItem onClick={() => onClick?.(NoteMenuItems.TOGGLE_HISTORY)}>
 						<HStack>
 							<FaClock />
 							<Text>History</Text>

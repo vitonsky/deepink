@@ -9,6 +9,7 @@ import { IResolvedTag } from '@core/features/tags';
 import {
 	useAttachmentsController,
 	useFilesRegistry,
+	useNotesHistory,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -18,9 +19,11 @@ import { selectEditorMode } from '@state/redux/settings/settings';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
+import { BackLinksTree } from './BackLinksTree';
 import { EditorPanelContext } from './EditorPanel';
 import { EditorPanel } from './EditorPanel/EditorPanel';
 import { NoteMenu, NoteMenuItems } from './NoteMenuItems';
+import { NoteVersions } from './NoteVersions';
 import { RichEditor } from './RichEditor/RichEditor';
 
 export type NoteEditorProps = {
@@ -59,6 +62,27 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	const updateNoteRef = useRef(updateNote);
 	updateNoteRef.current = updateNote;
 
+	// Snapshot note once
+	const noteSnapshotPromiseRef = useRef<null | Promise<void>>(null);
+	const noteHistory = useNotesHistory();
+	useEffect(() => {
+		noteSnapshotPromiseRef.current = new Promise<void>(async (res) => {
+			for (let attempt = 0; attempt < 3; attempt++) {
+				try {
+					await noteHistory.snapshot(note.id);
+					res();
+					return;
+				} catch (err) {
+					// Retry after delay
+					console.error(err);
+					await new Promise((res) => setTimeout(res, 200));
+				}
+			}
+		}).then(() => {
+			noteSnapshotPromiseRef.current = null;
+		});
+	}, [note.id, noteHistory]);
+
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedUpdateNote = useCallback(
 		debounce((data: { title: string; text: string }) => {
@@ -75,7 +99,14 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 			return;
 		}
 
-		debouncedUpdateNote({ title, text });
+		if (noteSnapshotPromiseRef.current === null) {
+			debouncedUpdateNote({ title, text });
+		} else {
+			// Wait note snapshotting before call
+			noteSnapshotPromiseRef.current.then(() => {
+				debouncedUpdateNote({ title, text });
+			});
+		}
 	}, [title, text, debouncedUpdateNote]);
 
 	const filesRegistry = useFilesRegistry();
@@ -119,12 +150,13 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 		attachTagName ? attachTagName.resolvedName : '',
 	);
 
-	const [sidePanel, setSidePanel] = useState<string | null>(null);
+	const [sidePanel, setSidePanel] = useState<NoteMenuItems | null>(null);
 
 	const onNoteMenuClick = useCallback((command: NoteMenuItems) => {
 		switch (command) {
 			case NoteMenuItems.TOGGLE_BACKLINKS:
-				setSidePanel((state) => (state ? null : 'backlinks'));
+			case NoteMenuItems.TOGGLE_HISTORY:
+				setSidePanel((state) => (state === command ? null : command));
 				break;
 
 			default:
@@ -312,31 +344,11 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 				</HStack>
 			</EditorPanelContext>
 
-			{sidePanel === 'backlinks' && (
-				<VStack
-					align="start"
-					w="100%"
-					h="300px"
-					flex={1}
-					padding=".5rem"
-					gap="1rem"
-					borderTop="1px solid"
-					borderColor="surface.border"
-				>
-					<HStack w="100%">
-						<Text fontWeight="bold">Back links tree</Text>
-						<Button
-							variant="ghost"
-							size="xs"
-							marginLeft="auto"
-							onClick={() => setSidePanel(null)}
-						>
-							<FaXmark />
-						</Button>
-					</HStack>
-
-					<Box w="100%">TODO: Note related data here</Box>
-				</VStack>
+			{sidePanel === NoteMenuItems.TOGGLE_BACKLINKS && (
+				<BackLinksTree onClose={() => setSidePanel(null)} />
+			)}
+			{sidePanel === NoteMenuItems.TOGGLE_HISTORY && (
+				<NoteVersions noteId={note.id} onClose={() => setSidePanel(null)} />
 			)}
 		</VStack>
 	);
