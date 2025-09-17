@@ -7,7 +7,7 @@ import { shortcuts } from '.';
 /**
  * Registers global keyboard shortcuts for commands
  *
- * Pressing a shortcut executes the corresponding command
+ * Configures the processing of global keyboard shortcuts, associating each combination with a corresponding command
  */
 export const useRegisterGlobalCommandShortcuts = () => {
 	const callCommand = useCommandEvent();
@@ -32,9 +32,7 @@ export const useRegisterGlobalCommandShortcuts = () => {
 		});
 
 		return () => {
-			Object.keys(shortcuts).forEach((shortcut) => {
-				hotkeys.unbind(shortcut);
-			});
+			Object.keys(shortcuts).forEach((shortcut) => hotkeys.unbind(shortcut));
 		};
 	}, [callCommand]);
 };

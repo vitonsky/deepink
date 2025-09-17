@@ -12,6 +12,7 @@ import {
 } from '@state/redux/profiles/profiles';
 
 /**
+ * Returns the ID of a note relative to the currently active note.
  * When reaching the end of the array, returns the first element, when reaching the start of the array, returns the last element
  */
 const getRelativeNoteId = (
@@ -19,7 +20,6 @@ const getRelativeNoteId = (
 	activeNoteId: string | null,
 	offset: number,
 ) => {
-	// switch only if 2 or more notes are opened
 	if (!activeNoteId || openedNotes.length < 2) return null;
 
 	const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
