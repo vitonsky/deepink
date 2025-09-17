@@ -1,6 +1,5 @@
 import React, { FC, useEffect } from 'react';
 import { HStack, VStack } from '@chakra-ui/react';
-import { useRegisterGlobalCommandShortcuts } from '@core/features/commands/shortcuts/useRegisterGlobalCommandShortcuts';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
@@ -30,8 +29,6 @@ export const MainScreen: FC = () => {
 			}
 		});
 	}, [tagsRegistry, updateNotes]);
-
-	useRegisterGlobalCommandShortcuts();
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
