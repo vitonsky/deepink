@@ -5,7 +5,11 @@ export const ReadOnlyPlugin = ({ readonly }: { readonly: boolean }) => {
 	const [editor] = useLexicalComposerContext();
 
 	useEffect(() => {
-		editor.setEditable(!readonly);
+		// Update state
+		const isEditable = !readonly;
+		if (isEditable !== editor.isEditable()) {
+			editor.setEditable(isEditable);
+		}
 
 		// Observe state changes
 		return editor.registerEditableListener((isEditable) => {
