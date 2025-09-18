@@ -23,8 +23,8 @@ export const NoteVersions = ({
 }: {
 	noteId: string;
 	onClose: () => void;
-	onVersionApply?: (version: NoteVersion) => void;
-	onShowVersion?: (version: NoteVersion) => void;
+	onVersionApply: (version: NoteVersion) => void;
+	onShowVersion: (version: NoteVersion) => void;
 }) => {
 	const noteHistory = useNotesHistory();
 
@@ -94,14 +94,98 @@ export const NoteVersions = ({
 									<Button
 										size="sm"
 										title="Apply version"
-										onClick={() => onVersionApply?.(version)}
+										onClick={(evt) => {
+											const applyVersion = () =>
+												onVersionApply(version);
+
+											// Apply immediately
+											if (evt.ctrlKey) {
+												applyVersion();
+												return;
+											}
+
+											show({
+												content: ({ onClose }) => (
+													<>
+														<ModalCloseButton />
+														<ModalHeader>
+															<Text>
+																Apply note version
+															</Text>
+														</ModalHeader>
+														<ModalBody paddingBottom="1rem">
+															<VStack
+																w="100%"
+																gap="1rem"
+																align="start"
+															>
+																<Text>
+																	You are about to apply
+																	note version{' '}
+																	<Text color="typography.secondary">
+																		{new Date(
+																			version.createdAt,
+																		).toLocaleString()}{' '}
+																		(
+																		{
+																			version.text
+																				.length
+																		}{' '}
+																		chars).
+																	</Text>
+																</Text>
+																<Text>
+																	This action will
+																	replace current note
+																	data with text of a
+																	selected snapshot. Are
+																	you sure?
+																</Text>
+
+																<HStack
+																	justifyContent="end"
+																	as={AutoFocusInside}
+																	w="100%"
+																>
+																	<Button
+																		variant="primary"
+																		onClick={() => {
+																			applyVersion();
+																			onClose();
+																		}}
+																	>
+																		Apply
+																	</Button>
+																	<Button
+																		variant="primary"
+																		onClick={() => {
+																			onShowVersion(
+																				version,
+																			);
+																			onClose();
+																		}}
+																	>
+																		Preview
+																	</Button>
+																	<Button
+																		onClick={onClose}
+																	>
+																		Cancel
+																	</Button>
+																</HStack>
+															</VStack>
+														</ModalBody>
+													</>
+												),
+											});
+										}}
 									>
 										<FaCheck />
 									</Button>
 									<Button
 										size="sm"
 										title="Open version"
-										onClick={() => onShowVersion?.(version)}
+										onClick={() => onShowVersion(version)}
 									>
 										<FaGlasses />
 									</Button>
@@ -174,19 +258,17 @@ export const NoteVersions = ({
 																	>
 																		Delete
 																	</Button>
-																	{onShowVersion && (
-																		<Button
-																			variant="primary"
-																			onClick={() => {
-																				onShowVersion(
-																					version,
-																				);
-																				onClose();
-																			}}
-																		>
-																			Preview
-																		</Button>
-																	)}
+																	<Button
+																		variant="primary"
+																		onClick={() => {
+																			onShowVersion(
+																				version,
+																			);
+																			onClose();
+																		}}
+																	>
+																		Preview
+																	</Button>
 																	<Button
 																		onClick={onClose}
 																	>
