@@ -162,8 +162,13 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 						placeholder="Note title"
 						size="sm"
 						borderRadius="6px"
-						value={title}
-						onChange={(evt) => setTitle(evt.target.value)}
+						value={versionPreview ? versionPreview.title : title}
+						onChange={
+							versionPreview
+								? undefined
+								: (evt) => setTitle(evt.target.value)
+						}
+						isDisabled={versionPreview !== null}
 					/>
 
 					{/* TODO: add options that may be toggled */}
@@ -173,18 +178,6 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
 				<HStack>
-					{versionPreview && (
-						<Button
-							variant="ghost"
-							size="xs"
-							title="Go back to editing"
-							onClick={() => {
-								setVersionPreview(null);
-							}}
-						>
-							<FaArrowLeft />
-						</Button>
-					)}
 					<Button variant="ghost" size="xs">
 						<FaBookmark />
 					</Button>
@@ -310,6 +303,28 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 					}}
 				/>
 			</HStack>
+
+			{versionPreview && (
+				<HStack alignItems="center" w="100%" flexWrap="wrap">
+					<HStack gap=".3rem">
+						<Button
+							variant="ghost"
+							size="xs"
+							title="Go back to editing"
+							onClick={() => {
+								setVersionPreview(null);
+							}}
+						>
+							<FaArrowLeft />
+						</Button>
+
+						<Text color="typography.secondary">
+							Version at{' '}
+							{new Date(versionPreview.createdAt).toLocaleString()}
+						</Text>
+					</HStack>
+				</HStack>
+			)}
 
 			{versionPreview ? (
 				<NoteEditor text={versionPreview.text} setText={() => {}} isReadOnly />
