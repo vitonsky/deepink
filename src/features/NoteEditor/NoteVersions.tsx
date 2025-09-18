@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FaCheck, FaGlasses, FaTrashCan, FaXmark } from 'react-icons/fa6';
 import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
@@ -18,20 +18,24 @@ export const NoteVersions = ({
 	const noteHistory = useNotesHistory();
 
 	const [versions, setVersions] = useState<NoteVersion[] | null>(null);
+	const updateVersionsList = useCallback(
+		() => noteHistory.getList(noteId).then(setVersions),
+		[noteHistory, noteId],
+	);
+
 	useEffect(() => {
 		setVersions(null);
-		noteHistory.getList(noteId).then(setVersions);
-	}, [noteHistory, noteId]);
+		updateVersionsList();
+	}, [noteId, updateVersionsList]);
 
 	// Refresh note versions by event
 	const eventBus = useEventBus();
 	useEffect(() => {
 		return eventBus.listen('noteHistoryUpdated', (noteId) => {
 			if (noteId !== noteId) return;
-
-			noteHistory.getList(noteId).then(setVersions);
+			updateVersionsList();
 		});
-	}, [eventBus, noteHistory]);
+	}, [eventBus, updateVersionsList]);
 
 	return (
 		<VStack
@@ -88,7 +92,14 @@ export const NoteVersions = ({
 									>
 										<FaGlasses />
 									</Button>
-									<Button size="sm" title="Delete version">
+									<Button
+										size="sm"
+										title="Delete version"
+										onClick={() => {
+											noteHistory.delete([version.id]);
+											eventBus.emit('noteHistoryUpdated', noteId);
+										}}
+									>
 										<FaTrashCan />
 									</Button>
 								</HStack>
