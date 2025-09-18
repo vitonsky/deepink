@@ -55,7 +55,7 @@ export const NoteEditor = ({
 						width="100%"
 						height="100%"
 						minW="0"
-						readOnly={isReadOnly}
+						isReadOnly={isReadOnly}
 					/>
 				)}
 				{(editorMode === 'richtext' || editorMode === 'split-screen') && (
