@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -28,11 +27,9 @@ import {
 } from './plugins/Markdown/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
 import { ReadOnlyPlugin } from './plugins/ReadOnlyPlugin';
-import { useRichEditorLock } from './useRichEditorLock';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
-		isEditable: boolean;
 		placeholder?: string;
 		isReadOnly?: boolean;
 		search?: string;
@@ -47,13 +44,6 @@ export const RichEditorContent = ({
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
-
-	const [editor] = useLexicalComposerContext();
-	const [temporarilyReadOnly, setTemporarilyReadOnly] = useState(false);
-
-	useEffect(() => {
-		editor.setEditable(Boolean(isReadOnly) && temporarilyReadOnly);
-	}, [editor, Boolean(isReadOnly), temporarilyReadOnly]);
 
 	return (
 		<Box
@@ -116,6 +106,8 @@ export const RichEditorContent = ({
 			<HorizontalRulePlugin />
 
 			<HighlightingPlugin search={search} />
+
+			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
 
 			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
 		</Box>

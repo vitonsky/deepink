@@ -18,13 +18,11 @@ export const isFocusedElement = (element: HTMLElement | null) => {
 export type MarkdownSerializePluginProps = {
 	value: string;
 	onChanged?: (value: string) => void;
-	setEditableMode?: (editable: boolean) => void;
 };
 
 export const MarkdownSerializePlugin = ({
 	value,
 	onChanged,
-	setEditableMode,
 }: MarkdownSerializePluginProps) => {
 	const [editor] = useLexicalComposerContext();
 
@@ -41,27 +39,42 @@ export const MarkdownSerializePlugin = ({
 			$convertFromMarkdownString(value);
 			$setSelection(null);
 		});
-		const isEditable = editor.isEditable();
 
 		// Disable editable mode while update if editor is not active,
 		// to prevent forced focus on editor
+		let isEditableForceDisabled = false;
 		const isActiveBeforeUpdate = isFocusedElement(editor.getRootElement());
-		if (!isActiveBeforeUpdate && isEditable) {
-			if (setEditableMode) setEditableMode(false);
+		if (!isActiveBeforeUpdate && editor.isEditable()) {
+			editor.setEditable(false);
+			isEditableForceDisabled = true;
 		}
+
+		// Listen `isEditable` changes once
+		let isEditableChanged = false;
+		const onEditableListenerCleanup = editor.registerEditableListener(() => {
+			isEditableChanged = true;
+			onEditableListenerCleanup();
+		});
 
 		editor.update(
 			() => {
 				$convertFromMarkdownString(value);
+				$setSelection(null);
 			},
 			{
 				onUpdate() {
+					onEditableListenerCleanup();
+
 					// Restore editable state once update completed
-					if (setEditableMode) setEditableMode(isEditable);
+					// In case `isEditable` has changed outside, we should not touch this property anymore, since control on value is transferred.
+					//
+					if (isEditableForceDisabled && !isEditableChanged) {
+						editor.setEditable(true);
+					}
 				},
 			},
 		);
-	}, [editor, setEditableMode, value]);
+	}, [editor, value]);
 
 	const onChange = (value: string) => {
 		serializedValueRef.current = value;
