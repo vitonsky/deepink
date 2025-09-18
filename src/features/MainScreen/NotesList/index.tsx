@@ -14,6 +14,7 @@ import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles'
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
+import { defaultNoteMenu, deletedNoteMenu } from './NoteContextMenu/ContextMenu';
 import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
 export type NotesListProps = {};
@@ -31,7 +32,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		closeNote: noteActions.close,
 		notesRegistry,
 		updateNotes,
-		noteUpdated,
+		updateNoteState: noteUpdated,
 	});
 
 	const parentRef = useRef<HTMLDivElement>(null);
@@ -129,10 +130,17 @@ export const NotesList: FC<NotesListProps> = () => {
 										)
 									}
 									onContextMenu={(evt) => {
-										openNoteContextMenu(note.id, {
-											x: evt.pageX,
-											y: evt.pageY,
-										});
+										openNoteContextMenu(
+											note.id,
+											{
+												x: evt.pageX,
+												y: evt.pageY,
+											},
+											() =>
+												note.isDeleted
+													? deletedNoteMenu
+													: defaultNoteMenu,
+										);
 									}}
 									onClick={() => {
 										noteActions.click(note.id);

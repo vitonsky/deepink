@@ -5,6 +5,10 @@ import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
+import {
+	defaultNoteMenu,
+	deletedNoteMenu,
+} from '../NotesList/NoteContextMenu/ContextMenu';
 import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
 
 export type TopBarProps = {
@@ -38,7 +42,7 @@ export const TopBar: FC<TopBarProps> = ({
 		closeNote: onClose,
 		notesRegistry,
 		updateNotes,
-		noteUpdated,
+		updateNoteState: noteUpdated,
 	});
 
 	const existsTabs = useMemo(
@@ -124,10 +128,17 @@ export const TopBar: FC<TopBarProps> = ({
 									overflow="hidden"
 									textOverflow="ellipsis"
 									onContextMenu={(evt) => {
-										openNoteContextMenu(note.id, {
-											x: evt.pageX,
-											y: evt.pageY,
-										});
+										openNoteContextMenu(
+											note.id,
+											{
+												x: evt.pageX,
+												y: evt.pageY,
+											},
+											() =>
+												note.isDeleted
+													? deletedNoteMenu
+													: defaultNoteMenu,
+										);
 									}}
 								>
 									{title}
