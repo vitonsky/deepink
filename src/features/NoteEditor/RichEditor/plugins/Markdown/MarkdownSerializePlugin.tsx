@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { $setSelection } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 
@@ -52,6 +53,7 @@ export const MarkdownSerializePlugin = ({
 		editor.update(
 			() => {
 				$convertFromMarkdownString(value);
+				$setSelection(null);
 			},
 			{
 				onUpdate() {
