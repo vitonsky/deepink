@@ -1,4 +1,5 @@
-import React, { createContext, FC, PropsWithChildren } from 'react';
+import React, { createContext, FC, PropsWithChildren, useState } from 'react';
+import { createEvent } from 'effector';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { INote } from '@core/features/notes';
@@ -14,6 +15,23 @@ export type NotesApi = {
 };
 export const NotesContext = createContext<NotesApi | null>(null);
 export const useNotesContext = createContextGetterHook(NotesContext);
+
+export type EventsMap = {
+	noteUpdated: string;
+	noteHistoryUpdated: string;
+};
+export type EventBusApi = {
+	emit: <K extends keyof EventsMap>(
+		eventName: K,
+		...args: EventsMap[K] extends void ? [payload?: void] : [payload: EventsMap[K]]
+	) => void;
+	listen: <T extends keyof EventsMap>(
+		eventName: T,
+		callback: (payload: EventsMap[T]) => void,
+	) => () => void;
+};
+export const EventBusContext = createContext<EventBusApi | null>(null);
+export const useEventBus = createContextGetterHook(EventBusContext);
 
 export const NotesRegistryContext = createContext<INotesController | null>(null);
 export const useNotesRegistry = createContextGetterHook(NotesRegistryContext);
@@ -53,19 +71,40 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 	notesHistory,
 	children,
 }) => {
+	const [eventBus] = useState(() => {
+		const event = createEvent<{
+			name: string;
+			payload: any;
+		}>();
+		return {
+			emit(eventName: string, payload?: any) {
+				event({ name: eventName, payload });
+			},
+			listen(eventName, callback) {
+				return event.watch((event) => {
+					if (event.name !== eventName) return;
+
+					callback(event.payload);
+				});
+			},
+		} satisfies EventBusApi;
+	});
+
 	return (
-		<NotesContext.Provider value={notesApi}>
-			<FilesRegistryContext.Provider value={filesRegistry}>
-				<AttachmentsControllerContext.Provider value={attachmentsController}>
-					<TagsRegistryContext.Provider value={tagsRegistry}>
-						<NotesRegistryContext.Provider value={notesRegistry}>
-							<NotesHistoryContext.Provider value={notesHistory}>
-								{children}
-							</NotesHistoryContext.Provider>
-						</NotesRegistryContext.Provider>
-					</TagsRegistryContext.Provider>
-				</AttachmentsControllerContext.Provider>
-			</FilesRegistryContext.Provider>
-		</NotesContext.Provider>
+		<EventBusContext.Provider value={eventBus}>
+			<NotesContext.Provider value={notesApi}>
+				<FilesRegistryContext.Provider value={filesRegistry}>
+					<AttachmentsControllerContext.Provider value={attachmentsController}>
+						<TagsRegistryContext.Provider value={tagsRegistry}>
+							<NotesRegistryContext.Provider value={notesRegistry}>
+								<NotesHistoryContext.Provider value={notesHistory}>
+									{children}
+								</NotesHistoryContext.Provider>
+							</NotesRegistryContext.Provider>
+						</TagsRegistryContext.Provider>
+					</AttachmentsControllerContext.Provider>
+				</FilesRegistryContext.Provider>
+			</NotesContext.Provider>
+		</EventBusContext.Provider>
 	);
 };

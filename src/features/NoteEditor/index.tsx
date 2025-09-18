@@ -1,4 +1,12 @@
-import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+	FC,
+	memo,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
 import { debounce } from 'lodash';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
@@ -9,7 +17,9 @@ import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { IResolvedTag } from '@core/features/tags';
 import {
 	useAttachmentsController,
+	useEventBus,
 	useNotesHistory,
+	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -33,8 +43,21 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
+	const eventBus = useEventBus();
+	const notesRegistry = useNotesRegistry();
+
 	const [title, setTitle] = useState(note.content.title);
 	const [text, setText] = useState(note.content.text);
+
+	// Forced update for note data
+	const forceUpdateLocalStateRef = useRef(false);
+	useMemo(() => {
+		if (!forceUpdateLocalStateRef.current) return;
+		forceUpdateLocalStateRef.current = false;
+
+		setTitle(note.content.title);
+		setText(note.content.text);
+	}, [note]);
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -340,10 +363,14 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 					noteId={note.id}
 					onClose={() => setSidePanel(null)}
 					onShowVersion={(version) => setVersionPreview(version)}
-					onVersionApply={(version) => {
-						// TODO: apply changes in single transaction + make new snapshot
-						setTitle(version.title);
-						setText(version.text);
+					onVersionApply={async (version) => {
+						await noteHistory.snapshot(note.id);
+						await notesRegistry.update(note.id, version);
+						await noteHistory.snapshot(note.id);
+
+						eventBus.emit('noteHistoryUpdated', note.id);
+						eventBus.emit('noteUpdated', note.id);
+						forceUpdateLocalStateRef.current = true;
 					}}
 				/>
 			)}

@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import {
+	useEventBus,
 	useNotesContext,
 	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
@@ -33,6 +34,16 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 			notes.map((note) => note.id),
 		)(state),
 	);
+
+	const eventBus = useEventBus();
+	useEffect(() => {
+		return eventBus.listen('noteUpdated', (noteId) => {
+			updateNotes();
+			notesRegistry.getById(noteId).then((note) => {
+				if (note) noteUpdated(note);
+			});
+		});
+	}, [eventBus, noteUpdated, notesRegistry, updateNotes]);
 
 	// Simulate note update
 	const updateNote = useImmutableCallback(

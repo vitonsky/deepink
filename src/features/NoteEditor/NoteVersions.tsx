@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaCheck, FaGlasses, FaTrashCan, FaXmark } from 'react-icons/fa6';
 import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
-import { useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
+import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
 
 export const NoteVersions = ({
 	noteId,
@@ -22,6 +22,16 @@ export const NoteVersions = ({
 		setVersions(null);
 		noteHistory.getList(noteId).then(setVersions);
 	}, [noteHistory, noteId]);
+
+	// Refresh note versions by event
+	const eventBus = useEventBus();
+	useEffect(() => {
+		return eventBus.listen('noteHistoryUpdated', (noteId) => {
+			if (noteId !== noteId) return;
+
+			noteHistory.getList(noteId).then(setVersions);
+		});
+	}, [eventBus, noteHistory]);
 
 	return (
 		<VStack
