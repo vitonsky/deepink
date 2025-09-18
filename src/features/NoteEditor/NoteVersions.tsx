@@ -1,8 +1,19 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { AutoFocusInside } from 'react-focus-lock';
 import { FaCheck, FaGlasses, FaTrashCan, FaXmark } from 'react-icons/fa6';
-import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	HStack,
+	ModalBody,
+	ModalCloseButton,
+	ModalHeader,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
+import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 
 export const NoteVersions = ({
 	noteId,
@@ -36,6 +47,8 @@ export const NoteVersions = ({
 			updateVersionsList();
 		});
 	}, [eventBus, updateVersionsList]);
+
+	const { show } = useWorkspaceModal();
 
 	return (
 		<VStack
@@ -95,9 +108,96 @@ export const NoteVersions = ({
 									<Button
 										size="sm"
 										title="Delete version"
-										onClick={() => {
-											noteHistory.delete([version.id]);
-											eventBus.emit('noteHistoryUpdated', noteId);
+										onClick={(evt) => {
+											const deleteVersion = () => {
+												noteHistory.delete([version.id]);
+												eventBus.emit(
+													'noteHistoryUpdated',
+													noteId,
+												);
+											};
+
+											// Delete immediately
+											if (evt.ctrlKey) {
+												deleteVersion();
+												return;
+											}
+
+											show({
+												content: ({ onClose }) => (
+													<>
+														<ModalCloseButton />
+														<ModalHeader>
+															<Text>
+																Delete note version
+															</Text>
+														</ModalHeader>
+														<ModalBody paddingBottom="1rem">
+															<VStack
+																w="100%"
+																gap="1rem"
+																align="start"
+															>
+																<Text>
+																	You are about to
+																	delete note version{' '}
+																	<Text color="typography.secondary">
+																		{new Date(
+																			version.createdAt,
+																		).toLocaleString()}{' '}
+																		(
+																		{
+																			version.text
+																				.length
+																		}{' '}
+																		chars).
+																	</Text>
+																</Text>
+																<Text>
+																	This action will
+																	delete note version
+																	irreversibly. Are you
+																	sure?
+																</Text>
+
+																<HStack
+																	justifyContent="end"
+																	as={AutoFocusInside}
+																	w="100%"
+																>
+																	<Button
+																		variant="primary"
+																		onClick={() => {
+																			deleteVersion();
+																			onClose();
+																		}}
+																	>
+																		Delete
+																	</Button>
+																	{onShowVersion && (
+																		<Button
+																			variant="primary"
+																			onClick={() => {
+																				onShowVersion(
+																					version,
+																				);
+																				onClose();
+																			}}
+																		>
+																			Preview
+																		</Button>
+																	)}
+																	<Button
+																		onClick={onClose}
+																	>
+																		Cancel
+																	</Button>
+																</HStack>
+															</VStack>
+														</ModalBody>
+													</>
+												),
+											});
 										}}
 									>
 										<FaTrashCan />
