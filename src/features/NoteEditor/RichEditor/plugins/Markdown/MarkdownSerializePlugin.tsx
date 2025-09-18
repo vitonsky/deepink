@@ -29,14 +29,25 @@ export const MarkdownSerializePlugin = ({
 		// Skip updates sent from this component, based on value equality
 		if (serializedValueRef.current === value) return;
 
-		const isEditable = editor.isEditable();
+		// Cleanup for new values, since it will be updated
+		// Otherwise we may have bug when value is updated via `editor.update`, an `OnChangePlugin` will not trigger callback (because synthetic update) and if next value update will have previous value - update will be ignored.
+		serializedValueRef.current = null;
 
 		// Disable editable mode while update if editor is not active,
 		// to prevent forced focus on editor
+		let isEditableForceDisabled = false;
 		const isActiveBeforeUpdate = isFocusedElement(editor.getRootElement());
-		if (!isActiveBeforeUpdate && isEditable) {
+		if (!isActiveBeforeUpdate && editor.isEditable()) {
 			editor.setEditable(false);
+			isEditableForceDisabled = true;
 		}
+
+		// Listen `isEditable` changes once
+		let isEditableChanged = false;
+		const onEditableListenerCleanup = editor.registerEditableListener(() => {
+			isEditableChanged = true;
+			onEditableListenerCleanup();
+		});
 
 		editor.update(
 			() => {
@@ -44,9 +55,13 @@ export const MarkdownSerializePlugin = ({
 			},
 			{
 				onUpdate() {
+					onEditableListenerCleanup();
+
 					// Restore editable state once update completed
-					if (isEditable !== editor.isEditable()) {
-						editor.setEditable(isEditable);
+					// In case `isEditable` has changed outside, we should not touch this property anymore, since control on value is transferred.
+					//
+					if (isEditableForceDisabled && !isEditableChanged) {
+						editor.setEditable(true);
 					}
 				},
 			},
