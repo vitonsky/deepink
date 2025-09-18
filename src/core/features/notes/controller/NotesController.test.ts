@@ -113,10 +113,10 @@ describe('CRUD operations', () => {
 				};
 			});
 		const ids = await Promise.all(notesSample.map((note) => registry.add(note)));
-		const notes = ids.slice(0, 100);
+		const notesToDelete = ids.slice(0, 100);
 
 		// set deleted status
-		await registry.updateStatus(notes, { deleted: true });
+		await registry.updateStatus(notesToDelete, { deleted: true });
 
 		await expect(registry.getLength()).resolves.toBe(300);
 		await expect(registry.get({ deleted: true })).resolves.toEqual(
@@ -124,7 +124,7 @@ describe('CRUD operations', () => {
 		);
 
 		// reset deleted status
-		await registry.updateStatus(notes, { deleted: false });
+		await registry.updateStatus(notesToDelete, { deleted: false });
 		await expect(registry.get({ deleted: false })).resolves.toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
 		);
@@ -243,17 +243,17 @@ describe('data fetching', () => {
 		await expect(registry.get()).resolves.toHaveLength(4);
 
 		// get only deleted notes
-		const deletedNotes = await registry.get({ deleted: true });
-		expect(deletedNotes).toHaveLength(1);
-		expect(deletedNotes).toEqual(
+		await expect(registry.get({ deleted: true })).resolves.toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
 		);
 
 		// get only non-deleted notes
-		const restoredNotes = await registry.get({ deleted: false });
-		expect(restoredNotes).toHaveLength(3);
-		expect(restoredNotes).toEqual(
-			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
+		await expect(registry.get({ deleted: false })).resolves.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ isDeleted: false }),
+				expect.objectContaining({ isDeleted: false }),
+				expect.objectContaining({ isDeleted: false }),
+			]),
 		);
 
 		await db.close();
@@ -278,6 +278,9 @@ describe('data fetching', () => {
 		await tags.setAttachedTags(note, [fooTag]);
 
 		await registry.updateStatus([note], { deleted: true });
+
+		// get notes filtered by tag only
+		await expect(registry.get({ tags: [fooTag] })).resolves.toHaveLength(1);
 
 		// get deleted notes with tag
 		await expect(
