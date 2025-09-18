@@ -16,52 +16,19 @@ import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
+import { mkdir, writeFile } from 'fs/promises';
+import { defaultNoteMenu } from './ContextMenu';
+import { NotesExporter } from './NotesExporter';
 import { NoteActions } from '.';
 
 type DefaultContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
-	noteUpdated: (id: INote) => void;
+	updateNoteState: (id: INote) => void;
 
 	// TODO: receive with react context
 	notesRegistry: INotesController;
 };
-
-export const defaultNoteMenu: ContextMenu = [
-	{
-		id: NoteActions.DUPLICATE,
-		label: 'Duplicate',
-	},
-	{
-		id: NoteActions.COPY_MARKDOWN_LINK,
-		label: 'Copy markdown link',
-	},
-	{
-		id: NoteActions.EXPORT,
-		label: 'Export',
-	},
-	{ type: 'separator' },
-	{
-		id: NoteActions.DELETE,
-		label: 'Delete',
-	},
-];
-
-export const deletedNoteMenu: ContextMenu = [
-	{
-		id: NoteActions.RESTORE,
-		label: 'Restore',
-	},
-	{
-		id: NoteActions.EXPORT,
-		label: 'Export',
-	},
-	{ type: 'separator' },
-	{
-		id: NoteActions.DELETE,
-		label: 'Delete',
-	},
-];
 
 const mdCharsForEscape = ['\\', '[', ']'];
 const mdCharsForEscapeRegEx = new RegExp(
@@ -73,7 +40,7 @@ export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
-	noteUpdated,
+	updateNoteState,
 }: DefaultContextMenuOptions) => {
 	const telemetry = useTelemetryTracker();
 
@@ -109,7 +76,7 @@ export const useNoteContextMenu = ({
 						await notesRegistry.updateStatus([id], { deleted: true });
 
 						const deletedNote = await notesRegistry.getById(id);
-						if (deletedNote) noteUpdated(deletedNote);
+						if (deletedNote) updateNoteState(deletedNote);
 					}
 
 					updateNotes();
@@ -124,7 +91,7 @@ export const useNoteContextMenu = ({
 					await notesRegistry.updateStatus([id], { deleted: false });
 
 					const restoredNote = await notesRegistry.getById(id);
-					if (restoredNote) noteUpdated(restoredNote);
+					if (restoredNote) updateNoteState(restoredNote);
 
 					updateNotes();
 					break;
@@ -187,7 +154,7 @@ export const useNoteContextMenu = ({
 			closeNote,
 			notes,
 			notesExport,
-			noteUpdated,
+			updateNoteState,
 			notesRegistry,
 			tagsRegistry,
 			telemetry,
@@ -197,32 +164,29 @@ export const useNoteContextMenu = ({
 	);
 
 	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
-	const triggerContextMenu = useContextMenu(activeMenu, noteContextMenuCallback);
+	const openMenu = useContextMenu(activeMenu, noteContextMenuCallback);
 
 	const [menuTarget, setMenuTarget] = useState<{
 		id: string;
 		point: { x: number; y: number };
 	} | null>(null);
 
-	// define which menu should be open
-	const openNoteContextMenu = useCallback(
-		async (id: string, point: { x: number; y: number }) => {
-			const note = await notesRegistry.getById(id);
-			if (!note) return;
-			const menu = note.isDeleted ? deletedNoteMenu : defaultNoteMenu;
-
-			setActiveMenu(menu);
-			setMenuTarget({ id, point });
-		},
-		[notesRegistry],
-	);
-
 	useEffect(() => {
 		if (!menuTarget) return;
 
-		triggerContextMenu(menuTarget.id, menuTarget.point);
+		openMenu(menuTarget.id, menuTarget.point);
 		setMenuTarget(null);
-	}, [menuTarget, triggerContextMenu]);
+	}, [menuTarget, openMenu]);
+
+	// define which menu should be open
+	const openNoteContextMenu = async (
+		id: string,
+		point: { x: number; y: number },
+		getMenu: () => ContextMenu,
+	) => {
+		setActiveMenu(getMenu());
+		setMenuTarget({ id, point });
+	};
 
 	return openNoteContextMenu;
 };
