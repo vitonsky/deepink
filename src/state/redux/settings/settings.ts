@@ -7,7 +7,6 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
-	isPermanentDeleteNotes: boolean;
 };
 
 export const settingsSlice = createSlice({
@@ -15,7 +14,6 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
-		isPermanentDeleteNotes: false,
 	} as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
@@ -29,12 +27,6 @@ export const settingsSlice = createSlice({
 		},
 		setTheme: (state, { payload }: PayloadAction<GlobalSettings['theme']>) => {
 			return { ...state, theme: payload } as GlobalSettings;
-		},
-		setIsPermanentDeleteNotes: (
-			state,
-			{ payload }: PayloadAction<GlobalSettings['isPermanentDeleteNotes']>,
-		) => {
-			return { ...state, isPermanentDeleteNotes: payload } as GlobalSettings;
 		},
 	},
 });
@@ -51,9 +43,4 @@ export const selectEditorMode = createAppSelector(
 export const selectTheme = createAppSelector(
 	selectSettings,
 	(settings) => settings.theme,
-);
-
-export const selectIsPermanentDeleteNotes = createAppSelector(
-	selectSettings,
-	(setting) => setting.isPermanentDeleteNotes,
 );
