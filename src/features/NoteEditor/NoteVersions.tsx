@@ -8,6 +8,7 @@ import {
 	ModalBody,
 	ModalCloseButton,
 	ModalHeader,
+	Switch,
 	Text,
 	VStack,
 } from '@chakra-ui/react';
@@ -20,11 +21,16 @@ export const NoteVersions = ({
 	onClose,
 	onVersionApply,
 	onShowVersion,
+	recordControl,
 }: {
 	noteId: string;
 	onClose: () => void;
 	onVersionApply: (version: NoteVersion) => void;
 	onShowVersion: (version: NoteVersion) => void;
+	recordControl: {
+		isDisabled: boolean;
+		onChange: (isDisabled: boolean) => void;
+	};
 }) => {
 	const noteHistory = useNotesHistory();
 
@@ -66,6 +72,17 @@ export const NoteVersions = ({
 				<Button variant="ghost" size="xs" marginLeft="auto" onClick={onClose}>
 					<FaXmark />
 				</Button>
+			</HStack>
+
+			<HStack w="100%">
+				<HStack as="label">
+					<Switch
+						size="sm"
+						isChecked={recordControl.isDisabled}
+						onChange={(event) => recordControl.onChange(event.target.checked)}
+					/>{' '}
+					<Text>Don't record changes for this note</Text>
+				</HStack>
 			</HStack>
 
 			<Box w="100%" maxH="150px" overflow="auto">

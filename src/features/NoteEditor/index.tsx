@@ -13,6 +13,7 @@ import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
+import { NoteMeta } from '@core/features/notes/controller';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { IResolvedTag } from '@core/features/tags';
 import {
@@ -34,12 +35,13 @@ import { NoteVersions } from './NoteVersions';
 export type NoteEditorProps = {
 	note: INote;
 	updateNote: (note: INoteContent) => void;
+	updateMeta: (meta: NoteMeta) => void;
 };
 
 /**
  * TODO: rename directory of component
  */
-export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
+export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
@@ -85,6 +87,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	const noteSnapshotPromiseRef = useRef<null | Promise<void>>(null);
 	const noteHistory = useNotesHistory();
 	useEffect(() => {
+		if (note.isSnapshotsDisabled) return;
+
 		noteSnapshotPromiseRef.current = new Promise<void>(async (res) => {
 			for (let attempt = 0; attempt < 3; attempt++) {
 				try {
@@ -100,7 +104,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 		}).then(() => {
 			noteSnapshotPromiseRef.current = null;
 		});
-	}, [note.id, noteHistory]);
+
+		// We need to run this effect once, at first render only
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedUpdateNote = useCallback(
@@ -361,6 +368,12 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 			{sidePanel === NoteMenuItems.TOGGLE_HISTORY && (
 				<NoteVersions
 					noteId={note.id}
+					recordControl={{
+						isDisabled: Boolean(note.isSnapshotsDisabled),
+						onChange(isDisabled) {
+							updateMeta({ isSnapshotsDisabled: isDisabled });
+						},
+					}}
 					onClose={() => setSidePanel(null)}
 					onShowVersion={(version) => setVersionPreview(version)}
 					onVersionApply={async (version) => {

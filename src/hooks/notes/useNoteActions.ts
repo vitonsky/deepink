@@ -5,6 +5,7 @@ import {
 	useEventBus,
 	useNotesContext,
 	useNotesHistory,
+	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -44,14 +45,20 @@ export const useNoteActions = () => {
 
 	const eventBus = useEventBus();
 	const noteHistory = useNotesHistory();
+	const notesRegistry = useNotesRegistry();
 	const close = useCallback(
-		(id: NoteId) => {
+		async (id: NoteId) => {
 			noteClosed(id);
-			noteHistory.snapshot(id).then(() => {
-				eventBus.emit('noteHistoryUpdated', id);
-			});
+
+			// Take note content snapshot (if not disabled)
+			const note = await notesRegistry.getById(id);
+			if (note && !note.isSnapshotsDisabled) {
+				noteHistory.snapshot(id).then(() => {
+					eventBus.emit('noteHistoryUpdated', id);
+				});
+			}
 		},
-		[eventBus, noteClosed, noteHistory],
+		[eventBus, noteClosed, noteHistory, notesRegistry],
 	);
 
 	return { click, close };

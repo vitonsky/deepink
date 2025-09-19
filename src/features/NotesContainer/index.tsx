@@ -53,6 +53,9 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 		async (note: INote) => {
 			noteUpdated(note);
 			await notesRegistry.update(note.id, note.content);
+			await notesRegistry.updateMeta([note.id], {
+				isSnapshotsDisabled: note.isSnapshotsDisabled,
+			});
 			await updateNotes();
 
 			// Reset sync job if any
@@ -62,12 +65,14 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 			}
 
 			// Sync by timeout
-			syncJobsRef.current[note.id] = setTimeout(async () => {
-				delete syncJobsRef.current[note.id];
+			if (!note.isSnapshotsDisabled) {
+				syncJobsRef.current[note.id] = setTimeout(async () => {
+					delete syncJobsRef.current[note.id];
 
-				await noteHistory.snapshot(note.id);
-				eventBus.emit('noteHistoryUpdated', note.id);
-			}, 10 * 1000);
+					await noteHistory.snapshot(note.id);
+					eventBus.emit('noteHistoryUpdated', note.id);
+				}, 10 * 1000);
+			}
 		},
 		[eventBus, noteHistory, noteUpdated, notesRegistry, updateNotes],
 	);
