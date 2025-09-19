@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { formatNoteLink } from '@core/features/links';
-import { INote, NoteId } from '@core/features/notes';
+import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
 	useNotesRegistry,
+	useNotesContext,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
@@ -22,7 +23,6 @@ import { NoteActions } from '.';
 type DefaultContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
-	updateNoteState: (id: INote) => void;
 
 	// TODO: receive with react context
 	notesRegistry: INotesController;
@@ -38,10 +38,10 @@ export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
-	updateNoteState,
 }: DefaultContextMenuOptions) => {
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
+	const { noteUpdated: updateNote } = useNotesContext();
 
 	const notesExport = useNotesExport();
 	const currentWorkspace = useWorkspaceData();
@@ -67,8 +67,9 @@ export const useNoteContextMenu = ({
 					} else {
 						await notesRegistry.updateStatus([id], { deleted: true });
 
+						// update the 'deleted' status of a note
 						const deletedNote = await notesRegistry.getById(id);
-						if (deletedNote) updateNoteState(deletedNote);
+						if (deletedNote) updateNote(deletedNote);
 					}
 
 					updateNotes();
@@ -81,7 +82,7 @@ export const useNoteContextMenu = ({
 					await notesRegistry.updateStatus([id], { deleted: false });
 
 					const restoredNote = await notesRegistry.getById(id);
-					if (restoredNote) updateNoteState(restoredNote);
+					if (restoredNote) updateNote(restoredNote);
 
 					updateNotes();
 					break;
@@ -144,7 +145,7 @@ export const useNoteContextMenu = ({
 			closeNote,
 			notes,
 			notesExport,
-			updateNoteState,
+			updateNote,
 			notesRegistry,
 			tagsRegistry,
 			updateNotes,
