@@ -1,9 +1,10 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import {
 	useEventBus,
 	useNotesContext,
+	useNotesHistory,
 	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { Notes } from '@features/MainScreen/Notes';
@@ -25,6 +26,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 
 	const notesRegistry = useNotesRegistry();
 	const { noteUpdated } = useNotesContext();
+	const noteHistory = useNotesHistory();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
@@ -46,13 +48,28 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	}, [eventBus, noteUpdated, notesRegistry, updateNotes]);
 
 	// Simulate note update
+	const syncJobsRef = useRef<Record<string, NodeJS.Timeout>>({});
 	const updateNote = useImmutableCallback(
 		async (note: INote) => {
 			noteUpdated(note);
 			await notesRegistry.update(note.id, note.content);
 			await updateNotes();
+
+			// Reset sync job if any
+			if (syncJobsRef.current[note.id]) {
+				clearTimeout(syncJobsRef.current[note.id]);
+				delete syncJobsRef.current[note.id];
+			}
+
+			// Sync by timeout
+			syncJobsRef.current[note.id] = setTimeout(async () => {
+				delete syncJobsRef.current[note.id];
+
+				await noteHistory.snapshot(note.id);
+				eventBus.emit('noteHistoryUpdated', note.id);
+			}, 10 * 1000);
 		},
-		[noteUpdated, notesRegistry, updateNotes],
+		[eventBus, noteHistory, noteUpdated, notesRegistry, updateNotes],
 	);
 
 	return (
