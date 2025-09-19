@@ -113,7 +113,6 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 							context: 'top bar',
 						});
 					},
-					noteUpdated,
 				}}
 			/>
 			<Box

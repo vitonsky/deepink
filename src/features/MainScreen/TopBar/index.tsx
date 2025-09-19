@@ -23,8 +23,6 @@ export type TopBarProps = {
 
 	// TODO: receive with react context
 	notesRegistry: INotesController;
-
-	noteUpdated: (id: INote) => void;
 };
 
 // TODO: improve tabs style
@@ -36,13 +34,11 @@ export const TopBar: FC<TopBarProps> = ({
 	onPick,
 	updateNotes,
 	notesRegistry,
-	noteUpdated,
 }) => {
 	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: onClose,
 		notesRegistry,
 		updateNotes,
-		updateNoteState: noteUpdated,
 	});
 
 	const existsTabs = useMemo(
