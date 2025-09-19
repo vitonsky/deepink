@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
 import { useStore } from 'react-redux';
 import { NoteId } from '@core/features/notes';
-import { useNotesContext } from '@features/App/Workspace/WorkspaceProvider';
+import {
+	useEventBus,
+	useNotesContext,
+	useNotesHistory,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import {
@@ -38,11 +42,16 @@ export const useNoteActions = () => {
 		[dispatch, openNote, store, workspaceData],
 	);
 
+	const eventBus = useEventBus();
+	const noteHistory = useNotesHistory();
 	const close = useCallback(
 		(id: NoteId) => {
 			noteClosed(id);
+			noteHistory.snapshot(id).then(() => {
+				eventBus.emit('noteHistoryUpdated', id);
+			});
 		},
-		[noteClosed],
+		[eventBus, noteClosed, noteHistory],
 	);
 
 	return { click, close };
