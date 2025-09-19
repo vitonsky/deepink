@@ -13,11 +13,13 @@ import { INotesController, NotesControllerFetchOptions } from '.';
  */
 const mappers = {
 	rowToNoteObject(row: any): INote {
-		const { id, title, text, creationTime, lastUpdateTime } = row;
+		const { id, title, text, creationTime, lastUpdateTime, isSnapshotsDisabled } =
+			row;
 		return {
 			id,
 			createdTimestamp: creationTime,
 			updatedTimestamp: lastUpdateTime,
+			isSnapshotsDisabled: Boolean(isSnapshotsDisabled),
 			content: { title, text },
 		};
 	},
@@ -208,6 +210,36 @@ export class NotesController implements INotesController {
 		if (result.changes !== ids.length) {
 			console.warn(
 				`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${result.changes}`,
+			);
+		}
+	}
+
+	public async updateMeta(
+		ids: NoteId[],
+		meta: { isSnapshotsDisabled?: boolean },
+	): Promise<void> {
+		const db = wrapDB(this.db.get());
+
+		const mappedMeta = Object.fromEntries(
+			Object.entries(meta).map(([key, value]): [string, string | number] => {
+				switch (key) {
+					case 'isSnapshotsDisabled':
+						return [key, Number(value)];
+					default:
+						return [key, String(value)];
+				}
+			}),
+		);
+
+		const result = db.run(
+			qb.sql`UPDATE notes
+				SET ${qb.values(mappedMeta)}
+				WHERE workspace_id=${this.workspace} AND id IN (${qb.values(ids)})`,
+		);
+
+		if (result.changes !== ids.length) {
+			console.warn(
+				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
 			);
 		}
 	}

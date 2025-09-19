@@ -168,3 +168,39 @@ describe('multi instances', () => {
 		await db.close();
 	});
 });
+
+describe('Notes meta control', () => {
+	const dbFile = createFileControllerMock();
+	const dbPromise = openDatabase(dbFile);
+
+	afterAll(async () => {
+		const db = await dbPromise;
+		await db.close();
+	});
+
+	test('insertion multiple entries', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, 'fake-workspace-id');
+
+		// Create note
+		const noteId = await registry.add({ title: 'Title', text: 'Text' });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isSnapshotsDisabled: false,
+		});
+
+		// Toggle snapshotting preferences
+		await registry.updateMeta([noteId], { isSnapshotsDisabled: true });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isSnapshotsDisabled: true,
+		});
+
+		// Toggle snapshotting preferences back
+		await registry.updateMeta([noteId], { isSnapshotsDisabled: false });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isSnapshotsDisabled: false,
+		});
+	});
+});
