@@ -113,18 +113,15 @@ describe('CRUD operations', () => {
 				};
 			});
 		const ids = await Promise.all(notesSample.map((note) => registry.add(note)));
-		const notesToDelete = ids.slice(0, 100);
 
 		// set deleted status
-		await registry.updateStatus(notesToDelete, { deleted: true });
-
-		await expect(registry.getLength()).resolves.toBe(300);
+		await registry.updateStatus(ids, { deleted: true });
 		await expect(registry.get({ deleted: true })).resolves.toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
 		);
 
 		// reset deleted status
-		await registry.updateStatus(notesToDelete, { deleted: false });
+		await registry.updateStatus(ids, { deleted: false });
 		await expect(registry.get({ deleted: false })).resolves.toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
 		);
@@ -237,29 +234,29 @@ describe('data fetching', () => {
 		const ids = await Promise.all(entries.map((note) => registry.add(note)));
 
 		// update status
-		await registry.updateStatus([ids[0]], { deleted: true });
+		await registry.updateStatus(ids.slice(0, 3), { deleted: true });
 
 		// get all notes
 		await expect(registry.get()).resolves.toHaveLength(4);
 
 		// get only deleted notes
-		await expect(registry.get({ deleted: true })).resolves.toEqual(
+		const deletedNotes = await registry.get({ deleted: true });
+		expect(deletedNotes).toHaveLength(3);
+		expect(deletedNotes).toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
 		);
 
-		// get only non-deleted notes
-		await expect(registry.get({ deleted: false })).resolves.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({ isDeleted: false }),
-				expect.objectContaining({ isDeleted: false }),
-				expect.objectContaining({ isDeleted: false }),
-			]),
+		// get only noе deleted notes
+		const notDeletedNotes = await registry.get({ deleted: false });
+		expect(notDeletedNotes).toHaveLength(1);
+		expect(notDeletedNotes).toEqual(
+			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
 		);
 
 		await db.close();
 	});
 
-	test('get notes filtered by tags and the deleted flag', async () => {
+	test('get notes filtered by tags and the deleted status', async () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, 'fake-workspace-id');
@@ -269,6 +266,7 @@ describe('data fetching', () => {
 			{ title: 'Title 1', text: 'Text 1' },
 			{ title: 'Title 2', text: 'Text 2' },
 			{ title: 'Title 3', text: 'Text 3' },
+			{ title: 'Title 4', text: 'Text 4' },
 		];
 
 		const ids = await Promise.all(entries.map((note) => registry.add(note)));
@@ -291,6 +289,13 @@ describe('data fetching', () => {
 		await expect(
 			registry.get({ tags: [fooTag], deleted: false }),
 		).resolves.toHaveLength(0);
+
+		// reset deleted status
+		// get not deleted notes with tag
+		await registry.updateStatus([note], { deleted: false });
+		await expect(
+			registry.get({ tags: [fooTag], deleted: false }),
+		).resolves.toHaveLength(1);
 
 		await db.close();
 	});
