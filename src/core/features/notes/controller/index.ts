@@ -23,6 +23,10 @@ export type NotesControllerFetchOptions = {
 	tags?: string[];
 };
 
+export type NoteMeta = {
+	isSnapshotsDisabled: boolean;
+};
+
 /**
  * Notes controller interface
  */
@@ -51,6 +55,11 @@ export interface INotesController {
 	 * Update note by unique id
 	 */
 	update(id: NoteId, updatedNote: INoteContent): Promise<void>;
+
+	/**
+	 * Update note meta information
+	 */
+	updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void>;
 
 	/**
 	 * Deletes all notes with specified ids
