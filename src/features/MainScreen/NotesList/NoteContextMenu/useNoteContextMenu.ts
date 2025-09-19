@@ -69,13 +69,15 @@ export const useNoteContextMenu = ({
 
 					closeNote(id);
 
-					if (isPermanentDeleteNotes || targetNote?.isDeleted) {
+					// permanently delete the note
+					if (targetNote?.isDeleted) {
 						await notesRegistry.delete([id]);
 						await tagsRegistry.setAttachedTags(id, []);
 					} else {
+						// mark the note as deleted
 						await notesRegistry.updateStatus([id], { deleted: true });
 
-						// refresh note state
+						// refresh the note status
 						const deletedNote = await notesRegistry.getById(id);
 						if (deletedNote) updateNote(deletedNote);
 					}
