@@ -75,7 +75,7 @@ export const useNoteContextMenu = ({
 					} else {
 						await notesRegistry.updateStatus([id], { deleted: true });
 
-						// update the 'deleted' status of a note
+						// refresh note state
 						const deletedNote = await notesRegistry.getById(id);
 						if (deletedNote) updateNote(deletedNote);
 					}
@@ -164,29 +164,27 @@ export const useNoteContextMenu = ({
 		],
 	);
 
-	const [activeMenu, setActiveMenu] = useState<ContextMenu>(defaultNoteMenu);
-	const openMenu = useContextMenu(activeMenu, noteContextMenuCallback);
+	// dynamic update menu
+	const [menu, setMenu] = useState<{
+		menu: ContextMenu;
+		target: { id: string; point: { x: number; y: number } } | null;
+	}>({ menu: defaultNoteMenu, target: null });
 
-	const [menuTarget, setMenuTarget] = useState<{
-		id: string;
-		point: { x: number; y: number };
-	} | null>(null);
+	const openMenu = useContextMenu(menu.menu, noteContextMenuCallback);
 
 	useEffect(() => {
-		if (!menuTarget) return;
+		if (menu.target) {
+			openMenu(menu.target.id, menu.target.point);
+			setMenu((prevMenu) => ({ ...prevMenu, target: null }));
+		}
+	}, [menu, openMenu]);
 
-		openMenu(menuTarget.id, menuTarget.point);
-		setMenuTarget(null);
-	}, [menuTarget, openMenu]);
-
-	// define which menu should be open
-	const openNoteContextMenu = async (
+	const openNoteContextMenu = (
 		id: string,
 		point: { x: number; y: number },
 		getMenu: () => ContextMenu,
 	) => {
-		setActiveMenu(getMenu());
-		setMenuTarget({ id, point });
+		setMenu({ menu: getMenu(), target: { id, point } });
 	};
 
 	return openNoteContextMenu;
