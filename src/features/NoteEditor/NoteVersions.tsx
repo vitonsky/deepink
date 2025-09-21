@@ -95,8 +95,15 @@ export const NoteVersions = ({
 						} else {
 							confirm(({ onClose }) => ({
 								title: 'Delete all note versions',
-								content:
-									'This action will permanently delete all note versions. Are you sure about it?',
+								content: (
+									<Box>
+										<Text>
+											This action will permanently delete all note
+											versions.
+										</Text>
+										<Text>Are you sure about it?</Text>
+									</Box>
+								),
 								action: (
 									<>
 										<Button
@@ -167,7 +174,7 @@ export const NoteVersions = ({
 											confirm(({ onClose }) => ({
 												title: 'Apply note version',
 												content: (
-													<VStack gap="1rem">
+													<VStack gap="1rem" align="start">
 														<Text>
 															You are about to apply note
 															version{' '}
@@ -247,7 +254,7 @@ export const NoteVersions = ({
 											confirm(({ onClose }) => ({
 												title: 'Delete note version',
 												content: (
-													<VStack gap="1rem">
+													<VStack gap="1rem" align="start">
 														<Text>
 															You are about to delete note
 															version{' '}
