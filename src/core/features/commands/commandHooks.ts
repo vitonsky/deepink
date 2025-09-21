@@ -1,32 +1,36 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 
-import { CommandEvent, useCommandEvent } from './CommandEventProvider';
-import { GLOBAL_COMMANDS } from '.';
+import { CommandEventContext, CommandPayloads } from './CommandEventProvider';
 
 /**
  * Returns a function that calls a command by its name
  */
 export function useCommand() {
-	const commandEvent = useCommandEvent();
+	const commandEvent = useContext(CommandEventContext);
+	if (!commandEvent) throw new Error(`Did not provide value for CommandEventContext`);
 
-	return <T extends GLOBAL_COMMANDS>(name: T, payload?: any) => {
-		commandEvent({ name, payload });
+	return <K extends keyof CommandPayloads>(
+		commandName: K,
+		payload?: CommandPayloads[K] extends void ? undefined : CommandPayloads[K],
+	) => {
+		commandEvent({ name: commandName, payload });
 	};
 }
 
 /**
  * Calls the provided callback whenever the given command is triggered
  */
-export function useCommandCallback(
-	command: GLOBAL_COMMANDS,
-	callback: (data: CommandEvent) => void,
+export function useCommandCallback<K extends keyof CommandPayloads>(
+	commandName: K,
+	callback: (payload: CommandPayloads[K]) => void,
 ) {
-	const commandEvent = useCommandEvent();
+	const commandEvent = useContext(CommandEventContext);
+	if (!commandEvent) throw new Error('Did not provide value for CommandEventContext');
 
 	useEffect(() => {
 		return commandEvent.watch((data) => {
-			if (data.name !== command) return;
-			callback(data);
+			if (data.name !== commandName) return;
+			callback(data.payload);
 		});
-	}, [callback, commandEvent, command]);
+	}, [callback, commandEvent, commandName]);
 }
