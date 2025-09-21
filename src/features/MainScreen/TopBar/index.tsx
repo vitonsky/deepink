@@ -62,6 +62,7 @@ export const TopBar: FC<TopBarProps> = ({
 			maxH="100px"
 			overflow="auto"
 			bgColor="surface.panel"
+			flexShrink={0}
 		>
 			<TabList
 				display="flex"
