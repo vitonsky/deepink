@@ -13,6 +13,9 @@ import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
 import { useConfirmDialog } from '@hooks/useConfirmDialog';
 
+export const formatNoteVersionPreview = (version: NoteVersion) =>
+	`${new Date(version.createdAt).toLocaleString()} (${version.text.length} chars)`;
+
 export const NoteVersions = ({
 	noteId,
 	onClose,
@@ -164,17 +167,19 @@ export const NoteVersions = ({
 											confirm(({ onClose }) => ({
 												title: 'Apply note version',
 												content: (
-													<>
+													<VStack gap="1rem">
 														<Text>
 															You are about to apply note
 															version{' '}
-															<Text color="typography.secondary">
-																{new Date(
-																	version.createdAt,
-																).toLocaleString()}{' '}
-																({version.text.length}{' '}
-																chars).
+															<Text
+																as="span"
+																color="typography.secondary"
+															>
+																{formatNoteVersionPreview(
+																	version,
+																)}
 															</Text>
+															.
 														</Text>
 														<Text>
 															This action will replace
@@ -182,7 +187,7 @@ export const NoteVersions = ({
 															a selected snapshot. Are you
 															sure?
 														</Text>
-													</>
+													</VStack>
 												),
 												action: (
 													<>
@@ -242,24 +247,26 @@ export const NoteVersions = ({
 											confirm(({ onClose }) => ({
 												title: 'Delete note version',
 												content: (
-													<>
+													<VStack gap="1rem">
 														<Text>
 															You are about to delete note
 															version{' '}
-															<Text color="typography.secondary">
-																{new Date(
-																	version.createdAt,
-																).toLocaleString()}{' '}
-																({version.text.length}{' '}
-																chars).
+															<Text
+																as="span"
+																color="typography.secondary"
+															>
+																{formatNoteVersionPreview(
+																	version,
+																)}
 															</Text>
+															.
 														</Text>
 														<Text>
 															This action will delete note
 															version irreversibly. Are you
 															sure?
 														</Text>
-													</>
+													</VStack>
 												),
 												action: (
 													<>
