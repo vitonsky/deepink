@@ -1,6 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
-import { FaCheck, FaGlasses, FaTrashCan, FaXmark } from 'react-icons/fa6';
+import {
+	FaCheck,
+	FaEraser,
+	FaFloppyDisk,
+	FaGlasses,
+	FaTrashCan,
+	FaXmark,
+} from 'react-icons/fa6';
 import {
 	Box,
 	Button,
@@ -19,12 +26,16 @@ import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 export const NoteVersions = ({
 	noteId,
 	onClose,
+	onSnapshot,
+	onDeleteAll,
 	onVersionApply,
 	onShowVersion,
 	recordControl,
 }: {
 	noteId: string;
 	onClose: () => void;
+	onSnapshot: () => void;
+	onDeleteAll: () => void;
 	onVersionApply: (version: NoteVersion) => void;
 	onShowVersion: (version: NoteVersion) => void;
 	recordControl: {
@@ -75,6 +86,23 @@ export const NoteVersions = ({
 			</HStack>
 
 			<HStack w="100%">
+				<Button
+					as={HStack}
+					size="sm"
+					title="Save the current state of this note as a new version in history"
+					onClick={onSnapshot}
+				>
+					<FaFloppyDisk /> <Text>Save version</Text>
+				</Button>
+				<Button
+					as={HStack}
+					size="sm"
+					title="Remove all saved versions of this note permanently"
+					onClick={onDeleteAll}
+				>
+					<FaEraser /> <Text>Delete all</Text>
+				</Button>
+
 				<HStack as="label">
 					<Switch
 						size="sm"

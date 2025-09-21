@@ -385,6 +385,14 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 						eventBus.emit('noteUpdated', note.id);
 						forceUpdateLocalStateRef.current = true;
 					}}
+					onSnapshot={async () => {
+						await noteHistory.snapshot(note.id, { force: true });
+						eventBus.emit('noteHistoryUpdated', note.id);
+					}}
+					onDeleteAll={async () => {
+						await noteHistory.purge([note.id]);
+						eventBus.emit('noteHistoryUpdated', note.id);
+					}}
 				/>
 			)}
 		</VStack>
