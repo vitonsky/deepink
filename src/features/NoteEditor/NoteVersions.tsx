@@ -22,6 +22,7 @@ import {
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
+import { useConfirmDialog } from '@hooks/useConfirmDialog';
 
 export const NoteVersions = ({
 	noteId,
@@ -66,6 +67,7 @@ export const NoteVersions = ({
 	}, [eventBus, updateVersionsList]);
 
 	const { show } = useWorkspaceModal();
+	const confirm = useConfirmDialog();
 
 	return (
 		<VStack
@@ -98,7 +100,31 @@ export const NoteVersions = ({
 					as={HStack}
 					size="sm"
 					title="Remove all saved versions of this note permanently"
-					onClick={onDeleteAll}
+					onClick={(evt) => {
+						if (evt.ctrlKey) {
+							onDeleteAll();
+						} else {
+							confirm(({ onClose }) => ({
+								title: 'Delete all note versions',
+								content:
+									'This action will permanently delete all note versions. Are you sure about it?',
+								action: (
+									<>
+										<Button
+											variant="primary"
+											onClick={() => {
+												onDeleteAll();
+												onClose();
+											}}
+										>
+											Apply
+										</Button>
+										<Button onClick={onClose}>Cancel</Button>
+									</>
+								),
+							}));
+						}
+					}}
 				>
 					<FaEraser /> <Text>Delete all</Text>
 				</Button>
