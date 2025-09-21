@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AutoFocusInside } from 'react-focus-lock';
 import {
 	FaCheck,
 	FaEraser,
@@ -8,21 +7,10 @@ import {
 	FaTrashCan,
 	FaXmark,
 } from 'react-icons/fa6';
-import {
-	Box,
-	Button,
-	HStack,
-	ModalBody,
-	ModalCloseButton,
-	ModalHeader,
-	Switch,
-	Text,
-	VStack,
-} from '@chakra-ui/react';
+import { Box, Button, HStack, Switch, Text, VStack } from '@chakra-ui/react';
 import { TextWithIcon } from '@components/TextWithIcon';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
-import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useConfirmDialog } from '@hooks/useConfirmDialog';
 
 export const NoteVersions = ({
@@ -67,7 +55,6 @@ export const NoteVersions = ({
 		});
 	}, [eventBus, updateVersionsList]);
 
-	const { show } = useWorkspaceModal();
 	const confirm = useConfirmDialog();
 
 	return (
@@ -174,80 +161,55 @@ export const NoteVersions = ({
 												return;
 											}
 
-											show({
-												content: ({ onClose }) => (
+											confirm(({ onClose }) => ({
+												title: 'Apply note version',
+												content: (
 													<>
-														<ModalCloseButton />
-														<ModalHeader>
-															<Text>
-																Apply note version
+														<Text>
+															You are about to apply note
+															version{' '}
+															<Text color="typography.secondary">
+																{new Date(
+																	version.createdAt,
+																).toLocaleString()}{' '}
+																({version.text.length}{' '}
+																chars).
 															</Text>
-														</ModalHeader>
-														<ModalBody paddingBottom="1rem">
-															<VStack
-																w="100%"
-																gap="1rem"
-																align="start"
-															>
-																<Text>
-																	You are about to apply
-																	note version{' '}
-																	<Text color="typography.secondary">
-																		{new Date(
-																			version.createdAt,
-																		).toLocaleString()}{' '}
-																		(
-																		{
-																			version.text
-																				.length
-																		}{' '}
-																		chars).
-																	</Text>
-																</Text>
-																<Text>
-																	This action will
-																	replace current note
-																	data with text of a
-																	selected snapshot. Are
-																	you sure?
-																</Text>
-
-																<HStack
-																	justifyContent="end"
-																	as={AutoFocusInside}
-																	w="100%"
-																>
-																	<Button
-																		variant="primary"
-																		onClick={() => {
-																			applyVersion();
-																			onClose();
-																		}}
-																	>
-																		Apply
-																	</Button>
-																	<Button
-																		variant="primary"
-																		onClick={() => {
-																			onShowVersion(
-																				version,
-																			);
-																			onClose();
-																		}}
-																	>
-																		Preview
-																	</Button>
-																	<Button
-																		onClick={onClose}
-																	>
-																		Cancel
-																	</Button>
-																</HStack>
-															</VStack>
-														</ModalBody>
+														</Text>
+														<Text>
+															This action will replace
+															current note data with text of
+															a selected snapshot. Are you
+															sure?
+														</Text>
 													</>
 												),
-											});
+												action: (
+													<>
+														<Button
+															variant="primary"
+															onClick={() => {
+																applyVersion();
+																onClose();
+															}}
+														>
+															Apply
+														</Button>
+														<Button
+															variant="primary"
+															onClick={() => {
+																onShowVersion(version);
+																onClose();
+															}}
+														>
+															Preview
+														</Button>
+														<Button onClick={onClose}>
+															Cancel
+														</Button>
+													</>
+												),
+											}));
 										}}
 									>
 										<FaCheck />
@@ -277,79 +239,54 @@ export const NoteVersions = ({
 												return;
 											}
 
-											show({
-												content: ({ onClose }) => (
+											confirm(({ onClose }) => ({
+												title: 'Delete note version',
+												content: (
 													<>
-														<ModalCloseButton />
-														<ModalHeader>
-															<Text>
-																Delete note version
+														<Text>
+															You are about to delete note
+															version{' '}
+															<Text color="typography.secondary">
+																{new Date(
+																	version.createdAt,
+																).toLocaleString()}{' '}
+																({version.text.length}{' '}
+																chars).
 															</Text>
-														</ModalHeader>
-														<ModalBody paddingBottom="1rem">
-															<VStack
-																w="100%"
-																gap="1rem"
-																align="start"
-															>
-																<Text>
-																	You are about to
-																	delete note version{' '}
-																	<Text color="typography.secondary">
-																		{new Date(
-																			version.createdAt,
-																		).toLocaleString()}{' '}
-																		(
-																		{
-																			version.text
-																				.length
-																		}{' '}
-																		chars).
-																	</Text>
-																</Text>
-																<Text>
-																	This action will
-																	delete note version
-																	irreversibly. Are you
-																	sure?
-																</Text>
-
-																<HStack
-																	justifyContent="end"
-																	as={AutoFocusInside}
-																	w="100%"
-																>
-																	<Button
-																		variant="primary"
-																		onClick={() => {
-																			deleteVersion();
-																			onClose();
-																		}}
-																	>
-																		Delete
-																	</Button>
-																	<Button
-																		variant="primary"
-																		onClick={() => {
-																			onShowVersion(
-																				version,
-																			);
-																			onClose();
-																		}}
-																	>
-																		Preview
-																	</Button>
-																	<Button
-																		onClick={onClose}
-																	>
-																		Cancel
-																	</Button>
-																</HStack>
-															</VStack>
-														</ModalBody>
+														</Text>
+														<Text>
+															This action will delete note
+															version irreversibly. Are you
+															sure?
+														</Text>
 													</>
 												),
-											});
+												action: (
+													<>
+														<Button
+															variant="primary"
+															onClick={() => {
+																deleteVersion();
+																onClose();
+															}}
+														>
+															Delete
+														</Button>
+														<Button
+															variant="primary"
+															onClick={() => {
+																onShowVersion(version);
+																onClose();
+															}}
+														>
+															Preview
+														</Button>
+														<Button onClick={onClose}>
+															Cancel
+														</Button>
+													</>
+												),
+											}));
 										}}
 									>
 										<FaTrashCan />
