@@ -1,11 +1,11 @@
 import React, { ReactNode, useCallback } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import {
+	Box,
 	HStack,
 	ModalBody,
 	ModalCloseButton,
 	ModalHeader,
-	Text,
 	VStack,
 } from '@chakra-ui/react';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
@@ -28,11 +28,11 @@ export const useConfirmDialog = () => {
 						<>
 							<ModalCloseButton />
 							<ModalHeader>
-								<Text>{title}</Text>
+								<Box>{title}</Box>
 							</ModalHeader>
 							<ModalBody paddingBottom="1rem">
 								<VStack w="100%" gap="1rem" align="start">
-									<Text>{content}</Text>
+									<Box>{content}</Box>
 
 									{action && (
 										<HStack
