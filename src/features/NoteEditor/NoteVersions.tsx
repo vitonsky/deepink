@@ -19,6 +19,7 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
+import { TextWithIcon } from '@components/TextWithIcon';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
@@ -89,15 +90,13 @@ export const NoteVersions = ({
 
 			<HStack w="100%">
 				<Button
-					as={HStack}
 					size="sm"
 					title="Save the current state of this note as a new version in history"
 					onClick={onSnapshot}
 				>
-					<FaFloppyDisk /> <Text>Save version</Text>
+					<TextWithIcon icon={<FaFloppyDisk />}>Save version</TextWithIcon>
 				</Button>
 				<Button
-					as={HStack}
 					size="sm"
 					title="Remove all saved versions of this note permanently"
 					onClick={(evt) => {
@@ -126,7 +125,7 @@ export const NoteVersions = ({
 						}
 					}}
 				>
-					<FaEraser /> <Text>Delete all</Text>
+					<TextWithIcon icon={<FaEraser />}>Delete all</TextWithIcon>
 				</Button>
 
 				<HStack as="label">
