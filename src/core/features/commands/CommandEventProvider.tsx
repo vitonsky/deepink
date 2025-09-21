@@ -4,8 +4,17 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { GLOBAL_COMMANDS } from '.';
 
-export type CommandEvent = {
-	name: GLOBAL_COMMANDS;
+// In the future, we can define a type for the payload like this:
+// CommandPayloads = {[GLOBAL_COMMANDS.CREATE_NOTE]: { title: string}}
+export type CommandPayloads = {
+	[K in GLOBAL_COMMANDS]?: unknown;
+};
+
+export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads> = {
+	name: K;
+	payload: CommandPayloads[K] extends void
+		? [payload?: void]
+		: [payload: CommandPayloads[K]];
 };
 
 const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(null);

@@ -9,8 +9,8 @@ import { GLOBAL_COMMANDS } from '.';
 export function useCommand() {
 	const commandEvent = useCommandEvent();
 
-	return <T extends GLOBAL_COMMANDS>(name: T) => {
-		commandEvent({ name });
+	return <T extends GLOBAL_COMMANDS>(name: T, payload?: any) => {
+		commandEvent({ name, payload });
 	};
 }
 
