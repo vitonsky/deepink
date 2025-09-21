@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { GLOBAL_COMMANDS } from '@core/features/commands';
-import { useCommandListener } from '@core/features/commands/useCommandListener';
+import { useCommandCallback } from '@core/features/commands/commandHooks';
 import { INote } from '@core/features/notes';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
@@ -40,9 +40,9 @@ export const useNoteShortcutActions = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
-	useCommandListener(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
+	useCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
 
-	useCommandListener(
+	useCommandCallback(
 		GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE,
 		useCallback(() => {
 			if (!activeNoteId) return;
@@ -50,7 +50,7 @@ export const useNoteShortcutActions = () => {
 		}, [activeNoteId, noteActions]),
 	);
 
-	useCommandListener(
+	useCommandCallback(
 		GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE,
 		useCallback(() => {
 			if (recentlyClosedNotes.length === 0) return;
@@ -58,7 +58,7 @@ export const useNoteShortcutActions = () => {
 		}, [noteActions, recentlyClosedNotes]),
 	);
 
-	useCommandListener(
+	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
 		useCallback(() => {
 			const previousNote = getRelativeNoteId(openedNotes, activeNoteId, +1);
@@ -67,7 +67,7 @@ export const useNoteShortcutActions = () => {
 		}, [activeNoteId, noteActions, openedNotes]),
 	);
 
-	useCommandListener(
+	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
 		useCallback(() => {
 			const nextNote = getRelativeNoteId(openedNotes, activeNoteId, -1);

@@ -5,17 +5,17 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 import { GLOBAL_COMMANDS } from '.';
 
 export type CommandEvent = {
-	id: GLOBAL_COMMANDS;
+	name: GLOBAL_COMMANDS;
 };
 
 const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(null);
 export const useCommandEvent = createContextGetterHook(CommandEventContext);
 
 export const CommandEventProvider: FC<PropsWithChildren> = ({ children }) => {
-	const event = createEvent<CommandEvent>();
+	const commandEvent = createEvent<CommandEvent>();
 
 	return (
-		<CommandEventContext.Provider value={event}>
+		<CommandEventContext.Provider value={commandEvent}>
 			{children}
 		</CommandEventContext.Provider>
 	);
