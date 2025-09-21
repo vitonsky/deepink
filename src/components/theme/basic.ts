@@ -181,6 +181,20 @@ export const basicTheme = extendTheme({
 				colorScheme: 'primary',
 			},
 		}),
+		Switch: createMultiStyleConfigHelpers([
+			'container',
+			'thumb',
+			'track',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				track: {
+					backgroundColor: 'primary.200',
+				},
+				thumb: {
+					backgroundColor: 'primary.500',
+				},
+			},
+		}),
 		Menu: createMultiStyleConfigHelpers([
 			'button',
 			'list',
