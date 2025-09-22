@@ -15,7 +15,7 @@ import {
  * Returns the ID of a note relative to the currently active note.
  * When reaching the end of the array, returns the first element, when reaching the start of the array, returns the last element
  */
-const getRelativeNoteId = (
+const getNoteIdByOffset = (
 	openedNotes: INote[],
 	activeNoteId: string | null,
 	offset: number,
@@ -30,7 +30,7 @@ const getRelativeNoteId = (
 };
 
 /**
- * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore, and navigation
+ * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
  */
 export const useNoteShortcutActions = () => {
 	const noteActions = useNoteActions();
@@ -61,7 +61,7 @@ export const useNoteShortcutActions = () => {
 	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
 		useCallback(() => {
-			const previousNote = getRelativeNoteId(openedNotes, activeNoteId, +1);
+			const previousNote = getNoteIdByOffset(openedNotes, activeNoteId, +1);
 			if (!previousNote) return;
 			noteActions.click(previousNote);
 		}, [activeNoteId, noteActions, openedNotes]),
@@ -70,7 +70,7 @@ export const useNoteShortcutActions = () => {
 	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
 		useCallback(() => {
-			const nextNote = getRelativeNoteId(openedNotes, activeNoteId, -1);
+			const nextNote = getNoteIdByOffset(openedNotes, activeNoteId, -1);
 			if (!nextNote) return;
 			noteActions.click(nextNote);
 		}, [activeNoteId, noteActions, openedNotes]),
