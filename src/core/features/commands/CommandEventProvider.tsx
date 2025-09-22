@@ -6,12 +6,12 @@ import { GLOBAL_COMMANDS } from '.';
 // In the future, we can define a type for the payload like this:
 // type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
 export type CommandPayloads = {
-	[K in GLOBAL_COMMANDS]: unknown;
+	[K in GLOBAL_COMMANDS]: void;
 };
 
 export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads> = {
 	name: K;
-	payload: CommandPayloads[K] extends void ? undefined : CommandPayloads[K];
+	payload?: CommandPayloads[K];
 };
 
 export const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(
