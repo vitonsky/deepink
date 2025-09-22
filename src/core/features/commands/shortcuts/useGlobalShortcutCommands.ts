@@ -9,8 +9,8 @@ import { shortcuts } from '.';
  *
  * Configures the processing of global keyboard shortcuts, associating each combination with a corresponding command
  */
-export const useRegisterGlobalCommandShortcuts = () => {
-	const callCommand = useCommand();
+export const useGlobalShortcutCommands = () => {
+	const runCommand = useCommand();
 
 	useEffect(() => {
 		// By default, the hotkeys library ignores INPUT, SELECT, and TEXTAREA elements,
@@ -26,7 +26,7 @@ export const useRegisterGlobalCommandShortcuts = () => {
 					capture: true,
 				},
 				() => {
-					callCommand(commandName);
+					runCommand(commandName);
 				},
 			);
 		});
@@ -34,5 +34,5 @@ export const useRegisterGlobalCommandShortcuts = () => {
 		return () => {
 			Object.keys(shortcuts).forEach((shortcut) => hotkeys.unbind(shortcut));
 		};
-	}, [callCommand]);
+	}, [runCommand]);
 };
