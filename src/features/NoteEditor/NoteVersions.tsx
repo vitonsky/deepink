@@ -65,6 +65,7 @@ export const NoteVersions = ({
 			align="start"
 			w="100%"
 			h="300px"
+			maxH="300px"
 			flex={1}
 			padding=".5rem"
 			gap="1rem"
@@ -135,7 +136,7 @@ export const NoteVersions = ({
 				</HStack>
 			</HStack>
 
-			<Box w="100%" maxH="150px" overflow="auto">
+			<Box w="100%" overflow="auto">
 				{versions === null ? (
 					<Text>Loading...</Text>
 				) : (
