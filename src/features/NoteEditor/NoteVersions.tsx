@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-	FaCheck,
-	FaEraser,
-	FaFloppyDisk,
-	FaGlasses,
-	FaTrashCan,
-	FaXmark,
-} from 'react-icons/fa6';
+import { FaCheck, FaEraser, FaFloppyDisk, FaGlasses, FaTrashCan } from 'react-icons/fa6';
 import { Box, Button, HStack, Switch, Text, VStack } from '@chakra-ui/react';
 import { TextWithIcon } from '@components/TextWithIcon';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
@@ -18,7 +11,6 @@ export const formatNoteVersionPreview = (version: NoteVersion) =>
 
 export const NoteVersions = ({
 	noteId,
-	onClose,
 	onSnapshot,
 	onDeleteAll,
 	onVersionApply,
@@ -26,7 +18,6 @@ export const NoteVersions = ({
 	recordControl,
 }: {
 	noteId: string;
-	onClose: () => void;
 	onSnapshot: () => void;
 	onDeleteAll: () => void;
 	onVersionApply: (version: NoteVersion) => void;
@@ -61,24 +52,7 @@ export const NoteVersions = ({
 	const confirm = useConfirmDialog();
 
 	return (
-		<VStack
-			align="start"
-			w="100%"
-			h="300px"
-			maxH="300px"
-			flex={1}
-			padding=".5rem"
-			gap="1rem"
-			borderTop="1px solid"
-			borderColor="surface.border"
-		>
-			<HStack w="100%">
-				<Text fontWeight="bold">Note versions</Text>
-				<Button variant="ghost" size="xs" marginLeft="auto" onClick={onClose}>
-					<FaXmark />
-				</Button>
-			</HStack>
-
+		<VStack w="100%" maxH="100%">
 			<HStack w="100%">
 				<Button
 					size="sm"

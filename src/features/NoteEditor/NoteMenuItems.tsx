@@ -25,8 +25,8 @@ import {
 } from '@chakra-ui/react';
 
 export enum NoteMenuItems {
-	TOGGLE_BACKLINKS,
-	TOGGLE_HISTORY,
+	TOGGLE_BACKLINKS = 'TOGGLE_BACKLINKS',
+	TOGGLE_HISTORY = 'TOGGLE_HISTORY',
 }
 
 export const NoteMenu = memo(

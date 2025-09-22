@@ -27,9 +27,9 @@ import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 
-import { BackLinksTree } from './BackLinksTree';
 import { NoteEditor } from './NoteEditor';
 import { NoteMenu, NoteMenuItems } from './NoteMenuItems';
+import { NoteSidebar } from './NoteSidebar';
 import { NoteVersions } from './NoteVersions';
 
 export type NoteEditorProps = {
@@ -362,37 +362,68 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				<NoteEditor text={text} setText={setText} />
 			)}
 
-			{sidePanel === NoteMenuItems.TOGGLE_BACKLINKS && (
-				<BackLinksTree onClose={() => setSidePanel(null)} />
-			)}
-			{sidePanel === NoteMenuItems.TOGGLE_HISTORY && (
-				<NoteVersions
-					noteId={note.id}
-					recordControl={{
-						isDisabled: Boolean(note.isSnapshotsDisabled),
-						onChange(isDisabled) {
-							updateMeta({ isSnapshotsDisabled: isDisabled });
-						},
-					}}
+			{!sidePanel ? null : (
+				<NoteSidebar
 					onClose={() => setSidePanel(null)}
-					onShowVersion={(version) => setVersionPreview(version)}
-					onVersionApply={async (version) => {
-						await noteHistory.snapshot(note.id);
-						await notesRegistry.update(note.id, version);
-						await noteHistory.snapshot(note.id);
+					activeTab={sidePanel as string}
+					onActiveTabChanged={(id) => setSidePanel(id as NoteMenuItems)}
+					tabs={[
+						{
+							id: NoteMenuItems.TOGGLE_HISTORY,
+							title: 'Note versions',
+							content() {
+								return (
+									<NoteVersions
+										noteId={note.id}
+										recordControl={{
+											isDisabled: Boolean(note.isSnapshotsDisabled),
+											onChange(isDisabled) {
+												updateMeta({
+													isSnapshotsDisabled: isDisabled,
+												});
+											},
+										}}
+										onShowVersion={(version) =>
+											setVersionPreview(version)
+										}
+										onVersionApply={async (version) => {
+											await noteHistory.snapshot(note.id);
+											await notesRegistry.update(note.id, version);
+											await noteHistory.snapshot(note.id);
 
-						eventBus.emit('noteHistoryUpdated', note.id);
-						eventBus.emit('noteUpdated', note.id);
-						forceUpdateLocalStateRef.current = true;
-					}}
-					onSnapshot={async () => {
-						await noteHistory.snapshot(note.id, { force: true });
-						eventBus.emit('noteHistoryUpdated', note.id);
-					}}
-					onDeleteAll={async () => {
-						await noteHistory.purge([note.id]);
-						eventBus.emit('noteHistoryUpdated', note.id);
-					}}
+											eventBus.emit('noteHistoryUpdated', note.id);
+											eventBus.emit('noteUpdated', note.id);
+											forceUpdateLocalStateRef.current = true;
+										}}
+										onSnapshot={async () => {
+											await noteHistory.snapshot(note.id, {
+												force: true,
+											});
+											eventBus.emit('noteHistoryUpdated', note.id);
+										}}
+										onDeleteAll={async () => {
+											await noteHistory.purge([note.id]);
+											eventBus.emit('noteHistoryUpdated', note.id);
+										}}
+									/>
+								);
+							},
+						},
+						{
+							id: NoteMenuItems.TOGGLE_BACKLINKS,
+							title: 'Back links',
+							content() {
+								return <div>TODO: Note back links</div>;
+							},
+						},
+						{
+							id: 'files',
+							title: 'Attached files',
+							content() {
+								return <div>TODO: Files attached to note</div>;
+							},
+						},
+					]}
 				/>
 			)}
 		</VStack>
