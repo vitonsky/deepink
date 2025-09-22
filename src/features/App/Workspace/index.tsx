@@ -1,7 +1,7 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
-import { useRegisterGlobalCommandShortcuts } from '@core/features/commands/shortcuts/useRegisterGlobalCommandShortcuts';
+import { useGlobalShortcutCommands } from '@core/features/commands/shortcuts/useGlobalShortcutCommands';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
@@ -77,7 +77,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
-	useRegisterGlobalCommandShortcuts();
+	useGlobalShortcutCommands();
 
 	return (
 		<Box
