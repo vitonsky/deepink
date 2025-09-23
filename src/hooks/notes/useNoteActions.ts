@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useStore } from 'react-redux';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { NoteId } from '@core/features/notes';
 import {
 	useEventBus,
@@ -54,7 +55,7 @@ export const useNoteActions = () => {
 			const note = await notesRegistry.getById(id);
 			if (note && !note.isSnapshotsDisabled) {
 				noteHistory.snapshot(id).then(() => {
-					eventBus.emit('noteHistoryUpdated', id);
+					eventBus.emit(WorkspaceEvents.NOTE_HISTORY_UPDATED, id);
 				});
 			}
 		},

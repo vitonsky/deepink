@@ -1,6 +1,7 @@
 import React, { createContext, FC, PropsWithChildren, useState } from 'react';
 import { createEvent } from 'effector';
 import { EventBus } from '@api/events/EventBus';
+import { WorkspaceEventsPayloadMap } from '@api/events/workspace';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { INote } from '@core/features/notes';
@@ -17,7 +18,9 @@ export type NotesApi = {
 export const NotesContext = createContext<NotesApi | null>(null);
 export const useNotesContext = createContextGetterHook(NotesContext);
 
-export const EventBusContext = createContext<EventBus | null>(null);
+export const EventBusContext = createContext<EventBus<WorkspaceEventsPayloadMap> | null>(
+	null,
+);
 export const useEventBus = createContextGetterHook(EventBusContext);
 
 export const NotesRegistryContext = createContext<INotesController | null>(null);
@@ -74,7 +77,7 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 					callback(event.payload);
 				});
 			},
-		} satisfies EventBus;
+		} satisfies EventBus<WorkspaceEventsPayloadMap>;
 	});
 
 	return (

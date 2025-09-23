@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useRef } from 'react';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import {
@@ -39,7 +40,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 
 	const eventBus = useEventBus();
 	useEffect(() => {
-		return eventBus.listen('noteUpdated', (noteId) => {
+		return eventBus.listen(WorkspaceEvents.NOTE_UPDATED, (noteId) => {
 			updateNotes();
 			notesRegistry.getById(noteId).then((note) => {
 				if (note) noteUpdated(note);
@@ -70,7 +71,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					delete syncJobsRef.current[note.id];
 
 					await noteHistory.snapshot(note.id);
-					eventBus.emit('noteHistoryUpdated', note.id);
+					eventBus.emit(WorkspaceEvents.NOTE_HISTORY_UPDATED, note.id);
 				}, 10 * 1000);
 			}
 		},

@@ -1,39 +1,20 @@
-import { NoteId } from '@core/features/notes';
-
-/**
- * Events payload map
- */
-export type EventsPayloadMap = {
-	/**
-	 * Fired when specific note  has been updated
-	 */
-	noteUpdated: NoteId;
-
-	/**
-	 * Fired when history of specific note has been updated
-	 */
-	noteHistoryUpdated: NoteId;
-};
-
 /**
  * Interface for a global events exchange in app
  */
-export type EventBus = {
+export type EventBus<PayloadMap extends Record<string, unknown>> = {
 	/**
 	 * Fire event by its name and provide payload if needed
 	 */
-	emit: <K extends keyof EventsPayloadMap>(
+	emit: <K extends keyof PayloadMap>(
 		eventName: K,
-		...args: EventsPayloadMap[K] extends void
-			? [payload?: void]
-			: [payload: EventsPayloadMap[K]]
+		...args: PayloadMap[K] extends void ? [payload?: void] : [payload: PayloadMap[K]]
 	) => void;
 
 	/**
 	 * Add listener for a specific event
 	 */
-	listen: <T extends keyof EventsPayloadMap>(
+	listen: <T extends keyof PayloadMap>(
 		eventName: T,
-		callback: (payload: EventsPayloadMap[T]) => void,
+		callback: (payload: PayloadMap[T]) => void,
 	) => () => void;
 };

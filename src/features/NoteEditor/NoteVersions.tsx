@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FaCheck, FaEraser, FaFloppyDisk, FaGlasses, FaTrashCan } from 'react-icons/fa6';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, HStack, Switch, Text, VStack } from '@chakra-ui/react';
 import { TextWithIcon } from '@components/TextWithIcon';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
@@ -43,7 +44,7 @@ export const NoteVersions = ({
 	// Refresh note versions by event
 	const eventBus = useEventBus();
 	useEffect(() => {
-		return eventBus.listen('noteHistoryUpdated', (noteId) => {
+		return eventBus.listen(WorkspaceEvents.NOTE_HISTORY_UPDATED, (noteId) => {
 			if (noteId !== noteId) return;
 			updateVersionsList();
 		});
@@ -215,7 +216,7 @@ export const NoteVersions = ({
 											const deleteVersion = () => {
 												noteHistory.delete([version.id]);
 												eventBus.emit(
-													'noteHistoryUpdated',
+													WorkspaceEvents.NOTE_HISTORY_UPDATED,
 													noteId,
 												);
 											};

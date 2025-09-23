@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
 import { debounce } from 'lodash';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
@@ -388,19 +389,31 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 											await notesRegistry.update(note.id, version);
 											await noteHistory.snapshot(note.id);
 
-											eventBus.emit('noteHistoryUpdated', note.id);
-											eventBus.emit('noteUpdated', note.id);
+											eventBus.emit(
+												WorkspaceEvents.NOTE_HISTORY_UPDATED,
+												note.id,
+											);
+											eventBus.emit(
+												WorkspaceEvents.NOTE_UPDATED,
+												note.id,
+											);
 											forceUpdateLocalStateRef.current = true;
 										}}
 										onSnapshot={async () => {
 											await noteHistory.snapshot(note.id, {
 												force: true,
 											});
-											eventBus.emit('noteHistoryUpdated', note.id);
+											eventBus.emit(
+												WorkspaceEvents.NOTE_HISTORY_UPDATED,
+												note.id,
+											);
 										}}
 										onDeleteAll={async () => {
 											await noteHistory.purge([note.id]);
-											eventBus.emit('noteHistoryUpdated', note.id);
+											eventBus.emit(
+												WorkspaceEvents.NOTE_HISTORY_UPDATED,
+												note.id,
+											);
 										}}
 									/>
 								);
