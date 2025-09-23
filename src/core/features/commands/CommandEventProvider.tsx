@@ -14,8 +14,8 @@ export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads
 	payload?: CommandPayloads[K];
 };
 
-export const CommandEventContext = createContext<EventCallable<CommandEvent> | null>(
-	null,
+export const CommandEventContext = createContext<EventCallable<CommandEvent>>(
+	createEvent(),
 );
 
 export const CommandEventProvider: FC<PropsWithChildren> = ({ children }) => {
