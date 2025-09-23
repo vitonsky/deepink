@@ -28,7 +28,7 @@ import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/ho
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { NoteEditor } from './NoteEditor';
-import { NoteMenu, NoteMenuItems } from './NoteMenuItems';
+import { NoteMenu, NoteMenuItems } from './NoteMenu';
 import { NoteSidebar } from './NoteSidebar';
 import { NoteVersions } from './NoteVersions';
 
