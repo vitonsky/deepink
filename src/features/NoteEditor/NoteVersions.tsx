@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FaCheck, FaEraser, FaFloppyDisk, FaGlasses, FaTrashCan } from 'react-icons/fa6';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, HStack, Switch, Text, VStack } from '@chakra-ui/react';
+import { BoxWithCenteredContent } from '@components/BoxWithCenteredContent';
 import { TextWithIcon } from '@components/TextWithIcon';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
@@ -10,6 +11,7 @@ import { useConfirmDialog } from '@hooks/useConfirmDialog';
 export const formatNoteVersionPreview = (version: NoteVersion) =>
 	`${new Date(version.createdAt).toLocaleString()} (${version.text.length} chars)`;
 
+// TODO: implement lazy loading
 export const NoteVersions = ({
 	noteId,
 	onSnapshot,
@@ -111,10 +113,18 @@ export const NoteVersions = ({
 				</HStack>
 			</HStack>
 
-			<Box w="100%" overflow="auto">
-				{versions === null ? (
-					<Text>Loading...</Text>
-				) : (
+			<Box w="100%" overflow="auto" display="flex" flex={1} flexFlow="column">
+				{versions && versions.length === 0 && (
+					<BoxWithCenteredContent>
+						<Text fontSize="1.3rem">This note have no recorded versions</Text>
+					</BoxWithCenteredContent>
+				)}
+				{versions === null && (
+					<BoxWithCenteredContent>
+						<Text fontSize="1.3rem">Loading...</Text>
+					</BoxWithCenteredContent>
+				)}
+				{versions !== null && versions.length > 0 && (
 					<VStack w="100%" gap={0}>
 						{versions.map((version) => (
 							<HStack

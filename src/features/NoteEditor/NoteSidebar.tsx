@@ -130,7 +130,8 @@ export const NoteSidebar = ({
 						key={tab.id}
 						w="100%"
 						overflow="auto"
-						display={isActive ? undefined : 'none'}
+						display={isActive ? 'flex' : 'none'}
+						flex="1"
 					>
 						{tab.content()}
 					</Box>
