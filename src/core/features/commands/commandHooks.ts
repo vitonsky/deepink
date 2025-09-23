@@ -7,7 +7,6 @@ import { CommandEventContext, CommandPayloads } from './CommandEventProvider';
  */
 export function useCommand() {
 	const commandEvent = useContext(CommandEventContext);
-	if (!commandEvent) throw new Error(`CommandEventContext is not provided`);
 
 	return <K extends keyof CommandPayloads>(
 		commandName: K,
@@ -25,7 +24,6 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 	callback: (payload: CommandPayloads[K]) => void,
 ) {
 	const commandEvent = useContext(CommandEventContext);
-	if (!commandEvent) throw new Error('CommandEventContext is not provided');
 
 	useEffect(() => {
 		return commandEvent.watch((command) => {
