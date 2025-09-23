@@ -28,9 +28,14 @@ import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/ho
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { NoteEditor } from './NoteEditor';
-import { NoteMenu, NoteMenuItems } from './NoteMenu';
+import { NoteMenu } from './NoteMenu';
 import { NoteSidebar } from './NoteSidebar';
 import { NoteVersions } from './NoteVersions';
+
+export enum NoteSidebarTabs {
+	HISTORY = 'HISTORY',
+	BACKLINKS = 'BACKLINKS',
+}
 
 export type NoteEditorProps = {
 	note: INote;
@@ -40,6 +45,7 @@ export type NoteEditorProps = {
 
 /**
  * TODO: rename directory of component
+ * TODO: create note context to interact with note from deep components
  */
 export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta }) => {
 	const dispatch = useAppDispatch();
@@ -168,18 +174,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 		attachTagName ? attachTagName.resolvedName : '',
 	);
 
-	const [sidePanel, setSidePanel] = useState<NoteMenuItems | null>(null);
-
-	const onNoteMenuClick = useCallback((command: NoteMenuItems) => {
-		switch (command) {
-			case NoteMenuItems.TOGGLE_BACKLINKS:
-			case NoteMenuItems.TOGGLE_HISTORY:
-				setSidePanel((state) => (state === command ? null : command));
-				break;
-
-			default:
-				break;
-		}
+	const [sidePanel, setSidePanel] = useState<NoteSidebarTabs | null>(null);
+	const onNoteMenuClick = useCallback((tabName: NoteSidebarTabs) => {
+		setSidePanel((state) => (state === tabName ? null : tabName));
 	}, []);
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
@@ -366,10 +363,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				<NoteSidebar
 					onClose={() => setSidePanel(null)}
 					activeTab={sidePanel as string}
-					onActiveTabChanged={(id) => setSidePanel(id as NoteMenuItems)}
+					onActiveTabChanged={(id) => setSidePanel(id as NoteSidebarTabs)}
 					tabs={[
 						{
-							id: NoteMenuItems.TOGGLE_HISTORY,
+							id: NoteSidebarTabs.HISTORY,
 							title: 'Note versions',
 							content() {
 								return (
@@ -410,7 +407,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							},
 						},
 						{
-							id: NoteMenuItems.TOGGLE_BACKLINKS,
+							id: NoteSidebarTabs.BACKLINKS,
 							title: 'Back links',
 							content() {
 								return <div>TODO: Note back links</div>;
