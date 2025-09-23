@@ -199,7 +199,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					/>
 
 					{/* TODO: add options that may be toggled */}
-					<NoteMenu onClick={onNoteMenuClick} />
+					<NoteMenu note={note} onClick={onNoteMenuClick} />
 				</HStack>
 			</HStack>
 
