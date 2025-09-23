@@ -99,6 +99,7 @@ export const basicTheme = extendTheme({
 			alternativeBorder: '#c0c4c9',
 		},
 		dim: {
+			50: '#fbfbfb',
 			100: '#f3f3f3',
 			400: '#e7e7e7',
 		},

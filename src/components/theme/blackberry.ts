@@ -38,6 +38,7 @@ export const blackberryTheme = extendTheme(basicTheme, {
 			alternativeBorder: '#ffffff',
 		},
 		dim: {
+			50: '#ffffff24',
 			100: '#ffffff30',
 			400: '#ffffff26',
 		},
