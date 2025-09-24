@@ -5,11 +5,11 @@ import { useCommand } from '../commandHooks';
 import { shortcuts } from '.';
 
 /**
- * Registers global keyboard shortcuts for commands
+ * Registers keyboard shortcuts for commands
  *
  * Configures the processing of global keyboard shortcuts, associating each combination with a corresponding command
  */
-export const useGlobalShortcutCommands = () => {
+export const useRegisterCommandShortcuts = () => {
 	const runCommand = useCommand();
 
 	useEffect(() => {
