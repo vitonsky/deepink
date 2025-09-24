@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
@@ -6,14 +6,8 @@ import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDataba
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { createFileManagerMock } from './__tests__/mocks/createFileManagerMock';
+import { createTextFile } from './__tests__/mocks/createTextFile';
 import { FilesController } from './FilesController';
-
-const File = require('blob-polyfill').File;
-
-globalThis.File = File;
-
-const createTextFile = (text: string): File =>
-	new File([Buffer.from(text).buffer], 'test.txt', { type: 'text/txt' });
 
 const testFiles = Array(5)
 	.fill(null)
