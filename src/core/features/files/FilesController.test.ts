@@ -5,32 +5,12 @@ import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
+import { createFileManagerMock } from './__tests__/mocks/createFileManagerMock';
 import { FilesController } from './FilesController';
-import { IFilesStorage } from '.';
 
 const File = require('blob-polyfill').File;
 
 globalThis.File = File;
-
-const createFileManagerMock = (): IFilesStorage => {
-	const storage: Record<string, ArrayBuffer> = {};
-	return {
-		async write(uuid, buffer) {
-			storage[uuid] = buffer;
-		},
-		async get(uuid) {
-			return storage[uuid];
-		},
-		async delete(uuids) {
-			uuids.forEach((uuid) => {
-				delete storage[uuid];
-			});
-		},
-		async list() {
-			return Object.keys(storage);
-		},
-	};
-};
 
 const createTextFile = (text: string): File =>
 	new File([Buffer.from(text).buffer], 'test.txt', { type: 'text/txt' });
