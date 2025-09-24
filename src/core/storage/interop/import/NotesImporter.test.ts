@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
@@ -5,7 +6,8 @@ import { NotesController } from '@core/features/notes/controller/NotesController
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { openDatabase } from '../database/SQLiteDatabase/SQLiteDatabase';
+import { openDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
+
 import { NotesImporter } from '.';
 
 const FAKE_WORKSPACE_NAME = 'fake-workspace-id';

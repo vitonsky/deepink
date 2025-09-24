@@ -1,12 +1,10 @@
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
-import { Root } from 'remark-parse/lib';
 import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
-import { visit } from 'unist-util-visit';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
@@ -14,33 +12,10 @@ import { INotesController } from '@core/features/notes/controller';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
 
+import { replaceUrls } from '../utils/mdast';
+
 // Map with files where key is a path and value is a content buffer
 export type FilesMap = Record<string, ArrayBuffer>;
-
-export const replaceUrls = (
-	tree: Root,
-	callback: (url: string) => Promise<string>,
-	handleUrlType = false,
-) => {
-	const promises: Promise<any>[] = [];
-
-	visit(tree, ['link', 'image'], (node) => {
-		if (node.type !== 'link' && node.type !== 'image') return;
-
-		// Skip not local urls
-		const urlRegEx = /^[a-z]+:\/\//;
-		const isUrlType = urlRegEx.test(node.url);
-		if (isUrlType && !handleUrlType) return;
-
-		promises.push(
-			callback(node.url).then((url) => {
-				node.url = url;
-			}),
-		);
-	});
-
-	return Promise.all(promises);
-};
 
 const getAbsolutePathOfRelativePath = (currentPath: string, relativePath: string) => {
 	const url = new URL(relativePath, `https://root/${currentPath}`);
