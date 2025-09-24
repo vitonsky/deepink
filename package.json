@@ -105,7 +105,7 @@
 		"lodash": "^4.17.21",
 		"monaco-editor-core": "^0.39.0",
 		"monaco-markdown": "^0.0.12",
-		"nano-queries": "^0.1.0",
+		"nano-queries": "^1.1.0",
 		"pretty-bytes": "^6.1.0",
 		"proper-lockfile": "^4.1.2",
 		"react": "^18.2.0",

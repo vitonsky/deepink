@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
+import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { ElectronFilesController } from '@electron/requests/storage/renderer';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -14,6 +15,7 @@ export type WorkspaceContainer = {
 	filesRegistry: FilesController;
 	tagsRegistry: TagsController;
 	notesRegistry: NotesController;
+	notesHistory: NoteVersions;
 };
 
 export const useWorkspace = (currentProfile: ProfileContainer) => {
@@ -37,15 +39,13 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 			attachmentsController,
 			workspaceId,
 		);
-		const tagsRegistry = new TagsController(db, workspaceId);
-		const notesRegistry = new NotesController(db, workspaceId);
-
 		setState({
 			attachmentsController,
 			filesController,
 			filesRegistry,
-			tagsRegistry,
-			notesRegistry,
+			tagsRegistry: new TagsController(db, workspaceId),
+			notesRegistry: new NotesController(db, workspaceId),
+			notesHistory: new NoteVersions(db, workspaceId),
 		});
 	}, [currentProfile, workspaceId]);
 

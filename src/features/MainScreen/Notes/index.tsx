@@ -2,10 +2,11 @@ import React, { FC, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote, INoteContent, NoteId } from '@core/features/notes';
+import { NoteMeta } from '@core/features/notes/controller';
 import { useAsRef } from '@hooks/useAsRef';
 
 import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
-import { NoteEditor } from '../../NoteEditor';
+import { Note } from '../../NoteEditor';
 
 export type NotesProps = {
 	tabs: NoteId[];
@@ -27,17 +28,26 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 					.map((id) => {
 						return [
 							id,
-							(content: INoteContent) => {
-								const note = notesRef.current.find(
-									(note) => note.id === id,
-								) as INote;
+							{
+								updateContent: (content: INoteContent) => {
+									const note = notesRef.current.find(
+										(note) => note.id === id,
+									) as INote;
 
-								// Skip updates with not changed data
-								if (isEqual(note.content, content)) {
-									return;
-								}
+									// Skip updates with not changed data
+									if (isEqual(note.content, content)) {
+										return;
+									}
 
-								updateNote({ ...note, content });
+									updateNote({ ...note, content });
+								},
+								updateMeta: (meta: NoteMeta) => {
+									const note = notesRef.current.find(
+										(note) => note.id === id,
+									) as INote;
+
+									updateNote({ ...note, ...meta });
+								},
 							},
 						];
 					}),
@@ -59,6 +69,8 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 				.map((id) => {
 					const note = notes.find((note) => note.id === id) as INote;
 					const isActiveTab = activeTab === note.id;
+					const { updateContent, updateMeta } = updateHooks[note.id];
+
 					return (
 						<Box
 							key={note.id}
@@ -66,10 +78,11 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 							w="100%"
 							h="100%"
 						>
-							<NoteEditor
+							<Note
 								key={note.id}
 								note={note}
-								updateNote={updateHooks[note.id]}
+								updateNote={updateContent}
+								updateMeta={updateMeta}
 							/>
 						</Box>
 					);

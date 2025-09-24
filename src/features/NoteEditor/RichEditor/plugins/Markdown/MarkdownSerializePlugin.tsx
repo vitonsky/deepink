@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { $setSelection } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 
@@ -29,28 +30,14 @@ export const MarkdownSerializePlugin = ({
 		// Skip updates sent from this component, based on value equality
 		if (serializedValueRef.current === value) return;
 
-		const isEditable = editor.isEditable();
+		// Cleanup for new values, since it will be updated
+		// Otherwise we may have bug when value is updated via `editor.update`, an `OnChangePlugin` will not trigger callback (because synthetic update) and if next value update will have previous value - update will be ignored.
+		serializedValueRef.current = null;
 
-		// Disable editable mode while update if editor is not active,
-		// to prevent forced focus on editor
-		const isActiveBeforeUpdate = isFocusedElement(editor.getRootElement());
-		if (!isActiveBeforeUpdate && isEditable) {
-			editor.setEditable(false);
-		}
-
-		editor.update(
-			() => {
-				$convertFromMarkdownString(value);
-			},
-			{
-				onUpdate() {
-					// Restore editable state once update completed
-					if (isEditable !== editor.isEditable()) {
-						editor.setEditable(isEditable);
-					}
-				},
-			},
-		);
+		editor.update(() => {
+			$convertFromMarkdownString(value);
+			$setSelection(null);
+		});
 	}, [editor, value]);
 
 	const onChange = (value: string) => {

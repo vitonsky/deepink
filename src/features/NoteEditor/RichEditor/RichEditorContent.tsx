@@ -25,16 +25,19 @@ import {
 	MarkdownSerializePluginProps,
 } from './plugins/Markdown/MarkdownSerializePlugin';
 import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
+import { ReadOnlyPlugin } from './plugins/ReadOnlyPlugin';
 
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
 		placeholder?: string;
+		isReadOnly?: boolean;
 	};
 
 export const RichEditorContent = ({
 	value,
 	onChanged,
 	placeholder,
+	isReadOnly,
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
@@ -98,6 +101,8 @@ export const RichEditorContent = ({
 			<CheckListPlugin />
 			<TablePlugin />
 			<HorizontalRulePlugin />
+
+			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
 		</Box>
 	);
 };

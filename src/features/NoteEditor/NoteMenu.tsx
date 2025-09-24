@@ -23,13 +23,19 @@ import {
 	MenuList,
 	Text,
 } from '@chakra-ui/react';
+import { INote } from '@core/features/notes';
 
-export enum NoteMenuItems {
-	TOGGLE_BACKLINKS,
-}
+import { NoteSidebarTabs } from '.';
 
+// TODO: call commands by click items
 export const NoteMenu = memo(
-	({ onClick }: { onClick?: (command: NoteMenuItems) => void }) => {
+	({
+		note,
+		onClick,
+	}: {
+		note: INote;
+		onClick?: (command: NoteSidebarTabs) => void;
+	}) => {
 		return (
 			<Menu>
 				<MenuButton as={Button} variant="primary" size="sm">
@@ -48,13 +54,16 @@ export const NoteMenu = memo(
 							<Text>Remind me</Text>
 						</HStack>
 					</MenuItem>
-					<MenuItem>
+					<MenuItem onClick={() => onClick?.(NoteSidebarTabs.HISTORY)}>
 						<HStack>
 							<FaClock />
 							<Text>History</Text>
+							{note.isSnapshotsDisabled && (
+								<Text color="typography.secondary">(Disabled)</Text>
+							)}
 						</HStack>
 					</MenuItem>
-					<MenuItem onClick={() => onClick?.(NoteMenuItems.TOGGLE_BACKLINKS)}>
+					<MenuItem onClick={() => onClick?.(NoteSidebarTabs.BACKLINKS)}>
 						<HStack>
 							<FaLink />
 							<Text>Back links</Text>

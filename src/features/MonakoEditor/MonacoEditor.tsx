@@ -55,6 +55,7 @@ export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	setValue?: (value: string) => void;
 	editorObjectRef?: RefObject<EditorObject>;
 	uploadFile: FileUploader;
+	isReadOnly?: boolean;
 };
 
 /**
@@ -66,6 +67,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	setValue,
 	editorObjectRef,
 	uploadFile,
+	isReadOnly,
 	...props
 }) => {
 	const setValueRef = useRef(setValue);
@@ -99,6 +101,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		if (!editorContainer) return;
 
 		const monacoEditor = editor.create(editorContainer, {
+			readOnly: isReadOnly,
 			value,
 			language: 'markdown',
 			automaticLayout: true,
@@ -157,6 +160,13 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		// Hook runs only once to initialize component
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	// Control over readonly mode
+	useEffect(() => {
+		if (editorRef.current) {
+			editorRef.current.updateOptions({ readOnly: isReadOnly });
+		}
+	}, [isReadOnly]);
 
 	// Update value
 	useEffect(() => {

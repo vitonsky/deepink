@@ -1,41 +1,72 @@
-import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
-import { FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
+import React, {
+	FC,
+	memo,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
+import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
 import { debounce } from 'lodash';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
+import { NoteMeta } from '@core/features/notes/controller';
+import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { IResolvedTag } from '@core/features/tags';
 import {
 	useAttachmentsController,
-	useFilesRegistry,
+	useEventBus,
+	useNotesHistory,
+	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
-import { selectEditorMode } from '@state/redux/settings/settings';
 
-import { FileUploader } from '../MonakoEditor/features/useDropFiles';
-import { MonacoEditor } from '../MonakoEditor/MonacoEditor';
-import { EditorPanelContext } from './EditorPanel';
-import { EditorPanel } from './EditorPanel/EditorPanel';
-import { NoteMenu, NoteMenuItems } from './NoteMenuItems';
-import { RichEditor } from './RichEditor/RichEditor';
+import { NoteEditor } from './NoteEditor';
+import { NoteMenu } from './NoteMenu';
+import { NoteSidebar } from './NoteSidebar';
+import { NoteVersions } from './NoteVersions';
+
+export enum NoteSidebarTabs {
+	HISTORY = 'HISTORY',
+	BACKLINKS = 'BACKLINKS',
+}
 
 export type NoteEditorProps = {
 	note: INote;
 	updateNote: (note: INoteContent) => void;
+	updateMeta: (meta: NoteMeta) => void;
 };
 
-export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
+/**
+ * TODO: rename directory of component
+ * TODO: create note context to interact with note from deep components
+ */
+export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
-	const editorMode = useAppSelector(selectEditorMode);
+	const eventBus = useEventBus();
+	const notesRegistry = useNotesRegistry();
 
 	const [title, setTitle] = useState(note.content.title);
 	const [text, setText] = useState(note.content.text);
+
+	// Forced update for note data
+	const forceUpdateLocalStateRef = useRef(false);
+	useMemo(() => {
+		if (!forceUpdateLocalStateRef.current) return;
+		forceUpdateLocalStateRef.current = false;
+
+		setTitle(note.content.title);
+		setText(note.content.text);
+	}, [note]);
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -59,6 +90,32 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 	const updateNoteRef = useRef(updateNote);
 	updateNoteRef.current = updateNote;
 
+	// Snapshot note once
+	const noteSnapshotPromiseRef = useRef<null | Promise<void>>(null);
+	const noteHistory = useNotesHistory();
+	useEffect(() => {
+		if (note.isSnapshotsDisabled) return;
+
+		noteSnapshotPromiseRef.current = new Promise<void>(async (res) => {
+			for (let attempt = 0; attempt < 3; attempt++) {
+				try {
+					await noteHistory.snapshot(note.id);
+					res();
+					return;
+				} catch (err) {
+					// Retry after delay
+					console.error(err);
+					await new Promise((res) => setTimeout(res, 200));
+				}
+			}
+		}).then(() => {
+			noteSnapshotPromiseRef.current = null;
+		});
+
+		// We need to run this effect once, at first render only
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedUpdateNote = useCallback(
 		debounce((data: { title: string; text: string }) => {
@@ -75,16 +132,15 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 			return;
 		}
 
-		debouncedUpdateNote({ title, text });
+		if (noteSnapshotPromiseRef.current === null) {
+			debouncedUpdateNote({ title, text });
+		} else {
+			// Wait note snapshotting before call
+			noteSnapshotPromiseRef.current.then(() => {
+				debouncedUpdateNote({ title, text });
+			});
+		}
 	}, [title, text, debouncedUpdateNote]);
-
-	const filesRegistry = useFilesRegistry();
-	const uploadFile: FileUploader = useCallback(
-		async (file) => {
-			return filesRegistry.add(file);
-		},
-		[filesRegistry],
-	);
 
 	const attachments = useAttachmentsController();
 
@@ -119,18 +175,12 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 		attachTagName ? attachTagName.resolvedName : '',
 	);
 
-	const [sidePanel, setSidePanel] = useState<string | null>(null);
-
-	const onNoteMenuClick = useCallback((command: NoteMenuItems) => {
-		switch (command) {
-			case NoteMenuItems.TOGGLE_BACKLINKS:
-				setSidePanel((state) => (state ? null : 'backlinks'));
-				break;
-
-			default:
-				break;
-		}
+	const [sidePanel, setSidePanel] = useState<NoteSidebarTabs | null>(null);
+	const onNoteMenuClick = useCallback((tabName: NoteSidebarTabs) => {
+		setSidePanel((state) => (state === tabName ? null : tabName));
 	}, []);
+
+	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
 	return (
 		<VStack w="100%" align="start">
@@ -140,12 +190,17 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 						placeholder="Note title"
 						size="sm"
 						borderRadius="6px"
-						value={title}
-						onChange={(evt) => setTitle(evt.target.value)}
+						value={versionPreview ? versionPreview.title : title}
+						onChange={
+							versionPreview
+								? undefined
+								: (evt) => setTitle(evt.target.value)
+						}
+						isDisabled={versionPreview !== null}
 					/>
 
 					{/* TODO: add options that may be toggled */}
-					<NoteMenu onClick={onNoteMenuClick} />
+					<NoteMenu note={note} onClick={onNoteMenuClick} />
 				</HStack>
 			</HStack>
 
@@ -277,69 +332,112 @@ export const NoteEditor: FC<NoteEditorProps> = memo(({ note, updateNote }) => {
 				/>
 			</HStack>
 
-			<EditorPanelContext>
-				<HStack align="start" w="100%" overflowX="auto" flexShrink={0}>
-					<EditorPanel />
-				</HStack>
-
-				<HStack
-					sx={{
-						display: 'flex',
-						width: '100%',
-						height: '100%',
-						overflow: 'hidden',
-					}}
-				>
-					{(editorMode === 'plaintext' || editorMode === 'split-screen') && (
-						<Box
-							as={MonacoEditor}
-							value={text}
-							setValue={setText}
-							flexGrow="100"
-							uploadFile={uploadFile}
-							width="100%"
-							height="100%"
-							minW="0"
-						/>
-					)}
-					{(editorMode === 'richtext' || editorMode === 'split-screen') && (
-						<RichEditor
-							placeholder="Write your thoughts here..."
-							value={text}
-							onChanged={setText}
-						/>
-					)}
-				</HStack>
-			</EditorPanelContext>
-
-			{sidePanel === 'backlinks' && (
-				<VStack
-					align="start"
-					w="100%"
-					h="300px"
-					flex={1}
-					padding=".5rem"
-					gap="1rem"
-					borderTop="1px solid"
-					borderColor="surface.border"
-				>
-					<HStack w="100%">
-						<Text fontWeight="bold">Back links tree</Text>
+			{versionPreview && (
+				<HStack alignItems="center" w="100%" flexWrap="wrap">
+					<HStack gap=".3rem">
 						<Button
 							variant="ghost"
 							size="xs"
-							marginLeft="auto"
-							onClick={() => setSidePanel(null)}
+							title="Go back to editing"
+							onClick={() => {
+								setVersionPreview(null);
+							}}
 						>
-							<FaXmark />
+							<FaArrowLeft />
 						</Button>
-					</HStack>
 
-					<Box w="100%">TODO: Note related data here</Box>
-				</VStack>
+						<Text color="typography.secondary">
+							Version at{' '}
+							{new Date(versionPreview.createdAt).toLocaleString()}
+						</Text>
+					</HStack>
+				</HStack>
+			)}
+
+			{versionPreview ? (
+				<NoteEditor text={versionPreview.text} setText={() => {}} isReadOnly />
+			) : (
+				<NoteEditor text={text} setText={setText} />
+			)}
+
+			{!sidePanel ? null : (
+				<NoteSidebar
+					onClose={() => setSidePanel(null)}
+					activeTab={sidePanel as string}
+					onActiveTabChanged={(id) => setSidePanel(id as NoteSidebarTabs)}
+					tabs={[
+						{
+							id: NoteSidebarTabs.HISTORY,
+							title: 'Note versions',
+							content() {
+								return (
+									<NoteVersions
+										noteId={note.id}
+										recordControl={{
+											isDisabled: Boolean(note.isSnapshotsDisabled),
+											onChange(isDisabled) {
+												updateMeta({
+													isSnapshotsDisabled: isDisabled,
+												});
+											},
+										}}
+										onShowVersion={(version) =>
+											setVersionPreview(version)
+										}
+										onVersionApply={async (version) => {
+											await noteHistory.snapshot(note.id);
+											await notesRegistry.update(note.id, version);
+											await noteHistory.snapshot(note.id);
+
+											eventBus.emit(
+												WorkspaceEvents.NOTE_HISTORY_UPDATED,
+												note.id,
+											);
+											eventBus.emit(
+												WorkspaceEvents.NOTE_UPDATED,
+												note.id,
+											);
+											forceUpdateLocalStateRef.current = true;
+										}}
+										onSnapshot={async () => {
+											await noteHistory.snapshot(note.id, {
+												force: true,
+											});
+											eventBus.emit(
+												WorkspaceEvents.NOTE_HISTORY_UPDATED,
+												note.id,
+											);
+										}}
+										onDeleteAll={async () => {
+											await noteHistory.purge([note.id]);
+											eventBus.emit(
+												WorkspaceEvents.NOTE_HISTORY_UPDATED,
+												note.id,
+											);
+										}}
+									/>
+								);
+							},
+						},
+						{
+							id: NoteSidebarTabs.BACKLINKS,
+							title: 'Back links',
+							content() {
+								return <div>TODO: Note back links</div>;
+							},
+						},
+						{
+							id: 'files',
+							title: 'Attached files',
+							content() {
+								return <div>TODO: Files attached to note</div>;
+							},
+						},
+					]}
+				/>
 			)}
 		</VStack>
 	);
 });
 
-NoteEditor.displayName = 'NoteEditor';
+Note.displayName = 'Note';

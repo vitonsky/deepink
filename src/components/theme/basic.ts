@@ -99,6 +99,7 @@ export const basicTheme = extendTheme({
 			alternativeBorder: '#c0c4c9',
 		},
 		dim: {
+			50: '#fbfbfb',
 			100: '#f3f3f3',
 			400: '#e7e7e7',
 		},
@@ -179,6 +180,20 @@ export const basicTheme = extendTheme({
 			defaultProps: {
 				variant: 'secondary',
 				colorScheme: 'primary',
+			},
+		}),
+		Switch: createMultiStyleConfigHelpers([
+			'container',
+			'thumb',
+			'track',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				track: {
+					backgroundColor: 'primary.200',
+				},
+				thumb: {
+					backgroundColor: 'primary.500',
+				},
 			},
 		}),
 		Menu: createMultiStyleConfigHelpers([

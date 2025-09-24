@@ -1,8 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import {
+	useEventBus,
 	useNotesContext,
+	useNotesHistory,
 	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { Notes } from '@features/MainScreen/Notes';
@@ -24,6 +27,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 
 	const notesRegistry = useNotesRegistry();
 	const { noteUpdated } = useNotesContext();
+	const noteHistory = useNotesHistory();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
@@ -34,14 +38,44 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 		)(state),
 	);
 
+	const eventBus = useEventBus();
+	useEffect(() => {
+		return eventBus.listen(WorkspaceEvents.NOTE_UPDATED, (noteId) => {
+			updateNotes();
+			notesRegistry.getById(noteId).then((note) => {
+				if (note) noteUpdated(note);
+			});
+		});
+	}, [eventBus, noteUpdated, notesRegistry, updateNotes]);
+
 	// Simulate note update
+	const syncJobsRef = useRef<Record<string, NodeJS.Timeout>>({});
 	const updateNote = useImmutableCallback(
 		async (note: INote) => {
 			noteUpdated(note);
 			await notesRegistry.update(note.id, note.content);
+			await notesRegistry.updateMeta([note.id], {
+				isSnapshotsDisabled: note.isSnapshotsDisabled,
+			});
 			await updateNotes();
+
+			// Reset sync job if any
+			if (syncJobsRef.current[note.id]) {
+				clearTimeout(syncJobsRef.current[note.id]);
+				delete syncJobsRef.current[note.id];
+			}
+
+			// Sync by timeout
+			if (!note.isSnapshotsDisabled) {
+				syncJobsRef.current[note.id] = setTimeout(async () => {
+					delete syncJobsRef.current[note.id];
+
+					await noteHistory.snapshot(note.id);
+					eventBus.emit(WorkspaceEvents.NOTE_HISTORY_UPDATED, note.id);
+				}, 10 * 1000);
+			}
 		},
-		[noteUpdated, notesRegistry, updateNotes],
+		[eventBus, noteHistory, noteUpdated, notesRegistry, updateNotes],
 	);
 
 	return (

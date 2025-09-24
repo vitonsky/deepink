@@ -15,5 +15,6 @@ export type INote = {
 	id: NoteId;
 	createdTimestamp?: number;
 	updatedTimestamp?: number;
+	isSnapshotsDisabled?: boolean;
 	content: INoteContent;
 };
