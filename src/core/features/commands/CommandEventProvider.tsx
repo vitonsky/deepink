@@ -9,10 +9,15 @@ export type CommandPayloads = {
 	[K in GLOBAL_COMMANDS]: void;
 };
 
-export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads> = {
-	name: K;
-	payload?: CommandPayloads[K];
-};
+export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads> =
+	CommandPayloads[K] extends void
+		? {
+				name: K;
+		  }
+		: {
+				name: K;
+				payload: CommandPayloads[K];
+		  };
 
 export const CommandEventContext = createContext<EventCallable<CommandEvent>>(
 	createEvent(),
