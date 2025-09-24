@@ -11,7 +11,6 @@ export const WorkspaceStatusBarItems = () => {
 
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
-
 	useFirstRender(() => {
 		statusBarButtons.controls.register(
 			'dbChange',
