@@ -1,7 +1,6 @@
 import { useContext, useEffect } from 'react';
 
 import { CommandEventContext, CommandPayloads } from './CommandEventProvider';
-import { GLOBAL_COMMANDS } from '.';
 
 /**
  * Returns a function that calls a command by its name
@@ -27,15 +26,22 @@ export function useCommand() {
  * Calls the provided callback whenever the given command is triggered
  */
 export function useCommandCallback<K extends keyof CommandPayloads>(
-	commandName: GLOBAL_COMMANDS,
-	callback: (payload?: CommandPayloads[K]) => void,
+	commandName: K,
+	callback: (payload: CommandPayloads[K]) => void,
 ) {
 	const commandEvent = useContext(CommandEventContext);
 
 	useEffect(() => {
 		return commandEvent.watch((command) => {
 			if (command.name !== commandName) return;
-			callback();
+
+			// Currently payload is void for all commands, but future commands may include payload
+			// We extract the payload if it exists and cast the type so the callback works both for commands with and without payload
+			const payload = (
+				'payload' in command ? command.payload : undefined
+			) as CommandPayloads[K];
+
+			callback(payload);
 		});
 	}, [callback, commandEvent, commandName]);
 }
