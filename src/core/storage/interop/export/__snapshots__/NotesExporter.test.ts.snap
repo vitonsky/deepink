@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Notes and files may be exported > Export notes > Exported notes array 1`] = `
+[
+  {
+    "data": "---
+title: Note 1
+created: 100000
+updated: 200000
+tags:
+  - bar
+  - baz
+  - foo
+
+---
+
+Hello world!
+",
+    "id": "[REDACTED UUID]",
+  },
+  {
+    "data": "---
+title: Note 2
+created: 100001
+updated: 200001
+tags: []
+
+---
+
+Mention for [Note 1](./[REDACTED-UUID].md)
+",
+    "id": "[REDACTED UUID]",
+  },
+  {
+    "data": "---
+title: Note 3
+created: 100002
+updated: 200002
+tags: []
+
+---
+
+Note with [attachment](res://[REDACTED-UUID])
+",
+    "id": "[REDACTED UUID]",
+  },
+  {
+    "data": "---
+title: Note 4
+created: 100003
+updated: 200003
+tags: []
+
+---
+
+Note with [attachment](res://[REDACTED-UUID]) and mention for [Note 1](./[REDACTED-UUID].md)
+",
+    "id": "[REDACTED UUID]",
+  },
+]
+`;
