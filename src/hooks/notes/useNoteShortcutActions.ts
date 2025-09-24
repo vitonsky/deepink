@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { GLOBAL_COMMANDS } from '@core/features/commands';
 import { useCommandCallback } from '@core/features/commands/commandHooks';
-import { INote } from '@core/features/notes';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -11,23 +10,7 @@ import {
 	selectRecentlyClosedNotes,
 } from '@state/redux/profiles/profiles';
 
-/**
- * Returns the ID of a note relative to the currently active note.
- * When reaching the end of the array, returns the first element, when reaching the start of the array, returns the last element
- */
-const getNoteIdByOffset = (
-	openedNotes: INote[],
-	activeNoteId: string | null,
-	offset: number,
-) => {
-	if (!activeNoteId || openedNotes.length < 2) return null;
-
-	const currentIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
-	if (currentIndex === -1) return null;
-
-	const nextIndex = (currentIndex + offset + openedNotes.length) % openedNotes.length;
-	return openedNotes[nextIndex].id;
-};
+import { getNextNoteIdByDirection } from './utils/getNextNoteIdByDirection';
 
 /**
  * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
@@ -53,15 +36,16 @@ export const useNoteShortcutActions = () => {
 	useCommandCallback(
 		GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE,
 		useCallback(() => {
-			if (recentlyClosedNotes.length === 0) return;
-			noteActions.click(recentlyClosedNotes[recentlyClosedNotes.length - 1]);
+			const lastClosedNote = recentlyClosedNotes[recentlyClosedNotes.length - 1];
+			if (!lastClosedNote) return;
+			noteActions.click(lastClosedNote);
 		}, [noteActions, recentlyClosedNotes]),
 	);
 
 	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
 		useCallback(() => {
-			const previousNote = getNoteIdByOffset(openedNotes, activeNoteId, +1);
+			const previousNote = getNextNoteIdByDirection(openedNotes, activeNoteId, +1);
 			if (!previousNote) return;
 			noteActions.click(previousNote);
 		}, [activeNoteId, noteActions, openedNotes]),
@@ -70,7 +54,7 @@ export const useNoteShortcutActions = () => {
 	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
 		useCallback(() => {
-			const nextNote = getNoteIdByOffset(openedNotes, activeNoteId, -1);
+			const nextNote = getNextNoteIdByDirection(openedNotes, activeNoteId, -1);
 			if (!nextNote) return;
 			noteActions.click(nextNote);
 		}, [activeNoteId, noteActions, openedNotes]),
