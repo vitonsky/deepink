@@ -11,13 +11,14 @@ export function useCommand() {
 
 	return <K extends keyof CommandPayloads>(
 		commandName: K,
-		payload?: CommandPayloads[K] extends void ? undefined : CommandPayloads[K],
+		...args: CommandPayloads[K] extends void
+			? [payload?: void]
+			: [payload: CommandPayloads[K]]
 	) => {
 		const data =
-			payload === undefined
+			args.length === 0
 				? { name: commandName }
-				: { name: commandName, payload };
-
+				: { name: commandName, payload: args[0] };
 		commandEvent(data);
 	};
 }
