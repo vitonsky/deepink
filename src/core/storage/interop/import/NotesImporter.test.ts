@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
