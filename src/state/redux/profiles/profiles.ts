@@ -199,7 +199,7 @@ export const profilesSlice = createSlice({
 				(id) => id !== note.id,
 			);
 			if (workspace.recentlyClosedNotes.length !== filteredClosedNotes.length) {
-				workspace.recentlyClosedNotes.length = filteredClosedNotes.length;
+				workspace.recentlyClosedNotes = filteredClosedNotes;
 			}
 		},
 
