@@ -3,7 +3,7 @@ import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { GLOBAL_COMMANDS } from '@core/features/commands';
 import { useCommandCallback } from '@core/features/commands/commandHooks';
-import { useGlobalShortcutCommands } from '@core/features/commands/shortcuts/useGlobalShortcutCommands';
+import { useRegisterCommandShortcuts } from '@core/features/commands/shortcuts/useRegisterCommandShortcuts';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
@@ -80,7 +80,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
-	useGlobalShortcutCommands();
+	useRegisterCommandShortcuts();
 
 	const profileControls = useProfileControls();
 	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, profileControls.close);
