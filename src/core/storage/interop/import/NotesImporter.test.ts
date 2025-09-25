@@ -66,9 +66,23 @@ describe('Text buffers may be imported', () => {
 				'Another text with [attachment](./_resources/secret.txt)',
 			),
 			// Notes in subdirectories
+			'/note-6.md': createTextBuffer(
+				'Mention for non exist notes [one](./non-exist-note-1.md), [two](<./non exist note 2.md>), [three](./non/exist/note.md), [four](../../non-exist-note.md). And non exists attachments [one](./non-exist-file-1.jpeg), [two](<./non exist file 2.jpeg>), [three](./non/exist/file.jpeg), [four](../non-exist-file.jpeg)',
+			),
+			'/note-7.md': createTextBuffer(
+				'Mention for [note #1](/note-1.md) via absolute path',
+			),
+			// Notes in subdirectories
 			'/section-1/note #1.md': createTextBuffer('Hello world!'),
 			'/section-1/note #2.md': createTextBuffer(
 				'Mention for [note #1](<./note #1.md>)',
+			),
+
+			// Subdirectories with resources
+			'/posts/about/image.png': createTextBuffer('IMAGE CONTENT HERE'),
+			'/posts/about/unused.png': createTextBuffer('UNUSED IMAGE CONTENT HERE'),
+			'/posts/about/index.md': createTextBuffer(
+				'---\ntitle: Blog post\n---\nPost with image\n\n![attached image](./image.png)\nThis post and all its resources is placed in subdirectory.',
 			),
 		});
 	});
@@ -110,6 +124,24 @@ describe('Text buffers may be imported', () => {
 				},
 			}),
 			expect.objectContaining({
+				// TODO: Leave invalid urls as is
+				content: {
+					title: 'note-6',
+					text: 'Mention for non exist notes [one](/non-exist-note-1.md), [two](/non%20exist%20note%202.md), [three](/non/exist/note.md), [four](non-exist-note.md). And non exists attachments [one](/non-exist-file-1.jpeg), [two](/non%20exist%20file%202.jpeg), [three](/non/exist/file.jpeg), [four](non-exist-file.jpeg)\n',
+				},
+			}),
+
+			expect.objectContaining({
+				content: {
+					title: 'note-7',
+					text: 'Mention for [note #1](note-1.md) via absolute path\n',
+					// TODO: fix to correct case. Path must be resolved well
+					// text: expect.stringMatching(
+					// 	/^Mention for \[note #1\]\(note:\/\/[\d\w-]+\) via absolute path\n$/,
+					// ),
+				},
+			}),
+			expect.objectContaining({
 				// TODO: fix unnecessary new line
 				content: { title: 'note #1', text: 'Hello world!\n' },
 			}),
@@ -123,13 +155,21 @@ describe('Text buffers may be imported', () => {
 					// ),
 				},
 			}),
+			expect.objectContaining({
+				content: {
+					title: 'Blog post',
+					text: expect.stringMatching(
+						/^Post with image\n\n!\[attached image\]\(res:\/\/[\d\w-]+\)\nThis post and all its resources is placed in subdirectory.\n$/,
+					),
+				},
+			}),
 		]);
 	});
 
 	test('Only attached files must be saved on FS', async () => {
 		// If file used in many places, it must have many references,
 		// but physically we have only one file
-		await expect(fileManager.list()).resolves.toHaveLength(1);
+		await expect(fileManager.list()).resolves.toHaveLength(2);
 	});
 
 	test('Attached files is in files list', async () => {
@@ -171,6 +211,16 @@ describe('Text buffers may be imported', () => {
 				name: 'section-1',
 				parent: expect.stringMatching(/^[\d\w-]+$/),
 				resolvedName: '/section-1',
+			}),
+			expect.objectContaining({
+				name: 'posts',
+				parent: expect.stringMatching(/^[\d\w-]+$/),
+				resolvedName: '/posts',
+			}),
+			expect.objectContaining({
+				name: 'about',
+				parent: expect.stringMatching(/^[\d\w-]+$/),
+				resolvedName: '/posts/about',
 			}),
 			// TODO: empty tag must not be created
 			expect.objectContaining({
