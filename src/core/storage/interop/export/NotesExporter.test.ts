@@ -86,6 +86,17 @@ describe('Notes and files may be exported', () => {
 			}),
 			[file1Id],
 		);
+		await attachmentsRegistry.set(
+			await notesRegistry.add({
+				title: 'Note 5',
+				text: `Note with [invalid attachment](${formatResourceLink(
+					'00000000-0000-0000-0000-000000000000',
+				)}) and mention for [invalid note](${formatNoteLink(
+					'00000000-0000-0000-0000-000000000000',
+				)})`,
+			}),
+			[file1Id],
+		);
 	});
 
 	test('Export notes', async () => {

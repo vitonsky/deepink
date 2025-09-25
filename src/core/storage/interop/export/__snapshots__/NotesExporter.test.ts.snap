@@ -57,5 +57,18 @@ Note with [attachment](res://[REDACTED-UUID]) and mention for [Note 1](./[REDACT
 ",
     "id": "[REDACTED UUID]",
   },
+  {
+    "data": "---
+title: Note 5
+created: 100004
+updated: 200004
+tags: []
+
+---
+
+Note with [invalid attachment](res://[REDACTED-UUID]) and mention for [invalid note](./[REDACTED-UUID].md)
+",
+    "id": "[REDACTED UUID]",
+  },
 ]
 `;
