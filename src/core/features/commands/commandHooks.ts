@@ -1,4 +1,9 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
+import { isEqual } from 'lodash';
+import { WorkspaceContext } from '@features/App/Workspace';
+import { useAppSelector } from '@state/redux/hooks';
+import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
 
 import { CommandEventContext, CommandPayloads } from './CommandEventProvider';
 
@@ -7,6 +12,11 @@ import { CommandEventContext, CommandPayloads } from './CommandEventProvider';
  */
 export function useCommand() {
 	const commandEvent = useContext(CommandEventContext);
+	const { profileId } = useWorkspaceData();
+	const activeWorkspace = useAppSelector(
+		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
+		isEqual,
+	);
 
 	return <K extends keyof CommandPayloads>(
 		commandName: K,
@@ -14,10 +24,18 @@ export function useCommand() {
 			? [payload?: void]
 			: [payload: CommandPayloads[K]]
 	) => {
+		if (!activeWorkspace) return;
+
+		const [payload] = args;
 		const data =
-			args.length === 0
-				? { name: commandName }
-				: { name: commandName, payload: args[0] };
+			payload === undefined
+				? { name: commandName, workspaceId: activeWorkspace.id }
+				: {
+						name: commandName,
+						workspaceId: activeWorkspace.id,
+						payload,
+				  };
+
 		commandEvent(data);
 	};
 }
@@ -30,10 +48,12 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 	callback: (payload: CommandPayloads[K]) => void,
 ) {
 	const commandEvent = useContext(CommandEventContext);
+	const currentWorkspace = useContext(WorkspaceContext);
 
 	useEffect(() => {
 		return commandEvent.watch((command) => {
 			if (command.name !== commandName) return;
+			if (command.workspaceId !== currentWorkspace?.workspaceId) return;
 
 			// Currently payload is void for all commands, but future commands may include payload
 			// We extract the payload if it exists and cast the type so the callback works both for commands with and without payload
@@ -43,5 +63,5 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 
 			callback(payload);
 		});
-	}, [callback, commandEvent, commandName]);
+	}, [callback, commandEvent, commandName, currentWorkspace?.workspaceId]);
 }
