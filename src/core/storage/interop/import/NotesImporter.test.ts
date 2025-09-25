@@ -82,7 +82,7 @@ describe('Text buffers may be imported', () => {
 			'/posts/about/image.png': createTextBuffer('IMAGE CONTENT HERE'),
 			'/posts/about/unused.png': createTextBuffer('UNUSED IMAGE CONTENT HERE'),
 			'/posts/about/index.md': createTextBuffer(
-				'---\ntitle: Blog post\n---\nPost with image\n\n![attached image](./image.png)\nThis post and all its resources is placed in subdirectory.',
+				'---\ntitle: Blog post\ntags:\n - foo\n - bar\n---\nPost with image\n\n![attached image](./image.png)\nThis post and all its resources is placed in subdirectory.',
 			),
 		});
 	});
