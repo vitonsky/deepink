@@ -13,9 +13,11 @@ export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads
 	CommandPayloads[K] extends void
 		? {
 				name: K;
+				workspaceId: string;
 		  }
 		: {
 				name: K;
+				workspaceId: string;
 				payload: CommandPayloads[K];
 		  };
 
