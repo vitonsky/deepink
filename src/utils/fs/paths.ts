@@ -24,16 +24,11 @@ export const getResolvedPath = (rel: string, base: string): string => {
 		throw new Error('base path must be absolute');
 	}
 
-	// TODO: handle cases like `/foo/bar/../x` to make it `/foo/x`
-	// if rel is absolute, just normalize and return
-	if (rel.startsWith('/')) {
-		return joinPathSegments(normalizeSegments(rel.split('/')));
-	}
-
 	// Combine base dir + relative path segments
 	const relSegments = normalizeSegments(rel.split('/'));
+	// If rel is absolute, set empty base name
 	// Split and normalize base segments
-	const stack: string[] = normalizeSegments(base.split('/'));
+	const stack: string[] = rel.startsWith('/') ? [] : normalizeSegments(base.split('/'));
 	for (const segment of relSegments) {
 		switch (segment) {
 			case '.':

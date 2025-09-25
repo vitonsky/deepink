@@ -7,6 +7,8 @@ test('resolves .. up levels from file base', () => {
 test('returns absolute rel as-is (normalized)', () => {
 	expect(getResolvedPath('/x', '/foo/bar')).toBe('/x');
 	expect(getResolvedPath('/a//b///c', '/anything')).toBe('/a/b/c');
+	expect(getResolvedPath('/a/b/../c', '/anything')).toBe('/a/c');
+	expect(getResolvedPath('/a/b/.././x/.././c', '/anything')).toBe('/a/c');
 });
 
 test('treats base with trailing slash as directory', () => {
