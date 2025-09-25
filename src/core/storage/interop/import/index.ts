@@ -11,7 +11,7 @@ import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
-import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
+import { getPathSegments, getResolvedPath, joinPathSegments } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
@@ -108,48 +108,15 @@ export class NotesImporter {
 
 			// Attach tags
 			if (isTagsArray(noteData.tags) && noteData.tags.length > 0) {
-				const tagsToAttach: string[] = [];
-				for (const resolvedTagName of noteData.tags) {
-					const tags = await tagsRegistry.getTags();
-
-					// Find exists tag
-					const foundTag = tags.find(
-						(tag) => tag.resolvedName === resolvedTagName,
-					);
-					if (foundTag) {
-						tagsToAttach.push(foundTag.id);
-						continue;
-					}
-
-					// Find parent tag and create sub tag
-					const parentTag = findParentTag(resolvedTagName, tags);
-					if (parentTag) {
-						const parentTagWithPrefixLength =
-							parentTag.resolvedName.length + 1;
-						const tagNamePartToAdd = resolvedTagName.slice(
-							parentTagWithPrefixLength,
-						);
-						const createdTagId = await tagsRegistry.add(
-							tagNamePartToAdd,
-							parentTag.id,
-						);
-						tagsToAttach.push(createdTagId);
-						continue;
-					}
-
-					// Create full resolved tag
-					const createdTagId = await tagsRegistry.add(resolvedTagName, null);
-					tagsToAttach.push(createdTagId);
-				}
-
-				if (tagsToAttach.length > 0) {
-					await tagsRegistry.setAttachedTags(noteId, tagsToAttach);
-				}
+				await tagsRegistry.setAttachedTags(
+					noteId,
+					await this.getTagIds(noteData.tags),
+				);
 			}
 
 			createdNotes[encodeURI(filename)] = {
 				id: noteId,
-				path: filenameSegments.slice(0, -1).join('/'),
+				path: getPathSegments(joinPathSegments(filenameSegments)).dirname,
 			};
 
 			// TODO: add method to registry, to emit event by updates
@@ -238,59 +205,55 @@ export class NotesImporter {
 			);
 
 			// Find or create tags and attach
-			let tagId: null | string = null;
-			const tags = await tagsRegistry.getTags();
-			const filenameBasePathSegments = noteData.path.split('/');
-			for (
-				let lastSegment = filenameBasePathSegments.length;
-				lastSegment > 0;
-				lastSegment--
-			) {
-				const resolvedTagForSearch = filenameBasePathSegments
-					.slice(0, lastSegment)
-					.join('/');
-
-				const tag = tags.find(
-					({ resolvedName }) => resolvedName === resolvedTagForSearch,
+			const pathWithRemovedRoot = noteData.path.slice(1);
+			if (pathWithRemovedRoot.length > 0) {
+				await tagsRegistry.setAttachedTags(
+					noteId,
+					await Promise.all([
+						tagsRegistry
+							.getAttachedTags(noteId)
+							.then((tags) => tags.map((tag) => tag.id)),
+						this.getTagIds([pathWithRemovedRoot]),
+					]).then((tagIds) => tagIds.flat()),
 				);
-
-				if (!tag) continue;
-
-				const isFullPathExists = lastSegment === filenameBasePathSegments.length;
-				if (isFullPathExists) {
-					// Tag found
-					tagId = tag.id;
-					break;
-				}
-
-				// Create nested tags
-				const parentTagId = tag.id;
-				const tagNameToCreate = filenameBasePathSegments
-					.slice(lastSegment)
-					.join('/');
-
-				tagId = await tagsRegistry.add(tagNameToCreate, parentTagId);
-
-				break;
 			}
-
-			if (tagId === null && filenameBasePathSegments.length > 0) {
-				const tagNameToCreate = filenameBasePathSegments.join('/').trim();
-				if (tagNameToCreate) {
-					tagId = await tagsRegistry.add(tagNameToCreate, null);
-				}
-			}
-
-			// Add tag based on path
-			const attachedTags = await tagsRegistry
-				.getAttachedTags(noteId)
-				.then((tags) => tags.map((tag) => tag.id));
-			if (tagId) {
-				attachedTags.push(tagId);
-			}
-			await tagsRegistry.setAttachedTags(noteId, attachedTags);
 		}
 
 		updateNotes();
+	}
+
+	private async getTagIds(tags: string[]) {
+		const { tagsRegistry } = this.storage;
+
+		const tagsToAttach: string[] = [];
+		for (const resolvedTagName of tags) {
+			const tags = await tagsRegistry.getTags();
+
+			// Find exists tag
+			const foundTag = tags.find((tag) => tag.resolvedName === resolvedTagName);
+			if (foundTag) {
+				tagsToAttach.push(foundTag.id);
+				continue;
+			}
+
+			// Find parent tag and create sub tag
+			const parentTag = findParentTag(resolvedTagName, tags);
+			if (parentTag) {
+				const parentTagWithPrefixLength = parentTag.resolvedName.length + 1;
+				const tagNamePartToAdd = resolvedTagName.slice(parentTagWithPrefixLength);
+				const createdTagId = await tagsRegistry.add(
+					tagNamePartToAdd,
+					parentTag.id,
+				);
+				tagsToAttach.push(createdTagId);
+				continue;
+			}
+
+			// Create full resolved tag
+			const createdTagId = await tagsRegistry.add(resolvedTagName, null);
+			tagsToAttach.push(createdTagId);
+		}
+
+		return tagsToAttach;
 	}
 }

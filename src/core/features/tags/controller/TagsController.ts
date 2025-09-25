@@ -30,7 +30,9 @@ export class TagsController {
 		const db = this.db.get();
 
 		return (
-			db.prepare(`${tagsQuery} WHERE workspace_id=?`).all(this.workspace) as any[]
+			db
+				.prepare(`${tagsQuery} WHERE workspace_id=? ORDER BY rowid`)
+				.all(this.workspace) as any[]
 		).map(({ id, name, resolvedName, parent }) => ({
 			id,
 			name,

@@ -196,32 +196,25 @@ describe('Text buffers may be imported', () => {
 		).resolves.toEqual('SECRET');
 	});
 
-	// TODO: fix flaky test. Sometimes tag `section-1` creates twice
-	test.todo('Tags is created and reproduces structure in FS', async () => {
+	test('Tags is created and reproduces structure in FS', async () => {
 		const db = await dbPromise;
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
 		await expect(tagsRegistry.getTags()).resolves.toEqual([
 			expect.objectContaining({
 				name: 'section-1',
-				parent: expect.stringMatching(/^[\d\w-]+$/),
-				resolvedName: '/section-1',
+				parent: null,
+				resolvedName: 'section-1',
 			}),
 			expect.objectContaining({
 				name: 'posts',
-				parent: expect.stringMatching(/^[\d\w-]+$/),
-				resolvedName: '/posts',
+				parent: null,
+				resolvedName: 'posts',
 			}),
 			expect.objectContaining({
 				name: 'about',
 				parent: expect.stringMatching(/^[\d\w-]+$/),
-				resolvedName: '/posts/about',
-			}),
-			// TODO: empty tag must not be created
-			expect.objectContaining({
-				name: '',
-				parent: null,
-				resolvedName: '',
+				resolvedName: 'posts/about',
 			}),
 		]);
 	});
