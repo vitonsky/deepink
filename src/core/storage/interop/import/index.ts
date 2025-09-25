@@ -22,7 +22,7 @@ const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
 	filePath.endsWith('.md') &&
 	resourcesDirs.every((dirPath) => !filePath.startsWith(dirPath));
 
-const resourcesDirectories = ['_resources'];
+const resourcesDirectories = ['/_resources'];
 
 // TODO: refactor the code
 // TODO: snapshot history for every note

@@ -50,8 +50,8 @@ describe('Text buffers may be imported', () => {
 			// This files must not be imported,
 			// since it is unused resources
 			'/_resources/unused1': createTextBuffer('UNUSED FILE'),
-			'/_resources/unused2': createTextBuffer('UNUSED FILE'),
-			'/_resources/unused3': createTextBuffer('UNUSED FILE'),
+			'/_resources/unused2.txt': createTextBuffer('UNUSED FILE'),
+			'/_resources/unused3.md': createTextBuffer('UNUSED FILE'),
 
 			// Notes list
 			'/note-1.md': createTextBuffer('Hello world!'),
