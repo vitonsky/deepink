@@ -56,7 +56,7 @@ describe('Text buffers may be imported', () => {
 			// Notes list
 			'/note-1.md': createTextBuffer('Hello world!'),
 			'/note-2.md': createTextBuffer(
-				'---\ntitle: Title from meta\n---\nHello world!',
+				'---\ntitle: Title from meta\ntags:\n - foo\n - bar\n - baz\n---\nHello world!',
 			),
 			'/note-3.md': createTextBuffer('Mention for [note #1](./note-1.md)'),
 			'/note-4.md': createTextBuffer(
@@ -201,6 +201,21 @@ describe('Text buffers may be imported', () => {
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
 		await expect(tagsRegistry.getTags()).resolves.toEqual([
+			expect.objectContaining({
+				name: 'foo',
+				parent: null,
+				resolvedName: 'foo',
+			}),
+			expect.objectContaining({
+				name: 'bar',
+				parent: null,
+				resolvedName: 'bar',
+			}),
+			expect.objectContaining({
+				name: 'baz',
+				parent: null,
+				resolvedName: 'baz',
+			}),
 			expect.objectContaining({
 				name: 'section-1',
 				parent: null,
