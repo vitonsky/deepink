@@ -9,8 +9,7 @@ import {
 	selectOpenedNotes,
 	selectRecentlyClosedNotes,
 } from '@state/redux/profiles/profiles';
-
-import { getNextNoteIdByDirection } from './utils/getNextNoteIdByDirection';
+import { getItemByOffset } from '@utils/collections/getItemByOffset';
 
 /**
  * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
@@ -45,18 +44,24 @@ export const useNoteShortcutActions = () => {
 	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
 		useCallback(() => {
-			const previousNote = getNextNoteIdByDirection(openedNotes, activeNoteId, +1);
+			const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+			if (noteIndex === -1) return;
+			const previousNote = getItemByOffset(openedNotes, noteIndex, 1);
 			if (!previousNote) return;
-			noteActions.click(previousNote);
+
+			noteActions.click(previousNote.id);
 		}, [activeNoteId, noteActions, openedNotes]),
 	);
 
 	useCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
 		useCallback(() => {
-			const nextNote = getNextNoteIdByDirection(openedNotes, activeNoteId, -1);
+			const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+			if (noteIndex === -1) return;
+
+			const nextNote = getItemByOffset(openedNotes, noteIndex, -1);
 			if (!nextNote) return;
-			noteActions.click(nextNote);
+			noteActions.click(nextNote.id);
 		}, [activeNoteId, noteActions, openedNotes]),
 	);
 };
