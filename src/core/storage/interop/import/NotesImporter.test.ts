@@ -124,21 +124,18 @@ describe('Text buffers may be imported', () => {
 				},
 			}),
 			expect.objectContaining({
-				// TODO: Leave invalid urls as is
 				content: {
 					title: 'note-6',
-					text: 'Mention for non exist notes [one](/non-exist-note-1.md), [two](/non%20exist%20note%202.md), [three](/non/exist/note.md), [four](non-exist-note.md). And non exists attachments [one](/non-exist-file-1.jpeg), [two](/non%20exist%20file%202.jpeg), [three](/non/exist/file.jpeg), [four](non-exist-file.jpeg)\n',
+					text: 'Mention for non exist notes [one](./non-exist-note-1.md), [two](<./non exist note 2.md>), [three](./non/exist/note.md), [four](../../non-exist-note.md). And non exists attachments [one](./non-exist-file-1.jpeg), [two](<./non exist file 2.jpeg>), [three](./non/exist/file.jpeg), [four](../non-exist-file.jpeg)\n',
 				},
 			}),
 
 			expect.objectContaining({
 				content: {
 					title: 'note-7',
-					text: 'Mention for [note #1](note-1.md) via absolute path\n',
-					// TODO: fix to correct case. Path must be resolved well
-					// text: expect.stringMatching(
-					// 	/^Mention for \[note #1\]\(note:\/\/[\d\w-]+\) via absolute path\n$/,
-					// ),
+					text: expect.stringMatching(
+						/^Mention for \[note #1\]\(note:\/\/[\d\w-]+\) via absolute path\n$/,
+					),
 				},
 			}),
 			expect.objectContaining({
@@ -148,11 +145,9 @@ describe('Text buffers may be imported', () => {
 			expect.objectContaining({
 				content: {
 					title: 'note #2',
-					text: 'Mention for [note #1](/section-1/note%20)\n',
-					// TODO: fix incorrect file handling. Must be:
-					// text: expect.stringMatching(
-					// 	/^Mention for \[note #1\]\(note:\/\/[\d\w-]+\)\n$/,
-					// ),
+					text: expect.stringMatching(
+						/^Mention for \[note #1\]\(note:\/\/[\d\w-]+\)\n$/,
+					),
 				},
 			}),
 			expect.objectContaining({

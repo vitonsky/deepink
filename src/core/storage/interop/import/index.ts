@@ -11,16 +11,12 @@ import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { findParentTag, isTagsArray } from '@core/features/tags/utils';
+import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
 // Map with files where key is a path and value is a content buffer
 export type FilesMap = Record<string, ArrayBuffer>;
-
-const getAbsolutePathOfRelativePath = (currentPath: string, relativePath: string) => {
-	const url = new URL(relativePath, `https://root/${currentPath}`);
-	return url.pathname.slice(1);
-};
 
 const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
 	filePath.endsWith('.md') &&
@@ -75,7 +71,13 @@ export class NotesImporter {
 
 			// Update URLs in AST and collect attachments
 			await replaceUrls(mdTree, async (nodeUrl) => {
-				const absoluteUrl = getAbsolutePathOfRelativePath(filename, nodeUrl);
+				const absoluteUrl = getResolvedPath(
+					nodeUrl,
+					getPathSegments(filename).dirname,
+				);
+
+				// Return original URL if file does not exist
+				if (!(absoluteUrl in filesBuffers)) return nodeUrl;
 
 				// Collect attachments URLs
 				if (!isNotePath(absoluteUrl, resourcesDirectories)) {
@@ -211,7 +213,7 @@ export class NotesImporter {
 			// Update URLs
 			const attachedFilesIds: string[] = [];
 			await replaceUrls(noteTree, async (absoluteUrl) => {
-				const createdNote = createdNotes[absoluteUrl];
+				const createdNote = createdNotes[encodeURI(absoluteUrl)];
 				if (createdNote) {
 					return formatNoteLink(createdNote.id);
 				}
