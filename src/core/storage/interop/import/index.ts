@@ -128,12 +128,14 @@ export class NotesImporter {
 					: basename;
 			}
 
-			// TODO: mark as temporary and don't show for user
-			const noteId = await notesRegistry.add({
-				title,
-				// TODO: do not change original note markup (like bullet points marker style, escaping chars)
-				text: markdownProcessor.stringify(mdTree),
-			});
+			const noteId = await notesRegistry.add(
+				{
+					title,
+					// TODO: do not change original note markup (like bullet points marker style, escaping chars)
+					text: markdownProcessor.stringify(mdTree),
+				},
+				{ isVisible: false },
+			);
 
 			// Attach tags
 			if (noteMeta.tags && noteMeta.tags.length > 0) {
@@ -219,6 +221,11 @@ export class NotesImporter {
 
 			await noteVersions.snapshot(noteId);
 		}
+
+		await notesRegistry.updateMeta(
+			Object.values(createdNotes).map((note) => note.id),
+			{ isVisible: true },
+		);
 
 		updateNotes();
 	}
