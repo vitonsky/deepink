@@ -5,13 +5,14 @@ import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
+import { z } from 'zod';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { findParentTag, isTagsArray } from '@core/features/tags/utils';
-import { getPathSegments, getResolvedPath, joinPathSegments } from '@utils/fs/paths';
+import { findParentTag } from '@core/features/tags/utils';
+import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
@@ -23,6 +24,17 @@ const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
 	resourcesDirs.every((dirPath) => !filePath.startsWith(dirPath));
 
 const resourcesDirectories = ['/_resources'];
+const RawNoteMetaScheme = z
+	.object({
+		title: z.string().trim().min(1).optional().catch(undefined),
+		tags: z
+			.string()
+			.array()
+			.transform((tags) => tags.map((tag) => tag.trim()).filter(Boolean))
+			.optional()
+			.catch(undefined),
+	})
+	.catch({});
 
 // TODO: refactor the code
 // TODO: snapshot history for every note
@@ -51,8 +63,8 @@ export class NotesImporter {
 			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 			.freeze();
 
-		const attachmentsToUpload: string[] = [];
 		const createdNotes: Record<string, { id: string; path: string }> = {};
+		const attachmentPathsToUpload: string[] = [];
 
 		// Extraction: On this step we just parse and format data
 		// Import notes
@@ -60,63 +72,59 @@ export class NotesImporter {
 			// Handle only notes
 			if (!isNotePath(filename, resourcesDirectories)) continue;
 
-			const filenameSegments = filename.split('/');
-			const fileBuffer = filesBuffers[filename];
-			const sourceNoteData = textDecoder.decode(fileBuffer);
+			const fileAbsolutePathSegments = getPathSegments(filename);
+			const rawText = textDecoder.decode(filesBuffers[filename]);
 
-			const mdTree = markdownProcessor.parse(sourceNoteData);
+			const mdTree = markdownProcessor.parse(rawText);
 
 			// Remove header node with meta data parsed by frontmatter
 			remove(mdTree, 'yaml');
 
-			// Update URLs in AST and collect attachments
+			// Resolve URLs to absolute paths in AST and collect attachments in use
 			await replaceUrls(mdTree, async (nodeUrl) => {
 				const absoluteUrl = getResolvedPath(
 					nodeUrl,
-					getPathSegments(filename).dirname,
+					fileAbsolutePathSegments.dirname,
 				);
 
-				// Return original URL if file does not exist
+				// Return original URL if file does not exist in files for import
 				if (!(absoluteUrl in filesBuffers)) return nodeUrl;
 
 				// Collect attachments URLs
 				if (!isNotePath(absoluteUrl, resourcesDirectories)) {
-					attachmentsToUpload.push(absoluteUrl);
+					attachmentPathsToUpload.push(absoluteUrl);
 				}
 
 				return absoluteUrl;
 			});
 
 			// Add note draft
-			// TODO: validate data
-			const noteData = (markdownProcessor.processSync(sourceNoteData).data
-				.frontmatter ?? {}) as Record<string, string>;
-			let noteTitle = noteData.title || null;
-			if (noteTitle === null) {
-				const noteNameWithExt = filenameSegments.slice(-1)[0];
-				noteTitle = noteNameWithExt.replace(/\.md$/iu, '');
-			}
+			const noteMeta = RawNoteMetaScheme.parse(
+				markdownProcessor.processSync(rawText).data.frontmatter,
+			);
 
 			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
 			const noteText = markdownProcessor.stringify(mdTree);
 
 			// TODO: mark as temporary and don't show for user
 			const noteId = await notesRegistry.add({
-				title: noteTitle,
+				title:
+					noteMeta.title ??
+					fileAbsolutePathSegments.basename.replace(/\.md$/iu, ''),
 				text: noteText,
 			});
 
 			// Attach tags
-			if (isTagsArray(noteData.tags) && noteData.tags.length > 0) {
+			if (noteMeta.tags && noteMeta.tags.length > 0) {
 				await tagsRegistry.setAttachedTags(
 					noteId,
-					await this.getTagIds(noteData.tags),
+					await this.getTagIds(noteMeta.tags),
 				);
 			}
 
 			createdNotes[encodeURI(filename)] = {
 				id: noteId,
-				path: getPathSegments(joinPathSegments(filenameSegments)).dirname,
+				path: fileAbsolutePathSegments.dirname,
 			};
 
 			// TODO: add method to registry, to emit event by updates
@@ -157,7 +165,7 @@ export class NotesImporter {
 
 		// Upload attached files
 		await Promise.all(
-			attachmentsToUpload
+			attachmentPathsToUpload
 				// Remove duplicates
 				.filter((url, index, arr) => index === arr.indexOf(url))
 				.map(async (absoluteUrl) => {
