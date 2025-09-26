@@ -6,24 +6,49 @@ import { wrapDB } from '@utils/db/wrapDB';
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { INote, INoteContent, NoteId } from '..';
-import { INotesController, NotesControllerFetchOptions } from '.';
+import { INotesController, NoteMeta, NotesControllerFetchOptions } from '.';
 
 /**
  * Data mappers between DB and objects
  */
 const mappers = {
 	rowToNoteObject(row: any): INote {
-		const { id, title, text, creationTime, lastUpdateTime, isSnapshotsDisabled } =
-			row;
+		const {
+			id,
+			title,
+			text,
+			creationTime,
+			lastUpdateTime,
+			isSnapshotsDisabled,
+			isVisible,
+		} = row;
 		return {
 			id,
 			createdTimestamp: creationTime,
 			updatedTimestamp: lastUpdateTime,
 			isSnapshotsDisabled: Boolean(isSnapshotsDisabled),
+			isVisible: Boolean(isVisible),
 			content: { title, text },
 		};
 	},
 };
+
+function formatNoteMeta(meta: Partial<NoteMeta>) {
+	return Object.fromEntries(
+		Object.entries(meta).map((item): [string, string | number] => {
+			const [key, value] = item as unknown as {
+				[K in keyof NoteMeta]: [K, NoteMeta[K]];
+			}[keyof NoteMeta];
+
+			switch (key) {
+				case 'isSnapshotsDisabled':
+					return [key, Number(value)];
+				case 'isVisible':
+					return [key, Number(value)];
+			}
+		}),
+	);
+}
 
 /**
  * Synced notes registry
@@ -75,12 +100,20 @@ export class NotesController implements INotesController {
 		limit = 100,
 		page = 1,
 		tags = [],
+		meta,
 	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		if (page < 1) throw new TypeError('Page value must not be less than 1');
 
 		const db = wrapDB(this.db.get());
 
 		const notes: INote[] = [];
+
+		const metaEntries = Object.entries(
+			formatNoteMeta({
+				isVisible: true,
+				...meta,
+			}),
+		);
 
 		db.all(
 			qb
@@ -92,22 +125,27 @@ export class NotesController implements INotesController {
 					}),
 				)
 				.where(
-					tags.length > 0
-						? qb.line(
-								'id IN',
-								qb.group(
-									qb
-										.select('target')
-										.from('attachedTags')
-										.where(
-											qb.line(
-												'source IN',
-												qb.values(tags).withParenthesis(),
+					qb.condition(
+						tags.length > 0
+							? qb.line(
+									'id IN',
+									qb.group(
+										qb
+											.select('target')
+											.from('attachedTags')
+											.where(
+												qb.line(
+													'source IN',
+													qb.values(tags).withParenthesis(),
+												),
 											),
-										),
-								),
-						  )
-						: undefined,
+									),
+							  )
+							: undefined,
+						...metaEntries.map(
+							([key, value]) => qb.sql`${qb.raw(key)} = ${value}`,
+						),
+					),
 				)
 				.limit(limit)
 				.offset((page - 1) * limit),
@@ -120,7 +158,7 @@ export class NotesController implements INotesController {
 		return notes;
 	}
 
-	public async add(note: INoteContent): Promise<NoteId> {
+	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
 		const db = wrapDB(this.db.get());
 
 		const creationTime = new Date().getTime();
@@ -128,20 +166,23 @@ export class NotesController implements INotesController {
 		// Insert data
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
 
+		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
+
 		const insertResult = db.run(
-			qb.line(
-				'INSERT INTO notes ("id","workspace_id","title","text","creationTime","lastUpdateTime") VALUES',
-				qb
-					.values([
+			qb.sql`
+				INSERT INTO notes (${qb.set([
+					qb.sql`"id","workspace_id","title","text","creationTime","lastUpdateTime"`,
+					...(metaEntries ? metaEntries.map(([key]) => key) : []),
+				])})
+					VALUES (${qb.values([
 						uuid4(),
 						this.workspace,
 						note.title,
 						note.text,
 						creationTime,
 						creationTime,
-					])
-					.withParenthesis(),
-			),
+						...metaEntries.map(([_key, value]) => value),
+					])})`,
 		);
 
 		// Get generated id
@@ -214,26 +255,12 @@ export class NotesController implements INotesController {
 		}
 	}
 
-	public async updateMeta(
-		ids: NoteId[],
-		meta: { isSnapshotsDisabled?: boolean },
-	): Promise<void> {
+	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
 		const db = wrapDB(this.db.get());
-
-		const mappedMeta = Object.fromEntries(
-			Object.entries(meta).map(([key, value]): [string, string | number] => {
-				switch (key) {
-					case 'isSnapshotsDisabled':
-						return [key, Number(value)];
-					default:
-						return [key, String(value)];
-				}
-			}),
-		);
 
 		const result = db.run(
 			qb.sql`UPDATE notes
-				SET ${qb.values(mappedMeta)}
+				SET ${qb.values(formatNoteMeta(meta))}
 				WHERE workspace_id=${this.workspace} AND id IN (${qb.values(ids)})`,
 		);
 

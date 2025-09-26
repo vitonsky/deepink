@@ -1,5 +1,10 @@
 import { INote, INoteContent, NoteId } from '..';
 
+export type NoteMeta = {
+	isSnapshotsDisabled: boolean;
+	isVisible: boolean;
+};
+
 export type NotesControllerFetchOptions = {
 	/**
 	 * Limit notes
@@ -21,10 +26,8 @@ export type NotesControllerFetchOptions = {
 	 * Filter notes by tags
 	 */
 	tags?: string[];
-};
 
-export type NoteMeta = {
-	isSnapshotsDisabled: boolean;
+	meta?: NoteMeta;
 };
 
 /**
@@ -49,7 +52,7 @@ export interface INotesController {
 	/**
 	 * Create note and return unique id of new note
 	 */
-	add(note: INoteContent): Promise<NoteId>;
+	add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId>;
 
 	/**
 	 * Update note by unique id

@@ -178,7 +178,7 @@ describe('Notes meta control', () => {
 		await db.close();
 	});
 
-	test('insertion multiple entries', async () => {
+	test('toggle note versions control', async () => {
 		const db = await dbPromise;
 		const registry = new NotesController(db, 'fake-workspace-id');
 
@@ -202,5 +202,46 @@ describe('Notes meta control', () => {
 			id: noteId,
 			isSnapshotsDisabled: false,
 		});
+	});
+
+	test('toggle note visibility', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, 'fake-workspace-id');
+
+		// Create note
+		const noteId = await registry.add({ title: 'Title', text: 'Text' });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isVisible: true,
+		});
+		await expect(registry.get()).resolves.toContainEqual(
+			expect.objectContaining({
+				id: noteId,
+			}),
+		);
+
+		// Toggle snapshotting preferences
+		await registry.updateMeta([noteId], { isVisible: false });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isVisible: false,
+		});
+		await expect(registry.get()).resolves.not.toContainEqual(
+			expect.objectContaining({
+				id: noteId,
+			}),
+		);
+
+		// Toggle snapshotting preferences back
+		await registry.updateMeta([noteId], { isVisible: true });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isVisible: true,
+		});
+		await expect(registry.get()).resolves.toContainEqual(
+			expect.objectContaining({
+				id: noteId,
+			}),
+		);
 	});
 });
