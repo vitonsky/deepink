@@ -17,11 +17,6 @@ import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
-const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
-	filePath.endsWith('.md') &&
-	resourcesDirs.every((dirPath) => !filePath.startsWith(dirPath));
-
-const resourcesDirectories = ['/_resources'];
 const RawNoteMetaScheme = z
 	.object({
 		title: z.string().trim().min(1).optional().catch(undefined),
@@ -34,7 +29,6 @@ const RawNoteMetaScheme = z
 	})
 	.catch({});
 
-// TODO: introduce parameters to configure import
 // TODO: call hooks to signal progress
 // TODO: snapshot history for every note
 export class NotesImporter {
@@ -45,7 +39,13 @@ export class NotesImporter {
 			filesRegistry: FilesController;
 			attachmentsRegistry: AttachmentsController;
 		},
-		private readonly options: { onUpdate?: () => void } = {},
+		private readonly options: {
+			ignorePaths?: string[];
+			noteExtensions?: string[];
+			// TODO: implement
+			// addTagsBasedOnPath?: 'never' | 'fallback' | 'always';
+			onUpdate?: () => void;
+		} = {},
 	) {}
 
 	public async import(files: IFilesStorage) {
@@ -69,7 +69,7 @@ export class NotesImporter {
 		const filePathsList = await files.list();
 		for (const filename of filePathsList) {
 			// Handle only notes
-			if (!isNotePath(filename, resourcesDirectories)) continue;
+			if (!this.isNotePath(filename)) continue;
 
 			const fileContent = await files.get(filename);
 			if (!fileContent) continue;
@@ -93,7 +93,7 @@ export class NotesImporter {
 				if (!filePathsList.includes(absolutePath)) return nodeUrl;
 
 				// Collect attachments paths
-				if (!isNotePath(absolutePath, resourcesDirectories)) {
+				if (!this.isNotePath(absolutePath)) {
 					attachmentPathsToUpload.add(absolutePath);
 				}
 
@@ -106,11 +106,23 @@ export class NotesImporter {
 				markdownProcessor.processSync(rawText).data.frontmatter,
 			);
 
+			// Extract title
+			let title = noteMeta.title;
+			if (!title) {
+				const { noteExtensions = ['.md'] } = this.options;
+				const { basename } = fileAbsolutePathSegments;
+				const noteExtension = noteExtensions.find((ext) =>
+					basename.toLowerCase().endsWith(ext.toLowerCase()),
+				);
+
+				title = noteExtension
+					? basename.slice(0, -noteExtension.length)
+					: basename;
+			}
+
 			// TODO: mark as temporary and don't show for user
 			const noteId = await notesRegistry.add({
-				title:
-					noteMeta.title ??
-					fileAbsolutePathSegments.basename.replace(/\.md$/iu, ''),
+				title,
 				// TODO: do not change original note markup (like bullet points marker style, escaping chars)
 				text: markdownProcessor.stringify(mdTree),
 			});
@@ -199,6 +211,23 @@ export class NotesImporter {
 		}
 
 		updateNotes();
+	}
+
+	private isNotePath(filePath: string) {
+		const { noteExtensions = ['.md'], ignorePaths = [] } = this.options;
+
+		// Check file name extension
+		if (
+			!noteExtensions.some((ext) =>
+				filePath.toLowerCase().endsWith(ext.toLowerCase()),
+			)
+		)
+			return false;
+
+		// Check path
+		if (ignorePaths.some((rootPath) => filePath.startsWith(rootPath))) return false;
+
+		return true;
 	}
 
 	private async getTagIds(tags: string[]) {

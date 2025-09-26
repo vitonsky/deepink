@@ -1,3 +1,4 @@
+/* eslint-disable spellcheck/spell-checker */
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
@@ -37,12 +38,18 @@ describe('Text buffers may be imported', () => {
 			FAKE_WORKSPACE_NAME,
 		);
 
-		const importer = new NotesImporter({
-			filesRegistry,
-			attachmentsRegistry,
-			notesRegistry,
-			tagsRegistry,
-		});
+		const importer = new NotesImporter(
+			{
+				filesRegistry,
+				attachmentsRegistry,
+				notesRegistry,
+				tagsRegistry,
+			},
+			{
+				ignorePaths: ['/_resources'],
+				noteExtensions: ['.md', '.mdx'],
+			},
+		);
 
 		await importer.import(
 			createFileManagerMock({
@@ -56,10 +63,10 @@ describe('Text buffers may be imported', () => {
 
 				// Notes list
 				'/note-1.md': createTextBuffer('Hello world!'),
-				'/note-2.md': createTextBuffer(
+				'/note-2.mdx': createTextBuffer(
 					'---\ntitle: Title from meta\ntags:\n - foo\n - bar\n - baz\n---\nHello world!',
 				),
-				'/note-3.md': createTextBuffer('Mention for [note #1](./note-1.md)'),
+				'/note-3.mdx': createTextBuffer('Mention for [note #1](./note-1.md)'),
 				'/note-4.md': createTextBuffer(
 					'Text with [attachment](./_resources/secret.txt)',
 				),
