@@ -32,6 +32,7 @@ const RawNoteMetaScheme = z
 // TODO: call hooks to signal progress
 // TODO: snapshot history for every note
 export class NotesImporter {
+	private readonly options;
 	constructor(
 		private readonly storage: {
 			notesRegistry: INotesController;
@@ -39,14 +40,20 @@ export class NotesImporter {
 			filesRegistry: FilesController;
 			attachmentsRegistry: AttachmentsController;
 		},
-		private readonly options: {
+		options: {
 			ignorePaths?: string[];
 			noteExtensions?: string[];
 			// TODO: implement
 			// addTagsBasedOnPath?: 'never' | 'fallback' | 'always';
 			onUpdate?: () => void;
 		} = {},
-	) {}
+	) {
+		this.options = {
+			noteExtensions: ['.md'],
+			ignorePaths: [],
+			...options,
+		};
+	}
 
 	public async import(files: IFilesStorage) {
 		const { notesRegistry, tagsRegistry, attachmentsRegistry } = this.storage;
@@ -109,9 +116,8 @@ export class NotesImporter {
 			// Extract title
 			let title = noteMeta.title;
 			if (!title) {
-				const { noteExtensions = ['.md'] } = this.options;
 				const { basename } = fileAbsolutePathSegments;
-				const noteExtension = noteExtensions.find((ext) =>
+				const noteExtension = this.options.noteExtensions.find((ext) =>
 					basename.toLowerCase().endsWith(ext.toLowerCase()),
 				);
 
@@ -214,18 +220,17 @@ export class NotesImporter {
 	}
 
 	private isNotePath(filePath: string) {
-		const { noteExtensions = ['.md'], ignorePaths = [] } = this.options;
-
 		// Check file name extension
 		if (
-			!noteExtensions.some((ext) =>
+			!this.options.noteExtensions.some((ext) =>
 				filePath.toLowerCase().endsWith(ext.toLowerCase()),
 			)
 		)
 			return false;
 
 		// Check path
-		if (ignorePaths.some((rootPath) => filePath.startsWith(rootPath))) return false;
+		if (this.options.ignorePaths.some((rootPath) => filePath.startsWith(rootPath)))
+			return false;
 
 		return true;
 	}
