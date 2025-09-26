@@ -1,9 +1,6 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
-import { GLOBAL_COMMANDS } from '@core/features/commands';
-import { useCommandCallback } from '@core/features/commands/commandHooks';
-import { useRegisterCommandShortcuts } from '@core/features/commands/shortcuts/useRegisterCommandShortcuts';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { SplashScreen } from '@features/SplashScreen';
@@ -17,7 +14,6 @@ import {
 } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { useProfileControls } from '../Profile';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -78,11 +74,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	);
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
-
-	useRegisterCommandShortcuts();
-
-	const profileControls = useProfileControls();
-	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, profileControls.close);
 
 	return (
 		<Box
