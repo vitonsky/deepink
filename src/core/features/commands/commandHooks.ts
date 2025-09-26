@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import { CommandEventContext, CommandPayloads } from './CommandEventProvider';
 
@@ -28,16 +28,19 @@ export function useCommand() {
 }
 
 /**
- * Calls the provided callback whenever the given command is triggered
+ * Calls the provided callback whenever the given command is triggered.
+ *
+ *  Return function for unsubscribe.
  */
 export function useCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
 	callback: (payload: CommandPayloads[K]) => void,
 ) {
 	const commandEvent = useContext(CommandEventContext);
+	const unsubscribe = useRef(() => {});
 
 	useEffect(() => {
-		return commandEvent.watch((command) => {
+		unsubscribe.current = commandEvent.watch((command) => {
 			if (command.name !== commandName) return;
 
 			// Currently payload is void for all commands, but future commands may include payload
@@ -48,5 +51,8 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 
 			callback(payload);
 		});
+		return unsubscribe.current;
 	}, [callback, commandEvent, commandName]);
+
+	return () => unsubscribe.current();
 }
