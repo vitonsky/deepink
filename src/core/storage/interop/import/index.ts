@@ -17,9 +17,6 @@ import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
-// Map with files where key is a path and value is a content buffer
-export type FilesMap = Record<string, ArrayBuffer>;
-
 const isNotePath = (filePath: string, resourcesDirs: string[] = []) =>
 	filePath.endsWith('.md') &&
 	resourcesDirs.every((dirPath) => !filePath.startsWith(dirPath));
@@ -37,7 +34,8 @@ const RawNoteMetaScheme = z
 	})
 	.catch({});
 
-// TODO: refactor the code
+// TODO: introduce parameters to configure import
+// TODO: call hooks to signal progress
 // TODO: snapshot history for every note
 export class NotesImporter {
 	constructor(
@@ -64,10 +62,10 @@ export class NotesImporter {
 			.freeze();
 
 		const createdNotes: Record<string, { id: string; path: string }> = {};
-		const attachmentPathsToUpload: string[] = [];
+		const attachmentPathsToUpload = new Set<string>();
 
-		// Extraction: On this step we just parse and format data
-		// Import notes
+		// Process files and add note drafts
+		// On this stage we collect used resources and add semi-raw note texts to DB
 		const filePathsList = await files.list();
 		for (const filename of filePathsList) {
 			// Handle only notes
@@ -77,9 +75,9 @@ export class NotesImporter {
 			if (!fileContent) continue;
 
 			const rawText = textDecoder.decode(fileContent);
-			const fileAbsolutePathSegments = getPathSegments(filename);
-
 			const mdTree = markdownProcessor.parse(rawText);
+
+			const fileAbsolutePathSegments = getPathSegments(filename);
 
 			// Remove header node with meta data parsed by frontmatter
 			remove(mdTree, 'yaml');
@@ -91,14 +89,15 @@ export class NotesImporter {
 					fileAbsolutePathSegments.dirname,
 				);
 
-				// Return original URL if file does not exist in files for import
+				// Leave original URL as is if file does not exist in files for import
 				if (!filePathsList.includes(absolutePath)) return nodeUrl;
 
-				// Collect attachments URLs
+				// Collect attachments paths
 				if (!isNotePath(absolutePath, resourcesDirectories)) {
-					attachmentPathsToUpload.push(absolutePath);
+					attachmentPathsToUpload.add(absolutePath);
 				}
 
+				// Set absolute path, to replace it later to an app link
 				return absolutePath;
 			});
 
@@ -107,15 +106,13 @@ export class NotesImporter {
 				markdownProcessor.processSync(rawText).data.frontmatter,
 			);
 
-			// TODO: do not change original note markup (like bullet points marker style, escaping chars)
-			const noteText = markdownProcessor.stringify(mdTree);
-
 			// TODO: mark as temporary and don't show for user
 			const noteId = await notesRegistry.add({
 				title:
 					noteMeta.title ??
 					fileAbsolutePathSegments.basename.replace(/\.md$/iu, ''),
-				text: noteText,
+				// TODO: do not change original note markup (like bullet points marker style, escaping chars)
+				text: markdownProcessor.stringify(mdTree),
 			});
 
 			// Attach tags
@@ -135,18 +132,12 @@ export class NotesImporter {
 			updateNotes();
 		}
 
-		// Uploading: On this stage we upload any files
-		/**
-		 * Map structure: file URL => entity ID
-		 * We use file URL, not a path, because links in MD contains encoded URLs, not a paths,
-		 * So we have to decode URLs if needs to use it as paths.
-		 */
+		// TODO: limit concurrency for case with many large files
+		// Upload attached files concurrently
 		const filePathToIdMap: Record<string, string> = {};
-
-		// Upload attached files
 		await Promise.all(
 			// Remove duplicates
-			Array.from(new Set(attachmentPathsToUpload)).map(async (absoluteUrl) => {
+			Array.from(attachmentPathsToUpload).map(async (absoluteUrl) => {
 				const fileId = await this.getFileId(absoluteUrl, files);
 				if (fileId) {
 					filePathToIdMap[absoluteUrl] = fileId;
@@ -154,8 +145,7 @@ export class NotesImporter {
 			}),
 		);
 
-		// Linking: On this stage all attachments (like files, other notes, etc) uploaded and ready to use
-		// Update notes
+		// Update note drafts to complete import
 		for (const { id: noteId, path: noteDirPath } of Object.values(createdNotes)) {
 			const note = await notesRegistry.getById(noteId);
 			if (!note) throw new Error('Note with such id does not exist');
@@ -164,6 +154,7 @@ export class NotesImporter {
 
 			// Update URLs and collect attached files
 			const attachedFilesIds = new Set<string>();
+			// Here we replace temporary absolute paths to app references
 			await replaceUrls(noteTree, async (absoluteUrl) => {
 				const createdNote = createdNotes[absoluteUrl];
 				if (createdNote) {
@@ -183,8 +174,10 @@ export class NotesImporter {
 			});
 
 			// Update note text
-			const updatedText = markdownProcessor.stringify(noteTree);
-			await notesRegistry.update(note.id, { ...note.content, text: updatedText });
+			await notesRegistry.update(note.id, {
+				...note.content,
+				text: markdownProcessor.stringify(noteTree),
+			});
 
 			// Attach files
 			await attachmentsRegistry.set(noteId, Array.from(attachedFilesIds));
