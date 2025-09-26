@@ -7,6 +7,7 @@ import { unified } from 'unified';
 import { remove } from 'unist-util-remove';
 import { z } from 'zod';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
+import { IFilesStorage } from '@core/features/files';
 import { FilesController } from '@core/features/files/FilesController';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
@@ -49,7 +50,7 @@ export class NotesImporter {
 		private readonly options: { onUpdate?: () => void } = {},
 	) {}
 
-	public async import(filesBuffers: FilesMap) {
+	public async import(files: IFilesStorage) {
 		const { notesRegistry, tagsRegistry, filesRegistry, attachmentsRegistry } =
 			this.storage;
 		const updateNotes = this.options.onUpdate ?? (() => {});
@@ -68,12 +69,16 @@ export class NotesImporter {
 
 		// Extraction: On this step we just parse and format data
 		// Import notes
-		for (const filename in filesBuffers) {
+		const filePathsList = await files.list();
+		for (const filename of filePathsList) {
 			// Handle only notes
 			if (!isNotePath(filename, resourcesDirectories)) continue;
 
+			const fileContent = await files.get(filename);
+			if (!fileContent) continue;
+
+			const rawText = textDecoder.decode(fileContent);
 			const fileAbsolutePathSegments = getPathSegments(filename);
-			const rawText = textDecoder.decode(filesBuffers[filename]);
 
 			const mdTree = markdownProcessor.parse(rawText);
 
@@ -82,20 +87,20 @@ export class NotesImporter {
 
 			// Resolve URLs to absolute paths in AST and collect attachments in use
 			await replaceUrls(mdTree, async (nodeUrl) => {
-				const absoluteUrl = getResolvedPath(
+				const absolutePath = getResolvedPath(
 					nodeUrl,
 					fileAbsolutePathSegments.dirname,
 				);
 
 				// Return original URL if file does not exist in files for import
-				if (!(absoluteUrl in filesBuffers)) return nodeUrl;
+				if (!filePathsList.includes(absolutePath)) return nodeUrl;
 
 				// Collect attachments URLs
-				if (!isNotePath(absoluteUrl, resourcesDirectories)) {
-					attachmentPathsToUpload.push(absoluteUrl);
+				if (!isNotePath(absolutePath, resourcesDirectories)) {
+					attachmentPathsToUpload.push(absolutePath);
 				}
 
-				return absoluteUrl;
+				return absolutePath;
 			});
 
 			// Add note draft
@@ -143,7 +148,7 @@ export class NotesImporter {
 			// Upload new files
 			if (!(urlRealPath in uploadedFiles)) {
 				uploadedFiles[urlRealPath] = (async () => {
-					const buffer = filesBuffers[urlRealPath];
+					const buffer = await files.get(urlRealPath);
 					if (!buffer) return null;
 
 					const urlFilename = urlRealPath.split('/').slice(-1)[0];

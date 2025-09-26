@@ -1,7 +1,9 @@
 import { IFilesStorage } from '../..';
 
-export const createFileManagerMock = (): IFilesStorage => {
-	const storage: Record<string, ArrayBuffer> = {};
+export const createFileManagerMock = (
+	initData?: Record<string, ArrayBuffer>,
+): IFilesStorage => {
+	const storage: Record<string, ArrayBuffer> = { ...initData };
 	return {
 		async write(uuid, buffer) {
 			storage[uuid] = buffer;
