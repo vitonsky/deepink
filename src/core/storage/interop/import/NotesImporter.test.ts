@@ -51,6 +51,7 @@ describe('Text buffers may be imported', () => {
 			{
 				ignorePaths: ['/_resources'],
 				noteExtensions: ['.md', '.mdx'],
+				convertPathToTag: 'always',
 			},
 		);
 

@@ -30,9 +30,19 @@ const RawNoteMetaScheme = z
 	})
 	.catch({});
 
+type Config = {
+	ignorePaths: string[];
+	noteExtensions: string[];
+	convertPathToTag: 'never' | 'fallback' | 'always';
+};
+
+type Options = {
+	onUpdate?: () => void;
+};
+
 // TODO: call hooks to signal progress
 export class NotesImporter {
-	private readonly options;
+	private readonly config: Config & Options;
 	constructor(
 		private readonly storage: {
 			notesRegistry: INotesController;
@@ -41,17 +51,12 @@ export class NotesImporter {
 			filesRegistry: FilesController;
 			attachmentsRegistry: AttachmentsController;
 		},
-		options: {
-			ignorePaths?: string[];
-			noteExtensions?: string[];
-			// TODO: implement
-			// addTagsBasedOnPath?: 'never' | 'fallback' | 'always';
-			onUpdate?: () => void;
-		} = {},
+		options: Partial<Config> & Options = {},
 	) {
-		this.options = {
+		this.config = {
 			noteExtensions: ['.md'],
 			ignorePaths: [],
+			convertPathToTag: 'fallback',
 			...options,
 		};
 	}
@@ -59,7 +64,7 @@ export class NotesImporter {
 	public async import(files: IFilesStorage) {
 		const { notesRegistry, noteVersions, tagsRegistry, attachmentsRegistry } =
 			this.storage;
-		const updateNotes = this.options.onUpdate ?? (() => {});
+		const updateNotes = this.config.onUpdate ?? (() => {});
 
 		const textDecoder = new TextDecoder('utf-8');
 		const markdownProcessor = unified()
@@ -119,7 +124,7 @@ export class NotesImporter {
 			let title = noteMeta.title;
 			if (!title) {
 				const { basename } = fileAbsolutePathSegments;
-				const noteExtension = this.options.noteExtensions.find((ext) =>
+				const noteExtension = this.config.noteExtensions.find((ext) =>
 					basename.toLowerCase().endsWith(ext.toLowerCase()),
 				);
 
@@ -205,18 +210,22 @@ export class NotesImporter {
 			await attachmentsRegistry.set(noteId, Array.from(attachedFilesIds));
 
 			// Attach tag equal to note directory path
-			if (noteDirPath !== '/') {
+			const { convertPathToTag } = this.config;
+			if (convertPathToTag !== 'never' && noteDirPath !== '/') {
 				const attachedTagIds = await tagsRegistry
 					.getAttachedTags(noteId)
 					.then((tags) => tags.map((tag) => tag.id));
 
-				const tagName = noteDirPath.split('/').filter(Boolean).join('/');
-				const [pathTagId] = await this.getTagIds([tagName]);
+				const isFallbackTagNeeded = attachedTagIds.length === 0;
+				if (isFallbackTagNeeded || convertPathToTag === 'always') {
+					const tagName = noteDirPath.split('/').filter(Boolean).join('/');
+					const [pathTagId] = await this.getTagIds([tagName]);
 
-				await tagsRegistry.setAttachedTags(noteId, [
-					...attachedTagIds,
-					pathTagId,
-				]);
+					await tagsRegistry.setAttachedTags(noteId, [
+						...attachedTagIds,
+						pathTagId,
+					]);
+				}
 			}
 
 			await noteVersions.snapshot(noteId);
@@ -233,14 +242,14 @@ export class NotesImporter {
 	private isNotePath(filePath: string) {
 		// Check file name extension
 		if (
-			!this.options.noteExtensions.some((ext) =>
+			!this.config.noteExtensions.some((ext) =>
 				filePath.toLowerCase().endsWith(ext.toLowerCase()),
 			)
 		)
 			return false;
 
 		// Check path
-		if (this.options.ignorePaths.some((rootPath) => filePath.startsWith(rootPath)))
+		if (this.config.ignorePaths.some((rootPath) => filePath.startsWith(rootPath)))
 			return false;
 
 		return true;
