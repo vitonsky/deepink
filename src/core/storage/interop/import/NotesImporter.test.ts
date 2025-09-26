@@ -1,5 +1,6 @@
 /* eslint-disable spellcheck/spell-checker */
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
+import { IFilesStorage } from '@core/features/files';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
@@ -7,23 +8,54 @@ import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { openDatabase } from '../../database/SQLiteDatabase/SQLiteDatabase';
+import {
+	openDatabase,
+	SQLiteDatabase,
+} from '../../database/SQLiteDatabase/SQLiteDatabase';
 
 import { NotesImporter } from '.';
 
 const FAKE_WORKSPACE_NAME = 'fake-workspace-id';
 
+const createAppContextIterator = () => {
+	let context = 0;
+
+	return (db: SQLiteDatabase, fileManager: IFilesStorage) => {
+		const namespace = FAKE_WORKSPACE_NAME + ++context;
+
+		const notesRegistry = new NotesController(db, namespace);
+		const noteVersions = new NoteVersions(db, namespace);
+		const tagsRegistry = new TagsController(db, namespace);
+
+		const attachmentsRegistry = new AttachmentsController(db, namespace);
+		const filesRegistry = new FilesController(
+			db,
+			fileManager,
+			attachmentsRegistry,
+			namespace,
+		);
+
+		return {
+			filesRegistry,
+			notesRegistry,
+			noteVersions,
+			attachmentsRegistry,
+			tagsRegistry,
+		};
+	};
+};
+
 const createTextBuffer = (text: string): ArrayBuffer => new TextEncoder().encode(text);
 
-const dbFile = createFileControllerMock();
-const dbPromise = openDatabase(dbFile);
+describe('Base notes import cases', () => {
+	const dbFile = createFileControllerMock();
+	const dbPromise = openDatabase(dbFile);
 
-afterAll(async () => {
-	const db = await dbPromise;
-	await db.close();
-});
+	afterAll(async () => {
+		const db = await dbPromise;
+		await db.close();
+	});
 
-describe('Text buffers may be imported', () => {
 	const fileManager = createFileManagerMock();
 
 	test('Import notes', async () => {
@@ -259,5 +291,116 @@ describe('Text buffers may be imported', () => {
 				resolvedName: 'posts/about',
 			}),
 		]);
+	});
+});
+
+describe('Import notes with different options', () => {
+	const dbFile = createFileControllerMock();
+	const dbPromise = openDatabase(dbFile);
+
+	afterAll(async () => {
+		const db = await dbPromise;
+		await db.close();
+	});
+
+	const fileManager = createFileManagerMock();
+	const createAppContext = createAppContextIterator();
+
+	describe('Convert paths to tag', () => {
+		test('always', async () => {
+			const db = await dbPromise;
+			const appContext = createAppContext(db, fileManager);
+
+			await new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'always',
+			}).import(
+				createFileManagerMock({
+					'/foo/bar/note.md': createTextBuffer('Hello world!'),
+					'/foo1/bar1/note.md': createTextBuffer(
+						'---\ntags:\n - another tag\n---\nHello world!',
+					),
+				}),
+			);
+
+			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+				expect.objectContaining({
+					name: 'another tag',
+					parent: null,
+					resolvedName: 'another tag',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					parent: null,
+					resolvedName: 'foo',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.stringMatching(/^[\d\w-]+$/),
+					resolvedName: 'foo/bar',
+				}),
+				expect.objectContaining({
+					name: 'foo1',
+					parent: null,
+					resolvedName: 'foo1',
+				}),
+				expect.objectContaining({
+					name: 'bar1',
+					parent: expect.stringMatching(/^[\d\w-]+$/),
+					resolvedName: 'foo1/bar1',
+				}),
+			]);
+		});
+
+		test('fallback', async () => {
+			const db = await dbPromise;
+			const appContext = createAppContext(db, fileManager);
+
+			await new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'fallback',
+			}).import(
+				createFileManagerMock({
+					'/foo/bar/note.md': createTextBuffer('Hello world!'),
+					'/foo1/bar1/note.md': createTextBuffer(
+						'---\ntags:\n - another tag\n---\nHello world!',
+					),
+				}),
+			);
+
+			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+				expect.objectContaining({
+					name: 'another tag',
+					parent: null,
+					resolvedName: 'another tag',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					parent: null,
+					resolvedName: 'foo',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.stringMatching(/^[\d\w-]+$/),
+					resolvedName: 'foo/bar',
+				}),
+			]);
+		});
+
+		test('never', async () => {
+			const db = await dbPromise;
+			const appContext = createAppContext(db, fileManager);
+
+			await new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'never',
+			}).import(
+				createFileManagerMock({
+					'/foo/bar/note.md': createTextBuffer('Hello world!'),
+				}),
+			);
+
+			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([]);
+		});
 	});
 });
