@@ -36,11 +36,8 @@ type Config = {
 	convertPathToTag: 'never' | 'fallback' | 'always';
 };
 
-type Options = {
-	onUpdate?: () => void;
-};
+type Options = {};
 
-// TODO: call hooks to signal progress
 export class NotesImporter {
 	private readonly config: Config & Options;
 	constructor(
@@ -64,7 +61,6 @@ export class NotesImporter {
 	public async import(files: IFilesStorage) {
 		const { notesRegistry, noteVersions, tagsRegistry, attachmentsRegistry } =
 			this.storage;
-		const updateNotes = this.config.onUpdate ?? (() => {});
 
 		const textDecoder = new TextDecoder('utf-8');
 		const markdownProcessor = unified()
@@ -154,9 +150,6 @@ export class NotesImporter {
 				id: noteId,
 				path: fileAbsolutePathSegments.dirname,
 			};
-
-			// TODO: add method to registry, to emit event by updates
-			updateNotes();
 		}
 
 		// TODO: limit concurrency for case with many large files
@@ -235,8 +228,6 @@ export class NotesImporter {
 			Object.values(createdNotes).map((note) => note.id),
 			{ isVisible: true },
 		);
-
-		updateNotes();
 	}
 
 	private isNotePath(filePath: string) {
