@@ -1,6 +1,10 @@
 import { useContext, useEffect, useRef } from 'react';
 
-import { CommandEventContext, CommandPayloads } from './CommandEventProvider';
+import {
+	CommandEvent,
+	CommandEventContext,
+	CommandPayloads,
+} from './CommandEventProvider';
 
 /**
  * Returns a function that calls a command by its name
@@ -27,6 +31,12 @@ export function useCommand() {
 	};
 }
 
+function hasCommandPayload<K extends keyof CommandPayloads>(
+	command: CommandEvent<K>,
+): command is { name: K; payload: CommandPayloads[K] } {
+	return 'payload' in command;
+}
+
 /**
  * Calls the provided callback whenever the given command is triggered.
  *
@@ -34,7 +44,7 @@ export function useCommand() {
  */
 export function useCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
-	callback: (payload: CommandPayloads[K]) => void,
+	callback: (payload?: CommandPayloads[K]) => void,
 ) {
 	const commandEvent = useContext(CommandEventContext);
 	const unsubscribe = useRef(() => {});
@@ -43,13 +53,7 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 		unsubscribe.current = commandEvent.watch((command) => {
 			if (command.name !== commandName) return;
 
-			// Currently payload is void for all commands, but future commands may include payload
-			// We extract the payload if it exists and cast the type so the callback works both for commands with and without payload
-			const payload = (
-				'payload' in command ? command.payload : undefined
-			) as CommandPayloads[K];
-
-			callback(payload);
+			hasCommandPayload(command) ? callback(command.payload) : callback();
 		});
 		return unsubscribe.current;
 	}, [callback, commandEvent, commandName]);
