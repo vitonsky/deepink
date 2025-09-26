@@ -156,24 +156,26 @@ export class NotesImporter {
 
 		// Linking: On this stage all attachments (like files, other notes, etc) uploaded and ready to use
 		// Update notes
-		for (const [_fileUrl, noteData] of Object.entries(createdNotes)) {
-			const noteId = noteData.id;
+		for (const { id: noteId, path: noteDirPath } of Object.values(createdNotes)) {
 			const note = await notesRegistry.getById(noteId);
-			if (!note) continue;
+			if (!note) throw new Error('Note with such id does not exist');
 
 			const noteTree = markdownProcessor.parse(note.content.text);
 
-			// Update URLs
-			const attachedFilesIds: string[] = [];
+			// Update URLs and collect attached files
+			const attachedFilesIds = new Set<string>();
 			await replaceUrls(noteTree, async (absoluteUrl) => {
 				const createdNote = createdNotes[absoluteUrl];
 				if (createdNote) {
+					// TODO: record back-link to note
 					return formatNoteLink(createdNote.id);
 				}
 
 				const fileId = filePathToIdMap[absoluteUrl];
 				if (fileId) {
-					attachedFilesIds.push(fileId);
+					// Record file id as used
+					attachedFilesIds.add(fileId);
+
 					return formatResourceLink(fileId);
 				}
 
@@ -185,23 +187,21 @@ export class NotesImporter {
 			await notesRegistry.update(note.id, { ...note.content, text: updatedText });
 
 			// Attach files
-			await attachmentsRegistry.set(
-				noteId,
-				attachedFilesIds.filter((id, idx, arr) => idx === arr.indexOf(id)),
-			);
+			await attachmentsRegistry.set(noteId, Array.from(attachedFilesIds));
 
-			// Find or create tags and attach
-			const pathWithRemovedRoot = noteData.path.slice(1);
-			if (pathWithRemovedRoot.length > 0) {
-				await tagsRegistry.setAttachedTags(
-					noteId,
-					await Promise.all([
-						tagsRegistry
-							.getAttachedTags(noteId)
-							.then((tags) => tags.map((tag) => tag.id)),
-						this.getTagIds([pathWithRemovedRoot]),
-					]).then((tagIds) => tagIds.flat()),
-				);
+			// Attach tag equal to note directory path
+			if (noteDirPath !== '/') {
+				const attachedTagIds = await tagsRegistry
+					.getAttachedTags(noteId)
+					.then((tags) => tags.map((tag) => tag.id));
+
+				const tagName = noteDirPath.split('/').filter(Boolean).join('/');
+				const [pathTagId] = await this.getTagIds([tagName]);
+
+				await tagsRegistry.setAttachedTags(noteId, [
+					...attachedTagIds,
+					pathTagId,
+				]);
 			}
 		}
 
