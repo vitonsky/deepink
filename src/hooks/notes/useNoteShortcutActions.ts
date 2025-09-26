@@ -35,6 +35,9 @@ export const useNoteShortcutActions = () => {
 
 	const createWorkspaceCommand = (callback: () => void) => {
 		return () => {
+			if (!currentWorkspace)
+				throw new Error('WorkspaceContext required but missing');
+
 			// This check is needed because multiple workspaces can run at the same time
 			// Without filtering, every workspace would handle the same command, causing unwanted side effects across all of them
 			if (activeWorkspace?.id !== currentWorkspace?.workspaceId) return;
