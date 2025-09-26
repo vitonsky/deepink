@@ -2,10 +2,10 @@ import { getItemByOffset } from '@utils/collections/getItemByOffset';
 
 const collection = Array.from({ length: 10 }, (_, i) => `item${i}`);
 
-test('Return null if collection is smaller then 3, otherwise return item', () => {
+test('Return null if the collection is smaller than 2; otherwise, return the item', () => {
+	expect(getItemByOffset([], 0, 1)).toBe(null);
 	expect(getItemByOffset([1], 0, 1)).toBe(null);
-	expect(getItemByOffset([1, 2], 0, 1)).toBe(null);
-	expect(getItemByOffset([1, 2, 3], 0, 1)).toBe(2);
+	expect(getItemByOffset([1, 2], 0, 1)).toBe(2);
 });
 test('Returns null for an index outside the collection', () => {
 	expect(getItemByOffset([1, 2, 3], 67, 1)).toBe(null);
