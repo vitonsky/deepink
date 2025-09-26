@@ -38,6 +38,60 @@ describe('manage tags', () => {
 		await db.close();
 	});
 
+	// TODO:fox that cases. Paths must be normalized
+	test('weird tags', async () => {
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+
+		const tags = new TagsController(db, 'workspace-fake-id');
+
+		await tags.add('///foo', null);
+		await tags.add('/foo/bar', null);
+
+		await tags.getTags().then((tags) => {
+			expect(tags).toEqual([
+				expect.objectContaining({
+					name: '',
+					parent: null,
+					resolvedName: '',
+				}),
+				expect.objectContaining({
+					name: '',
+					parent: expect.any(String),
+					resolvedName: '/',
+				}),
+				expect.objectContaining({
+					name: '',
+					parent: expect.any(String),
+					resolvedName: '//',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					parent: expect.any(String),
+					resolvedName: '///foo',
+				}),
+
+				expect.objectContaining({
+					name: '',
+					parent: null,
+					resolvedName: '',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					parent: expect.any(String),
+					resolvedName: '/foo',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.any(String),
+					resolvedName: '/foo/bar',
+				}),
+			]);
+		});
+
+		await db.close();
+	});
+
 	test('update tags', async () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
