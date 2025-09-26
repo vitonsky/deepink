@@ -122,7 +122,7 @@ export class NotesImporter {
 				);
 			}
 
-			createdNotes[encodeURI(filename)] = {
+			createdNotes[filename] = {
 				id: noteId,
 				path: fileAbsolutePathSegments.dirname,
 			};
@@ -188,7 +188,7 @@ export class NotesImporter {
 			// Update URLs
 			const attachedFilesIds: string[] = [];
 			await replaceUrls(noteTree, async (absoluteUrl) => {
-				const createdNote = createdNotes[encodeURI(absoluteUrl)];
+				const createdNote = createdNotes[absoluteUrl];
 				if (createdNote) {
 					return formatNoteLink(createdNote.id);
 				}
