@@ -3,6 +3,7 @@ import { AttachmentsController } from '@core/features/attachments/AttachmentsCon
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
+import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
@@ -28,6 +29,7 @@ describe('Text buffers may be imported', () => {
 	test('Import notes', async () => {
 		const db = await dbPromise;
 		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
 		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
@@ -41,8 +43,9 @@ describe('Text buffers may be imported', () => {
 		const importer = new NotesImporter(
 			{
 				filesRegistry,
-				attachmentsRegistry,
 				notesRegistry,
+				noteVersions,
+				attachmentsRegistry,
 				tagsRegistry,
 			},
 			{
@@ -174,6 +177,20 @@ describe('Text buffers may be imported', () => {
 		// If file used in many places, it must have many references,
 		// but physically we have only one file
 		await expect(fileManager.list()).resolves.toHaveLength(2);
+	});
+
+	test('Every note have snapshot', async () => {
+		const db = await dbPromise;
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
+
+		const notes = await notesRegistry.get();
+
+		await Promise.all(
+			notes.map((note) =>
+				expect(noteVersions.getList(note.id)).resolves.toHaveLength(1),
+			),
+		);
 	});
 
 	test('Attached files is in files list', async () => {

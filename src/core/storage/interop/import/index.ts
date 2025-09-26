@@ -11,6 +11,7 @@ import { IFilesStorage } from '@core/features/files';
 import { FilesController } from '@core/features/files/FilesController';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { INotesController } from '@core/features/notes/controller';
+import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { findParentTag } from '@core/features/tags/utils';
 import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
@@ -30,12 +31,12 @@ const RawNoteMetaScheme = z
 	.catch({});
 
 // TODO: call hooks to signal progress
-// TODO: snapshot history for every note
 export class NotesImporter {
 	private readonly options;
 	constructor(
 		private readonly storage: {
 			notesRegistry: INotesController;
+			noteVersions: NoteVersions;
 			tagsRegistry: TagsController;
 			filesRegistry: FilesController;
 			attachmentsRegistry: AttachmentsController;
@@ -56,7 +57,8 @@ export class NotesImporter {
 	}
 
 	public async import(files: IFilesStorage) {
-		const { notesRegistry, tagsRegistry, attachmentsRegistry } = this.storage;
+		const { notesRegistry, noteVersions, tagsRegistry, attachmentsRegistry } =
+			this.storage;
 		const updateNotes = this.options.onUpdate ?? (() => {});
 
 		const textDecoder = new TextDecoder('utf-8');
@@ -214,6 +216,8 @@ export class NotesImporter {
 					pathTagId,
 				]);
 			}
+
+			await noteVersions.snapshot(noteId);
 		}
 
 		updateNotes();
