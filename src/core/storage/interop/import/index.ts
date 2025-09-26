@@ -51,8 +51,7 @@ export class NotesImporter {
 	) {}
 
 	public async import(files: IFilesStorage) {
-		const { notesRegistry, tagsRegistry, filesRegistry, attachmentsRegistry } =
-			this.storage;
+		const { notesRegistry, tagsRegistry, attachmentsRegistry } = this.storage;
 		const updateNotes = this.options.onUpdate ?? (() => {});
 
 		const textDecoder = new TextDecoder('utf-8');
@@ -137,48 +136,22 @@ export class NotesImporter {
 		}
 
 		// Uploading: On this stage we upload any files
-		const uploadedFiles: Record<string, Promise<string | null>> = {};
-		/**
-		 * Uploads a file and returns file id.
-		 * Returns file id instant, for already uploaded files in current import session
-		 */
-		const getUploadedFileId = async (url: string) => {
-			const urlRealPath = decodeURI(url);
-
-			// Upload new files
-			if (!(urlRealPath in uploadedFiles)) {
-				uploadedFiles[urlRealPath] = (async () => {
-					const buffer = await files.get(urlRealPath);
-					if (!buffer) return null;
-
-					const urlFilename = urlRealPath.split('/').slice(-1)[0];
-					const file = new File([buffer], urlFilename);
-
-					return filesRegistry.add(file);
-				})();
-			}
-
-			return uploadedFiles[urlRealPath];
-		};
-
 		/**
 		 * Map structure: file URL => entity ID
 		 * We use file URL, not a path, because links in MD contains encoded URLs, not a paths,
 		 * So we have to decode URLs if needs to use it as paths.
 		 */
-		const fileUrlToIdMap: Record<string, string> = {};
+		const filePathToIdMap: Record<string, string> = {};
 
 		// Upload attached files
 		await Promise.all(
-			attachmentPathsToUpload
-				// Remove duplicates
-				.filter((url, index, arr) => index === arr.indexOf(url))
-				.map(async (absoluteUrl) => {
-					const fileId = await getUploadedFileId(absoluteUrl);
-					if (fileId) {
-						fileUrlToIdMap[absoluteUrl] = fileId;
-					}
-				}),
+			// Remove duplicates
+			Array.from(new Set(attachmentPathsToUpload)).map(async (absoluteUrl) => {
+				const fileId = await this.getFileId(absoluteUrl, files);
+				if (fileId) {
+					filePathToIdMap[absoluteUrl] = fileId;
+				}
+			}),
 		);
 
 		// Linking: On this stage all attachments (like files, other notes, etc) uploaded and ready to use
@@ -198,7 +171,7 @@ export class NotesImporter {
 					return formatNoteLink(createdNote.id);
 				}
 
-				const fileId = fileUrlToIdMap[absoluteUrl];
+				const fileId = filePathToIdMap[absoluteUrl];
 				if (fileId) {
 					attachedFilesIds.push(fileId);
 					return formatResourceLink(fileId);
@@ -268,5 +241,27 @@ export class NotesImporter {
 		}
 
 		return tagsToAttach;
+	}
+
+	private readonly uploadedFiles: Record<string, Promise<string | null>> = {};
+	/**
+	 * Returns file id by its path. Uploads file if not uploaded yet
+	 */
+	async getFileId(url: string, files: IFilesStorage) {
+		const { filesRegistry } = this.storage;
+
+		// Upload new files
+		if (!(url in this.uploadedFiles)) {
+			this.uploadedFiles[url] = Promise.resolve().then(async () => {
+				const buffer = await files.get(url);
+				if (!buffer) return null;
+
+				return filesRegistry.add(
+					new File([buffer], getPathSegments(url).basename),
+				);
+			});
+		}
+
+		return this.uploadedFiles[url];
 	}
 }
