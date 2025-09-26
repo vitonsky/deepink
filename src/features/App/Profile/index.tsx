@@ -1,7 +1,9 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
-import { CommandEventProvider } from '@core/features/commands/CommandEventProvider';
+import { GLOBAL_COMMANDS } from '@core/features/commands';
+import { useCommandCallback } from '@core/features/commands/commandHooks';
+import { useRegisterCommandShortcuts } from '@core/features/commands/shortcuts/useRegisterCommandShortcuts';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
@@ -101,6 +103,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		};
 	}, [db, isDevMode]);
 
+	useRegisterCommandShortcuts();
+
+	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{workspaces.map((workspace) =>
@@ -110,16 +116,14 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId: profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<CommandEventProvider>
-								<Workspace profile={currentProfile} />
-								<ProfileStatusBar />
-								{isDevMode && (
-									<ToggleSQLConsole
-										isVisible={isDBConsoleVisible}
-										onVisibilityChange={setIsDBConsoleVisible}
-									/>
-								)}
-							</CommandEventProvider>
+							<Workspace profile={currentProfile} />
+							<ProfileStatusBar />
+							{isDevMode && (
+								<ToggleSQLConsole
+									isVisible={isDBConsoleVisible}
+									onVisibilityChange={setIsDBConsoleVisible}
+								/>
+							)}
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				) : null,

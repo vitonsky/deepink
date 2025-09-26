@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
+import { CommandEventProvider } from '@core/features/commands/CommandEventProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
@@ -42,7 +43,9 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 						value={controls}
 						key={profile.profile.id}
 					>
-						<Profile profile={profile} controls={controls} />
+						<CommandEventProvider>
+							<Profile profile={profile} controls={controls} />
+						</CommandEventProvider>
 					</ProfileControlsContext.Provider>
 				);
 			})}
