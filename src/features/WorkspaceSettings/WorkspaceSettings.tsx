@@ -10,6 +10,7 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { importNotes } from '@electron/requests/files/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import {
+	useFilesController,
 	useFilesRegistry,
 	useNotesRegistry,
 	useTagsRegistry,
@@ -62,6 +63,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const notes = useNotesRegistry();
 	const tags = useTagsRegistry();
 	const files = useFilesRegistry();
+	const filesController = useFilesController();
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
@@ -85,6 +87,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 			.query()
 			.then((filesList) => files.delete(filesList.map((file) => file.id)));
 		await files.clearOrphaned();
+		await filesController.delete([currentWorkspace.workspaceId]);
 
 		dispatch(
 			workspacesApi.setActiveWorkspace({
@@ -100,6 +103,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		currentWorkspace.workspaceId,
 		dispatch,
 		files,
+		filesController,
 		notes,
 		tags,
 		workspaceInfo.name,

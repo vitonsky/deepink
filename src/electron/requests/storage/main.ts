@@ -39,7 +39,7 @@ export const enableStorage = () =>
 					continue;
 				}
 
-				await rm(filePath, { force: true });
+				await rm(filePath, { force: true, recursive: true });
 				console.debug('Removed file', filePath);
 			}
 		},
