@@ -46,3 +46,33 @@ export const getResolvedPath = (rel: string, base: string): string => {
 
 	return joinPathSegments(stack);
 };
+
+/**
+ * Returns a relative path based on a base path
+ */
+export const getRelativePath = (path: string, base: string): string => {
+	const pathSegments = normalizeSegments(getResolvedPath(path, '/').split('/'));
+	const baseSegments = normalizeSegments(getResolvedPath(base, '/').split('/'));
+
+	const notEqualSegmentIndex = pathSegments.findIndex(
+		(segment, index) => baseSegments[index] !== segment,
+	);
+
+	// If >0, then path is larger than base path and vice versa
+	const segmentsSizeDelta = pathSegments.length - baseSegments.length;
+	let levelsToUp = segmentsSizeDelta < 0 ? Math.abs(segmentsSizeDelta) : 0;
+	if (notEqualSegmentIndex !== -1) {
+		levelsToUp +=
+			pathSegments.length -
+			notEqualSegmentIndex -
+			(segmentsSizeDelta > 0 ? segmentsSizeDelta : 0);
+	}
+
+	const relativePath: string[] =
+		levelsToUp === 0 ? ['.'] : Array(levelsToUp).fill('..');
+	if (notEqualSegmentIndex !== -1) {
+		relativePath.push(...pathSegments.slice(notEqualSegmentIndex));
+	}
+
+	return relativePath.length === 0 ? './' : relativePath.join('/');
+};
