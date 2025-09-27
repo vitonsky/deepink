@@ -1,34 +1,56 @@
-import React, { createContext, FC, PropsWithChildren } from 'react';
-import { createEvent, EventCallable } from 'effector';
+import React, { createContext, FC, PropsWithChildren, useState } from 'react';
+import { createEvent } from 'effector';
+import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { GLOBAL_COMMANDS } from '.';
+import { CommandPayloads } from '.';
 
-// In the future, we can define a type for the payload like this:
-// type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
-export type CommandPayloads = {
-	[K in GLOBAL_COMMANDS]: void;
+export type CommandBus<CommandPayloads extends Record<string, unknown>> = {
+	/**
+	 * Fire command event by its name and provide payload if needed
+	 */
+	call: <K extends keyof CommandPayloads>(
+		commandName: K,
+		...args: CommandPayloads[K] extends void
+			? [payload?: void]
+			: [payload: CommandPayloads[K]]
+	) => void;
+
+	/**
+	 * Add listener for a specific command event
+	 */
+	handle: <K extends keyof CommandPayloads>(
+		commandName: K,
+		callback: (payload: CommandPayloads[K]) => void,
+	) => () => void;
 };
 
-export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads> =
-	CommandPayloads[K] extends void
-		? {
-				name: K;
-		  }
-		: {
-				name: K;
-				payload: CommandPayloads[K];
-		  };
+export const CommandBusContext = createContext<CommandBus<CommandPayloads> | null>(null);
+export const useCommandBusContext = createContextGetterHook(CommandBusContext);
 
-export const CommandEventContext = createContext<EventCallable<CommandEvent>>(
-	createEvent(),
-);
+export const CommandBusProvider: FC<PropsWithChildren> = ({ children }) => {
+	const [commandBus] = useState(() => {
+		const commandEvent = createEvent<{
+			name: string;
+			payload: any;
+		}>();
 
-export const CommandEventProvider: FC<PropsWithChildren> = ({ children }) => {
-	const commandEvent = createEvent<CommandEvent>();
+		return {
+			call(commandName: string, payload?: any) {
+				commandEvent({ name: commandName, payload });
+			},
+			handle(commandName, callback) {
+				return commandEvent.watch((event) => {
+					if (event.name !== commandName) return;
+
+					callback(event.payload);
+				});
+			},
+		} satisfies CommandBus<CommandPayloads>;
+	});
 
 	return (
-		<CommandEventContext.Provider value={commandEvent}>
+		<CommandBusContext.Provider value={commandBus}>
 			{children}
-		</CommandEventContext.Provider>
+		</CommandBusContext.Provider>
 	);
 };

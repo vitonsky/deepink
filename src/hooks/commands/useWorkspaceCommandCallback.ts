@@ -1,10 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { isEqual } from 'lodash';
-import { CommandPayloads } from '@hooks/commands/CommandEventProvider';
-import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useCommandBusContext } from '@hooks/commands/CommandEventProvider';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
+
+import { CommandPayloads } from '.';
 
 /**
  * Subscribes to a command event and automatically unsubscribes
@@ -14,19 +15,21 @@ export function useWorkspaceCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
 	callback: (payload: CommandPayloads[K]) => void,
 ) {
+	const commandBus = useCommandBusContext();
+
 	const { profileId, workspaceId: contextWorkspaceId } = useWorkspaceData();
 	const activeWorkspace = useAppSelector(
 		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
 		isEqual,
 	);
 
-	// Updating `activeWorkspace` causes the parent components to re-render
-	// which triggers a callback update, leading to a new subscription
-	const unsubscribe = useCommandCallback(commandName, callback);
+	const unsubscribe = useRef(() => {});
 
 	useEffect(() => {
-		if (activeWorkspace?.id !== contextWorkspaceId) {
-			unsubscribe();
+		if (activeWorkspace?.id === contextWorkspaceId) {
+			unsubscribe.current = commandBus.handle(commandName, callback);
 		}
-	}, [activeWorkspace?.id, contextWorkspaceId, unsubscribe]);
+
+		return () => unsubscribe.current();
+	}, [activeWorkspace?.id, contextWorkspaceId, commandBus, commandName, callback]);
 }
