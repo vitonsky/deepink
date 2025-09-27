@@ -1,9 +1,6 @@
-import React, { useMemo } from 'react';
-import { isEqual } from 'lodash';
+import React from 'react';
 import { Modal, ModalProps } from '@chakra-ui/react';
-import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
+import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 
 /**
  * Modal window bound to a workspace context
@@ -12,18 +9,10 @@ import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
  * and become visible back when workspace will be active again.
  */
 export const WorkspaceModal = (props: ModalProps) => {
-	const workspaceData = useWorkspaceData();
-	const { profileId } = useWorkspaceData();
-
-	const activeWorkspace = useAppSelector(
-		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
-		isEqual,
-	);
-	const isVisibleWorkspace =
-		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
+	const isActiveWorkspace = useIsActiveWorkspace();
 
 	return (
-		<Modal {...props} isOpen={Boolean(isVisibleWorkspace && props.isOpen)}>
+		<Modal {...props} isOpen={Boolean(isActiveWorkspace && props.isOpen)}>
 			{props.children}
 		</Modal>
 	);

@@ -5,6 +5,7 @@ import { getNoteTitle } from '@core/features/notes/utils';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
+import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -29,7 +30,9 @@ export const NotesList: FC<NotesListProps> = () => {
 	});
 
 	const parentRef = useRef<HTMLDivElement>(null);
+	const isActiveWorkspace = useIsActiveWorkspace();
 	const virtualizer = useVirtualizer({
+		enabled: isActiveWorkspace,
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
