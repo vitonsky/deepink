@@ -16,6 +16,7 @@ import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 import { createWorkspaceSelector } from '@state/redux/profiles/utils';
+import { joinCallbacks } from '@utils/react/joinCallbacks';
 
 import { EditorModePicker } from './EditorModePicker/EditorModePicker';
 
@@ -40,12 +41,15 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 
 	const eventBus = useEventBus();
 	useEffect(() => {
-		return eventBus.listen(WorkspaceEvents.NOTE_UPDATED, (noteId) => {
-			updateNotes();
-			notesRegistry.getById(noteId).then((note) => {
-				if (note) noteUpdated(note);
-			});
-		});
+		return joinCallbacks(
+			eventBus.listen(WorkspaceEvents.NOTES_UPDATED, updateNotes),
+			eventBus.listen(WorkspaceEvents.NOTE_UPDATED, (noteId) => {
+				updateNotes();
+				notesRegistry.getById(noteId).then((note) => {
+					if (note) noteUpdated(note);
+				});
+			}),
+		);
 	}, [eventBus, noteUpdated, notesRegistry, updateNotes]);
 
 	// Simulate note update

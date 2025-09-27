@@ -18,7 +18,7 @@ import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
-type OnProcessedPayload = {
+export type OnProcessedPayload = {
 	stage: 'parsing' | 'uploading' | 'updating';
 	total: number;
 	processed: number;

@@ -5,7 +5,9 @@ import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
+import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { importNotes } from '@electron/requests/files/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import {
 	useFilesRegistry,
@@ -27,6 +29,8 @@ import {
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 
+import { useNotesImport } from './useNotesImport';
+
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;
 }
@@ -35,6 +39,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const {
 		profile: { db },
 	} = useProfileControls();
+
+	const notesImport = useNotesImport();
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
 
@@ -135,10 +141,42 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 					<FeaturesHeader view="section">Notes management</FeaturesHeader>
 
 					<FeaturesOption description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app">
-						<HStack>
-							<Button>Import notes</Button>
-							<Button>Export notes</Button>
-						</HStack>
+						<VStack w="100%" align="start">
+							<HStack>
+								<Button
+									isDisabled={notesImport.progress !== null}
+									onClick={async () => {
+										const content = await importNotes();
+										await notesImport.importNotes(
+											// TODO: update files fetching API
+											createFileManagerMock(
+												Object.fromEntries(
+													Object.entries(content).map(
+														([path, buffer]) => [
+															'/' + path,
+															buffer,
+														],
+													),
+												),
+											),
+										);
+
+										console.log('Import is completed');
+									}}
+								>
+									Import notes
+								</Button>
+								<Button>Export notes</Button>
+							</HStack>
+							{notesImport.progress && (
+								<Text>
+									Notes import is in progress:{' '}
+									{notesImport.progress.stage}{' '}
+									{notesImport.progress.total}/
+									{notesImport.progress.processed}
+								</Text>
+							)}
+						</VStack>
 					</FeaturesOption>
 
 					<FeaturesOption description="Keep full changes log for notes. You may disable history for single notes">
