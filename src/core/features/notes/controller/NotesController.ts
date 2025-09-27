@@ -125,27 +125,30 @@ export class NotesController implements INotesController {
 					}),
 				)
 				.where(
-					qb.condition(
-						tags.length > 0
-							? qb.line(
-									'id IN',
-									qb.group(
-										qb
-											.select('target')
-											.from('attachedTags')
-											.where(
-												qb.line(
-													'source IN',
-													qb.values(tags).withParenthesis(),
+					qb
+						.condition(
+							tags.length > 0
+								? qb.line(
+										'id IN',
+										qb.group(
+											qb
+												.select('target')
+												.from('attachedTags')
+												.where(
+													qb.line(
+														'source IN',
+														qb.values(tags).withParenthesis(),
+													),
 												),
-											),
-									),
-							  )
-							: undefined,
-						...metaEntries.map(
-							([key, value]) => qb.sql`${qb.raw(key)} = ${value}`,
+										),
+								  )
+								: undefined,
+						)
+						.and(
+							...metaEntries.map(
+								([key, value]) => qb.sql`${qb.raw(key)} = ${value}`,
+							),
 						),
-					),
 				)
 				.limit(limit)
 				.offset((page - 1) * limit),
