@@ -41,7 +41,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 
 									updateNote({ ...note, content });
 								},
-								updateMeta: (meta: NoteMeta) => {
+								updateMeta: (meta: Partial<NoteMeta>) => {
 									const note = notesRef.current.find(
 										(note) => note.id === id,
 									) as INote;
