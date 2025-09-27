@@ -204,3 +204,69 @@ test('Export single note and it attachments', async () => {
 		),
 	).resolves.toMatchSnapshot('Notes texts');
 });
+
+test('Export all notes and attached files with custom file names', async () => {
+	const db = await dbPromise;
+	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+
+	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
+	const filesRegistry = new FilesController(
+		db,
+		fileManager,
+		attachmentsRegistry,
+		FAKE_WORKSPACE_NAME,
+	);
+
+	const exporter = new NotesExporter(
+		{
+			filesRegistry,
+			notesRegistry,
+			tagsRegistry,
+		},
+		{
+			filesRoot: '/files',
+			noteFilename(note) {
+				return [
+					'notes',
+					note.tags[0],
+					[note.id, note.content.title].filter(Boolean).join('-') + '.md',
+				]
+					.filter(Boolean)
+					.join('/');
+			},
+		},
+	);
+
+	// Exported notes
+	const exportTarget = createFileManagerMock();
+	await expect(exporter.exportNotes(exportTarget)).resolves.not.toThrow();
+
+	const filesList = exportTarget.list();
+	await expect(
+		filesList.then((paths) =>
+			paths.map((path) =>
+				path.replaceAll(/[a-z\d]+(-[a-z\d]+){4}/g, '[REDACTED-UUID]'),
+			),
+		),
+	).resolves.toMatchSnapshot('Files list');
+
+	const notesPaths = await filesList.then((paths) =>
+		paths.filter((path) => path.endsWith('.md')),
+	);
+
+	await expect(
+		Promise.all(
+			notesPaths.map(async (path, index) => {
+				const content = await exportTarget.get(path);
+				if (!content) throw new Error('File not found');
+
+				return new TextDecoder()
+					.decode(content)
+					.replace(/created: \d+/, `created: ${100_000 + index}`)
+					.replace(/updated: \d+/, `updated: ${200_000 + index}`)
+					.replaceAll(/[a-z\d]+(-[a-z\d]+){4}/g, '[REDACTED-UUID]');
+			}),
+		),
+	).resolves.toMatchSnapshot('Notes texts');
+});

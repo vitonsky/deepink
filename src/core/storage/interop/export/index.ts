@@ -15,27 +15,45 @@ import { getPathSegments, getRelativePath, joinPathSegments } from '@utils/fs/pa
 
 import { replaceUrls } from '../utils/mdast';
 
+type NoteData = INote & { tags: string[] };
+
 type ExportContext = {
 	files: IFilesStorage;
 	/**
 	 * Saves an attachment by id and returns absolute path to a file
 	 */
 	saveAttachment: (id: string) => Promise<string | null>;
+
+	/**
+	 * Return persistent note data per export session
+	 */
+	getNoteData: (id: string) => Promise<NoteData | null>;
 };
 
+type Config = {
+	filesRoot: string;
+	noteFilename?: (note: NoteData) => string;
+};
+
+// TODO: add hooks to track progress
 export class NotesExporter {
+	private readonly config: Config;
 	constructor(
 		private readonly context: {
 			notesRegistry: INotesController;
 			filesRegistry: FilesController;
 			tagsRegistry: TagsController;
 		},
-	) {}
+		config?: Partial<Config>,
+	) {
+		this.config = {
+			filesRoot: '_resources',
+			...config,
+		};
+	}
 
-	private async exportSingleNote(note: INote, { saveAttachment }: ExportContext) {
-		const { tagsRegistry } = this.context;
-
-		const notePath = getPathSegments(this.resolveNotePath(note.id));
+	private async exportSingleNote(note: NoteData, context: ExportContext) {
+		const notePath = getPathSegments(this.resolveNotePath(note));
 
 		const markdownProcessor = unified()
 			.use(remarkParse)
@@ -44,12 +62,6 @@ export class NotesExporter {
 			.use(remarkGfm)
 			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 			.freeze();
-
-		const tags = await tagsRegistry
-			.getAttachedTags(note.id)
-			.then((tags) =>
-				tags.map((tag) => tag.resolvedName).sort((a, b) => (b > a ? -1 : 1)),
-			);
 
 		const mdTree = markdownProcessor.parse(note.content.text);
 
@@ -60,7 +72,7 @@ export class NotesExporter {
 				title: note.content.title,
 				created: note.createdTimestamp,
 				updated: note.updatedTimestamp,
-				tags,
+				tags: note.tags,
 			}),
 		});
 
@@ -72,14 +84,20 @@ export class NotesExporter {
 				if (!appResource) return nodeUrl;
 
 				// Format note link
-				if (appResource.type === 'note')
+				if (appResource.type === 'note') {
+					const noteData = await context.getNoteData(appResource.id);
+
+					// Don't change URL if can't found data
+					if (!noteData) return nodeUrl;
+
 					return getRelativePath(
-						this.resolveNotePath(appResource.id),
+						this.resolveNotePath(noteData),
 						notePath.dirname,
 					);
+				}
 
 				// Save attachment and format link
-				const filePath = await saveAttachment(appResource.id);
+				const filePath = await context.saveAttachment(appResource.id);
 				return filePath ? getRelativePath(filePath, notePath.dirname) : nodeUrl;
 			},
 			true,
@@ -94,11 +112,17 @@ export class NotesExporter {
 
 		await Promise.all(
 			notes.map(async (note) => {
-				const data = await this.exportSingleNote(note, this.createContext(files));
+				const tags = await this.getNoteTags(note.id);
+				const noteData = { ...note, tags };
+
+				const noteDump = await this.exportSingleNote(
+					noteData,
+					this.createContext(files),
+				);
 
 				await files.write(
-					this.resolveNotePath(note.id),
-					new TextEncoder().encode(data),
+					this.resolveNotePath(noteData),
+					new TextEncoder().encode(noteDump),
 				);
 			}),
 		);
@@ -106,17 +130,20 @@ export class NotesExporter {
 
 	// TODO: implement recursive mode, to collect references
 	public async exportNote(noteId: string, files: IFilesStorage) {
-		const { notesRegistry } = this.context;
+		const exportContext = this.createContext(files);
 
-		const note = await notesRegistry.getById(noteId);
-		if (!note) return;
+		const noteData = await exportContext.getNoteData(noteId);
+		if (!noteData) return;
 
-		const data = await this.exportSingleNote(note, this.createContext(files));
-		await files.write(this.resolveNotePath(note.id), new TextEncoder().encode(data));
+		const noteDump = await this.exportSingleNote(noteData, exportContext);
+		await files.write(
+			this.resolveNotePath(noteData),
+			new TextEncoder().encode(noteDump),
+		);
 	}
 
-	private createContext(files: IFilesStorage) {
-		const { filesRegistry } = this.context;
+	private createContext(files: IFilesStorage): ExportContext {
+		const { notesRegistry, filesRegistry } = this.context;
 		const fetchedFiles: Record<string, Promise<string | null>> = {};
 		return {
 			files,
@@ -128,7 +155,7 @@ export class NotesExporter {
 						if (!file) return null;
 
 						const fileName = `${id}-${file.name}`;
-						const path = joinPathSegments(['_resources', fileName]);
+						const path = joinPathSegments([this.config.filesRoot, fileName]);
 
 						const buffer = await file.arrayBuffer();
 
@@ -139,10 +166,28 @@ export class NotesExporter {
 
 				return fetchedFiles[id];
 			},
+			getNoteData: async (noteId: string) => {
+				const note = await notesRegistry.getById(noteId);
+				if (!note) return null;
+
+				const tags = await this.getNoteTags(note.id);
+				return { ...note, tags };
+			},
 		};
 	}
 
-	private resolveNotePath(id: string) {
-		return joinPathSegments([`${id}.md`]);
+	private resolveNotePath(note: NoteData) {
+		const filename = this.config.noteFilename?.(note) || `${note.id}.md`;
+
+		return joinPathSegments([filename]);
+	}
+
+	private async getNoteTags(noteId: string) {
+		const { tagsRegistry } = this.context;
+		return tagsRegistry
+			.getAttachedTags(noteId)
+			.then((tags) =>
+				tags.map((tag) => tag.resolvedName).sort((a, b) => (b > a ? -1 : 1)),
+			);
 	}
 }
