@@ -88,41 +88,13 @@ export class NotesExporter {
 		return markdownProcessor.stringify(mdTree);
 	}
 
-	// TODO: implement import for single note
-	// public async exportNote(noteId: string) {
-	// 	return this.exportSingleNote(noteId, this.createFileUploader());
-	// }
-
 	public async exportNotes(files: IFilesStorage) {
-		const { notesRegistry, filesRegistry } = this.context;
+		const { notesRegistry } = this.context;
 		const notes = await notesRegistry.get();
-
-		const fetchedFiles: Record<string, Promise<string | null>> = {};
 
 		await Promise.all(
 			notes.map(async (note) => {
-				const data = await this.exportSingleNote(note, {
-					files,
-					saveAttachment: async (id: string) => {
-						// Fetch file and upload
-						if (!(id in fetchedFiles)) {
-							fetchedFiles[id] = Promise.resolve().then(async () => {
-								const file = await filesRegistry.get(id);
-								if (!file) return null;
-
-								const fileName = `${id}-${file.name}`;
-								const path = joinPathSegments(['_resources', fileName]);
-
-								const buffer = await file.arrayBuffer();
-
-								await files.write(path, buffer);
-								return path;
-							});
-						}
-
-						return fetchedFiles[id];
-					},
-				});
+				const data = await this.exportSingleNote(note, this.createContext(files));
 
 				await files.write(
 					this.resolveNotePath(note.id),
@@ -130,6 +102,44 @@ export class NotesExporter {
 				);
 			}),
 		);
+	}
+
+	// TODO: implement recursive mode, to collect references
+	public async exportNote(noteId: string, files: IFilesStorage) {
+		const { notesRegistry } = this.context;
+
+		const note = await notesRegistry.getById(noteId);
+		if (!note) return;
+
+		const data = await this.exportSingleNote(note, this.createContext(files));
+		await files.write(this.resolveNotePath(note.id), new TextEncoder().encode(data));
+	}
+
+	private createContext(files: IFilesStorage) {
+		const { filesRegistry } = this.context;
+		const fetchedFiles: Record<string, Promise<string | null>> = {};
+		return {
+			files,
+			saveAttachment: async (id: string) => {
+				// Fetch file and upload
+				if (!(id in fetchedFiles)) {
+					fetchedFiles[id] = Promise.resolve().then(async () => {
+						const file = await filesRegistry.get(id);
+						if (!file) return null;
+
+						const fileName = `${id}-${file.name}`;
+						const path = joinPathSegments(['_resources', fileName]);
+
+						const buffer = await file.arrayBuffer();
+
+						await files.write(path, buffer);
+						return path;
+					});
+				}
+
+				return fetchedFiles[id];
+			},
+		};
 	}
 
 	private resolveNotePath(id: string) {

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Notes and files may be exported > Export notes > Files list 1`] = `
+exports[`Export all notes and attached files > Files list 1`] = `
 [
   "/[REDACTED-UUID].md",
   "/[REDACTED-UUID].md",
@@ -11,7 +11,7 @@ exports[`Notes and files may be exported > Export notes > Files list 1`] = `
 ]
 `;
 
-exports[`Notes and files may be exported > Export notes > Notes texts 1`] = `
+exports[`Export all notes and attached files > Notes texts 1`] = `
 [
   "---
 title: Note 1
@@ -60,6 +60,28 @@ Note with [attachment](./_resources/[REDACTED-UUID]-test.txt)
 title: Note 4
 created: 100004
 updated: 200004
+tags: []
+
+---
+
+Note with [attachment](./_resources/[REDACTED-UUID]-test.txt) and mention for [Note 1](./[REDACTED-UUID].md)
+",
+]
+`;
+
+exports[`Export single note and it attachments > Files list 1`] = `
+[
+  "/_resources/[REDACTED-UUID]-test.txt",
+  "/[REDACTED-UUID].md",
+]
+`;
+
+exports[`Export single note and it attachments > Notes texts 1`] = `
+[
+  "---
+title: Note 4
+created: 100000
+updated: 200000
 tags: []
 
 ---
