@@ -1,12 +1,12 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
-import { GLOBAL_COMMANDS } from '@core/features/commands';
-import { useCommandCallback } from '@core/features/commands/commandHooks';
-import { useRegisterCommandShortcuts } from '@core/features/commands/shortcuts/useRegisterCommandShortcuts';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useRegisterCommandShortcuts } from '@hooks/commands/shortcuts/useRegisterCommandShortcuts';
+import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
