@@ -112,36 +112,42 @@ describe('Notes and files may be exported', () => {
 			FAKE_WORKSPACE_NAME,
 		);
 
-		const saveFile = vi.fn();
-
 		const exporter = new NotesExporter({
-			saveFile,
 			filesRegistry,
 			notesRegistry,
 			tagsRegistry,
 		});
 
-		// TODO: Replace resource URLs like `Note with [attachment](res://[REDACTED-UUID])` to file paths
-		// TODO: save notes one by one
 		// Exported notes
+		const exportTarget = createFileManagerMock();
+		await expect(exporter.exportNotes(exportTarget)).resolves.not.toThrow();
+
+		const filesList = exportTarget.list();
 		await expect(
-			exporter.exportNotes().then((notes) =>
-				notes.map((note, index) => {
-					note.id = '[REDACTED UUID]';
-					note.data = note.data
+			filesList.then((paths) =>
+				paths.map((path) =>
+					path.replaceAll(/[a-z\d]+(-[a-z\d]+){4}/g, '[REDACTED-UUID]'),
+				),
+			),
+		).resolves.toMatchSnapshot('Files list');
+
+		const notesPaths = await filesList.then((paths) =>
+			paths.filter((path) => path.endsWith('.md')),
+		);
+
+		await expect(
+			Promise.all(
+				notesPaths.map(async (path, index) => {
+					const content = await exportTarget.get(path);
+					if (!content) throw new Error('File not found');
+
+					return new TextDecoder()
+						.decode(content)
 						.replace(/created: \d+/, `created: ${100_000 + index}`)
 						.replace(/updated: \d+/, `updated: ${200_000 + index}`)
 						.replaceAll(/[a-z\d]+(-[a-z\d]+){4}/g, '[REDACTED-UUID]');
-					return note;
 				}),
 			),
-		).resolves.toMatchSnapshot('Exported notes array');
-
-		// TODO: callback must be called only once per unique file (not to save twice the same file)
-		// Callback calls to save files
-		expect(saveFile.mock.calls).toEqual([
-			[expect.any(File), expect.any(String)],
-			[expect.any(File), expect.any(String)],
-		]);
+		).resolves.toMatchSnapshot('Notes texts');
 	});
 });

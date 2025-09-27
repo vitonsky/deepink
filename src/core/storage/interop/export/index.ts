@@ -5,55 +5,37 @@ import remarkParseFrontmatter from 'remark-parse-frontmatter';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { stringify as stringifyYaml } from 'yaml';
+import { IFilesStorage } from '@core/features/files';
 import { FilesController } from '@core/features/files/FilesController';
 import { getAppResourceDataInUrl } from '@core/features/links';
+import { INote } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { TagsController } from '@core/features/tags/controller/TagsController';
+import { getPathSegments, getRelativePath, joinPathSegments } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
-export type SaveFileCallback = (file: File, id: string) => Promise<string>;
-export type FileUploader = (id: string) => Promise<string | null>;
+type ExportContext = {
+	files: IFilesStorage;
+	/**
+	 * Saves an attachment by id and returns absolute path to a file
+	 */
+	saveAttachment: (id: string) => Promise<string | null>;
+};
 
 export class NotesExporter {
-	private readonly saveFile;
-	private readonly notesRegistry;
-	private readonly filesRegistry;
-	private readonly tagsRegistry;
+	constructor(
+		private readonly context: {
+			notesRegistry: INotesController;
+			filesRegistry: FilesController;
+			tagsRegistry: TagsController;
+		},
+	) {}
 
-	constructor({
-		saveFile,
-		notesRegistry,
-		filesRegistry,
-		tagsRegistry,
-	}: {
-		saveFile: SaveFileCallback;
-		notesRegistry: INotesController;
-		filesRegistry: FilesController;
-		tagsRegistry: TagsController;
-	}) {
-		this.saveFile = saveFile;
-		this.notesRegistry = notesRegistry;
-		this.filesRegistry = filesRegistry;
-		this.tagsRegistry = tagsRegistry;
-	}
+	private async exportSingleNote(note: INote, { saveAttachment }: ExportContext) {
+		const { tagsRegistry } = this.context;
 
-	private createFileUploader() {
-		const fetchedFiles: Record<string, string | null> = {};
-		return async (id: string) => {
-			// Fetch file and upload
-			if (!(id in fetchedFiles)) {
-				const file = await this.filesRegistry.get(id);
-				fetchedFiles[id] = file ? await this.saveFile(file, id) : null;
-			}
-
-			return fetchedFiles[id];
-		};
-	}
-
-	private async exportSingleNote(noteId: string, getUploadedFilePath: FileUploader) {
-		const note = await this.notesRegistry.getById(noteId);
-		if (!note) return;
+		const notePath = getPathSegments(this.resolveNotePath(note.id));
 
 		const markdownProcessor = unified()
 			.use(remarkParse)
@@ -63,13 +45,15 @@ export class NotesExporter {
 			.use(remarkStringify, { bullet: '-', listItemIndent: 'one' })
 			.freeze();
 
-		const mdTree = markdownProcessor.parse(note.content.text);
-
-		const tags = await this.tagsRegistry
+		const tags = await tagsRegistry
 			.getAttachedTags(note.id)
 			.then((tags) =>
 				tags.map((tag) => tag.resolvedName).sort((a, b) => (b > a ? -1 : 1)),
 			);
+
+		const mdTree = markdownProcessor.parse(note.content.text);
+
+		// TODO: insert frontmater optionally
 		mdTree.children.unshift({
 			type: 'yaml',
 			value: stringifyYaml({
@@ -86,10 +70,17 @@ export class NotesExporter {
 				const appResource = getAppResourceDataInUrl(nodeUrl);
 
 				if (!appResource) return nodeUrl;
-				if (appResource.type === 'note') return `./${appResource.id}.md`;
 
-				const filePath = await getUploadedFilePath(appResource.id);
-				return filePath ?? nodeUrl;
+				// Format note link
+				if (appResource.type === 'note')
+					return getRelativePath(
+						this.resolveNotePath(appResource.id),
+						notePath.dirname,
+					);
+
+				// Save attachment and format link
+				const filePath = await saveAttachment(appResource.id);
+				return filePath ? getRelativePath(filePath, notePath.dirname) : nodeUrl;
 			},
 			true,
 		);
@@ -97,21 +88,51 @@ export class NotesExporter {
 		return markdownProcessor.stringify(mdTree);
 	}
 
-	public async exportNote(noteId: string) {
-		return this.exportSingleNote(noteId, this.createFileUploader());
+	// TODO: implement import for single note
+	// public async exportNote(noteId: string) {
+	// 	return this.exportSingleNote(noteId, this.createFileUploader());
+	// }
+
+	public async exportNotes(files: IFilesStorage) {
+		const { notesRegistry, filesRegistry } = this.context;
+		const notes = await notesRegistry.get();
+
+		const fetchedFiles: Record<string, Promise<string | null>> = {};
+
+		await Promise.all(
+			notes.map(async (note) => {
+				const data = await this.exportSingleNote(note, {
+					files,
+					saveAttachment: async (id: string) => {
+						// Fetch file and upload
+						if (!(id in fetchedFiles)) {
+							fetchedFiles[id] = Promise.resolve().then(async () => {
+								const file = await filesRegistry.get(id);
+								if (!file) return null;
+
+								const fileName = `${id}-${file.name}`;
+								const path = joinPathSegments(['_resources', fileName]);
+
+								const buffer = await file.arrayBuffer();
+
+								await files.write(path, buffer);
+								return path;
+							});
+						}
+
+						return fetchedFiles[id];
+					},
+				});
+
+				await files.write(
+					this.resolveNotePath(note.id),
+					new TextEncoder().encode(data),
+				);
+			}),
+		);
 	}
 
-	public async exportNotes() {
-		const notes = await this.notesRegistry.get();
-		const uploader = this.createFileUploader();
-
-		return Promise.all(
-			notes.map(async (note) => {
-				const data = await this.exportSingleNote(note.id, uploader);
-				return { id: note.id, data };
-			}),
-		).then((notes) => notes.filter((note) => note.data !== undefined)) as Promise<
-			Array<{ id: string; data: string }>
-		>;
+	private resolveNotePath(id: string) {
+		return joinPathSegments([`${id}.md`]);
 	}
 }

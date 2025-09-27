@@ -1,9 +1,19 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Notes and files may be exported > Export notes > Exported notes array 1`] = `
+exports[`Notes and files may be exported > Export notes > Files list 1`] = `
 [
-  {
-    "data": "---
+  "/[REDACTED-UUID].md",
+  "/[REDACTED-UUID].md",
+  "/[REDACTED-UUID].md",
+  "/_resources/[REDACTED-UUID]-test.txt",
+  "/[REDACTED-UUID].md",
+  "/[REDACTED-UUID].md",
+]
+`;
+
+exports[`Notes and files may be exported > Export notes > Notes texts 1`] = `
+[
+  "---
 title: Note 1
 created: 100000
 updated: 200000
@@ -16,10 +26,7 @@ tags:
 
 Hello world!
 ",
-    "id": "[REDACTED UUID]",
-  },
-  {
-    "data": "---
+  "---
 title: Note 2
 created: 100001
 updated: 200001
@@ -29,46 +36,35 @@ tags: []
 
 Mention for [Note 1](./[REDACTED-UUID].md)
 ",
-    "id": "[REDACTED UUID]",
-  },
-  {
-    "data": "---
-title: Note 3
+  "---
+title: Note 5
 created: 100002
 updated: 200002
 tags: []
 
 ---
 
-Note with [attachment](res://[REDACTED-UUID])
+Note with [invalid attachment](res://[REDACTED-UUID]) and mention for [invalid note](./[REDACTED-UUID].md)
 ",
-    "id": "[REDACTED UUID]",
-  },
-  {
-    "data": "---
-title: Note 4
+  "---
+title: Note 3
 created: 100003
 updated: 200003
 tags: []
 
 ---
 
-Note with [attachment](res://[REDACTED-UUID]) and mention for [Note 1](./[REDACTED-UUID].md)
+Note with [attachment](./_resources/[REDACTED-UUID]-test.txt)
 ",
-    "id": "[REDACTED UUID]",
-  },
-  {
-    "data": "---
-title: Note 5
+  "---
+title: Note 4
 created: 100004
 updated: 200004
 tags: []
 
 ---
 
-Note with [invalid attachment](res://[REDACTED-UUID]) and mention for [invalid note](./[REDACTED-UUID].md)
+Note with [attachment](./_resources/[REDACTED-UUID]-test.txt) and mention for [Note 1](./[REDACTED-UUID].md)
 ",
-    "id": "[REDACTED UUID]",
-  },
 ]
 `;
