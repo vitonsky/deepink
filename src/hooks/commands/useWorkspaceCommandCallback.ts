@@ -1,6 +1,5 @@
-import { useContext, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
-import { WorkspaceContext } from '@features/App/Workspace';
 import { CommandPayloads } from '@hooks/commands/CommandEventProvider';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useAppSelector } from '@state/redux/hooks';
@@ -15,19 +14,19 @@ export function useWorkspaceCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
 	callback: (payload: CommandPayloads[K]) => void,
 ) {
-	const currentWorkspace = useContext(WorkspaceContext);
-	const { profileId } = useWorkspaceData();
+	const { profileId, workspaceId: contextWorkspaceId } = useWorkspaceData();
 	const activeWorkspace = useAppSelector(
 		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
 		isEqual,
 	);
 
+	// Updating `activeWorkspace` causes the parent components to re-render
+	// which triggers a callback update, leading to a new subscription
 	const unsubscribe = useCommandCallback(commandName, callback);
 
 	useEffect(() => {
-		if (!currentWorkspace) throw new Error('WorkspaceContext required but missing');
-		if (activeWorkspace?.id !== currentWorkspace.workspaceId) {
+		if (activeWorkspace?.id !== contextWorkspaceId) {
 			unsubscribe();
 		}
-	}, [activeWorkspace?.id, currentWorkspace, unsubscribe]);
+	}, [activeWorkspace?.id, contextWorkspaceId, unsubscribe]);
 }
