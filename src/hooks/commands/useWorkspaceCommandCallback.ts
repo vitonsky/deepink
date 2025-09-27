@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { useCommandBusContext } from '@hooks/commands/CommandEventProvider';
 import { useAppSelector } from '@state/redux/hooks';
@@ -23,13 +23,11 @@ export function useWorkspaceCommandCallback<K extends keyof CommandPayloads>(
 		isEqual,
 	);
 
-	const unsubscribe = useRef(() => {});
-
 	useEffect(() => {
+		let unsubscribe = () => {};
 		if (activeWorkspace?.id === contextWorkspaceId) {
-			unsubscribe.current = commandBus.handle(commandName, callback);
+			unsubscribe = commandBus.handle(commandName, callback);
 		}
-
-		return () => unsubscribe.current();
+		return unsubscribe;
 	}, [activeWorkspace?.id, contextWorkspaceId, commandBus, commandName, callback]);
 }
