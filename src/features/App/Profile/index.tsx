@@ -107,7 +107,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	useRegisterCommandShortcuts();
 
-	commandBus.handle(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
+	commandBus.listen(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
