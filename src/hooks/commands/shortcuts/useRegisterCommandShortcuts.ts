@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
 
-import { useCommand } from '../commandHooks';
+import { useCommand } from '../useCommand';
 import { shortcuts } from '.';
 
 /**

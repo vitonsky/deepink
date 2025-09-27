@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
-import { CommandEventProvider } from '@core/features/commands/CommandEventProvider';
+import { CommandEventProvider } from '@hooks/commands/CommandEventProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 

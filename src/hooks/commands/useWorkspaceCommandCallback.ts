@@ -1,8 +1,8 @@
 import { useContext, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
-import { CommandPayloads } from '@core/features/commands/CommandEventProvider';
-import { useCommandCallback } from '@core/features/commands/commandHooks';
 import { WorkspaceContext } from '@features/App/Workspace';
+import { CommandPayloads } from '@hooks/commands/CommandEventProvider';
+import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';

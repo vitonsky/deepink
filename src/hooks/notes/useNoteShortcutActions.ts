@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { GLOBAL_COMMANDS } from '@core/features/commands';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { useWorkspaceCommandCallback } from '@hooks/useWorkspaceCommandCallback';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
