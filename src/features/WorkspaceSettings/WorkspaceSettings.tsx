@@ -80,6 +80,10 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 		await notes.delete(notesList.map((note) => note.id));
 		await Promise.all(tagsList.map((note) => tags.delete(note.id)));
+
+		await files
+			.query()
+			.then((filesList) => files.delete(filesList.map((file) => file.id)));
 		await files.clearOrphaned();
 
 		dispatch(
