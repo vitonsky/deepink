@@ -8,7 +8,7 @@ export type CommandBus<CommandPayloads extends Record<string, unknown>> = {
 	/**
 	 * Fire command by its name and provide payload if needed
 	 */
-	call: <K extends keyof CommandPayloads>(
+	emit: <K extends keyof CommandPayloads>(
 		commandName: K,
 		...args: CommandPayloads[K] extends void
 			? [payload?: void]
@@ -18,7 +18,7 @@ export type CommandBus<CommandPayloads extends Record<string, unknown>> = {
 	/**
 	 * Add listener for a specific command
 	 */
-	handle: <K extends keyof CommandPayloads>(
+	listen: <K extends keyof CommandPayloads>(
 		commandName: K,
 		callback: (payload: CommandPayloads[K]) => void,
 	) => () => void;
@@ -35,10 +35,10 @@ export const CommandBusProvider: FC<PropsWithChildren> = ({ children }) => {
 		}>();
 
 		return {
-			call(commandName: string, payload?: any) {
+			emit(commandName: string, payload?: any) {
 				commandEvent({ name: commandName, payload });
 			},
-			handle(commandName, callback) {
+			listen(commandName, callback) {
 				return commandEvent.watch((event) => {
 					if (event.name !== commandName) return;
 
