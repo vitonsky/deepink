@@ -26,7 +26,7 @@ export function useWorkspaceCommandCallback<K extends keyof CommandPayloads>(
 	useEffect(() => {
 		let unsubscribe = () => {};
 		if (activeWorkspace?.id === contextWorkspaceId) {
-			unsubscribe = commandBus.handle(commandName, callback);
+			unsubscribe = commandBus.listen(commandName, callback);
 		}
 		return unsubscribe;
 	}, [activeWorkspace?.id, contextWorkspaceId, commandBus, commandName, callback]);

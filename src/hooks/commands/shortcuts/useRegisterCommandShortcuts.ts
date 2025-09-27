@@ -25,7 +25,7 @@ export const useRegisterCommandShortcuts = () => {
 				{
 					capture: true,
 				},
-				() => commandBus.call(commandName),
+				() => commandBus.emit(commandName),
 			);
 		});
 
