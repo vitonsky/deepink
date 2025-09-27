@@ -35,7 +35,6 @@ type Config = {
 	noteFilename?: (note: NoteData) => string;
 };
 
-// TODO: add hooks to track progress
 export class NotesExporter {
 	private readonly config: Config;
 	constructor(
@@ -106,10 +105,18 @@ export class NotesExporter {
 		return markdownProcessor.stringify(mdTree);
 	}
 
-	public async exportNotes(files: IFilesStorage) {
+	public async exportNotes(
+		files: IFilesStorage,
+		{
+			onProcessed,
+		}: {
+			onProcessed?: (info: { total: number; processed: number }) => void;
+		} = {},
+	) {
 		const { notesRegistry } = this.context;
 		const notes = await notesRegistry.get();
 
+		let progress = 0;
 		await Promise.all(
 			notes.map(async (note) => {
 				const tags = await this.getNoteTags(note.id);
@@ -124,6 +131,15 @@ export class NotesExporter {
 					this.resolveNotePath(noteData),
 					new TextEncoder().encode(noteDump),
 				);
+
+				// Notify progress
+				++progress;
+				if (onProcessed) {
+					onProcessed({
+						total: notes.length,
+						processed: progress,
+					});
+				}
 			}),
 		);
 	}

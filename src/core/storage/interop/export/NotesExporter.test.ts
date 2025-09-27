@@ -109,6 +109,7 @@ test('Export all notes and attached files', async () => {
 		FAKE_WORKSPACE_NAME,
 	);
 
+	const onProcessed = vi.fn();
 	const exporter = new NotesExporter({
 		filesRegistry,
 		notesRegistry,
@@ -117,7 +118,11 @@ test('Export all notes and attached files', async () => {
 
 	// Exported notes
 	const exportTarget = createFileManagerMock();
-	await expect(exporter.exportNotes(exportTarget)).resolves.not.toThrow();
+	await expect(
+		exporter.exportNotes(exportTarget, { onProcessed }),
+	).resolves.not.toThrow();
+
+	expect(onProcessed.mock.calls).toMatchSnapshot('onProcessed hook calls');
 
 	const filesList = exportTarget.list();
 	await expect(

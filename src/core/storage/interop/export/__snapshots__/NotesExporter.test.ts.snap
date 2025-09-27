@@ -69,6 +69,41 @@ Note with [attachment](./_resources/[REDACTED-UUID]-test.txt) and mention for [N
 ]
 `;
 
+exports[`Export all notes and attached files > onProcessed hook calls 1`] = `
+[
+  [
+    {
+      "processed": 1,
+      "total": 5,
+    },
+  ],
+  [
+    {
+      "processed": 2,
+      "total": 5,
+    },
+  ],
+  [
+    {
+      "processed": 3,
+      "total": 5,
+    },
+  ],
+  [
+    {
+      "processed": 4,
+      "total": 5,
+    },
+  ],
+  [
+    {
+      "processed": 5,
+      "total": 5,
+    },
+  ],
+]
+`;
+
 exports[`Export all notes and attached files with custom file names > Files list 1`] = `
 [
   "/notes/bar/[REDACTED-UUID]-Note 1.md",
