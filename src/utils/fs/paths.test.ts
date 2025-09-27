@@ -1,4 +1,11 @@
-import { getRelativePath, getResolvedPath } from './paths';
+import { getRelativePath, getResolvedPath, joinPathSegments } from './paths';
+
+test('joinPathSegments', () => {
+	expect(joinPathSegments([])).toBe('/');
+	expect(joinPathSegments(['foo', 'bar'])).toBe('/foo/bar');
+	expect(joinPathSegments(['/foo', '//bar'])).toBe('/foo/bar');
+	expect(joinPathSegments(['/foo', './bar'])).toBe('/foo/./bar');
+});
 
 describe('getResolvedPath', () => {
 	test('resolves .. up levels from file base', () => {

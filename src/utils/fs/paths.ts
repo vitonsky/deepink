@@ -4,7 +4,10 @@
 export const normalizeSegments = (parts: string[]) => parts.filter(Boolean);
 
 export const joinPathSegments = (segments: string[]) =>
-	'/' + normalizeSegments(segments).join('/');
+	'/' +
+	normalizeSegments(
+		segments.map((segment) => normalizeSegments(segment.split('/')).join('/')),
+	).join('/');
 
 export const getPathSegments = (path: string) => {
 	const segments = normalizeSegments(path.split('/'));
