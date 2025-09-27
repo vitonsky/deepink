@@ -6,7 +6,7 @@ import { CommandPayloads } from '.';
 
 export type CommandBus<CommandPayloads extends Record<string, unknown>> = {
 	/**
-	 * Fire command event by its name and provide payload if needed
+	 * Fire command by its name and provide payload if needed
 	 */
 	call: <K extends keyof CommandPayloads>(
 		commandName: K,
@@ -16,7 +16,7 @@ export type CommandBus<CommandPayloads extends Record<string, unknown>> = {
 	) => void;
 
 	/**
-	 * Add listener for a specific command event
+	 * Add listener for a specific command
 	 */
 	handle: <K extends keyof CommandPayloads>(
 		commandName: K,
