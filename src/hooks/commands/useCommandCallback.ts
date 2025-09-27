@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 
 import {
 	CommandEvent,
@@ -6,32 +6,7 @@ import {
 	CommandPayloads,
 } from './CommandEventProvider';
 
-/**
- * Returns a function that calls a command by its name
- */
-export function useCommand() {
-	const commandEvent = useContext(CommandEventContext);
-
-	return <K extends keyof CommandPayloads>(
-		commandName: K,
-		...args: CommandPayloads[K] extends void
-			? [payload?: void]
-			: [payload: CommandPayloads[K]]
-	) => {
-		const [payload] = args;
-		const data =
-			payload === undefined
-				? { name: commandName }
-				: {
-						name: commandName,
-						payload,
-				  };
-
-		commandEvent(data);
-	};
-}
-
-function hasCommandPayload<K extends keyof CommandPayloads>(
+export function hasCommandPayload<K extends keyof CommandPayloads>(
 	command: CommandEvent<K>,
 ): command is { name: K; payload: CommandPayloads[K] } {
 	return 'payload' in command;
@@ -42,6 +17,7 @@ function hasCommandPayload<K extends keyof CommandPayloads>(
  *
  *  Return function for unsubscribe.
  */
+
 export function useCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
 	callback: (payload?: CommandPayloads[K]) => void,
@@ -58,5 +34,5 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 		return unsubscribe.current;
 	}, [callback, commandEvent, commandName]);
 
-	return () => unsubscribe.current();
+	return useCallback(() => unsubscribe.current(), []);
 }
