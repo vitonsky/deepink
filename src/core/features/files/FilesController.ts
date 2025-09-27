@@ -60,7 +60,7 @@ export class FilesController {
 		// TODO: encrypt file
 		// Write file
 		const buffer = await file.arrayBuffer();
-		this.fileController.write(fileId, buffer);
+		this.fileController.write(this.getFilePath(fileId), buffer);
 
 		return fileId;
 	}
@@ -77,7 +77,7 @@ export class FilesController {
 
 		const { name, mimetype } = fileEntry;
 
-		const buffer = await this.fileController.get(id);
+		const buffer = await this.fileController.get(this.getFilePath(id));
 		if (!buffer) return null;
 
 		// TODO: decrypt file
@@ -94,7 +94,9 @@ export class FilesController {
 		).run(this.workspace, ...filesId);
 
 		// Delete files
-		await this.fileController.delete(filesId);
+		await this.fileController.delete(
+			filesId.map((filename) => this.getFilePath(filename)),
+		);
 	}
 
 	public async query() {
@@ -117,23 +119,32 @@ export class FilesController {
 	public async clearOrphaned() {
 		const db = this.db.get();
 
-		const files = db
-			.prepare('SELECT id FROM files WHERE workspace_id=?')
-			.all(this.workspace) as Array<{ id: string }>;
+		const files = new Set(
+			(
+				db
+					.prepare('SELECT id FROM files WHERE workspace_id=?')
+					.all(this.workspace) as Array<{ id: string }>
+			).map((file) => file.id),
+		);
 
 		// Remove orphaned files in FS
 		const filesInStorage = await this.fileController.list();
 		const orphanedFilesInFs = filesInStorage.filter((id) => {
-			const isFoundInDb = files.some((file) => file.id === id);
-			return !isFoundInDb;
+			// Skip files out of workspace directory and workspace directory itself
+			if (!id.startsWith(this.workspace) || id === this.workspace) return false;
+			return !files.has(id);
 		});
 		await this.fileController.delete(orphanedFilesInFs);
 
 		// Remove files from DB
 		const orphanedFilesInDatabase = await this.attachments.findOrphanedResources(
-			files.map(({ id }) => id),
+			Array.from(files),
 		);
 		await this.attachments.delete(orphanedFilesInDatabase);
 		await this.delete(orphanedFilesInDatabase);
+	}
+
+	private getFilePath(filename: string) {
+		return [this.workspace, filename].join('/');
 	}
 }

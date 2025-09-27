@@ -15,6 +15,7 @@ export const enableStorage = () =>
 			await mkdir(filesDir, { recursive: true });
 
 			const filePath = joinPath(filesDir, id);
+			await mkdir(path.dirname(filePath), { recursive: true });
 			await writeFileAtomic(filePath, Buffer.from(buffer));
 		},
 
@@ -38,7 +39,7 @@ export const enableStorage = () =>
 					continue;
 				}
 
-				await rm(filePath);
+				await rm(filePath, { force: true });
 				console.debug('Removed file', filePath);
 			}
 		},
