@@ -1,4 +1,7 @@
 import { v4 as uuid4 } from 'uuid';
+import { z } from 'zod';
+import { qb } from '@utils/db/query-builder';
+import { wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -92,6 +95,23 @@ export class FilesController {
 
 		// Delete files
 		await this.fileController.delete(filesId);
+	}
+
+	public async query() {
+		const db = wrapDB(this.db.get());
+
+		return z
+			.object({
+				id: z.string(),
+				name: z.string(),
+				mimetype: z.string(),
+			})
+			.array()
+			.parse(
+				db.all(
+					qb.sql`SELECT id, name, mimetype FROM files WHERE workspace_id=${this.workspace}`,
+				),
+			);
 	}
 
 	public async clearOrphaned() {
