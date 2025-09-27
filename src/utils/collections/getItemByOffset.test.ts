@@ -63,10 +63,10 @@ describe('Circular navigation with large offset', () => {
 	test('Give the third item with offset -71 to get the last item of 10', () => {
 		expect(getItemByOffset(collection, 2, -73)).toBe(collection[9]);
 	});
-	test('Give the third item with offset 1000 to get the sixth item of 10', () => {
+	test('Give the third item with offset 1004 to get the sixth item of 10', () => {
 		expect(getItemByOffset(collection, 2, 1004)).toBe(collection[6]);
 	});
-	test('Give the third item with offset -1000 to get the second item of 10', () => {
+	test('Give the third item with offset -1004 to get the second item of 10', () => {
 		expect(getItemByOffset(collection, 2, -1004)).toBe(collection[8]);
 	});
 });
