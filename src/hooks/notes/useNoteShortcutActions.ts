@@ -22,46 +22,38 @@ export const useNoteShortcutActions = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
+	const closeCurrentNote = useCallback(() => {
+		if (!activeNoteId) return;
+		noteActions.close(activeNoteId);
+	}, [activeNoteId, noteActions]);
+
+	const restoreClosedNote = useCallback(() => {
+		const lastClosedNote = recentlyClosedNotes[recentlyClosedNotes.length - 1];
+		if (!lastClosedNote) return;
+		noteActions.click(lastClosedNote);
+	}, [noteActions, recentlyClosedNotes]);
+
+	const focusPreviousNote = useCallback(() => {
+		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+		if (noteIndex === -1) return;
+		const previousNote = getItemByOffset(openedNotes, noteIndex, 1);
+		if (!previousNote) return;
+
+		noteActions.click(previousNote.id);
+	}, [activeNoteId, noteActions, openedNotes]);
+
+	const focusNextNote = useCallback(() => {
+		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+		if (noteIndex === -1) return;
+		const nextNote = getItemByOffset(openedNotes, noteIndex, -1);
+		if (!nextNote) return;
+
+		noteActions.click(nextNote.id);
+	}, [activeNoteId, noteActions, openedNotes]);
+
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE,
-		useCallback(() => {
-			if (!activeNoteId) return;
-			noteActions.close(activeNoteId);
-		}, [activeNoteId, noteActions]),
-	);
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE,
-		useCallback(() => {
-			const lastClosedNote = recentlyClosedNotes[recentlyClosedNotes.length - 1];
-			if (!lastClosedNote) return;
-			noteActions.click(lastClosedNote);
-		}, [noteActions, recentlyClosedNotes]),
-	);
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
-		useCallback(() => {
-			const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
-			if (noteIndex === -1) return;
-			const previousNote = getItemByOffset(openedNotes, noteIndex, 1);
-			if (!previousNote) return;
-
-			noteActions.click(previousNote.id);
-		}, [activeNoteId, noteActions, openedNotes]),
-	);
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
-		useCallback(() => {
-			const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
-			if (noteIndex === -1) return;
-			const nextNote = getItemByOffset(openedNotes, noteIndex, -1);
-			if (!nextNote) return;
-
-			noteActions.click(nextNote.id);
-		}, [activeNoteId, noteActions, openedNotes]),
-	);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, restoreClosedNote);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE, closeCurrentNote);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE, focusPreviousNote);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE, focusNextNote);
 };
