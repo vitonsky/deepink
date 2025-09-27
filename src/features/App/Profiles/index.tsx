@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { CommandEventProvider } from '@hooks/commands/CommandEventProvider';
+import { CommandBusProvider } from '@hooks/commands/CommandEventProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
@@ -39,9 +39,9 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 						value={controls}
 						key={profile.profile.id}
 					>
-						<CommandEventProvider>
+						<CommandBusProvider>
 							<Profile profile={profile} controls={controls} />
-						</CommandEventProvider>
+						</CommandBusProvider>
 					</ProfileControlsContext.Provider>
 				);
 			})}
