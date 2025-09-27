@@ -18,6 +18,30 @@ import { getPathSegments, getResolvedPath } from '@utils/fs/paths';
 
 import { replaceUrls } from '../utils/mdast';
 
+type OnProcessedPayload = {
+	stage: 'parsing' | 'uploading' | 'updating';
+	total: number;
+	processed: number;
+};
+
+type OnProcessedHook = (info: OnProcessedPayload) => void;
+const createNotifier = ({
+	stage,
+	total,
+	callback,
+}: {
+	stage: OnProcessedPayload['stage'];
+	total: number;
+	callback?: OnProcessedHook;
+}) => {
+	let counter = 0;
+
+	return () => {
+		counter++;
+		if (callback) callback({ stage, total, processed: counter });
+	};
+};
+
 const RawNoteMetaScheme = z
 	.object({
 		title: z.string().trim().min(1).optional().catch(undefined),
@@ -58,7 +82,18 @@ export class NotesImporter {
 		};
 	}
 
-	public async import(files: IFilesStorage) {
+	public async import(
+		files: IFilesStorage,
+		{
+			onProcessed,
+		}: {
+			onProcessed?: (info: {
+				stage: 'parsing' | 'uploading' | 'updating';
+				total: number;
+				processed: number;
+			}) => void;
+		} = {},
+	) {
 		const { notesRegistry, noteVersions, tagsRegistry, attachmentsRegistry } =
 			this.storage;
 
@@ -77,12 +112,23 @@ export class NotesImporter {
 		// Process files and add note drafts
 		// On this stage we collect used resources and add semi-raw note texts to DB
 		const filePathsList = await files.list();
+		const notifyParsingProgress = createNotifier({
+			stage: 'parsing',
+			total: filePathsList.length,
+			callback: onProcessed,
+		});
 		for (const filename of filePathsList) {
 			// Handle only notes
-			if (!this.isNotePath(filename)) continue;
+			if (!this.isNotePath(filename)) {
+				notifyParsingProgress();
+				continue;
+			}
 
 			const fileContent = await files.get(filename);
-			if (!fileContent) continue;
+			if (!fileContent) {
+				notifyParsingProgress();
+				continue;
+			}
 
 			const rawText = textDecoder.decode(fileContent);
 			const mdTree = markdownProcessor.parse(rawText);
@@ -150,11 +196,18 @@ export class NotesImporter {
 				id: noteId,
 				path: fileAbsolutePathSegments.dirname,
 			};
+
+			notifyParsingProgress();
 		}
 
 		// TODO: limit concurrency for case with many large files
 		// Upload attached files concurrently
 		const filePathToIdMap: Record<string, string> = {};
+		const notifyUploadingProgress = createNotifier({
+			stage: 'uploading',
+			total: attachmentPathsToUpload.size,
+			callback: onProcessed,
+		});
 		await Promise.all(
 			// Remove duplicates
 			Array.from(attachmentPathsToUpload).map(async (absoluteUrl) => {
@@ -162,11 +215,19 @@ export class NotesImporter {
 				if (fileId) {
 					filePathToIdMap[absoluteUrl] = fileId;
 				}
+
+				notifyUploadingProgress();
 			}),
 		);
 
 		// Update note drafts to complete import
-		for (const { id: noteId, path: noteDirPath } of Object.values(createdNotes)) {
+		const notesToUpdate = Object.values(createdNotes);
+		const notifyUpdatingProgress = createNotifier({
+			stage: 'updating',
+			total: notesToUpdate.length,
+			callback: onProcessed,
+		});
+		for (const { id: noteId, path: noteDirPath } of notesToUpdate) {
 			const note = await notesRegistry.getById(noteId);
 			if (!note) throw new Error('Note with such id does not exist');
 
@@ -222,6 +283,8 @@ export class NotesImporter {
 			}
 
 			await noteVersions.snapshot(noteId);
+
+			notifyUpdatingProgress();
 		}
 
 		await notesRegistry.updateMeta(

@@ -87,49 +87,57 @@ describe('Base notes import cases', () => {
 			},
 		);
 
-		await importer.import(
-			createFileManagerMock({
-				// Resources is a special directory with attachments
-				'/_resources/secret.txt': createTextBuffer('SECRET'),
-				// This files must not be imported,
-				// since it is unused resources
-				'/_resources/unused1': createTextBuffer('UNUSED FILE'),
-				'/_resources/unused2.txt': createTextBuffer('UNUSED FILE'),
-				'/_resources/unused3.md': createTextBuffer('UNUSED FILE'),
+		const onProcessed = vi.fn();
+		await expect(
+			importer.import(
+				createFileManagerMock({
+					// Resources is a special directory with attachments
+					'/_resources/secret.txt': createTextBuffer('SECRET'),
+					// This files must not be imported,
+					// since it is unused resources
+					'/_resources/unused1': createTextBuffer('UNUSED FILE'),
+					'/_resources/unused2.txt': createTextBuffer('UNUSED FILE'),
+					'/_resources/unused3.md': createTextBuffer('UNUSED FILE'),
 
-				// Notes list
-				'/note-1.md': createTextBuffer('Hello world!'),
-				'/note-2.mdx': createTextBuffer(
-					'---\ntitle: Title from meta\ntags:\n - foo\n - bar\n - baz\n---\nHello world!',
-				),
-				'/note-3.mdx': createTextBuffer('Mention for [note #1](./note-1.md)'),
-				'/note-4.md': createTextBuffer(
-					'Text with [attachment](./_resources/secret.txt)',
-				),
-				'/note-5.md': createTextBuffer(
-					'Another text with [attachment](./_resources/secret.txt)',
-				),
-				// Notes in subdirectories
-				'/note-6.md': createTextBuffer(
-					'Mention for non exist notes [one](./non-exist-note-1.md), [two](<./non exist note 2.md>), [three](./non/exist/note.md), [four](../../non-exist-note.md). And non exists attachments [one](./non-exist-file-1.jpeg), [two](<./non exist file 2.jpeg>), [three](./non/exist/file.jpeg), [four](../non-exist-file.jpeg)',
-				),
-				'/note-7.md': createTextBuffer(
-					'Mention for [note #1](/note-1.md) via absolute path',
-				),
-				// Notes in subdirectories
-				'/section-1/note #1.md': createTextBuffer('Hello world!'),
-				'/section-1/note #2.md': createTextBuffer(
-					'Mention for [note #1](<./note #1.md>)',
-				),
+					// Notes list
+					'/note-1.md': createTextBuffer('Hello world!'),
+					'/note-2.mdx': createTextBuffer(
+						'---\ntitle: Title from meta\ntags:\n - foo\n - bar\n - baz\n---\nHello world!',
+					),
+					'/note-3.mdx': createTextBuffer('Mention for [note #1](./note-1.md)'),
+					'/note-4.md': createTextBuffer(
+						'Text with [attachment](./_resources/secret.txt)',
+					),
+					'/note-5.md': createTextBuffer(
+						'Another text with [attachment](./_resources/secret.txt)',
+					),
+					// Notes in subdirectories
+					'/note-6.md': createTextBuffer(
+						'Mention for non exist notes [one](./non-exist-note-1.md), [two](<./non exist note 2.md>), [three](./non/exist/note.md), [four](../../non-exist-note.md). And non exists attachments [one](./non-exist-file-1.jpeg), [two](<./non exist file 2.jpeg>), [three](./non/exist/file.jpeg), [four](../non-exist-file.jpeg)',
+					),
+					'/note-7.md': createTextBuffer(
+						'Mention for [note #1](/note-1.md) via absolute path',
+					),
+					// Notes in subdirectories
+					'/section-1/note #1.md': createTextBuffer('Hello world!'),
+					'/section-1/note #2.md': createTextBuffer(
+						'Mention for [note #1](<./note #1.md>)',
+					),
 
-				// Subdirectories with resources
-				'/posts/about/image.png': createTextBuffer('IMAGE CONTENT HERE'),
-				'/posts/about/unused.png': createTextBuffer('UNUSED IMAGE CONTENT HERE'),
-				'/posts/about/index.md': createTextBuffer(
-					'---\ntitle: Blog post\ntags:\n - foo\n - bar\n---\nPost with image\n\n![attached image](./image.png)\nThis post and all its resources is placed in subdirectory.',
-				),
-			}),
-		);
+					// Subdirectories with resources
+					'/posts/about/image.png': createTextBuffer('IMAGE CONTENT HERE'),
+					'/posts/about/unused.png': createTextBuffer(
+						'UNUSED IMAGE CONTENT HERE',
+					),
+					'/posts/about/index.md': createTextBuffer(
+						'---\ntitle: Blog post\ntags:\n - foo\n - bar\n---\nPost with image\n\n![attached image](./image.png)\nThis post and all its resources is placed in subdirectory.',
+					),
+				}),
+				{ onProcessed },
+			),
+		).resolves.not.toThrow();
+
+		expect(onProcessed.mock.calls).toMatchSnapshot('onProcessed hook calls');
 	});
 
 	test('Imported notes is in list', async () => {

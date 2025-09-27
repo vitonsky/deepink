@@ -1,0 +1,202 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Base notes import cases > Import notes > onProcessed hook calls 1`] = `
+[
+  [
+    {
+      "processed": 1,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 2,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 3,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 4,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 5,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 6,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 7,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 8,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 9,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 10,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 11,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 12,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 13,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 14,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 15,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 16,
+      "stage": "parsing",
+      "total": 16,
+    },
+  ],
+  [
+    {
+      "processed": 1,
+      "stage": "uploading",
+      "total": 2,
+    },
+  ],
+  [
+    {
+      "processed": 2,
+      "stage": "uploading",
+      "total": 2,
+    },
+  ],
+  [
+    {
+      "processed": 1,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 2,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 3,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 4,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 5,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 6,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 7,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 8,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 9,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+  [
+    {
+      "processed": 10,
+      "stage": "updating",
+      "total": 10,
+    },
+  ],
+]
+`;
