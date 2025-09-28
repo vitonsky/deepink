@@ -12,6 +12,13 @@ export class FilesIntegrityController {
 		},
 	) {}
 
+	public async fixAll() {
+		await this.deleteOrphanedFilesInFs();
+		await this.fixFiles();
+		await this.fixAttachments();
+		await this.deleteUnattachedFiles();
+	}
+
 	public async deleteOrphanedFilesInFs() {
 		const filePathsInDB = await this.controllers.files
 			.query()

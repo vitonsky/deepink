@@ -28,12 +28,6 @@ test('Clear orphaned files', async () => {
 		files,
 		attachments,
 	});
-	const cleanOrphanedFiles = async () => {
-		await integrityController.deleteOrphanedFilesInFs();
-		await integrityController.fixFiles();
-		await integrityController.fixAttachments();
-		await integrityController.deleteUnattachedFiles();
-	};
 
 	// Upload file and attach
 	const fileToAttach = createTextFile('Attached file');
@@ -67,7 +61,7 @@ test('Clear orphaned files', async () => {
 	});
 
 	// Clear files and check again
-	await cleanOrphanedFiles();
+	await integrityController.fixAll();
 
 	await files.get(attachedFileId).then((file) => {
 		expect(file).not.toBeNull();
@@ -79,14 +73,14 @@ test('Clear orphaned files', async () => {
 	// File is not orphaned when any resource use it
 	await attachments.set('some-note-id', []);
 	await attachments.set('some-note-id2', [attachedFileId]);
-	await cleanOrphanedFiles();
+	await integrityController.fixAll();
 	await files.get(attachedFileId).then((file) => {
 		expect(file).not.toBeNull();
 	});
 
 	// File orphaned when nothing to refer on file
 	await attachments.set('some-note-id2', []);
-	await cleanOrphanedFiles();
+	await integrityController.fixAll();
 	await files.get(attachedFileId).then((file) => {
 		expect(file).toBeNull();
 	});
