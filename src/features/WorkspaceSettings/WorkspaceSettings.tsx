@@ -6,6 +6,7 @@ import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
+import { ZipFS } from '@core/features/files/ZipFS';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { importNotes, selectDirectory } from '@electron/requests/files/renderer';
@@ -36,6 +37,15 @@ import { getPathSegments, joinPathSegments } from '@utils/fs/paths';
 import { mkdir, writeFile } from 'fs/promises';
 import { useNotesExport } from './useNotesExport';
 import { useNotesImport } from './useNotesImport';
+
+export const saveFile = async (fullPath: string, fileBuffer: ArrayBuffer) => {
+	console.log('Write file to', fullPath);
+
+	// TODO: remove node usages in frontend code
+	await mkdir(getPathSegments(fullPath).dirname, { recursive: true });
+
+	await writeFile(fullPath, Buffer.from(fileBuffer));
+};
 
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;
@@ -190,6 +200,9 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 								<Button
 									isDisabled={notesExport.progress !== null}
 									onClick={async () => {
+										// TODO: customize this option via UI
+										const saveAsZip = true;
+
 										const directories = await selectDirectory();
 										if (!directories || directories.length !== 1) {
 											console.log('Must be selected one directory');
@@ -198,32 +211,34 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 										const directory = directories[0];
 
-										const exportTarget = createFileManagerMock();
-										await notesExport.exportNotes(exportTarget);
+										// Export
+										const exportFs = new ZipFS();
+										await notesExport.exportNotes(exportFs);
 
-										for (const filePath of await exportTarget.list()) {
-											const fileBuffer = await exportTarget.get(
-												filePath,
+										// Save
+										if (saveAsZip) {
+											const zipBuffer = await exportFs.dump();
+											await saveFile(
+												joinPathSegments([
+													directory,
+													`backup-${Date.now()}.zip`,
+												]),
+												zipBuffer,
 											);
-											if (!fileBuffer) continue;
+										} else {
+											for (const filePath of await exportFs.list()) {
+												const fileBuffer = await exportFs.get(
+													filePath,
+												);
+												if (!fileBuffer) continue;
 
-											const fullPath = joinPathSegments([
-												directory,
-												filePath,
-											]);
+												const fullPath = joinPathSegments([
+													directory,
+													filePath,
+												]);
 
-											console.log('Write file to', fullPath);
-
-											// TODO: remove node usages in frontend code
-											await mkdir(
-												getPathSegments(fullPath).dirname,
-												{ recursive: true },
-											);
-
-											await writeFile(
-												fullPath,
-												Buffer.from(fileBuffer),
-											);
+												await saveFile(fullPath, fileBuffer);
+											}
 										}
 									}}
 								>

@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
-import { debounce } from 'lodash';
 import { IFilesStorage } from '@core/features/files';
-import { NotesExporter } from '@core/storage/interop/export';
+import { ExportProgress, NotesExporter } from '@core/storage/interop/export';
 import {
 	useFilesRegistry,
 	useNotesRegistry,
@@ -26,8 +25,7 @@ export const useNotesExport = () => {
 				processed: 0,
 			});
 
-			const debouncedProgressUpdate = debounce(setProgress, 50);
-			await new NotesExporter(
+			const exporter = new NotesExporter(
 				{
 					filesRegistry,
 					notesRegistry,
@@ -45,14 +43,15 @@ export const useNotesExport = () => {
 							.join('/');
 					},
 				},
-			).exportNotes(exportTarget, {
-				onProcessed(info) {
-					console.log(info);
-					debouncedProgressUpdate(info);
+			);
+
+			await exporter.exportNotes(exportTarget, {
+				onProcessed: (info: ExportProgress) => {
+					setProgress(info);
 				},
 			});
 
-			debouncedProgressUpdate(null);
+			setProgress(null);
 		},
 		[filesRegistry, notesRegistry, tagsRegistry],
 	);

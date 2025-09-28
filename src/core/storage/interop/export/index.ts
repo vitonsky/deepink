@@ -17,6 +17,8 @@ import { replaceUrls } from '../utils/mdast';
 
 type NoteData = INote & { tags: string[] };
 
+export type ExportProgress = { total: number; processed: number };
+
 type ExportContext = {
 	files: IFilesStorage;
 	/**
@@ -111,7 +113,7 @@ export class NotesExporter {
 		{
 			onProcessed,
 		}: {
-			onProcessed?: (info: { total: number; processed: number }) => void;
+			onProcessed?: (info: ExportProgress) => void;
 		} = {},
 	) {
 		const { notesRegistry } = this.context;
