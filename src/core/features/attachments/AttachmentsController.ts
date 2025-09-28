@@ -1,4 +1,7 @@
 import { v4 as uuid4 } from 'uuid';
+import { z } from 'zod';
+import { qb } from '@utils/db/query-builder';
+import { wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -62,6 +65,23 @@ export class AttachmentsController {
 		db.prepare(
 			`DELETE FROM attachments WHERE workspace_id=? AND file IN (${placeholders})`,
 		).run(this.workspace, ...resources);
+	}
+
+	public async query() {
+		const db = wrapDB(this.db.get());
+
+		return z
+			.object({
+				id: z.string(),
+				file: z.string(),
+				note: z.string(),
+			})
+			.array()
+			.parse(
+				db.all(
+					qb.sql`SELECT id, file, note FROM attachments WHERE workspace_id=${this.workspace}`,
+				),
+			);
 	}
 
 	/**

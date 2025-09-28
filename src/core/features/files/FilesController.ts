@@ -84,6 +84,7 @@ export class FilesController {
 		return new File([buffer], name, { type: mimetype });
 	}
 
+	// TODO: remove attached files
 	public async delete(filesId: string[]) {
 		const db = this.db.get();
 
