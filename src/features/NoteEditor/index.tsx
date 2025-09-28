@@ -372,6 +372,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 			{versionPreview ? (
 				<NoteEditor text={versionPreview.text} setText={() => {}} isReadOnly />
+			) : isReadOnly ? (
+				<NoteEditor text={text} setText={() => {}} isReadOnly />
 			) : (
 				<NoteEditor text={text} setText={setText} />
 			)}
@@ -388,6 +390,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							content() {
 								return (
 									<NoteVersions
+										isReadOnly={isReadOnly}
 										noteId={note.id}
 										recordControl={{
 											isDisabled: Boolean(note.isSnapshotsDisabled),
