@@ -49,16 +49,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 		};
 	}, [dispatch, workspaceData]);
 
-	// Run optional services for active profile
-	useEffect(() => {
-		if (!workspace) return;
-
-		const { filesRegistry } = workspace;
-
-		// TODO: schedule when to run method
-		filesRegistry.clearOrphaned();
-	}, [workspace]);
-
 	// TODO: replace to hook
 	// Load tags
 	useEffect(() => {
