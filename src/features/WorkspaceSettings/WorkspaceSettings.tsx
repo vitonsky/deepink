@@ -8,7 +8,7 @@ import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { importNotes } from '@electron/requests/files/renderer';
+import { importNotes, selectDirectory } from '@electron/requests/files/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import {
 	useAttachmentsController,
@@ -31,7 +31,10 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { getPathSegments, joinPathSegments } from '@utils/fs/paths';
 
+import { mkdir, writeFile } from 'fs/promises';
+import { useNotesExport } from './useNotesExport';
 import { useNotesImport } from './useNotesImport';
 
 export interface WorkspaceSettingsProps {
@@ -44,6 +47,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	} = useProfileControls();
 
 	const notesImport = useNotesImport();
+	const notesExport = useNotesExport();
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
 
@@ -183,7 +187,48 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 								>
 									Import notes
 								</Button>
-								<Button>Export notes</Button>
+								<Button
+									isDisabled={notesExport.progress !== null}
+									onClick={async () => {
+										const directories = await selectDirectory();
+										if (!directories || directories.length !== 1) {
+											console.log('Must be selected one directory');
+											return;
+										}
+
+										const directory = directories[0];
+
+										const exportTarget = createFileManagerMock();
+										await notesExport.exportNotes(exportTarget);
+
+										for (const filePath of await exportTarget.list()) {
+											const fileBuffer = await exportTarget.get(
+												filePath,
+											);
+											if (!fileBuffer) continue;
+
+											const fullPath = joinPathSegments([
+												directory,
+												filePath,
+											]);
+
+											console.log('Write file to', fullPath);
+
+											// TODO: remove node usages in frontend code
+											await mkdir(
+												getPathSegments(fullPath).dirname,
+												{ recursive: true },
+											);
+
+											await writeFile(
+												fullPath,
+												Buffer.from(fileBuffer),
+											);
+										}
+									}}
+								>
+									Export notes
+								</Button>
 							</HStack>
 							{notesImport.progress && (
 								<Text>
