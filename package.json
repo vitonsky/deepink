@@ -99,6 +99,7 @@
 		"effector": "^23.2.0",
 		"effector-react": "^23.2.0",
 		"fast-glob": "^3.3.1",
+		"fflate": "^0.8.2",
 		"file-saver": "^2.0.5",
 		"framer-motion": "^11.9.0",
 		"github-markdown-css": "^5.2.0",

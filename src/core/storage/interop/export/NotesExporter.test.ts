@@ -4,6 +4,7 @@ import { AttachmentsController } from '@core/features/attachments/AttachmentsCon
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { createTextFile } from '@core/features/files/__tests__/mocks/createTextFile';
 import { FilesController } from '@core/features/files/FilesController';
+import { ZipFS } from '@core/features/files/ZipFS';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
@@ -251,4 +252,53 @@ test('Export all notes and attached files with custom file names', async () => {
 			}),
 		),
 	).resolves.toMatchSnapshot('Notes texts');
+});
+
+test('Export all notes and attached files as a zip file', async () => {
+	const db = await dbPromise;
+	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+
+	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+
+	const exporter = new NotesExporter(
+		{
+			filesRegistry,
+			notesRegistry,
+			tagsRegistry,
+		},
+		{
+			filesRoot: '/_files',
+			noteFilename(note) {
+				return [
+					'notes',
+					note.tags[0],
+					[note.id, note.content.title].filter(Boolean).join('-') + '.md',
+				]
+					.filter(Boolean)
+					.join('/');
+			},
+		},
+	);
+
+	// Export notes
+	const fs1 = new ZipFS();
+	await expect(exporter.exportNotes(fs1)).resolves.not.toThrow();
+
+	// Dump as zip file
+	const zipBuffer = await fs1.dump();
+
+	// Load zip file
+	const fs2 = new ZipFS();
+	await fs2.load(zipBuffer);
+
+	const filesList = await fs2.list();
+	expect(filesList.length).toBeGreaterThan(0);
+
+	for (const file of filesList) {
+		const file1 = await fs1.get(file);
+		const file2 = await fs2.get(file);
+
+		expect(new TextDecoder().decode(file1)).toEqual(new TextDecoder().decode(file2));
+	}
 });
