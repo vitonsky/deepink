@@ -1,7 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { formatNoteLink } from '@core/features/links';
-import { NoteId } from '@core/features/notes';
-import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
 	useNotesRegistry,
@@ -17,23 +14,14 @@ import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
 import { defaultNoteMenu } from './ContextMenu';
-import { NotesExporter } from './NotesExporter';
-import { NoteActions } from '.';
+import {
+	DefaultContextMenuOptions,
+	useNoteContextMenuCallback,
+} from './useNoteContextMenuCallback';
 
-type DefaultContextMenuOptions = {
-	closeNote: (id: NoteId) => void;
-	updateNotes: () => void;
-
-	// TODO: receive with react context
-	notesRegistry: INotesController;
-};
-
-const mdCharsForEscape = ['\\', '[', ']'];
-const mdCharsForEscapeRegEx = new RegExp(
-	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
-	'g',
-);
-
+/**
+ * Returns a function that accepts a note ID, screen coordinates, and a function that provides the menu configuration.
+ */
 export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
@@ -164,6 +152,7 @@ export const useNoteContextMenu = ({
 
 	const openMenu = useContextMenu(menu.menu, noteContextMenuCallback);
 
+	// open menu only after update openMenu
 	useEffect(() => {
 		if (menu.target) {
 			openMenu(menu.target.id, menu.target.point);
@@ -171,13 +160,11 @@ export const useNoteContextMenu = ({
 		}
 	}, [menu, openMenu]);
 
-	const openNoteContextMenu = (
-		id: string,
-		point: { x: number; y: number },
-		getMenu: () => ContextMenu,
-	) => {
-		setMenu({ menu: getMenu(), target: { id, point } });
-	};
-
-	return openNoteContextMenu;
+	// Updates the menu state first to ensure openMenu has the latest menu
+	return useCallback(
+		(id: string, point: { x: number; y: number }, getMenu: () => ContextMenu) => {
+			setMenu({ menu: getMenu(), target: { id, point } });
+		},
+		[],
+	);
 };
