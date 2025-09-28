@@ -83,22 +83,4 @@ export class AttachmentsController {
 				),
 			);
 	}
-
-	/**
-	 * Return array with ids of resources that not in use
-	 */
-	public async findOrphanedResources(resources: string[]) {
-		const db = this.db.get();
-
-		const placeholders = Array(resources.length).fill('?').join(',');
-		const attached = db
-			.prepare(
-				`SELECT file as id FROM attachments WHERE workspace_id=? AND file IN (${placeholders})`,
-			)
-			.all(this.workspace, ...resources) as Array<{ id: string }>;
-
-		return resources.filter((id) =>
-			attached.every((attachment) => attachment.id !== id),
-		);
-	}
 }

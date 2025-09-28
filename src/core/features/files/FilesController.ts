@@ -5,29 +5,21 @@ import { wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
-import { AttachmentsController } from '../attachments/AttachmentsController';
 import { IFilesStorage } from '.';
 
+// TODO: add tests
 // TODO: add runtime validation
 // TODO: implement interface and use interface instead of class
-
 /**
  * Files manager for local database
  */
 export class FilesController {
 	private db;
 	private fileController;
-	private attachments;
 	private readonly workspace;
-	constructor(
-		db: SQLiteDatabase,
-		fileController: IFilesStorage,
-		attachments: AttachmentsController,
-		workspace: string,
-	) {
+	constructor(db: SQLiteDatabase, fileController: IFilesStorage, workspace: string) {
 		this.db = db;
 		this.fileController = fileController;
-		this.attachments = attachments;
 		this.workspace = workspace;
 	}
 
@@ -115,35 +107,6 @@ export class FilesController {
 					qb.sql`SELECT id, name, mimetype FROM files WHERE workspace_id=${this.workspace}`,
 				),
 			);
-	}
-
-	// TODO: don't run it automatically to prevent accidental files lose
-	public async clearOrphaned() {
-		const db = this.db.get();
-
-		const files = new Set(
-			(
-				db
-					.prepare('SELECT id FROM files WHERE workspace_id=?')
-					.all(this.workspace) as Array<{ id: string }>
-			).map((file) => this.getFilePath(file.id)),
-		);
-
-		// Remove orphaned files in FS
-		const filesInStorage = await this.fileController.list();
-		const orphanedFilesInFs = filesInStorage.filter((id) => {
-			// Skip files out of workspace directory and workspace directory itself
-			if (!id.startsWith(this.workspace) || id === this.workspace) return false;
-			return !files.has(id);
-		});
-		await this.fileController.delete(orphanedFilesInFs);
-
-		// Remove files from DB
-		const orphanedFilesInDatabase = await this.attachments.findOrphanedResources(
-			Array.from(files),
-		);
-		await this.attachments.delete(orphanedFilesInDatabase);
-		await this.delete(orphanedFilesInDatabase);
 	}
 
 	private getFilePath(filename: string) {

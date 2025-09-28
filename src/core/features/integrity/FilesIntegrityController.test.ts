@@ -22,7 +22,7 @@ test('Clear orphaned files', async () => {
 
 	const fileManager = createFileManagerMock();
 	const attachments = new AttachmentsController(db, WORKSPACE_ID);
-	const files = new FilesController(db, fileManager, attachments, WORKSPACE_ID);
+	const files = new FilesController(db, fileManager, WORKSPACE_ID);
 
 	const integrityController = new FilesIntegrityController(WORKSPACE_ID, fileManager, {
 		files,

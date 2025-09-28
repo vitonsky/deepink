@@ -31,12 +31,7 @@ test('Create notes', async () => {
 	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
 	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-	const filesRegistry = new FilesController(
-		db,
-		fileManager,
-		attachmentsRegistry,
-		FAKE_WORKSPACE_NAME,
-	);
+	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
 
 	// Upload files
 	const file1Id = await filesRegistry.add(createTextFile('Text content of attachment'));
@@ -101,13 +96,7 @@ test('Export all notes and attached files', async () => {
 	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
 	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
-	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-	const filesRegistry = new FilesController(
-		db,
-		fileManager,
-		attachmentsRegistry,
-		FAKE_WORKSPACE_NAME,
-	);
+	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
 
 	const onProcessed = vi.fn();
 	const exporter = new NotesExporter({
@@ -158,13 +147,7 @@ test('Export single note and it attachments', async () => {
 	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
 	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
-	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-	const filesRegistry = new FilesController(
-		db,
-		fileManager,
-		attachmentsRegistry,
-		FAKE_WORKSPACE_NAME,
-	);
+	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
 
 	const exporter = new NotesExporter({
 		filesRegistry,
@@ -215,13 +198,7 @@ test('Export all notes and attached files with custom file names', async () => {
 	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
 	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
-	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-	const filesRegistry = new FilesController(
-		db,
-		fileManager,
-		attachmentsRegistry,
-		FAKE_WORKSPACE_NAME,
-	);
+	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
 
 	const exporter = new NotesExporter(
 		{

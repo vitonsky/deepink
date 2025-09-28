@@ -28,21 +28,14 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 
 		// Setup files
 		// TODO: implement methods to close the objects after use
-		const attachmentsController = new AttachmentsController(db, workspaceId);
 		const filesController = new ElectronFilesController(
 			[profile.id, 'files'].join('/'),
 			encryptionController,
 		);
-		const filesRegistry = new FilesController(
-			db,
-			filesController,
-			attachmentsController,
-			workspaceId,
-		);
 		setState({
-			attachmentsController,
 			filesController,
-			filesRegistry,
+			attachmentsController: new AttachmentsController(db, workspaceId),
+			filesRegistry: new FilesController(db, filesController, workspaceId),
 			tagsRegistry: new TagsController(db, workspaceId),
 			notesRegistry: new NotesController(db, workspaceId),
 			notesHistory: new NoteVersions(db, workspaceId),

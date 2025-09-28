@@ -28,12 +28,7 @@ const createAppContextIterator = () => {
 		const tagsRegistry = new TagsController(db, namespace);
 
 		const attachmentsRegistry = new AttachmentsController(db, namespace);
-		const filesRegistry = new FilesController(
-			db,
-			fileManager,
-			attachmentsRegistry,
-			namespace,
-		);
+		const filesRegistry = new FilesController(db, fileManager, namespace);
 
 		return {
 			filesRegistry,
@@ -65,12 +60,7 @@ describe('Base notes import cases', () => {
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
 
 		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(
-			db,
-			fileManager,
-			attachmentsRegistry,
-			FAKE_WORKSPACE_NAME,
-		);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
 
 		const importer = new NotesImporter(
 			{
@@ -246,12 +236,7 @@ describe('Base notes import cases', () => {
 		});
 
 		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(
-			db,
-			fileManager,
-			attachmentsRegistry,
-			FAKE_WORKSPACE_NAME,
-		);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
 
 		const attachmentIds = await attachmentsRegistry.get(note.id);
 		expect(attachmentIds).toHaveLength(1);

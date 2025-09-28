@@ -6,10 +6,12 @@ import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
+import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { importNotes } from '@electron/requests/files/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import {
+	useAttachmentsController,
 	useFilesController,
 	useFilesRegistry,
 	useNotesRegistry,
@@ -64,6 +66,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const tags = useTagsRegistry();
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
+	const attachments = useAttachmentsController();
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
@@ -86,8 +89,13 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		await files
 			.query()
 			.then((filesList) => files.delete(filesList.map((file) => file.id)));
-		await files.clearOrphaned();
 		await filesController.delete([currentWorkspace.workspaceId]);
+
+		await new FilesIntegrityController(
+			currentWorkspace.workspaceId,
+			filesController,
+			{ files, attachments },
+		).fixAll();
 
 		dispatch(
 			workspacesApi.setActiveWorkspace({
@@ -99,6 +107,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		await workspacesManager.delete([currentWorkspace.workspaceId]);
 		await workspaces.update();
 	}, [
+		attachments,
 		currentWorkspace.profileId,
 		currentWorkspace.workspaceId,
 		dispatch,
