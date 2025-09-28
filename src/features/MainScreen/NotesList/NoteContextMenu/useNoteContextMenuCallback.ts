@@ -59,7 +59,7 @@ export const useNoteContextMenuCallback = ({
 						await notesRegistry.delete([id]);
 						await tagsRegistry.setAttachedTags(id, []);
 					} else {
-						await notesRegistry.updateStatus([id], { deleted: true });
+						await notesRegistry.updateMeta([id], { isDeleted: true });
 						const deletedNote = await notesRegistry.getById(id);
 						if (deletedNote) updateNote(deletedNote);
 					}
@@ -71,7 +71,7 @@ export const useNoteContextMenuCallback = ({
 					const isConfirmed = confirm('Are you sure to restore note?');
 					if (!isConfirmed) return;
 
-					await notesRegistry.updateStatus([id], { deleted: false });
+					await notesRegistry.updateMeta([id], { isDeleted: false });
 
 					const restoredNote = await notesRegistry.getById(id);
 					if (restoredNote) updateNote(restoredNote);
