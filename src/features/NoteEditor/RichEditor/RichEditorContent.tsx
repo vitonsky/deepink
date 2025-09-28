@@ -108,8 +108,6 @@ export const RichEditorContent = ({
 			<HighlightingPlugin search={search} />
 
 			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
-
-			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
 		</Box>
 	);
 };
