@@ -5,11 +5,8 @@ import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
-import {
-	defaultNoteMenu,
-	deletedNoteMenu,
-} from '../NotesList/NoteContextMenu/ContextMenu';
 import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
+import { getCurrentNoteMenu } from '../NotesList/NoteContextMenu/utils/getCurrentNoteMenu';
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -137,10 +134,7 @@ export const TopBar: FC<TopBarProps> = ({
 												x: evt.pageX,
 												y: evt.pageY,
 											},
-											() =>
-												note.isDeleted
-													? deletedNoteMenu
-													: defaultNoteMenu,
+											() => getCurrentNoteMenu(note),
 										);
 									}}
 								>

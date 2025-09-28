@@ -17,8 +17,8 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { defaultNoteMenu, deletedNoteMenu } from './NoteContextMenu/ContextMenu';
 import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
+import { getCurrentNoteMenu } from './NoteContextMenu/utils/getCurrentNoteMenu';
 
 export type NotesListProps = {};
 
@@ -141,10 +141,7 @@ export const NotesList: FC<NotesListProps> = () => {
 												x: evt.pageX,
 												y: evt.pageY,
 											},
-											() =>
-												note.isDeleted
-													? deletedNoteMenu
-													: defaultNoteMenu,
+											() => getCurrentNoteMenu(note),
 										);
 									}}
 									onClick={() => {
