@@ -33,6 +33,7 @@ type ExportContext = {
 type Config = {
 	filesRoot: string;
 	noteFilename?: (note: NoteData) => string;
+	notesFetchLimit?: number;
 };
 
 export class NotesExporter {
@@ -118,7 +119,12 @@ export class NotesExporter {
 		let progress = 0;
 		const context = this.createContext(files);
 		for (let page = 1; true; page++) {
-			const notes = await notesRegistry.get({ page });
+			const totalNotes = await notesRegistry.getLength();
+			const notes = await notesRegistry.get({
+				limit: this.config.notesFetchLimit ?? 10_000,
+				page,
+				sort: { by: 'createdAt', order: 'asc' },
+			});
 
 			// Complete when no more notes left
 			if (notes.length === 0) break;
@@ -138,7 +144,7 @@ export class NotesExporter {
 					++progress;
 					if (onProcessed) {
 						onProcessed({
-							total: notes.length,
+							total: totalNotes,
 							processed: progress,
 						});
 					}
