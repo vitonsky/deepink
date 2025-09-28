@@ -114,34 +114,37 @@ export class NotesExporter {
 		} = {},
 	) {
 		const { notesRegistry } = this.context;
-		const notes = await notesRegistry.get();
 
 		let progress = 0;
-		await Promise.all(
-			notes.map(async (note) => {
-				const tags = await this.getNoteTags(note.id);
-				const noteData = { ...note, tags };
+		const context = this.createContext(files);
+		for (let page = 1; true; page++) {
+			const notes = await notesRegistry.get({ page });
 
-				const noteDump = await this.exportSingleNote(
-					noteData,
-					this.createContext(files),
-				);
+			// Complete when no more notes left
+			if (notes.length === 0) break;
 
-				await files.write(
-					this.resolveNotePath(noteData),
-					new TextEncoder().encode(noteDump),
-				);
+			await Promise.all(
+				notes.map(async (note) => {
+					const tags = await this.getNoteTags(note.id);
+					const noteData = { ...note, tags };
+					const noteDump = await this.exportSingleNote(noteData, context);
 
-				// Notify progress
-				++progress;
-				if (onProcessed) {
-					onProcessed({
-						total: notes.length,
-						processed: progress,
-					});
-				}
-			}),
-		);
+					await files.write(
+						this.resolveNotePath(noteData),
+						new TextEncoder().encode(noteDump),
+					);
+
+					// Notify progress
+					++progress;
+					if (onProcessed) {
+						onProcessed({
+							total: notes.length,
+							processed: progress,
+						});
+					}
+				}),
+			);
+		}
 	}
 
 	// TODO: implement recursive mode, to collect references
