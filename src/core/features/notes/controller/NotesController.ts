@@ -95,13 +95,18 @@ function getFetchQuery(
 					  )}))`,
 			)
 			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
-		sort
-			? qb.line(
-					qb.sql`ORDER BY`,
-					qb.set([sortFieldMap[sort.by], 'rowid']),
-					qb.raw(sort.order === 'desc' ? 'DESC' : 'ASC'),
-			  )
-			: qb.sql`ORDER BY rowid ASC`,
+		qb.line(
+			qb.sql`ORDER BY`,
+			qb.set([
+				sort
+					? qb.line(
+							sortFieldMap[sort.by],
+							sort.order === 'desc' ? 'DESC' : 'ASC',
+					  )
+					: undefined,
+				'rowid ASC',
+			]),
+		),
 		limit ? qb.limit(limit) : undefined,
 		page && limit ? qb.offset((page - 1) * limit) : undefined,
 	);
