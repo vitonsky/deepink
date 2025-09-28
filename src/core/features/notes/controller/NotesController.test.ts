@@ -136,6 +136,25 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
+
+	test('method getLength consider filters', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, 'fake-workspace-id');
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+		await registry.updateMeta(notesId, { isVisible: false });
+
+		await expect(registry.getLength({ meta: { isVisible: false } })).resolves.toBe(
+			10,
+		);
+		await expect(registry.getLength({ meta: { isVisible: true } })).resolves.toBe(
+			notesSample.length - 10,
+		);
+
+		await db.close();
+	});
 });
 
 describe('multi instances', () => {

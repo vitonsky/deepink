@@ -5,6 +5,8 @@ export type NoteMeta = {
 	isVisible: boolean;
 };
 
+export type NoteSortField = 'id' | 'createdAt' | 'updatedAt';
+
 export type NotesControllerFetchOptions = {
 	/**
 	 * Limit notes
@@ -27,7 +29,18 @@ export type NotesControllerFetchOptions = {
 	 */
 	tags?: string[];
 
-	meta?: NoteMeta;
+	/**
+	 * Filters by note meta info
+	 */
+	meta?: Partial<NoteMeta>;
+
+	/**
+	 * Sorting options
+	 */
+	sort?: {
+		by: NoteSortField;
+		order?: 'desc' | 'asc';
+	};
 };
 
 /**
@@ -42,7 +55,7 @@ export interface INotesController {
 	/**
 	 * Get number of notes
 	 */
-	getLength(): Promise<number>;
+	getLength(query?: NotesControllerFetchOptions): Promise<number>;
 
 	/**
 	 * Primary method to get notes filtered by parameters

@@ -1,12 +1,19 @@
 /* eslint-disable camelcase */
+import { Query } from 'nano-queries/core/Query';
 import { v4 as uuid4 } from 'uuid';
+import { z } from 'zod';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { INote, INoteContent, NoteId } from '..';
-import { INotesController, NoteMeta, NotesControllerFetchOptions } from '.';
+import {
+	INotesController,
+	NoteMeta,
+	NotesControllerFetchOptions,
+	NoteSortField,
+} from '.';
 
 /**
  * Data mappers between DB and objects
@@ -50,6 +57,56 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 	);
 }
 
+function getFetchQuery(
+	{
+		select,
+		workspace,
+	}: {
+		select: Query;
+		workspace?: string;
+	},
+	{ limit, page, tags = [], meta, sort }: NotesControllerFetchOptions = {},
+) {
+	if (page !== undefined && page < 1)
+		throw new TypeError('Page value must not be less than 1');
+
+	const metaEntries = Object.entries(
+		formatNoteMeta({
+			isVisible: true,
+			...meta,
+		}),
+	);
+
+	const sortFieldMap: { [K in NoteSortField]: string } = {
+		id: 'id',
+		createdAt: 'creationTime',
+		updatedAt: 'lastUpdateTime',
+	};
+
+	return qb.line(
+		qb.sql`SELECT ${select} FROM notes`,
+		qb
+			.where(workspace ? qb.sql`workspace_id=${workspace}` : undefined)
+			.and(
+				tags.length === 0
+					? undefined
+					: `id IN (SELECT target FROM attachedTags WHERE source IN (${qb.values(
+							tags,
+					  )}))`,
+			)
+			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
+		sort
+			? qb.line(
+					qb.sql`ORDER BY`,
+					qb.set([sortFieldMap[sort.by], 'rowid']),
+					qb.raw(sort.order === 'desc' ? 'DESC' : 'ASC'),
+			  )
+			: qb.sql`ORDER BY rowid ASC`,
+		limit ? qb.limit(limit) : undefined,
+		page && limit ? qb.offset((page - 1) * limit) : undefined,
+	);
+}
+
 /**
  * Synced notes registry
  */
@@ -78,87 +135,28 @@ export class NotesController implements INotesController {
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
-	public async getLength(): Promise<number> {
+	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
 		const db = wrapDB(this.db.get());
 
-		const { length } = db.get(
-			qb
-				.select('COUNT(id) as length')
-				.from('notes')
-				.where(
-					qb.values({
-						workspace_id: this.workspace,
-					}),
+		return z
+			.object({ count: z.number() })
+			.transform((row) => row.count)
+			.parse(
+				db.get(
+					getFetchQuery(
+						{ select: qb.sql`COUNT(*) as count`, workspace: this.workspace },
+						query,
+					),
 				),
-		) as {
-			length?: number;
-		};
-		return length ?? 0;
+			);
 	}
 
-	public async get({
-		limit = 100,
-		page = 1,
-		tags = [],
-		meta,
-	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
-		if (page < 1) throw new TypeError('Page value must not be less than 1');
-
+	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		const db = wrapDB(this.db.get());
 
-		const notes: INote[] = [];
-
-		const metaEntries = Object.entries(
-			formatNoteMeta({
-				isVisible: true,
-				...meta,
-			}),
-		);
-
-		db.all(
-			qb
-				.select('*')
-				.from('notes')
-				.where(
-					qb.values({
-						workspace_id: this.workspace,
-					}),
-				)
-				.where(
-					qb
-						.condition(
-							tags.length > 0
-								? qb.line(
-										'id IN',
-										qb.group(
-											qb
-												.select('target')
-												.from('attachedTags')
-												.where(
-													qb.line(
-														'source IN',
-														qb.values(tags).withParenthesis(),
-													),
-												),
-										),
-								  )
-								: undefined,
-						)
-						.and(
-							...metaEntries.map(
-								([key, value]) => qb.sql`${qb.raw(key)} = ${value}`,
-							),
-						),
-				)
-				.limit(limit)
-				.offset((page - 1) * limit),
-		).map((row) => {
-			// TODO: validate data for first note
-
-			notes.push(mappers.rowToNoteObject(row));
-		});
-
-		return notes;
+		return db
+			.all(getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query))
+			.map(mappers.rowToNoteObject);
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
