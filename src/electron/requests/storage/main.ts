@@ -1,11 +1,12 @@
 import { existsSync } from 'fs';
 import path from 'path';
+import recursive from 'recursive-readdir';
 import { recoveryAtomicFile, writeFileAtomic } from '@utils/files';
 
 import { getUserDataPath, joinPath } from '../../utils/files';
 import { ipcMainHandler } from '../../utils/ipc/ipcMainHandler';
 
-import { mkdir, readdir, readFile, rm } from 'fs/promises';
+import { mkdir, readFile, rm } from 'fs/promises';
 import { storageChannel } from '.';
 
 export const enableStorage = () =>
@@ -49,7 +50,10 @@ export const enableStorage = () =>
 
 			if (!existsSync(filesDir)) return [];
 
-			const files = await readdir(filesDir, {});
-			return files ?? [];
+			const files = await recursive(filesDir);
+			return files.map((path) =>
+				// Remove root path + slash
+				path.slice(filesDir.length + 1),
+			);
 		},
 	});
