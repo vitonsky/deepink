@@ -103,8 +103,6 @@ export const RichEditorContent = ({
 			<HorizontalRulePlugin />
 
 			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
-
-			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
 		</Box>
 	);
 };
