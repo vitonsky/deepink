@@ -3,6 +3,7 @@ import { INote, INoteContent, NoteId } from '..';
 export type NoteMeta = {
 	isSnapshotsDisabled: boolean;
 	isVisible: boolean;
+	isDeleted: boolean;
 };
 
 export type NoteSortField = 'id' | 'createdAt' | 'updatedAt';
@@ -85,9 +86,4 @@ export interface INotesController {
 	 * Deletes all notes with specified ids
 	 */
 	delete(ids: NoteId[]): Promise<void>;
-
-	/**
-	 * Updates the status of specific notes
-	 */
-	updateStatus(ids: NoteId[], status: { deleted: boolean }): Promise<void>;
 }
