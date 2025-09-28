@@ -58,6 +58,8 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 					return ['history_disabled', Boolean(value)];
 				case 'isVisible':
 					return ['visible', Boolean(value)];
+				case 'isDeleted':
+					return [key, Number(value)];
 			}
 		}),
 	);

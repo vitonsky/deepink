@@ -115,13 +115,13 @@ describe('CRUD operations', () => {
 		const ids = await Promise.all(notesSample.map((note) => registry.add(note)));
 
 		// set deleted status
-		await registry.updateStatus(ids, { deleted: true });
+		await registry.updateMeta(ids, { isDeleted: true });
 		await expect(registry.get({ deleted: true })).resolves.toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
 		);
 
 		// reset deleted status
-		await registry.updateStatus(ids, { deleted: false });
+		await registry.updateMeta(ids, { isDeleted: false });
 		await expect(registry.get({ deleted: false })).resolves.toEqual(
 			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
 		);
@@ -234,7 +234,7 @@ describe('data fetching', () => {
 		const ids = await Promise.all(entries.map((note) => registry.add(note)));
 
 		// update status
-		await registry.updateStatus(ids.slice(0, 3), { deleted: true });
+		await registry.updateMeta(ids.slice(0, 3), { isDeleted: true });
 
 		// get all notes
 		await expect(registry.get()).resolves.toHaveLength(4);
@@ -275,7 +275,7 @@ describe('data fetching', () => {
 		const fooTag = await tags.add('foo', null);
 		await tags.setAttachedTags(note, [fooTag]);
 
-		await registry.updateStatus([note], { deleted: true });
+		await registry.updateMeta([note], { isDeleted: true });
 
 		// get notes filtered by tag only
 		await expect(registry.get({ tags: [fooTag] })).resolves.toHaveLength(1);
@@ -292,7 +292,7 @@ describe('data fetching', () => {
 
 		// reset deleted status
 		// get not deleted notes with tag
-		await registry.updateStatus([note], { deleted: false });
+		await registry.updateMeta([note], { isDeleted: false });
 		await expect(
 			registry.get({ tags: [fooTag], deleted: false }),
 		).resolves.toHaveLength(1);
