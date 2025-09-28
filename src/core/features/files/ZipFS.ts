@@ -1,40 +1,21 @@
-import { AsyncZipOptions, unzip, zip } from 'fflate';
+import { unzipSync, ZipOptions, zipSync } from 'fflate';
 
 import { InMemoryFS } from './InMemoryFS';
 
 export class ZipFS extends InMemoryFS {
-	async dump(options?: AsyncZipOptions) {
+	async dump(options?: ZipOptions) {
 		const filesMap: Record<string, Uint8Array> = {};
 		for (const [path, content] of Object.entries(this.storage)) {
 			filesMap[path] = new Uint8Array(content);
 		}
 
-		return new Promise<ArrayBuffer>((resolve, reject) => {
-			zip(filesMap, { ...options }, (error, data) => {
-				if (error) {
-					reject(error);
-					return;
-				}
-
-				resolve(data.buffer);
-			});
-		});
+		return zipSync(filesMap, { ...options }).buffer;
 	}
 
 	async load(buffer: ArrayBuffer) {
-		return new Promise<void>((resolve, reject) => {
-			unzip(new Uint8Array(buffer), {}, (error, files) => {
-				if (error) {
-					reject(error);
-					return;
-				}
-
-				for (const [path, content] of Object.entries(files)) {
-					this.storage[path] = content.buffer;
-				}
-
-				resolve();
-			});
-		});
+		const files = unzipSync(new Uint8Array(buffer));
+		for (const [path, content] of Object.entries(files)) {
+			this.storage[path] = content.buffer;
+		}
 	}
 }
