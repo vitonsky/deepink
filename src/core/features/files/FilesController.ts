@@ -116,6 +116,7 @@ export class FilesController {
 			);
 	}
 
+	// TODO: don't run it automatically to prevent accidental files lose
 	public async clearOrphaned() {
 		const db = this.db.get();
 
@@ -124,7 +125,7 @@ export class FilesController {
 				db
 					.prepare('SELECT id FROM files WHERE workspace_id=?')
 					.all(this.workspace) as Array<{ id: string }>
-			).map((file) => file.id),
+			).map((file) => this.getFilePath(file.id)),
 		);
 
 		// Remove orphaned files in FS
