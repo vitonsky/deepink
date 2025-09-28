@@ -221,7 +221,16 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 											await saveFile(
 												joinPathSegments([
 													directory,
-													`backup-${Date.now()}.zip`,
+													[
+														'backup',
+														workspaceData
+															? `workspace_${workspaceData.name}`
+															: undefined,
+														`${Date.now()}.zip`,
+													]
+														.filter(Boolean)
+														.join('-')
+														.replaceAll(/[^\w\d]/g, '_'),
 												]),
 												zipBuffer,
 											);
