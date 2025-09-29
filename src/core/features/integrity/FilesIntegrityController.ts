@@ -1,3 +1,5 @@
+import { joinPathSegments } from '@utils/fs/paths';
+
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { IFilesStorage } from '../files';
 import { FilesController } from '../files/FilesController';
@@ -26,8 +28,9 @@ export class FilesIntegrityController {
 
 		const filesInStorage = await this.files.list();
 		const orphanedFilePaths = filesInStorage.filter((filePath) => {
+			const workspacePrefix = this.getFilePath();
 			// Skip files out of workspace directory and workspace directory itself
-			if (!filePath.startsWith(this.workspace) || filePath === this.workspace)
+			if (!filePath.startsWith(workspacePrefix) || filePath === workspacePrefix)
 				return false;
 
 			return !filePathsInDB.has(filePath);
@@ -92,7 +95,7 @@ export class FilesIntegrityController {
 		await this.controllers.files.delete(lostFileIds);
 	}
 
-	private getFilePath(filename: string) {
-		return [this.workspace, filename].join('/');
+	private getFilePath(filename?: string) {
+		return joinPathSegments([this.workspace, filename].filter(Boolean) as string[]);
 	}
 }
