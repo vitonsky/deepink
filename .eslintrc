@@ -52,6 +52,7 @@
 					"Checkbox",
 					"Classname",
 					"DOM",
+					"memfs",
 					"Focusable",
 					"Frontmatter",
 					"Gfm",
