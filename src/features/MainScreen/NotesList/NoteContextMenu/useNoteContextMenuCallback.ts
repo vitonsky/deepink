@@ -83,8 +83,9 @@ export const useNoteContextMenuCallback = ({
 
 				[NoteActions.DUPLICATE]: async (id: string) => {
 					const sourceNote = await notesRegistry.getById(id);
+
 					if (!sourceNote) {
-						console.warn(`Not found note with id ${id}`);
+						console.warn(`Not found note with id ${sourceNote}`);
 						return;
 					}
 
@@ -95,10 +96,9 @@ export const useNoteContextMenuCallback = ({
 					});
 
 					const attachedTags = await tagsRegistry.getAttachedTags(id);
-					await tagsRegistry.setAttachedTags(
-						newNoteId,
-						attachedTags.map(({ id }) => id),
-					);
+					const attachedTagsIds = attachedTags.map(({ id }) => id);
+
+					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
 
 					updateNotes();
 				},
@@ -130,11 +130,13 @@ export const useNoteContextMenuCallback = ({
 					const filesDirectoryName = `_files`;
 					const filesDirectory = [directory, filesDirectoryName].join('/');
 
+					// TODO: remove node usages in frontend code
 					await mkdir(filesDirectory, { recursive: true });
 
 					const notesExport = new NotesExporter({
 						saveFile: async (file, id) => {
 							const filename = `${filesDirectory}/${id}-${file.name}`;
+
 							const buffer = await file.arrayBuffer();
 							await writeFile(filename, new Uint8Array(buffer));
 							return `./${filesDirectoryName}/${id}-${file.name}`;
@@ -145,9 +147,10 @@ export const useNoteContextMenuCallback = ({
 					});
 
 					const noteData = await notesExport.exportNote(id);
-					if (noteData) {
-						await writeFile(`${directory}/${id}.md`, noteData);
-					}
+
+					if (!noteData) return;
+
+					await writeFile(`${directory}/${id}.md`, noteData);
 				},
 			};
 
