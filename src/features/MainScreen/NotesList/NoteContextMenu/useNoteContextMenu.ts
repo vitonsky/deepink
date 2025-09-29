@@ -21,9 +21,9 @@ import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
-import { defaultNoteMenu } from './ContextMenu';
+import { defaultNoteMenu } from './noteContextMenus';
 import {
-	DefaultContextMenuOptions,
+	ContextMenuOptions,
 	useNoteContextMenuCallback,
 } from './useNoteContextMenuCallback';
 
@@ -178,8 +178,8 @@ export const useNoteContextMenu = ({
 
 	// Updates the menu state first to ensure openMenu has the latest menu
 	return useCallback(
-		(id: string, point: { x: number; y: number }, getMenu: () => ContextMenu) => {
-			setMenu({ menu: getMenu(), target: { id, point } });
+		(id: string, point: { x: number; y: number }, menu: ContextMenu) => {
+			setMenu({ menu, target: { id, point } });
 		},
 		[],
 	);

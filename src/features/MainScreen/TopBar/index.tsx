@@ -6,7 +6,7 @@ import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
 import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
-import { getCurrentNoteMenu } from '../NotesList/NoteContextMenu/utils/getCurrentNoteMenu';
+import { selectNoteMenu } from '../NotesList/NoteContextMenu/utils/selectNoteMenu';
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -115,10 +115,14 @@ export const TopBar: FC<TopBarProps> = ({
 								// Prevent text selection on macOS
 								evt.preventDefault();
 
-								openNoteContextMenu(note.id, {
-									x: evt.pageX,
-									y: evt.pageY,
-								});
+								openNoteContextMenu(
+									note.id,
+									{
+										x: evt.pageX,
+										y: evt.pageY,
+									},
+									selectNoteMenu(note),
+								);
 							}}
 						>
 							<HStack gap=".5rem" w="100%" justifyContent="space-between">
@@ -127,16 +131,6 @@ export const TopBar: FC<TopBarProps> = ({
 									whiteSpace="nowrap"
 									overflow="hidden"
 									textOverflow="ellipsis"
-									onContextMenu={(evt) => {
-										openNoteContextMenu(
-											note.id,
-											{
-												x: evt.pageX,
-												y: evt.pageY,
-											},
-											() => getCurrentNoteMenu(note),
-										);
-									}}
 								>
 									{getNoteTitle(note.content, 25)}
 								</Text>
