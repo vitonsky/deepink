@@ -20,24 +20,33 @@ test('Basic cases', async () => {
 	await expect(files.write('file1', new ArrayBuffer(1))).resolves.not.toThrow();
 	await expect(files.write('/file2', new ArrayBuffer(1))).resolves.not.toThrow();
 	await expect(
+		files.write('../../../../file3', new ArrayBuffer(1)),
+	).resolves.not.toThrow();
+	await expect(
 		files.write('dir1/dir2/file1', new ArrayBuffer(1)),
 	).resolves.not.toThrow();
 	await expect(
 		files.write('/dir1/dir2/file2', new ArrayBuffer(1)),
 	).resolves.not.toThrow();
+	await expect(
+		files.write('/dir1/dir2/../file3', new ArrayBuffer(1)),
+	).resolves.not.toThrow();
 
 	await expect(files.list()).resolves.toEqual([
 		`/${subdirectory}/file1`,
 		`/${subdirectory}/file2`,
+		`/${subdirectory}/file3`,
 		`/${subdirectory}/dir1/dir2/file1`,
 		`/${subdirectory}/dir1/dir2/file2`,
+		`/${subdirectory}/dir1/file3`,
 	]);
 
-	// TODO: fix it. Paths must be consistent. All paths must have slash at start
 	expect(uploadSpy.mock.calls).toEqual([
 		['file1', expect.any(ArrayBuffer), subdirectory],
-		['/file2', expect.any(ArrayBuffer), subdirectory],
+		['file2', expect.any(ArrayBuffer), subdirectory],
+		['file3', expect.any(ArrayBuffer), subdirectory],
 		['dir1/dir2/file1', expect.any(ArrayBuffer), subdirectory],
-		['/dir1/dir2/file2', expect.any(ArrayBuffer), subdirectory],
+		['dir1/dir2/file2', expect.any(ArrayBuffer), subdirectory],
+		['dir1/file3', expect.any(ArrayBuffer), subdirectory],
 	]);
 });
