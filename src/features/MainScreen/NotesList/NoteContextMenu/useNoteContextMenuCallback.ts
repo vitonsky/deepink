@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { selectDirectory } from '@electron/requests/files/renderer';
 import {
+	useEventBus,
 	useFilesRegistry,
-	useNotesContext,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
@@ -15,7 +16,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import { NotesExporter } from './NotesExporter';
 import { NoteActions } from '.';
 
-export type DefaultContextMenuOptions = {
+export type ContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
 
@@ -30,16 +31,16 @@ export const mdCharsForEscapeRegEx = new RegExp(
 );
 
 /**
- * Stores handlers for noteActions
+ * Returns a callback that executes handlers for note context menu actions
  */
 export const useNoteContextMenuCallback = ({
 	closeNote,
 	updateNotes,
 	notesRegistry,
-}: DefaultContextMenuOptions) => {
+}: ContextMenuOptions) => {
 	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
-	const { noteUpdated: updateNote } = useNotesContext();
+	const eventBus = useEventBus();
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
@@ -47,9 +48,11 @@ export const useNoteContextMenuCallback = ({
 				[NoteActions.DELETE]: async (id: string) => {
 					const targetNote = await notesRegistry.getById(id);
 					const isConfirmed = confirm(
-						`Are you sure to ${
-							targetNote?.isDeleted ? 'permanently delete' : 'delete'
-						} note?`,
+						`Are you sure you want to ${
+							targetNote?.isDeleted
+								? 'delete the note permanently'
+								: 'move the note to the bin'
+						}?`,
 					);
 					if (!isConfirmed) return;
 
@@ -60,21 +63,20 @@ export const useNoteContextMenuCallback = ({
 						await tagsRegistry.setAttachedTags(id, []);
 					} else {
 						await notesRegistry.updateMeta([id], { isDeleted: true });
-						const deletedNote = await notesRegistry.getById(id);
-						if (deletedNote) updateNote(deletedNote);
+						eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 					}
 
 					updateNotes();
 				},
 
 				[NoteActions.RESTORE]: async (id: string) => {
-					const isConfirmed = confirm('Are you sure to restore note?');
+					const isConfirmed = confirm(
+						'Are you sure you want to restore the note',
+					);
 					if (!isConfirmed) return;
 
 					await notesRegistry.updateMeta([id], { isDeleted: false });
-
-					const restoredNote = await notesRegistry.getById(id);
-					if (restoredNote) updateNote(restoredNote);
+					eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
 					updateNotes();
 				},
@@ -151,7 +153,7 @@ export const useNoteContextMenuCallback = ({
 
 			await handlers[action](id);
 		},
-		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNote, updateNotes],
+		[closeNote, eventBus, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
 	);
 
 	return noteContextMenuCallback;
