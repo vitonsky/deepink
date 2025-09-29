@@ -1,3 +1,4 @@
+// TODO: add method `has`
 /**
  * Interface for persistent files storage
  * File name is UUID, not a file system path

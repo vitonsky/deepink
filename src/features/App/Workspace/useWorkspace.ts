@@ -4,7 +4,7 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -29,6 +29,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 		// Setup files
 		// TODO: implement methods to close the objects after use
 		const filesController = new ElectronFilesController(
+			storageApi,
 			[profile.id, 'files'].join('/'),
 			encryptionController,
 		);

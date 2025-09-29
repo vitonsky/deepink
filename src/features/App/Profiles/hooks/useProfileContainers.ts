@@ -12,7 +12,7 @@ import {
 	SQLiteDatabase,
 } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { DisposableBox } from '@utils/disposable';
 
 import { createProfilesApi, ProfileEntry } from './profiles';
@@ -62,7 +62,10 @@ export const useProfileContainers = () => {
 		) => {
 			const cleanups: Array<() => void> = [];
 
-			const profileFilesController = new ElectronFilesController(`/${profile.id}`);
+			const profileFilesController = new ElectronFilesController(
+				storageApi,
+				`/${profile.id}`,
+			);
 
 			// Setup encryption
 			let encryptionController: EncryptionController;
