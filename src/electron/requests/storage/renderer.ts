@@ -1,6 +1,5 @@
 import { IEncryptionController } from '@core/encryption';
 import { IFilesStorage } from '@core/features/files';
-import { getResolvedPath } from '@utils/fs/paths';
 
 import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
@@ -25,12 +24,7 @@ export class ElectronFilesController implements IFilesStorage {
 			: buffer;
 
 		// Absolute file name with no slash
-		const resolvedFileName = getResolvedPath(filename, '/').slice(1);
-		return this.storageApi.upload(
-			resolvedFileName,
-			encryptedBuffer,
-			this.subdirectory,
-		);
+		return this.storageApi.upload(filename, encryptedBuffer, this.subdirectory);
 	}
 
 	public async get(id: string) {

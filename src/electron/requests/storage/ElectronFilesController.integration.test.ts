@@ -222,6 +222,14 @@ test('Path traversal out of scope directory must not be possible', async () => {
 		'Resolved path is out of root directory',
 	);
 
+	// All ops respects the limitation
+	await expect(filesController.delete(['../secret.txt'])).rejects.toThrowError(
+		'Resolved path is out of root directory',
+	);
+	await expect(
+		filesController.write('../secret.txt', new Uint8Array()),
+	).rejects.toThrowError('Resolved path is out of root directory');
+
 	// Read file out of root directory
 	vol.writeFileSync('/home/userData/secret.txt', 'Secret data');
 	await expect(filesController.get('../../secret.txt')).rejects.toThrowError(
