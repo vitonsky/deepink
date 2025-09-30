@@ -5,7 +5,7 @@ import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
-import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
+import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { importNotes } from '@electron/requests/files/renderer';
@@ -167,17 +167,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 									onClick={async () => {
 										const content = await importNotes();
 										await notesImport.importNotes(
-											// TODO: update files fetching API
-											createFileManagerMock(
-												Object.fromEntries(
-													Object.entries(content).map(
-														([path, buffer]) => [
-															'/' + path,
-															buffer,
-														],
-													),
-												),
-											),
+											new InMemoryFS(content),
 										);
 
 										console.log('Import is completed');
