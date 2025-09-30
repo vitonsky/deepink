@@ -66,6 +66,8 @@ vi.mock('recursive-readdir', async () => {
 const storageHandlerCleanup = enableStorage();
 const filesController = new ElectronFilesController(storageApi, 'profileDir');
 
+const getBufferFromText = (text: string) => new Uint8Array(Buffer.from(text)).buffer;
+
 test('Write files', async () => {
 	expect(vol.readdirSync('/', { recursive: true })).toEqual([]);
 
@@ -99,6 +101,31 @@ test('Check files content', async () => {
 			),
 		),
 	).resolves.toMatchSnapshot('Files content');
+});
+
+test('File may be accessed via absolute and relevant paths both', async () => {
+	await expect(filesController.get('test.txt')).resolves.toStrictEqual(
+		getBufferFromText('File text content'),
+	);
+	await expect(filesController.get('/test.txt')).resolves.toStrictEqual(
+		getBufferFromText('File text content'),
+	);
+	await expect(filesController.get('////test.txt')).resolves.toStrictEqual(
+		getBufferFromText('File text content'),
+	);
+	await expect(filesController.get('/foo/../test.txt')).resolves.toStrictEqual(
+		getBufferFromText('File text content'),
+	);
+
+	await expect(filesController.get('/foo/bar/baz/test.txt')).resolves.toStrictEqual(
+		getBufferFromText('File text content'),
+	);
+	await expect(filesController.get('./foo/bar/baz/test.txt')).resolves.toStrictEqual(
+		getBufferFromText('File text content'),
+	);
+	await expect(filesController.get('foo/bar/baz/test.txt')).resolves.toStrictEqual(
+		getBufferFromText('File text content'),
+	);
 });
 
 describe('Many clients', () => {
