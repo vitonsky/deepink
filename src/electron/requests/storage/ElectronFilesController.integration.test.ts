@@ -103,6 +103,29 @@ test('Check files content', async () => {
 	).resolves.toMatchSnapshot('Files content');
 });
 
+test('Path traversal out of scope directory must not be possible', async () => {
+	await expect(filesController.get('/')).resolves.toBeNull();
+
+	// Just to ensure we can read available files
+	vol.writeFileSync('/home/userData/appDir/profileDir/secret.txt', 'Secret data');
+	await expect(filesController.get('./secret.txt')).resolves.toBeInstanceOf(
+		ArrayBuffer,
+	);
+
+	// Read file out of scoped directory
+	// Scope is defined by a client
+	vol.writeFileSync('/home/userData/appDir/secret.txt', 'Secret data');
+	await expect(filesController.get('../secret.txt')).rejects.toThrowError(
+		'Resolved path is out of root directory',
+	);
+
+	// Read file out of root directory
+	vol.writeFileSync('/home/userData/secret.txt', 'Secret data');
+	await expect(filesController.get('../../secret.txt')).rejects.toThrowError(
+		'Resolved path is out of root directory',
+	);
+});
+
 test('When storage is disposed, any ops in controller throws error', async () => {
 	// Clean handler
 	storageHandlerCleanup();
