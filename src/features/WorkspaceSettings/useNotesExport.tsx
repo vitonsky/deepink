@@ -1,8 +1,12 @@
 import { useCallback, useState } from 'react';
-import { IFilesStorage } from '@core/features/files';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { dumpFilesStorage } from '@core/features/files/utils/dumpFilesStorage';
-import { ExportProgress, NotesExporter } from '@core/storage/interop/export';
+import { NoteId } from '@core/features/notes';
+import {
+	ExportProgress,
+	NoteExportData,
+	NotesExporter,
+} from '@core/storage/interop/export';
 import {
 	useFilesRegistry,
 	useNotesRegistry,
@@ -19,76 +23,124 @@ export const getExportArchiveName = (workspaceName?: string) =>
 		.filter(Boolean)
 		.join('-');
 
+function noteFilename(note: NoteExportData) {
+	return [
+		'notes',
+		note.tags[0],
+		[note.id, note.content.title].filter(Boolean).join('-') + '.md',
+	]
+		.filter(Boolean)
+		.join('/');
+}
 // TODO: notify for successful export
 export const useNotesExport = () => {
-	const [progress, setProgress] = useState<{
-		total: number;
-		processed: number;
+	const [status, setStatus] = useState<{
+		status: 'noteExport' | 'notesExport';
+		progress?: {
+			total: number;
+			processed: number;
+		};
 	} | null>(null);
 
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 	const filesRegistry = useFilesRegistry();
 
-	const dumpNotes = useCallback(
-		async (exportTarget: IFilesStorage) => {
-			setProgress({
-				total: 0,
-				processed: 0,
+	const exportNotes = useCallback(
+		async (saveAsZip: boolean, name?: string) => {
+			if (status) {
+				console.warn(
+					'Reject exporting request, because another export process in run',
+				);
+				return;
+			}
+
+			const directory = await requestDirectoryPath();
+			if (!directory) return;
+
+			setStatus({
+				status: 'notesExport',
+				progress: {
+					total: 0,
+					processed: 0,
+				},
 			});
 
-			const exporter = new NotesExporter(
+			// Export
+			const files = new InMemoryFS();
+			await new NotesExporter(
 				{
 					filesRegistry,
 					notesRegistry,
 					tagsRegistry,
 				},
 				{
-					noteFilename(note) {
-						return [
-							'notes',
-							note.tags[0],
-							[note.id, note.content.title].filter(Boolean).join('-') +
-								'.md',
-						]
-							.filter(Boolean)
-							.join('/');
-					},
+					noteFilename,
 				},
-			);
-
-			await exporter.exportNotes(exportTarget, {
+			).exportNotes(files, {
 				onProcessed: (info: ExportProgress) => {
-					setProgress(info);
+					setStatus({
+						status: 'notesExport',
+						progress: info,
+					});
 				},
 			});
 
-			setProgress(null);
-		},
-		[filesRegistry, notesRegistry, tagsRegistry],
-	);
-
-	const exportNotes = useCallback(
-		async (saveAsZip: boolean, name?: string) => {
-			const directory = await requestDirectoryPath();
-			if (!directory) return;
-
-			// Export
-			const exportFs = new InMemoryFS();
-			await dumpNotes(exportFs);
+			setStatus(null);
 
 			// Save
-
-			await dumpFilesStorage(exportFs, directory, {
+			await dumpFilesStorage(files, directory, {
 				zip: saveAsZip,
 				name,
 			});
 		},
-		[dumpNotes],
+		[filesRegistry, notesRegistry, status, tagsRegistry],
+	);
+
+	const exportNote = useCallback(
+		async (noteId: NoteId, saveAsZip: boolean, name?: string) => {
+			if (status) {
+				console.warn(
+					'Reject exporting request, because another export process in run',
+				);
+				return;
+			}
+
+			const directory = await requestDirectoryPath();
+			if (!directory) return;
+
+			setStatus({
+				status: 'noteExport',
+			});
+
+			// Export
+			const files = new InMemoryFS();
+			await new NotesExporter(
+				{
+					filesRegistry,
+					notesRegistry,
+					tagsRegistry,
+				},
+				{
+					noteFilename,
+				},
+			).exportNote(noteId, files);
+
+			setStatus(null);
+
+			// Save
+			await dumpFilesStorage(files, directory, {
+				zip: saveAsZip,
+				name,
+			});
+		},
+		[filesRegistry, notesRegistry, status, tagsRegistry],
 	);
 
 	return {
 		exportNotes,
-		progress,
+		exportNote,
+		isPending: status !== null,
+		progress: status?.progress ?? null,
 	} as const;
 };

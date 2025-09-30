@@ -15,7 +15,7 @@ import { getPathSegments, getRelativePath, joinPathSegments } from '@utils/fs/pa
 
 import { replaceUrls } from '../utils/mdast';
 
-type NoteData = INote & { tags: string[] };
+export type NoteExportData = INote & { tags: string[] };
 
 export type ExportProgress = { total: number; processed: number };
 
@@ -29,12 +29,12 @@ type ExportContext = {
 	/**
 	 * Return persistent note data per export session
 	 */
-	getNoteData: (id: string) => Promise<NoteData | null>;
+	getNoteData: (id: string) => Promise<NoteExportData | null>;
 };
 
 type Config = {
 	filesRoot: string;
-	noteFilename?: (note: NoteData) => string;
+	noteFilename?: (note: NoteExportData) => string;
 	notesFetchLimit?: number;
 };
 
@@ -54,7 +54,7 @@ export class NotesExporter {
 		};
 	}
 
-	private async exportSingleNote(note: NoteData, context: ExportContext) {
+	private async exportSingleNote(note: NoteExportData, context: ExportContext) {
 		const notePath = getPathSegments(this.resolveNotePath(note));
 
 		const markdownProcessor = unified()
@@ -203,7 +203,7 @@ export class NotesExporter {
 		};
 	}
 
-	private resolveNotePath(note: NoteData) {
+	private resolveNotePath(note: NoteExportData) {
 		const filename = this.config.noteFilename?.(note) || `${note.id}.md`;
 
 		return joinPathSegments([filename]);
