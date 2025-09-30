@@ -4,6 +4,7 @@ import { AttachmentsController } from '@core/features/attachments/AttachmentsCon
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { createTextFile } from '@core/features/files/__tests__/mocks/createTextFile';
 import { FilesController } from '@core/features/files/FilesController';
+import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { ZipFS } from '@core/features/files/ZipFS';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
@@ -282,14 +283,14 @@ test('Export all notes and attached files as a zip file', async () => {
 	);
 
 	// Export notes
-	const fs1 = new ZipFS();
+	const fs1 = new ZipFS(new InMemoryFS());
 	await expect(exporter.exportNotes(fs1)).resolves.not.toThrow();
 
 	// Dump as zip file
 	const zipBuffer = await fs1.dump();
 
 	// Load zip file
-	const fs2 = new ZipFS();
+	const fs2 = new ZipFS(new InMemoryFS());
 	await fs2.load(zipBuffer);
 
 	const filesList = await fs2.list();
@@ -299,6 +300,8 @@ test('Export all notes and attached files as a zip file', async () => {
 		const file1 = await fs1.get(file);
 		const file2 = await fs2.get(file);
 
-		expect(new TextDecoder().decode(file1)).toEqual(new TextDecoder().decode(file2));
+		expect(new TextDecoder().decode(file1 as ArrayBuffer)).toEqual(
+			new TextDecoder().decode(file2 as ArrayBuffer),
+		);
 	}
 });
