@@ -201,11 +201,11 @@ describe('data fetching', () => {
 			{ title: 'Title 3', text: 'Text 3' },
 			{ title: 'Title 4', text: 'Text 4' },
 		];
-		const ids = await Promise.all(entries.map((note) => registry.add(note)));
+		const notesId = await Promise.all(entries.map((note) => registry.add(note)));
 		await expect(registry.get()).resolves.toHaveLength(4);
 
 		// update status for 3 notes
-		await registry.updateMeta(ids.slice(0, 3), { isDeleted: true });
+		await registry.updateMeta(notesId.slice(0, 3), { isDeleted: true });
 
 		// get only deleted notes
 		const deletedNotes = await registry.get({ deleted: true });
@@ -228,7 +228,7 @@ describe('data fetching', () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, 'fake-workspace-id');
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const tags = new TagsController(db, 'fake-workspace-id');
 
 		// Create notes and attach tag to note
 		const entries = [
@@ -237,14 +237,14 @@ describe('data fetching', () => {
 			{ title: 'Title 3', text: 'Text 3' },
 			{ title: 'Title 4', text: 'Text 4' },
 		];
-		const notes = await Promise.all(entries.map((note) => registry.add(note)));
-		const note = notes[0];
+		const notesId = await Promise.all(entries.map((note) => registry.add(note)));
+		const noteId = notesId[0];
 		const fooTag = await tags.add('foo', null);
-		await tags.setAttachedTags(note, [fooTag]);
+		await tags.setAttachedTags(noteId, [fooTag]);
 
 		await expect(registry.get()).resolves.toHaveLength(4);
 
-		await registry.updateMeta([note], { isDeleted: true });
+		await registry.updateMeta([noteId], { isDeleted: true });
 
 		// filter by tag only
 		await expect(registry.get({ tags: [fooTag] })).resolves.toHaveLength(1);
@@ -258,7 +258,7 @@ describe('data fetching', () => {
 		).resolves.toHaveLength(0);
 
 		// reset deleted status
-		await registry.updateMeta([note], { isDeleted: false });
+		await registry.updateMeta([noteId], { isDeleted: false });
 
 		// filter by tag + deleted:
 		await expect(
