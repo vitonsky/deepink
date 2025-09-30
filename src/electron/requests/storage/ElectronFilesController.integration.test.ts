@@ -63,8 +63,6 @@ vi.mock('recursive-readdir', async () => {
 	};
 });
 
-// TODO: add tests for multiple clients
-// TODO: add tests for directory traversal protection. Client must not go out of app root
 const storageHandlerCleanup = enableStorage();
 const filesController = new ElectronFilesController(storageApi, 'profileDir');
 
@@ -101,6 +99,33 @@ test('Check files content', async () => {
 			),
 		),
 	).resolves.toMatchSnapshot('Files content');
+});
+
+describe('Many clients', () => {
+	const files1 = new ElectronFilesController(storageApi, 'profile1');
+	const files2 = new ElectronFilesController(storageApi, 'profile2');
+
+	test('Available files is scoped by client root', async () => {
+		await files1.write('test.bytes', new Uint8Array(1));
+
+		await expect(files1.list()).resolves.toEqual(['/test.bytes']);
+		await expect(files2.list()).resolves.toEqual([]);
+
+		await files2.write('test.bytes', new Uint8Array(2));
+
+		await expect(files1.get('test.bytes')).resolves.toStrictEqual(
+			new Uint8Array(1).buffer,
+		);
+		await expect(files2.get('test.bytes')).resolves.toStrictEqual(
+			new Uint8Array(2).buffer,
+		);
+	});
+
+	test("Client can't traverse out of it's root", async () => {
+		await expect(files1.get('../profile2/test.bytes')).rejects.toThrowError(
+			'Resolved path is out of root directory',
+		);
+	});
 });
 
 test('Path traversal out of scope directory must not be possible', async () => {
