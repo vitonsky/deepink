@@ -133,6 +133,9 @@ describe('Deletion tests', () => {
 
 	test('Add files', async () => {
 		await expect(files.write('/root.bytes', new Uint8Array())).resolves.not.toThrow();
+		await expect(files.write('/bytes1', new Uint8Array())).resolves.not.toThrow();
+		await expect(files.write('/bytes2', new Uint8Array())).resolves.not.toThrow();
+		await expect(files.write('/bytes3', new Uint8Array())).resolves.not.toThrow();
 		await expect(files.write('/foo/bytes1', new Uint8Array())).resolves.not.toThrow();
 		await expect(files.write('/foo/bytes2', new Uint8Array())).resolves.not.toThrow();
 		await expect(
@@ -141,6 +144,22 @@ describe('Deletion tests', () => {
 		await expect(
 			files.write('/foo/bar/bytes2', new Uint8Array()),
 		).resolves.not.toThrow();
+	});
+
+	test('Single file may be deleted', async () => {
+		await expect(files.list()).resolves.toContain('/bytes1');
+		await files.delete(['bytes1']);
+		await expect(files.list()).resolves.not.toContain('/bytes1');
+	});
+
+	test('Few files may be deleted', async () => {
+		await expect(files.list()).resolves.toContain('/bytes2');
+		await expect(files.list()).resolves.toContain('/bytes3');
+
+		await files.delete(['bytes2', '/bytes3']);
+
+		await expect(files.list()).resolves.not.toContain('/bytes2');
+		await expect(files.list()).resolves.not.toContain('/bytes3');
 	});
 
 	test('Directory deletion deletes all its content', async () => {
