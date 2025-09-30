@@ -128,6 +128,38 @@ test('File may be accessed via absolute and relevant paths both', async () => {
 	);
 });
 
+describe('Deletion tests', () => {
+	const files = new ElectronFilesController(storageApi, 'deletionTests');
+
+	test('Add files', async () => {
+		await expect(files.write('/root.bytes', new Uint8Array())).resolves.not.toThrow();
+		await expect(files.write('/foo/bytes1', new Uint8Array())).resolves.not.toThrow();
+		await expect(files.write('/foo/bytes2', new Uint8Array())).resolves.not.toThrow();
+		await expect(
+			files.write('/foo/bar/bytes1', new Uint8Array()),
+		).resolves.not.toThrow();
+		await expect(
+			files.write('/foo/bar/bytes2', new Uint8Array()),
+		).resolves.not.toThrow();
+	});
+
+	test('Directory deletion deletes all its content', async () => {
+		await expect(files.list()).resolves.toContain('/foo/bar/bytes1');
+		await expect(files.list()).resolves.toContain('/foo/bar/bytes2');
+
+		await files.delete(['/foo/bar']);
+		await expect(files.list()).resolves.not.toContain('/foo/bar/bytes1');
+		await expect(files.list()).resolves.not.toContain('/foo/bar/bytes2');
+	});
+
+	test('Root directory may be deleted', async () => {
+		await expect(files.list()).resolves.not.toEqual([]);
+
+		await files.delete(['/']);
+		await expect(files.list()).resolves.toEqual([]);
+	});
+});
+
 describe('Many clients', () => {
 	const files1 = new ElectronFilesController(storageApi, 'profile1');
 	const files2 = new ElectronFilesController(storageApi, 'profile2');
