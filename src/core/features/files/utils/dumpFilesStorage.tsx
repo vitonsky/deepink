@@ -13,7 +13,7 @@ export const dumpFilesStorage = async (
 		await saveFile(
 			joinPathSegments([
 				directory,
-				(name ?? Date.now() + '.zip').replaceAll(/[^\w\d]/g, '_'),
+				String(name ?? Date.now()).replaceAll(/[^\w\d]/g, '_') + '.zip',
 			]),
 			zipBuffer,
 		);
