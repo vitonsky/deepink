@@ -13,7 +13,10 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { requestDirectoryPath } from '@utils/fs/client';
+import { escapeFileName, getResolvedPath } from '@utils/fs/paths';
+import { uniqueName } from '@utils/fs/uniqueName';
 
+// TODO: customize file names to use specific name for export single note
 export const getExportArchiveName = (workspaceName?: string) =>
 	[
 		'backup',
@@ -23,15 +26,40 @@ export const getExportArchiveName = (workspaceName?: string) =>
 		.filter(Boolean)
 		.join('-');
 
-function noteFilename(note: NoteExportData) {
-	return [
-		'notes',
-		note.tags[0],
-		[note.id, note.content.title].filter(Boolean).join('-') + '.md',
-	]
-		.filter(Boolean)
-		.join('/');
-}
+export const configureNoteNameGetter = (isSingleNoteMode = false) =>
+	uniqueName(function noteFilename(note: NoteExportData, uniqueId) {
+		let noteTag: string | null = null;
+		if (!isSingleNoteMode) {
+			for (const tag of note.tags) {
+				// Use any tag if nothing selected
+				if (!noteTag) {
+					noteTag = tag;
+					continue;
+				}
+
+				// Select tag with greatest segments number
+				if (tag.split('/').length > noteTag.split('/').length) {
+					noteTag = tag;
+					continue;
+				}
+			}
+		}
+
+		return getResolvedPath(
+			[
+				...(isSingleNoteMode ? [] : [noteTag]),
+				escapeFileName(
+					[note.content.title.trim() || note.id, uniqueId]
+						.filter(Boolean)
+						.join('-') + '.md',
+				),
+			]
+				.filter(Boolean)
+				.join('/'),
+			'/',
+		);
+	});
+
 // TODO: notify for successful export
 export const useNotesExport = () => {
 	const [status, setStatus] = useState<{
@@ -75,7 +103,7 @@ export const useNotesExport = () => {
 					tagsRegistry,
 				},
 				{
-					noteFilename,
+					noteFilename: configureNoteNameGetter(false),
 				},
 			).exportNotes(files, {
 				onProcessed: (info: ExportProgress) => {
@@ -122,7 +150,7 @@ export const useNotesExport = () => {
 					tagsRegistry,
 				},
 				{
-					noteFilename,
+					noteFilename: configureNoteNameGetter(true),
 				},
 			).exportNote(noteId, files);
 
