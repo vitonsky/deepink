@@ -117,7 +117,8 @@ export const useDefaultNoteContextMenu = ({
 					break;
 				}
 				case NoteActions.EXPORT: {
-					await notesExport.exportNotes(
+					await notesExport.exportNote(
+						id,
 						true,
 						getExportArchiveName(workspaceData?.name),
 					);
