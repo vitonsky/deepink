@@ -1,4 +1,6 @@
 // Run only in browser-like env
-if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+const isDOMLikeEnv = typeof window !== 'undefined' && typeof document !== 'undefined';
+if (isDOMLikeEnv) {
+	require('@testing-library/jest-dom');
 	require('blob-polyfill');
 }
