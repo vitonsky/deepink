@@ -40,6 +40,7 @@
 			"@hooks/*": ["src/hooks/*"],
 			"@api/*": ["src/api/*"],
 			"@state/*": ["src/state/*"],
+			"@mocks/*": ["src/__tests__/__mocks__/*"],
 			"@utils/*": ["src/utils/*"]
 		}
 	},
