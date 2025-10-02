@@ -22,7 +22,9 @@ import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { configureNoteNameGetter, useNotesExport } from './useNotesExport';
 
-vi.mock('@utils/fs/client', async () => fsClientMock);
+vi.mock('fs', () => vi.importActual('@mocks/fs'));
+vi.mock('fs/promises', () => vi.importActual('@mocks/fs/promises'));
+vi.mock('@utils/fs/client', () => vi.importActual('@utils/fs/__tests__/client.mock'));
 
 afterEach(() => {
 	vi.clearAllMocks();
