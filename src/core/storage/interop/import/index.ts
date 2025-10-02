@@ -36,11 +36,18 @@ const createNotifier = ({
 }) => {
 	let counter = 0;
 
-	return () => {
-		counter++;
-		if (callback) callback({ stage, total, processed: counter });
+	return {
+		getStats() {
+			return { total, processed: counter };
+		},
+		notify: () => {
+			counter++;
+			if (callback) callback({ stage, total, processed: counter });
+		},
 	};
 };
+
+const waitNextTick = () => new Promise((res) => requestAnimationFrame(res));
 
 const RawNoteMetaScheme = z
 	.object({
@@ -60,10 +67,11 @@ type Config = {
 	convertPathToTag: 'never' | 'fallback' | 'always';
 };
 
-type Options = {};
+export type NotesImporterOptions = Partial<Config>;
 
+// TODO: run import and export in worker
 export class NotesImporter {
-	private readonly config: Config & Options;
+	private readonly config: Config;
 	constructor(
 		private readonly storage: {
 			notesRegistry: INotesController;
@@ -72,7 +80,7 @@ export class NotesImporter {
 			filesRegistry: FilesController;
 			attachmentsRegistry: AttachmentsController;
 		},
-		options: Partial<Config> & Options = {},
+		options: NotesImporterOptions = {},
 	) {
 		this.config = {
 			noteExtensions: ['.md'],
@@ -112,21 +120,23 @@ export class NotesImporter {
 		// Process files and add note drafts
 		// On this stage we collect used resources and add semi-raw note texts to DB
 		const filePathsList = await files.list();
-		const notifyParsingProgress = createNotifier({
+		const parsingProgress = createNotifier({
 			stage: 'parsing',
 			total: filePathsList.length,
 			callback: onProcessed,
 		});
 		for (const filename of filePathsList) {
+			await waitNextTick();
+
 			// Handle only notes
 			if (!this.isNotePath(filename)) {
-				notifyParsingProgress();
+				parsingProgress.notify();
 				continue;
 			}
 
 			const fileContent = await files.get(filename);
 			if (!fileContent) {
-				notifyParsingProgress();
+				parsingProgress.notify();
 				continue;
 			}
 
@@ -197,13 +207,13 @@ export class NotesImporter {
 				path: fileAbsolutePathSegments.dirname,
 			};
 
-			notifyParsingProgress();
+			parsingProgress.notify();
 		}
 
 		// TODO: limit concurrency for case with many large files
 		// Upload attached files concurrently
 		const filePathToIdMap: Record<string, string> = {};
-		const notifyUploadingProgress = createNotifier({
+		const uploadingProgress = createNotifier({
 			stage: 'uploading',
 			total: attachmentPathsToUpload.size,
 			callback: onProcessed,
@@ -216,18 +226,20 @@ export class NotesImporter {
 					filePathToIdMap[absoluteUrl] = fileId;
 				}
 
-				notifyUploadingProgress();
+				uploadingProgress.notify();
 			}),
 		);
 
 		// Update note drafts to complete import
 		const notesToUpdate = Object.values(createdNotes);
-		const notifyUpdatingProgress = createNotifier({
+		const updatingProgress = createNotifier({
 			stage: 'updating',
 			total: notesToUpdate.length,
 			callback: onProcessed,
 		});
 		for (const { id: noteId, path: noteDirPath } of notesToUpdate) {
+			await waitNextTick();
+
 			const note = await notesRegistry.getById(noteId);
 			if (!note) throw new Error('Note with such id does not exist');
 
@@ -284,7 +296,7 @@ export class NotesImporter {
 
 			await noteVersions.snapshot(noteId);
 
-			notifyUpdatingProgress();
+			updatingProgress.notify();
 		}
 
 		await notesRegistry.updateMeta(

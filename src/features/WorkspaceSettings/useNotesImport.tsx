@@ -1,8 +1,12 @@
 import { useCallback, useState } from 'react';
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { IFilesStorage } from '@core/features/files';
-import { NotesImporter, OnProcessedPayload } from '@core/storage/interop/import';
+import {
+	NotesImporter,
+	NotesImporterOptions,
+	OnProcessedPayload,
+} from '@core/storage/interop/import';
 import {
 	useAttachmentsController,
 	useEventBus,
@@ -24,14 +28,14 @@ export const useNotesImport = () => {
 
 	const eventBus = useEventBus();
 	const importNotes = useCallback(
-		async (files: IFilesStorage) => {
+		async (files: IFilesStorage, options: NotesImporterOptions = {}) => {
 			setProgress({
 				stage: 'parsing',
 				total: 0,
 				processed: 0,
 			});
 
-			const debouncedProgressUpdate = debounce(setProgress, 50);
+			const onProgress = throttle(setProgress, 200);
 			await new NotesImporter(
 				{
 					filesRegistry,
@@ -45,15 +49,17 @@ export const useNotesImport = () => {
 					// eslint-disable-next-line spellcheck/spell-checker
 					noteExtensions: ['.md', '.mdx'],
 					convertPathToTag: 'always',
+					...options,
 				},
 			).import(files, {
 				onProcessed(info) {
-					console.log(info);
-					debouncedProgressUpdate(info);
+					console.log('Import progress', info);
+					onProgress(info);
 				},
 			});
 
-			debouncedProgressUpdate(null);
+			onProgress.flush();
+			setProgress(null);
 			eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
 		},
 		[
