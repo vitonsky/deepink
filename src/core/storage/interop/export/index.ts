@@ -8,7 +8,7 @@ import { stringify as stringifyYaml } from 'yaml';
 import { IFilesStorage } from '@core/features/files';
 import { FilesController } from '@core/features/files/FilesController';
 import { getAppResourceDataInUrl } from '@core/features/links';
-import { INote } from '@core/features/notes';
+import { INote, NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { getPathSegments, getRelativePath, joinPathSegments } from '@utils/fs/paths';
@@ -30,6 +30,13 @@ type ExportContext = {
 	 * Return persistent note data per export session
 	 */
 	getNoteData: (id: string) => Promise<NoteExportData | null>;
+
+	/**
+	 * Resolves note to unique path
+	 *
+	 * Path are persistent per note and unique in context
+	 */
+	resolveNotePath: (note: NoteExportData) => string;
 };
 
 type Config = {
@@ -55,7 +62,7 @@ export class NotesExporter {
 	}
 
 	private async exportSingleNote(note: NoteExportData, context: ExportContext) {
-		const notePath = getPathSegments(this.resolveNotePath(note));
+		const notePath = getPathSegments(context.resolveNotePath(note));
 
 		const markdownProcessor = unified()
 			.use(remarkParse)
@@ -93,7 +100,7 @@ export class NotesExporter {
 					if (!noteData) return nodeUrl;
 
 					return getRelativePath(
-						this.resolveNotePath(noteData),
+						context.resolveNotePath(noteData),
 						notePath.dirname,
 					);
 				}
@@ -138,7 +145,7 @@ export class NotesExporter {
 					const noteDump = await this.exportSingleNote(noteData, context);
 
 					await files.write(
-						this.resolveNotePath(noteData),
+						context.resolveNotePath(noteData),
 						new TextEncoder().encode(noteDump),
 					);
 
@@ -164,7 +171,7 @@ export class NotesExporter {
 
 		const noteDump = await this.exportSingleNote(noteData, exportContext);
 		await files.write(
-			this.resolveNotePath(noteData),
+			exportContext.resolveNotePath(noteData),
 			new TextEncoder().encode(noteDump),
 		);
 	}
@@ -172,6 +179,8 @@ export class NotesExporter {
 	private createContext(files: IFilesStorage): ExportContext {
 		const { notesRegistry, filesRegistry } = this.context;
 		const fetchedFiles: Record<string, Promise<string | null>> = {};
+		const noteNames: Record<NoteId, string> = {};
+
 		return {
 			files,
 			saveAttachment: async (id: string) => {
@@ -200,13 +209,15 @@ export class NotesExporter {
 				const tags = await this.getNoteTags(note.id);
 				return { ...note, tags };
 			},
+			resolveNotePath: (note: NoteExportData) => {
+				if (!noteNames[note.id]) {
+					const filename = this.config.noteFilename?.(note) || `${note.id}.md`;
+					noteNames[note.id] = joinPathSegments([filename]);
+				}
+
+				return noteNames[note.id];
+			},
 		};
-	}
-
-	private resolveNotePath(note: NoteExportData) {
-		const filename = this.config.noteFilename?.(note) || `${note.id}.md`;
-
-		return joinPathSegments([filename]);
 	}
 
 	private async getNoteTags(noteId: string) {

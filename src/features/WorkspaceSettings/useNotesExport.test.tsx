@@ -109,10 +109,10 @@ describe('Export notes', async () => {
 		await fs.load(fsClientMock.saveFile.mock.calls[0][1]);
 
 		await expect(fs.list()).resolves.toStrictEqual([
-			'/Title_1-1.md',
-			'/Title_2-1.md',
+			'/Title_1.md',
+			'/Title_2.md',
 			expect.stringMatching('/_resources/[\\w\\d-]+-attachment.txt'),
-			'/Note_with_attachment-1.md',
+			'/Note_with_attachment.md',
 		]);
 	});
 
@@ -161,7 +161,7 @@ describe('Export notes', async () => {
 
 		await expect(fs.list()).resolves.toStrictEqual([
 			expect.stringMatching('/_resources/[\\w\\d-]+-attachment.txt'),
-			'/Note_with_attachment-1.md',
+			'/Note_with_attachment.md',
 		]);
 	});
 });
