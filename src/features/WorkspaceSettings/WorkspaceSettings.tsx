@@ -1,14 +1,28 @@
 import React, { FC, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Checkbox, HStack, Input, Link, Text, VStack } from '@chakra-ui/react';
+import { FlateErrorCode } from 'fflate';
+import {
+	Button,
+	Checkbox,
+	HStack,
+	Input,
+	Link,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
+import { copyFileListToFS } from '@core/features/files/utils/copyFileListToFS';
+import { ZipFS } from '@core/features/files/ZipFS';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { importNotes } from '@electron/requests/files/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import {
 	useAttachmentsController,
@@ -24,6 +38,8 @@ import {
 } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useDirectoryPicker } from '@hooks/files/useDirectoryPicker';
+import { useFilesPicker } from '@hooks/files/useFilesPicker';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -34,6 +50,11 @@ import {
 
 import { getExportArchiveName, useNotesExport } from './useNotesExport';
 import { useNotesImport } from './useNotesImport';
+
+export const importOptions = [
+	{ type: 'zip', text: 'Import notes from .zip archive' },
+	{ type: 'directory', text: 'Import directory with Markdown files' },
+] as const;
 
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;
@@ -46,6 +67,60 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 	const notesImport = useNotesImport();
 	const notesExport = useNotesExport();
+
+	const selectDirectory = useDirectoryPicker();
+	const selectFiles = useFilesPicker();
+
+	const onClickImport = useCallback(
+		async (type: (typeof importOptions)[number]['type']) => {
+			try {
+				// NotesImporterOptions
+				switch (type) {
+					case 'zip': {
+						const files = await selectFiles({
+							accept: '.zip',
+						});
+						if (!files) return;
+
+						const fs = new ZipFS(new InMemoryFS());
+
+						const zipBuffer = await files[0].arrayBuffer();
+						await fs.load(zipBuffer);
+
+						await notesImport.importNotes(fs, {
+							noteExtensions: ['.md', '.mdx'],
+							convertPathToTag: 'always',
+						});
+						break;
+					}
+					case 'directory': {
+						const files = await selectDirectory();
+						if (!files) return;
+
+						await notesImport.importNotes(
+							await copyFileListToFS(files, new InMemoryFS()),
+							{
+								noteExtensions: ['.md', '.mdx'],
+								convertPathToTag: 'always',
+							},
+						);
+						break;
+					}
+				}
+			} catch (error) {
+				if (typeof error === 'object' && error && 'code' in error) {
+					switch (error.code) {
+						case FlateErrorCode.InvalidZipData:
+							console.log('Invalid archive data');
+							break;
+					}
+				}
+
+				throw error;
+			}
+		},
+		[notesImport, selectDirectory, selectFiles],
+	);
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
 
@@ -162,19 +237,18 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 					<FeaturesOption description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app">
 						<VStack w="100%" align="start">
 							<HStack>
-								<Button
-									isDisabled={notesImport.progress !== null}
-									onClick={async () => {
-										const content = await importNotes();
-										await notesImport.importNotes(
-											new InMemoryFS(content),
-										);
-
-										console.log('Import is completed');
-									}}
-								>
-									Import notes
-								</Button>
+								<Menu>
+									<MenuButton as={Button}>Import notes</MenuButton>
+									<MenuList>
+										{importOptions.map((option) => (
+											<MenuItem
+												onClick={() => onClickImport(option.type)}
+											>
+												<Text>{option.text}</Text>
+											</MenuItem>
+										))}
+									</MenuList>
+								</Menu>
 								<Button
 									isDisabled={notesExport.progress !== null}
 									onClick={async () => {
