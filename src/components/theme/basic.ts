@@ -166,7 +166,10 @@ export const basicTheme = extendTheme({
 				secondary: {
 					backgroundColor: 'dim.100',
 					color: 'typography.primary',
-					'&:hover': {
+					'&[disabled], &:hover, &[disabled]:hover': {
+						backgroundColor: 'dim.100',
+					},
+					'&:not([disabled]):hover': {
 						backgroundColor: 'dim.400',
 					},
 				},
