@@ -47,34 +47,49 @@ export const useImportNotesPreset = () => {
 					break;
 				}
 				case 'directory': {
-					await notesImport.importNotes(
-						new FilesFS(
-							Object.fromEntries(
-								files.map((file) => {
-									let filePath = file.name;
-									if (file.webkitRelativePath) {
-										const relativePath = file.webkitRelativePath.split('/');
-										filePath = joinPathSegments(
-											relativePath.length > 1
-												? relativePath.slice(1)
-												: relativePath
-										);
-									}
+					const fs = new FilesFS(
+						Object.fromEntries(
+							files.map((file) => {
+								let filePath = file.name;
 
-									return [filePath, file];
-								})
-							)
+								const relativePath: string =
+									(file as any).relativePath ?? '';
+								if (file.webkitRelativePath) {
+									const relativePath =
+										file.webkitRelativePath.split('/');
+									filePath = joinPathSegments(
+										relativePath.length > 1
+											? relativePath.slice(1)
+											: relativePath,
+									);
+								} else if (relativePath) {
+									// Handle case if files was dropped and have no `webkitRelativePath` property, but have non standard `relativePath` property
+									// https://github.com/react-dropzone/react-dropzone/issues/459
+									// Remove first empty segment (root)
+									const segments = relativePath
+										.split('/')
+										.filter(Boolean);
+									filePath = joinPathSegments(
+										segments.length > 1
+											? segments.slice(1)
+											: segments,
+									);
+								}
+
+								return [filePath, file];
+							}),
 						),
-						{
-							noteExtensions: ['.md', '.mdx'],
-							convertPathToTag: 'always',
-						}
 					);
+
+					await notesImport.importNotes(fs, {
+						noteExtensions: ['.md', '.mdx'],
+						convertPathToTag: 'always',
+					});
 					break;
 				}
 			}
 		},
-		[notesImport]
+		[notesImport],
 	);
 
 	return {
