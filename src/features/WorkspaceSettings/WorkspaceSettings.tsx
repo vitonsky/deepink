@@ -1,7 +1,8 @@
 import React, { FC, useCallback, useMemo } from 'react';
+import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
-import { FlateErrorCode } from 'fflate';
 import {
+	Box,
 	Button,
 	Checkbox,
 	HStack,
@@ -11,6 +12,7 @@ import {
 	MenuButton,
 	MenuItem,
 	MenuList,
+	Spinner,
 	Text,
 	VStack,
 } from '@chakra-ui/react';
@@ -18,9 +20,6 @@ import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
-import { FilesFS } from '@core/features/files/FilesFS';
-import { InMemoryFS } from '@core/features/files/InMemoryFS';
-import { ZipFS } from '@core/features/files/ZipFS';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
@@ -47,15 +46,9 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { joinPathSegments } from '@utils/fs/paths';
 
+import { importOptions, ImportTypes, useImportNotesPreset } from './useImportNotesPreset';
 import { getExportArchiveName, useNotesExport } from './useNotesExport';
-import { useNotesImport } from './useNotesImport';
-
-export const importOptions = [
-	{ type: 'zip', text: 'Import notes from .zip archive' },
-	{ type: 'directory', text: 'Import directory with Markdown files' },
-] as const;
 
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;
@@ -66,78 +59,35 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		profile: { db },
 	} = useProfileControls();
 
-	const notesImport = useNotesImport();
+	const { importFiles, progress: importProgress } = useImportNotesPreset();
 	const notesExport = useNotesExport();
 
 	const selectDirectory = useDirectoryPicker();
 	const selectFiles = useFilesPicker();
 
 	const onClickImport = useCallback(
-		async (type: (typeof importOptions)[number]['type']) => {
-			try {
-				// NotesImporterOptions
-				switch (type) {
-					case 'zip': {
-						const files = await selectFiles({
-							accept: '.zip',
-						});
-						if (!files) return;
+		async (type: ImportTypes) => {
+			// NotesImporterOptions
+			switch (type) {
+				case 'zip': {
+					const files = await selectFiles({
+						accept: '.zip',
+					});
+					if (!files || files.length !== 1) return;
 
-						const fs = new ZipFS(new InMemoryFS());
-
-						const zipBuffer = await files[0].arrayBuffer();
-						await fs.load(zipBuffer);
-
-						await notesImport.importNotes(fs, {
-							noteExtensions: ['.md', '.mdx'],
-							convertPathToTag: 'always',
-						});
-						break;
-					}
-					case 'directory': {
-						const files = await selectDirectory();
-						if (!files) return;
-
-						await notesImport.importNotes(
-							new FilesFS(
-								Object.fromEntries(
-									Array.from(files).map((file) => {
-										let filePath = file.name;
-										if (file.webkitRelativePath) {
-											const relativePath =
-												file.webkitRelativePath.split('/');
-											filePath = joinPathSegments(
-												relativePath.length > 1
-													? relativePath.slice(1)
-													: relativePath,
-											);
-										}
-
-										return [filePath, file];
-									}),
-								),
-							),
-							{
-								noteExtensions: ['.md', '.mdx'],
-								convertPathToTag: 'always',
-							},
-						);
-						break;
-					}
+					await importFiles('zip', Array.from(files));
+					break;
 				}
-			} catch (error) {
-				if (typeof error === 'object' && error && 'code' in error) {
-					switch (error.code) {
-						case FlateErrorCode.InvalidZipData:
-							console.log('Invalid archive data');
-							break;
-					}
-				}
+				case 'directory': {
+					const files = await selectDirectory();
+					if (!files || files.length === 0) return;
 
-				throw error;
+					await importFiles('zip', Array.from(files));
+					break;
+				}
 			}
 		},
-		[notesImport, selectDirectory, selectFiles],
+		[importFiles, selectDirectory, selectFiles],
 	);
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
@@ -219,7 +169,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 	return (
 		<ModalScreen isVisible onClose={onClose} title="Workspace settings">
-			<VStack w="100%" minH="100%" p="2rem 5rem" justifyContent="center">
+			<VStack w="100%" minH="100%" p="2rem" justifyContent="center">
 				<Features>
 					<FeaturesOption title="Workspace name">
 						<HStack
@@ -256,7 +206,12 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 						<VStack w="100%" align="start">
 							<HStack>
 								<Menu>
-									<MenuButton as={Button}>Import notes</MenuButton>
+									<MenuButton
+										as={Button}
+										isDisabled={importProgress !== null}
+									>
+										Import notes
+									</MenuButton>
 									<MenuList>
 										{importOptions.map((option) => (
 											<MenuItem
@@ -280,14 +235,60 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 									Export notes
 								</Button>
 							</HStack>
-							{notesImport.progress && (
-								<Text>
-									Notes import is in progress:{' '}
-									{notesImport.progress.stage}{' '}
-									{notesImport.progress.total}/
-									{notesImport.progress.processed}
-								</Text>
+							{importProgress && (
+								<HStack w="100%" align="start">
+									<Spinner size="sm" />
+									<Text>
+										Notes import is in progress. Stage:{' '}
+										{importProgress.stage} {importProgress.total}/
+										{importProgress.processed}
+									</Text>
+								</HStack>
 							)}
+
+							<Dropzone
+								onDrop={async (files) => {
+									if (files.length === 0) return;
+
+									// Import zip file
+									if (
+										files.length === 1 &&
+										files[0].name.endsWith('.zip')
+									) {
+										await importFiles('zip', files);
+										return;
+									}
+
+									// Import markdown files
+									await importFiles('directory', files);
+								}}
+								disabled={importProgress !== null}
+							>
+								{({ getRootProps, getInputProps, isDragActive }) => (
+									<Box
+										as="section"
+										border="1px dashed"
+										backgroundColor="dim.50"
+										borderColor={isDragActive ? 'dim.400' : 'dim.100'}
+										borderWidth="2px"
+										borderRadius="2px"
+										padding="1rem"
+										opacity={importProgress === null ? 1 : 0.6}
+									>
+										<VStack {...getRootProps()} gap="1rem">
+											<input {...getInputProps()} />
+											<Text>
+												Drop Markdown files or .zip archive to
+												import
+											</Text>
+											<Text color="typography.secondary">
+												Drag & Drop some files here, or click to
+												select files
+											</Text>
+										</VStack>
+									</Box>
+								)}
+							</Dropzone>
 						</VStack>
 					</FeaturesOption>
 

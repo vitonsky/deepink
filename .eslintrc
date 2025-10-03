@@ -54,6 +54,7 @@
 					"DOM",
 					"mdx",
 					"webkit",
+					"Dropzone",
 					"memfs",
 					"Flate",
 					"Focusable",

@@ -35,7 +35,7 @@ export const ProfileSettings = () => {
 
 	return (
 		<ModalScreen isVisible={isOpened} onClose={onClose} title="Settings">
-			<VStack w="100%" minH="100%" p="2rem 5rem" justifyContent="center">
+			<VStack w="100%" minH="100%" p="2rem" justifyContent="center">
 				<Features>
 					<FeaturesHeader view="primary">Database settings</FeaturesHeader>
 
