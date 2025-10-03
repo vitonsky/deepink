@@ -49,6 +49,7 @@ export const useNotesImport = () => {
 					// eslint-disable-next-line spellcheck/spell-checker
 					noteExtensions: ['.md', '.mdx'],
 					convertPathToTag: 'always',
+					throttle: requestAnimationFrame,
 					...options,
 				},
 			).import(files, {

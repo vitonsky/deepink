@@ -47,7 +47,8 @@ const createNotifier = ({
 	};
 };
 
-const waitNextTick = () => new Promise((res) => requestAnimationFrame(res));
+const waitNextTick = (callback?: (callback: () => void) => void) =>
+	callback ? new Promise<void>((res) => callback(res)) : Promise.resolve();
 
 const RawNoteMetaScheme = z
 	.object({
@@ -65,6 +66,7 @@ type Config = {
 	ignorePaths: string[];
 	noteExtensions: string[];
 	convertPathToTag: 'never' | 'fallback' | 'always';
+	throttle?: (callback: () => void) => void;
 };
 
 export type NotesImporterOptions = Partial<Config>;
@@ -126,7 +128,7 @@ export class NotesImporter {
 			callback: onProcessed,
 		});
 		for (const filename of filePathsList) {
-			await waitNextTick();
+			await waitNextTick(this.config.throttle);
 
 			// Handle only notes
 			if (!this.isNotePath(filename)) {
@@ -238,7 +240,7 @@ export class NotesImporter {
 			callback: onProcessed,
 		});
 		for (const { id: noteId, path: noteDirPath } of notesToUpdate) {
-			await waitNextTick();
+			await waitNextTick(this.config.throttle);
 
 			const note = await notesRegistry.getById(noteId);
 			if (!note) throw new Error('Note with such id does not exist');

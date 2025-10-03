@@ -83,6 +83,7 @@ describe('Base notes import cases', () => {
 				ignorePaths: ['/_resources'],
 				noteExtensions: ['.md', '.mdx'],
 				convertPathToTag: 'always',
+				throttle: requestAnimationFrame,
 			},
 		);
 
