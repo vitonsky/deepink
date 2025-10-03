@@ -95,15 +95,17 @@ export class NotesImporter {
 	public async import(
 		files: IFilesStorage,
 		{
+			abortSignal,
 			onProcessed,
 		}: {
-			onProcessed?: (info: {
-				stage: 'parsing' | 'uploading' | 'updating';
-				total: number;
-				processed: number;
-			}) => void;
+			abortSignal?: AbortSignal;
+			onProcessed?: OnProcessedHook;
 		} = {},
 	) {
+		const checkForAbortion = () => {
+			abortSignal?.throwIfAborted();
+		};
+
 		const { notesRegistry, noteVersions, tagsRegistry, attachmentsRegistry } =
 			this.storage;
 
@@ -128,6 +130,7 @@ export class NotesImporter {
 			callback: onProcessed,
 		});
 		for (const filename of filePathsList) {
+			checkForAbortion();
 			await waitNextTick(this.config.throttle);
 
 			// Handle only notes
@@ -223,6 +226,8 @@ export class NotesImporter {
 		await Promise.all(
 			// Remove duplicates
 			Array.from(attachmentPathsToUpload).map(async (absoluteUrl) => {
+				// TODO: cancel uploading for all files
+				checkForAbortion();
 				const fileId = await this.getFileId(absoluteUrl, files);
 				if (fileId) {
 					filePathToIdMap[absoluteUrl] = fileId;
@@ -240,6 +245,7 @@ export class NotesImporter {
 			callback: onProcessed,
 		});
 		for (const { id: noteId, path: noteDirPath } of notesToUpdate) {
+			checkForAbortion();
 			await waitNextTick(this.config.throttle);
 
 			const note = await notesRegistry.getById(noteId);

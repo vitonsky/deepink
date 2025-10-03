@@ -14,7 +14,7 @@ import {
 	SQLiteDatabase,
 } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
-import { NotesImporter } from '.';
+import { NotesImporter, OnProcessedPayload } from '.';
 
 // Mock API
 globalThis.requestAnimationFrame = (callback) => {
@@ -408,64 +408,155 @@ describe('Import notes with different options', () => {
 	});
 });
 
-test('Importer throw error if DB closed while importing', async () => {
-	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
+describe('Import interruptions', () => {
+	const filesSample = {
+		'/_resources/secret.txt': createTextBuffer('SECRET'),
 
-	const fileManager = createFileManagerMock();
-
-	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-	const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
-	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
-
-	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
-
-	let handled = 0;
-	const importer = new NotesImporter(
-		{
-			filesRegistry,
-			notesRegistry,
-			noteVersions,
-			attachmentsRegistry,
-			tagsRegistry,
-		},
-		{
-			ignorePaths: ['/_resources'],
-			noteExtensions: ['.md', '.mdx'],
-			convertPathToTag: 'always',
-			throttle: (callback) => {
-				if (handled === 0) {
-					handled++;
-					callback();
-				} else {
-					db.close().then(() => {
-						callback();
-						handled++;
-					});
-				}
-			},
-		},
-	);
-
-	const onProcessed = vi.fn();
-	await expect(
-		importer.import(
-			createFileManagerMock({
-				// Notes list
-				'/note-1.md': createTextBuffer('Hello world!'),
-				'/note-2.mdx': createTextBuffer(
-					'---\ntitle: Title from meta\ntags:\n - foo\n - bar\n - baz\n---\nHello world!',
-				),
-				'/note-3.mdx': createTextBuffer('Mention for [note #1](./note-1.md)'),
-				'/note-4.md': createTextBuffer(
-					'Text with [attachment](./_resources/secret.txt)',
-				),
-				'/note-5.md': createTextBuffer(
-					'Another text with [attachment](./_resources/secret.txt)',
-				),
-			}),
-			{ onProcessed },
+		// Notes list
+		'/note-1.md': createTextBuffer('Hello world!'),
+		'/note-2.mdx': createTextBuffer(
+			'---\ntitle: Title from meta\ntags:\n - foo\n - bar\n - baz\n---\nHello world!',
 		),
-	).rejects.toThrowError('The database connection is not open');
+		'/note-3.mdx': createTextBuffer('Mention for [note #1](./note-1.md)'),
+		'/note-4.md': createTextBuffer('Text with [attachment](./_resources/secret.txt)'),
+		'/note-5.md': createTextBuffer(
+			'Another text with [attachment](./_resources/secret.txt)',
+		),
+	};
+
+	describe('Importer throw error by call for abort signal', async () => {
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+
+		const fileManager = createFileManagerMock();
+
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+
+		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+
+		const importer = new NotesImporter(
+			{
+				filesRegistry,
+				notesRegistry,
+				noteVersions,
+				attachmentsRegistry,
+				tagsRegistry,
+			},
+			{
+				ignorePaths: ['/_resources'],
+				noteExtensions: ['.md', '.mdx'],
+				convertPathToTag: 'always',
+			},
+		);
+
+		test('Throw on parsing stage', async () => {
+			const abortController = new AbortController();
+			const onProcessed = vi.fn((info: OnProcessedPayload) => {
+				if (info.stage === 'parsing' && info.processed === 2) {
+					abortController.abort(new Error('Import is cancelled'));
+				}
+			});
+
+			await expect(
+				importer.import(createFileManagerMock(filesSample), {
+					abortSignal: abortController.signal,
+					onProcessed,
+				}),
+			).rejects.toThrowError('Import is cancelled');
+
+			expect(onProcessed).toHaveBeenLastCalledWith({
+				stage: 'parsing',
+				total: expect.any(Number),
+				processed: 2,
+			});
+		});
+
+		test('Throw on uploading stage', async () => {
+			const abortController = new AbortController();
+			const onProcessed = vi.fn((info: OnProcessedPayload) => {
+				if (info.stage === 'uploading' && info.processed === 1) {
+					abortController.abort(new Error('Import is cancelled'));
+				}
+			});
+
+			await expect(
+				importer.import(createFileManagerMock(filesSample), {
+					abortSignal: abortController.signal,
+					onProcessed,
+				}),
+			).rejects.toThrowError('Import is cancelled');
+
+			expect(onProcessed).toHaveBeenLastCalledWith({
+				stage: 'uploading',
+				total: expect.any(Number),
+				processed: 1,
+			});
+		});
+
+		test('Throw on updating stage', async () => {
+			const abortController = new AbortController();
+			const onProcessed = vi.fn((info: OnProcessedPayload) => {
+				if (info.stage === 'updating' && info.processed === 1) {
+					abortController.abort(new Error('Import is cancelled'));
+				}
+			});
+
+			await expect(
+				importer.import(createFileManagerMock(filesSample), {
+					abortSignal: abortController.signal,
+					onProcessed,
+				}),
+			).rejects.toThrowError('Import is cancelled');
+
+			expect(onProcessed).toHaveBeenLastCalledWith({
+				stage: 'updating',
+				total: expect.any(Number),
+				processed: 1,
+			});
+		});
+	});
+
+	test('Importer throw error if DB closed while importing', async () => {
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+
+		const fileManager = createFileManagerMock();
+
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+
+		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+
+		const importer = new NotesImporter(
+			{
+				filesRegistry,
+				notesRegistry,
+				noteVersions,
+				attachmentsRegistry,
+				tagsRegistry,
+			},
+			{
+				ignorePaths: ['/_resources'],
+				noteExtensions: ['.md', '.mdx'],
+				convertPathToTag: 'always',
+				// Slow down the processing
+				throttle: requestAnimationFrame,
+			},
+		);
+
+		await expect(
+			importer.import(createFileManagerMock(filesSample), {
+				onProcessed(info) {
+					if (info.processed > 0) {
+						db.close();
+					}
+				},
+			}),
+		).rejects.toThrowError('The database connection is not open');
+	});
 });
