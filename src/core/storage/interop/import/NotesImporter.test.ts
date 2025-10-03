@@ -7,6 +7,7 @@ import { NotesController } from '@core/features/notes/controller/NotesController
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { wait } from '@utils/tests';
 
 import {
 	openDatabase,
@@ -14,6 +15,14 @@ import {
 } from '../../database/SQLiteDatabase/SQLiteDatabase';
 
 import { NotesImporter } from '.';
+
+// Mock API
+globalThis.requestAnimationFrame = (callback) => {
+	wait(1).then(() => {
+		callback(Date.now());
+	});
+	return 0;
+};
 
 const FAKE_WORKSPACE_NAME = 'fake-workspace-id';
 
