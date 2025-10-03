@@ -160,16 +160,21 @@ export class NotesImporter {
 					fileAbsolutePathSegments.dirname,
 				);
 
+				// TODO: use set for O(1) access
+				const foundPath = [absolutePath, decodeURI(absolutePath)].find((path) =>
+					filePathsList.includes(path),
+				);
+
 				// Leave original URL as is if file does not exist in files for import
-				if (!filePathsList.includes(absolutePath)) return nodeUrl;
+				if (!foundPath) return nodeUrl;
 
 				// Collect attachments paths
-				if (!this.isNotePath(absolutePath)) {
-					attachmentPathsToUpload.add(absolutePath);
+				if (!this.isNotePath(foundPath)) {
+					attachmentPathsToUpload.add(foundPath);
 				}
 
 				// Set absolute path, to replace it later to an app link
-				return absolutePath;
+				return foundPath;
 			});
 
 			// Add note draft
@@ -225,12 +230,12 @@ export class NotesImporter {
 		});
 		await Promise.all(
 			// Remove duplicates
-			Array.from(attachmentPathsToUpload).map(async (absoluteUrl) => {
+			Array.from(attachmentPathsToUpload).map(async (filePath) => {
 				// TODO: cancel uploading for all files
 				checkForAbortion();
-				const fileId = await this.getFileId(absoluteUrl, files);
+				const fileId = await this.getFileId(filePath, files);
 				if (fileId) {
-					filePathToIdMap[absoluteUrl] = fileId;
+					filePathToIdMap[filePath] = fileId;
 				}
 
 				uploadingProgress.notify();

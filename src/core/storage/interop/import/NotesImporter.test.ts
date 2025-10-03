@@ -132,6 +132,15 @@ describe('Base notes import cases', () => {
 					'/posts/about/index.md': createTextBuffer(
 						'---\ntitle: Blog post\ntags:\n - foo\n - bar\n---\nPost with image\n\n![attached image](./image.png)\nThis post and all its resources is placed in subdirectory.',
 					),
+					'/paths/Hello%20world.md': createTextBuffer(
+						'Note with url encoded name and [attachment](./file%20with_space.txt)\nLink to another note via [url encoded link](./Another%20note%20with%20space.md) and [<raw> url](<./Another note with space.md>)',
+					),
+					'/paths/Another note with space.md': createTextBuffer(
+						'Note with url encoded name and [attachment](./url%2520encoded%2520file.txt)\nLink to another note via [url encoded link](./Hello%2520world.md) and [<raw> url](<./Hello%20world.md>)',
+					),
+					'/paths/file with_space.txt': createTextBuffer('Attachment content'),
+					'/paths/url%20encoded%20file.txt':
+						createTextBuffer('Attachment content'),
 				}),
 				{ onProcessed },
 			),
@@ -211,13 +220,29 @@ describe('Base notes import cases', () => {
 					),
 				},
 			}),
+			expect.objectContaining({
+				content: {
+					title: 'Hello%20world',
+					text: expect.stringMatching(
+						/^Note with url encoded name and \[attachment\]\(res:\/\/[\d\w-]+\)\nLink to another note via \[url encoded link\]\(note:\/\/[\d\w-]+\) and \[<raw> url\]\(note:\/\/[\d\w-]+\)\n$/,
+					),
+				},
+			}),
+			expect.objectContaining({
+				content: {
+					title: 'Another note with space',
+					text: expect.stringMatching(
+						/^Note with url encoded name and \[attachment\]\(res:\/\/[\d\w-]+\)\nLink to another note via \[url encoded link\]\(note:\/\/[\d\w-]+\) and \[<raw> url\]\(note:\/\/[\d\w-]+\)\n$/,
+					),
+				},
+			}),
 		]);
 	});
 
 	test('Only attached files must be saved on FS', async () => {
 		// If file used in many places, it must have many references,
 		// but physically we have only one file
-		await expect(fileManager.list()).resolves.toHaveLength(2);
+		await expect(fileManager.list()).resolves.toHaveLength(4);
 	});
 
 	test('Every note have snapshot', async () => {
@@ -292,6 +317,11 @@ describe('Base notes import cases', () => {
 				name: 'about',
 				parent: expect.stringMatching(/^[\d\w-]+$/),
 				resolvedName: 'posts/about',
+			}),
+			expect.objectContaining({
+				name: 'paths',
+				parent: null,
+				resolvedName: 'paths',
 			}),
 		]);
 	});
