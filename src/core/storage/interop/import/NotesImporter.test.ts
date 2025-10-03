@@ -407,3 +407,65 @@ describe('Import notes with different options', () => {
 		});
 	});
 });
+
+test('Importer throw error if DB closed while importing', async () => {
+	const dbFile = createFileControllerMock();
+	const db = await openDatabase(dbFile);
+
+	const fileManager = createFileManagerMock();
+
+	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+	const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
+	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+
+	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
+	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+
+	let handled = 0;
+	const importer = new NotesImporter(
+		{
+			filesRegistry,
+			notesRegistry,
+			noteVersions,
+			attachmentsRegistry,
+			tagsRegistry,
+		},
+		{
+			ignorePaths: ['/_resources'],
+			noteExtensions: ['.md', '.mdx'],
+			convertPathToTag: 'always',
+			throttle: (callback) => {
+				if (handled === 0) {
+					handled++;
+					callback();
+				} else {
+					db.close().then(() => {
+						callback();
+						handled++;
+					});
+				}
+			},
+		},
+	);
+
+	const onProcessed = vi.fn();
+	await expect(
+		importer.import(
+			createFileManagerMock({
+				// Notes list
+				'/note-1.md': createTextBuffer('Hello world!'),
+				'/note-2.mdx': createTextBuffer(
+					'---\ntitle: Title from meta\ntags:\n - foo\n - bar\n - baz\n---\nHello world!',
+				),
+				'/note-3.mdx': createTextBuffer('Mention for [note #1](./note-1.md)'),
+				'/note-4.md': createTextBuffer(
+					'Text with [attachment](./_resources/secret.txt)',
+				),
+				'/note-5.md': createTextBuffer(
+					'Another text with [attachment](./_resources/secret.txt)',
+				),
+			}),
+			{ onProcessed },
+		),
+	).rejects.toThrowError('The database connection is not open');
+});
