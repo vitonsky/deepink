@@ -242,6 +242,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 									<MenuList>
 										{importOptions.map((option) => (
 											<MenuItem
+												key={option.type}
 												onClick={() => onClickImport(option.type)}
 											>
 												<Text>{option.text}</Text>
