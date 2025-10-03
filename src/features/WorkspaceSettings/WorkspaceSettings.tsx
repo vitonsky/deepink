@@ -18,8 +18,8 @@ import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
+import { FilesFS } from '@core/features/files/FilesFS';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
-import { copyFileListToFS } from '@core/features/files/utils/copyFileListToFS';
 import { ZipFS } from '@core/features/files/ZipFS';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
@@ -47,6 +47,7 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { joinPathSegments } from '@utils/fs/paths';
 
 import { getExportArchiveName, useNotesExport } from './useNotesExport';
 import { useNotesImport } from './useNotesImport';
@@ -98,7 +99,24 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 						if (!files) return;
 
 						await notesImport.importNotes(
-							await copyFileListToFS(files, new InMemoryFS()),
+							new FilesFS(
+								Object.fromEntries(
+									Array.from(files).map((file) => {
+										let filePath = file.name;
+										if (file.webkitRelativePath) {
+											const relativePath =
+												file.webkitRelativePath.split('/');
+											filePath = joinPathSegments(
+												relativePath.length > 1
+													? relativePath.slice(1)
+													: relativePath,
+											);
+										}
+
+										return [filePath, file];
+									}),
+								),
+							),
 							{
 								noteExtensions: ['.md', '.mdx'],
 								convertPathToTag: 'always',
