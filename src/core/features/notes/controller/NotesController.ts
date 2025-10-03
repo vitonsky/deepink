@@ -90,7 +90,7 @@ function getFetchQuery(
 			.and(
 				tags.length === 0
 					? undefined
-					: `id IN (SELECT target FROM attachedTags WHERE source IN (${qb.values(
+					: qb.sql`id IN (SELECT target FROM attachedTags WHERE source IN (${qb.values(
 							tags,
 					  )}))`,
 			)

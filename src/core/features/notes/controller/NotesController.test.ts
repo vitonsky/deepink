@@ -1,3 +1,4 @@
+import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
@@ -109,9 +110,36 @@ describe('data fetching', () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, 'fake-workspace-id');
 
+		const ids: string[] = [];
 		for (const note of notesSample) {
-			await registry.add(note);
+			ids.push(await registry.add(note));
 		}
+
+		const tags = new TagsController(db, 'fake-workspace-id');
+		await tags.setAttachedTags(ids[0], [await tags.add('foo', null)]);
+		await tags.setAttachedTags(ids[1], [await tags.add('bar', null)]);
+
+		await db.close();
+	});
+
+	test('filter by tags', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, 'fake-workspace-id');
+		const tags = new TagsController(db, 'fake-workspace-id');
+
+		const tagsList = await tags.getTags();
+
+		await expect(
+			registry.get({
+				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
+			}),
+		).resolves.toHaveLength(1);
+
+		await expect(
+			registry.get({
+				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+			}),
+		).resolves.toHaveLength(1);
 
 		await db.close();
 	});
