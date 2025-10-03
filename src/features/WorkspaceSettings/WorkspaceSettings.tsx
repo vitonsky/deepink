@@ -82,7 +82,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 					const files = await selectDirectory();
 					if (!files || files.length === 0) return;
 
-					await importFiles('zip', Array.from(files));
+					await importFiles('directory', Array.from(files));
 					break;
 				}
 			}
