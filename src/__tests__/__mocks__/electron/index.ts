@@ -1,5 +1,5 @@
 import type electron from 'electron';
-import * as electronIPCMock from '@electron/utils/ipc/__tests__/electron';
+import * as electronIPCMock from '@mocks/electron/__mocks__/ipc';
 
 export const ipcMain = electronIPCMock.ipcMain;
 export const ipcRenderer = electronIPCMock.ipcRenderer;
