@@ -1,7 +1,7 @@
 import { IFilesStorage } from '@core/features/files';
 import { ZipFS } from '@core/features/files/ZipFS';
 import { saveFile } from '@utils/fs/client';
-import { joinPathSegments } from '@utils/fs/paths';
+import { escapeFileName, joinPathSegments } from '@utils/fs/paths';
 
 export const dumpFilesStorage = async (
 	fs: IFilesStorage,
@@ -13,7 +13,7 @@ export const dumpFilesStorage = async (
 		await saveFile(
 			joinPathSegments([
 				directory,
-				String(name ?? Date.now()).replaceAll(/[^\w\d]/g, '_') + '.zip',
+				escapeFileName(String(name ?? Date.now())) + '.zip',
 			]),
 			zipBuffer,
 		);

@@ -48,7 +48,7 @@ import {
 } from '@state/redux/profiles/profiles';
 
 import { importOptions, ImportTypes, useImportNotesPreset } from './useImportNotesPreset';
-import { getExportArchiveName, useNotesExport } from './useNotesExport';
+import { buildFileName, useNotesExport } from './useNotesExport';
 
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;
@@ -228,7 +228,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 								onClick={async () => {
 									await notesExport.exportNotes(
 										true,
-										getExportArchiveName(workspaceData?.name),
+										buildFileName(workspaceData?.name, 'backup'),
 									);
 								}}
 							>

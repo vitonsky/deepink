@@ -16,15 +16,11 @@ import { requestDirectoryPath } from '@utils/fs/client';
 import { escapeFileName, getResolvedPath } from '@utils/fs/paths';
 import { uniqueName } from '@utils/fs/uniqueName';
 
-// TODO: customize file names to use specific name for export single note
-export const getExportArchiveName = (workspaceName?: string) =>
-	[
-		'backup',
-		workspaceName ? `workspace_${workspaceName}` : undefined,
-		`${Date.now()}.zip`,
-	]
-		.filter(Boolean)
-		.join('-');
+/**
+ * Build file name from parts and add timestamp at end
+ */
+export const buildFileName = (...parts: (string | undefined)[]) =>
+	[...parts, `${Date.now()}`].filter(Boolean).join('-');
 
 export const configureNoteNameGetter = (isSingleNoteMode = false) =>
 	uniqueName(function noteFilename(note: NoteExportData, uniqueId) {

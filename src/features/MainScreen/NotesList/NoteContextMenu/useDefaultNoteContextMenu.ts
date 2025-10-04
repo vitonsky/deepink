@@ -5,7 +5,7 @@ import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import {
-	getExportArchiveName,
+	buildFileName,
 	useNotesExport,
 } from '@features/WorkspaceSettings/useNotesExport';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
@@ -120,7 +120,7 @@ export const useDefaultNoteContextMenu = ({
 					await notesExport.exportNote(
 						id,
 						true,
-						getExportArchiveName(workspaceData?.name),
+						buildFileName(workspaceData?.name, `note_${id}`),
 					);
 					break;
 				}
