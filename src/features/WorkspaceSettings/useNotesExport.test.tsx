@@ -101,7 +101,7 @@ describe('Export notes', async () => {
 
 		// File must be saved
 		expect(fsClientMock.saveFile.mock.calls).toEqual([
-			['/foo/bar/custom_name.zip', expect.any(ArrayBuffer)],
+			['/foo/bar/custom-name.zip', expect.any(ArrayBuffer)],
 		]);
 
 		// File content is a zip file
@@ -146,13 +146,17 @@ describe('Export notes', async () => {
 
 		await act(async () => {
 			await expect(
-				result.current.exportNote(noteWithAttachment.id, true, 'custom-name'),
+				result.current.exportNote(
+					noteWithAttachment.id,
+					true,
+					'/x/y/カスタム名!@#$%^&*()_-+=~<>',
+				),
 			).resolves.not.toThrow();
 		});
 
 		// File must be saved
 		expect(fsClientMock.saveFile.mock.calls).toEqual([
-			['/foo/bar/custom_name.zip', expect.any(ArrayBuffer)],
+			['/foo/bar/x_y_カスタム名_-.zip', expect.any(ArrayBuffer)],
 		]);
 
 		// File content is a zip file
