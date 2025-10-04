@@ -153,6 +153,9 @@ describe('Many clients', () => {
 
 test('Path traversal out of scope directory must not be possible', async () => {
 	await expect(filesController.get('/')).resolves.toBeNull();
+	await expect(filesController.write('/', new ArrayBuffer(1))).rejects.toThrowError(
+		"EISDIR: illegal operation on a directory, open '/home/userData/appDir/profileDir'",
+	);
 
 	// Just to ensure we can read available files
 	vol.writeFileSync('/home/userData/appDir/profileDir/secret.txt', 'Secret data');
