@@ -16,6 +16,7 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
+import { CalmButton } from '@components/CalmButton';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
@@ -206,7 +207,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 						<HStack>
 							<Menu>
 								<MenuButton
-									as={Button}
+									as={CalmButton}
 									isDisabled={importProgress !== null}
 								>
 									Import notes
