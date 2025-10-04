@@ -203,93 +203,94 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 					<FeaturesHeader view="section">Notes management</FeaturesHeader>
 
 					<FeaturesOption description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app">
-						<VStack w="100%" align="start">
-							<HStack>
-								<Menu>
-									<MenuButton
-										as={Button}
-										isDisabled={importProgress !== null}
-									>
-										Import notes
-									</MenuButton>
-									<MenuList>
-										{importOptions.map((option) => (
-											<MenuItem
-												key={option.type}
-												onClick={() => onClickImport(option.type)}
-											>
-												<Text>{option.text}</Text>
-											</MenuItem>
-										))}
-									</MenuList>
-								</Menu>
-								<Button
-									isDisabled={notesExport.progress !== null}
-									onClick={async () => {
-										await notesExport.exportNotes(
-											true,
-											getExportArchiveName(workspaceData?.name),
-										);
-									}}
+						<HStack>
+							<Menu>
+								<MenuButton
+									as={Button}
+									isDisabled={importProgress !== null}
 								>
-									Export notes
-								</Button>
-							</HStack>
-							{importProgress && (
-								<HStack w="100%" align="start">
-									<Spinner size="sm" />
-									<Text>
-										Notes import is in progress. Stage:{' '}
-										{importProgress.stage} {importProgress.total}/
-										{importProgress.processed}
-									</Text>
-								</HStack>
-							)}
+									Import notes
+								</MenuButton>
+								<MenuList>
+									{importOptions.map((option) => (
+										<MenuItem
+											key={option.type}
+											onClick={() => onClickImport(option.type)}
+										>
+											<Text>{option.text}</Text>
+										</MenuItem>
+									))}
+								</MenuList>
+							</Menu>
 
-							<Dropzone
-								onDrop={async (files) => {
-									if (files.length === 0) return;
-
-									// Import zip file
-									if (
-										files.length === 1 &&
-										files[0].name.endsWith('.zip')
-									) {
-										await importFiles('zip', files);
-										return;
-									}
-
-									// Import markdown files
-									await importFiles('directory', files);
+							<Button
+								isDisabled={notesExport.progress !== null}
+								onClick={async () => {
+									await notesExport.exportNotes(
+										true,
+										getExportArchiveName(workspaceData?.name),
+									);
 								}}
-								disabled={importProgress !== null}
 							>
-								{({ getRootProps, getInputProps, isDragActive }) => (
-									<Box
-										as="section"
-										border="1px dashed"
-										backgroundColor="dim.50"
-										borderColor={isDragActive ? 'dim.400' : 'dim.100'}
-										borderWidth="2px"
-										borderRadius="2px"
-										padding="1rem"
-										opacity={importProgress === null ? 1 : 0.6}
-									>
-										<VStack {...getRootProps()} gap="1rem">
-											<input {...getInputProps()} />
-											<Text>
-												Drop Markdown files or .zip archive to
-												import
-											</Text>
-											<Text color="typography.secondary">
-												Drag & Drop some files here, or click to
-												select files
-											</Text>
-										</VStack>
-									</Box>
-								)}
-							</Dropzone>
-						</VStack>
+								Export notes
+							</Button>
+						</HStack>
+					</FeaturesOption>
+
+					<FeaturesOption>
+						<Dropzone
+							onDrop={async (files) => {
+								if (files.length === 0) return;
+
+								// Import zip file
+								if (
+									files.length === 1 &&
+									files[0].name.endsWith('.zip')
+								) {
+									await importFiles('zip', files);
+									return;
+								}
+
+								// Import markdown files
+								await importFiles('directory', files);
+							}}
+							disabled={importProgress !== null}
+						>
+							{({ getRootProps, getInputProps, isDragActive }) => (
+								<Box
+									as="section"
+									border="1px dashed"
+									backgroundColor="dim.50"
+									borderColor={isDragActive ? 'dim.400' : 'dim.100'}
+									borderWidth="2px"
+									borderRadius="2px"
+									padding="1rem"
+									opacity={importProgress === null ? 1 : 0.6}
+								>
+									<VStack {...getRootProps()} gap="1rem">
+										<input {...getInputProps()} />
+										<Text>
+											Drop Markdown files or .zip archive to import
+										</Text>
+										<Text color="typography.secondary">
+											Drag & Drop some files here, or click to
+											select files
+										</Text>
+									</VStack>
+								</Box>
+							)}
+						</Dropzone>
+
+						{importProgress && (
+							<HStack w="100%" align="start">
+								<Spinner size="sm" />
+								<Text>
+									Notes import is in progress. Stage:{' '}
+									{importProgress.stage} {importProgress.total}/
+									{importProgress.processed}
+								</Text>
+							</HStack>
+						)}
 					</FeaturesOption>
 
 					<FeaturesOption description="Keep full changes log for notes. You may disable history for single notes">
