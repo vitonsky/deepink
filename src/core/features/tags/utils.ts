@@ -1,9 +1,5 @@
 import { IResolvedTag } from '.';
 
-// TODO: remove unused code
-export const isTagsArray = (data: unknown): data is string[] =>
-	Array.isArray(data) && data.every((item) => typeof item === 'string');
-
 export const findParentTag = (resolvedTagName: string, tags: IResolvedTag[]) => {
 	const tagSegments = resolvedTagName.split('/');
 
