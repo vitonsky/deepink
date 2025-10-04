@@ -3,7 +3,10 @@ import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
-import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import {
+	useNotesRegistry,
+	useTagsRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import {
 	buildFileName,
 	useNotesExport,
@@ -55,6 +58,7 @@ export const useDefaultNoteContextMenu = ({
 	updateNotes,
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
+	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
 	const notesExport = useNotesExport();
@@ -117,10 +121,15 @@ export const useDefaultNoteContextMenu = ({
 					break;
 				}
 				case NoteActions.EXPORT: {
+					const note = await notes.getById(id);
 					await notesExport.exportNote(
 						id,
 						true,
-						buildFileName(workspaceData?.name, `note_${id}`),
+						buildFileName(
+							workspaceData?.name,
+							note?.content.title.trim().slice(0, 50).trim() ||
+								`note_${id}`,
+						),
 					);
 					break;
 				}
@@ -128,6 +137,7 @@ export const useDefaultNoteContextMenu = ({
 		},
 		[
 			closeNote,
+			notes,
 			notesExport,
 			notesRegistry,
 			tagsRegistry,
