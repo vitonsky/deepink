@@ -2,7 +2,6 @@ import React, { FC, useCallback, useMemo } from 'react';
 import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import {
-	Box,
 	Button,
 	Checkbox,
 	HStack,
@@ -258,7 +257,9 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 							disabled={importProgress !== null}
 						>
 							{({ getRootProps, getInputProps, isDragActive }) => (
-								<Box
+								<VStack
+									{...getRootProps()}
+									gap="1rem"
 									as="section"
 									border="1px dashed"
 									backgroundColor="dim.50"
@@ -268,17 +269,15 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 									padding="1rem"
 									opacity={importProgress === null ? 1 : 0.6}
 								>
-									<VStack {...getRootProps()} gap="1rem">
-										<input {...getInputProps()} />
-										<Text>
-											Drop Markdown files or .zip archive to import
-										</Text>
-										<Text color="typography.secondary">
-											Drag & Drop some files here, or click to
-											select files
-										</Text>
-									</VStack>
-								</Box>
+									<input {...getInputProps()} />
+									<Text>
+										Drop Markdown files or .zip archive to import
+									</Text>
+									<Text color="typography.secondary">
+										Drag & Drop some files here, or click to select
+										files
+									</Text>
+								</VStack>
 							)}
 						</Dropzone>
 
