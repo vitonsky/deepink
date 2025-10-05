@@ -5,8 +5,8 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useCommandBusContext } from '@hooks/commands/CommandEventProvider';
 import { useRegisterCommandShortcuts } from '@hooks/commands/shortcuts/useRegisterCommandShortcuts';
+import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
@@ -39,8 +39,6 @@ export type ProfileProps = {
 
 export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls }) => {
 	const dispatch = useAppDispatch();
-
-	const commandBus = useCommandBusContext();
 
 	const profileId = currentProfile.profile.id;
 
@@ -107,7 +105,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	useRegisterCommandShortcuts();
 
-	commandBus.listen(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
+	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

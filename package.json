@@ -121,7 +121,7 @@
 		"file-saver": "^2.0.5",
 		"framer-motion": "^12.23.22",
 		"github-markdown-css": "^5.2.0",
-		"hotkeys-js": "^3.13.10",
+		"hotkeys-js": "^3.13.15",
 		"lexical": "^0.37.0",
 		"lodash": "^4.17.21",
 		"monaco-editor-core": "^0.39.0",
