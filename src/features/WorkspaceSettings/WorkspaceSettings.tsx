@@ -62,7 +62,11 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		profile: { db },
 	} = useProfileControls();
 
-	const { importFiles, progress: importProgress } = useImportNotesPreset();
+	const {
+		importFiles,
+		progress: importProgress,
+		abort: abortImport,
+	} = useImportNotesPreset();
 	const notesExport = useNotesExport();
 
 	const selectDirectory = useDirectoryPicker();
@@ -127,6 +131,10 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 			`You are about to delete workspace "${workspaceInfo.name}". Are you sure you want to do it?\n\nIf you will continue, all data related to this workspace will be deleted, including notes, tags and files.`,
 		);
 		if (!isConfirmed) return;
+
+		// TODO: emit event and react on it
+		// Abort any operations in workspace
+		abortImport(new Error('Workspace deletion is in progress'));
 
 		const tagsList = await tags.getTags();
 		const notesList = await notes.get();

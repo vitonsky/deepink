@@ -95,5 +95,6 @@ export const useImportNotesPreset = () => {
 	return {
 		importFiles,
 		progress: notesImport.progress,
+		abort: notesImport.abort,
 	};
 };

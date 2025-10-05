@@ -18,7 +18,10 @@ import {
 
 // TODO: notify for successful import
 export const useNotesImport = () => {
-	const [progress, setProgress] = useState<OnProcessedPayload | null>(null);
+	const [importSession, setImportSession] = useState<{
+		abortController: AbortController;
+		progress: OnProcessedPayload;
+	} | null>(null);
 
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
@@ -29,13 +32,18 @@ export const useNotesImport = () => {
 	const eventBus = useEventBus();
 	const importNotes = useCallback(
 		async (files: IFilesStorage, options: NotesImporterOptions = {}) => {
-			setProgress({
-				stage: 'parsing',
-				total: 0,
-				processed: 0,
+			const abortController = new AbortController();
+
+			setImportSession({
+				abortController,
+				progress: {
+					stage: 'parsing',
+					total: 0,
+					processed: 0,
+				},
 			});
 
-			const onProgress = throttle(setProgress, 200);
+			const onProgress = throttle(setImportSession, 200);
 			await new NotesImporter(
 				{
 					filesRegistry,
@@ -53,14 +61,15 @@ export const useNotesImport = () => {
 					...options,
 				},
 			).import(files, {
+				abortSignal: abortController.signal,
 				onProcessed(info) {
 					console.log('Import progress', info);
-					onProgress(info);
+					onProgress((value) => (value ? { ...value, progress: info } : value));
 				},
 			});
 
 			onProgress.flush();
-			setProgress(null);
+			setImportSession(null);
 			eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
 		},
 		[
@@ -73,8 +82,19 @@ export const useNotesImport = () => {
 		],
 	);
 
+	// TODO: return promise that will be resolved once import session is ended
+	const abortController = importSession?.abortController;
+	const abort = useCallback(
+		(reason?: any) => {
+			if (!abortController) return;
+			abortController.abort(reason ?? new Error('Import is aborted by user'));
+		},
+		[abortController],
+	);
+
 	return {
 		importNotes,
-		progress,
+		progress: importSession?.progress ?? null,
+		abort,
 	} as const;
 };
