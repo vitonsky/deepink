@@ -1,29 +1,116 @@
 /* eslint-disable camelcase */
+import { Query } from 'nano-queries/core/Query';
 import { v4 as uuid4 } from 'uuid';
+import { z } from 'zod';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { INote, INoteContent, NoteId } from '..';
-import { INotesController, NotesControllerFetchOptions } from '.';
+import {
+	INotesController,
+	NoteMeta,
+	NotesControllerFetchOptions,
+	NoteSortField,
+} from '.';
 
 /**
  * Data mappers between DB and objects
  */
 const mappers = {
 	rowToNoteObject(row: any): INote {
-		const { id, title, text, creationTime, lastUpdateTime, isSnapshotsDisabled } =
-			row;
+		const {
+			id,
+			title,
+			text,
+			creationTime,
+			lastUpdateTime,
+			isSnapshotsDisabled,
+			isVisible,
+		} = row;
 		return {
 			id,
 			createdTimestamp: creationTime,
 			updatedTimestamp: lastUpdateTime,
 			isSnapshotsDisabled: Boolean(isSnapshotsDisabled),
+			isVisible: Boolean(isVisible),
 			content: { title, text },
 		};
 	},
 };
+
+function formatNoteMeta(meta: Partial<NoteMeta>) {
+	return Object.fromEntries(
+		Object.entries(meta).map((item): [string, string | number] => {
+			const [key, value] = item as unknown as {
+				[K in keyof NoteMeta]: [K, NoteMeta[K]];
+			}[keyof NoteMeta];
+
+			switch (key) {
+				case 'isSnapshotsDisabled':
+					return [key, Number(value)];
+				case 'isVisible':
+					return [key, Number(value)];
+			}
+		}),
+	);
+}
+
+function getFetchQuery(
+	{
+		select,
+		workspace,
+	}: {
+		select: Query;
+		workspace?: string;
+	},
+	{ limit, page, tags = [], meta, sort }: NotesControllerFetchOptions = {},
+) {
+	if (page !== undefined && page < 1)
+		throw new TypeError('Page value must not be less than 1');
+
+	const metaEntries = Object.entries(
+		formatNoteMeta({
+			isVisible: true,
+			...meta,
+		}),
+	);
+
+	const sortFieldMap: { [K in NoteSortField]: string } = {
+		id: 'id',
+		createdAt: 'creationTime',
+		updatedAt: 'lastUpdateTime',
+	};
+
+	return qb.line(
+		qb.sql`SELECT ${select} FROM notes`,
+		qb
+			.where(workspace ? qb.sql`workspace_id=${workspace}` : undefined)
+			.and(
+				tags.length === 0
+					? undefined
+					: qb.sql`id IN (SELECT target FROM attachedTags WHERE source IN (${qb.values(
+							tags,
+					  )}))`,
+			)
+			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
+		qb.line(
+			qb.sql`ORDER BY`,
+			qb.set([
+				sort
+					? qb.line(
+							sortFieldMap[sort.by],
+							sort.order === 'desc' ? 'DESC' : 'ASC',
+					  )
+					: undefined,
+				'rowid ASC',
+			]),
+		),
+		limit ? qb.limit(limit) : undefined,
+		page && limit ? qb.offset((page - 1) * limit) : undefined,
+	);
+}
 
 /**
  * Synced notes registry
@@ -53,74 +140,31 @@ export class NotesController implements INotesController {
 		return note ? mappers.rowToNoteObject(note) : null;
 	}
 
-	public async getLength(): Promise<number> {
+	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
 		const db = wrapDB(this.db.get());
 
-		const { length } = db.get(
-			qb
-				.select('COUNT(id) as length')
-				.from('notes')
-				.where(
-					qb.values({
-						workspace_id: this.workspace,
-					}),
+		return z
+			.object({ count: z.number() })
+			.transform((row) => row.count)
+			.parse(
+				db.get(
+					getFetchQuery(
+						{ select: qb.sql`COUNT(*) as count`, workspace: this.workspace },
+						query,
+					),
 				),
-		) as {
-			length?: number;
-		};
-		return length ?? 0;
+			);
 	}
 
-	public async get({
-		limit = 100,
-		page = 1,
-		tags = [],
-	}: NotesControllerFetchOptions = {}): Promise<INote[]> {
-		if (page < 1) throw new TypeError('Page value must not be less than 1');
-
+	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		const db = wrapDB(this.db.get());
 
-		const notes: INote[] = [];
-
-		db.all(
-			qb
-				.select('*')
-				.from('notes')
-				.where(
-					qb.values({
-						workspace_id: this.workspace,
-					}),
-				)
-				.where(
-					tags.length > 0
-						? qb.line(
-								'id IN',
-								qb.group(
-									qb
-										.select('target')
-										.from('attachedTags')
-										.where(
-											qb.line(
-												'source IN',
-												qb.values(tags).withParenthesis(),
-											),
-										),
-								),
-						  )
-						: undefined,
-				)
-				.limit(limit)
-				.offset((page - 1) * limit),
-		).map((row) => {
-			// TODO: validate data for first note
-
-			notes.push(mappers.rowToNoteObject(row));
-		});
-
-		return notes;
+		return db
+			.all(getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query))
+			.map(mappers.rowToNoteObject);
 	}
 
-	public async add(note: INoteContent): Promise<NoteId> {
+	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
 		const db = wrapDB(this.db.get());
 
 		const creationTime = new Date().getTime();
@@ -128,20 +172,23 @@ export class NotesController implements INotesController {
 		// Insert data
 		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
 
+		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
+
 		const insertResult = db.run(
-			qb.line(
-				'INSERT INTO notes ("id","workspace_id","title","text","creationTime","lastUpdateTime") VALUES',
-				qb
-					.values([
+			qb.sql`
+				INSERT INTO notes (${qb.set([
+					qb.sql`"id","workspace_id","title","text","creationTime","lastUpdateTime"`,
+					...(metaEntries ? metaEntries.map(([key]) => key) : []),
+				])})
+					VALUES (${qb.values([
 						uuid4(),
 						this.workspace,
 						note.title,
 						note.text,
 						creationTime,
 						creationTime,
-					])
-					.withParenthesis(),
-			),
+						...metaEntries.map(([_key, value]) => value),
+					])})`,
 		);
 
 		// Get generated id
@@ -214,26 +261,12 @@ export class NotesController implements INotesController {
 		}
 	}
 
-	public async updateMeta(
-		ids: NoteId[],
-		meta: { isSnapshotsDisabled?: boolean },
-	): Promise<void> {
+	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
 		const db = wrapDB(this.db.get());
-
-		const mappedMeta = Object.fromEntries(
-			Object.entries(meta).map(([key, value]): [string, string | number] => {
-				switch (key) {
-					case 'isSnapshotsDisabled':
-						return [key, Number(value)];
-					default:
-						return [key, String(value)];
-				}
-			}),
-		);
 
 		const result = db.run(
 			qb.sql`UPDATE notes
-				SET ${qb.values(mappedMeta)}
+				SET ${qb.values(formatNoteMeta(meta))}
 				WHERE workspace_id=${this.workspace} AND id IN (${qb.values(ids)})`,
 		);
 

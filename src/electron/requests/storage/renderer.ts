@@ -3,27 +3,32 @@ import { IFilesStorage } from '@core/features/files';
 
 import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
-import { storageChannel } from '.';
+import { storageChannel, StorageChannelAPI } from '.';
 
 export const storageApi = storageChannel.client(ipcRendererFetcher);
 
+// TODO: transparently resolve all file names like it is absolute paths
 export class ElectronFilesController implements IFilesStorage {
-	private readonly subdirectory;
-	private readonly encryption;
-	constructor(subdirectory: string, encryption?: IEncryptionController) {
+	constructor(
+		private readonly storageApi: StorageChannelAPI,
+		private readonly subdirectory: string,
+		private readonly encryption?: IEncryptionController,
+	) {
 		this.subdirectory = subdirectory;
 		this.encryption = encryption;
 	}
 
-	public async write(id: string, buffer: ArrayBuffer) {
+	public async write(filename: string, buffer: ArrayBuffer) {
 		const encryptedBuffer = this.encryption
 			? await this.encryption.encrypt(buffer)
 			: buffer;
-		return storageApi.upload(id, encryptedBuffer, this.subdirectory);
+
+		// Absolute file name with no slash
+		return this.storageApi.upload(filename, encryptedBuffer, this.subdirectory);
 	}
 
 	public async get(id: string) {
-		return storageApi.get(id, this.subdirectory).then((buffer) => {
+		return this.storageApi.get(id, this.subdirectory).then((buffer) => {
 			// Don't handle empty data
 			if (!buffer) return buffer;
 
@@ -33,10 +38,10 @@ export class ElectronFilesController implements IFilesStorage {
 	}
 
 	public async delete(ids: string[]) {
-		return storageApi.delete(ids, this.subdirectory);
+		return this.storageApi.delete(ids, this.subdirectory);
 	}
 
 	public async list() {
-		return storageApi.list(this.subdirectory);
+		return this.storageApi.list(this.subdirectory);
 	}
 }

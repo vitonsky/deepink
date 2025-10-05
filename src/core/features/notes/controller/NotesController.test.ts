@@ -1,3 +1,4 @@
+import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
@@ -109,9 +110,36 @@ describe('data fetching', () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, 'fake-workspace-id');
 
+		const ids: string[] = [];
 		for (const note of notesSample) {
-			await registry.add(note);
+			ids.push(await registry.add(note));
 		}
+
+		const tags = new TagsController(db, 'fake-workspace-id');
+		await tags.setAttachedTags(ids[0], [await tags.add('foo', null)]);
+		await tags.setAttachedTags(ids[1], [await tags.add('bar', null)]);
+
+		await db.close();
+	});
+
+	test('filter by tags', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, 'fake-workspace-id');
+		const tags = new TagsController(db, 'fake-workspace-id');
+
+		const tagsList = await tags.getTags();
+
+		await expect(
+			registry.get({
+				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
+			}),
+		).resolves.toHaveLength(1);
+
+		await expect(
+			registry.get({
+				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+			}),
+		).resolves.toHaveLength(1);
 
 		await db.close();
 	});
@@ -133,6 +161,25 @@ describe('data fetching', () => {
 
 		const page2 = await registry.get({ limit: 100, page: 2 });
 		expect(page2[0].content).toMatchObject(notesSample[100]);
+
+		await db.close();
+	});
+
+	test('method getLength consider filters', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, 'fake-workspace-id');
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+		await registry.updateMeta(notesId, { isVisible: false });
+
+		await expect(registry.getLength({ meta: { isVisible: false } })).resolves.toBe(
+			10,
+		);
+		await expect(registry.getLength({ meta: { isVisible: true } })).resolves.toBe(
+			notesSample.length - 10,
+		);
 
 		await db.close();
 	});
@@ -178,7 +225,7 @@ describe('Notes meta control', () => {
 		await db.close();
 	});
 
-	test('insertion multiple entries', async () => {
+	test('toggle note versions control', async () => {
 		const db = await dbPromise;
 		const registry = new NotesController(db, 'fake-workspace-id');
 
@@ -202,5 +249,46 @@ describe('Notes meta control', () => {
 			id: noteId,
 			isSnapshotsDisabled: false,
 		});
+	});
+
+	test('toggle note visibility', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, 'fake-workspace-id');
+
+		// Create note
+		const noteId = await registry.add({ title: 'Title', text: 'Text' });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isVisible: true,
+		});
+		await expect(registry.get()).resolves.toContainEqual(
+			expect.objectContaining({
+				id: noteId,
+			}),
+		);
+
+		// Toggle snapshotting preferences
+		await registry.updateMeta([noteId], { isVisible: false });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isVisible: false,
+		});
+		await expect(registry.get()).resolves.not.toContainEqual(
+			expect.objectContaining({
+				id: noteId,
+			}),
+		);
+
+		// Toggle snapshotting preferences back
+		await registry.updateMeta([noteId], { isVisible: true });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isVisible: true,
+		});
+		await expect(registry.get()).resolves.toContainEqual(
+			expect.objectContaining({
+				id: noteId,
+			}),
+		);
 	});
 });

@@ -1,0 +1,35 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Check files content > Files content 1`] = `
+[
+  {
+    "content": "File text content",
+    "path": "/test.txt",
+  },
+  {
+    "content": "File text content",
+    "path": "/foo/bar/baz/test.txt",
+  },
+]
+`;
+
+exports[`Write files > Controller files list after writing 1`] = `
+[
+  "/test.txt",
+  "/foo/bar/baz/test.txt",
+]
+`;
+
+exports[`Write files > FS structure after writing 1`] = `
+[
+  "/home/userData/appDir",
+  "/home/userData/appDir/profileDir/foo/bar",
+  "/home/userData/appDir/profileDir/foo/bar/baz",
+  "/home/userData/appDir/profileDir/foo",
+  "home",
+  "/home/userData/appDir/profileDir",
+  "/home/userData/appDir/profileDir/test.txt",
+  "/home/userData/appDir/profileDir/foo/bar/baz/test.txt",
+  "/home/userData",
+]
+`;

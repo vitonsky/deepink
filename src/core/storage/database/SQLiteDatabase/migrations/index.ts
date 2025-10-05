@@ -78,6 +78,16 @@ const migrations = [
 			})();
 		},
 	},
+	{
+		version: 7,
+		up: async (db: MigrationsTarget) => {
+			db.transaction(() => {
+				db.exec(
+					`ALTER TABLE "notes" ADD COLUMN "isVisible" INTEGER NOT NULL DEFAULT 1;`,
+				);
+			})();
+		},
+	},
 ] as const;
 
 export const latestSchemaVersion = migrations[migrations.length - 1].version;

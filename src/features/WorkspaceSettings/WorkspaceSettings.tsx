@@ -1,13 +1,31 @@
 import React, { FC, useCallback, useMemo } from 'react';
+import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
-import { Button, Checkbox, HStack, Input, Link, Text, VStack } from '@chakra-ui/react';
+import {
+	Button,
+	Checkbox,
+	HStack,
+	Input,
+	Link,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
+	Spinner,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
+import { CalmButton } from '@components/CalmButton';
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
+import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
 import {
+	useAttachmentsController,
+	useFilesController,
 	useFilesRegistry,
 	useNotesRegistry,
 	useTagsRegistry,
@@ -19,6 +37,14 @@ import {
 } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useDirectoryPicker } from '@hooks/files/useDirectoryPicker';
+import { useFilesPicker } from '@hooks/files/useFilesPicker';
+import {
+	importOptions,
+	ImportTypes,
+	useImportNotesPreset,
+} from '@hooks/notes/useImportNotesPreset';
+import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -35,6 +61,41 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const {
 		profile: { db },
 	} = useProfileControls();
+
+	const {
+		importFiles,
+		progress: importProgress,
+		abort: abortImport,
+	} = useImportNotesPreset();
+	const notesExport = useNotesExport();
+
+	const selectDirectory = useDirectoryPicker();
+	const selectFiles = useFilesPicker();
+
+	const onClickImport = useCallback(
+		async (type: ImportTypes) => {
+			// NotesImporterOptions
+			switch (type) {
+				case 'zip': {
+					const files = await selectFiles({
+						accept: '.zip',
+					});
+					if (!files || files.length !== 1) return;
+
+					await importFiles('zip', Array.from(files));
+					break;
+				}
+				case 'directory': {
+					const files = await selectDirectory();
+					if (!files || files.length === 0) return;
+
+					await importFiles('directory', Array.from(files));
+					break;
+				}
+			}
+		},
+		[importFiles, selectDirectory, selectFiles],
+	);
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
 
@@ -56,6 +117,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 	const notes = useNotesRegistry();
 	const tags = useTagsRegistry();
 	const files = useFilesRegistry();
+	const filesController = useFilesController();
+	const attachments = useAttachmentsController();
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
@@ -69,12 +132,26 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		);
 		if (!isConfirmed) return;
 
+		// TODO: emit event and react on it
+		// Abort any operations in workspace
+		abortImport(new Error('Workspace deletion is in progress'));
+
 		const tagsList = await tags.getTags();
 		const notesList = await notes.get();
 
 		await notes.delete(notesList.map((note) => note.id));
 		await Promise.all(tagsList.map((note) => tags.delete(note.id)));
-		await files.clearOrphaned();
+
+		await files
+			.query()
+			.then((filesList) => files.delete(filesList.map((file) => file.id)));
+		await filesController.delete([currentWorkspace.workspaceId]);
+
+		await new FilesIntegrityController(
+			currentWorkspace.workspaceId,
+			filesController,
+			{ files, attachments },
+		).fixAll();
 
 		dispatch(
 			workspacesApi.setActiveWorkspace({
@@ -86,10 +163,12 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		await workspacesManager.delete([currentWorkspace.workspaceId]);
 		await workspaces.update();
 	}, [
+		attachments,
 		currentWorkspace.profileId,
 		currentWorkspace.workspaceId,
 		dispatch,
 		files,
+		filesController,
 		notes,
 		tags,
 		workspaceInfo.name,
@@ -101,7 +180,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 	return (
 		<ModalScreen isVisible onClose={onClose} title="Workspace settings">
-			<VStack w="100%" minH="100%" p="2rem 5rem" justifyContent="center">
+			<VStack w="100%" minH="100%" p="2rem" justifyContent="center">
 				<Features>
 					<FeaturesOption title="Workspace name">
 						<HStack
@@ -136,9 +215,93 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 					<FeaturesOption description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app">
 						<HStack>
-							<Button>Import notes</Button>
-							<Button>Export notes</Button>
+							<Menu>
+								<MenuButton
+									as={CalmButton}
+									isDisabled={importProgress !== null}
+								>
+									Import notes
+								</MenuButton>
+								<MenuList>
+									{importOptions.map((option) => (
+										<MenuItem
+											key={option.type}
+											onClick={() => onClickImport(option.type)}
+										>
+											<Text>{option.text}</Text>
+										</MenuItem>
+									))}
+								</MenuList>
+							</Menu>
+
+							<Button
+								isDisabled={notesExport.progress !== null}
+								onClick={async () => {
+									await notesExport.exportNotes(
+										true,
+										buildFileName(workspaceData?.name, 'backup'),
+									);
+								}}
+							>
+								Export notes
+							</Button>
 						</HStack>
+					</FeaturesOption>
+
+					<FeaturesOption>
+						<Dropzone
+							onDrop={async (files) => {
+								if (files.length === 0) return;
+
+								// Import zip file
+								if (
+									files.length === 1 &&
+									files[0].name.endsWith('.zip')
+								) {
+									await importFiles('zip', files);
+									return;
+								}
+
+								// Import markdown files
+								await importFiles('directory', files);
+							}}
+							disabled={importProgress !== null}
+						>
+							{({ getRootProps, getInputProps, isDragActive }) => (
+								<VStack
+									{...getRootProps()}
+									gap="1rem"
+									as="section"
+									border="1px dashed"
+									backgroundColor="dim.50"
+									borderColor={isDragActive ? 'dim.400' : 'dim.100'}
+									borderWidth="2px"
+									borderRadius="2px"
+									padding="1rem"
+									opacity={importProgress === null ? 1 : 0.6}
+								>
+									<input {...getInputProps()} />
+									<Text>
+										Drop Markdown files or .zip archive to import
+									</Text>
+									<Text color="typography.secondary">
+										Drag & Drop some files here, or click to select
+										files
+									</Text>
+								</VStack>
+							)}
+						</Dropzone>
+
+						{importProgress && (
+							<HStack w="100%" align="start">
+								<Spinner size="sm" />
+								<Text>
+									Notes import is in progress. Stage:{' '}
+									{importProgress.stage} {importProgress.total}/
+									{importProgress.processed}
+								</Text>
+							</HStack>
+						)}
 					</FeaturesOption>
 
 					<FeaturesOption description="Keep full changes log for notes. You may disable history for single notes">

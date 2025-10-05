@@ -13,6 +13,6 @@ export const ipcMainHandler: ServerRequestHandler<Electron.IpcMainInvokeEvent> =
 	ipcMain.handle(endpoint, eventCallback);
 
 	return () => {
-		ipcMain.off(endpoint, eventCallback);
+		ipcMain.removeHandler(endpoint);
 	};
 };

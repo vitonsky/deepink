@@ -41,7 +41,7 @@ export enum NoteSidebarTabs {
 export type NoteEditorProps = {
 	note: INote;
 	updateNote: (note: INoteContent) => void;
-	updateMeta: (meta: NoteMeta) => void;
+	updateMeta: (meta: Partial<NoteMeta>) => void;
 };
 
 /**

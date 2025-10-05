@@ -3,16 +3,17 @@ import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { ContextMenu } from '@electron/requests/contextMenu';
-import { selectDirectory } from '@electron/requests/files/renderer';
 import {
-	useFilesRegistry,
+	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
+import { useAppSelector } from '@state/redux/hooks';
+import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
-import { mkdir, writeFile } from 'fs/promises';
-import { NotesExporter } from './NotesExporter';
 import { NoteActions } from '.';
 
 type DefaultContextMenuOptions = {
@@ -54,8 +55,12 @@ export const useDefaultNoteContextMenu = ({
 	updateNotes,
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
-	const filesRegistry = useFilesRegistry();
+	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
+
+	const notesExport = useNotesExport();
+	const currentWorkspace = useWorkspaceData();
+	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
@@ -113,42 +118,29 @@ export const useDefaultNoteContextMenu = ({
 					break;
 				}
 				case NoteActions.EXPORT: {
-					const directories = await selectDirectory();
-					if (!directories || directories.length !== 1) {
-						console.log('Must be selected one directory');
-						return;
-					}
-
-					const directory = directories[0];
-					const filesDirectoryName = `_files`;
-					const filesDirectory = [directory, filesDirectoryName].join('/');
-
-					// TODO: remove node usages in frontend code
-					await mkdir(filesDirectory, { recursive: true });
-
-					const notesExport = new NotesExporter({
-						saveFile: async (file, id) => {
-							const filename = `${filesDirectory}/${id}-${file.name}`;
-
-							const buffer = await file.arrayBuffer();
-							await writeFile(filename, new Uint8Array(buffer));
-							return `./${filesDirectoryName}/${id}-${file.name}`;
-						},
-						notesRegistry,
-						filesRegistry,
-						tagsRegistry,
-					});
-
-					const noteData = await notesExport.exportNote(id);
-
-					if (!noteData) return;
-
-					await writeFile(`${directory}/${id}.md`, noteData);
+					const note = await notes.getById(id);
+					await notesExport.exportNote(
+						id,
+						true,
+						buildFileName(
+							workspaceData?.name,
+							note?.content.title.trim().slice(0, 50).trim() ||
+								`note_${id}`,
+						),
+					);
 					break;
 				}
 			}
 		},
-		[closeNote, filesRegistry, notesRegistry, tagsRegistry, updateNotes],
+		[
+			closeNote,
+			notes,
+			notesExport,
+			notesRegistry,
+			tagsRegistry,
+			updateNotes,
+			workspaceData?.name,
+		],
 	);
 
 	return useContextMenu(noteMenu, noteContextMenuCallback);

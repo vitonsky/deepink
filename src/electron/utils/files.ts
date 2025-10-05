@@ -24,10 +24,12 @@ export const getResourcesPath = (resourcePath?: string) => {
 	return resourcePath ? joinPath(rootPath, resourcePath) : rootPath;
 };
 
-export const getUserDataPath = (resourcePath?: string) => {
+export const getUserDataPath = (...resourcePath: (string | undefined)[]) => {
 	// Docs: https://www.electronjs.org/docs/latest/api/app#appgetpathname
 	const rootPath = isDevMode()
 		? joinPath(app.getAppPath(), 'tmp')
 		: app.getPath('userData');
-	return resourcePath ? joinPath(rootPath, resourcePath) : rootPath;
+
+	const pathSegments = resourcePath.filter(Boolean) as string[];
+	return pathSegments.length > 0 ? joinPath(rootPath, ...pathSegments) : rootPath;
 };

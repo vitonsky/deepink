@@ -1,105 +1,99 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
 
-import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
-
-import { AttachmentsController } from '../attachments/AttachmentsController';
+import { createFileManagerMock } from './__tests__/mocks/createFileManagerMock';
 import { FilesController } from './FilesController';
-import { IFilesStorage } from '.';
 
-const File = require('blob-polyfill').File;
+const WORKSPACE_ID = 'fake-workspace-id';
 
-globalThis.File = File;
+const { getDB } = makeAutoClosedDB();
+const fileManager = createFileManagerMock();
 
-const createFileManagerMock = (): IFilesStorage => {
-	const storage: Record<string, ArrayBuffer> = {};
-	return {
-		async write(uuid, buffer) {
-			storage[uuid] = buffer;
-		},
-		async get(uuid) {
-			return storage[uuid];
-		},
-		async delete(uuids) {
-			uuids.forEach((uuid) => {
-				delete storage[uuid];
-			});
-		},
-		async list() {
-			return Object.keys(storage);
-		},
-	};
-};
+test('Upload files', async () => {
+	const db = await getDB();
+	const files = new FilesController(db, fileManager, WORKSPACE_ID);
 
-const createTextFile = (text: string): File =>
-	new File([Buffer.from(text).buffer], 'test.txt', { type: 'text/txt' });
+	await files.add(new File(['Hello world'], 'hello.md', { type: 'text/markdown' }));
+	await files.add(new File(['foo'], 'foo.txt', { type: 'text/plain' }));
+	await files.add(new File(['bar'], 'bar.txt', { type: 'text/plain' }));
+	await files.add(new File(['baz'], 'baz.txt', { type: 'text/plain' }));
 
-const testFiles = Array(5)
-	.fill(null)
-	.map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
+	await expect(fileManager.list()).resolves.toHaveLength(4);
+});
 
-test('clear orphaned files', async () => {
-	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
-	const fileManager = createFileManagerMock();
-	const attachments = new AttachmentsController(db, 'fake-workspace-id');
-	const files = new FilesController(db, fileManager, attachments, 'fake-workspace-id');
+test('Fetch files', async () => {
+	const db = await getDB();
+	const files = new FilesController(db, fileManager, WORKSPACE_ID);
 
-	// Upload file and attach
-	const fileToAttach = createTextFile('Attached file');
-	const attachedFileId = await files.add(fileToAttach);
-	await attachments.set('some-note-id', [attachedFileId]);
-
-	// Upload files with no attach
-	const filesId = await Promise.all(testFiles.map((file) => files.add(file)));
-
-	// Test files content are expected
-	await Promise.all(
-		filesId.map(async (fileId, index) => {
-			const file = await files.get(fileId);
-			expect(file).not.toBeNull();
-
-			const fileBuffer = await (file as File).arrayBuffer();
-			const originalFileBuffer = await testFiles[index].arrayBuffer();
-
-			const fileString = Buffer.from(fileBuffer).toString('utf-8');
-			const originalString = Buffer.from(originalFileBuffer).toString('utf-8');
-			expect(fileString).toBe(originalString);
+	const filesList = await files.query();
+	expect(filesList).toEqual([
+		expect.objectContaining({
+			mimetype: 'text/markdown',
+			name: 'hello.md',
 		}),
-	);
+		expect.objectContaining({
+			mimetype: 'text/plain',
+			name: 'foo.txt',
+		}),
+		expect.objectContaining({
+			mimetype: 'text/plain',
+			name: 'bar.txt',
+		}),
+		expect.objectContaining({
+			mimetype: 'text/plain',
+			name: 'baz.txt',
+		}),
+	]);
 
-	// Check files before cleanup
-	await files.get(attachedFileId).then((file) => {
-		expect(file).not.toBeNull();
-	});
-	await files.get(filesId[0]).then((file) => {
-		expect(file).not.toBeNull();
+	const file = await files.get(filesList[0].id);
+
+	expect(file).toBeInstanceOf(File);
+	expect(file).toHaveProperty('name', 'hello.md');
+	expect(file).toHaveProperty('type', 'text/markdown');
+	expect(file).toHaveProperty('lastModified', expect.any(Number));
+	await expect(
+		file?.arrayBuffer().then((buffer) => new TextDecoder().decode(buffer)),
+	).resolves.toBe('Hello world');
+});
+
+test('Delete files', async () => {
+	const db = await getDB();
+	const files = new FilesController(db, fileManager, WORKSPACE_ID);
+
+	const filesList = await files.query();
+	expect(filesList).toHaveLength(4);
+	await expect(fileManager.list()).resolves.toHaveLength(4);
+
+	await files.delete([filesList[0].id]);
+	await expect(files.query()).resolves.toHaveLength(3);
+	await expect(fileManager.list()).resolves.toHaveLength(3);
+});
+
+test('Fetch for non exists file in FS returns null', async () => {
+	const db = await getDB();
+	const files = new FilesController(db, fileManager, WORKSPACE_ID);
+
+	const filesList = await files.query();
+
+	// Delete files
+	const fileIdToDelete = filesList[0].id;
+	expect(filesList).toHaveLength(3);
+	await fileManager.list().then(async (files) => {
+		expect(files).toHaveLength(3);
+		expect(files).toContainEqual(expect.stringContaining(fileIdToDelete));
+
+		const filePath = files.find((file) => file.endsWith(fileIdToDelete));
+		if (!filePath) throw new Error("Can't find file");
+
+		await fileManager.delete([filePath]);
 	});
 
-	// Clear files and check again
-	await files.clearOrphaned();
-	await files.get(attachedFileId).then((file) => {
-		expect(file).not.toBeNull();
-	});
-	await files.get(filesId[0]).then((file) => {
-		expect(file).toBeNull();
+	// File no more exists in FS
+	await fileManager.list().then(async (files) => {
+		expect(files).toHaveLength(2);
+		expect(files).not.toContainEqual(expect.stringContaining(fileIdToDelete));
 	});
 
-	// File is not orphaned when any resource use it
-	await attachments.set('some-note-id', []);
-	await attachments.set('some-note-id2', [attachedFileId]);
-	await files.clearOrphaned();
-	await files.get(attachedFileId).then((file) => {
-		expect(file).not.toBeNull();
-	});
-
-	// File orphaned when nothing to refer on file
-	await attachments.set('some-note-id2', []);
-	await files.clearOrphaned();
-	await files.get(attachedFileId).then((file) => {
-		expect(file).toBeNull();
-	});
-
-	await db.close();
+	await expect(files.get(fileIdToDelete)).resolves.toBe(null);
 });

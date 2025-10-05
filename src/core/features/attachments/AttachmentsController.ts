@@ -1,4 +1,7 @@
 import { v4 as uuid4 } from 'uuid';
+import { z } from 'zod';
+import { qb } from '@utils/db/query-builder';
+import { wrapDB } from '@utils/db/wrapDB';
 
 import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
@@ -64,21 +67,20 @@ export class AttachmentsController {
 		).run(this.workspace, ...resources);
 	}
 
-	/**
-	 * Return array with ids of resources that not in use
-	 */
-	public async findOrphanedResources(resources: string[]) {
-		const db = this.db.get();
+	public async query() {
+		const db = wrapDB(this.db.get());
 
-		const placeholders = Array(resources.length).fill('?').join(',');
-		const attached = db
-			.prepare(
-				`SELECT file as id FROM attachments WHERE workspace_id=? AND file IN (${placeholders})`,
-			)
-			.all(this.workspace, ...resources) as Array<{ id: string }>;
-
-		return resources.filter((id) =>
-			attached.every((attachment) => attachment.id !== id),
-		);
+		return z
+			.object({
+				id: z.string(),
+				file: z.string(),
+				note: z.string(),
+			})
+			.array()
+			.parse(
+				db.all(
+					qb.sql`SELECT id, file, note FROM attachments WHERE workspace_id=${this.workspace}`,
+				),
+			);
 	}
 }

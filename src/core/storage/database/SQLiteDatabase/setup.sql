@@ -7,6 +7,7 @@ CREATE TABLE "notes" (
 	"creationTime" INTEGER NOT NULL DEFAULT 0,
 	"lastUpdateTime" INTEGER NOT NULL DEFAULT 0,
 	"isSnapshotsDisabled" INTEGER NOT NULL DEFAULT 0,
+	"isVisible" INTEGER NOT NULL DEFAULT 1,
 	PRIMARY KEY("id")
 );
 -- Note text snapshots

@@ -3,7 +3,7 @@ import { bytesToBase64 } from '@core/encryption/utils/encoding';
 import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
-import { ElectronFilesController } from '@electron/requests/storage/renderer';
+import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { NewProfile } from '@features/App/WorkspaceManager/ProfileCreator';
 
 export type ProfilesListApi = {
@@ -19,8 +19,9 @@ export const useProfilesList = (): ProfilesListApi => {
 	const [profilesManager] = useState(
 		() =>
 			new ProfilesManager(
-				new ElectronFilesController('/'),
-				(profileName) => new ElectronFilesController(`/${profileName}`),
+				new ElectronFilesController(storageApi, '/'),
+				(profileName) =>
+					new ElectronFilesController(storageApi, `/${profileName}`),
 			),
 	);
 

@@ -1,6 +1,7 @@
 import { NoteId } from '@core/features/notes';
 
 export enum WorkspaceEvents {
+	NOTES_UPDATED = 'notesUpdated',
 	NOTE_UPDATED = 'noteUpdated',
 	NOTE_HISTORY_UPDATED = 'noteHistoryUpdated',
 }
@@ -10,6 +11,8 @@ export enum WorkspaceEvents {
  */
 
 export type WorkspaceEventsPayloadMap = {
+	[WorkspaceEvents.NOTES_UPDATED]: void;
+
 	/**
 	 * Fired when specific note  has been updated
 	 */
