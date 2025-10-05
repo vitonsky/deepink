@@ -1,33 +1,28 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { isEqual } from 'lodash';
-import { useCommandBusContext } from '@hooks/commands/CommandEventProvider';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
 
+import { useCommandCallback } from './useCommandCallback';
 import { CommandPayloads } from '.';
 
 /**
- * Subscribes to a command event and automatically unsubscribes
- * if the current workspace context does not match the active workspace
+ * Subscribes to a command event only within the current workspace context
+ * and automatically unsubscribes when the workspace is not active or the component unmounts.
  */
 export function useWorkspaceCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
 	callback: (payload: CommandPayloads[K]) => void,
 ) {
-	const commandBus = useCommandBusContext();
-
 	const { profileId, workspaceId: contextWorkspaceId } = useWorkspaceData();
 	const activeWorkspace = useAppSelector(
 		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
 		isEqual,
 	);
 
-	useEffect(() => {
-		let unsubscribe = () => {};
-		if (activeWorkspace?.id === contextWorkspaceId) {
-			unsubscribe = commandBus.listen(commandName, callback);
-		}
-		return unsubscribe;
-	}, [activeWorkspace?.id, contextWorkspaceId, commandBus, commandName, callback]);
+	// subscription is active only when the current workspace matches the context workspace
+	const isEnabled = activeWorkspace?.id === contextWorkspaceId;
+
+	useCommandCallback(commandName, callback, { enabled: isEnabled });
 }
