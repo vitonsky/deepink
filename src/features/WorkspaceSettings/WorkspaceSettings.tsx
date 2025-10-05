@@ -39,6 +39,12 @@ import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDirectoryPicker } from '@hooks/files/useDirectoryPicker';
 import { useFilesPicker } from '@hooks/files/useFilesPicker';
+import {
+	importOptions,
+	ImportTypes,
+	useImportNotesPreset,
+} from '@hooks/notes/useImportNotesPreset';
+import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -46,9 +52,6 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-
-import { importOptions, ImportTypes, useImportNotesPreset } from './useImportNotesPreset';
-import { buildFileName, useNotesExport } from './useNotesExport';
 
 export interface WorkspaceSettingsProps {
 	onClose?: () => void;

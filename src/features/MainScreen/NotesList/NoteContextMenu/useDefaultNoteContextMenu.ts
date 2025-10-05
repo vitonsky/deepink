@@ -7,10 +7,7 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import {
-	buildFileName,
-	useNotesExport,
-} from '@features/WorkspaceSettings/useNotesExport';
+import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
