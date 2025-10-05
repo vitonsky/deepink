@@ -16,7 +16,7 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 	const commandBus = useCommandBusContext();
 
 	useEffect(() => {
-		if (options && !options.enabled) return;
+		if (options?.enabled === false) return;
 
 		return commandBus.listen(commandName, callback);
 	}, [commandBus, commandName, callback, options]);
