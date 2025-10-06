@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
 
-import { useCommandCallback } from './useCommandCallback';
+import { useCommandBusContext } from './CommandEventProvider';
 import { CommandPayloads } from '.';
 
 /**
@@ -15,14 +15,18 @@ export function useWorkspaceCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
 	callback: (payload: CommandPayloads[K]) => void,
 ) {
+	const commandBus = useCommandBusContext();
+
 	const { profileId, workspaceId: contextWorkspaceId } = useWorkspaceData();
 	const activeWorkspace = useAppSelector(
 		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
 		isEqual,
 	);
 
-	// subscription is active only when the current workspace matches the context workspace
-	const isEnabled = activeWorkspace?.id === contextWorkspaceId;
+	useEffect(() => {
+		// subscription is active only when the current workspace matches the context workspace
+		if (activeWorkspace?.id !== contextWorkspaceId) return;
 
-	useCommandCallback(commandName, callback, { enabled: isEnabled });
+		return commandBus.listen(commandName, callback);
+	}, [commandBus, commandName, callback, activeWorkspace?.id, contextWorkspaceId]);
 }
