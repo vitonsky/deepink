@@ -9,7 +9,7 @@ import { ZipFS } from '@core/features/files/ZipFS';
 import { formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { openDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
+import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { NoteExportData } from '@core/storage/interop/export';
 import {
 	FilesRegistryContext,

@@ -1,14 +1,12 @@
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-
-import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
 
 import { TagsController } from './TagsController';
 
 describe('manage tags', () => {
-	test('nested tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
 
+	test('nested tags', async () => {
+		const db = await getDB();
 		const tags = new TagsController(db, 'workspace-fake-id');
 
 		await tags.add('foo', null);
@@ -34,15 +32,11 @@ describe('manage tags', () => {
 				]),
 			);
 		});
-
-		await db.close();
 	});
 
 	// TODO:fox that cases. Paths must be normalized
 	test('weird tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
+		const db = await getDB();
 		const tags = new TagsController(db, 'workspace-fake-id');
 
 		await tags.add('///foo', null);
@@ -88,14 +82,10 @@ describe('manage tags', () => {
 				}),
 			]);
 		});
-
-		await db.close();
 	});
 
 	test('update tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
+		const db = await getDB();
 		const tags = new TagsController(db, 'workspace-fake-id');
 
 		await tags.add('foo', null).then(async (tagId) => {
@@ -136,14 +126,10 @@ describe('manage tags', () => {
 				]),
 			);
 		});
-
-		await db.close();
 	});
 
 	test('delete tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
+		const db = await getDB();
 		const tags = new TagsController(db, 'workspace-fake-id');
 
 		await tags.add('foo', null);
@@ -161,16 +147,14 @@ describe('manage tags', () => {
 				}),
 			]);
 		});
-
-		await db.close();
 	});
 });
 
 describe('manage attachments', () => {
-	test('set attached tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
 
+	test('set attached tags', async () => {
+		const db = await getDB();
 		const tags = new TagsController(db, 'workspace-fake-id');
 
 		const fooId = await tags.add('foo', null);
@@ -208,14 +192,10 @@ describe('manage attachments', () => {
 				]),
 			);
 		});
-
-		await db.close();
 	});
 
 	test('deleted tag will not appears in tags list', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
+		const db = await getDB();
 		const tags = new TagsController(db, 'workspace-fake-id');
 
 		const fooId = await tags.add('foo', null);
@@ -240,7 +220,5 @@ describe('manage attachments', () => {
 		await tags.getAttachedTags('target1').then((tags) => {
 			expect(tags).toEqual([]);
 		});
-
-		await db.close();
 	});
 });

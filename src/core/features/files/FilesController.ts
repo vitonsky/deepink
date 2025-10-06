@@ -1,9 +1,7 @@
-import { v4 as uuid4 } from 'uuid';
 import { z } from 'zod';
+import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
-
-import { SQLiteDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { IFilesStorage } from '.';
 
@@ -17,53 +15,46 @@ export class FilesController {
 	private db;
 	private fileController;
 	private readonly workspace;
-	constructor(db: SQLiteDatabase, fileController: IFilesStorage, workspace: string) {
+	constructor(db: PGLiteDatabase, fileController: IFilesStorage, workspace: string) {
 		this.db = db;
 		this.fileController = fileController;
 		this.workspace = workspace;
 	}
 
 	public async add(file: File) {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		// Insert in DB
-		const insertResult = db
-			.prepare(
-				'INSERT INTO files ("id","workspace_id","name","mimetype") VALUES (@id,@workspace,@name,@mimetype)',
-			)
-			.run({
-				id: uuid4(),
-				workspace: this.workspace,
-				name: file.name,
-				mimetype: file.type,
-			});
-
-		const selectWithId = db
-			.prepare('SELECT `id` FROM files WHERE workspace_id=? AND rowid=?')
-			.get(this.workspace, insertResult.lastInsertRowid) as any;
-
-		if (!selectWithId || !selectWithId.id) {
-			throw new Error("Can't get id of inserted row");
-		}
-
-		const fileId: string = selectWithId.id;
+		const {
+			rows: [{ id: fileId }],
+		} = await db.query(
+			qb.sql`INSERT INTO files (workspace_id,name,mimetype) VALUES (${this.workspace},${file.name},${file.type}) RETURNING id`,
+			z.object({ id: z.string() }),
+		);
 
 		// TODO: delete entry in DB if can't upload file. Or try to upload first and then add file to DB
 		// TODO: encrypt file
 		// Write file
 		const buffer = await file.arrayBuffer();
-		this.fileController.write(this.getFilePath(fileId), buffer);
+		await this.fileController.write(this.getFilePath(fileId), buffer);
 
 		return fileId;
 	}
 
 	public async get(id: string) {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
 		// Insert in DB
-		const fileEntry = db
-			.prepare('SELECT * FROM files WHERE workspace_id=? AND id=?')
-			.get(this.workspace, id) as any;
+		const [fileEntry] = await db
+			.query(
+				qb.sql`SELECT * FROM files WHERE workspace_id=${this.workspace} AND id=${id}`,
+
+				z.object({
+					name: z.string(),
+					mimetype: z.string(),
+				}),
+			)
+			.then((result) => result.rows);
 
 		if (!fileEntry) return null;
 
@@ -78,13 +69,16 @@ export class FilesController {
 
 	// TODO: remove attached files
 	public async delete(filesId: string[]) {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
+
+		if (filesId.length === 0) return;
 
 		// Delete in database
-		const placeholders = Array(filesId.length).fill('?').join(',');
-		db.prepare(
-			`DELETE FROM files WHERE workspace_id=? AND id IN (${placeholders})`,
-		).run(this.workspace, ...filesId);
+		await db.query(
+			qb.sql`DELETE FROM files WHERE workspace_id=${
+				this.workspace
+			} AND id IN (${qb.values(filesId)})`,
+		);
 
 		// Delete files
 		await this.fileController.delete(
@@ -95,18 +89,16 @@ export class FilesController {
 	public async query() {
 		const db = wrapDB(this.db.get());
 
-		return z
-			.object({
-				id: z.string(),
-				name: z.string(),
-				mimetype: z.string(),
-			})
-			.array()
-			.parse(
-				db.all(
-					qb.sql`SELECT id, name, mimetype FROM files WHERE workspace_id=${this.workspace}`,
-				),
-			);
+		return await db
+			.query(
+				qb.sql`SELECT id, name, mimetype FROM files WHERE workspace_id=${this.workspace}`,
+				z.object({
+					id: z.string(),
+					name: z.string(),
+					mimetype: z.string(),
+				}),
+			)
+			.then(({ rows }) => rows);
 	}
 
 	private getFilePath(filename: string) {

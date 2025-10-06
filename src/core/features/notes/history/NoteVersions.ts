@@ -1,29 +1,11 @@
 /* eslint-disable camelcase */
 import { v4 as uuid4 } from 'uuid';
 import { z } from 'zod';
-import { SQLiteDatabase } from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
+import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
-/**
- * Return mapper function that receive original object and returns new object with renamed fields according to names map
- *
- * For type safe use it's necessary to use `as const` like that `rename({ created_at: 'createdAt' } as const)`
- */
-const rename =
-	<M extends Record<string, string>>(map: M) =>
-	<T extends Record<string, any>>(
-		input: keyof M extends keyof T ? T : never,
-	): {
-		[K in keyof T as K extends keyof M ? M[K] : K]: T[K];
-	} => {
-		const result: Record<string, any> = {};
-		for (const [key, value] of Object.entries(input)) {
-			result[map[key] ?? key] = value;
-		}
-
-		return result as any;
-	};
+import { rename } from './rename';
 
 const NoteVersionRowScheme = z.object({
 	id: z.string(),
@@ -42,7 +24,7 @@ export type NoteVersion = z.TypeOf<typeof NoteVersionMapScheme>;
 export class NoteVersions {
 	private db;
 	private readonly workspace;
-	constructor(db: SQLiteDatabase, workspace: string) {
+	constructor(db: PGLiteDatabase, workspace: string) {
 		this.db = db;
 		this.workspace = workspace;
 	}
@@ -67,7 +49,7 @@ export class NoteVersions {
 		const db = wrapDB(this.db.get());
 
 		if (options.force) {
-			db.run(
+			await db.query(
 				qb.sql`
 					INSERT INTO note_versions (id, note_id, created_at, title, text)
 					SELECT
@@ -84,7 +66,7 @@ export class NoteVersions {
 			return;
 		}
 
-		db.run(
+		await db.query(
 			qb.sql`
 				INSERT INTO note_versions (id, note_id, created_at, title, text)
 				SELECT
@@ -97,8 +79,8 @@ export class NoteVersions {
 				LEFT JOIN (
 					SELECT v.title, v.text, v.note_id
 					FROM note_versions v
-					-- Order by monotonic "rowid" in case of timestamp collisions
-					ORDER BY v.created_at DESC, rowid DESC
+					-- Order by monotonic "ctid" in case of timestamp collisions
+					ORDER BY v.created_at DESC, ctid DESC
 					LIMIT 1
 				) last ON last.note_id = n.id
 				WHERE
@@ -111,30 +93,38 @@ export class NoteVersions {
 	public async getList(noteId: string) {
 		const db = wrapDB(this.db.get());
 
-		return NoteVersionMapScheme.array().parse(
-			db.all(
-				// Order by monotonic "rowid" in case of timestamp collisions
-				qb.sql`SELECT * FROM note_versions WHERE note_id = ${noteId} ORDER BY created_at DESC, rowid DESC`,
-			),
+		const { rows } = await db.query(
+			// Order by monotonic "ctid" in case of timestamp collisions
+			qb.sql`SELECT * FROM note_versions WHERE note_id = ${noteId} ORDER BY created_at DESC, ctid DESC`,
+			NoteVersionMapScheme,
 		);
+
+		return rows;
 	}
 
 	public async get(versionId: string) {
 		const db = wrapDB(this.db.get());
 
-		return NoteVersionMapScheme.parse(
-			db.get(qb.sql`SELECT * FROM note_versions WHERE id = ${versionId} LIMIT 1`),
+		const {
+			rows: [version],
+		} = await db.query(
+			qb.sql`SELECT * FROM note_versions WHERE id = ${versionId} LIMIT 1`,
+			NoteVersionMapScheme,
 		);
+
+		return version ?? null;
 	}
 
 	public async delete(versionIds: string[]) {
 		const db = wrapDB(this.db.get());
-		db.run(qb.sql`DELETE FROM note_versions WHERE id IN (${qb.values(versionIds)})`);
+		db.query(
+			qb.sql`DELETE FROM note_versions WHERE id IN (${qb.values(versionIds)})`,
+		);
 	}
 
 	public async purge(noteIds: string[]) {
 		const db = wrapDB(this.db.get());
-		db.run(
+		db.query(
 			qb.sql`DELETE FROM note_versions WHERE note_id IN (${qb.values(noteIds)})`,
 		);
 	}

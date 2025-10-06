@@ -1,23 +1,32 @@
 -- Query to select tags with resolved name (like `foo/bar/baz`)
-WITH RECURSIVE tagTree AS (
-	SELECT
-		id, parent, name, 1 AS segmentId, id AS tagTreeId
-	FROM tags
-	UNION ALL
-	SELECT
-		t2.id, t.parent, t.name, t2.segmentId + 1 AS segmentId, t2.tagTreeId AS tagTreeId
-	FROM tags t
-	INNER JOIN tagTree t2
-	ON t.id = t2.parent
+WITH RECURSIVE tagtree AS (
+    SELECT
+        id,
+        parent,
+        name,
+        1 AS segment_id,
+        id AS tag_tree_id
+    FROM tags
+  UNION ALL
+    SELECT
+        t.id,
+        t.parent,
+        t.name,
+        tt.segment_id + 1 AS segment_id,
+        tt.tag_tree_id
+    FROM tags t
+    JOIN tagtree tt ON t.id = tt.parent
 )
 SELECT
-	t.id, t.name, x.name as resolvedName, t.parent
+    t.id,
+    t.name,
+    x.resolved_name,
+    t.parent
 FROM tags t
-INNER JOIN (
-	SELECT id, group_concat(name, '/') AS name
-	FROM (
-		SELECT * FROM tagTree ORDER BY segmentId DESC
-	)
-	GROUP BY tagTreeId
-) x
-ON t.id = x.id
+JOIN (
+    SELECT
+        tag_tree_id AS id,
+        string_agg(name, '/' ORDER BY segment_id DESC) AS resolved_name
+    FROM tagtree
+    GROUP BY tag_tree_id
+) x ON t.id = x.id

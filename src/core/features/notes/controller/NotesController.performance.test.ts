@@ -1,6 +1,5 @@
+import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-
-import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { NotesController } from './NotesController';
 

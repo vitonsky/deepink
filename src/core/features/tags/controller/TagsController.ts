@@ -1,18 +1,32 @@
+/* eslint-disable camelcase */
 import { createEvent } from 'effector';
-import { v4 as uuid4 } from 'uuid';
-
-import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { z } from 'zod';
+import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { qb } from '@utils/db/query-builder';
+import { wrapDB } from '@utils/db/wrapDB';
 
 import tagsQuery from './selectTagsWithResolvedNames.sql';
 import { IResolvedTag, ITag } from '..';
 
 type ChangeEvent = 'tags' | 'noteTags';
 
+const RowScheme = z
+	.object({
+		id: z.string(),
+		name: z.string(),
+		resolved_name: z.string(),
+		parent: z.string().nullable(),
+	})
+	.transform(({ resolved_name, ...props }) => ({
+		...props,
+		resolvedName: resolved_name,
+	}));
+
 export class TagsController {
 	private readonly db;
 	private readonly workspace;
 	private readonly onChanged;
-	constructor(db: SQLiteDatabase, workspace: string) {
+	constructor(db: PGLiteDatabase, workspace: string) {
 		this.db = db;
 		this.workspace = workspace;
 		this.onChanged = createEvent<ChangeEvent>();
@@ -27,95 +41,97 @@ export class TagsController {
 	 * Returns tags  list
 	 */
 	public async getTags(): Promise<IResolvedTag[]> {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
-		return (
-			db
-				.prepare(`${tagsQuery} WHERE workspace_id=? ORDER BY rowid`)
-				.all(this.workspace) as any[]
-		).map(({ id, name, resolvedName, parent }) => ({
-			id,
-			name,
-			resolvedName,
-			parent: parent ?? null,
-		}));
+		const { rows } = await db.query(
+			qb.line(
+				tagsQuery,
+				qb.sql`JOIN (SELECT id, ctid FROM tags) s ON t.id = s.id WHERE workspace_id=${this.workspace} ORDER BY s.ctid`,
+			),
+			RowScheme,
+		);
+
+		return rows;
 	}
 
 	public async add(name: string, parent: null | string): Promise<string> {
-		const db = this.db.get();
-
-		let lastId: number;
+		const db = wrapDB(this.db.get());
 
 		const segments = name.split('/');
+
+		let lastId: string | null = null;
 		if (segments.length > 1) {
-			const results = db.transaction(() =>
-				segments.map((name, idx) => {
+			await this.db.get().transaction(async (tx) => {
+				const db = wrapDB(tx);
+
+				for (let idx = 0; idx < segments.length; idx++) {
+					const name = segments[idx];
 					const isFirstItem = idx === 0;
 
 					if (isFirstItem) {
-						return db
-							.prepare(
-								'INSERT INTO tags ("id", "workspace_id", "name", "parent") VALUES (?, ?, ?, ?)',
+						await db
+							.query(
+								qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
+									[this.workspace, name, parent],
+								)}) RETURNING id`,
+								z.object({ id: z.string() }),
 							)
-							.run(uuid4(), this.workspace, name, parent);
+							.then(({ rows: [{ id }] }) => {
+								lastId = id;
+							});
+
+						continue;
 					}
 
-					return db
-						.prepare(
-							'INSERT INTO tags ("id", "workspace_id", "name", "parent") VALUES (?, ?, ?, (SELECT id FROM tags WHERE ROWID=last_insert_rowid()))',
+					await db
+						.query(
+							qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
+								[this.workspace, name],
+							)}, (SELECT id FROM tags WHERE id=${lastId})) RETURNING id`,
+							z.object({ id: z.string() }),
 						)
-						.run(uuid4(), this.workspace, name);
-				}),
-			)();
-
-			lastId = Number(results[results.length - 1].lastInsertRowid);
+						.then(({ rows: [{ id }] }) => {
+							lastId = id;
+						});
+				}
+			});
 		} else {
-			const insertResult = db
-				.prepare(
-					'INSERT INTO tags ("id", "workspace_id", "name", "parent") VALUES (?, ?, ?, ?)',
+			await db
+				.query(
+					qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
+						[this.workspace, name, parent],
+					)}) RETURNING id`,
+					z.object({ id: z.string() }),
 				)
-				.run(uuid4(), this.workspace, name, parent);
-			if (insertResult.lastInsertRowid === undefined) {
-				throw new Error('Last insert id not found');
-			}
-
-			lastId = Number(insertResult.lastInsertRowid);
+				.then(({ rows: [{ id }] }) => {
+					lastId = id;
+				});
 		}
 
-		// Get generated id
-		const selectWithId = (await db
-			.prepare('SELECT `id` FROM tags WHERE rowid=?')
-			.get(lastId)) as any;
-		if (!selectWithId || !selectWithId.id) {
+		if (!lastId) {
 			throw new Error("Can't get id of inserted row");
 		}
 
 		this.onChanged('tags');
 
-		return selectWithId.id;
+		return lastId;
 	}
 
-	public async update(tag: ITag): Promise<void> {
-		const db = this.db.get();
+	public async update({ name, parent, id }: ITag): Promise<void> {
+		const db = wrapDB(this.db.get());
 
-		db.prepare('UPDATE tags SET name=?, parent=? WHERE id=? AND workspace_id=?').run(
-			tag.name,
-			tag.parent,
-			tag.id,
-			this.workspace,
+		await db.query(
+			qb.sql`UPDATE tags SET name=${name}, parent=${parent} WHERE id=${id} AND workspace_id=${this.workspace}`,
 		);
 
 		this.onChanged('tags');
 	}
 
 	public async delete(id: string): Promise<void> {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
-		const tagsIdForRemove = (
-			db
-				.prepare(
-					`
-			WITH RECURSIVE tagTree AS (
+		const { rows: tagsIdForRemove } = await db.query(
+			qb.sql`WITH RECURSIVE tagTree AS (
 				SELECT
 					id, parent, name, id AS root
 				FROM tags
@@ -126,29 +142,24 @@ export class TagsController {
 				INNER JOIN tagTree t2
 				ON t.parent = t2.id
 			)
-			SELECT id FROM tagTree WHERE root IN (?) GROUP BY id
-		`,
-				)
-				.all(id) as { id: string }[]
-		).map(({ id }) => id);
+			SELECT id FROM tagTree WHERE root IN (${id}) GROUP BY id`,
+			z.object({ id: z.string() }).transform((row) => row.id),
+		);
 
-		db.transaction(() => {
-			db.prepare(
-				`DELETE FROM tags WHERE workspace_id=? AND id IN (${Array(
-					tagsIdForRemove.length,
-				)
-					.fill('?')
-					.join(',')})`,
-			).run(this.workspace, ...tagsIdForRemove);
+		await this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
 
-			db.prepare(
-				`DELETE FROM attachedTags WHERE workspace_id=? AND source IN (${Array(
-					tagsIdForRemove.length,
-				)
-					.fill('?')
-					.join(',')})`,
-			).run(this.workspace, ...tagsIdForRemove);
-		})();
+			await db.query(
+				qb.sql`DELETE FROM tags WHERE workspace_id=${
+					this.workspace
+				} AND id IN (${qb.values(tagsIdForRemove)})`,
+			);
+			await db.query(
+				qb.sql`DELETE FROM attached_tags WHERE workspace_id=${
+					this.workspace
+				} AND source IN (${qb.values(tagsIdForRemove)})`,
+			);
+		});
 
 		this.onChanged('tags');
 	}
@@ -157,43 +168,37 @@ export class TagsController {
 	 * Returns tags attached to a entity
 	 */
 	public async getAttachedTags(target: string): Promise<IResolvedTag[]> {
-		const db = this.db.get();
+		const db = wrapDB(this.db.get());
 
-		const query = [
-			tagsQuery,
-			`WHERE t.id IN (SELECT source FROM attachedTags WHERE workspace_id=? AND target = ?)`,
-		].join(' ');
-
-		return (db.prepare(query).all(this.workspace, target) as any[]).map(
-			({ id, name, resolvedName, parent }) => ({
-				id,
-				name,
-				resolvedName,
-				parent: parent ?? null,
-			}),
+		const { rows } = await db.query(
+			qb.line(
+				tagsQuery,
+				qb.sql`WHERE t.id IN (SELECT source FROM attached_tags WHERE workspace_id=${this.workspace} AND target=${target})`,
+			),
+			RowScheme,
 		);
+
+		return rows;
 	}
 
 	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
-		const db = this.db.get();
+		await this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
 
-		db.transaction(() => {
-			db.prepare(`DELETE FROM attachedTags WHERE workspace_id=? AND target=?`).run(
-				this.workspace,
-				target,
+			await db.query(
+				qb.sql`DELETE FROM attached_tags WHERE workspace_id=${this.workspace} AND target=${target}`,
 			);
+
 			if (tags.length > 0) {
-				db.prepare(
-					`INSERT INTO attachedTags(id,workspace_id,source,target) VALUES ${Array(
-						tags.length,
-					)
-						.fill('(?, ?, ?, ?)')
-						.join(',')}`,
-				).run(
-					tags.map((tagId) => [uuid4(), this.workspace, tagId, target]).flat(),
+				await db.query(
+					qb.sql`INSERT INTO attached_tags(workspace_id,source,target) VALUES ${qb.set(
+						tags.map((tagId) =>
+							qb.values([this.workspace, tagId, target]).withParenthesis(),
+						),
+					)}`,
 				);
 			}
-		})();
+		});
 
 		this.onChanged('noteTags');
 	}

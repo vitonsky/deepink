@@ -1,4 +1,3 @@
-import DB, { Database } from 'better-sqlite3';
 import { createEvent } from 'effector';
 import { IFileController } from '@core/features/files';
 
@@ -7,19 +6,16 @@ import {
 	ManagedDatabase,
 	Options as ManagedDatabaseOptions,
 } from '../ManagedDatabase';
-import { latestSchemaVersion, migrateToLatestSchema } from './migrations';
+import { EventsMap, ExtendedPGLite } from './ExtendedPGLite';
 import setupSQL from './setup.sql';
 import { IDatabaseContainer } from '..';
 
-export type SQLiteDatabaseContainer = IDatabaseContainer<Database>;
+export type PGLiteDatabaseContainer = IDatabaseContainer<ExtendedPGLite>;
 
-export type SQLiteDatabase = IManagedDatabase<Database>;
+export type PGLiteDatabase = IManagedDatabase<ExtendedPGLite>;
 
 export type Options = ManagedDatabaseOptions & {
-	/**
-	 * Option to disable verbose logs
-	 */
-	verbose?: boolean;
+	verboseLog?: boolean;
 };
 
 export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
@@ -54,8 +50,8 @@ export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 50
 
 export const getWrappedDb = async (
 	dbFile: IFileController,
-	{ verbose: verboseLog = false }: Options = {},
-): Promise<SQLiteDatabaseContainer> => {
+	{ verboseLog }: Options = {},
+): Promise<PGLiteDatabaseContainer> => {
 	const onChanged = createEvent();
 
 	const mutableCommands = [
@@ -76,58 +72,38 @@ export const getWrappedDb = async (
 	];
 
 	// Create DB
-	let db: Database;
-	const dbOptions = {
-		// We use this way, because loader can't automatically find a native module
-		nativeBinding:
-			require('better-sqlite3/build/Release/better_sqlite3.node') as string,
-		verbose: (command?: unknown, ..._additionalArgs: unknown[]) => {
-			if (typeof command !== 'string') return;
+	let db: ExtendedPGLite;
+	const onCommand = ({ command }: EventsMap['command']) => {
+		if (typeof command !== 'string') return;
 
-			// Skip for closed DB
-			if (!db.open) return;
+		// Skip for closed DB
+		if (db.closed) return;
 
-			if (verboseLog) {
-				console.debug(command);
-			}
+		if (verboseLog) {
+			console.debug(command);
+		}
 
-			// Track mutable changes
-			const capitalizedCommand = command.toUpperCase();
-			if (
-				mutableCommands.some((commandName) =>
-					capitalizedCommand.includes(commandName),
-				)
-			) {
-				onChanged();
-			}
-		},
+		// Track mutable changes
+		const capitalizedCommand = command.toUpperCase();
+		if (
+			mutableCommands.some((commandName) =>
+				capitalizedCommand.includes(commandName),
+			)
+		) {
+			onChanged();
+		}
 	};
 
 	const dbFileBuffer = await dbFile.get();
 	if (dbFileBuffer && dbFileBuffer.byteLength > 0) {
 		// Load DB
-		// Check header signature, to detect a database file https://www.sqlite.org/fileformat.html#the_database_header
-		const isDatabaseFile = new TextDecoder()
-			.decode(dbFileBuffer.slice(0, 16))
-			.startsWith(`SQLite format 3`);
-		if (isDatabaseFile) {
-			db = new DB(Buffer.from(dbFileBuffer), dbOptions);
-		} else {
-			// If no database file, load buffer as string with SQL commands
-			db = new DB(':memory:', dbOptions);
+		db = new ExtendedPGLite({ loadDataDir: new Blob([dbFileBuffer]) });
+		await db.waitReady;
 
-			const sqlText = new TextDecoder().decode(dbFileBuffer);
-			db.exec(sqlText);
-		}
-
-		// Migrate data
-		await migrateToLatestSchema(db, verboseLog);
+		// TODO: Migrate data
 	} else {
-		// Create new DB
-		db = new DB(':memory:', dbOptions);
-
-		// Setup pragma
-		db.pragma(`main.user_version = ${latestSchemaVersion};`);
+		db = new ExtendedPGLite();
+		await db.waitReady;
 
 		// Create DB
 		if (verboseLog) {
@@ -138,7 +114,15 @@ export const getWrappedDb = async (
 		db.exec(setupSQL);
 	}
 
-	const dumpData = () => waitDatabaseLock(() => db.serialize());
+	db.on('command', onCommand);
+
+	const dumpData = async () => {
+		const buffer = await waitDatabaseLock(() =>
+			db.dumpDataDir().then((file) => file.arrayBuffer()),
+		);
+
+		return Buffer.from(new Uint8Array(buffer));
+	};
 
 	// Write latest data
 	dbFile.write(await dumpData());
@@ -149,15 +133,13 @@ export const getWrappedDb = async (
 			return db;
 		},
 		isOpened() {
-			return db.open;
+			return !db.closed;
 		},
 		getData() {
 			return dumpData();
 		},
 		close() {
-			return waitDatabaseLock(() => {
-				db.close();
-			});
+			return db.close();
 		},
 	};
 };
@@ -165,7 +147,7 @@ export const getWrappedDb = async (
 export const openDatabase = async (
 	dbFile: IFileController,
 	options: Options = {},
-): Promise<SQLiteDatabase> => {
+): Promise<PGLiteDatabase> => {
 	const wrappedDb = await getWrappedDb(dbFile, options);
 	return new ManagedDatabase(wrappedDb, dbFile, options);
 };

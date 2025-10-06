@@ -6,13 +6,12 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-import { wait } from '@utils/tests';
-
 import {
 	openDatabase,
-	SQLiteDatabase,
-} from '../../database/SQLiteDatabase/SQLiteDatabase';
+	PGLiteDatabase,
+} from '@core/storage/database/pglite/PGLiteDatabase';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { wait } from '@utils/tests';
 
 import { NotesImporter, OnProcessedPayload } from '.';
 
@@ -29,7 +28,7 @@ const FAKE_WORKSPACE_NAME = 'fake-workspace-id';
 const createAppContextIterator = () => {
 	let context = 0;
 
-	return (db: SQLiteDatabase, fileManager: IFilesStorage) => {
+	return (db: PGLiteDatabase, fileManager: IFilesStorage) => {
 		const namespace = FAKE_WORKSPACE_NAME + ++context;
 
 		const notesRegistry = new NotesController(db, namespace);
@@ -575,18 +574,18 @@ describe('Import interruptions', () => {
 				noteExtensions: ['.md', '.mdx'],
 				convertPathToTag: 'always',
 				// Slow down the processing
-				throttle: requestAnimationFrame,
+				async throttle(callback) {
+					if (!db.get().closed) {
+						await db.close();
+					}
+
+					callback();
+				},
 			},
 		);
 
 		await expect(
-			importer.import(createFileManagerMock(filesSample), {
-				onProcessed(info) {
-					if (info.processed > 0) {
-						db.close();
-					}
-				},
-			}),
-		).rejects.toThrowError('The database connection is not open');
+			importer.import(createFileManagerMock(filesSample)),
+		).rejects.toThrowError('PGlite is closed');
 	});
 });
