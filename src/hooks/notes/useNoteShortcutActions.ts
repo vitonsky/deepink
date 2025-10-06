@@ -36,7 +36,7 @@ export const useNoteShortcutActions = () => {
 	const focusPreviousNote = useCallback(() => {
 		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		if (noteIndex === -1) return;
-		const previousNote = getItemByOffset(openedNotes, noteIndex, 1);
+		const previousNote = getItemByOffset(openedNotes, noteIndex, -1);
 		if (!previousNote) return;
 
 		noteActions.click(previousNote.id);
@@ -45,7 +45,7 @@ export const useNoteShortcutActions = () => {
 	const focusNextNote = useCallback(() => {
 		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		if (noteIndex === -1) return;
-		const nextNote = getItemByOffset(openedNotes, noteIndex, -1);
+		const nextNote = getItemByOffset(openedNotes, noteIndex, 1);
 		if (!nextNote) return;
 
 		noteActions.click(nextNote.id);
