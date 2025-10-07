@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import { v4 as uuid4 } from 'uuid';
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { qb } from '@utils/db/query-builder';
@@ -51,9 +50,8 @@ export class NoteVersions {
 		if (options.force) {
 			await db.query(
 				qb.sql`
-					INSERT INTO note_versions (id, note_id, created_at, title, text)
+					INSERT INTO note_versions (note_id, created_at, title, text)
 					SELECT
-						${uuid4()} as id,
 						id as note_id, 
 						${Date.now()} as created_at,
 						title,
@@ -68,9 +66,8 @@ export class NoteVersions {
 
 		await db.query(
 			qb.sql`
-				INSERT INTO note_versions (id, note_id, created_at, title, text)
+				INSERT INTO note_versions (note_id, created_at, title, text)
 				SELECT
-					${uuid4()} as id,
 					id as note_id,
 					${Date.now()} as created_at,
 					n.title,
