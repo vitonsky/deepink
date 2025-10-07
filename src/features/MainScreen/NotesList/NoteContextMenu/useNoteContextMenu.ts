@@ -170,10 +170,9 @@ export const useNoteContextMenu = ({
 
 	// open menu only after update openMenu
 	useEffect(() => {
-		if (menu.target) {
-			openMenu(menu.target.id, menu.target.point);
-			setMenu((prevMenu) => ({ ...prevMenu, target: null }));
-		}
+		if (!menu.target) return;
+
+		openMenu(menu.target.id, menu.target.point);
 	}, [menu, openMenu]);
 
 	// Updates the menu state first to ensure openMenu has the latest menu
