@@ -22,6 +22,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 					item.visible ? (
 						<Button
 							key={idx}
+							ref={item.ref}
 							size="xs"
 							variant="ghost"
 							borderRadius="0"
@@ -43,6 +44,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 					item.visible ? (
 						<Button
 							key={idx}
+							ref={item.ref}
 							size="xs"
 							variant="ghost"
 							borderRadius="0"

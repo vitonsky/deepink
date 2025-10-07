@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaFeather } from 'react-icons/fa6';
-import { Box, Divider, Text, VStack } from '@chakra-ui/react';
+import { Divider, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { Popper } from '@components/Popper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -42,12 +42,9 @@ export const EditorModePicker = () => {
 				visible: isNotesOpened,
 				title: 'Editor mode',
 				text: editorModes[editorMode],
-				icon: (
-					<Box ref={setReferenceRef}>
-						<FaFeather />
-					</Box>
-				),
+				icon: <FaFeather />,
 				onClick: () => setIsVisible((state) => !state),
+				ref: setReferenceRef,
 			},
 			{
 				placement: 'end',
