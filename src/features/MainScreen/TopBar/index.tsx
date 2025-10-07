@@ -2,7 +2,6 @@ import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { FaXmark } from 'react-icons/fa6';
 import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
-import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
 import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
@@ -17,9 +16,6 @@ export type TopBarProps = {
 	notes: INote[];
 
 	updateNotes: () => void;
-
-	// TODO: receive with react context
-	notesRegistry: INotesController;
 };
 
 // TODO: improve tabs style
@@ -30,11 +26,9 @@ export const TopBar: FC<TopBarProps> = ({
 	onClose,
 	onPick,
 	updateNotes,
-	notesRegistry,
 }) => {
 	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: onClose,
-		notesRegistry,
 		updateNotes,
 	});
 

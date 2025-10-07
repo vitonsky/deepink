@@ -96,7 +96,6 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 		<VStack align="start" w="100%" h="100%" gap={0} overflow="hidden" {...props}>
 			<TopBar
 				{...{
-					notesRegistry,
 					updateNotes,
 					notes: openedNotes,
 					tabs,
