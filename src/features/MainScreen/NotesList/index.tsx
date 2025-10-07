@@ -2,7 +2,6 @@ import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
@@ -16,12 +15,10 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
-import { selectNoteMenu } from './NoteContextMenu/utils/selectNoteMenu';
 
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
-	const notesRegistry = useNotesRegistry();
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
@@ -32,7 +29,6 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: noteActions.close,
-		notesRegistry,
 		updateNotes,
 	});
 
@@ -131,14 +127,10 @@ export const NotesList: FC<NotesListProps> = () => {
 										)
 									}
 									onContextMenu={(evt) => {
-										openNoteContextMenu(
-											note.id,
-											{
-												x: evt.pageX,
-												y: evt.pageY,
-											},
-											selectNoteMenu(note),
-										);
+										openNoteContextMenu(note, {
+											x: evt.pageX,
+											y: evt.pageY,
+										});
 									}}
 									onClick={() => {
 										noteActions.click(note.id);
