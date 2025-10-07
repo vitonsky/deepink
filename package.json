@@ -5,7 +5,7 @@
 	"main": "dist/main.js",
 	"license": "MIT",
 	"scripts": {
-		"test": "npm rebuild && vitest",
+		"test": "vitest",
 		"clean": "rm -Rf dist out",
 		"build:dev": "npm run prepare-electron-deps && webpack -w",
 		"start": "electron-forge start -- --no-sandbox",
