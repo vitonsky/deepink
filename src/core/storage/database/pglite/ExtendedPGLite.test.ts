@@ -25,7 +25,7 @@ test('Listen commands on database', async () => {
 	);
 
 	expect(onCommand).toHaveBeenCalledTimes(1);
-	expect(onCommand).toBeCalledWith({ command: 'SELECT * FROM test;' });
+	expect(onCommand).toBeCalledWith({ command: 'SELECT * FROM test;', affectedRows: 0 });
 });
 
 describe('Import/export data', () => {
