@@ -2,7 +2,7 @@ import { createEvent, EventCallable } from 'effector';
 import { PGlite, PGliteOptions, QueryOptions, Results } from '@electric-sql/pglite';
 
 export type EventsMap = {
-	command: { command: string };
+	command: { command: string; affectedRows?: number };
 };
 
 export class ExtendedPGLite extends PGlite {
@@ -22,7 +22,7 @@ export class ExtendedPGLite extends PGlite {
 		options?: QueryOptions | undefined,
 	): Promise<Results<T>> {
 		const result = await super.query<T>(query, params, options);
-		this.events.command({ command: query });
+		this.events.command({ command: query, affectedRows: result.affectedRows });
 
 		return result;
 	}

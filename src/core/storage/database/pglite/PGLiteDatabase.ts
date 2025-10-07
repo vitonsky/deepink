@@ -73,7 +73,7 @@ export const getWrappedDb = async (
 
 	// Create DB
 	let db: ExtendedPGLite;
-	const onCommand = ({ command }: EventsMap['command']) => {
+	const onCommand = ({ command, affectedRows }: EventsMap['command']) => {
 		if (typeof command !== 'string') return;
 
 		// Skip for closed DB
@@ -86,6 +86,7 @@ export const getWrappedDb = async (
 		// Track mutable changes
 		const capitalizedCommand = command.toUpperCase();
 		if (
+			(affectedRows === undefined || affectedRows > 0) &&
 			mutableCommands.some((commandName) =>
 				capitalizedCommand.includes(commandName),
 			)
@@ -118,7 +119,7 @@ export const getWrappedDb = async (
 
 	const dumpData = async () => {
 		const buffer = await waitDatabaseLock(() =>
-			db.dumpDataDir().then((file) => file.arrayBuffer()),
+			db.dumpDataDir('none').then((file) => file.arrayBuffer()),
 		);
 
 		return Buffer.from(new Uint8Array(buffer));
