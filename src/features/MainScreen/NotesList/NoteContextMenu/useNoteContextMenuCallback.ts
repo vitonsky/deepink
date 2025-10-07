@@ -10,6 +10,7 @@ import { selectDirectory } from '@electron/requests/files/renderer';
 import {
 	useEventBus,
 	useFilesRegistry,
+	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
@@ -22,15 +23,13 @@ import { NoteActions } from '.';
 export type ContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
-
-	// TODO: receive with react context
-	notesRegistry: INotesController;
 };
 
 export type NoteActionsOptions = ContextMenuOptions & {
 	filesRegistry: FilesController;
 	tagsRegistry: TagsController;
 	eventBus: EventBus<WorkspaceEventsPayloadMap>;
+	notesRegistry: INotesController;
 };
 
 const mdCharsForEscape = ['\\', '[', ']'];
@@ -163,17 +162,19 @@ export const createNoteActions = ({
 export const useNoteContextMenuCallback = (options: ContextMenuOptions) => {
 	const filesRegistry = useFilesRegistry();
 	const tagsRegistry = useTagsRegistry();
+	const notesRegistry = useNotesRegistry();
 	const eventBus = useEventBus();
 
 	const actions = useMemo(
 		() =>
 			createNoteActions({
 				...options,
+				notesRegistry,
 				filesRegistry,
 				tagsRegistry,
 				eventBus,
 			}),
-		[options, filesRegistry, tagsRegistry, eventBus],
+		[options, notesRegistry, filesRegistry, tagsRegistry, eventBus],
 	);
 
 	return useCallback<ContextMenuCallback<NoteActions>>(
