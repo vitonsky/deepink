@@ -3,6 +3,7 @@ import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
+import { ContextMenuProvider } from '@features/MainScreen/NotesList/NoteContextMenu/ContextMenuProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -125,7 +126,9 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					}}
 				>
 					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
-						<MainScreen />
+						<ContextMenuProvider>
+							<MainScreen />
+						</ContextMenuProvider>
 						<WorkspaceStatusBarItems />
 					</WorkspaceModalProvider>
 				</WorkspaceProvider>
