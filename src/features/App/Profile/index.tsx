@@ -108,7 +108,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const commandBus = useCommandBusContext();
 	useEffect(() => {
 		return commandBus.listen(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
-	}, [commandBus]);
+	}, [commandBus, controls.close]);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

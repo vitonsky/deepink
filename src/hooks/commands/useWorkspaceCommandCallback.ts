@@ -22,11 +22,12 @@ export function useWorkspaceCommandCallback<K extends keyof CommandPayloads>(
 		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
 		isEqual,
 	);
+	const isVisibleWorkspace =
+		activeWorkspace && activeWorkspace.id === contextWorkspaceId;
 
 	useEffect(() => {
-		// subscription is active only when the current workspace matches the context workspace
-		if (activeWorkspace?.id !== contextWorkspaceId) return;
+		if (!isVisibleWorkspace) return;
 
 		return commandBus.listen(commandName, callback);
-	}, [commandBus, commandName, callback, activeWorkspace?.id, contextWorkspaceId]);
+	}, [commandBus, commandName, callback, contextWorkspaceId, isVisibleWorkspace]);
 }
