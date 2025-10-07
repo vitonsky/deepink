@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
+import React, { forwardRef, JSX, useCallback, useEffect, useRef } from 'react';
 
 /**
  * HOC that wrap component to a container that will always redirect focus from itself to a target component.
@@ -8,8 +8,8 @@ import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
  */
 export const WithFocusRedirect = <C extends React.ElementType>(Component: C) =>
 	forwardRef<HTMLElement, JSX.LibraryManagedAttributes<C, any>>((props, ref) => {
-		const rootRef = useRef<HTMLElement | null>();
-		const componentRef = useRef<HTMLElement>();
+		const rootRef = useRef<HTMLElement | null>(null);
+		const componentRef = useRef<HTMLElement>(null);
 		useEffect(() => {
 			const rootElement = rootRef.current;
 			if (!rootElement) return;
