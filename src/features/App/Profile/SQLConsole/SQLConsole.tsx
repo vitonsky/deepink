@@ -74,7 +74,6 @@ export const SQLConsole = ({
 					if (!node || isInitializedRef.current) return;
 
 					const input = node.querySelector('.cm-content');
-					console.log({ input });
 					if (!input || !(input instanceof HTMLDivElement)) return;
 
 					isInitializedRef.current = true;
