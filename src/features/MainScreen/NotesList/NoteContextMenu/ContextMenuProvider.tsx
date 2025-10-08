@@ -23,17 +23,18 @@ const ContextMenuContext = createContext<{
 export const useContextMenuProvider = createContextGetterHook(ContextMenuContext);
 
 export const ContextMenuProvider: FC<PropsWithChildren> = ({ children }) => {
-	const [context] = useState(() => ({
-		show: createEvent<ContextMenuPayload>(),
-	}));
-
+	const [context] = useState(() => ({ show: createEvent<ContextMenuPayload>() }));
 	const [menuState, setMenuState] = useState<ContextMenuPayload | null>(null);
 
-	const closeMenu = useCallback(() => setMenuState(null), []);
+	const toggleMenu = useCallback((payload: ContextMenuPayload) => {
+		setMenuState((prev) => (prev ? null : payload));
+	}, []);
 
 	useEffect(() => {
-		return context.show.watch((payload) => setMenuState(payload));
-	}, [context]);
+		return context.show.watch(toggleMenu);
+	}, [context, toggleMenu]);
+
+	const closeMenu = useCallback(() => setMenuState(null), []);
 
 	return (
 		<ContextMenuContext.Provider value={context}>
@@ -42,12 +43,12 @@ export const ContextMenuProvider: FC<PropsWithChildren> = ({ children }) => {
 				<ContextMenu
 					items={menuState.items}
 					position={menuState.position}
-					isOpen={true}
-					onClose={closeMenu}
-					onAction={async (actionId) => {
+					isOpen={Boolean(menuState)}
+					onAction={(actionId) => {
 						menuState.onAction(actionId);
 						closeMenu();
 					}}
+					onClose={closeMenu}
 				/>
 			)}
 		</ContextMenuContext.Provider>
