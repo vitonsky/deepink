@@ -1,4 +1,5 @@
 /* eslint-disable spellcheck/spell-checker */
+import { getUUID } from 'src/__tests__/utils/uuid';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
@@ -23,13 +24,11 @@ globalThis.requestAnimationFrame = (callback) => {
 	return 0;
 };
 
-const FAKE_WORKSPACE_NAME = 'fake-workspace-id';
+const FAKE_WORKSPACE_ID = getUUID();
 
 const createAppContextIterator = () => {
-	let context = 0;
-
 	return (db: PGLiteDatabase, fileManager: IFilesStorage) => {
-		const namespace = FAKE_WORKSPACE_NAME + ++context;
+		const namespace = getUUID();
 
 		const notesRegistry = new NotesController(db, namespace);
 		const noteVersions = new NoteVersions(db, namespace);
@@ -63,12 +62,12 @@ describe('Base notes import cases', () => {
 
 	test('Import notes', async () => {
 		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
 		const importer = new NotesImporter(
 			{
@@ -150,7 +149,7 @@ describe('Base notes import cases', () => {
 
 	test('Imported notes is in list', async () => {
 		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		await expect(notesRegistry.get()).resolves.toEqual([
 			expect.objectContaining({
@@ -246,8 +245,8 @@ describe('Base notes import cases', () => {
 
 	test('Every note have snapshot', async () => {
 		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
 
 		const notes = await notesRegistry.get();
 
@@ -260,7 +259,7 @@ describe('Base notes import cases', () => {
 
 	test('Attached files is in files list', async () => {
 		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const note = await notesRegistry.get().then((notes) => {
 			const note = notes.find((note) => note.content.title === 'note-4');
@@ -269,8 +268,8 @@ describe('Base notes import cases', () => {
 			return note;
 		});
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
 		const attachmentIds = await attachmentsRegistry.get(note.id);
 		expect(attachmentIds).toHaveLength(1);
@@ -284,7 +283,7 @@ describe('Base notes import cases', () => {
 
 	test('Tags is created and reproduces structure in FS', async () => {
 		const db = await dbPromise;
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await expect(tagsRegistry.getTags()).resolves.toEqual([
 			expect.objectContaining({
@@ -459,12 +458,12 @@ describe('Import interruptions', () => {
 
 		const fileManager = createFileManagerMock();
 
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
 		const importer = new NotesImporter(
 			{
@@ -554,12 +553,12 @@ describe('Import interruptions', () => {
 
 		const fileManager = createFileManagerMock();
 
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_NAME);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
 		const importer = new NotesImporter(
 			{

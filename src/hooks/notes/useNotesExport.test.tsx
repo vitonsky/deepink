@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import React from 'react';
 import { act } from 'react-dom/test-utils';
+import { getUUID } from 'src/__tests__/utils/uuid';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
@@ -31,7 +32,7 @@ afterEach(() => {
 });
 
 describe('Export notes', async () => {
-	const FAKE_WORKSPACE_NAME = 'fake-workspace-id';
+	const FAKE_WORKSPACE_ID = getUUID();
 
 	const fileManager = createFileManagerMock();
 
@@ -45,9 +46,9 @@ describe('Export notes', async () => {
 
 	test('Add test data', async () => {
 		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
-		const attachments = new AttachmentsController(db, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+		const attachments = new AttachmentsController(db, FAKE_WORKSPACE_ID);
 
 		await notesRegistry.add({
 			title: 'Title 1',
@@ -74,9 +75,9 @@ describe('Export notes', async () => {
 
 	test('Export all notes via useNotesExport', async () => {
 		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
 		const { result } = renderHook(useNotesExport, {
 			wrapper(props) {
@@ -118,9 +119,9 @@ describe('Export notes', async () => {
 
 	test('Export single note via useNotesExport', async () => {
 		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_NAME);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_NAME);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_NAME);
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
 		const { result } = renderHook(useNotesExport, {
 			wrapper(props) {

@@ -77,10 +77,11 @@ export const getWrappedDb = async (
 	await db.waitReady;
 
 	// Migrate data
+	const context = { db };
 	const migrations = new MigrationsRunner({
 		storage: new PostgresMigrationsStorage(),
 		migrations: await getMigrationsList(),
-		context: { db },
+		context,
 		logger: console,
 	});
 
@@ -94,7 +95,13 @@ export const getWrappedDb = async (
 				typeof globalThis.localStorage !== 'undefined' &&
 				localStorage.getItem('recovery_mode') === 'true';
 
-			if (!isRecoveryMode) throw error;
+			if (!isRecoveryMode) {
+				// Clear DB from context
+				// With no this code, tests freezes while errors
+				// Probably this is because wasm code can't make free due to references
+				delete (context as any)['db'];
+				throw error;
+			}
 
 			console.error(error);
 

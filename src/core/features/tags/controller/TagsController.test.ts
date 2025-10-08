@@ -1,13 +1,16 @@
 import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
+import { getUUID } from 'src/__tests__/utils/uuid';
 
 import { TagsController } from './TagsController';
+
+const FAKE_WORKSPACE_ID = getUUID();
 
 describe('manage tags', () => {
 	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
 
 	test('nested tags', async () => {
 		const db = await getDB();
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('foo', null);
 		await tags.add('bar', null).then((tagId) => tags.add('baz', tagId));
@@ -37,7 +40,7 @@ describe('manage tags', () => {
 	// TODO:fox that cases. Paths must be normalized
 	test('weird tags', async () => {
 		const db = await getDB();
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('///foo', null);
 		await tags.add('/foo/bar', null);
@@ -86,7 +89,7 @@ describe('manage tags', () => {
 
 	test('update tags', async () => {
 		const db = await getDB();
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('foo', null).then(async (tagId) => {
 			await tags.update({
@@ -130,7 +133,7 @@ describe('manage tags', () => {
 
 	test('delete tags', async () => {
 		const db = await getDB();
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('foo', null);
 
@@ -153,20 +156,22 @@ describe('manage tags', () => {
 describe('manage attachments', () => {
 	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
 
+	const FAKE_NOTE_ID = getUUID();
+
 	test('set attached tags', async () => {
 		const db = await getDB();
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
 		const bazId = await tags.add('baz', barId);
 
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual([]);
 		});
 
-		await tags.setAttachedTags('target1', [fooId, bazId]);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -181,8 +186,8 @@ describe('manage attachments', () => {
 			);
 		});
 
-		await tags.setAttachedTags('target1', [barId]);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.setAttachedTags(FAKE_NOTE_ID, [barId]);
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -196,16 +201,16 @@ describe('manage attachments', () => {
 
 	test('deleted tag will not appears in tags list', async () => {
 		const db = await getDB();
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
 		const bazId = await tags.add('baz', barId);
 
-		await tags.setAttachedTags('target1', [fooId, bazId]);
+		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
 
 		await tags.delete(bazId);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -217,7 +222,7 @@ describe('manage attachments', () => {
 		});
 
 		await tags.delete(fooId);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual([]);
 		});
 	});
