@@ -2,7 +2,7 @@
 import { Query } from 'nano-queries/core/Query';
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { qb } from '@utils/db/query-builder';
+import { DBTypes, qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
 import { INote, INoteContent, NoteId } from '..';
@@ -18,10 +18,10 @@ const RowScheme = z
 		id: z.string(),
 		title: z.string(),
 		text: z.string(),
-		created_at: z.number(),
-		updated_at: z.number(),
-		history_disabled: z.number(),
-		visible: z.number(),
+		created_at: z.date(),
+		updated_at: z.date(),
+		history_disabled: z.boolean(),
+		visible: z.boolean(),
 	})
 	.transform(
 		({
@@ -34,26 +34,26 @@ const RowScheme = z
 			visible,
 		}): INote => ({
 			id,
-			createdTimestamp: created_at,
-			updatedTimestamp: updated_at,
-			isSnapshotsDisabled: Boolean(history_disabled),
-			isVisible: Boolean(visible),
+			createdTimestamp: created_at.getTime(),
+			updatedTimestamp: updated_at.getTime(),
+			isSnapshotsDisabled: history_disabled,
+			isVisible: visible,
 			content: { title, text },
 		}),
 	);
 
 function formatNoteMeta(meta: Partial<NoteMeta>) {
 	return Object.fromEntries(
-		Object.entries(meta).map((item): [string, string | number] => {
+		Object.entries(meta).map((item): [string, DBTypes] => {
 			const [key, value] = item as unknown as {
 				[K in keyof NoteMeta]: [K, NoteMeta[K]];
 			}[keyof NoteMeta];
 
 			switch (key) {
 				case 'isSnapshotsDisabled':
-					return ['history_disabled', Number(value)];
+					return ['history_disabled', Boolean(value)];
 				case 'isVisible':
-					return ['visible', Number(value)];
+					return ['visible', Boolean(value)];
 			}
 		}),
 	);
@@ -64,7 +64,7 @@ function getFetchQuery(
 		select,
 		workspace,
 	}: {
-		select: Query;
+		select: Query<DBTypes>;
 		workspace?: string;
 	},
 	{ limit, page, tags = [], meta, sort }: NotesControllerFetchOptions = {},

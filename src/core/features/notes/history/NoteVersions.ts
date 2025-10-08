@@ -9,7 +9,7 @@ import { rename } from './rename';
 const NoteVersionRowScheme = z.object({
 	id: z.string(),
 	note_id: z.string(),
-	created_at: z.number(),
+	created_at: z.date().transform((date) => date.getTime()),
 	title: z.string(),
 	text: z.string(),
 });

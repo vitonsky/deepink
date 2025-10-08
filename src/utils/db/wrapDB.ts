@@ -3,11 +3,11 @@ import { z } from 'zod';
 import { ExtendedPGLite } from '@core/storage/database/pglite/ExtendedPGLite';
 import { Results, Transaction } from '@electric-sql/pglite';
 
-import { qb } from './query-builder';
+import { DBTypes, qb } from './query-builder';
 
 type WrappedDbMethods = {
 	query: <S extends z.ZodType>(
-		query: Query,
+		query: Query<DBTypes>,
 		scheme?: S,
 	) => Promise<Results<z.TypeOf<S>>>;
 };
