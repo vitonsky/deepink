@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Menu, MenuDivider, MenuItem, MenuList, Portal } from '@chakra-ui/react';
 
 type MenuItem<T = string> = {
@@ -29,10 +29,26 @@ export const ContextMenu = ({
 	isOpen,
 	onClose,
 }: ContextMenuProps) => {
+	const menuListRef = useRef<HTMLDivElement | null>(null);
+	const [isOpenMenu, setOpenMenu] = useState(isOpen);
+
+	useEffect(() => {
+		const onClick = (e: MouseEvent) => {
+			const target = e.target;
+
+			if (target || menuListRef.current?.contains(target)) return;
+			setOpenMenu(false);
+		};
+
+		document.addEventListener('click', onClick);
+		return () => document.removeEventListener('click', onClick);
+	}, []);
+
 	return (
-		<Menu isOpen={isOpen} onClose={onClose}>
+		<Menu isOpen={isOpenMenu} onClose={onClose}>
 			<Portal>
 				<MenuList
+					ref={menuListRef}
 					position="absolute"
 					top={`${position.y}px`}
 					left={`${position.x}px`}
