@@ -103,7 +103,7 @@ describe('Migrations run in strict order', () => {
 	});
 });
 
-describe.only('Migrations runs in transactions', () => {
+describe('Migrations runs in transactions', () => {
 	const db = new PGlite();
 	const storage = new PostgresMigrationsStorage();
 
