@@ -84,7 +84,39 @@ export const getWrappedDb = async (
 		logger: console,
 	});
 
-	await migrations.up();
+	// Run migrations with hooks for recovery mode
+	while (true) {
+		try {
+			await migrations.up();
+			break;
+		} catch (error) {
+			const isRecoveryMode =
+				typeof globalThis.localStorage !== 'undefined' &&
+				localStorage.getItem('recovery_mode') === 'true';
+
+			if (!isRecoveryMode) throw error;
+
+			console.error(error);
+
+			await new Promise((resolve, reject) => {
+				const recoveryControls = {
+					db,
+					resolve,
+					reject() {
+						reject(error);
+					},
+				};
+
+				(globalThis as any)['__recovery'] = recoveryControls;
+				console.log(
+					"Recovery mode is enabled. Call `resolve` once you've done with fix database or call `reject` to exit of recovery mode",
+					recoveryControls,
+				);
+			});
+
+			console.log('Recovery is completed. Apply migrations again...');
+		}
+	}
 
 	// Configure DB
 	db.on('command', onCommand);
