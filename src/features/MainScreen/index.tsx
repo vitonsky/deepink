@@ -1,4 +1,5 @@
 import React, { FC, useEffect } from 'react';
+import { debounce } from 'lodash';
 import { HStack, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
@@ -23,11 +24,11 @@ export const MainScreen: FC = () => {
 
 	// Update notes list by attach tags
 	useEffect(() => {
-		return tagsRegistry.onChange((scope) => {
-			if (scope === 'noteTags') {
-				updateNotes();
-			}
-		});
+		return tagsRegistry.onChange(
+			debounce((scope) => {
+				if (scope === 'noteTags') updateNotes();
+			}, 10),
+		);
 	}, [tagsRegistry, updateNotes]);
 
 	useEffect(() => {
