@@ -134,6 +134,7 @@
 		"remark-stringify": "^11.0.0",
 		"reselect": "^5.1.1",
 		"twofish-ts": "^1.0.2",
+		"umzug": "^3.8.2",
 		"unified": "^11.0.5",
 		"unist-builder": "^4.0.0",
 		"unist-util-remove": "^4.0.0",

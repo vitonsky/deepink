@@ -7,7 +7,9 @@ import {
 	Options as ManagedDatabaseOptions,
 } from '../ManagedDatabase';
 import { EventsMap, ExtendedPGLite } from './ExtendedPGLite';
-import setupSQL from './setup.sql';
+import { getMigrationsList } from './migrations';
+import { MigrationsRunner } from './migrations/MigrationsRunner';
+import { PostgresMigrationsStorage } from './migrations/PostgresMigrationsStorage';
 import { IDatabaseContainer } from '..';
 
 export type PGLiteDatabaseContainer = IDatabaseContainer<ExtendedPGLite>;
@@ -16,36 +18,6 @@ export type PGLiteDatabase = IManagedDatabase<ExtendedPGLite>;
 
 export type Options = ManagedDatabaseOptions & {
 	verboseLog?: boolean;
-};
-
-export const waitDatabaseLock = async <T = void>(callback: () => T, timeout = 5000) => {
-	const startTime = new Date().getTime();
-
-	return new Promise<T>((res, rej) => {
-		const tryExecute = () => {
-			try {
-				const result = callback();
-				res(result);
-				return;
-			} catch (error) {
-				if (
-					typeof error === 'object' &&
-					(error as Error).message ===
-						'This database connection is busy executing a query'
-				) {
-					if (new Date().getTime() - startTime < timeout) {
-						setTimeout(tryExecute, 10);
-					} else {
-						rej(error);
-					}
-				} else {
-					rej(error);
-				}
-			}
-		};
-
-		tryExecute();
-	});
 };
 
 export const getWrappedDb = async (
@@ -99,29 +71,26 @@ export const getWrappedDb = async (
 	if (dbFileBuffer && dbFileBuffer.byteLength > 0) {
 		// Load DB
 		db = new ExtendedPGLite({ loadDataDir: new Blob([dbFileBuffer]) });
-		await db.waitReady;
-
-		// TODO: Migrate data
 	} else {
 		db = new ExtendedPGLite();
-		await db.waitReady;
-
-		// Create DB
-		if (verboseLog) {
-			console.info('Initialize DB');
-			console.debug(setupSQL);
-		}
-
-		db.exec(setupSQL);
 	}
+	await db.waitReady;
 
+	// Migrate data
+	const migrations = new MigrationsRunner({
+		storage: new PostgresMigrationsStorage(),
+		migrations: await getMigrationsList(),
+		context: { db },
+		logger: console,
+	});
+
+	await migrations.up();
+
+	// Configure DB
 	db.on('command', onCommand);
 
 	const dumpData = async () => {
-		const buffer = await waitDatabaseLock(() =>
-			db.dumpDataDir('none').then((file) => file.arrayBuffer()),
-		);
-
+		const buffer = await db.dumpDataDir('none').then((file) => file.arrayBuffer());
 		return Buffer.from(new Uint8Array(buffer));
 	};
 
