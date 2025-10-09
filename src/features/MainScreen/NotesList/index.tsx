@@ -11,6 +11,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
+import { selectNoteMenu } from './NoteContextMenu/utils/selectNoteMenu';
 
 export type NotesListProps = {};
 
@@ -121,10 +122,14 @@ export const NotesList: FC<NotesListProps> = () => {
 										)
 									}
 									onContextMenu={(evt) => {
-										openNoteContextMenu(note, {
-											x: evt.pageX,
-											y: evt.pageY,
-										});
+										openNoteContextMenu(
+											note.id,
+											{
+												x: evt.pageX,
+												y: evt.pageY,
+											},
+											selectNoteMenu(note),
+										);
 									}}
 									onClick={() => {
 										noteActions.click(note.id);

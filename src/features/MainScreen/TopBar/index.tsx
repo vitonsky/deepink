@@ -5,6 +5,7 @@ import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
 
 import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
+import { selectNoteMenu } from '../NotesList/NoteContextMenu/utils/selectNoteMenu';
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -107,10 +108,14 @@ export const TopBar: FC<TopBarProps> = ({
 								onClose(note.id);
 							}}
 							onContextMenu={(evt) => {
-								openNoteContextMenu(note, {
-									x: evt.clientX,
-									y: evt.clientY,
-								});
+								openNoteContextMenu(
+									note.id,
+									{
+										x: evt.pageX,
+										y: evt.pageY,
+									},
+									selectNoteMenu(note),
+								);
 							}}
 						>
 							<HStack gap=".5rem" w="100%" justifyContent="space-between">
