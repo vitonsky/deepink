@@ -410,7 +410,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				<NoteEditor
 					text={versionPreview ? versionPreview.text : text}
 					setText={() => {}}
-					isReadOnly
+					isReadOnly={isReadOnly}
 				/>
 			) : (
 				<NoteEditor text={text} setText={setText} />
