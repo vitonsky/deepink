@@ -1,21 +1,32 @@
-import Database from 'better-sqlite3';
-import { SQLCompiler } from 'nano-queries/compilers/SQLCompiler';
 import { Query } from 'nano-queries/core/Query';
+import { z } from 'zod';
+import { ExtendedPGLite } from '@core/storage/database/pglite/ExtendedPGLite';
+import { Results, Transaction } from '@electric-sql/pglite';
 
-type ProxyMethods = keyof Pick<Database.Statement, 'all' | 'run' | 'get'>;
+import { DBTypes, qb } from './query-builder';
+
 type WrappedDbMethods = {
-	[K in ProxyMethods]: (query: Query) => ReturnType<Database.Statement[K]>;
+	query: <S extends z.ZodType>(
+		query: Query<DBTypes>,
+		scheme?: S,
+	) => Promise<Results<z.TypeOf<S>>>;
 };
-export const wrapDB = (db: Database.Database): WrappedDbMethods => {
-	const compiler = new SQLCompiler();
+export const wrapDB = (db: ExtendedPGLite | Transaction): WrappedDbMethods => {
 	return new Proxy<any>(
 		{},
 		{
-			get(_target, p: keyof WrappedDbMethods) {
-				return (query: Query) => {
-					const { sql, bindings } = compiler.toSQL(query);
+			get(_target, _propertyName: keyof WrappedDbMethods) {
+				return async (query: Query, scheme?: z.ZodType) => {
+					const { sql, bindings } = qb.toSQL(query);
 					try {
-						return db.prepare(sql)[p](bindings);
+						const result = await db.query(sql, bindings);
+						// console.log("DBG", result.rows);
+
+						if (scheme) {
+							result.rows = scheme.array().parse(result.rows);
+						}
+
+						return result;
 					} catch (error) {
 						console.error('SQL query', sql);
 						throw error;

@@ -1,9 +1,11 @@
+import { getUUID } from 'src/__tests__/utils/uuid';
 import { TagsController } from '@core/features/tags/controller/TagsController';
+import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
-
 import { NotesController } from './NotesController';
+
+const FAKE_WORKSPACE_ID = getUUID();
 
 describe('CRUD operations', () => {
 	const dbFile = createFileControllerMock();
@@ -16,7 +18,7 @@ describe('CRUD operations', () => {
 
 	test('insertion multiple entries', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const entries = [
 			{ title: 'Title 1', text: 'Text 1' },
@@ -40,7 +42,7 @@ describe('CRUD operations', () => {
 
 	test('update entry and get by id', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Entries match data
 		const entries = await registry.get();
@@ -59,7 +61,7 @@ describe('CRUD operations', () => {
 	test('delete entries', async () => {
 		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Insert entries to test
 		const notesSample = Array(300)
@@ -108,14 +110,14 @@ describe('data fetching', () => {
 
 	test('insert sample entries', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const ids: string[] = [];
 		for (const note of notesSample) {
 			ids.push(await registry.add(note));
 		}
 
-		const tags = new TagsController(db, 'fake-workspace-id');
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 		await tags.setAttachedTags(ids[0], [await tags.add('foo', null)]);
 		await tags.setAttachedTags(ids[1], [await tags.add('bar', null)]);
 
@@ -124,8 +126,8 @@ describe('data fetching', () => {
 
 	test('filter by tags', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
-		const tags = new TagsController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const tagsList = await tags.getTags();
 
@@ -146,7 +148,7 @@ describe('data fetching', () => {
 
 	test('get entries by pages', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		await registry.getLength().then((length) => {
 			expect(length).toBe(notesSample.length);
@@ -167,7 +169,7 @@ describe('data fetching', () => {
 
 	test('method getLength consider filters', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notesId = await registry
 			.get({ limit: 10 })
@@ -190,7 +192,7 @@ describe('multi instances', () => {
 
 	test('insertion multiple entries and close with sync data', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notes = [
 			{ title: 'Title 1', text: 'Text 1' },
@@ -204,7 +206,7 @@ describe('multi instances', () => {
 
 	test('read entries from previous step', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Entries match data
 		const entries = await registry.get();
@@ -227,7 +229,7 @@ describe('Notes meta control', () => {
 
 	test('toggle note versions control', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Create note
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
@@ -253,7 +255,7 @@ describe('Notes meta control', () => {
 
 	test('toggle note visibility', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Create note
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });

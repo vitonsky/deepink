@@ -1,7 +1,8 @@
-import React, { createContext, FC, useEffect, useMemo } from 'react';
+import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
@@ -13,6 +14,8 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
+import { SQLConsole } from './SQLConsole/SQLConsole';
+import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
@@ -79,6 +82,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		};
 	}, [dispatch, profileId, workspacesManager]);
 
+	const [isDBConsoleVisible, setIsDBConsoleVisible] = useState(false);
+	const isDevMode = useIsDeveloper();
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{workspaces.map((workspace) =>
@@ -90,9 +96,21 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						<StatusBarProvider>
 							<Workspace profile={currentProfile} />
 							<ProfileStatusBar />
+							{isDevMode && (
+								<ToggleSQLConsole
+									isVisible={isDBConsoleVisible}
+									onVisibilityChange={setIsDBConsoleVisible}
+								/>
+							)}
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				) : null,
+			)}
+			{isDevMode && (
+				<SQLConsole
+					isVisible={isDBConsoleVisible}
+					onVisibilityChange={setIsDBConsoleVisible}
+				/>
 			)}
 		</ProfileControlsContext.Provider>
 	);

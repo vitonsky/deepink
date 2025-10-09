@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, RefCallback } from 'react';
 
 export type ButtonObject = {
 	visible: boolean;
 	onClick?: () => void;
+	ref?: RefCallback<HTMLElement>;
 	title?: string;
 } & (
 	| {

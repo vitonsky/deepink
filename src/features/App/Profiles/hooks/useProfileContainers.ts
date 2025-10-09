@@ -9,8 +9,8 @@ import { FileControllerWithEncryption } from '@core/features/files/FileControlle
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import {
 	openDatabase,
-	SQLiteDatabase,
-} from '@core/storage/database/SQLiteDatabase/SQLiteDatabase';
+	PGLiteDatabase,
+} from '@core/storage/database/pglite/PGLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { DisposableBox } from '@utils/disposable';
@@ -19,7 +19,7 @@ import { createProfilesApi, ProfileEntry } from './profiles';
 
 export type ProfileContainer = {
 	profile: ProfileEntry;
-	db: SQLiteDatabase;
+	db: PGLiteDatabase;
 	encryptionController: EncryptionController;
 };
 

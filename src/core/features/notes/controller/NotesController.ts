@@ -1,11 +1,9 @@
 /* eslint-disable camelcase */
 import { Query } from 'nano-queries/core/Query';
-import { v4 as uuid4 } from 'uuid';
 import { z } from 'zod';
-import { qb } from '@utils/db/query-builder';
+import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { DBTypes, qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
-
-import { SQLiteDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { INote, INoteContent, NoteId } from '..';
 import {
@@ -15,43 +13,47 @@ import {
 	NoteSortField,
 } from '.';
 
-/**
- * Data mappers between DB and objects
- */
-const mappers = {
-	rowToNoteObject(row: any): INote {
-		const {
+const RowScheme = z
+	.object({
+		id: z.string(),
+		title: z.string(),
+		text: z.string(),
+		created_at: z.date(),
+		updated_at: z.date(),
+		history_disabled: z.boolean(),
+		visible: z.boolean(),
+	})
+	.transform(
+		({
 			id,
 			title,
 			text,
-			creationTime,
-			lastUpdateTime,
-			isSnapshotsDisabled,
-			isVisible,
-		} = row;
-		return {
+			created_at,
+			updated_at,
+			history_disabled,
+			visible,
+		}): INote => ({
 			id,
-			createdTimestamp: creationTime,
-			updatedTimestamp: lastUpdateTime,
-			isSnapshotsDisabled: Boolean(isSnapshotsDisabled),
-			isVisible: Boolean(isVisible),
+			createdTimestamp: created_at.getTime(),
+			updatedTimestamp: updated_at.getTime(),
+			isSnapshotsDisabled: history_disabled,
+			isVisible: visible,
 			content: { title, text },
-		};
-	},
-};
+		}),
+	);
 
 function formatNoteMeta(meta: Partial<NoteMeta>) {
 	return Object.fromEntries(
-		Object.entries(meta).map((item): [string, string | number] => {
+		Object.entries(meta).map((item): [string, DBTypes] => {
 			const [key, value] = item as unknown as {
 				[K in keyof NoteMeta]: [K, NoteMeta[K]];
 			}[keyof NoteMeta];
 
 			switch (key) {
 				case 'isSnapshotsDisabled':
-					return [key, Number(value)];
+					return ['history_disabled', Boolean(value)];
 				case 'isVisible':
-					return [key, Number(value)];
+					return ['visible', Boolean(value)];
 			}
 		}),
 	);
@@ -62,7 +64,7 @@ function getFetchQuery(
 		select,
 		workspace,
 	}: {
-		select: Query;
+		select: Query<DBTypes>;
 		workspace?: string;
 	},
 	{ limit, page, tags = [], meta, sort }: NotesControllerFetchOptions = {},
@@ -79,8 +81,8 @@ function getFetchQuery(
 
 	const sortFieldMap: { [K in NoteSortField]: string } = {
 		id: 'id',
-		createdAt: 'creationTime',
-		updatedAt: 'lastUpdateTime',
+		createdAt: 'created_at',
+		updatedAt: 'updated_at',
 	};
 
 	return qb.line(
@@ -90,23 +92,24 @@ function getFetchQuery(
 			.and(
 				tags.length === 0
 					? undefined
-					: qb.sql`id IN (SELECT target FROM attachedTags WHERE source IN (${qb.values(
+					: qb.sql`id IN (SELECT target FROM attached_tags WHERE source IN (${qb.values(
 							tags,
 					  )}))`,
 			)
 			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
-		qb.line(
-			qb.sql`ORDER BY`,
-			qb.set([
-				sort
-					? qb.line(
-							sortFieldMap[sort.by],
-							sort.order === 'desc' ? 'DESC' : 'ASC',
-					  )
-					: undefined,
-				'rowid ASC',
-			]),
-		),
+		sort
+			? qb.line(
+					qb.sql`ORDER BY`,
+					qb.set([
+						sort
+							? qb.line(
+									sortFieldMap[sort.by],
+									sort.order === 'desc' ? 'DESC' : 'ASC',
+							  )
+							: undefined,
+					]),
+			  )
+			: undefined,
 		limit ? qb.limit(limit) : undefined,
 		page && limit ? qb.offset((page - 1) * limit) : undefined,
 	);
@@ -118,7 +121,7 @@ function getFetchQuery(
 export class NotesController implements INotesController {
 	private db;
 	private readonly workspace;
-	constructor(db: SQLiteDatabase, workspace: string) {
+	constructor(db: PGLiteDatabase, workspace: string) {
 		this.db = db;
 		this.workspace = workspace;
 	}
@@ -126,42 +129,41 @@ export class NotesController implements INotesController {
 	public async getById(id: NoteId): Promise<INote | null> {
 		const db = wrapDB(this.db.get());
 
-		const note = db.get(
-			qb
-				.select('*')
-				.from('notes')
-				.where(
-					qb.values({
-						workspace_id: this.workspace,
-					}),
-				)
-				.where(qb.values({ id })),
+		const {
+			rows: [note],
+		} = await db.query(
+			qb.sql`SELECT * FROM notes WHERE workspace_id=${this.workspace} AND id=${id}`,
+			RowScheme,
 		);
-		return note ? mappers.rowToNoteObject(note) : null;
+
+		return note ?? null;
 	}
 
 	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
 		const db = wrapDB(this.db.get());
 
-		return z
-			.object({ count: z.number() })
-			.transform((row) => row.count)
-			.parse(
-				db.get(
-					getFetchQuery(
-						{ select: qb.sql`COUNT(*) as count`, workspace: this.workspace },
-						query,
-					),
-				),
-			);
+		const {
+			rows: [{ count }],
+		} = await db.query(
+			getFetchQuery(
+				{ select: qb.sql`COUNT(*) as count`, workspace: this.workspace },
+				query,
+			),
+			z.object({ count: z.number() }),
+		);
+
+		return count;
 	}
 
 	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		const db = wrapDB(this.db.get());
 
-		return db
-			.all(getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query))
-			.map(mappers.rowToNoteObject);
+		const { rows } = await db.query(
+			getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query),
+			RowScheme,
+		);
+
+		return rows;
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
@@ -170,70 +172,46 @@ export class NotesController implements INotesController {
 		const creationTime = new Date().getTime();
 
 		// Insert data
-		// Use UUID to generate ID: https://github.com/nalgeon/sqlean/blob/f57fdef59b7ae7260778b00924d13304e23fd32c/docs/uuid.md
-
 		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
 
-		const insertResult = db.run(
-			qb.sql`
-				INSERT INTO notes (${qb.set([
-					qb.sql`"id","workspace_id","title","text","creationTime","lastUpdateTime"`,
-					...(metaEntries ? metaEntries.map(([key]) => key) : []),
-				])})
-					VALUES (${qb.values([
-						uuid4(),
-						this.workspace,
-						note.title,
-						note.text,
-						creationTime,
-						creationTime,
-						...metaEntries.map(([_key, value]) => value),
-					])})`,
+		const {
+			rows: [id],
+		} = await db.query(
+			qb.sql`INSERT INTO notes (${qb.set([
+				qb.sql`"workspace_id","title","text","created_at","updated_at"`,
+				...(metaEntries ? metaEntries.map(([key]) => key) : []),
+			])}) VALUES (${qb.values([
+				this.workspace,
+				note.title,
+				note.text,
+				creationTime,
+				creationTime,
+				...metaEntries.map(([_key, value]) => value),
+			])}) RETURNING id`,
+			z.object({ id: z.string() }).transform(({ id }) => id),
 		);
 
-		// Get generated id
-		const selectWithId = db.get(
-			qb
-				.select('id')
-				.from('notes')
-				.where(
-					qb.values({
-						workspace_id: this.workspace,
-					}),
-				)
-				.where(
-					qb.values({
-						rowid: Number(insertResult.lastInsertRowid),
-					}),
-				),
-		) as { id: string };
-
-		if (!selectWithId || !selectWithId.id) {
-			throw new Error("Can't get id of inserted row");
-		}
-
-		return selectWithId.id;
+		return id;
 	}
 
 	public async update(id: string, updatedNote: INoteContent) {
 		const db = wrapDB(this.db.get());
 
 		const updateTime = new Date().getTime();
-		const result = db.run(
+		const result = await db.query(
 			qb.line(
 				'UPDATE notes SET',
 				qb.values({
 					title: updatedNote.title,
 					text: updatedNote.text,
-					lastUpdateTime: updateTime,
+					// TODO: should we really update note by update meta?
+					updated_at: updateTime,
 				}),
-				qb
-					.where(qb.values({ id }))
-					.and(qb.values({ workspace_id: this.workspace })),
+				qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
 			),
 		);
 
-		if (!result.changes || result.changes < 1) {
+		if (!result.affectedRows || result.affectedRows < 1) {
 			throw new Error('Note did not updated');
 		}
 	}
@@ -241,22 +219,15 @@ export class NotesController implements INotesController {
 	public async delete(ids: NoteId[]): Promise<void> {
 		const db = wrapDB(this.db.get());
 
-		const result = db.run(
-			qb.line(
-				'DELETE FROM notes',
-				qb
-					.where(
-						qb.values({
-							workspace_id: this.workspace,
-						}),
-					)
-					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
-			),
+		const { affectedRows = 0 } = await db.query(
+			qb.sql`DELETE FROM notes WHERE workspace_id=${
+				this.workspace
+			} AND id IN (${qb.values(ids)})`,
 		);
 
-		if (result.changes !== ids.length) {
+		if (affectedRows !== ids.length) {
 			console.warn(
-				`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${result.changes}`,
+				`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
 			);
 		}
 	}
@@ -264,15 +235,14 @@ export class NotesController implements INotesController {
 	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
 		const db = wrapDB(this.db.get());
 
-		const result = db.run(
-			qb.sql`UPDATE notes
-				SET ${qb.values(formatNoteMeta(meta))}
+		const { affectedRows = 0 } = await db.query(
+			qb.sql`UPDATE notes SET ${qb.values(formatNoteMeta(meta))}
 				WHERE workspace_id=${this.workspace} AND id IN (${qb.values(ids)})`,
 		);
 
-		if (result.changes !== ids.length) {
+		if (affectedRows !== ids.length) {
 			console.warn(
-				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
+				`Not match updated entries length. Expected: ${ids.length}; Updated: ${affectedRows}`,
 			);
 		}
 	}

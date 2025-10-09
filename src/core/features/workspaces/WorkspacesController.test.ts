@@ -1,12 +1,11 @@
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-
-import { openDatabase } from '../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
 
 import { WorkspacesController } from './WorkspacesController';
 
+const { getDB } = makeAutoClosedDB();
+
 test('basic usage', async () => {
-	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
+	const db = await getDB();
 
 	const workspaces = new WorkspacesController(db);
 
@@ -39,13 +38,10 @@ test('basic usage', async () => {
 			expect.objectContaining({ id: workspacesIds[1], name: 'Workspace name' }),
 		]),
 	);
-
-	await db.close();
 });
 
 test('update workspace', async () => {
-	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
+	const db = await getDB();
 
 	const workspaces = new WorkspacesController(db);
 
@@ -60,6 +56,4 @@ test('update workspace', async () => {
 		id,
 		name: 'Updated name',
 	});
-
-	await db.close();
 });

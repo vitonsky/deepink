@@ -1,8 +1,16 @@
 /* eslint-disable spellcheck/spell-checker */
-import React, { useEffect, useState } from 'react';
-import { usePopper } from 'react-popper';
+import React from 'react';
 import { Box, BoxProps, Portal } from '@chakra-ui/react';
-import { computeStyles, flip, offset, preventOverflow } from '@popperjs/core';
+import {
+	autoPlacement,
+	autoUpdate,
+	hide,
+	offset,
+	shift,
+	useDismiss,
+	useFloating,
+	useInteractions,
+} from '@floating-ui/react';
 
 export type PopperProps = BoxProps & {
 	referenceRef?: HTMLElement;
@@ -11,67 +19,37 @@ export type PopperProps = BoxProps & {
 
 export const Popper = ({ referenceRef, onClose, children, ...props }: PopperProps) => {
 	// Manage popper
-	const [popperRef, setPopperRef] = useState<HTMLElement | null>(null);
-	const popper = usePopper(referenceRef, popperRef, {
-		placement: 'auto',
-		modifiers: [
-			{
-				...computeStyles,
-				options: {
-					// Prevent scroll body
-					gpuAcceleration: false,
-				},
-			},
-			{ ...flip, options: { fallbackPlacements: ['bottom', 'top'] } },
-			{ ...offset, options: { offset: [0, 10] } },
-			{
-				...preventOverflow,
-				options: {
-					mainAxis: true,
-					altAxis: true,
-					boundary: 'clippingParents',
-					padding: 10,
-				},
-			} as const,
+	const { refs, floatingStyles, context } = useFloating({
+		open: true,
+		onOpenChange: (open) => {
+			if (!open && onClose) onClose();
+		},
+		strategy: 'fixed',
+		middleware: [
+			offset({ mainAxis: 2 }),
+			hide(),
+			shift(),
+			autoPlacement({
+				allowedPlacements: ['top', 'top-end', 'top-start'],
+			}),
 		],
+		whileElementsMounted: autoUpdate,
+		elements: {
+			reference: referenceRef,
+		},
 	});
 
-	// Close popup by click outside
-	useEffect(() => {
-		if (!popperRef) return;
-
-		const onMouseDown = (evt: MouseEvent) => {
-			const target = evt.target;
-			if (!(target instanceof HTMLElement)) return;
-
-			if (target !== popperRef && !popperRef.contains(target)) {
-				if (onClose) {
-					onClose();
-				}
-			}
-		};
-
-		document.addEventListener('mousedown', onMouseDown);
-		return () => {
-			document.removeEventListener('mousedown', onMouseDown);
-		};
-	}, [onClose, popperRef]);
+	const dismiss = useDismiss(context);
+	const { getFloatingProps } = useInteractions([dismiss]);
 
 	return children ? (
 		<Portal>
 			<Box
-				ref={setPopperRef}
+				ref={refs.setFloating}
 				tabIndex={0}
 				{...props}
-				style={{ ...popper.styles.popper, ...props.style }}
-				onKeyUp={(evt) => {
-					// Close by escape
-					if (evt.key === 'Escape') {
-						if (onClose) {
-							onClose();
-						}
-					}
-				}}
+				style={{ ...floatingStyles, ...props.style }}
+				{...getFloatingProps()}
 			>
 				{children}
 			</Box>

@@ -17,5 +17,6 @@ export default defineConfig({
 	test: {
 		globals: true,
 		setupFiles: ['scripts/vitest.setup.ts'],
+		dir: 'src',
 	},
 });

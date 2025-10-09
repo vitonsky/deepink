@@ -54,7 +54,7 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 	constructor(
 		dbContainer: IDatabaseContainer<T>,
 		dbFile: IFileController,
-		{ sync = { delay: 300, deadline: 800 } }: Options = {},
+		{ sync = { delay: 1300, deadline: 8000 } }: Options = {},
 	) {
 		this.dbContainer = dbContainer;
 		this.dbFile = dbFile;

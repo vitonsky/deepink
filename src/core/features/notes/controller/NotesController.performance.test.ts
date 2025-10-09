@@ -1,6 +1,6 @@
+import { getUUID } from 'src/__tests__/utils/uuid';
+import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-
-import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
 
 import { NotesController } from './NotesController';
 
@@ -10,6 +10,8 @@ function getRandomNumber(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+const FAKE_WORKSPACE_ID = getUUID();
+
 describe('stress tests', () => {
 	const dbFile = createFileControllerMock();
 
@@ -18,7 +20,7 @@ describe('stress tests', () => {
 	// Gzipped data takes ~800kb. We must to compress data
 	test('insert 10k notes contains 150k chars', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const requests: Promise<string>[] = [];
 
@@ -44,7 +46,7 @@ describe('stress tests', () => {
 
 	test('update random notes 10k times', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const noteIds = await registry.get().then((notes) => notes.map(({ id }) => id));
 

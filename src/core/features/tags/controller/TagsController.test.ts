@@ -1,15 +1,16 @@
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-
-import { openDatabase } from '../../../storage/database/SQLiteDatabase/SQLiteDatabase';
+import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
+import { getUUID } from 'src/__tests__/utils/uuid';
 
 import { TagsController } from './TagsController';
 
-describe('manage tags', () => {
-	test('nested tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+const FAKE_WORKSPACE_ID = getUUID();
 
-		const tags = new TagsController(db, 'workspace-fake-id');
+describe('manage tags', () => {
+	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
+
+	test('nested tags', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('foo', null);
 		await tags.add('bar', null).then((tagId) => tags.add('baz', tagId));
@@ -34,16 +35,12 @@ describe('manage tags', () => {
 				]),
 			);
 		});
-
-		await db.close();
 	});
 
 	// TODO:fox that cases. Paths must be normalized
 	test('weird tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('///foo', null);
 		await tags.add('/foo/bar', null);
@@ -88,15 +85,11 @@ describe('manage tags', () => {
 				}),
 			]);
 		});
-
-		await db.close();
 	});
 
 	test('update tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('foo', null).then(async (tagId) => {
 			await tags.update({
@@ -136,15 +129,11 @@ describe('manage tags', () => {
 				]),
 			);
 		});
-
-		await db.close();
 	});
 
 	test('delete tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await tags.add('foo', null);
 
@@ -161,28 +150,28 @@ describe('manage tags', () => {
 				}),
 			]);
 		});
-
-		await db.close();
 	});
 });
 
 describe('manage attachments', () => {
-	test('set attached tags', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
 
-		const tags = new TagsController(db, 'workspace-fake-id');
+	const FAKE_NOTE_ID = getUUID();
+
+	test('set attached tags', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
 		const bazId = await tags.add('baz', barId);
 
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual([]);
 		});
 
-		await tags.setAttachedTags('target1', [fooId, bazId]);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -197,8 +186,8 @@ describe('manage attachments', () => {
 			);
 		});
 
-		await tags.setAttachedTags('target1', [barId]);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.setAttachedTags(FAKE_NOTE_ID, [barId]);
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -208,24 +197,20 @@ describe('manage attachments', () => {
 				]),
 			);
 		});
-
-		await db.close();
 	});
 
 	test('deleted tag will not appears in tags list', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
-		const tags = new TagsController(db, 'workspace-fake-id');
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
 		const bazId = await tags.add('baz', barId);
 
-		await tags.setAttachedTags('target1', [fooId, bazId]);
+		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
 
 		await tags.delete(bazId);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -237,10 +222,8 @@ describe('manage attachments', () => {
 		});
 
 		await tags.delete(fooId);
-		await tags.getAttachedTags('target1').then((tags) => {
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual([]);
 		});
-
-		await db.close();
 	});
 });
