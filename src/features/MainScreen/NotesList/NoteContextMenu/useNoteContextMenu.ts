@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
@@ -21,6 +22,11 @@ import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
+=======
+import { ContextMenu } from '@electron/requests/contextMenu';
+import { useContextMenu } from '@hooks/useContextMenu';
+
+>>>>>>> 4fdd5e50 (Revert "feat: implement context menu with react")
 import { defaultNoteMenu } from './noteContextMenus';
 import {
 	ContextMenuOptions,
@@ -30,6 +36,7 @@ import {
 /**
  * Returns a function that accepts a note ID, screen coordinates, and a function that provides the menu configuration.
  */
+<<<<<<< HEAD
 export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
@@ -159,6 +166,13 @@ export const useNoteContextMenu = ({
 			workspaceData?.name,
 		],
 	);
+=======
+export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOptions) => {
+	const noteContextMenuCallback = useNoteContextMenuCallback({
+		closeNote,
+		updateNotes,
+	});
+>>>>>>> 4fdd5e50 (Revert "feat: implement context menu with react")
 
 	// dynamic update menu
 	const [menu, setMenu] = useState<{

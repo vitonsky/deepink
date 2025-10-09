@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
-import { ContextMenu } from '@features/MainScreen/NotesList/NoteContextMenu/ContextMenu';
-import { useContextMenuProvider } from '@features/MainScreen/NotesList/NoteContextMenu/ContextMenuProvider';
-import { ContextMenuCallback } from '@hooks/useContextMenu';
+import { ContextMenu } from '@electron/requests/contextMenu';
+import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 
 export enum TagContextMenu {
 	ADD = 'add',
@@ -36,7 +35,7 @@ export const useTagContextMenu = ({
 	onEdit,
 	onDelete,
 }: TagContextMenuCallbacks) => {
-	const tagContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
+	const noteContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
 		async ({ id, action }) => {
 			const actionsMap = {
 				[TagContextMenu.ADD]: onAdd,
@@ -51,21 +50,5 @@ export const useTagContextMenu = ({
 		[onAdd, onEdit, onDelete],
 	);
 
-	const contextMenu = useContextMenuProvider();
-
-	return useCallback(
-		(id: string, position: { x: number; y: number }) => {
-			contextMenu.show({
-				items: tagMenu,
-				position: { x: position.x, y: position.y },
-				onAction: (action) => {
-					tagContextMenuCallback({
-						id: id,
-						action: action as TagContextMenu,
-					});
-				},
-			});
-		},
-		[contextMenu, tagContextMenuCallback],
-	);
+	return useContextMenu(tagMenu, noteContextMenuCallback);
 };
