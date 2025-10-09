@@ -182,14 +182,16 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
+	// In the future, read-only mode will cover more cases than deleted notes,
+	// but some UI depends specifically on the deleted state
 	const isReadOnly = note.isDeleted;
+	const isShowActions = note.isDeleted;
 
 	return (
 		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
 				<HStack w="100%" align="start">
 					<Input
-						isReadOnly={isReadOnly}
 						placeholder="Note title"
 						size="sm"
 						borderRadius="6px"
@@ -199,7 +201,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								? undefined
 								: (evt) => setTitle(evt.target.value)
 						}
-						isDisabled={versionPreview !== null}
+						isDisabled={versionPreview !== null || isReadOnly}
 					/>
 
 					{/* TODO: add options that may be toggled */}
@@ -208,7 +210,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			</HStack>
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				{!isReadOnly && (
+				{!isShowActions && (
 					<>
 						<HStack>
 							<Button variant="ghost" size="xs">
@@ -370,10 +372,12 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				</HStack>
 			)}
 
-			{versionPreview ? (
-				<NoteEditor text={versionPreview.text} setText={() => {}} isReadOnly />
-			) : isReadOnly ? (
-				<NoteEditor text={text} setText={() => {}} isReadOnly />
+			{versionPreview || isReadOnly ? (
+				<NoteEditor
+					text={versionPreview ? versionPreview.text : text}
+					setText={() => {}}
+					isReadOnly
+				/>
 			) : (
 				<NoteEditor text={text} setText={setText} />
 			)}
@@ -390,7 +394,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							content() {
 								return (
 									<NoteVersions
-										isReadOnly={isReadOnly}
+										isReadOnly
 										noteId={note.id}
 										recordControl={{
 											isDisabled: Boolean(note.isSnapshotsDisabled),
