@@ -3,7 +3,6 @@ import { EventBus } from '@api/events/EventBus';
 import { WorkspaceEvents, WorkspaceEventsPayloadMap } from '@api/events/workspace';
 import { FilesController } from '@core/features/files/FilesController';
 import { formatNoteLink } from '@core/features/links';
-import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { selectDirectory } from '@electron/requests/files/renderer';
@@ -18,12 +17,8 @@ import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
 import { NotesExporter } from './NotesExporter';
+import { ContextMenuOptions } from './useNoteContextMenu';
 import { NoteActions } from '.';
-
-export type ContextMenuOptions = {
-	closeNote: (id: NoteId) => void;
-	updateNotes: () => void;
-};
 
 export type NoteActionsOptions = ContextMenuOptions & {
 	filesRegistry: FilesController;

@@ -196,7 +196,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 	// In the future, read-only mode will cover more cases than deleted notes,
 	// but some UI depends specifically on the deleted state
 	const isReadOnly = note.isDeleted;
-	const isShowActions = note.isDeleted;
+	const isShowActions = !note.isDeleted;
 
 	return (
 		<VStack w="100%" align="start">
@@ -221,7 +221,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			</HStack>
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				{!isShowActions && (
+				{isShowActions && (
 					<>
 						<HStack>
 							<Button variant="ghost" size="xs">
@@ -428,7 +428,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							content() {
 								return (
 									<NoteVersions
-										isReadOnly
+										isReadOnly={isReadOnly}
 										noteId={note.id}
 										recordControl={{
 											isDisabled: Boolean(note.isSnapshotsDisabled),

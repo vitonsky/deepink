@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-=======
->>>>>>> ef99c201 (refactor: split hook)
+
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
 	useNotesRegistry,
@@ -22,21 +20,23 @@ import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { mkdir, writeFile } from 'fs/promises';
-=======
+
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { useContextMenu } from '@hooks/useContextMenu';
 
->>>>>>> 4fdd5e50 (Revert "feat: implement context menu with react")
-import { defaultNoteMenu } from './noteContextMenus';
-import {
-	ContextMenuOptions,
-	useNoteContextMenuCallback,
-} from './useNoteContextMenuCallback';
+import { defaultNoteMenu } from './noteMenus';
+import { useNoteContextMenuCallback } from './useNoteContextMenuCallback';
+import { useDynamicContextMenu } from '@hooks/useDynamicContextMenu';
+import { NoteActions } from '.';
+
+export type ContextMenuOptions = {
+	closeNote: (id: NoteId) => void;
+	updateNotes: () => void;
+};
 
 /**
- * Returns a function that accepts a note ID, screen coordinates, and a function that provides the menu configuration.
+ * Returns function for call context menu
  */
-<<<<<<< HEAD
 export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
@@ -166,34 +166,13 @@ export const useNoteContextMenu = ({
 			workspaceData?.name,
 		],
 	);
-=======
+
 export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOptions) => {
 	const noteContextMenuCallback = useNoteContextMenuCallback({
 		closeNote,
 		updateNotes,
 	});
->>>>>>> 4fdd5e50 (Revert "feat: implement context menu with react")
 
-	// dynamic update menu
-	const [menu, setMenu] = useState<{
-		menu: ContextMenu;
-		target: { id: string; point: { x: number; y: number } } | null;
-	}>({ menu: defaultNoteMenu, target: null });
-
-	const openMenu = useContextMenu(menu.menu, noteContextMenuCallback);
-
-	// open menu only after update openMenu
-	useEffect(() => {
-		if (!menu.target) return;
-
-		openMenu(menu.target.id, menu.target.point);
-	}, [menu, openMenu]);
-
-	// Updates the menu state first to ensure openMenu has the latest menu
-	return useCallback(
-		(id: string, point: { x: number; y: number }, menu: ContextMenu) => {
-			setMenu({ menu, target: { id, point } });
-		},
-		[],
-	);
+	const openMenu = useDynamicContextMenu(noteContextMenuCallback, defaultNoteMenu);
+	return openMenu;
 };
