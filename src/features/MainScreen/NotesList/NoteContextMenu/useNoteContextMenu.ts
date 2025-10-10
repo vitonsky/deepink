@@ -1,13 +1,10 @@
-import { NoteId } from '@core/features/notes';
 import { useDynamicContextMenu } from '@hooks/useDynamicContextMenu';
 
 import { defaultNoteMenu } from './noteMenus';
-import { useNoteContextMenuCallback } from './useNoteContextMenuCallback';
-
-export type ContextMenuOptions = {
-	closeNote: (id: NoteId) => void;
-	updateNotes: () => void;
-};
+import {
+	ContextMenuOptions,
+	useNoteContextMenuCallback,
+} from './useNoteContextMenuCallback';
 
 /**
  * Returns function for call context menu
