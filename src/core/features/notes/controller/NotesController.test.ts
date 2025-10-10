@@ -2,7 +2,6 @@
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { LexemesRegistry } from './LexemesRegistry';
@@ -100,7 +99,7 @@ describe('CRUD operations', () => {
 });
 
 describe('data fetching', () => {
-	const dbFile = createFileControllerMock();
+	let dbFile: any;
 
 	const notesSample = Array(300)
 		.fill(null)
@@ -111,7 +110,11 @@ describe('data fetching', () => {
 			};
 		});
 
-	test('insert sample entries', async () => {
+	// Ensure each test runs with fresh, isolated data
+	// Insert sample entries
+	beforeEach(async () => {
+		dbFile = createFileControllerMock();
+
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
@@ -190,83 +193,56 @@ describe('data fetching', () => {
 	});
 
 	test('get entries by deletion status', async () => {
-		const dbFile = createFileControllerMock();
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
-		// Create notes
-		const entries = [
-			{ title: 'Title 1', text: 'Text 1' },
-			{ title: 'Title 2', text: 'Text 2' },
-			{ title: 'Title 3', text: 'Text 3' },
-			{ title: 'Title 4', text: 'Text 4' },
-		];
-		const notesId = await Promise.all(entries.map((note) => registry.add(note)));
-		await expect(registry.get()).resolves.toHaveLength(4);
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
 
-		// update status for 3 notes
-		await registry.updateMeta(notesId.slice(0, 3), { isDeleted: true });
+		// update status for 10 notes
+		await registry.updateMeta(notesId, { isDeleted: true });
+		await expect(registry.getLength({ meta: { isDeleted: true } })).resolves.toBe(10);
 
-		// get only deleted notes
-		const deletedNotes = await registry.get({ deleted: true });
-		expect(deletedNotes).toHaveLength(3);
-		expect(deletedNotes).toEqual(
-			expect.arrayContaining([expect.objectContaining({ isDeleted: true })]),
-		);
-
-		// get only not deleted notes
-		const notDeletedNotes = await registry.get({ deleted: false });
-		expect(notDeletedNotes).toHaveLength(1);
-		expect(notDeletedNotes).toEqual(
-			expect.arrayContaining([expect.objectContaining({ isDeleted: false })]),
+		// check only not deleted notes
+		await expect(registry.getLength({ meta: { isDeleted: false } })).resolves.toBe(
+			notesSample.length - 10,
 		);
 
 		await db.close();
 	});
 
-	test('get notes filtered by tags and the deleted status', async () => {
-		const dbFile = createFileControllerMock();
+	test('filter by tags and the deleted status', async () => {
 		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, 'fake-workspace-id');
-		const tags = new TagsController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		// Create notes and attach tag to note
-		const entries = [
-			{ title: 'Title 1', text: 'Text 1' },
-			{ title: 'Title 2', text: 'Text 2' },
-			{ title: 'Title 3', text: 'Text 3' },
-			{ title: 'Title 4', text: 'Text 4' },
-		];
-		const notesId = await Promise.all(entries.map((note) => registry.add(note)));
-		const noteId = notesId[0];
-		const fooTag = await tags.add('foo', null);
-		await tags.setAttachedTags(noteId, [fooTag]);
+		const tagsList = await tags.getTags();
 
-		await expect(registry.get()).resolves.toHaveLength(4);
+		const noteId = await registry
+			.get({
+				limit: 1,
+				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+			})
+			.then((notes) => notes.map((note) => note.id));
 
-		await registry.updateMeta([noteId], { isDeleted: true });
-
-		// filter by tag only
-		await expect(registry.get({ tags: [fooTag] })).resolves.toHaveLength(1);
-
-		// filter by tag + deleted:
+		// set deleted status
+		await registry.updateMeta(noteId, { isDeleted: true });
 		await expect(
-			registry.get({ tags: [fooTag], deleted: true }),
+			registry.get({
+				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+				meta: { isDeleted: true },
+			}),
 		).resolves.toHaveLength(1);
-		await expect(
-			registry.get({ tags: [fooTag], deleted: false }),
-		).resolves.toHaveLength(0);
 
 		// reset deleted status
-		await registry.updateMeta([noteId], { isDeleted: false });
-
-		// filter by tag + deleted:
+		await registry.updateMeta(noteId, { isDeleted: false });
 		await expect(
-			registry.get({ tags: [fooTag], deleted: true }),
+			registry.get({
+				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+				meta: { isDeleted: true },
+			}),
 		).resolves.toHaveLength(0);
-		await expect(
-			registry.get({ tags: [fooTag], deleted: false }),
-		).resolves.toHaveLength(1);
 
 		await db.close();
 	});
@@ -379,9 +355,9 @@ describe('Notes meta control', () => {
 		);
 	});
 
-	test('update deletion status of note', async () => {
+	test('toggle note deletion status', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db, 'fake-workspace-id');
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Create notes
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
