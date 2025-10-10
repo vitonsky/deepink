@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useCallback, useEffect, useState } from 'react';
 
 import { formatNoteLink } from '@core/features/links';
@@ -33,6 +34,15 @@ export type ContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
 };
+=======
+import { useDynamicContextMenu } from '@hooks/useDynamicContextMenu';
+
+import { defaultNoteMenu } from './noteMenus';
+import {
+	ContextMenuOptions,
+	useNoteContextMenuCallback,
+} from './useNoteContextMenuCallback';
+>>>>>>> 9bfb14d6 (chore: improve code)
 
 /**
  * Returns function for call context menu
