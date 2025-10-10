@@ -193,10 +193,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	// In the future, read-only mode will cover more cases than deleted notes,
-	// but some UI depends specifically on the deleted state
+	// In the future, read-only mode will cover more cases than deleted notes
 	const isReadOnly = note.isDeleted;
-	const isShowActions = !note.isDeleted;
 
 	return (
 		<VStack w="100%" align="start">
@@ -221,7 +219,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			</HStack>
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				{isShowActions && (
+				{!note.isDeleted && (
 					<>
 						<HStack>
 							<Button variant="ghost" size="xs">
@@ -406,15 +404,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				</HStack>
 			)}
 
-			{versionPreview || isReadOnly ? (
-				<NoteEditor
-					text={versionPreview ? versionPreview.text : text}
-					setText={() => {}}
-					isReadOnly={isReadOnly}
-				/>
-			) : (
-				<NoteEditor text={text} setText={setText} />
-			)}
+			<NoteEditor
+				text={versionPreview ? versionPreview.text : text}
+				setText={isReadOnly || versionPreview ? () => {} : setText}
+				isReadOnly={isReadOnly || Boolean(versionPreview)}
+			/>
 
 			{!sidePanel ? null : (
 				<NoteSidebar
