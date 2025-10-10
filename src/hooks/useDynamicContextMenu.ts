@@ -26,8 +26,8 @@ export const useDynamicContextMenu = <T extends string>(
 
 	// Function to trigger opening of the menu
 	return useCallback(
-		(id: string, point: { x: number; y: number }, menu?: ContextMenu) => {
-			if (menu) setMenu(menu);
+		(id: string, point: { x: number; y: number }, newMenu?: ContextMenu) => {
+			if (newMenu) setMenu(newMenu);
 			setTarget({ id, point });
 		},
 		[],
