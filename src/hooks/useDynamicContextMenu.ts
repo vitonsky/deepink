@@ -9,28 +9,26 @@ export const useDynamicContextMenu = <T extends string>(
 	contextMenuCallback: ContextMenuCallback<T>,
 	defaultMenu: ContextMenu,
 ) => {
-	// dynamic update menu
-	const [menu, setMenu] = useState<{
-		menu: ContextMenu;
-		target: { id: string; point: { x: number; y: number } } | null;
-	}>({ menu: defaultMenu, target: null });
+	const [menu, setMenu] = useState<ContextMenu>(defaultMenu);
+	const [target, setTarget] = useState<{
+		id: string;
+		point: { x: number; y: number };
+	} | null>(null);
 
-	const openMenu = useContextMenu(menu.menu, contextMenuCallback);
+	const openMenu = useContextMenu(menu, contextMenuCallback);
 
-	// open menu only after update openMenu
+	// Wait before openMenu was updated
+	// Automatically open menu when target is set
 	useEffect(() => {
-		if (!menu.target) return;
+		if (!target) return;
+		openMenu(target.id, target.point);
+	}, [menu, openMenu, target]);
 
-		openMenu(menu.target.id, menu.target.point);
-	}, [menu, openMenu]);
-
-	// Updates the menu state first to ensure openMenu has the latest menu
+	// Function to trigger opening of the menu
 	return useCallback(
 		(id: string, point: { x: number; y: number }, menu?: ContextMenu) => {
-			setMenu((prev) => ({
-				menu: menu ?? prev.menu,
-				target: { id, point },
-			}));
+			if (menu) setMenu(menu);
+			setTarget({ id, point });
 		},
 		[],
 	);
