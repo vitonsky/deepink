@@ -27,7 +27,7 @@ export const useUpdateNotes = () => {
 		const notes = await notesRegistry.get({
 			limit: 10000,
 			tags,
-			deleted,
+			meta: { isDeleted: deleted },
 		});
 
 		notes.sort((a, b) => {

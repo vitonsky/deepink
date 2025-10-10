@@ -22,7 +22,7 @@ const RowScheme = z
 		updated_at: z.date(),
 		history_disabled: z.boolean(),
 		visible: z.boolean(),
-		deleted: z.boolean(),
+		is_deleted: z.boolean(),
 	})
 	.transform(
 		({
@@ -33,14 +33,14 @@ const RowScheme = z
 			updated_at,
 			history_disabled,
 			visible,
-			deleted,
+			is_deleted,
 		}): INote => ({
 			id,
 			createdTimestamp: created_at.getTime(),
 			updatedTimestamp: updated_at.getTime(),
 			isSnapshotsDisabled: history_disabled,
 			isVisible: visible,
-			isDeleted: deleted,
+			isDeleted: is_deleted,
 			content: { title, text },
 		}),
 	);
@@ -58,7 +58,7 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 				case 'isVisible':
 					return ['visible', Boolean(value)];
 				case 'isDeleted':
-					return [key, Number(value)];
+					return ['is_deleted', Boolean(value)];
 			}
 		}),
 	);
@@ -101,7 +101,11 @@ function getFetchQuery(
 							tags,
 					  )}))`,
 			)
-			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
+			.and(
+				metaEntries
+					.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)
+					.reduce((acc, value) => qb.sql`${acc} AND ${value}`),
+			),
 		sort
 			? qb.line(
 					qb.sql`ORDER BY`,
@@ -248,35 +252,6 @@ export class NotesController implements INotesController {
 		if (affectedRows !== ids.length) {
 			console.warn(
 				`Not match updated entries length. Expected: ${ids.length}; Updated: ${affectedRows}`,
-			);
-		}
-	}
-
-	public async updateStatus(
-		ids: NoteId[],
-		status: { deleted: boolean },
-	): Promise<void> {
-		const db = wrapDB(this.db.get());
-
-		const result = db.run(
-			qb.line(
-				'UPDATE notes SET',
-				qb.values({
-					isDeleted: null,
-				}),
-				qb
-					.where(
-						qb.values({
-							workspace_id: this.workspace,
-						}),
-					)
-					.and(qb.line('id IN', qb.values(ids).withParenthesis())),
-			),
-		);
-
-		if (result.changes !== ids.length) {
-			console.warn(
-				`Not match updated entries length. Expected: ${ids.length}; Updated: ${result.changes}`,
 			);
 		}
 	}
