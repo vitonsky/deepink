@@ -1,5 +1,6 @@
 import { createEvent } from 'effector';
 import { IFileController } from '@core/features/files';
+import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
 
 import {
 	IManagedDatabase,
@@ -70,9 +71,12 @@ export const getWrappedDb = async (
 	const dbFileBuffer = await dbFile.get();
 	if (dbFileBuffer && dbFileBuffer.byteLength > 0) {
 		// Load DB
-		db = new ExtendedPGLite({ loadDataDir: new Blob([dbFileBuffer]) });
+		db = new ExtendedPGLite({
+			loadDataDir: new Blob([dbFileBuffer]),
+			extensions: { pg_trgm },
+		});
 	} else {
-		db = new ExtendedPGLite();
+		db = new ExtendedPGLite({ extensions: { pg_trgm } });
 	}
 	await db.waitReady;
 

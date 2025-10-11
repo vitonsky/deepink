@@ -52,6 +52,7 @@
 					"embeddings",
 					"onnx",
 					"huggingface",
+					"pg_trgm",
 					"Checkbox",
 					"Classname",
 					"DOM",
@@ -236,6 +237,7 @@
 			"error",
 			{
 				"allow": [
+					"^pg_",
 					"^UNSAFE_",
 					"^UNSTABLE_"
 				]
