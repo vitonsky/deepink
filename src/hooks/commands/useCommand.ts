@@ -1,15 +1,25 @@
-import { useCommandBusContext } from './CommandEventProvider';
+import { useContext } from 'react';
+
+import { CommandEventContext } from './CommandEventProvider';
 import { CommandPayloads } from '.';
 
 export const useCommand = () => {
-	const commandBus = useCommandBusContext();
+	const commandEvent = useContext(CommandEventContext);
 
 	return <K extends keyof CommandPayloads>(
 		commandName: K,
 		...args: CommandPayloads[K] extends void
-			? [payload?: void | undefined]
+			? [payload?: undefined]
 			: [payload: CommandPayloads[K]]
 	) => {
-		commandBus.emit(commandName, ...args);
+		const [payload] = args;
+		const data =
+			payload === undefined
+				? { name: commandName }
+				: {
+						name: commandName,
+						payload,
+				  };
+		commandEvent(data);
 	};
 };

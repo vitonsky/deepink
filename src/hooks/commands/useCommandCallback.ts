@@ -1,7 +1,13 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 
-import { useCommandBusContext } from './CommandEventProvider';
+import { CommandEvent, CommandEventContext } from './CommandEventProvider';
 import { CommandPayloads } from '.';
+
+export function hasCommandPayload<K extends keyof CommandPayloads>(
+	command: CommandEvent<K>,
+): command is { name: K; payload: CommandPayloads[K] } {
+	return 'payload' in command;
+}
 
 /**
  * Subscribes to a command via CommandBus and automatically cleans up.
@@ -11,14 +17,18 @@ import { CommandPayloads } from '.';
 
 export function useCommandCallback<K extends keyof CommandPayloads>(
 	commandName: K,
-	callback: (payload: CommandPayloads[K]) => void,
+	callback: (payload?: CommandPayloads[K]) => void,
 	options?: { enabled?: boolean },
 ) {
-	const commandBus = useCommandBusContext();
+	const commandEvent = useContext(CommandEventContext);
 
 	useEffect(() => {
-		if (options?.enabled === false) return;
+		if (!options?.enabled) return;
 
-		return commandBus.listen(commandName, callback);
-	}, [commandBus, commandName, callback, options]);
+		return commandEvent.watch((event) => {
+			if (event.name !== commandName) return;
+
+			hasCommandPayload(event) ? callback(event.payload) : callback();
+		});
+	}, [callback, commandName, commandEvent, options?.enabled]);
 }
