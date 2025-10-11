@@ -34,6 +34,6 @@ export const deletedNoteMenu: ContextMenu = [
 	{ type: 'separator' },
 	{
 		id: NoteActions.DELETE,
-		label: 'Delete',
+		label: 'Delete permanently',
 	},
 ];
