@@ -64,10 +64,6 @@ module.exports = {
 				test: /\.sql$/,
 				type: 'asset/source',
 			},
-			{
-				test: /\.node$/,
-				loader: 'node-loader',
-			},
 		],
 	},
 };

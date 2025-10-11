@@ -49,6 +49,9 @@
 				"lang": "en_US",
 				"skipWords": [
 					"Aes",
+					"embeddings",
+					"onnx",
+					"huggingface",
 					"Checkbox",
 					"Classname",
 					"DOM",

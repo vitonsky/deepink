@@ -2,7 +2,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { merge } = require('webpack-merge');
 const { readdirSync } = require('fs');
-
+const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path');
 const { isFastBuild } = require('./scripts/webpack');
 const commonConfig = require('./webpack.common');
 
@@ -11,7 +12,7 @@ const windows = readdirSync('./src/windows', { withFileTypes: true })
 	.map((file) => file.name);
 
 module.exports = merge(commonConfig, {
-	target: 'electron-renderer',
+	target: 'web',
 	entry: {
 		...Object.fromEntries(
 			windows.map((name) => [
@@ -31,7 +32,45 @@ module.exports = merge(commonConfig, {
 				}),
 		),
 		new MiniCssExtractPlugin({}),
+		new CopyPlugin({
+			patterns: [
+				// TODO: make this package use provided instance of `onnxruntime-web`
+				// This package takes many space in bundle
+				// Only reason to copy it, is it does not see an "ort" package otherwise
+				{
+					from: path.resolve(
+						__dirname,
+						'node_modules/@huggingface/transformers/**',
+					),
+					to: '[path][name][ext]',
+				},
+			],
+		}),
 	],
+	// We explicitly define external imports instead of use `electron-renderer` target
+	externals: {
+		...Object.fromEntries(
+			[
+				'electron',
+				'@huggingface/transformers',
+				// TODO: remove packages below
+				// Most of packages is used by Umzug, PGLite, `onnxruntime-web`
+				'path',
+				'url',
+				'fs',
+				'fs/promises',
+				'os',
+				'util',
+				'assert',
+				'constants',
+				'stream',
+				'graceful-fs',
+				'process',
+				'child_process',
+				'module',
+			].map((name) => [name, `commonjs2 ${name}`]),
+		),
+	},
 	module: {
 		rules: [
 			{

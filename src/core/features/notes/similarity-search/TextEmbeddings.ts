@@ -1,6 +1,6 @@
 /* eslint-disable spellcheck/spell-checker */
 /* eslint-disable camelcase */
-import * as ort from 'onnxruntime-web';
+import ort from 'onnxruntime-web';
 import { AutoTokenizer } from '@huggingface/transformers';
 
 export class TextEmbeddings {

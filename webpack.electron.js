@@ -23,4 +23,12 @@ module.exports = merge(commonConfig, {
 			],
 		}),
 	],
+	module: {
+		rules: [
+			{
+				test: /\.node$/,
+				loader: 'node-loader',
+			},
+		],
+	},
 });

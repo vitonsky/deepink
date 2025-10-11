@@ -1,5 +1,3 @@
-import { TextEncoder } from 'node:util';
-
 import { IFilesStorage } from '../features/files';
 
 export type ProfileObject = {
