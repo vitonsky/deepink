@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
-import { CommandBusProvider } from '@hooks/commands/CommandEventProvider';
+import { CommandProvider } from '@hooks/commands/CommandProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
@@ -43,9 +43,9 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 						value={controls}
 						key={profile.profile.id}
 					>
-						<CommandBusProvider>
+						<CommandProvider>
 							<Profile profile={profile} controls={controls} />
-						</CommandBusProvider>
+						</CommandProvider>
 					</ProfileControlsContext.Provider>
 				);
 			})}
