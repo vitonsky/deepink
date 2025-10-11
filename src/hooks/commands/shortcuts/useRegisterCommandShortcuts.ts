@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
 
-import { useCommandBusContext } from '../CommandEventProvider';
+import { useCommand } from '../useCommand';
 import { shortcuts } from '.';
 
 /**
@@ -10,7 +10,7 @@ import { shortcuts } from '.';
  * Configures the processing of global keyboard shortcuts, associating each combination with a corresponding command
  */
 export const useRegisterCommandShortcuts = () => {
-	const commandBus = useCommandBusContext();
+	const runCommand = useCommand();
 
 	useEffect(() => {
 		// By default, the hotkeys library ignores INPUT, SELECT, and TEXTAREA elements,
@@ -25,12 +25,12 @@ export const useRegisterCommandShortcuts = () => {
 				{
 					capture: true,
 				},
-				() => commandBus.emit(commandName),
+				() => runCommand(commandName),
 			);
 		});
 
 		return () => {
 			Object.keys(shortcuts).forEach((shortcut) => hotkeys.unbind(shortcut));
 		};
-	}, [commandBus]);
+	}, [runCommand]);
 };
