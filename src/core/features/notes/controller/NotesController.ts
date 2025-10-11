@@ -22,7 +22,7 @@ const RowScheme = z
 		updated_at: z.date(),
 		history_disabled: z.boolean(),
 		visible: z.boolean(),
-		is_deleted: z.boolean(),
+		deleted: z.boolean(),
 	})
 	.transform(
 		({
@@ -33,14 +33,14 @@ const RowScheme = z
 			updated_at,
 			history_disabled,
 			visible,
-			is_deleted,
+			deleted,
 		}): INote => ({
 			id,
 			createdTimestamp: created_at.getTime(),
 			updatedTimestamp: updated_at.getTime(),
 			isSnapshotsDisabled: history_disabled,
 			isVisible: visible,
-			isDeleted: is_deleted,
+			isDeleted: deleted,
 			content: { title, text },
 		}),
 	);
@@ -58,7 +58,7 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 				case 'isVisible':
 					return ['visible', Boolean(value)];
 				case 'isDeleted':
-					return ['is_deleted', Boolean(value)];
+					return ['deleted', Boolean(value)];
 			}
 		}),
 	);
