@@ -67,7 +67,7 @@ function getFetchQuery(
 		select: Query<DBTypes>;
 		workspace?: string;
 	},
-	{ limit, page, tags = [], meta, sort }: NotesControllerFetchOptions = {},
+	{ limit, page, tags = [], meta, search, sort }: NotesControllerFetchOptions = {},
 ) {
 	if (page !== undefined && page < 1)
 		throw new TypeError('Page value must not be less than 1');
@@ -85,31 +85,59 @@ function getFetchQuery(
 		updatedAt: 'updated_at',
 	};
 
+	const selectAddonsQuery: Query<DBTypes>[] = [];
+	const filterQuery: Query<DBTypes>[] = [];
+	const orderQuery: Query<DBTypes>[] = [];
+
+	// Search
+	if (search) {
+		selectAddonsQuery.push(
+			qb.sql`GREATEST(similarity(title, ${search.text}), similarity(text, ${search.text})) as similarity`,
+		);
+
+		if (search.minSimilarity) {
+			filterQuery.push(
+				qb.sql`GREATEST(similarity(title, ${search.text}), similarity(text, ${search.text})) >= ${search.minSimilarity}`,
+			);
+		}
+
+		orderQuery.push(qb.sql`similarity DESC`);
+	}
+
+	// Filtering
+	if (tags.length > 0) {
+		filterQuery.push(
+			qb.sql`id IN (SELECT target FROM attached_tags WHERE source IN (${qb.values(
+				tags,
+			)}))`,
+		);
+	}
+
+	if (metaEntries.length > 0) {
+		filterQuery.push(
+			...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`),
+		);
+	}
+
+	// Sort
+	if (sort) {
+		orderQuery.push(
+			qb.line(sortFieldMap[sort.by], sort.order === 'desc' ? 'DESC' : 'ASC'),
+		);
+	}
+
 	return qb.line(
-		qb.sql`SELECT ${select} FROM notes`,
+		qb.sql`SELECT ${qb.set([select, ...selectAddonsQuery])} FROM notes`,
 		qb
 			.where(workspace ? qb.sql`workspace_id=${workspace}` : undefined)
 			.and(
-				tags.length === 0
-					? undefined
-					: qb.sql`id IN (SELECT target FROM attached_tags WHERE source IN (${qb.values(
-							tags,
-					  )}))`,
-			)
-			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
-		sort
-			? qb.line(
-					qb.sql`ORDER BY`,
-					qb.set([
-						sort
-							? qb.line(
-									sortFieldMap[sort.by],
-									sort.order === 'desc' ? 'DESC' : 'ASC',
-							  )
-							: undefined,
-					]),
-			  )
-			: undefined,
+				qb.line(
+					...filterQuery.map((query, index) =>
+						index === 0 ? query : qb.sql`AND (${query})`,
+					),
+				),
+			),
+		orderQuery.length > 0 ? qb.sql`ORDER BY ${qb.set(orderQuery)}` : undefined,
 		limit ? qb.limit(limit) : undefined,
 		page && limit ? qb.offset((page - 1) * limit) : undefined,
 	);
