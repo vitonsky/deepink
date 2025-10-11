@@ -72,6 +72,7 @@ export const SQLConsole = ({
 				ref={(node) => {
 					// Init Repl with command
 					if (!node || isInitializedRef.current) return;
+					if (!isVisible) return;
 
 					const input = node.querySelector('.cm-content');
 					if (!input || !(input instanceof HTMLDivElement)) return;
