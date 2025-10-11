@@ -32,6 +32,6 @@ export enum GLOBAL_COMMANDS {
 
 // In the future, we can define a type for the payload like this:
 // type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
-export type CommandPayloads = {
+export type CommandPayloadsMap = {
 	[K in GLOBAL_COMMANDS]: void;
 };
