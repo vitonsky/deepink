@@ -1,56 +1,28 @@
-import React, { createContext, FC, PropsWithChildren, useState } from 'react';
-import { createEvent } from 'effector';
-import { createContextGetterHook } from '@utils/react/createContextGetterHook';
+import React, { createContext, FC, PropsWithChildren } from 'react';
+import { createEvent, EventCallable } from 'effector';
 
 import { CommandPayloads } from '.';
 
-export type CommandBus<CommandPayloads extends Record<string, unknown>> = {
-	/**
-	 * Fire command by its name and provide payload if needed
-	 */
-	emit: <K extends keyof CommandPayloads>(
-		commandName: K,
-		...args: CommandPayloads[K] extends void
-			? [payload?: void]
-			: [payload: CommandPayloads[K]]
-	) => void;
+export type CommandEvent<K extends keyof CommandPayloads = keyof CommandPayloads> =
+	CommandPayloads[K] extends void
+		? {
+				name: K;
+		  }
+		: {
+				name: K;
+				payload: CommandPayloads[K];
+		  };
 
-	/**
-	 * Add listener for a specific command
-	 */
-	listen: <K extends keyof CommandPayloads>(
-		commandName: K,
-		callback: (payload: CommandPayloads[K]) => void,
-	) => () => void;
-};
-
-export const CommandBusContext = createContext<CommandBus<CommandPayloads> | null>(null);
-export const useCommandBusContext = createContextGetterHook(CommandBusContext);
+export const CommandEventContext = createContext<EventCallable<CommandEvent>>(
+	createEvent(),
+);
 
 export const CommandBusProvider: FC<PropsWithChildren> = ({ children }) => {
-	const [commandBus] = useState(() => {
-		const commandEvent = createEvent<{
-			name: string;
-			payload: any;
-		}>();
-
-		return {
-			emit(commandName: string, payload?: any) {
-				commandEvent({ name: commandName, payload });
-			},
-			listen(commandName, callback) {
-				return commandEvent.watch((event) => {
-					if (event.name !== commandName) return;
-
-					callback(event.payload);
-				});
-			},
-		} satisfies CommandBus<CommandPayloads>;
-	});
+	const commandEvent = createEvent<CommandEvent>();
 
 	return (
-		<CommandBusContext.Provider value={commandBus}>
+		<CommandEventContext.Provider value={commandEvent}>
 			{children}
-		</CommandBusContext.Provider>
+		</CommandEventContext.Provider>
 	);
 };
