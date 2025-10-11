@@ -2,10 +2,10 @@ import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
-import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useCommandBusContext } from '@hooks/commands/CommandEventProvider';
 import { useRegisterCommandShortcuts } from '@hooks/commands/shortcuts/useRegisterCommandShortcuts';
+import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
@@ -90,10 +90,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	useRegisterCommandShortcuts();
 
-	const commandBus = useCommandBusContext();
-	useEffect(() => {
-		return commandBus.listen(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
-	}, [commandBus, controls.close]);
+	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
