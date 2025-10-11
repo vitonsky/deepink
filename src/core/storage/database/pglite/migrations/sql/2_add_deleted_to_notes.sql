@@ -1,1 +1,1 @@
-ALTER TABLE "notes" ADD COLUMN "is_deleted" BOOLEAN DEFAULT false;
+ALTER TABLE "notes" ADD COLUMN "deleted" BOOLEAN DEFAULT false;
