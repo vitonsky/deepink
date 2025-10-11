@@ -1,16 +1,19 @@
 import { useContext } from 'react';
 
-import { CommandEventContext } from './CommandEventProvider';
-import { CommandPayloads } from '.';
+import { CommandContext } from './CommandProvider';
+import { CommandPayloadsMap } from '.';
 
+/**
+ * Provides a function that triggers a command event
+ */
 export const useCommand = () => {
-	const commandEvent = useContext(CommandEventContext);
+	const commandEvent = useContext(CommandContext);
 
-	return <K extends keyof CommandPayloads>(
+	return <K extends keyof CommandPayloadsMap>(
 		commandName: K,
-		...args: CommandPayloads[K] extends void
+		...args: CommandPayloadsMap[K] extends void
 			? [payload?: undefined]
-			: [payload: CommandPayloads[K]]
+			: [payload: CommandPayloadsMap[K]]
 	) => {
 		const [payload] = args;
 		const data =

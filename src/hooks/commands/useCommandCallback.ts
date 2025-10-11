@@ -1,26 +1,26 @@
 import { useContext, useEffect } from 'react';
 
-import { CommandEvent, CommandEventContext } from './CommandEventProvider';
-import { CommandPayloads } from '.';
+import { CommandContext, CommandEvent } from './CommandProvider';
+import { CommandPayloadsMap } from '.';
 
-export function hasCommandPayload<K extends keyof CommandPayloads>(
+export function hasCommandPayload<K extends keyof CommandPayloadsMap>(
 	command: CommandEvent<K>,
-): command is { name: K; payload: CommandPayloads[K] } {
+): command is { name: K; payload: CommandPayloadsMap[K] } {
 	return 'payload' in command;
 }
 
 /**
- * Subscribes to a command via CommandBus and automatically cleans up.
+ * Subscribes to a command event by its name and cleans up automatically
  *
  * Optionally, the subscription can be disabled using the `enabled` flag.
  */
 
-export function useCommandCallback<K extends keyof CommandPayloads>(
+export const useCommandCallback = <K extends keyof CommandPayloadsMap>(
 	commandName: K,
-	callback: (payload?: CommandPayloads[K]) => void,
+	callback: (payload?: CommandPayloadsMap[K]) => void,
 	options?: { enabled?: boolean },
-) {
-	const commandEvent = useContext(CommandEventContext);
+) => {
+	const commandEvent = useContext(CommandContext);
 
 	useEffect(() => {
 		if (!options?.enabled) return;
@@ -31,4 +31,4 @@ export function useCommandCallback<K extends keyof CommandPayloads>(
 			hasCommandPayload(event) ? callback(event.payload) : callback();
 		});
 	}, [callback, commandName, commandEvent, options?.enabled]);
-}
+};
