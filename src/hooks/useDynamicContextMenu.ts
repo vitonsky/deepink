@@ -17,8 +17,8 @@ export const useDynamicContextMenu = <T extends string>(
 
 	const openMenu = useContextMenu(menu, contextMenuCallback);
 
-	// Wait before openMenu was updated
-	// Automatically open menu when target is set
+	// Open menu automatically when `target` is set
+	// Ensures the menu is updated (after `menu` state updates)
 	useEffect(() => {
 		if (!target) return;
 		openMenu(target.id, target.point);
