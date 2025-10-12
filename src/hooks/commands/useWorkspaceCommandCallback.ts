@@ -24,5 +24,7 @@ export const useWorkspaceCommandCallback = <K extends keyof CommandPayloadsMap>(
 
 	const isEnabled = activeWorkspace?.id === contextWorkspaceId;
 
-	useCommandCallback(commandName, callback, { enabled: isEnabled ?? options?.enabled });
+	useCommandCallback(commandName, callback, {
+		enabled: isEnabled && options?.enabled !== false,
+	});
 };
