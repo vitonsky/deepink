@@ -1,10 +1,10 @@
 import { useContext, useEffect } from 'react';
 
-import { CommandContext, CommandEvent } from './CommandProvider';
+import { Command, CommandEventContext } from './CommandEventProvider';
 import { CommandPayloadsMap } from '.';
 
 export function hasCommandPayload<K extends keyof CommandPayloadsMap>(
-	command: CommandEvent<K>,
+	command: Command<K>,
 ): command is { name: K; payload: CommandPayloadsMap[K] } {
 	return 'payload' in command;
 }
@@ -20,10 +20,10 @@ export const useCommandCallback = <K extends keyof CommandPayloadsMap>(
 	callback: (payload?: CommandPayloadsMap[K]) => void,
 	options?: { enabled?: boolean },
 ) => {
-	const commandEvent = useContext(CommandContext);
+	const commandEvent = useContext(CommandEventContext);
 
 	useEffect(() => {
-		if (!options?.enabled) return;
+		if (options?.enabled === false) return;
 
 		return commandEvent.watch((event) => {
 			if (event.name !== commandName) return;
