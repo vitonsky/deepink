@@ -114,6 +114,7 @@
 		"monaco-markdown": "^0.0.12",
 		"nano-queries": "^1.2.0",
 		"onnxruntime-web": "^1.23.0",
+		"ordinality": "^1.0.1",
 		"pretty-bytes": "^6.1.0",
 		"proper-lockfile": "^4.1.2",
 		"react": "^19.2.0",
