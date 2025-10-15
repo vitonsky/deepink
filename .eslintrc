@@ -83,6 +83,7 @@
 					"Obfuscator",
 					"Outdent",
 					"Paddings",
+					"warmup",
 					"Postfix",
 					"Renderer",
 					"Struct",
