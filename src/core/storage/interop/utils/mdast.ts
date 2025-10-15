@@ -1,4 +1,4 @@
-import { Root } from 'remark-parse/lib';
+import { Root } from 'mdast';
 import { visit } from 'unist-util-visit';
 
 export const replaceUrls = (

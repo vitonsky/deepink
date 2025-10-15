@@ -31,7 +31,7 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"baseUrl": ".",
-		"types": ["@testing-library/jest-dom/types/vitest"],
+		"types": ["@testing-library/jest-dom/vitest"],
 		"paths": {
 			"@core/*": ["src/core/*"],
 			"@electron/*": ["src/electron/*"],

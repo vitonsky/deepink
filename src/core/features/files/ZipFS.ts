@@ -18,7 +18,7 @@ export class ZipFS extends OverlayFS {
 	async load(buffer: ArrayBuffer) {
 		const files = unzipSync(new Uint8Array(buffer));
 		for (const [path, content] of Object.entries(files)) {
-			await this.write(path, content.buffer);
+			await this.write(path, new Uint8Array(content.buffer).buffer as ArrayBuffer);
 		}
 	}
 }

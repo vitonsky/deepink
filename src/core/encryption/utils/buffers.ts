@@ -1,7 +1,7 @@
 /**
  * Join buffers into a new buffer
  */
-export const joinBuffers = (buffers: ArrayBuffer[]) => {
+export const joinBuffers = (buffers: (ArrayBufferLike | Buffer | TypedArray)[]) => {
 	const bufferLen = buffers.reduce((len, buffer) => len + buffer.byteLength, 0);
 	const resultBuffer = new Uint8Array(bufferLen);
 
@@ -60,6 +60,19 @@ export class BufferView {
 	}
 }
 
+type TypedArray =
+	| Int8Array
+	| Uint8Array
+	| Uint8ClampedArray
+	| Int16Array
+	| Uint16Array
+	| Int32Array
+	| Uint32Array
+	| Float32Array
+	| Float64Array
+	| BigInt64Array
+	| BigUint64Array;
+
 /**
  * Receive any buffer and returns a converted transferable buffer and codec for revert converting
  *
@@ -68,14 +81,16 @@ export class BufferView {
  * @param buffer
  * @returns [buffer, convertor]
  */
-export const convertBufferToTransferable = (
-	buffer: ArrayBuffer,
-): [ArrayBuffer, (buffer: ArrayBuffer) => ArrayBuffer] => {
+export const convertBufferToTransferable = <
+	T extends ArrayBufferLike | Buffer | TypedArray,
+>(
+	buffer: T,
+): [ArrayBuffer, (buffer: ArrayBuffer) => T] => {
 	if (buffer instanceof Buffer) {
 		return [
-			buffer.buffer,
+			buffer.buffer as ArrayBuffer,
 			(buffer: ArrayBuffer) => {
-				return Buffer.from(buffer);
+				return Buffer.from(buffer) as T;
 			},
 		];
 	}
@@ -96,17 +111,17 @@ export const convertBufferToTransferable = (
 	].find((proto) => buffer instanceof proto);
 	if (typedArray && buffer instanceof typedArray) {
 		return [
-			buffer.buffer,
+			(buffer as Uint8Array).buffer as ArrayBuffer,
 			(buffer: ArrayBuffer) => {
-				return new typedArray(buffer);
+				return new typedArray(buffer) as T;
 			},
 		];
 	}
 
 	return [
-		buffer,
+		buffer as ArrayBuffer,
 		(buffer: ArrayBuffer) => {
-			return buffer;
+			return buffer as T;
 		},
 	];
 };

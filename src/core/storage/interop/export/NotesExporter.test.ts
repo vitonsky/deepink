@@ -291,7 +291,7 @@ test('Export all notes and attached files as a zip file', async () => {
 
 	// Load zip file
 	const fs2 = new ZipFS(new InMemoryFS());
-	await fs2.load(zipBuffer);
+	await fs2.load(zipBuffer as ArrayBuffer);
 
 	const filesList = await fs2.list();
 	expect(filesList.length).toBeGreaterThan(0);

@@ -35,8 +35,8 @@ requests.addHandler('init', async ({ key, salt, algorithm }) => {
 	if (!(salt instanceof Uint8Array))
 		throw new Error('Salt is not instance of Uint8Array');
 
-	const derivedKeys = await getMasterKey(key, salt).then((masterKey) =>
-		getDerivedKeysManager(masterKey, salt),
+	const derivedKeys = await getMasterKey(key, salt.buffer as ArrayBuffer).then(
+		(masterKey) => getDerivedKeysManager(masterKey, salt as Uint8Array<ArrayBuffer>),
 	);
 
 	const cipherMap: Record<ENCRYPTION_ALGORITHM, () => Promise<IEncryptionProcessor>> = {

@@ -15,7 +15,7 @@ export const dumpFilesStorage = async (
 				directory,
 				escapeFileName(String(name ?? Date.now())) + '.zip',
 			]),
-			zipBuffer,
+			zipBuffer as ArrayBuffer,
 		);
 	} else {
 		for (const filePath of await fs.list()) {

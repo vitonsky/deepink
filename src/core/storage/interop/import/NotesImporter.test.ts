@@ -47,7 +47,8 @@ const createAppContextIterator = () => {
 	};
 };
 
-const createTextBuffer = (text: string): ArrayBuffer => new TextEncoder().encode(text);
+const createTextBuffer = (text: string): ArrayBuffer =>
+	new TextEncoder().encode(text).buffer;
 
 describe('Base notes import cases', () => {
 	const dbFile = createFileControllerMock();

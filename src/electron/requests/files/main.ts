@@ -57,7 +57,8 @@ export const serveFiles = () =>
 					const rootPathLengthWithSlash = rootDir.length + 1;
 					const filename = absoluteFilename.slice(rootPathLengthWithSlash);
 					const buffer = await readFile(file);
-					filesMap[filename] = buffer.buffer;
+					filesMap[filename] = new Uint8Array(buffer.buffer)
+						.buffer as ArrayBuffer;
 				}),
 			);
 
