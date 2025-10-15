@@ -51,6 +51,7 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 	public readonly dbContainer;
 	private readonly dbFile: IFileController;
 	private readonly debouncedSync;
+	private readonly cleanups: Array<() => void> = [];
 	constructor(
 		dbContainer: IDatabaseContainer<T>,
 		dbFile: IFileController,
@@ -65,8 +66,7 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 			deadline: sync.deadline,
 		});
 
-		// TODO: cleanup by close db
-		dbContainer.onChanged.watch(this.debouncedSync);
+		this.cleanups.push(dbContainer.onChanged.watch(this.debouncedSync));
 	}
 
 	public get = () => {
@@ -88,10 +88,16 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 	};
 
 	public close = async () => {
-		// Sync latest changes
-		this.debouncedSync.cancel();
+		// Cleanup any listeners
+		for (const cleanup of this.cleanups) {
+			cleanup();
+		}
 
+		// Sync latest changes immediately
+		this.debouncedSync.cancel();
 		await this.sync();
+
+		// Close DB
 		await this.dbContainer.close();
 	};
 
