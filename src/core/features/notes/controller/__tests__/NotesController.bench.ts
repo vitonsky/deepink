@@ -142,7 +142,10 @@ describe.sequential('Note ops performance', async () => {
 		bench(
 			'Search note with random text',
 			async function () {
-				await registry.get({ search: { text: `Note #${Math.random()}` } });
+				await registry.get({
+					search: { text: `Note #${Math.random()}` },
+					limit: 10,
+				});
 			},
 			{
 				...benchConfig,
