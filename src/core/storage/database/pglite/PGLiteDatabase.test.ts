@@ -1,4 +1,7 @@
 /* eslint-disable spellcheck/spell-checker */
+import { getLongText } from 'src/__tests__/samples';
+import { PGlite } from '@electric-sql/pglite';
+import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openDatabase } from './PGLiteDatabase';
@@ -102,4 +105,81 @@ describe('Database persistence', () => {
 
 		await dbContainer.close();
 	});
+});
+
+describe('Known database problems', () => {
+	const textSample = getLongText();
+
+	describe.concurrent(
+		'pg_trgm throw Error: index row requires N bytes, maximum size is 8191',
+		() => {
+			test('Error throws for GIST index', async () => {
+				const db = new PGlite({ extensions: { pg_trgm } });
+				await db.exec(`
+				CREATE TABLE "notes" (
+					"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+					"title" TEXT NOT NULL,
+					"text" TEXT NOT NULL
+				);
+		
+				CREATE EXTENSION pg_trgm;
+				CREATE INDEX notes_trgm_idx ON notes USING GIST (title gist_trgm_ops(siglen=32), text gist_trgm_ops(siglen=32))
+			`);
+
+				expect(textSample.length).toBeGreaterThanOrEqual(90_000);
+				await expect(
+					db.query('INSERT INTO notes(title, text) VALUES($1, $2)', [
+						'Title',
+						textSample,
+					]),
+				).rejects.toThrowError(
+					/index row requires \d+ bytes, maximum size is \d+/,
+				);
+			});
+
+			test('Error is not thrown for GIN index', async () => {
+				const db = new PGlite({ extensions: { pg_trgm } });
+				await db.exec(`
+				CREATE TABLE "notes" (
+					"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+					"title" TEXT NOT NULL,
+					"text" TEXT NOT NULL
+				);
+		
+				CREATE EXTENSION pg_trgm;
+				CREATE INDEX notes_trgm_idx ON notes USING GIN (title gin_trgm_ops, text gin_trgm_ops);
+			`);
+
+				expect(textSample.length).toBeGreaterThanOrEqual(90_000);
+				await expect(
+					db.query('INSERT INTO notes(title, text) VALUES($1, $2)', [
+						'Title',
+						textSample,
+					]),
+				).resolves.not.toThrow();
+			});
+			test('Error is not thrown for partial GIST index with filter', async () => {
+				const db = new PGlite({ extensions: { pg_trgm } });
+				await db.exec(`
+				CREATE TABLE "notes" (
+					"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+					"title" TEXT NOT NULL,
+					"text" TEXT NOT NULL
+				);
+		
+				CREATE EXTENSION pg_trgm;
+				CREATE INDEX notes_trgm_idx ON notes USING GIST (title gist_trgm_ops(siglen=32), text gist_trgm_ops(siglen=32))
+					WHERE octet_length(title) <= 4055 AND octet_length(text) <= 4055;
+			`);
+
+				expect(textSample.length).toBeGreaterThanOrEqual(90_000);
+				await expect(
+					db.query('INSERT INTO notes(title, text) VALUES($1, $2)', [
+						'Title',
+						textSample,
+					]),
+				).resolves.not.toThrow();
+			});
+		},
+	);
 });
