@@ -3,14 +3,14 @@ import { MigrationRunner } from 'ordinality/MigrationRunner';
 import { IFileController } from '@core/features/files';
 import { PGlite, PGliteOptions } from '@electric-sql/pglite';
 import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
-import { PGliteWorker } from '@electric-sql/pglite/worker';
 
 import {
 	IManagedDatabase,
 	ManagedDatabase,
 	Options as ManagedDatabaseOptions,
 } from '../ManagedDatabase';
-import { EventsMap, ExtendedPGLite } from './ExtendedPGLite';
+import { ExtendedPGLite } from './ExtendedPGLite';
+import { ExtendedPGliteWorker } from './ExtendedPGliteWorker';
 import { getMigrationsList } from './migrations';
 import { PostgresMigrationsStorage } from './migrations/PostgresMigrationsStorage';
 import { IDatabaseContainer } from '..';
@@ -34,63 +34,26 @@ export const getPGLiteInstance = async (options: PGliteOptions) => {
 		return new ExtendedPGLite({
 			...options,
 			extensions: { pg_trgm },
-		}) as unknown as PGliteWorker;
+		}) as unknown as ExtendedPGliteWorker;
 	} else {
 		const DBWorker = await import('./PGLite.worker').then(
 			(module: any) => module.default,
 		);
 
-		return new PGliteWorker(new DBWorker(), options);
+		return new ExtendedPGliteWorker(new DBWorker(), options);
 	}
 };
 
+// TODO: fix types. Introduce common type to use in app
 export const getWrappedDb = async (
 	dbFile: IFileController,
 	{ verboseLog }: Options = {},
 ): Promise<PGLiteDatabaseContainer> => {
 	const onChanged = createEvent();
 
-	const mutableCommands = [
-		'INSERT',
-		'UPDATE',
-		'DELETE',
-		'REPLACE',
-		'CREATE TABLE',
-		'CREATE INDEX',
-		'CREATE VIEW',
-		'CREATE TRIGGER',
-		'DROP TABLE',
-		'DROP INDEX',
-		'DROP VIEW',
-		'DROP TRIGGER',
-		'ALTER TABLE',
-		'PRAGMA',
-	];
-
 	// TODO: attach to a DB
 	// Create DB
-	let db: PGliteWorker;
-	const onCommand = ({ command, affectedRows }: EventsMap['command']) => {
-		if (typeof command !== 'string') return;
-
-		// Skip for closed DB
-		if (db.closed) return;
-
-		if (verboseLog) {
-			console.debug(command);
-		}
-
-		// Track mutable changes
-		const capitalizedCommand = command.toUpperCase();
-		if (
-			(affectedRows === undefined || affectedRows > 0) &&
-			mutableCommands.some((commandName) =>
-				capitalizedCommand.includes(commandName),
-			)
-		) {
-			onChanged();
-		}
-	};
+	let db: ExtendedPGliteWorker;
 
 	const dbFileBuffer = await dbFile.get();
 
@@ -116,7 +79,22 @@ export const getWrappedDb = async (
 	// Run migrations with hooks for recovery mode
 	while (true) {
 		try {
-			await migrations.up();
+			if (verboseLog) {
+				console.debug(
+					'Executed migrations',
+					(await migrations.executed()).join(', '),
+				);
+				console.debug(
+					'Migrations to apply',
+					(await migrations.executed()).join(', '),
+				);
+			}
+
+			const executedMigrations = await migrations.up();
+
+			if (verboseLog) {
+				console.debug('Executed migrations', executedMigrations);
+			}
 			break;
 		} catch (error) {
 			const isRecoveryMode =
@@ -154,7 +132,12 @@ export const getWrappedDb = async (
 	}
 
 	// Configure DB
-	// db.on('command', onCommand);
+	db.on('sync', () => {
+		// Skip for closed DB
+		if (db.closed) return;
+
+		onChanged();
+	});
 
 	const dumpData = async () =>
 		db.dumpDataDir('none').then((file) => file.arrayBuffer());
