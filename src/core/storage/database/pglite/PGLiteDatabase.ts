@@ -15,9 +15,9 @@ import { getMigrationsList } from './migrations';
 import { PostgresMigrationsStorage } from './migrations/PostgresMigrationsStorage';
 import { IDatabaseContainer } from '..';
 
-export type PGLiteDatabaseContainer = IDatabaseContainer<ExtendedPGLite>;
-
-export type PGLiteDatabase = IManagedDatabase<ExtendedPGLite>;
+export type DatabaseObject = ExtendedPGLite | ExtendedPGliteWorker;
+export type PGLiteDatabaseContainer = IDatabaseContainer<DatabaseObject>;
+export type PGLiteDatabase = IManagedDatabase<DatabaseObject>;
 
 export type Options = ManagedDatabaseOptions & {
 	verboseLog?: boolean;
@@ -29,7 +29,6 @@ export const IN_NODE =
 	typeof process.versions.node === 'string';
 
 export const getPGLiteInstance = async (options: PGliteOptions) => {
-	console.log({ IN_NODE });
 	if (IN_NODE) {
 		return new ExtendedPGLite({
 			...options,
