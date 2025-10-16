@@ -1,3 +1,4 @@
+/* eslint-disable spellcheck/spell-checker */
 /* eslint-disable camelcase */
 import { Query } from 'nano-queries/core/Query';
 import { z } from 'zod';
@@ -91,17 +92,11 @@ function getFetchQuery(
 
 	// Search
 	if (search) {
-		selectAddonsQuery.push(
-			qb.sql`GREATEST(similarity(title, ${search.text}), similarity(text, ${search.text})) as similarity`,
+		filterQuery.push(qb.sql`text_tsv @@ plainto_tsquery('simple', ${search.text})`);
+
+		orderQuery.push(
+			qb.sql`ts_rank_cd(text_tsv, plainto_tsquery('simple', ${search.text})) DESC`,
 		);
-
-		if (search.minSimilarity) {
-			filterQuery.push(
-				qb.sql`GREATEST(similarity(title, ${search.text}), similarity(text, ${search.text})) >= ${search.minSimilarity}`,
-			);
-		}
-
-		orderQuery.push(qb.sql`similarity DESC`);
 	}
 
 	// Filtering
