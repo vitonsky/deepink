@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FaFilter, FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
+import { FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
 import { useDebouncedCallback } from 'use-debounce';
 import {
 	Box,
@@ -99,7 +99,7 @@ export const NotesPanel = () => {
 							flexShrink={0}
 							alignSelf="center"
 						>
-							<FaFilter />
+							Filter by
 						</Text>
 						<HStack maxW="100%" align="start" overflow="hidden">
 							<Tag
@@ -107,7 +107,7 @@ export const NotesPanel = () => {
 								as={HStack}
 								gap=".5rem"
 								align="start"
-								title={`Notes with tag "${activeTag.resolvedName}"`}
+								title={activeTag.resolvedName}
 							>
 								<Text
 									maxW="100%"
