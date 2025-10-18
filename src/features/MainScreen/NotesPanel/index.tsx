@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FaArrowDownWideShort, FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
+import { FaFilter, FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
 import { useDebouncedCallback } from 'use-debounce';
 import {
-	Button,
+	Box,
+	Divider,
 	HStack,
 	Input,
 	InputGroup,
@@ -65,10 +66,10 @@ export const NotesPanel = () => {
 				width: '100%',
 				height: '100%',
 				flexDirection: 'column',
-				gap: '1rem',
+				gap: '.5rem',
 			}}
 		>
-			<VStack align="start" w="100%" gap="0.8rem">
+			<VStack align="start" w="100%" gap="0.5rem">
 				<HStack>
 					<InputGroup size="sm">
 						<InputLeftElement pointerEvents="none">
@@ -89,29 +90,58 @@ export const NotesPanel = () => {
 							</InputRightElement>
 						) : undefined}
 					</InputGroup>
-
-					<Button variant="primary" size="sm" paddingInline=".5rem">
-						<FaArrowDownWideShort />
-					</Button>
 				</HStack>
 
 				{activeTag && (
-					<HStack maxW="100%" paddingInline=".3rem">
-						<Text minW="fit-content">With tag</Text>
-						<Tag variant="accent">
-							<Text
-								maxW="100%"
-								whiteSpace="nowrap"
-								overflow="hidden"
-								textOverflow="ellipsis"
-								dir="rtl"
+					<HStack align="start" gap="0.5rem" maxW="100%">
+						<Text
+							color="typography.secondary"
+							flexShrink={0}
+							alignSelf="center"
+						>
+							<FaFilter />
+						</Text>
+						<HStack maxW="100%" align="start" overflow="hidden">
+							<Tag
+								variant="accent"
+								as={HStack}
+								gap=".5rem"
+								align="start"
+								title={`Notes with tag "${activeTag.resolvedName}"`}
 							>
-								{activeTag.resolvedName}
-							</Text>
-						</Tag>
+								<Text
+									maxW="100%"
+									whiteSpace="nowrap"
+									overflow="hidden"
+									textOverflow="ellipsis"
+									dir="rtl"
+								>
+									{activeTag.resolvedName}
+								</Text>
+								<Box
+									sx={{
+										'&:not(:hover)': {
+											opacity: '0.7',
+										},
+									}}
+									onClick={() => {
+										dispatch(
+											workspacesApi.setSelectedTag({
+												...workspaceData,
+												tag: null,
+											}),
+										);
+									}}
+								>
+									<FaXmark />
+								</Box>
+							</Tag>
+						</HStack>
 					</HStack>
 				)}
 			</VStack>
+
+			<Divider />
 
 			<NotesList />
 		</VStack>
