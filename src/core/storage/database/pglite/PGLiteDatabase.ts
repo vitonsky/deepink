@@ -3,6 +3,7 @@ import { MigrationRunner } from 'ordinality/MigrationRunner';
 import { IFileController } from '@core/features/files';
 import { PGlite, PGliteOptions } from '@electric-sql/pglite';
 import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
+import { unaccent } from '@electric-sql/pglite/contrib/unaccent';
 
 import {
 	IManagedDatabase,
@@ -32,7 +33,7 @@ export const getPGLiteInstance = async (options: PGliteOptions) => {
 	if (IN_NODE) {
 		return new ExtendedPGLite({
 			...options,
-			extensions: { pg_trgm },
+			extensions: { pg_trgm, unaccent },
 		}) as unknown as ExtendedPGliteWorker;
 	} else {
 		const DBWorker = await import('./PGLite.worker').then(

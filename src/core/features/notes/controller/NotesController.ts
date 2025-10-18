@@ -86,17 +86,56 @@ function getFetchQuery(
 		updatedAt: 'updated_at',
 	};
 
+	const withQuery: { name: string; query: Query<DBTypes> }[] = [];
 	const selectAddonsQuery: Query<DBTypes>[] = [];
+	const joinQuery: Query<DBTypes>[] = [];
 	const filterQuery: Query<DBTypes>[] = [];
 	const orderQuery: Query<DBTypes>[] = [];
 
 	// Search
 	if (search) {
-		filterQuery.push(qb.sql`text_tsv @@ plainto_tsquery('simple', ${search.text})`);
+		// In case a user input contains typos, tsquery will not match,
+		// so we extends a query and adds a few alternative lexemes to each
+		// Alternative lexemes is extracted from real texts in DB
+		// We find the top N of most similar lexemes via trgm
+		withQuery.push({
+			name: 'user_tokens',
+			query: qb.sql`SELECT regexp_split_to_table(lower(unaccent(${search.text})), '\s+') AS token`,
+		});
+		withQuery.push({
+			name: 'token_alternatives',
+			query: qb.sql`SELECT t.token,
+					l.word AS candidate
+				FROM user_tokens t
+				LEFT JOIN lexemes l
+				ON l.word % t.token
+				LIMIT 5`,
+		});
+		withQuery.push({
+			name: 'grouped_alternatives',
+			query: qb.sql`SELECT
+				plainto_tsquery('simple', string_agg(token, ' ')) AS token,
+				to_tsquery('simple', string_agg(candidate, ' | ')) AS or_group
+				FROM token_alternatives
+				GROUP BY token`,
+		});
+		withQuery.push({
+			name: 'expanded_tsquery',
+			query: qb.sql` SELECT
+				tsquery_and_agg(token) AS original_query,
+				tsquery_and_agg(or_group) AS query
+				FROM grouped_alternatives ga`,
+		});
 
-		orderQuery.push(
-			qb.sql`ts_rank_cd(text_tsv, plainto_tsquery('simple', ${search.text})) DESC`,
-		);
+		// Filter by expanded query to get more results
+		joinQuery.push(qb.sql`CROSS JOIN expanded_tsquery et`);
+		filterQuery.push(qb.sql`text_tsv @@ et.query`);
+
+		// Order by original query match first
+		orderQuery.push(qb.sql`ts_rank_cd(text_tsv, et.original_query) DESC`);
+
+		// Order not matched results by extended query
+		orderQuery.push(qb.sql`ts_rank_cd(text_tsv, et.query) DESC`);
 	}
 
 	// Filtering
@@ -122,13 +161,24 @@ function getFetchQuery(
 	}
 
 	return qb.line(
+		withQuery.length > 0
+			? qb.line(
+					'WITH',
+					qb.set(
+						withQuery.map(
+							({ name, query }) => qb.sql`${qb.raw(name)} AS (${query})`,
+						),
+					),
+			  )
+			: undefined,
 		qb.sql`SELECT ${qb.set([select, ...selectAddonsQuery])} FROM notes`,
+		(joinQuery.length > 0 || undefined) && qb.line(...joinQuery),
 		qb
 			.where(workspace ? qb.sql`workspace_id=${workspace}` : undefined)
 			.and(
 				qb.line(
 					...filterQuery.map((query, index) =>
-						index === 0 ? query : qb.sql`AND (${query})`,
+						index === 0 ? query : qb.sql`AND ${query}`,
 					),
 				),
 			),
@@ -190,33 +240,41 @@ export class NotesController implements INotesController {
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
-		const db = wrapDB(this.db.get());
-
 		const creationTime = new Date().getTime();
 
 		// Insert data
 		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
 
-		const {
-			rows: [id],
-		} = await db.query(
-			qb.sql`INSERT INTO notes (${qb.set([
-				qb.sql`"workspace_id","title","text","created_at","updated_at"`,
-				...(metaEntries ? metaEntries.map(([key]) => key) : []),
-			])}) VALUES (${qb.values([
-				this.workspace,
-				note.title,
-				note.text,
-				creationTime,
-				creationTime,
-				...metaEntries.map(([_key, value]) => value),
-			])}) RETURNING id`,
-			z.object({ id: z.string() }).transform(({ id }) => id),
-		);
+		return this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
 
-		return id;
+			const {
+				rows: [id],
+			} = await db.query(
+				qb.sql`INSERT INTO notes (${qb.set([
+					qb.sql`"workspace_id","title","text","created_at","updated_at"`,
+					...(metaEntries ? metaEntries.map(([key]) => key) : []),
+				])}) VALUES (${qb.values([
+					this.workspace,
+					note.title,
+					note.text,
+					creationTime,
+					creationTime,
+					...metaEntries.map(([_key, value]) => value),
+				])}) RETURNING id`,
+				z.object({ id: z.string() }).transform(({ id }) => id),
+			);
+
+			// Update lexemes list
+			await db.query(
+				qb.sql`INSERT INTO lexemes(word) SELECT word FROM ts_stat('SELECT text_tsv FROM notes WHERE id=''' || ${id} || '''') ON CONFLICT DO NOTHING;`,
+			);
+
+			return id;
+		});
 	}
 
+	// TODO: delete lexemes used by this note before update
 	public async update(id: string, updatedNote: INoteContent) {
 		const db = wrapDB(this.db.get());
 
@@ -239,6 +297,7 @@ export class NotesController implements INotesController {
 		}
 	}
 
+	// TODO: delete lexemes used by notes, before deletion notes
 	public async delete(ids: NoteId[]): Promise<void> {
 		const db = wrapDB(this.db.get());
 

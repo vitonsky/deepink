@@ -1,5 +1,6 @@
 import z from 'zod';
 import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
+import { unaccent } from '@electric-sql/pglite/contrib/unaccent';
 import { worker } from '@electric-sql/pglite/worker';
 
 import { ExtendedPGLite } from './ExtendedPGLite';
@@ -10,7 +11,7 @@ worker({
 		// Create and return a PGlite instance
 		const db = new ExtendedPGLite({
 			...options,
-			extensions: { pg_trgm },
+			extensions: { pg_trgm, unaccent },
 		});
 
 		db.on('sync', () => {

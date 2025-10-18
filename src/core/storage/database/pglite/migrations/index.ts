@@ -25,7 +25,7 @@ export const getMigrationsList = async (): Promise<PGMigration[]> =>
 	Promise.all([
 		convertSQLToMigrationObject('1_init_db', import('./sql/1_init_db.sql')),
 		convertSQLToMigrationObject(
-			'2_add_trgm_index_for_notes',
-			import('./sql/2_add_trgm_index_for_notes.sql'),
+			'2_full_text_search_for_notes',
+			import('./sql/2_full_text_search_for_notes.sql'),
 		),
 	]);

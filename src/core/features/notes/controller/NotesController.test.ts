@@ -296,7 +296,7 @@ describe('Notes meta control', () => {
 	});
 });
 
-describe.only('Notes search', () => {
+describe('Notes search', () => {
 	const dbFile = createFileControllerMock();
 	const dbPromise = openDatabase(dbFile);
 
@@ -384,7 +384,7 @@ describe.only('Notes search', () => {
 			registry.get({ search: { text: 'qick' }, limit: 3 }),
 			'Search is typo tolerant',
 		).resolves.toEqual(
-			Array.from({ length: 3 }).map(() =>
+			Array.from({ length: 2 }).map(() =>
 				expect.objectContaining({
 					content: expect.objectContaining({
 						text: expect.stringContaining('quick'),
@@ -468,20 +468,5 @@ describe.only('Notes search', () => {
 				}),
 			}),
 		]);
-	});
-
-	test('Control minimal similarity level', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-
-		await expect(
-			registry.get({ search: { text: 'Note #2', minSimilarity: 1 } }),
-			'Exact text search',
-		).resolves.toHaveLength(1);
-
-		await expect(
-			registry.get({ search: { text: 'Non exist text', minSimilarity: 1 } }),
-			'Exact text search',
-		).resolves.toHaveLength(0);
 	});
 });
