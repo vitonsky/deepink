@@ -15,13 +15,18 @@ const selectWorkspaceObject = (
 	return profile.workspaces[workspaceId] ?? null;
 };
 
-export const createWorkspaceObject = (workspace: { id: string; name: string }) => ({
+export const createWorkspaceObject = (workspace: {
+	id: string;
+	name: string;
+}): WorkspaceData => ({
 	...workspace,
 	touched: false,
 
 	activeNote: null,
 	openedNotes: [],
 	notes: [],
+
+	search: '',
 
 	tags: {
 		selected: null,
@@ -52,6 +57,8 @@ export type WorkspaceData = {
 	activeNote: NoteId | null;
 	openedNotes: INote[];
 	notes: INote[];
+
+	search: string;
 
 	tags: {
 		selected: string | null;
@@ -280,6 +287,18 @@ export const profilesSlice = createSlice({
 			if (!isSelectedTagExists) {
 				workspace.tags.selected = null;
 			}
+		},
+
+		setSearch: (
+			state,
+			{
+				payload: { profileId, workspaceId, search },
+			}: PayloadAction<WorkspaceScoped<{ search: string }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.search = search;
 		},
 	},
 });

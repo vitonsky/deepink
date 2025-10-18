@@ -48,6 +48,15 @@ export const selectActiveNoteId = createWorkspaceSelector(
 	},
 );
 
+export const selectSearch = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return '';
+
+		return workspace.search;
+	},
+);
+
 export const selectActiveNote = createWorkspaceSelector(
 	[selectWorkspaceRoot],
 	(workspace) => {
