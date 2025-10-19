@@ -25,7 +25,7 @@
 		"preserveConstEnums": true,
 		"removeComments": false,
 		"sourceMap": true,
-		"lib": ["es2021", "dom"],
+		"lib": ["ES2024", "dom"],
 		"rootDir": ".",
 		"allowJs": true,
 		"resolveJsonModule": true,
