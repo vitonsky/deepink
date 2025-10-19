@@ -83,7 +83,8 @@ export const useProfileContainers = () => {
 					throw new Error('Key file is not found in profile directory');
 				}
 
-				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
+				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt))
+					.buffer;
 				const key = await decryptKey({
 					encryptedKey: encryptedKeyBuffer,
 					password: password,
