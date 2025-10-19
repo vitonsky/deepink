@@ -143,13 +143,14 @@ describe.sequential('Note ops performance', async () => {
 			'Search note with random text',
 			async function () {
 				await registry.get({
-					search: { text: `Note #${Math.random()}` },
+					// Text with typo
+					search: { text: `powr` },
 					limit: 10,
 				});
 			},
 			{
 				...benchConfig,
-				iterations: 3,
+				iterations: 10,
 			},
 		);
 	});
