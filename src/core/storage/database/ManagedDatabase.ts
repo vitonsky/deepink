@@ -63,7 +63,6 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 		// Auto sync changes
 		this.debouncedSync = debounce(this.sync, {
 			wait: sync.delay,
-			deadline: sync.deadline,
 		});
 
 		this.cleanups.push(dbContainer.onChanged.watch(this.debouncedSync));
