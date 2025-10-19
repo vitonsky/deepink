@@ -4,6 +4,7 @@ import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { BookmarksController } from '../bookmarks/Bookmarks';
 import { LexemesRegistry } from './LexemesRegistry';
 import { NotesController } from './NotesController';
 
@@ -250,6 +251,26 @@ describe('data fetching', () => {
 		);
 
 		await db.close();
+	});
+
+	test('filtered notes by bookmarks', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const bookmarks = new BookmarksController(db);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+		await Promise.all(notesId.slice(0, 2).map((note) => bookmarks.add(note)));
+
+		// get all notes
+		await expect(registry.get()).resolves.toHaveLength(290);
+
+		// get only bookmarked notes
+		await expect(registry.get({ bookmarks: true })).resolves.toHaveLength(2);
+
+		// get only not bookmarked notes
+		await expect(registry.get({ bookmarks: false })).resolves.toHaveLength(288);
 	});
 });
 
