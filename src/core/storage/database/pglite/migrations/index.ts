@@ -21,4 +21,8 @@ export async function convertSQLToMigrationObject(
 export const getMigrationsList = async (): Promise<PGMigration[]> =>
 	Promise.all([
 		convertSQLToMigrationObject('1_init_db', import('./sql/1_init_db.sql')),
+		convertSQLToMigrationObject(
+			'2_add_bookmarks_tab',
+			import('./sql/2_add_bookmarks_tab.sql'),
+		),
 	]);

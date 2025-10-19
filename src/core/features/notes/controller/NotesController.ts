@@ -59,6 +59,12 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 	);
 }
 
+function getBookmarksFilter(bookmarks?: boolean) {
+	if (bookmarks === true) return qb.sql`id IN (SELECT note_id FROM bookmarks)`;
+	if (bookmarks === false) return qb.sql`id NOT IN (SELECT note_id FROM bookmarks)`;
+	return undefined;
+}
+
 function getFetchQuery(
 	{
 		select,
@@ -67,7 +73,7 @@ function getFetchQuery(
 		select: Query<DBTypes>;
 		workspace?: string;
 	},
-	{ limit, page, tags = [], meta, sort }: NotesControllerFetchOptions = {},
+	{ limit, page, tags = [], meta, sort, bookmarks }: NotesControllerFetchOptions = {},
 ) {
 	if (page !== undefined && page < 1)
 		throw new TypeError('Page value must not be less than 1');
@@ -96,7 +102,8 @@ function getFetchQuery(
 							tags,
 					  )}))`,
 			)
-			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
+			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`))
+			.and(getBookmarksFilter(bookmarks)),
 		sort
 			? qb.line(
 					qb.sql`ORDER BY`,
