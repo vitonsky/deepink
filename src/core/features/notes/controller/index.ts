@@ -46,6 +46,11 @@ export type NotesControllerFetchOptions = {
 		by: NoteSortField;
 		order?: 'desc' | 'asc';
 	};
+
+	/**
+	 * Filters notes by bookmarked
+	 */
+	bookmarks?: boolean;
 };
 
 /**
