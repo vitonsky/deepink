@@ -1,6 +1,8 @@
 import React, { forwardRef, ReactNode } from 'react';
 import { Box, StackProps, Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
 
+import { TextSample } from './TextSample';
+
 export const NotePreview = forwardRef<
 	HTMLDivElement,
 	{
@@ -8,8 +10,9 @@ export const NotePreview = forwardRef<
 		text: string;
 		meta?: ReactNode;
 		isSelected?: boolean;
+		textToHighlight?: string;
 	} & StackProps
->(({ title, text, meta, isSelected, ...props }, ref) => {
+>(({ title, text, textToHighlight, meta, isSelected, ...props }, ref) => {
 	const styles = useMultiStyleConfig('NotePreview');
 
 	return (
@@ -24,10 +27,22 @@ export const NotePreview = forwardRef<
 		>
 			<VStack sx={styles.body}>
 				<Text as="h3" sx={styles.title}>
-					{title}
+					<TextSample
+						text={title}
+						highlightText={textToHighlight}
+						lengthLimit={30}
+					/>
 				</Text>
 
-				{text.length > 0 && <Text sx={styles.text}>{text}</Text>}
+				{text.length > 0 ? (
+					<Text sx={styles.text}>
+						<TextSample
+							text={text}
+							highlightText={textToHighlight}
+							lengthLimit={150}
+						/>
+					</Text>
+				) : undefined}
 			</VStack>
 
 			{meta && <Box sx={styles.meta}>{meta}</Box>}
