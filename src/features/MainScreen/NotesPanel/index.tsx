@@ -43,7 +43,7 @@ export const NotesPanel = () => {
 
 	const [searchInput, setSearchInput] = useState(search);
 
-	const debouncedSearchUpdate = useDebouncedCallback(setSearch, 600);
+	const debouncedSearchUpdate = useDebouncedCallback(setSearch, 300);
 	useEffect(() => {
 		debouncedSearchUpdate(searchInput);
 	}, [debouncedSearchUpdate, searchInput]);
