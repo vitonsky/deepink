@@ -3,7 +3,7 @@ import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { BookmarksController } from '../bookmarks/Bookmarks';
+import { BookmarksController } from '../bookmarks/BookmarksController';
 import { NotesController } from './NotesController';
 
 const FAKE_WORKSPACE_ID = getUUID();
