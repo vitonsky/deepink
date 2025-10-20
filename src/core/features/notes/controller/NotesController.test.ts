@@ -108,7 +108,7 @@ describe('CRUD operations', () => {
 });
 
 describe('data fetching', () => {
-	const dbFile = createFileControllerMock();
+	let dbFile: any;
 
 	const notesSample = Array(300)
 		.fill(null)
@@ -119,7 +119,11 @@ describe('data fetching', () => {
 			};
 		});
 
-	test('insert sample entries', async () => {
+	// Ensure each test runs with fresh, isolated data
+	// Insert sample entries
+	beforeEach(async () => {
+		dbFile = createFileControllerMock();
+
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
@@ -264,13 +268,43 @@ describe('data fetching', () => {
 		await Promise.all(notesId.slice(0, 2).map((note) => bookmarks.add(note)));
 
 		// get all notes
-		await expect(registry.get()).resolves.toHaveLength(290);
+		await expect(registry.get()).resolves.toHaveLength(notesSample.length);
 
 		// get only bookmarked notes
 		await expect(registry.get({ bookmarks: true })).resolves.toHaveLength(2);
 
 		// get only not bookmarked notes
-		await expect(registry.get({ bookmarks: false })).resolves.toHaveLength(288);
+		await expect(registry.get({ bookmarks: false })).resolves.toHaveLength(
+			notesSample.length - 2,
+		);
+
+		await db.close();
+	});
+
+	test('filtered notes by archived', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		await registry.updateMeta([notesId[0]], { isArchived: true });
+
+		// get all notes
+		await expect(registry.get()).resolves.toHaveLength(notesSample.length - 1);
+
+		// get only archived notes
+		await expect(registry.get({ meta: { isArchived: true } })).resolves.toHaveLength(
+			1,
+		);
+
+		// get only not archived notes
+		await expect(registry.get({ bookmarks: false })).resolves.toHaveLength(
+			notesSample.length - 1,
+		);
+
+		await db.close();
 	});
 });
 
