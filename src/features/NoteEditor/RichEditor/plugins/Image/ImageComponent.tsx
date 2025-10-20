@@ -10,6 +10,7 @@
 import * as React from 'react';
 import { JSX, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import {
+	$getNodeByKey,
 	$getSelection,
 	$isNodeSelection,
 	COMMAND_PRIORITY_LOW,
@@ -85,27 +86,34 @@ export const LazyImage = React.forwardRef<
 		src: string;
 		width: 'inherit' | number;
 		onError: () => void;
+		onLoad?: () => void;
 	}
->(({ altText, className, src, width, height, maxWidth, onError }, ref): JSX.Element => {
-	const url = useSuspenseImage(src);
+>(
+	(
+		{ altText, className, src, width, height, maxWidth, onError, onLoad },
+		ref,
+	): JSX.Element => {
+		const url = useSuspenseImage(src);
 
-	return (
-		<img
-			ref={ref}
-			className={className || undefined}
-			src={url}
-			alt={altText}
-			style={{
-				height,
-				maxWidth,
-				width,
-				objectFit: 'contain',
-			}}
-			onError={onError}
-			draggable="false"
-		/>
-	);
-});
+		return (
+			<img
+				ref={ref}
+				className={className || undefined}
+				src={url}
+				alt={altText}
+				style={{
+					height,
+					maxWidth,
+					width,
+					objectFit: 'contain',
+				}}
+				onError={onError}
+				onLoad={onLoad}
+				draggable="false"
+			/>
+		);
+	},
+);
 
 function BrokenImage(): JSX.Element {
 	return <div>Broken image</div>;
@@ -198,6 +206,19 @@ export default function ImageComponent({
 		onImageClick,
 	]);
 
+	const markDirty = useCallback(() => {
+		editor.update(() => {
+			const node = $getNodeByKey(nodeKey);
+			if (node) {
+				node.markDirty();
+			}
+		});
+	}, [editor, nodeKey]);
+
+	useEffect(() => {
+		markDirty();
+	}, [isLoadError, markDirty]);
+
 	return (
 		<div
 			ref={containerRef}
@@ -239,6 +260,7 @@ export default function ImageComponent({
 						height={height}
 						maxWidth={maxWidth}
 						onError={() => setIsLoadError(true)}
+						onLoad={markDirty}
 					/>
 				)}
 			</Suspense>
