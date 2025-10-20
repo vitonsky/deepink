@@ -4,6 +4,7 @@ export type NoteMeta = {
 	isSnapshotsDisabled: boolean;
 	isVisible: boolean;
 	isDeleted: boolean;
+	isArchived: boolean;
 };
 
 export type NoteSortField = 'id' | 'createdAt' | 'updatedAt';

@@ -24,6 +24,7 @@ const RowScheme = z
 		history_disabled: z.boolean(),
 		visible: z.boolean(),
 		deleted: z.boolean(),
+		archived: z.boolean(),
 	})
 	.transform(
 		({
@@ -35,6 +36,7 @@ const RowScheme = z
 			history_disabled,
 			visible,
 			deleted,
+			archived,
 		}): INote => ({
 			id,
 			createdTimestamp: created_at.getTime(),
@@ -42,6 +44,7 @@ const RowScheme = z
 			isSnapshotsDisabled: history_disabled,
 			isVisible: visible,
 			isDeleted: deleted,
+			isArchived: archived,
 			content: { title, text },
 		}),
 	);
@@ -60,6 +63,8 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 					return ['visible', Boolean(value)];
 				case 'isDeleted':
 					return ['deleted', Boolean(value)];
+				case 'isArchived':
+					return ['archived', Boolean(value)];
 			}
 		}),
 	);
@@ -95,6 +100,7 @@ function getFetchQuery(
 	const metaEntries = Object.entries(
 		formatNoteMeta({
 			isVisible: true,
+			isArchived: false,
 			...meta,
 		}),
 	);
