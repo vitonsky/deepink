@@ -3,6 +3,7 @@ import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { BookmarksController } from '../bookmarks/BookmarksController';
 import { NotesController } from './NotesController';
 
 const FAKE_WORKSPACE_ID = getUUID();
@@ -97,7 +98,7 @@ describe('CRUD operations', () => {
 });
 
 describe('data fetching', () => {
-	const dbFile = createFileControllerMock();
+	let dbFile: any;
 
 	const notesSample = Array(300)
 		.fill(null)
@@ -108,7 +109,11 @@ describe('data fetching', () => {
 			};
 		});
 
-	test('insert sample entries', async () => {
+	// Ensure each test runs with fresh, isolated data
+	// Insert sample entries
+	beforeEach(async () => {
+		dbFile = createFileControllerMock();
+
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
@@ -181,6 +186,48 @@ describe('data fetching', () => {
 		);
 		await expect(registry.getLength({ meta: { isVisible: true } })).resolves.toBe(
 			notesSample.length - 10,
+		);
+
+		await db.close();
+	});
+
+	test('filtered notes by bookmarks', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const bookmarks = new BookmarksController(db);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+		await Promise.all(notesId.slice(0, 2).map((note) => bookmarks.add(note)));
+
+		// get only bookmarked notes
+		await expect(registry.getLength({ bookmarks: true })).resolves.toBe(2);
+
+		// get only not bookmarked notes
+		await expect(registry.getLength({ bookmarks: false })).resolves.toBe(
+			notesSample.length - 2,
+		);
+
+		await db.close();
+	});
+
+	test('filtered notes by archived', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		await registry.updateMeta([notesId[0]], { isArchived: true });
+
+		// get only archived notes
+		await expect(registry.getLength({ meta: { isArchived: true } })).resolves.toBe(1);
+
+		// get only not archived notes
+		await expect(registry.getLength({ meta: { isArchived: false } })).resolves.toBe(
+			notesSample.length - 1,
 		);
 
 		await db.close();

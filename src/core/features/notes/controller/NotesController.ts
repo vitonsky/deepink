@@ -22,6 +22,7 @@ const RowScheme = z
 		updated_at: z.date(),
 		history_disabled: z.boolean(),
 		visible: z.boolean(),
+		archived: z.boolean(),
 	})
 	.transform(
 		({
@@ -32,12 +33,14 @@ const RowScheme = z
 			updated_at,
 			history_disabled,
 			visible,
+			archived,
 		}): INote => ({
 			id,
 			createdTimestamp: created_at.getTime(),
 			updatedTimestamp: updated_at.getTime(),
 			isSnapshotsDisabled: history_disabled,
 			isVisible: visible,
+			isArchived: archived,
 			content: { title, text },
 		}),
 	);
@@ -54,9 +57,17 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 					return ['history_disabled', Boolean(value)];
 				case 'isVisible':
 					return ['visible', Boolean(value)];
+				case 'isArchived':
+					return ['archived', Boolean(value)];
 			}
 		}),
 	);
+}
+
+function getBookmarksFilter(bookmarks?: boolean) {
+	if (bookmarks === true) return qb.sql`id IN (SELECT note_id FROM bookmarks)`;
+	if (bookmarks === false) return qb.sql`id NOT IN (SELECT note_id FROM bookmarks)`;
+	return undefined;
 }
 
 function getFetchQuery(
@@ -67,7 +78,7 @@ function getFetchQuery(
 		select: Query<DBTypes>;
 		workspace?: string;
 	},
-	{ limit, page, tags = [], meta, sort }: NotesControllerFetchOptions = {},
+	{ limit, page, tags = [], meta, sort, bookmarks }: NotesControllerFetchOptions = {},
 ) {
 	if (page !== undefined && page < 1)
 		throw new TypeError('Page value must not be less than 1');
@@ -75,6 +86,7 @@ function getFetchQuery(
 	const metaEntries = Object.entries(
 		formatNoteMeta({
 			isVisible: true,
+			isArchived: false,
 			...meta,
 		}),
 	);
@@ -96,7 +108,12 @@ function getFetchQuery(
 							tags,
 					  )}))`,
 			)
-			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
+			.and(
+				metaEntries
+					.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)
+					.reduce((acc, value) => qb.sql`${acc} AND ${value}`),
+			)
+			.and(getBookmarksFilter(bookmarks)),
 		sort
 			? qb.line(
 					qb.sql`ORDER BY`,

@@ -3,6 +3,7 @@ import { INote, INoteContent, NoteId } from '..';
 export type NoteMeta = {
 	isSnapshotsDisabled: boolean;
 	isVisible: boolean;
+	isArchived: boolean;
 };
 
 export type NoteSortField = 'id' | 'createdAt' | 'updatedAt';
@@ -41,6 +42,11 @@ export type NotesControllerFetchOptions = {
 		by: NoteSortField;
 		order?: 'desc' | 'asc';
 	};
+
+	/**
+	 * Filters notes by bookmarked
+	 */
+	bookmarks?: boolean;
 };
 
 /**
