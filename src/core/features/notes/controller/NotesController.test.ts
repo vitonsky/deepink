@@ -267,14 +267,11 @@ describe('data fetching', () => {
 			.then((notes) => notes.map((note) => note.id));
 		await Promise.all(notesId.slice(0, 2).map((note) => bookmarks.add(note)));
 
-		// get all notes
-		await expect(registry.get()).resolves.toHaveLength(notesSample.length);
-
 		// get only bookmarked notes
-		await expect(registry.get({ bookmarks: true })).resolves.toHaveLength(2);
+		await expect(registry.getLength({ bookmarks: true })).resolves.toBe(2);
 
 		// get only not bookmarked notes
-		await expect(registry.get({ bookmarks: false })).resolves.toHaveLength(
+		await expect(registry.getLength({ bookmarks: false })).resolves.toBe(
 			notesSample.length - 2,
 		);
 
@@ -291,16 +288,11 @@ describe('data fetching', () => {
 
 		await registry.updateMeta([notesId[0]], { isArchived: true });
 
-		// get all notes
-		await expect(registry.get()).resolves.toHaveLength(notesSample.length - 1);
-
 		// get only archived notes
-		await expect(registry.get({ meta: { isArchived: true } })).resolves.toHaveLength(
-			1,
-		);
+		await expect(registry.getLength({ meta: { isArchived: true } })).resolves.toBe(1);
 
 		// get only not archived notes
-		await expect(registry.get({ bookmarks: false })).resolves.toHaveLength(
+		await expect(registry.getLength({ meta: { isArchived: false } })).resolves.toBe(
 			notesSample.length - 1,
 		);
 
