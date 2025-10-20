@@ -219,10 +219,11 @@ describe('data fetching', () => {
 
 		const tagsList = await tags.getTags();
 
+		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string;
 		const noteId = await registry
 			.get({
 				limit: 1,
-				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+				tags: [barTag],
 			})
 			.then((notes) => notes.map((note) => note.id));
 
@@ -230,7 +231,7 @@ describe('data fetching', () => {
 		await registry.updateMeta(noteId, { isDeleted: true });
 		await expect(
 			registry.get({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+				tags: [barTag],
 				meta: { isDeleted: true },
 			}),
 		).resolves.toHaveLength(1);
@@ -239,7 +240,7 @@ describe('data fetching', () => {
 		await registry.updateMeta(noteId, { isDeleted: false });
 		await expect(
 			registry.get({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+				tags: [barTag],
 				meta: { isDeleted: true },
 			}),
 		).resolves.toHaveLength(0);
