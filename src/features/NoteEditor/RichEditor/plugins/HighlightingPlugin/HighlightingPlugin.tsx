@@ -3,7 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { $getEditor, $getNodeByKey, $getRoot, LexicalNode, TextNode } from 'lexical';
 import { Box } from '@chakra-ui/react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { mergeRegister } from '@lexical/utils';
 import { findTextSegments } from '@utils/text/search';
+
+import { registerMutationObserver } from '../../utils/registerMutationObserver';
 
 const $getTextNodeHighlights = (node: LexicalNode, search: string) => {
 	const text = node.getTextContent();
@@ -37,46 +40,55 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 	useEffect(() => {
 		if (!search) return;
 
-		editor.read(() => {
-			const root = $getRoot();
-			const textNodes = root.getAllTextNodes();
-
-			const newRanges: Record<string, Range[]> = {};
-			for (const node of textNodes) {
-				newRanges[node.getKey()] = $getTextNodeHighlights(node, search);
-			}
-
-			setHighlights((state) => ({ ...state, ...newRanges }));
-		});
-
-		const unsubscribe = editor.registerMutationListener(TextNode, (mutations) => {
+		// Find search query immediately
+		requestAnimationFrame(() => {
 			editor.read(() => {
+				const root = $getRoot();
+				const textNodes = root.getAllTextNodes();
+
 				const newRanges: Record<string, Range[]> = {};
-				for (const [key, mutation] of mutations) {
-					// Delete node
-					if (mutation === 'destroyed') {
-						setHighlights((state) => {
-							if (key in state) {
-								const newState = { ...state };
-								delete newState[key];
-								return newState;
-							}
-
-							return state;
-						});
-
-						return;
-					}
-
-					const node = $getNodeByKey(key);
-					if (node) {
-						newRanges[key] = $getTextNodeHighlights(node, search);
-					}
+				for (const node of textNodes) {
+					newRanges[node.getKey()] = $getTextNodeHighlights(node, search);
 				}
 
 				setHighlights((state) => ({ ...state, ...newRanges }));
 			});
 		});
+
+		const unsubscribe = mergeRegister(
+			registerMutationObserver(editor, () => {
+				// Redraw markers, since position may be updated
+				setHighlights((state) => ({ ...state }));
+			}),
+			editor.registerMutationListener(TextNode, (mutations) => {
+				editor.read(() => {
+					const newRanges: Record<string, Range[]> = {};
+					for (const [key, mutation] of mutations) {
+						// Delete node
+						if (mutation === 'destroyed') {
+							setHighlights((state) => {
+								if (key in state) {
+									const newState = { ...state };
+									delete newState[key];
+									return newState;
+								}
+
+								return state;
+							});
+
+							return;
+						}
+
+						const node = $getNodeByKey(key);
+						if (node) {
+							newRanges[key] = $getTextNodeHighlights(node, search);
+						}
+					}
+
+					setHighlights((state) => ({ ...state, ...newRanges }));
+				});
+			}),
+		);
 
 		return () => {
 			unsubscribe();
