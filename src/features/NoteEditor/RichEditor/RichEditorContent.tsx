@@ -63,7 +63,6 @@ export const RichEditorContent = ({
 						maxH="100%"
 						outline="none"
 						padding="1rem"
-						zIndex={1}
 						{...props}
 						as={ContentEditable}
 					/>
@@ -106,9 +105,9 @@ export const RichEditorContent = ({
 			<TablePlugin />
 			<HorizontalRulePlugin />
 
-			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
-
 			<HighlightingPlugin search={search} />
+
+			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
 		</Box>
 	);
 };

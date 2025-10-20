@@ -108,17 +108,18 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 						({ x, y, width, height }, rectIndex) => (
 							<Box
 								key={`${key}-${index}-${rectIndex}`}
-								sx={{
-									left: `${x - rootRect.x}px`,
-									top: `${y - rootRect.y}px`,
-									width: `${width}px`,
-									height: `${height}px`,
-								}}
 								position="absolute"
 								pointerEvents="none"
 								opacity=".4"
 								transform="scale(1.1)"
 								backgroundColor="yellow"
+								blendMode="multiply"
+								style={{
+									left: `${x - rootRect.x}px`,
+									top: `${y - rootRect.y}px`,
+									width: `${width}px`,
+									height: `${height}px`,
+								}}
 							/>
 						),
 					),
