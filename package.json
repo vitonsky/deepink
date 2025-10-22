@@ -8,6 +8,7 @@
 		"test": "vitest",
 		"clean": "rm -Rf dist out",
 		"build:dev": "npm run prepare-electron-deps && webpack -w",
+		"typecheck": "tsc --noEmit --watch",
 		"start": "electron-forge start -- --no-sandbox",
 		"package": "electron-forge package",
 		"make": "electron-forge make",
