@@ -13,7 +13,7 @@ export const useCommand = () => {
 		<K extends keyof CommandPayloadsMap>(
 			commandName: K,
 			...args: CommandPayloadsMap[K] extends void
-				? [payload?: undefined]
+				? [payload?: void]
 				: [payload: CommandPayloadsMap[K]]
 		) => {
 			const [payload] = args;
