@@ -36,7 +36,6 @@ export type NotesControllerFetchOptions = {
 
 	search?: {
 		text: string;
-		minSimilarity?: number;
 	};
 
 	/**
