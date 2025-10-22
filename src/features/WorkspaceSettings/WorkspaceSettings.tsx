@@ -163,6 +163,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		await workspacesManager.delete([currentWorkspace.workspaceId]);
 		await workspaces.update();
 	}, [
+		abortImport,
 		attachments,
 		currentWorkspace.profileId,
 		currentWorkspace.workspaceId,
@@ -238,7 +239,6 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 								isDisabled={notesExport.progress !== null}
 								onClick={async () => {
 									await notesExport.exportNotes(
-										true,
 										buildFileName(workspaceData?.name, 'backup'),
 									);
 								}}

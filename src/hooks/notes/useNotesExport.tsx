@@ -12,7 +12,6 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { requestDirectoryPath } from '@utils/fs/client';
 import { escapeFileName, getResolvedPath } from '@utils/fs/paths';
 import { uniqueName } from '@utils/fs/uniqueName';
 
@@ -71,16 +70,13 @@ export const useNotesExport = () => {
 	const filesRegistry = useFilesRegistry();
 
 	const exportNotes = useCallback(
-		async (saveAsZip: boolean, name?: string) => {
+		async (name?: string) => {
 			if (status) {
 				console.warn(
 					'Reject exporting request, because another export process in run',
 				);
 				return;
 			}
-
-			const directory = await requestDirectoryPath();
-			if (!directory) return;
 
 			setStatus({
 				status: 'notesExport',
@@ -113,25 +109,19 @@ export const useNotesExport = () => {
 			setStatus(null);
 
 			// Save
-			await dumpFilesStorage(files, directory, {
-				zip: saveAsZip,
-				name,
-			});
+			await dumpFilesStorage(files, { name });
 		},
 		[filesRegistry, notesRegistry, status, tagsRegistry],
 	);
 
 	const exportNote = useCallback(
-		async (noteId: NoteId, saveAsZip: boolean, name?: string) => {
+		async (noteId: NoteId, name?: string) => {
 			if (status) {
 				console.warn(
 					'Reject exporting request, because another export process in run',
 				);
 				return;
 			}
-
-			const directory = await requestDirectoryPath();
-			if (!directory) return;
 
 			setStatus({
 				status: 'noteExport',
@@ -153,10 +143,7 @@ export const useNotesExport = () => {
 			setStatus(null);
 
 			// Save
-			await dumpFilesStorage(files, directory, {
-				zip: saveAsZip,
-				name,
-			});
+			await dumpFilesStorage(files, { name });
 		},
 		[filesRegistry, notesRegistry, status, tagsRegistry],
 	);
