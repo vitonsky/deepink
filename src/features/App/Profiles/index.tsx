@@ -1,8 +1,9 @@
 import React, { FC } from 'react';
+import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
-import { Profile, ProfileControlsContext } from '../Profile';
+import { Profile, ProfileControls, ProfileControlsContext } from '../Profile';
 import { ProfilesApi } from './hooks/useProfileContainers';
 
 export type ProfilesProps = {
@@ -22,6 +23,9 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				const profile = profileContainer.getContent();
 				const controls = {
 					profile,
+					api: {
+						lexemes: new LexemesRegistry(profile.db),
+					},
 					close: () => {
 						profilesApi.events.profileClosed(profileContainer);
 
@@ -31,7 +35,7 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 							}),
 						);
 					},
-				};
+				} satisfies ProfileControls;
 
 				return (
 					<ProfileControlsContext.Provider

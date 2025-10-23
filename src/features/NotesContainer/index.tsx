@@ -57,10 +57,13 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	const updateNote = useImmutableCallback(
 		async (note: INote) => {
 			noteUpdated(note);
+
 			await notesRegistry.update(note.id, note.content);
 			await notesRegistry.updateMeta([note.id], {
 				isSnapshotsDisabled: note.isSnapshotsDisabled,
 			});
+			eventBus.emit(WorkspaceEvents.NOTE_EDITED, note.id);
+
 			await updateNotes();
 
 			// Reset sync job if any

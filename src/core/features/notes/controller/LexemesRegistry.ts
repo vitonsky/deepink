@@ -20,7 +20,7 @@ export class LexemesRegistry {
 		return rows;
 	}
 
-	public async prune(): Promise<any> {
+	public async prune(): Promise<string[]> {
 		return this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
