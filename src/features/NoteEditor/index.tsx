@@ -119,7 +119,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedUpdateNote = useCallback(
 		debounce((data: { title: string; text: string }) => {
-			console.log('Update note in DB');
+			console.debug('Update note in DB');
 			updateNoteRef.current(data);
 		}, 800),
 		[],
