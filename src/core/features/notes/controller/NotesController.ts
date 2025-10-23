@@ -267,51 +267,68 @@ export class NotesController implements INotesController {
 
 			// Update lexemes list
 			await db.query(
-				qb.sql`INSERT INTO lexemes(word) SELECT word FROM ts_stat('SELECT text_tsv FROM notes WHERE id=''' || ${id} || '''') ON CONFLICT DO NOTHING;`,
+				qb.sql`INSERT INTO lexemes(word, query) SELECT word, plainto_tsquery('simple', word) AS query FROM ts_stat('SELECT text_tsv FROM notes WHERE id=''' || ${id} || '''') ON CONFLICT DO NOTHING;`,
 			);
 
 			return id;
 		});
 	}
 
-	// TODO: delete lexemes used by this note before update
 	public async update(id: string, updatedNote: INoteContent) {
-		const db = wrapDB(this.db.get());
+		await this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
 
-		const updateTime = new Date().getTime();
-		const result = await db.query(
-			qb.line(
-				'UPDATE notes SET',
-				qb.values({
-					title: updatedNote.title,
-					text: updatedNote.text,
-					// TODO: should we really update note by update meta?
-					updated_at: updateTime,
-				}),
-				qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
-			),
-		);
+			const updateTime = new Date().getTime();
+			const result = await db.query(
+				qb.line(
+					'UPDATE notes SET',
+					qb.values({
+						title: updatedNote.title,
+						text: updatedNote.text,
+						// TODO: should we really update note by update meta?
+						updated_at: updateTime,
+					}),
+					qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
+				),
+			);
 
-		if (!result.affectedRows || result.affectedRows < 1) {
-			throw new Error('Note did not updated');
-		}
+			// Delete unused lexemes
+			await db.query(
+				qb.sql`DELETE FROM lexemes l WHERE NOT EXISTS (SELECT 1 FROM notes n WHERE n.text_tsv @@ l.query LIMIT 1)`,
+			);
+
+			// Update lexemes list
+			await db.query(
+				qb.sql`INSERT INTO lexemes(word, query) SELECT word, plainto_tsquery('simple', word) AS query FROM ts_stat('SELECT text_tsv FROM notes WHERE id=''' || ${id} || '''') ON CONFLICT DO NOTHING;`,
+			);
+
+			if (!result.affectedRows || result.affectedRows < 1) {
+				throw new Error('Note did not updated');
+			}
+		});
 	}
 
-	// TODO: delete lexemes used by notes, before deletion notes
 	public async delete(ids: NoteId[]): Promise<void> {
-		const db = wrapDB(this.db.get());
+		await this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
 
-		const { affectedRows = 0 } = await db.query(
-			qb.sql`DELETE FROM notes WHERE workspace_id=${
-				this.workspace
-			} AND id IN (${qb.values(ids)})`,
-		);
-
-		if (affectedRows !== ids.length) {
-			console.warn(
-				`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
+			const { affectedRows = 0 } = await db.query(
+				qb.sql`DELETE FROM notes WHERE workspace_id=${
+					this.workspace
+				} AND id IN (${qb.values(ids)})`,
 			);
-		}
+
+			if (affectedRows !== ids.length) {
+				console.warn(
+					`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
+				);
+			}
+
+			// Delete unused lexemes
+			await db.query(
+				qb.sql`DELETE FROM lexemes l WHERE NOT EXISTS (SELECT 1 FROM notes n WHERE n.text_tsv @@ l.query LIMIT 1)`,
+			);
+		});
 	}
 
 	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
@@ -327,5 +344,19 @@ export class NotesController implements INotesController {
 				`Not match updated entries length. Expected: ${ids.length}; Updated: ${affectedRows}`,
 			);
 		}
+	}
+
+	/**
+	 * Inner method for debug purposes only
+	 */
+	public async getLexemes(): Promise<string[]> {
+		const db = wrapDB(this.db.get());
+
+		const { rows } = await db.query(
+			qb.sql`SELECT word FROM lexemes`,
+			z.object({ word: z.string() }).transform(({ word }) => word),
+		);
+
+		return rows;
 	}
 }

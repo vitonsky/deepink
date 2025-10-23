@@ -469,4 +469,43 @@ describe('Notes search', () => {
 			}),
 		]);
 	});
+
+	test('Lexemes list must updates automatically', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const [note] = await registry.get({ search: { text: 'leaped' }, limit: 1 });
+
+		expect(note).not.toBeUndefined();
+		expect(note.content.text, 'Found expected note').toBe(
+			'A fast auburn fox leaped above a sleepy canine',
+		);
+
+		await expect(
+			registry.getLexemes(),
+			'Lexemes list have words of note text',
+		).resolves.toContain('leaped');
+		await expect(
+			registry.getLexemes(),
+			'Lexemes list have no a target word for test',
+		).resolves.not.toContain('unique');
+
+		await registry.update(note.id, {
+			title: 'Updated note',
+			text: 'Updated text with unique text',
+		});
+		await expect(
+			registry.getLexemes(),
+			'Unused lexeme must be deleted',
+		).resolves.not.toContain('leaped');
+		await expect(
+			registry.getLexemes(),
+			'New lexemes must be added',
+		).resolves.toContain('unique');
+
+		await expect(
+			registry.get({ search: { text: 'unique text' }, limit: 1 }),
+			'Note can be found by updated text',
+		).resolves.toEqual([expect.objectContaining({ id: note.id })]);
+	});
 });

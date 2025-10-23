@@ -11,7 +11,10 @@ ALTER TABLE notes
 CREATE INDEX notes_text_tsv_idx ON notes USING GIN (text_tsv);
 
 -- Lexemes to correct typos
-CREATE TABLE lexemes(word text PRIMARY KEY);
+CREATE TABLE lexemes(
+  word text PRIMARY KEY,
+  query tsquery NOT NULL
+);
 CREATE INDEX ON lexemes USING gin (word gin_trgm_ops);
 
 -- Utils to build query with alternative lexemes while search query
