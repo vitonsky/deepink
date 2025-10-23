@@ -265,11 +265,6 @@ export class NotesController implements INotesController {
 				z.object({ id: z.string() }).transform(({ id }) => id),
 			);
 
-			// Update lexemes list
-			await db.query(
-				qb.sql`INSERT INTO lexemes(word, query) SELECT word, plainto_tsquery('simple', word) AS query FROM ts_stat('SELECT text_tsv FROM notes WHERE id=''' || ${id} || '''') ON CONFLICT DO NOTHING;`,
-			);
-
 			return id;
 		});
 	}
@@ -290,16 +285,6 @@ export class NotesController implements INotesController {
 					}),
 					qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
 				),
-			);
-
-			// Delete unused lexemes
-			await db.query(
-				qb.sql`DELETE FROM lexemes l WHERE NOT EXISTS (SELECT 1 FROM notes n WHERE n.text_tsv @@ l.query LIMIT 1)`,
-			);
-
-			// Update lexemes list
-			await db.query(
-				qb.sql`INSERT INTO lexemes(word, query) SELECT word, plainto_tsquery('simple', word) AS query FROM ts_stat('SELECT text_tsv FROM notes WHERE id=''' || ${id} || '''') ON CONFLICT DO NOTHING;`,
 			);
 
 			if (!result.affectedRows || result.affectedRows < 1) {
@@ -323,11 +308,6 @@ export class NotesController implements INotesController {
 					`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
 				);
 			}
-
-			// Delete unused lexemes
-			await db.query(
-				qb.sql`DELETE FROM lexemes l WHERE NOT EXISTS (SELECT 1 FROM notes n WHERE n.text_tsv @@ l.query LIMIT 1)`,
-			);
 		});
 	}
 
@@ -344,19 +324,5 @@ export class NotesController implements INotesController {
 				`Not match updated entries length. Expected: ${ids.length}; Updated: ${affectedRows}`,
 			);
 		}
-	}
-
-	/**
-	 * Inner method for debug purposes only
-	 */
-	public async getLexemes(): Promise<string[]> {
-		const db = wrapDB(this.db.get());
-
-		const { rows } = await db.query(
-			qb.sql`SELECT word FROM lexemes`,
-			z.object({ word: z.string() }).transform(({ word }) => word),
-		);
-
-		return rows;
 	}
 }
