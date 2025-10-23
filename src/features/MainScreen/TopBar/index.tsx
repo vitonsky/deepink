@@ -2,10 +2,9 @@ import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { FaXmark } from 'react-icons/fa6';
 import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
-import { INotesController } from '@core/features/notes/controller';
 import { getNoteTitle } from '@core/features/notes/utils';
 
-import { useDefaultNoteContextMenu } from '../NotesList/NoteContextMenu/useDefaultNoteContextMenu';
+import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -16,9 +15,6 @@ export type TopBarProps = {
 	notes: INote[];
 
 	updateNotes: () => void;
-
-	// TODO: receive with react context
-	notesRegistry: INotesController;
 };
 
 // TODO: improve tabs style
@@ -29,11 +25,9 @@ export const TopBar: FC<TopBarProps> = ({
 	onClose,
 	onPick,
 	updateNotes,
-	notesRegistry,
 }) => {
-	const openNoteContextMenu = useDefaultNoteContextMenu({
+	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: onClose,
-		notesRegistry,
 		updateNotes,
 	});
 
@@ -96,6 +90,9 @@ export const TopBar: FC<TopBarProps> = ({
 							flex="1 1 auto"
 							marginBottom={0}
 							title={title}
+							textDecorationLine={
+								note.isDeleted ? 'line-through' : undefined
+							}
 							onMouseDown={(evt) => {
 								const isLeftButton = evt.button === 0;
 								if (isLeftButton) return;
@@ -109,6 +106,12 @@ export const TopBar: FC<TopBarProps> = ({
 
 								onClose(note.id);
 							}}
+							onContextMenu={(evt) => {
+								openNoteContextMenu(note, {
+									x: evt.pageX,
+									y: evt.pageY,
+								});
+							}}
 						>
 							<HStack gap=".5rem" w="100%" justifyContent="space-between">
 								<Text
@@ -116,12 +119,6 @@ export const TopBar: FC<TopBarProps> = ({
 									whiteSpace="nowrap"
 									overflow="hidden"
 									textOverflow="ellipsis"
-									onContextMenu={(evt) => {
-										openNoteContextMenu(note.id, {
-											x: evt.pageX,
-											y: evt.pageY,
-										});
-									}}
 								>
 									{title}
 								</Text>

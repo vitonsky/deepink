@@ -19,6 +19,7 @@ export const NoteVersions = ({
 	onVersionApply,
 	onShowVersion,
 	recordControl,
+	isReadOnly,
 }: {
 	noteId: string;
 	onSnapshot: () => void;
@@ -29,6 +30,7 @@ export const NoteVersions = ({
 		isDisabled: boolean;
 		onChange: (isDisabled: boolean) => void;
 	};
+	isReadOnly?: Boolean;
 }) => {
 	const noteHistory = useNotesHistory();
 
@@ -57,13 +59,15 @@ export const NoteVersions = ({
 	return (
 		<VStack w="100%" maxH="100%">
 			<HStack w="100%">
-				<Button
-					size="sm"
-					title="Save the current state of this note as a new version in history"
-					onClick={onSnapshot}
-				>
-					<TextWithIcon icon={<FaFloppyDisk />}>Save version</TextWithIcon>
-				</Button>
+				{!isReadOnly && (
+					<Button
+						size="sm"
+						title="Save the current state of this note as a new version in history"
+						onClick={onSnapshot}
+					>
+						<TextWithIcon icon={<FaFloppyDisk />}>Save version</TextWithIcon>
+					</Button>
+				)}
 				<Button
 					size="sm"
 					title="Remove all saved versions of this note permanently"
@@ -103,14 +107,18 @@ export const NoteVersions = ({
 					<TextWithIcon icon={<FaEraser />}>Delete all</TextWithIcon>
 				</Button>
 
-				<HStack as="label">
-					<Switch
-						size="sm"
-						isChecked={recordControl.isDisabled}
-						onChange={(event) => recordControl.onChange(event.target.checked)}
-					/>{' '}
-					<Text>Don't record changes for this note</Text>
-				</HStack>
+				{!isReadOnly && (
+					<HStack as="label">
+						<Switch
+							size="sm"
+							isChecked={recordControl.isDisabled}
+							onChange={(event) =>
+								recordControl.onChange(event.target.checked)
+							}
+						/>{' '}
+						<Text>Don't record changes for this note</Text>
+					</HStack>
+				)}
 			</HStack>
 
 			<Box w="100%" overflow="auto" display="flex" flex={1} flexFlow="column">
@@ -144,74 +152,79 @@ export const NoteVersions = ({
 									</Text>
 								</HStack>
 								<HStack marginLeft="auto">
-									<Button
-										size="sm"
-										title="Apply version"
-										onClick={(evt) => {
-											const applyVersion = () =>
-												onVersionApply(version);
+									{!isReadOnly && (
+										<Button
+											size="sm"
+											title="Apply version"
+											onClick={(evt) => {
+												const applyVersion = () =>
+													onVersionApply(version);
 
-											// Apply immediately
-											if (evt.ctrlKey) {
-												applyVersion();
-												return;
-											}
+												// Apply immediately
+												if (evt.ctrlKey) {
+													applyVersion();
+													return;
+												}
 
-											confirm(({ onClose }) => ({
-												title: 'Apply note version',
-												content: (
-													<VStack gap="1rem" align="start">
-														<Text>
-															You are about to apply note
-															version{' '}
-															<Text
-																as="span"
-																color="typography.secondary"
-															>
-																{formatNoteVersionPreview(
-																	version,
-																)}
+												confirm(({ onClose }) => ({
+													title: 'Apply note version',
+													content: (
+														<VStack gap="1rem" align="start">
+															<Text>
+																You are about to apply
+																note version{' '}
+																<Text
+																	as="span"
+																	color="typography.secondary"
+																>
+																	{formatNoteVersionPreview(
+																		version,
+																	)}
+																</Text>
+																.
 															</Text>
-															.
-														</Text>
-														<Text>
-															This action will replace
-															current note data with text of
-															a selected snapshot. Are you
-															sure?
-														</Text>
-													</VStack>
-												),
-												action: (
-													<>
-														<Button
-															variant="primary"
-															onClick={() => {
-																applyVersion();
-																onClose();
-															}}
-														>
-															Apply
-														</Button>
-														<Button
-															variant="primary"
-															onClick={() => {
-																onShowVersion(version);
-																onClose();
-															}}
-														>
-															Preview
-														</Button>
-														<Button onClick={onClose}>
-															Cancel
-														</Button>
-													</>
-												),
-											}));
-										}}
-									>
-										<FaCheck />
-									</Button>
+															<Text>
+																This action will replace
+																current note data with
+																text of a selected
+																snapshot. Are you sure?
+															</Text>
+														</VStack>
+													),
+													action: (
+														<>
+															<Button
+																variant="primary"
+																onClick={() => {
+																	applyVersion();
+																	onClose();
+																}}
+															>
+																Apply
+															</Button>
+															<Button
+																variant="primary"
+																onClick={() => {
+																	onShowVersion(
+																		version,
+																	);
+																	onClose();
+																}}
+															>
+																Preview
+															</Button>
+															<Button onClick={onClose}>
+																Cancel
+															</Button>
+														</>
+													),
+												}));
+											}}
+										>
+											<FaCheck />
+										</Button>
+									)}
+
 									<Button
 										size="sm"
 										title="Open version"

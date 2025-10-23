@@ -22,6 +22,7 @@ const RowScheme = z
 		updated_at: z.date(),
 		history_disabled: z.boolean(),
 		visible: z.boolean(),
+		deleted: z.boolean(),
 	})
 	.transform(
 		({
@@ -32,12 +33,14 @@ const RowScheme = z
 			updated_at,
 			history_disabled,
 			visible,
+			deleted,
 		}): INote => ({
 			id,
 			createdTimestamp: created_at.getTime(),
 			updatedTimestamp: updated_at.getTime(),
 			isSnapshotsDisabled: history_disabled,
 			isVisible: visible,
+			isDeleted: deleted,
 			content: { title, text },
 		}),
 	);
@@ -54,6 +57,8 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 					return ['history_disabled', Boolean(value)];
 				case 'isVisible':
 					return ['visible', Boolean(value)];
+				case 'isDeleted':
+					return ['deleted', Boolean(value)];
 			}
 		}),
 	);
@@ -96,7 +101,11 @@ function getFetchQuery(
 							tags,
 					  )}))`,
 			)
-			.and(...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)),
+			.and(
+				metaEntries
+					.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`)
+					.reduce((acc, value) => qb.sql`${acc} AND ${value}`),
+			),
 		sort
 			? qb.line(
 					qb.sql`ORDER BY`,

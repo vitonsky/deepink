@@ -3,6 +3,7 @@ import { INote, INoteContent, NoteId } from '..';
 export type NoteMeta = {
 	isSnapshotsDisabled: boolean;
 	isVisible: boolean;
+	isDeleted: boolean;
 };
 
 export type NoteSortField = 'id' | 'createdAt' | 'updatedAt';
