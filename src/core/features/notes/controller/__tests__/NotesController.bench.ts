@@ -157,4 +157,14 @@ describe.sequential('Note ops performance', async () => {
 			},
 		);
 	});
+
+	describe('Lexemes pruning', () => {
+		bench(
+			'Prune lexemes',
+			async () => {
+				await lexemes.prune();
+			},
+			{ ...benchConfig, iterations: 10 },
+		);
+	});
 });
