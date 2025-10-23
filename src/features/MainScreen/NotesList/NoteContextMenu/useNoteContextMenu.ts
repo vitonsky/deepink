@@ -33,9 +33,11 @@ export type ContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
 };
+import { useCallback } from 'react';
+import { INote } from '@core/features/notes';
 import { useDynamicContextMenu } from '@hooks/useDynamicContextMenu';
 
-import { defaultNoteMenu } from './noteMenus';
+import { defaultNoteMenu, deletedNoteMenu } from './noteMenus';
 import {
 	ContextMenuOptions,
 	useNoteContextMenuCallback,
@@ -181,5 +183,14 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 		updateNotes,
 	});
 
-	return useDynamicContextMenu(noteContextMenuCallback, defaultNoteMenu);
+	const openMenu = useDynamicContextMenu(noteContextMenuCallback, defaultNoteMenu);
+
+	return useCallback(
+		(note: INote, point: { x: number; y: number }) => {
+			const menu = note.isDeleted ? deletedNoteMenu : defaultNoteMenu;
+
+			openMenu(note.id, point, menu);
+		},
+		[openMenu],
+	);
 };
