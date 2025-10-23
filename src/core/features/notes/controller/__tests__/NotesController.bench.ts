@@ -4,6 +4,7 @@ import { bench } from 'vitest';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { LexemesRegistry } from '../LexemesRegistry';
 import { NotesController } from '../NotesController';
 
 function getRandomNumber(min: number, max: number) {
@@ -27,6 +28,7 @@ describe.sequential('Note ops performance', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
 	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+	const lexemes = new LexemesRegistry(db);
 
 	let noteCounter = 0;
 	const getNoteId = () => ++noteCounter;
@@ -142,6 +144,7 @@ describe.sequential('Note ops performance', async () => {
 		bench(
 			'Search note with random text',
 			async function () {
+				await lexemes.index();
 				await registry.get({
 					// Text with typo
 					search: { text: `powr` },
