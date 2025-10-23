@@ -14,7 +14,7 @@ export const useLexemesRegistryPrune = () => {
 	} = useProfileControls();
 
 	useEffect(() => {
-		const PRUNE_DELAY = 5000;
+		const PRUNE_DELAY = 30_000;
 
 		let timer: NodeJS.Timeout | null = null;
 		let cbId: number | null = null;
