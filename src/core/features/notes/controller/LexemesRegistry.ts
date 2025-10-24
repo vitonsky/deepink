@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { qb } from '@utils/db/query-builder';
@@ -44,10 +43,6 @@ export class LexemesRegistry {
 
 			const textsQuery = qb.sql`SELECT text_tsv FROM notes WHERE updated_at >= COALESCE((SELECT executed_at FROM lexeme_ops ORDER BY executed_at DESC LIMIT 1), to_timestamp(0))`;
 
-			// await db.query(
-			// 	qb.sql`SELECT word, plainto_tsquery('simple', word) AS query FROM ts_stat(E'${textsQuery}')`
-			// ).then((r) => console.log("Rows", r.rows));
-
 			const { rows } = await db.query(
 				qb.sql`INSERT INTO lexemes(word, query) SELECT word, plainto_tsquery('simple', word) AS query FROM ts_stat(E'${textsQuery}') ON CONFLICT DO NOTHING RETURNING word`,
 				WordScheme,
@@ -67,10 +62,10 @@ export class LexemesRegistry {
 		const { rows } = await db.query(
 			qb.line(
 				qb.sql`SELECT t.word, COALESCE(array_agg(l.word) FILTER(WHERE l.word IS NOT NULL), ARRAY[]::text[]) AS suggests
-					FROM unnest(${lexemes}::text[]) WITH ORDINALITY as t(word, ord)
+					FROM unnest(${lexemes}::text[]) WITH ORDINALITY as t(word, seq)
 					LEFT JOIN lexemes l ON l.word % t.word AND l.word != t.word
-					GROUP BY (t.word, t.ord)
-					ORDER BY t.ord`,
+					GROUP BY (t.word, t.seq)
+					ORDER BY t.seq`,
 				qb.limit(limit),
 			),
 			z.object({ word: z.string(), suggests: z.string().array() }),
