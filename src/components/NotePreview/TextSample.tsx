@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { findTextSegments, getHighlightedText } from '@utils/text/search';
+import { findTextSegments } from '@utils/text/findTextSegments';
+import { getHighlightedText } from '@utils/text/getHighlightedText';
 
 /**
  * Render text sample and highlight terms or similar texts
@@ -18,7 +19,7 @@ export const TextSample = ({
 			text,
 			highlightText
 				? findTextSegments(text, highlightText, {
-						similarity: 0.5,
+						similarity: 0.7,
 						joinDistance: 20,
 				  })
 				: [],

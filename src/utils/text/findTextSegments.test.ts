@@ -1,4 +1,4 @@
-import { findTextSegments } from './search';
+import { findTextSegments } from './findTextSegments';
 
 test('No results for empty strings', () => {
 	expect(

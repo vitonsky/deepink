@@ -1,12 +1,15 @@
-import { findTextSegments, getHighlightedText } from './search';
+import { findTextSegments } from './findTextSegments';
+import { getHighlightedText } from './getHighlightedText';
 
 test('Basic case', () => {
 	const text = 'The quick brown fox jumps over the lazy dog';
 	expect(
-		getHighlightedText(text, findTextSegments(text, 'fox')).map((segment) => ({
-			text: text.slice(segment.start, segment.end),
-			highlight: segment.highlight,
-		})),
+		getHighlightedText(text, findTextSegments(text, 'fox', { similarity: 0.7 })).map(
+			(segment) => ({
+				text: text.slice(segment.start, segment.end),
+				highlight: segment.highlight,
+			}),
+		),
 	).toStrictEqual([
 		{
 			text: 'The quick brown ',
@@ -51,12 +54,12 @@ test('Multiple texts', () => {
 test('Limit text size', () => {
 	const text = 'The quick brown fox jumps over the lazy dog';
 	expect(
-		getHighlightedText(text, findTextSegments(text, 'fox'), { limit: 25 }).map(
-			(segment) => ({
-				text: text.slice(segment.start, segment.end),
-				highlight: segment.highlight,
-			}),
-		),
+		getHighlightedText(text, findTextSegments(text, 'fox', { similarity: 0.7 }), {
+			limit: 25,
+		}).map((segment) => ({
+			text: text.slice(segment.start, segment.end),
+			highlight: segment.highlight,
+		})),
 	).toStrictEqual([
 		{
 			text: 'The quick brown ',
@@ -73,12 +76,12 @@ test('Limit text size', () => {
 	]);
 
 	expect(
-		getHighlightedText(text, findTextSegments(text, 'fox'), { limit: 15 }).map(
-			(segment) => ({
-				text: text.slice(segment.start, segment.end),
-				highlight: segment.highlight,
-			}),
-		),
+		getHighlightedText(text, findTextSegments(text, 'fox', { similarity: 0.7 }), {
+			limit: 15,
+		}).map((segment) => ({
+			text: text.slice(segment.start, segment.end),
+			highlight: segment.highlight,
+		})),
 	).toStrictEqual([
 		{
 			text: 'quick brown ',

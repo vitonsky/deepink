@@ -11,15 +11,14 @@ import { Box } from '@chakra-ui/react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
 import { debounce } from '@utils/debounce/debounce';
-import { findTextSegments } from '@utils/text/search';
+import { findTextSegments } from '@utils/text/findTextSegments';
 
 import { registerMutationObserver } from '../../utils/registerMutationObserver';
 
 const $getTextNodeHighlights = (node: LexicalNode, search: string) => {
 	const text = node.getTextContent();
 	const segments = findTextSegments(text, search, {
-		// TODO: value is inverted. Fix it. Make 0 is not similar, 1 is completely similar
-		similarity: 0.2,
+		similarity: 0.7,
 	});
 
 	if (segments.length === 0) return [];
