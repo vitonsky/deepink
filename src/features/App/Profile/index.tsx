@@ -89,6 +89,17 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const [isDBConsoleVisible, setIsDBConsoleVisible] = useState(false);
 	const isDevMode = useIsDeveloper();
 
+	const db = controls.profile.db;
+	useEffect(() => {
+		if (!isDevMode) return;
+
+		(globalThis as any)[Symbol.for('db')] = db;
+
+		return () => {
+			delete (globalThis as any)[Symbol.for('db')];
+		};
+	}, [db, isDevMode]);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{workspaces.map((workspace) =>
