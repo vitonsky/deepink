@@ -11,7 +11,8 @@ import { registerMutationObserver } from '../../utils/registerMutationObserver';
 const $getTextNodeHighlights = (node: LexicalNode, search: string) => {
 	const text = node.getTextContent();
 	const segments = findTextSegments(text, search, {
-		similarity: 0.5,
+		// TODO: value is inverted. Fix it. Make 0 is not similar, 1 is completely similar
+		similarity: 0.2,
 	});
 
 	if (segments.length === 0) return [];
@@ -40,18 +41,63 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 	useEffect(() => {
 		if (!search) return;
 
-		// Find search query immediately
+		const elementToKeyMap = new Map<Element, string>();
+
+		// Render highlights only for nodes in viewport
+		const observer = new IntersectionObserver((entries) => {
+			const keysToRemove: string[] = [];
+			const keysToAdd: string[] = [];
+
+			for (const entry of entries) {
+				const key = elementToKeyMap.get(entry.target);
+				if (!key) continue;
+
+				// Remove
+				if (!entry.isIntersecting) {
+					keysToRemove.push(key);
+					continue;
+				}
+
+				// Add
+				keysToAdd.push(key);
+			}
+
+			// Apply changes
+			setHighlights((state) => {
+				return editor.read(() => {
+					const newState = { ...state };
+
+					// Delete
+					keysToRemove.forEach((key) => delete newState[key]);
+
+					// Add
+					for (const key of keysToAdd) {
+						const node = $getNodeByKey(key);
+						if (node) {
+							newState[key] = $getTextNodeHighlights(node, search);
+						}
+					}
+
+					return newState;
+				});
+			});
+		});
+
+		// Observe intersections on all text nodes
 		requestAnimationFrame(() => {
 			editor.read(() => {
 				const root = $getRoot();
 				const textNodes = root.getAllTextNodes();
 
-				const newRanges: Record<string, Range[]> = {};
 				for (const node of textNodes) {
-					newRanges[node.getKey()] = $getTextNodeHighlights(node, search);
-				}
+					const key = node.getKey();
+					const element = editor.getElementByKey(key);
 
-				setHighlights((state) => ({ ...state, ...newRanges }));
+					if (element) {
+						elementToKeyMap.set(element, key);
+						observer.observe(element);
+					}
+				}
 			});
 		});
 
@@ -62,30 +108,34 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 			}),
 			editor.registerMutationListener(TextNode, (mutations) => {
 				editor.read(() => {
-					const newRanges: Record<string, Range[]> = {};
+					const keysToRemove: string[] = [];
 					for (const [key, mutation] of mutations) {
-						// Delete node
+						// Delete highlighting
 						if (mutation === 'destroyed') {
-							setHighlights((state) => {
-								if (key in state) {
-									const newState = { ...state };
-									delete newState[key];
-									return newState;
-								}
-
-								return state;
-							});
-
-							return;
+							// TODO: unobserve elements
+							keysToRemove.push(key);
 						}
 
-						const node = $getNodeByKey(key);
-						if (node) {
-							newRanges[key] = $getTextNodeHighlights(node, search);
+						// Track intersections
+						const element = editor.getElementByKey(key);
+						if (element) {
+							elementToKeyMap.set(element, key);
+							observer.unobserve(element);
+							observer.observe(element);
 						}
 					}
 
-					setHighlights((state) => ({ ...state, ...newRanges }));
+					// Apply changes
+					setHighlights((state) => {
+						return editor.read(() => {
+							const newState = { ...state };
+
+							// Delete
+							keysToRemove.forEach((key) => delete newState[key]);
+
+							return newState;
+						});
+					});
 				});
 			}),
 		);
@@ -93,6 +143,8 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 		return () => {
 			unsubscribe();
 			setHighlights({});
+			elementToKeyMap.clear();
+			observer.disconnect();
 		};
 	}, [editor, search]);
 

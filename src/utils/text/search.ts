@@ -59,7 +59,7 @@ export const findTextSegments = (
 
 	// Build segments
 	let segments: OffsetsRange[] = [];
-	const segmenter = new Segmenter('und', { granularity: 'word' });
+	const segmenter = new Segmenter('und', { granularity: 'word', maxChunkLength: 1000 });
 	for (const segment of segmenter.segment(text)) {
 		// Lazy search up to limit
 		if (limit !== undefined && segments.length >= limit) break;
