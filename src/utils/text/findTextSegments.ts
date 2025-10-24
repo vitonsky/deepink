@@ -1,7 +1,7 @@
 import { distance } from 'fastest-levenshtein';
-import { Segmenter } from 'intl-segmenter';
 
 import { BKTree } from './bktree';
+import { getLexemesList } from './getLexemesList';
 
 /**
  * Returns normalized lexemes from text
@@ -9,8 +9,7 @@ import { BKTree } from './bktree';
 export const getLexemes = (text: string) => {
 	const segmentsMap: Record<string, number> = {};
 
-	const segmenter = new Segmenter('und', { granularity: 'word' });
-	for (const segment of segmenter.segment(text)) {
+	for (const segment of getLexemesList(text, 1000)) {
 		if (!segment.isWordLike) continue;
 
 		const normalizedSegment = segment.segment
@@ -62,8 +61,7 @@ export const findTextSegments = (
 
 	// Build segments
 	let segments: OffsetsRange[] = [];
-	const segmenter = new Segmenter('und', { granularity: 'word', maxChunkLength: 1000 });
-	for (const segment of segmenter.segment(text)) {
+	for (const segment of getLexemesList(text, 1000)) {
 		// Lazy search up to limit
 		if (limit !== undefined && segments.length >= limit) break;
 
