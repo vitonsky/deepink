@@ -5,10 +5,14 @@ export type DebounceOptions = {
 	runImmediateFirstCall?: boolean;
 };
 
+export type DebouncedFn<T extends (...args: any[]) => any> = ((
+	...args: Parameters<T>
+) => void) & { cancel: () => void };
+
 export function debounce<T extends (...args: any[]) => any>(
 	func: T,
 	options: DebounceOptions,
-): ((...args: Parameters<T>) => void) & { cancel: () => void } {
+): DebouncedFn<T> {
 	const { wait, deadline, runImmediateFirstCall } = options;
 	let timerId: ReturnType<typeof setTimeout> | null = null;
 	let deadlineTimerId: ReturnType<typeof setTimeout> | null = null;
