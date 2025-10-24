@@ -86,7 +86,7 @@ export const convertBufferToTransferable = <
 >(
 	buffer: T,
 ): [ArrayBuffer, (buffer: ArrayBuffer) => T] => {
-	if (buffer instanceof Buffer) {
+	if (globalThis.Buffer !== undefined && buffer instanceof Buffer) {
 		return [
 			buffer.buffer as ArrayBuffer,
 			(buffer: ArrayBuffer) => {
