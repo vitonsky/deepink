@@ -1,9 +1,16 @@
 /* eslint-disable spellcheck/spell-checker */
 import React, { useEffect, useState } from 'react';
-import { $getEditor, $getNodeByKey, $getRoot, LexicalNode, TextNode } from 'lexical';
+import {
+	$getEditor,
+	$getNearestNodeFromDOMNode,
+	$getRoot,
+	LexicalNode,
+	TextNode,
+} from 'lexical';
 import { Box } from '@chakra-ui/react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
+import { debounce } from '@utils/debounce/debounce';
 import { findTextSegments } from '@utils/text/search';
 
 import { registerMutationObserver } from '../../utils/registerMutationObserver';
@@ -32,7 +39,7 @@ const $getTextNodeHighlights = (node: LexicalNode, search: string) => {
 	return ranges;
 };
 
-// TODO: update position by any changes in DOM
+// TODO: decorate original text nodes instead of draw boxes over
 export const HighlightingPlugin = ({ search }: { search?: string }) => {
 	const [highlights, setHighlights] = useState<Record<string, Range[]>>({});
 
@@ -41,47 +48,62 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 	useEffect(() => {
 		if (!search) return;
 
-		const elementToKeyMap = new Map<Element, string>();
+		// Render visible elements
+		const visibleElements = new Set<Element>();
+		const clearHighlights = () =>
+			setHighlights((state) => (Object.keys(state).length === 0 ? state : {}));
+		const updateHighlights = debounce(
+			() => {
+				editor.read(() => {
+					const newState: Record<string, Range[]> = {};
 
-		// Render highlights only for nodes in viewport
-		const observer = new IntersectionObserver((entries) => {
-			const keysToRemove: string[] = [];
-			const keysToAdd: string[] = [];
-
-			for (const entry of entries) {
-				const key = elementToKeyMap.get(entry.target);
-				if (!key) continue;
-
-				// Remove
-				if (!entry.isIntersecting) {
-					keysToRemove.push(key);
-					continue;
-				}
-
-				// Add
-				keysToAdd.push(key);
-			}
-
-			// Apply changes
-			setHighlights((state) => {
-				return editor.read(() => {
-					const newState = { ...state };
-
-					// Delete
-					keysToRemove.forEach((key) => delete newState[key]);
-
-					// Add
-					for (const key of keysToAdd) {
-						const node = $getNodeByKey(key);
+					for (const element of visibleElements) {
+						const node = $getNearestNodeFromDOMNode(element);
 						if (node) {
+							const key = node.getKey();
 							newState[key] = $getTextNodeHighlights(node, search);
 						}
 					}
 
-					return newState;
+					setHighlights(newState);
 				});
-			});
+			},
+			{ wait: 100 },
+		);
+
+		// Render highlights only for nodes in viewport
+		const observer = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) {
+					visibleElements.add(entry.target);
+				} else {
+					visibleElements.delete(entry.target);
+				}
+			}
+
+			updateHighlights();
 		});
+
+		const observedNodes = new Map<string, Element>();
+		const observe = (key: string, node: Element) => {
+			const prevNode = observedNodes.get(key);
+			if (prevNode && prevNode !== node) {
+				observer.unobserve(prevNode);
+				visibleElements.delete(prevNode);
+			}
+
+			observedNodes.set(key, node);
+			observer.observe(node);
+		};
+
+		const unobserve = (key: string) => {
+			const node = observedNodes.get(key);
+			if (node) {
+				observer.unobserve(node);
+				visibleElements.delete(node);
+				observedNodes.delete(key);
+			}
+		};
 
 		// Observe intersections on all text nodes
 		requestAnimationFrame(() => {
@@ -94,57 +116,46 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 					const element = editor.getElementByKey(key);
 
 					if (element) {
-						elementToKeyMap.set(element, key);
-						observer.observe(element);
+						observe(key, element);
 					}
 				}
 			});
 		});
 
 		const unsubscribe = mergeRegister(
+			// Redraw markers, since position may be updated
 			registerMutationObserver(editor, () => {
-				// Redraw markers, since position may be updated
-				setHighlights((state) => ({ ...state }));
+				clearHighlights();
+				updateHighlights();
 			}),
 			editor.registerMutationListener(TextNode, (mutations) => {
 				editor.read(() => {
-					const keysToRemove: string[] = [];
 					for (const [key, mutation] of mutations) {
 						// Delete highlighting
 						if (mutation === 'destroyed') {
-							// TODO: unobserve elements
-							keysToRemove.push(key);
+							unobserve(key);
+							continue;
 						}
 
 						// Track intersections
 						const element = editor.getElementByKey(key);
 						if (element) {
-							elementToKeyMap.set(element, key);
-							observer.unobserve(element);
-							observer.observe(element);
+							observe(key, element);
 						}
 					}
-
-					// Apply changes
-					setHighlights((state) => {
-						return editor.read(() => {
-							const newState = { ...state };
-
-							// Delete
-							keysToRemove.forEach((key) => delete newState[key]);
-
-							return newState;
-						});
-					});
 				});
+
+				updateHighlights();
 			}),
 		);
 
 		return () => {
 			unsubscribe();
-			setHighlights({});
-			elementToKeyMap.clear();
 			observer.disconnect();
+			observedNodes.clear();
+
+			updateHighlights.cancel();
+			setHighlights({});
 		};
 	}, [editor, search]);
 
