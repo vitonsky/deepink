@@ -11,7 +11,7 @@ test('Init database with seed data', async () => {
 
 test('Listen commands on database', async () => {
 	const onCommand = vi.fn();
-	db.on('command', onCommand, { once: true });
+	db.on('sync', onCommand, { once: true });
 
 	await expect(db.query('SELECT * FROM test;')).resolves.toEqual(
 		expect.objectContaining({
@@ -25,7 +25,6 @@ test('Listen commands on database', async () => {
 	);
 
 	expect(onCommand).toHaveBeenCalledTimes(1);
-	expect(onCommand).toBeCalledWith({ command: 'SELECT * FROM test;', affectedRows: 0 });
 });
 
 describe('Import/export data', () => {

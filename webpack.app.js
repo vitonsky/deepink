@@ -2,7 +2,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { merge } = require('webpack-merge');
 const { readdirSync } = require('fs');
-
 const { isFastBuild } = require('./scripts/webpack');
 const commonConfig = require('./webpack.common');
 
@@ -11,7 +10,7 @@ const windows = readdirSync('./src/windows', { withFileTypes: true })
 	.map((file) => file.name);
 
 module.exports = merge(commonConfig, {
-	target: 'electron-renderer',
+	target: 'web',
 	entry: {
 		...Object.fromEntries(
 			windows.map((name) => [
@@ -32,6 +31,10 @@ module.exports = merge(commonConfig, {
 		),
 		new MiniCssExtractPlugin({}),
 	],
+	// We explicitly define external imports instead of use `electron-renderer` target
+	externals: {
+		electron: 'global electron',
+	},
 	module: {
 		rules: [
 			{

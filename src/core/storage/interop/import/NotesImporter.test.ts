@@ -47,7 +47,8 @@ const createAppContextIterator = () => {
 	};
 };
 
-const createTextBuffer = (text: string): ArrayBuffer => new TextEncoder().encode(text);
+const createTextBuffer = (text: string): ArrayBuffer =>
+	new TextEncoder().encode(text).buffer;
 
 describe('Base notes import cases', () => {
 	const dbFile = createFileControllerMock();
@@ -151,7 +152,9 @@ describe('Base notes import cases', () => {
 		const db = await dbPromise;
 		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 
-		await expect(notesRegistry.get()).resolves.toEqual([
+		await expect(
+			notesRegistry.get({ sort: { by: 'createdAt', order: 'asc' } }),
+		).resolves.toEqual([
 			expect.objectContaining({
 				// TODO: fix unnecessary new line
 				content: { title: 'note-1', text: 'Hello world!\n' },

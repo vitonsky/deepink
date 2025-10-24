@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-type DebounceOptions = {
+export type DebounceOptions = {
 	wait: number; // Minimum wait time in milliseconds before invoking the function again
 	deadline?: number; // Maximum time in milliseconds to force invocation
+	runImmediateFirstCall?: boolean;
 };
+
+export type DebouncedFn<T extends (...args: any[]) => any> = ((
+	...args: Parameters<T>
+) => void) & { cancel: () => void };
 
 export function debounce<T extends (...args: any[]) => any>(
 	func: T,
 	options: DebounceOptions,
-): ((...args: Parameters<T>) => void) & { cancel: () => void } {
-	const { wait, deadline } = options;
+): DebouncedFn<T> {
+	const { wait, deadline, runImmediateFirstCall } = options;
 	let timerId: ReturnType<typeof setTimeout> | null = null;
 	let deadlineTimerId: ReturnType<typeof setTimeout> | null = null;
 	let lastCallTime: number | null = null;
@@ -24,12 +29,14 @@ export function debounce<T extends (...args: any[]) => any>(
 		};
 
 		// Run immediately
-		if (
-			lastCallTime === null ||
-			(!deadlineTimerId && Date.now() - lastCallTime >= wait)
-		) {
-			run();
-			return;
+		if (runImmediateFirstCall) {
+			if (
+				lastCallTime === null ||
+				(!deadlineTimerId && Date.now() - lastCallTime >= wait)
+			) {
+				run();
+				return;
+			}
 		}
 
 		// Schedule run

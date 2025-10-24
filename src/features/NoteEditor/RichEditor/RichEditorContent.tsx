@@ -18,6 +18,7 @@ import { EditorPanelPlugin } from './plugins/EditorPanelPlugin/EditorPanelPlugin
 import { DropFilesPlugin } from './plugins/Files/DropFilesPlugin';
 import { FilesPlugin } from './plugins/Files/FilesPlugin';
 import { FormattingPlugin } from './plugins/Formatting/FormattingPlugin';
+import { HighlightingPlugin } from './plugins/HighlightingPlugin/HighlightingPlugin';
 import ImagesPlugin from './plugins/Image/ImagesPlugin';
 import { LinkClickHandlerPlugin } from './plugins/LinkClickHandlerPlugin';
 import {
@@ -31,6 +32,7 @@ export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
 		placeholder?: string;
 		isReadOnly?: boolean;
+		search?: string;
 	};
 
 export const RichEditorContent = ({
@@ -38,6 +40,7 @@ export const RichEditorContent = ({
 	onChanged,
 	placeholder,
 	isReadOnly,
+	search,
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
@@ -48,7 +51,7 @@ export const RichEditorContent = ({
 			display="flex"
 			width="100%"
 			height="100%"
-			overflow="hidden"
+			overflow="auto"
 			sx={styles.root}
 		>
 			<ContextMenuPlugin renderer={GenericContextMenu} />
@@ -58,7 +61,7 @@ export const RichEditorContent = ({
 					<Box
 						w="100%"
 						maxH="100%"
-						overflow="auto"
+						outline="none"
 						padding="1rem"
 						{...props}
 						as={ContentEditable}
@@ -101,6 +104,8 @@ export const RichEditorContent = ({
 			<CheckListPlugin />
 			<TablePlugin />
 			<HorizontalRulePlugin />
+
+			<HighlightingPlugin search={search} />
 
 			<ReadOnlyPlugin readonly={isReadOnly ?? false} />
 		</Box>

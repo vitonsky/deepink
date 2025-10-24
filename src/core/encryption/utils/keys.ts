@@ -60,7 +60,10 @@ type KeyAlgorithm =
 /**
  * Creates object to generate derived keys and bytes based on provided master key
  */
-export async function getDerivedKeysManager(masterKey: CryptoKey, salt: Uint8Array) {
+export async function getDerivedKeysManager(
+	masterKey: CryptoKey,
+	salt: Uint8Array<ArrayBuffer>,
+) {
 	const codec = new TextEncoder();
 
 	const getScopedSalt = (scope: string) =>

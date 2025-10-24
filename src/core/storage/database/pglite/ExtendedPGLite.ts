@@ -1,40 +1,24 @@
 import { createEvent, EventCallable } from 'effector';
-import { PGlite, PGliteOptions, QueryOptions, Results } from '@electric-sql/pglite';
+import { PGlite, PGliteOptions } from '@electric-sql/pglite';
 
 export type EventsMap = {
-	command: { command: string; affectedRows?: number };
+	sync: void;
 };
 
 export class ExtendedPGLite extends PGlite {
 	private readonly events: {
 		[K in keyof EventsMap]: EventCallable<EventsMap[K]>;
 	} = {
-		command: createEvent(),
+		sync: createEvent(),
 	};
 
 	constructor(options?: PGliteOptions) {
 		super(options);
 	}
 
-	async query<T>(
-		query: string,
-		params?: any[] | undefined,
-		options?: QueryOptions | undefined,
-	): Promise<Results<T>> {
-		const result = await super.query<T>(query, params, options);
-		this.events.command({ command: query, affectedRows: result.affectedRows });
-
-		return result;
-	}
-
-	async exec(
-		query: string,
-		options?: QueryOptions | undefined,
-	): Promise<Results<{ [key: string]: any }>[]> {
-		const result = await super.exec(query, options);
-		this.events.command({ command: query });
-
-		return result;
+	syncToFs(): Promise<void> {
+		this.events.sync();
+		return super.syncToFs();
 	}
 
 	public on<T extends keyof EventsMap>(

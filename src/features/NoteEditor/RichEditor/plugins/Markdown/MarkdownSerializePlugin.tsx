@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { $setSelection } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { useDebouncedCallback } from '@utils/debounce/useDebouncedCallback';
 
 import { $convertFromMarkdownString, $convertToMarkdownString } from './markdownParser';
 
@@ -48,16 +49,23 @@ export const MarkdownSerializePlugin = ({
 		}
 	};
 
+	const syncValue = useDebouncedCallback(
+		() => {
+			editor.read(() => {
+				onChange($convertToMarkdownString());
+			});
+		},
+		{ wait: 500 },
+	);
+
 	return (
 		<OnChangePlugin
+			ignoreSelectionChange
 			onChange={(_, editor) => {
 				const isActive = isFocusedElement(editor.getRootElement());
 				if (!isActive) return;
 
-				// TODO: debounce for 1-3 seconds
-				editor.read(() => {
-					onChange($convertToMarkdownString());
-				});
+				syncValue();
 			}}
 		/>
 	);

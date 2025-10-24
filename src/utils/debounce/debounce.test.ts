@@ -1,10 +1,11 @@
-import { debounce } from './debounce';
+import { debounce, DebounceOptions } from './debounce';
 
 describe('Debounce functions basic usage', () => {
-	const times = {
+	const options = {
 		wait: 300,
 		deadline: 10000,
-	};
+		runImmediateFirstCall: true,
+	} satisfies DebounceOptions;
 
 	beforeAll(() => {
 		vi.useFakeTimers();
@@ -20,21 +21,21 @@ describe('Debounce functions basic usage', () => {
 
 	test('call function immediately when queue is empty', () => {
 		const callback = vi.fn();
-		const debouncedCallback = debounce(callback, times);
+		const debouncedCallback = debounce(callback, options);
 
 		// First call
 		debouncedCallback();
 		expect(callback).toHaveBeenCalledTimes(1);
 
 		// One more call after delay time must be executed immediately
-		vi.advanceTimersByTime(times.wait);
+		vi.advanceTimersByTime(options.wait);
 		debouncedCallback();
 		expect(callback).toHaveBeenCalledTimes(2);
 	});
 
 	test('delay function calls in row', () => {
 		const callback = vi.fn();
-		const debouncedCallback = debounce(callback, times);
+		const debouncedCallback = debounce(callback, options);
 
 		// First call
 		debouncedCallback();
@@ -45,18 +46,18 @@ describe('Debounce functions basic usage', () => {
 		debouncedCallback();
 		debouncedCallback();
 		expect(callback).toHaveBeenCalledTimes(1);
-		vi.advanceTimersByTime(times.wait);
+		vi.advanceTimersByTime(options.wait);
 		expect(callback).toHaveBeenCalledTimes(2);
 
 		// Execute call immediately, in case queue is empty
-		vi.advanceTimersByTime(times.wait);
+		vi.advanceTimersByTime(options.wait);
 		debouncedCallback();
 		expect(callback).toHaveBeenCalledTimes(3);
 	});
 
 	test('call function by deadline', () => {
 		const callback = vi.fn();
-		const debouncedCallback = debounce(callback, times);
+		const debouncedCallback = debounce(callback, options);
 
 		// First call
 		debouncedCallback();
@@ -69,8 +70,8 @@ describe('Debounce functions basic usage', () => {
 		expect(callback).toHaveBeenCalledTimes(1);
 
 		// Call by deadline
-		const stepTime = times.wait / 2;
-		const iterations = Math.ceil(times.deadline / stepTime);
+		const stepTime = options.wait / 2;
+		const iterations = Math.ceil(options.deadline / stepTime);
 		for (let i = 0; i < iterations; i++) {
 			vi.advanceTimersByTime(stepTime);
 			debouncedCallback();

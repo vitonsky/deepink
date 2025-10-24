@@ -34,6 +34,10 @@ export type NotesControllerFetchOptions = {
 	 */
 	meta?: Partial<NoteMeta>;
 
+	search?: {
+		text: string;
+	};
+
 	/**
 	 * Sorting options
 	 */

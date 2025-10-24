@@ -1,5 +1,6 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
+import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
@@ -19,6 +20,9 @@ import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
+	api: {
+		lexemes: LexemesRegistry;
+	};
 	close: () => void;
 };
 
@@ -84,6 +88,17 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	const [isDBConsoleVisible, setIsDBConsoleVisible] = useState(false);
 	const isDevMode = useIsDeveloper();
+
+	const db = controls.profile.db;
+	useEffect(() => {
+		if (!isDevMode) return;
+
+		(globalThis as any)[Symbol.for('db')] = db;
+
+		return () => {
+			delete (globalThis as any)[Symbol.for('db')];
+		};
+	}, [db, isDevMode]);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

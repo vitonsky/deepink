@@ -1,21 +1,63 @@
-import React from 'react';
-import { FaArrowDownWideShort, FaMagnifyingGlass } from 'react-icons/fa6';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
+import { useDebouncedCallback } from 'use-debounce';
 import {
-	Button,
+	Box,
+	Divider,
 	HStack,
 	Input,
 	InputGroup,
 	InputLeftElement,
+	InputRightElement,
 	Tag,
 	Text,
 	VStack,
 } from '@chakra-ui/react';
 import { NotesList } from '@features/MainScreen/NotesList';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveTag } from '@state/redux/profiles/profiles';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	selectActiveTag,
+	selectSearch,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 export const NotesPanel = () => {
+	const dispatch = useAppDispatch();
+
+	const search = useWorkspaceSelector(selectSearch);
 	const activeTag = useWorkspaceSelector(selectActiveTag);
+
+	const workspaceData = useWorkspaceData();
+	const setSearch = useCallback(
+		(value: string) => {
+			dispatch(
+				workspacesApi.setSearch({
+					...workspaceData,
+					search: value,
+				}),
+			);
+		},
+		[dispatch, workspaceData],
+	);
+
+	const [searchInput, setSearchInput] = useState(search);
+
+	const debouncedSearchUpdate = useDebouncedCallback(setSearch, 300);
+	useEffect(() => {
+		debouncedSearchUpdate(searchInput);
+	}, [debouncedSearchUpdate, searchInput]);
+
+	useEffect(() => {
+		debouncedSearchUpdate.cancel();
+		setSearchInput(search);
+	}, [debouncedSearchUpdate, search]);
+
+	const clearSearch = () => {
+		debouncedSearchUpdate.cancel();
+		setSearch('');
+		setSearchInput('');
+	};
 
 	return (
 		<VStack
@@ -24,40 +66,82 @@ export const NotesPanel = () => {
 				width: '100%',
 				height: '100%',
 				flexDirection: 'column',
-				gap: '1rem',
+				gap: '.5rem',
 			}}
 		>
-			<VStack align="start" w="100%" gap="0.8rem">
+			<VStack align="start" w="100%" gap="0.5rem">
 				<HStack>
 					<InputGroup size="sm">
 						<InputLeftElement pointerEvents="none">
 							<FaMagnifyingGlass />
 						</InputLeftElement>
-						<Input borderRadius="6px" placeholder="Search..." />
+						<Input
+							borderRadius="6px"
+							placeholder="Search..."
+							value={searchInput}
+							onChange={(e) => setSearchInput(e.target.value)}
+							onKeyUp={(e) => {
+								if (e.key === 'Escape') clearSearch();
+							}}
+						/>
+						{searchInput.length > 0 ? (
+							<InputRightElement onClick={clearSearch}>
+								<FaXmark />
+							</InputRightElement>
+						) : undefined}
 					</InputGroup>
-
-					<Button variant="primary" size="sm" paddingInline=".5rem">
-						<FaArrowDownWideShort />
-					</Button>
 				</HStack>
 
 				{activeTag && (
-					<HStack maxW="100%" paddingInline=".3rem">
-						<Text minW="fit-content">With tag</Text>
-						<Tag variant="accent">
-							<Text
-								maxW="100%"
-								whiteSpace="nowrap"
-								overflow="hidden"
-								textOverflow="ellipsis"
-								dir="rtl"
+					<HStack align="start" gap="0.5rem" maxW="100%">
+						<Text
+							color="typography.secondary"
+							flexShrink={0}
+							alignSelf="center"
+						>
+							Filter by
+						</Text>
+						<HStack maxW="100%" align="start" overflow="hidden">
+							<Tag
+								variant="accent"
+								as={HStack}
+								gap=".5rem"
+								align="start"
+								title={activeTag.resolvedName}
 							>
-								{activeTag.resolvedName}
-							</Text>
-						</Tag>
+								<Text
+									maxW="100%"
+									whiteSpace="nowrap"
+									overflow="hidden"
+									textOverflow="ellipsis"
+									dir="rtl"
+								>
+									{activeTag.resolvedName}
+								</Text>
+								<Box
+									sx={{
+										'&:not(:hover)': {
+											opacity: '0.7',
+										},
+									}}
+									onClick={() => {
+										dispatch(
+											workspacesApi.setSelectedTag({
+												...workspaceData,
+												tag: null,
+											}),
+										);
+									}}
+								>
+									<FaXmark />
+								</Box>
+							</Tag>
+						</HStack>
 					</HStack>
 				)}
 			</VStack>
+
+			<Divider />
 
 			<NotesList />
 		</VStack>

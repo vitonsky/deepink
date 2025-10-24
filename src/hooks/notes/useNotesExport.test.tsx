@@ -96,18 +96,18 @@ describe('Export notes', async () => {
 		// Export all notes
 		await act(async () => {
 			await expect(
-				result.current.exportNotes(true, 'custom-name'),
+				result.current.exportNotes('custom-name'),
 			).resolves.not.toThrow();
 		});
 
 		// File must be saved
 		expect(fsClientMock.saveFile.mock.calls).toEqual([
-			['/foo/bar/custom-name.zip', expect.any(ArrayBuffer)],
+			[expect.any(ArrayBuffer), 'custom-name.zip'],
 		]);
 
 		// File content is a zip file
 		const fs = new ZipFS(new InMemoryFS());
-		await fs.load(fsClientMock.saveFile.mock.calls[0][1]);
+		await fs.load(fsClientMock.saveFile.mock.calls[0][0]);
 
 		await expect(fs.list()).resolves.toStrictEqual([
 			'/Title_1.md',
@@ -149,7 +149,6 @@ describe('Export notes', async () => {
 			await expect(
 				result.current.exportNote(
 					noteWithAttachment.id,
-					true,
 					'/x/y/カスタム名!@#$%^&*()_-+=~<>',
 				),
 			).resolves.not.toThrow();
@@ -157,12 +156,12 @@ describe('Export notes', async () => {
 
 		// File must be saved
 		expect(fsClientMock.saveFile.mock.calls).toEqual([
-			['/foo/bar/x_y_カスタム名_-.zip', expect.any(ArrayBuffer)],
+			[expect.any(ArrayBuffer), 'x_y_カスタム名_-.zip'],
 		]);
 
 		// File content is a zip file
 		const fs = new ZipFS(new InMemoryFS());
-		await fs.load(fsClientMock.saveFile.mock.calls[0][1]);
+		await fs.load(fsClientMock.saveFile.mock.calls[0][0]);
 
 		await expect(fs.list()).resolves.toStrictEqual([
 			expect.stringMatching('/_resources/[\\w\\d-]+-attachment.txt'),

@@ -15,7 +15,7 @@ export type IDatabaseContainer<T> = {
 	/**
 	 * Get latest database data snapshot
 	 */
-	getData: () => Promise<Buffer>;
+	getData: () => Promise<ArrayBuffer>;
 
 	/**
 	 * Close database

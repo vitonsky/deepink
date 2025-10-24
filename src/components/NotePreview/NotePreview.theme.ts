@@ -20,6 +20,7 @@ export const NotePreviewTheme = createMultiStyleConfigHelpers([
 		body: {
 			gap: '0.2rem',
 			alignItems: 'start',
+			maxWidth: '100%',
 		},
 		title: {
 			fontWeight: 'bold',
@@ -27,6 +28,7 @@ export const NotePreviewTheme = createMultiStyleConfigHelpers([
 		},
 		text: {
 			fontSize: '14px',
+			maxWidth: '100%',
 		},
 		meta: {
 			fontSize: '14px',

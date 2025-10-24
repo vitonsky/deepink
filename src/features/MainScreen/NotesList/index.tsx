@@ -7,7 +7,11 @@ import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId, selectNotes } from '@state/redux/profiles/profiles';
+import {
+	selectActiveNoteId,
+	selectNotes,
+	selectSearch,
+} from '@state/redux/profiles/profiles';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
@@ -22,6 +26,8 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
+
+	const search = useWorkspaceSelector(selectSearch);
 
 	const openNoteContextMenu = useDefaultNoteContextMenu({
 		closeNote: noteActions.close,
@@ -99,7 +105,6 @@ export const NotesList: FC<NotesListProps> = () => {
 							const note = notes[virtualRow.index];
 
 							const date = note.createdTimestamp ?? note.updatedTimestamp;
-							const text = note.content.text.slice(0, 80).trim();
 							const isActive = note.id === activeNoteId;
 
 							// TODO: get preview text from DB as prepared value
@@ -116,8 +121,9 @@ export const NotesList: FC<NotesListProps> = () => {
 									}}
 									data-index={virtualRow.index}
 									isSelected={isActive}
+									textToHighlight={search}
 									title={getNoteTitle(note.content)}
-									text={text}
+									text={note.content.text}
 									meta={
 										date && (
 											<Text>{new Date(date).toDateString()}</Text>

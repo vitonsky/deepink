@@ -7,18 +7,25 @@ import { PGMigration } from './types';
  * @returns
  */
 export async function convertSQLToMigrationObject(
-	name: string,
+	uid: string,
 	module: Promise<typeof import('*.sql')>,
 ): Promise<PGMigration> {
 	const { default: sql } = await module;
 
 	return {
-		name,
-		up: async ({ context: { db } }) => db.transaction((tx) => tx.exec(sql)),
+		uid,
+		apply: async ({ context: { db } }) =>
+			db.transaction(async (tx) => {
+				await tx.exec(sql);
+			}),
 	};
 }
 
 export const getMigrationsList = async (): Promise<PGMigration[]> =>
 	Promise.all([
 		convertSQLToMigrationObject('1_init_db', import('./sql/1_init_db.sql')),
+		convertSQLToMigrationObject(
+			'2_full_text_search_for_notes',
+			import('./sql/2_full_text_search_for_notes.sql'),
+		),
 	]);

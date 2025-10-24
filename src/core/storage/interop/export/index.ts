@@ -146,7 +146,7 @@ export class NotesExporter {
 
 					await files.write(
 						context.resolveNotePath(noteData),
-						new TextEncoder().encode(noteDump),
+						new TextEncoder().encode(noteDump).buffer,
 					);
 
 					// Notify progress
@@ -172,7 +172,7 @@ export class NotesExporter {
 		const noteDump = await this.exportSingleNote(noteData, exportContext);
 		await files.write(
 			exportContext.resolveNotePath(noteData),
-			new TextEncoder().encode(noteDump),
+			new TextEncoder().encode(noteDump).buffer,
 		);
 	}
 

@@ -2,6 +2,8 @@ import React, { useCallback } from 'react';
 import { Box, HStack } from '@chakra-ui/react';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppSelector } from '@state/redux/hooks';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectSearch } from '@state/redux/profiles/profiles';
 import { selectEditorMode } from '@state/redux/settings/settings';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
@@ -20,6 +22,7 @@ export const NoteEditor = ({
 	isReadOnly?: boolean;
 }) => {
 	const editorMode = useAppSelector(selectEditorMode);
+	const search = useWorkspaceSelector(selectSearch);
 
 	const filesRegistry = useFilesRegistry();
 	const uploadFile: FileUploader = useCallback(
@@ -64,6 +67,7 @@ export const NoteEditor = ({
 						value={text}
 						onChanged={setText}
 						isReadOnly={isReadOnly}
+						search={search || undefined}
 					/>
 				)}
 			</HStack>

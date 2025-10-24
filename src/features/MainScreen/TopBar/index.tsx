@@ -80,8 +80,6 @@ export const TopBar: FC<TopBarProps> = ({
 						throw new Error('Note not found');
 					}
 
-					const title = getNoteTitle(note.content);
-
 					return (
 						<Tab
 							key={note.id}
@@ -95,7 +93,7 @@ export const TopBar: FC<TopBarProps> = ({
 							whiteSpace="nowrap"
 							flex="1 1 auto"
 							marginBottom={0}
-							title={title}
+							title={getNoteTitle(note.content)}
 							onMouseDown={(evt) => {
 								const isLeftButton = evt.button === 0;
 								if (isLeftButton) return;
@@ -123,7 +121,7 @@ export const TopBar: FC<TopBarProps> = ({
 										});
 									}}
 								>
-									{title}
+									{getNoteTitle(note.content, 25)}
 								</Text>
 								<Box
 									title="Close tab"

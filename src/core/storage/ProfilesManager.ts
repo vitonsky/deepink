@@ -1,5 +1,3 @@
-import { TextEncoder } from 'node:util';
-
 import { IFilesStorage } from '../features/files';
 
 export type ProfileObject = {
@@ -52,7 +50,7 @@ export class ProfilesManager {
 
 		const serializedProfiles = JSON.stringify(profiles);
 		const buffer = new TextEncoder().encode(serializedProfiles);
-		await this.filesController.write('profiles.json', buffer);
+		await this.filesController.write('profiles.json', buffer.buffer);
 
 		// Write key
 		if (profileData.encryption) {

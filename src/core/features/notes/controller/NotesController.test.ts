@@ -1,8 +1,10 @@
+/* eslint-disable spellcheck/spell-checker */
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { LexemesRegistry } from './LexemesRegistry';
 import { NotesController } from './NotesController';
 
 const FAKE_WORKSPACE_ID = getUUID();
@@ -292,5 +294,228 @@ describe('Notes meta control', () => {
 				id: noteId,
 			}),
 		);
+	});
+});
+
+describe('Notes search', () => {
+	const dbFile = createFileControllerMock();
+	const dbPromise = openDatabase(dbFile);
+
+	const texts = [
+		'A fast auburn fox leaped above a sleepy canine',
+		'PostgreSQL trigram indexing speeds up fuzzy text search',
+		'Full-text search and trigram search solve different problems',
+		'The database index makes LIKE queries fast',
+		'Fuzzy string matching can catch small typos in text',
+		'A lazy dog was sleeping near the river bank',
+		'The quick red fox jumped high above the hedge',
+		'Speedy foxes and sleepy dogs appear in many idioms',
+		'The quick brown fox jumps over the lazy dog',
+		'Trigram search helps find similar product names quickly',
+	];
+
+	afterAll(async () => {
+		const db = await dbPromise;
+		await db.close();
+	});
+
+	let tagsMap: Record<string, string>;
+	test('Add notes', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		tagsMap = await Promise.all(
+			['1th', '2th', '3th', 'none'].map(async (name) => [
+				name,
+				await tags.add(name, null),
+			]),
+		).then((tags) => Object.fromEntries(tags));
+
+		await Promise.all(
+			texts.map(async (text, index) => {
+				const noteId = await registry.add({ title: `Note #${index + 1}`, text });
+
+				const seqNum = index + 1;
+				await tags.setAttachedTags(
+					noteId,
+					[
+						tagsMap['1th'],
+						seqNum % 2 === 0 && tagsMap['2th'],
+						seqNum % 3 === 0 && tagsMap['3th'],
+					].filter(Boolean) as string[],
+				);
+
+				return noteId;
+			}),
+		);
+	});
+
+	test('Update lexemes', async () => {
+		const db = await dbPromise;
+		const lexemes = new LexemesRegistry(db);
+		await expect(lexemes.index()).resolves.not.toHaveLength(0);
+	});
+
+	test('Search by text', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		await expect(
+			registry.get({ search: { text: 'fox' }, limit: 3 }),
+			'Top results includes a word for search',
+		).resolves.toEqual(
+			Array.from({ length: 3 }).map(() =>
+				expect.objectContaining({
+					content: expect.objectContaining({
+						text: expect.stringContaining('fox'),
+					}),
+				}),
+			),
+		);
+
+		await expect(
+			registry.get({ search: { text: 'FOX' }, limit: 3 }),
+			'Search ignores text case',
+		).resolves.toEqual(
+			Array.from({ length: 3 }).map(() =>
+				expect.objectContaining({
+					content: expect.objectContaining({
+						text: expect.stringContaining('fox'),
+					}),
+				}),
+			),
+		);
+
+		await expect(
+			registry.get({ search: { text: 'qick' }, limit: 3 }),
+			'Search is typo tolerant',
+		).resolves.toEqual(
+			Array.from({ length: 2 }).map(() =>
+				expect.objectContaining({
+					content: expect.objectContaining({
+						text: expect.stringContaining('quick'),
+					}),
+				}),
+			),
+		);
+
+		await expect(
+			registry.get({ search: { text: '#4' }, limit: 1 }),
+			'Search works for note titles',
+		).resolves.toEqual([
+			expect.objectContaining({
+				content: expect.objectContaining({
+					title: 'Note #4',
+				}),
+			}),
+		]);
+	});
+
+	test('Search by text and filter by tags', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		await expect(
+			registry.get({ search: { text: 'Note' } }),
+			'Fetch notes for control',
+		).resolves.toHaveLength(texts.length);
+
+		await expect(
+			registry.get({ search: { text: 'Note' }, meta: { isVisible: false } }),
+			'Filter by meta properties hides results',
+		).resolves.toHaveLength(0);
+
+		await expect(
+			registry.get({ search: { text: 'Note' }, tags: [tagsMap['none']] }),
+			'Filter by not attached tag returns no results',
+		).resolves.toHaveLength(0);
+
+		await expect(
+			registry.get({ search: { text: 'Note' }, tags: [tagsMap['1th']] }),
+			'Filter by specific tag',
+		).resolves.toHaveLength(texts.length);
+
+		await expect(
+			registry.get({ search: { text: 'Note' }, tags: [tagsMap['2th']] }),
+			'Filter by specific tag',
+		).resolves.toHaveLength(Math.floor(texts.length / 2));
+
+		await expect(
+			registry.get({ search: { text: 'Note' }, tags: [tagsMap['3th']] }),
+			'Filter by specific tag',
+		).resolves.toHaveLength(Math.floor(texts.length / 3));
+
+		await expect(
+			registry.get({
+				search: { text: 'Note #2' },
+				tags: [tagsMap['3th']],
+				limit: 1,
+			}),
+			'Search returns most similar text after filtering',
+		).resolves.not.toEqual([
+			expect.objectContaining({
+				content: expect.objectContaining({
+					title: 'Note #2',
+				}),
+			}),
+		]);
+
+		await expect(
+			registry.get({
+				search: { text: 'Note #2' },
+				tags: [tagsMap['2th']],
+				limit: 1,
+			}),
+			'Exact match with filter must be at top of the list',
+		).resolves.toEqual([
+			expect.objectContaining({
+				content: expect.objectContaining({
+					title: 'Note #2',
+				}),
+			}),
+		]);
+	});
+
+	test('Lexemes list can be updated after changes', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const lexemes = new LexemesRegistry(db);
+
+		const [note] = await registry.get({ search: { text: 'leaped' }, limit: 1 });
+
+		expect(note).not.toBeUndefined();
+		expect(note.content.text, 'Found expected note').toBe(
+			'A fast auburn fox leaped above a sleepy canine',
+		);
+
+		await expect(
+			lexemes.getList(),
+			'Lexemes list have words of note text',
+		).resolves.toContain('leaped');
+		await expect(
+			lexemes.getList(),
+			'Lexemes list have no a target word for test',
+		).resolves.not.toContain('unique');
+
+		await registry.update(note.id, {
+			title: 'Updated note',
+			text: 'Updated text with unique text',
+		});
+		await expect(lexemes.index()).resolves.not.toHaveLength(0);
+		await expect(lexemes.prune()).resolves.not.toHaveLength(0);
+
+		await expect(
+			lexemes.getList(),
+			'Unused lexeme must be deleted',
+		).resolves.not.toContain('leaped');
+		await expect(lexemes.getList(), 'New lexemes must be added').resolves.toContain(
+			'unique',
+		);
+
+		await expect(
+			registry.get({ search: { text: 'unique text' }, limit: 1 }),
+			'Note can be found by updated text',
+		).resolves.toEqual([expect.objectContaining({ id: note.id })]);
 	});
 });

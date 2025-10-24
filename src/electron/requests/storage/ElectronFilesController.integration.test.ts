@@ -16,10 +16,13 @@ const getBufferFromText = (text: string) => new Uint8Array(Buffer.from(text)).bu
 test('Write files', async () => {
 	expect(vol.readdirSync('/', { recursive: true })).toEqual([]);
 
-	await filesController.write('test.txt', Buffer.from('File text content'));
+	await filesController.write(
+		'test.txt',
+		new Uint8Array(Buffer.from('File text content')).buffer as ArrayBuffer,
+	);
 	await filesController.write(
 		'/foo/bar/baz/test.txt',
-		Buffer.from('File text content'),
+		new Uint8Array(Buffer.from('File text content')).buffer as ArrayBuffer,
 	);
 
 	expect(vol.readdirSync('/', { recursive: true })).toMatchSnapshot(
@@ -77,17 +80,29 @@ describe('Deletion tests', () => {
 	const files = new ElectronFilesController(storageApi, 'deletionTests');
 
 	test('Add files', async () => {
-		await expect(files.write('/root.bytes', new Uint8Array())).resolves.not.toThrow();
-		await expect(files.write('/bytes1', new Uint8Array())).resolves.not.toThrow();
-		await expect(files.write('/bytes2', new Uint8Array())).resolves.not.toThrow();
-		await expect(files.write('/bytes3', new Uint8Array())).resolves.not.toThrow();
-		await expect(files.write('/foo/bytes1', new Uint8Array())).resolves.not.toThrow();
-		await expect(files.write('/foo/bytes2', new Uint8Array())).resolves.not.toThrow();
 		await expect(
-			files.write('/foo/bar/bytes1', new Uint8Array()),
+			files.write('/root.bytes', new Uint8Array().buffer),
 		).resolves.not.toThrow();
 		await expect(
-			files.write('/foo/bar/bytes2', new Uint8Array()),
+			files.write('/bytes1', new Uint8Array().buffer),
+		).resolves.not.toThrow();
+		await expect(
+			files.write('/bytes2', new Uint8Array().buffer),
+		).resolves.not.toThrow();
+		await expect(
+			files.write('/bytes3', new Uint8Array().buffer),
+		).resolves.not.toThrow();
+		await expect(
+			files.write('/foo/bytes1', new Uint8Array().buffer),
+		).resolves.not.toThrow();
+		await expect(
+			files.write('/foo/bytes2', new Uint8Array().buffer),
+		).resolves.not.toThrow();
+		await expect(
+			files.write('/foo/bar/bytes1', new Uint8Array().buffer),
+		).resolves.not.toThrow();
+		await expect(
+			files.write('/foo/bar/bytes2', new Uint8Array().buffer),
 		).resolves.not.toThrow();
 	});
 
@@ -129,12 +144,12 @@ describe('Many clients', () => {
 	const files2 = new ElectronFilesController(storageApi, 'profile2');
 
 	test('Available files is scoped by client root', async () => {
-		await files1.write('test.bytes', new Uint8Array(1));
+		await files1.write('test.bytes', new Uint8Array(1).buffer);
 
 		await expect(files1.list()).resolves.toEqual(['/test.bytes']);
 		await expect(files2.list()).resolves.toEqual([]);
 
-		await files2.write('test.bytes', new Uint8Array(2));
+		await files2.write('test.bytes', new Uint8Array(2).buffer);
 
 		await expect(files1.get('test.bytes')).resolves.toStrictEqual(
 			new Uint8Array(1).buffer,
@@ -175,7 +190,7 @@ test('Path traversal out of scope directory must not be possible', async () => {
 		'Resolved path is out of root directory',
 	);
 	await expect(
-		filesController.write('../secret.txt', new Uint8Array()),
+		filesController.write('../secret.txt', new Uint8Array().buffer),
 	).rejects.toThrowError('Resolved path is out of root directory');
 
 	// Read file out of root directory

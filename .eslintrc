@@ -49,6 +49,10 @@
 				"lang": "en_US",
 				"skipWords": [
 					"Aes",
+					"embeddings",
+					"onnx",
+					"huggingface",
+					"pg_trgm",
 					"Checkbox",
 					"Classname",
 					"DOM",
@@ -59,10 +63,15 @@
 					"ctid",
 					"repl",
 					"Pglite",
+					"plainto",
+					"agg",
+					"unnest",
+					"tsquery",
 					"Runnable",
 					"Ctx",
 					"Postgres",
 					"unlog",
+					"Cacheable",
 					"Umzug",
 					"memfs",
 					"Flate",
@@ -78,6 +87,10 @@
 					"Obfuscator",
 					"Outdent",
 					"Paddings",
+					"warmup",
+					"lexeme",
+					"lexemes",
+					"Segmenter",
 					"Postfix",
 					"Renderer",
 					"Struct",
@@ -232,6 +245,7 @@
 			"error",
 			{
 				"allow": [
+					"^pg_",
 					"^UNSAFE_",
 					"^UNSTABLE_"
 				]

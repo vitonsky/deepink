@@ -121,7 +121,6 @@ export const useDefaultNoteContextMenu = ({
 					const note = await notes.getById(id);
 					await notesExport.exportNote(
 						id,
-						true,
 						buildFileName(
 							workspaceData?.name,
 							note?.content.title.trim().slice(0, 50).trim() ||

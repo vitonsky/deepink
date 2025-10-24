@@ -1,94 +1,100 @@
 import { createEvent } from 'effector';
+import { MigrationRunner } from 'ordinality/MigrationRunner';
 import { IFileController } from '@core/features/files';
+import { PGlite, PGliteOptions } from '@electric-sql/pglite';
+import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
+import { unaccent } from '@electric-sql/pglite/contrib/unaccent';
 
 import {
 	IManagedDatabase,
 	ManagedDatabase,
 	Options as ManagedDatabaseOptions,
 } from '../ManagedDatabase';
-import { EventsMap, ExtendedPGLite } from './ExtendedPGLite';
+import { ExtendedPGLite } from './ExtendedPGLite';
+import { ExtendedPGliteWorker } from './ExtendedPGliteWorker';
 import { getMigrationsList } from './migrations';
-import { MigrationsRunner } from './migrations/MigrationsRunner';
 import { PostgresMigrationsStorage } from './migrations/PostgresMigrationsStorage';
 import { IDatabaseContainer } from '..';
 
-export type PGLiteDatabaseContainer = IDatabaseContainer<ExtendedPGLite>;
-
-export type PGLiteDatabase = IManagedDatabase<ExtendedPGLite>;
+export type DatabaseObject = ExtendedPGLite | ExtendedPGliteWorker;
+export type PGLiteDatabaseContainer = IDatabaseContainer<DatabaseObject>;
+export type PGLiteDatabase = IManagedDatabase<DatabaseObject>;
 
 export type Options = ManagedDatabaseOptions & {
 	verboseLog?: boolean;
 };
 
+export const IN_NODE =
+	typeof process === 'object' &&
+	typeof process.versions === 'object' &&
+	typeof process.versions.node === 'string';
+
+export const getPGLiteInstance = async (options: PGliteOptions) => {
+	if (IN_NODE) {
+		return new ExtendedPGLite({
+			...options,
+			extensions: { pg_trgm, unaccent },
+		}) as unknown as ExtendedPGliteWorker;
+	} else {
+		const DBWorker = await import('./PGLite.worker').then(
+			(module: any) => module.default,
+		);
+
+		return new ExtendedPGliteWorker(new DBWorker(), options);
+	}
+};
+
+// TODO: fix types. Introduce common type to use in app
 export const getWrappedDb = async (
 	dbFile: IFileController,
 	{ verboseLog }: Options = {},
 ): Promise<PGLiteDatabaseContainer> => {
 	const onChanged = createEvent();
 
-	const mutableCommands = [
-		'INSERT',
-		'UPDATE',
-		'DELETE',
-		'REPLACE',
-		'CREATE TABLE',
-		'CREATE INDEX',
-		'CREATE VIEW',
-		'CREATE TRIGGER',
-		'DROP TABLE',
-		'DROP INDEX',
-		'DROP VIEW',
-		'DROP TRIGGER',
-		'ALTER TABLE',
-		'PRAGMA',
-	];
-
+	// TODO: attach to a DB
 	// Create DB
-	let db: ExtendedPGLite;
-	const onCommand = ({ command, affectedRows }: EventsMap['command']) => {
-		if (typeof command !== 'string') return;
-
-		// Skip for closed DB
-		if (db.closed) return;
-
-		if (verboseLog) {
-			console.debug(command);
-		}
-
-		// Track mutable changes
-		const capitalizedCommand = command.toUpperCase();
-		if (
-			(affectedRows === undefined || affectedRows > 0) &&
-			mutableCommands.some((commandName) =>
-				capitalizedCommand.includes(commandName),
-			)
-		) {
-			onChanged();
-		}
-	};
+	let db: ExtendedPGliteWorker;
 
 	const dbFileBuffer = await dbFile.get();
+
 	if (dbFileBuffer && dbFileBuffer.byteLength > 0) {
 		// Load DB
-		db = new ExtendedPGLite({ loadDataDir: new Blob([dbFileBuffer]) });
+
+		db = await getPGLiteInstance({
+			loadDataDir: new Blob([dbFileBuffer]),
+		});
 	} else {
-		db = new ExtendedPGLite();
+		db = await getPGLiteInstance({});
 	}
 	await db.waitReady;
 
 	// Migrate data
-	const context = { db };
-	const migrations = new MigrationsRunner({
-		storage: new PostgresMigrationsStorage(),
+	const context = { db: db as unknown as PGlite };
+	const migrations = new MigrationRunner({
+		storage: new PostgresMigrationsStorage(db),
 		migrations: await getMigrationsList(),
 		context,
-		logger: console,
 	});
 
 	// Run migrations with hooks for recovery mode
 	while (true) {
 		try {
-			await migrations.up();
+			if (verboseLog) {
+				console.debug(
+					'Executed migrations',
+					(await migrations.executed()).join(', '),
+				);
+				console.debug(
+					'Migrations to apply',
+					(await migrations.executed()).join(', '),
+				);
+			}
+
+			const executedMigrations = await migrations.up();
+
+			if (verboseLog) {
+				console.debug('Executed migrations', executedMigrations);
+			}
 			break;
 		} catch (error) {
 			const isRecoveryMode =
@@ -126,12 +132,15 @@ export const getWrappedDb = async (
 	}
 
 	// Configure DB
-	db.on('command', onCommand);
+	db.on('sync', () => {
+		// Skip for closed DB
+		if (db.closed) return;
 
-	const dumpData = async () => {
-		const buffer = await db.dumpDataDir('none').then((file) => file.arrayBuffer());
-		return Buffer.from(new Uint8Array(buffer));
-	};
+		onChanged();
+	});
+
+	const dumpData = async () =>
+		db.dumpDataDir('none').then((file) => file.arrayBuffer());
 
 	// Write latest data
 	dbFile.write(await dumpData());
@@ -139,7 +148,8 @@ export const getWrappedDb = async (
 	return {
 		onChanged,
 		getDatabase() {
-			return db;
+			// TODO: fix types
+			return db as unknown as ExtendedPGLite;
 		},
 		isOpened() {
 			return !db.closed;

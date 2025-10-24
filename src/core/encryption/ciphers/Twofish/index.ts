@@ -94,7 +94,10 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
 
 		const iv = this.randomBytesGenerator(this.ivSize);
-		const encryptedBuffer = await this.ctrCipher.encrypt(bufferView, iv);
+		const encryptedBuffer = await this.ctrCipher.encrypt(
+			bufferView.buffer as ArrayBuffer,
+			iv,
+		);
 
 		const header = this.header.createBuffer({ padding, iv });
 		return joinBuffers([header, encryptedBuffer]);
@@ -105,7 +108,7 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 
 		const encryptedBuffer = new Uint8Array(buffer.slice(this.header.bufferSize));
 		const decryptedBufferWithPaddings = await this.ctrCipher.decrypt(
-			encryptedBuffer,
+			encryptedBuffer.buffer,
 			iv,
 		);
 

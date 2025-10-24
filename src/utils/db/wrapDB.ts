@@ -1,6 +1,6 @@
 import { Query } from 'nano-queries/core/Query';
 import { z } from 'zod';
-import { ExtendedPGLite } from '@core/storage/database/pglite/ExtendedPGLite';
+import { DatabaseObject } from '@core/storage/database/pglite/PGLiteDatabase';
 import { Results, Transaction } from '@electric-sql/pglite';
 
 import { DBTypes, qb } from './query-builder';
@@ -11,7 +11,7 @@ type WrappedDbMethods = {
 		scheme?: S,
 	) => Promise<Results<z.TypeOf<S>>>;
 };
-export const wrapDB = (db: ExtendedPGLite | Transaction): WrappedDbMethods => {
+export const wrapDB = (db: DatabaseObject | Transaction): WrappedDbMethods => {
 	return new Proxy<any>(
 		{},
 		{
