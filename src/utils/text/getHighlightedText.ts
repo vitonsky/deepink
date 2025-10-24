@@ -26,7 +26,9 @@ export const getHighlightedText = (
 
 		let charsLeft = Math.max(
 			0,
-			firstSegment && lastSegment ? lastSegment.end - firstSegment.start : limit,
+			firstSegment && lastSegment
+				? limit - (lastSegment.end - firstSegment.start)
+				: limit,
 		);
 
 		// No chars left

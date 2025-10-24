@@ -24,6 +24,32 @@ test('Basic case', () => {
 			highlight: false,
 		},
 	]);
+
+	expect(
+		getHighlightedText(text, findTextSegments(text, 'fox', { similarity: 0.3 })).map(
+			(segment) => ({
+				text: text.slice(segment.start, segment.end),
+				highlight: segment.highlight,
+			}),
+		),
+	).toStrictEqual([
+		{
+			text: 'The quick brown ',
+			highlight: false,
+		},
+		{
+			text: 'fox',
+			highlight: true,
+		},
+		{
+			text: ' jumps over the lazy ',
+			highlight: false,
+		},
+		{
+			text: 'dog',
+			highlight: true,
+		},
+	]);
 });
 
 test('Multiple texts', () => {
@@ -37,15 +63,55 @@ test('Multiple texts', () => {
 		),
 	).toStrictEqual([
 		{
-			text: 'quick brown ',
+			text: 'fox',
+			highlight: true,
+		},
+		{
+			text: ' jumps over ',
 			highlight: false,
 		},
 		{
 			text: 'fox',
 			highlight: true,
 		},
+	]);
+
+	expect(
+		getHighlightedText(text2, findTextSegments(text2, 'fox'), { limit: 17 }).map(
+			(segment) => ({
+				text: text2.slice(segment.start, segment.end),
+				highlight: segment.highlight,
+			}),
+		),
+	).toStrictEqual([
 		{
-			text: ' ju',
+			text: 'fox',
+			highlight: true,
+		},
+		{
+			text: ' jumps over ',
+			highlight: false,
+		},
+		{
+			text: 'fo',
+			highlight: true,
+		},
+	]);
+
+	expect(
+		getHighlightedText(text2, findTextSegments(text2, 'fox'), { limit: 15 }).map(
+			(segment) => ({
+				text: text2.slice(segment.start, segment.end),
+				highlight: segment.highlight,
+			}),
+		),
+	).toStrictEqual([
+		{
+			text: 'fox',
+			highlight: true,
+		},
+		{
+			text: ' jumps over ',
 			highlight: false,
 		},
 	]);
