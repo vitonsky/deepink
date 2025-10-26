@@ -73,39 +73,47 @@ export const SQLConsole = ({
 					// Init Repl with command
 					if (!node || isInitializedRef.current) return;
 
-					wait(10).then(async () => {
-						// wait before Repl initializes the dom because otherwise the code will only be executed on the next render
+					let attempts = 0;
+					const maxAttempts = 100;
+					const interval = setInterval(() => {
 						const input = node.querySelector('.cm-content');
-						if (!input || !(input instanceof HTMLDivElement)) return;
 
-						isInitializedRef.current = true;
+						if (input && input instanceof HTMLDivElement) {
+							clearInterval(interval);
 
-						input.click();
+							isInitializedRef.current = true;
 
-						await wait(100);
-						// eslint-disable-next-line spellcheck/spell-checker
-						input.innerHTML = `SELECT * FROM pg_tables WHERE schemaname = 'public'`;
+							wait(10).then(async () => {
+								input.click();
 
-						await wait(100);
-						input.dispatchEvent(
-							new KeyboardEvent('keydown', {
-								key: 'Enter',
-								keyCode: 13,
-								which: 13,
-								code: 'Enter',
-								bubbles: true,
-							}),
-						);
-						input.dispatchEvent(
-							new KeyboardEvent('keyup', {
-								key: 'Enter',
-								keyCode: 13,
-								which: 13,
-								code: 'Enter',
-								bubbles: true,
-							}),
-						);
-					});
+								await wait(100);
+								// eslint-disable-next-line spellcheck/spell-checker
+								input.innerHTML = `SELECT * FROM pg_tables WHERE schemaname = 'public'`;
+
+								await wait(100);
+								input.dispatchEvent(
+									new KeyboardEvent('keydown', {
+										key: 'Enter',
+										keyCode: 13,
+										which: 13,
+										code: 'Enter',
+										bubbles: true,
+									}),
+								);
+								input.dispatchEvent(
+									new KeyboardEvent('keyup', {
+										key: 'Enter',
+										keyCode: 13,
+										which: 13,
+										code: 'Enter',
+										bubbles: true,
+									}),
+								);
+							});
+						} else if (attempts++ >= maxAttempts) {
+							clearInterval(interval);
+						}
+					}, 10);
 				}}
 			>
 				<Repl pg={profile.db.get()} />
