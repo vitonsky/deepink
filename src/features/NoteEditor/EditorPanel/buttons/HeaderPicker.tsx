@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaHeading } from 'react-icons/fa6';
 import {
 	Button,
@@ -35,19 +35,37 @@ export const HeaderPicker = ({
 		[onPick],
 	);
 
+	const forceShowListRef = useRef(false);
+
 	return (
-		<Menu autoSelect={false} {...props}>
+		<Menu autoSelect={true} {...props}>
 			<MenuButton
 				as={Button}
 				size="sm"
 				variant="ghost"
-				title={`Ctrl + click to insert header with level ${level}`}
-				onClick={(evt) => {
-					if (evt.ctrlKey) {
-						evt.preventDefault();
-						evt.stopPropagation();
-						onPress(level);
+				title={`Click to insert header with level ${level}. Open context menu to choose another option`}
+				onMouseUp={(evt) => {
+					const isAltButton = [1, 2].includes(evt.button);
+					if (isAltButton) {
+						forceShowListRef.current = true;
+						(evt.target as HTMLElement).click();
 					}
+				}}
+				onClick={(evt) => {
+					// Let user pick options
+					if (forceShowListRef.current) {
+						forceShowListRef.current = false;
+						return;
+					}
+
+					// Let user pick option by click with modifiers
+					// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+					if (evt.ctrlKey || evt.metaKey) return;
+
+					// Use default level
+					evt.preventDefault();
+					evt.stopPropagation();
+					onPress(level);
 				}}
 				minW="auto"
 			>

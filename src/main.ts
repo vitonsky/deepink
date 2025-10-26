@@ -3,13 +3,32 @@ import { openMainWindow } from 'src/windows/main/main';
 import { isDevMode } from '@electron/utils/app';
 import { getResourcesPath } from '@electron/utils/files';
 
+import { createAppMenu } from './createAppMenu';
+
 console.log({
 	isDev: isDevMode(),
 	appDir: app.getAppPath(),
 	resourcesPath: getResourcesPath(),
 });
 
+const onShutdown = (callback: () => any) => {
+	process.once('beforeExit', callback);
+	process.once('SIGTERM', callback);
+	process.once('SIGINT', callback);
+
+	return () => {
+		process.off('beforeExit', callback);
+		process.off('SIGTERM', callback);
+		process.off('SIGINT', callback);
+	};
+};
+
+// Set custom menu
 Menu.setApplicationMenu(null);
+app.on('ready', () => {
+	Menu.setApplicationMenu(createAppMenu());
+});
+
 app.whenReady().then(async () => {
 	console.log('App ready');
 
@@ -32,5 +51,11 @@ app.whenReady().then(async () => {
 		);
 	}
 
-	openMainWindow();
+	const windowControls = await openMainWindow();
+
+	// Force app shutdown
+	onShutdown(() => {
+		windowControls.quit();
+		app.exit();
+	});
 });

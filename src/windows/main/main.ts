@@ -7,7 +7,6 @@ import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
-import { isPlatform } from '@electron/utils/platform';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { createWatcher } from '@utils/effector/watcher';
 
@@ -39,6 +38,10 @@ export const openMainWindow = async () => {
 	const win = new BrowserWindow({
 		width: 1300,
 		height: 800,
+
+		// Auto hide menu on linux and windows
+		autoHideMenuBar: true,
+
 		// show: false,
 		backgroundColor: '#fff', // required to enable sub pixel rendering, can't be in css
 		webPreferences: {
@@ -100,12 +103,16 @@ export const openMainWindow = async () => {
 	createWatcher($shouldBeClosed, (shouldBeClosed) => {
 		const onClose = (evt: { preventDefault: () => void }) => {
 			// Allow to close window
-			if (shouldBeClosed) {
-				return;
-			}
+			if (shouldBeClosed) return;
 
+			// Hide window instead of close
 			evt.preventDefault();
 			win.hide();
+
+			// Hide app in dock
+			if (app.dock) {
+				app.dock.hide();
+			}
 		};
 
 		win.addListener('close', onClose);
@@ -114,17 +121,9 @@ export const openMainWindow = async () => {
 		};
 	});
 
-	// Dock
-	win.addListener('hide', () => {
-		if (win.isMinimized()) return;
-
-		if (isPlatform('darwin')) {
-			app.dock.hide();
-		}
-	});
-
+	// Show app in dock always when window becomes visible
 	win.addListener('show', () => {
-		if (isPlatform('darwin')) {
+		if (app.dock) {
 			app.dock.show();
 		}
 	});
@@ -154,4 +153,6 @@ export const openMainWindow = async () => {
 			{ label: 'Quit', click: trayApi.quit },
 		]),
 	);
+
+	return trayApi;
 };
