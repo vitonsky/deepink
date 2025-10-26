@@ -179,9 +179,17 @@ export const profilesSlice = createSlice({
 				workspace.recentlyClosedNotes[workspace.recentlyClosedNotes.length - 1];
 			if (!lastClosedNote) return;
 
+			// update opened note
+			const foundNoteInList = workspace.notes.find(
+				({ id }) => id === lastClosedNote,
+			);
+			if (!foundNoteInList) return;
+			workspace.openedNotes.push(foundNoteInList);
+
+			// update active note
 			workspace.activeNote = lastClosedNote;
 
-			// update recentlyClosedNotes after restore
+			// update recentlyClosedNotes
 			const filteredClosedNotes = workspace.recentlyClosedNotes.filter(
 				(id) => id !== lastClosedNote,
 			);
