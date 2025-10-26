@@ -150,4 +150,6 @@ export const openMainWindow = async () => {
 			{ label: 'Quit', click: trayApi.quit },
 		]),
 	);
+
+	return trayApi;
 };

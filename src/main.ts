@@ -12,6 +12,18 @@ console.log({
 	resourcesPath: getResourcesPath(),
 });
 
+const onShutdown = (callback: () => any) => {
+	process.once('beforeExit', callback);
+	process.once('SIGTERM', callback);
+	process.once('SIGINT', callback);
+
+	return () => {
+		process.off('beforeExit', callback);
+		process.off('SIGTERM', callback);
+		process.off('SIGINT', callback);
+	};
+};
+
 Menu.setApplicationMenu(null);
 app.whenReady().then(async () => {
 	console.log('App ready');
@@ -35,7 +47,13 @@ app.whenReady().then(async () => {
 		);
 	}
 
-	openMainWindow();
+	const windowControls = await openMainWindow();
+
+	// Force app shutdown
+	onShutdown(() => {
+		windowControls.quit();
+		app.exit();
+	});
 });
 
 app.on('ready', () => {
