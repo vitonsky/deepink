@@ -19,22 +19,24 @@ export const enableContextMenu = () =>
 			});
 
 			const prepareMenu = (menu: Electron.MenuItemConstructorOptions[]) => {
-				return menu.map(({ id, click, ...props }) => {
-					// Decorate click handler, to resolve promise with menu id by click on menu
-					const clickHandler =
-						id === undefined
-							? click
-							: (
-									menuItem: Electron.MenuItem,
-									browserWindow: Electron.BrowserWindow | undefined,
-									event: Electron.KeyboardEvent,
-							  ) => {
-									if (click) click(menuItem, browserWindow, event);
-									onClick(id);
-							  };
+				return menu.map(
+					({ id, click, ...props }): Electron.MenuItemConstructorOptions => {
+						// Decorate click handler, to resolve promise with menu id by click on menu
+						const clickHandler =
+							id === undefined
+								? click
+								: (
+										menuItem: Electron.MenuItem,
+										browserWindow: Electron.BaseWindow | undefined,
+										event: Electron.KeyboardEvent,
+								  ) => {
+										if (click) click(menuItem, browserWindow, event);
+										onClick(id);
+								  };
 
-					return { id, click: clickHandler, ...props };
-				});
+						return { id, click: clickHandler, ...props };
+					},
+				);
 			};
 
 			const menu = Menu.buildFromTemplate(prepareMenu(menuTemplate));

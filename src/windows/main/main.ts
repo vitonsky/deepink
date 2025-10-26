@@ -7,7 +7,6 @@ import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
-import { isPlatform } from '@electron/utils/platform';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { createWatcher } from '@utils/effector/watcher';
 
@@ -107,7 +106,7 @@ export const openMainWindow = async () => {
 			win.hide();
 
 			// Hide app in dock
-			if (isPlatform('darwin')) {
+			if (app.dock) {
 				app.dock.hide();
 			}
 		};
@@ -120,7 +119,7 @@ export const openMainWindow = async () => {
 
 	// Show app in dock always when window becomes visible
 	win.addListener('show', () => {
-		if (isPlatform('darwin')) {
+		if (app.dock) {
 			app.dock.show();
 		}
 	});
