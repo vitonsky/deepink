@@ -72,7 +72,6 @@ export const SQLConsole = ({
 				ref={(node) => {
 					// Init Repl with command
 					if (!node || isInitializedRef.current) return;
-					if (!isVisible) return;
 
 					const input = node.querySelector('.cm-content');
 					if (!input || !(input instanceof HTMLDivElement)) return;
@@ -89,6 +88,15 @@ export const SQLConsole = ({
 						await wait(100);
 						input.dispatchEvent(
 							new KeyboardEvent('keydown', {
+								key: 'Enter',
+								keyCode: 13,
+								which: 13,
+								code: 'Enter',
+								bubbles: true,
+							}),
+						);
+						input.dispatchEvent(
+							new KeyboardEvent('keyup', {
 								key: 'Enter',
 								keyCode: 13,
 								which: 13,
