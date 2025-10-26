@@ -9,7 +9,7 @@ import { shortcuts } from '.';
  *
  * Configures the processing of global keyboard shortcuts, associating each combination with a corresponding command
  */
-export const useRegisterCommandShortcuts = () => {
+export const useShortcutsBinding = () => {
 	const runCommand = useCommand();
 
 	useEffect(() => {
