@@ -6,6 +6,31 @@ import { wait } from '@utils/tests';
 
 import { useProfileControls } from '..';
 
+const findElement = (
+	parentNode: HTMLDivElement,
+	selector: string,
+	delay = 10,
+	maxAttempts = 300,
+): Promise<HTMLDivElement> => {
+	return new Promise((resolve) => {
+		let attempts = 0;
+
+		const interval = setInterval(() => {
+			const element = parentNode.querySelector(selector);
+
+			if (element && element instanceof HTMLDivElement) {
+				clearInterval(interval);
+				resolve(element);
+			} else if (attempts++ >= maxAttempts) {
+				clearInterval(interval);
+				console.warn(
+					`Element "${selector}" not found after ${maxAttempts} attempts.`,
+				);
+			}
+		}, delay);
+	});
+};
+
 export const SQLConsole = ({
 	isVisible,
 	onVisibilityChange,
@@ -73,47 +98,36 @@ export const SQLConsole = ({
 					// Init Repl with command
 					if (!node || isInitializedRef.current) return;
 
-					let attempts = 0;
-					const maxAttempts = 100;
-					const interval = setInterval(() => {
-						const input = node.querySelector('.cm-content');
+					wait(10).then(async () => {
+						const input = await findElement(node, '.cm-content');
 
-						if (input && input instanceof HTMLDivElement) {
-							clearInterval(interval);
+						isInitializedRef.current = true;
 
-							isInitializedRef.current = true;
+						input.click();
+						await wait(100);
+						// eslint-disable-next-line spellcheck/spell-checker
+						input.innerHTML = `SELECT * FROM pg_tables WHERE schemaname = 'public'`;
 
-							wait(10).then(async () => {
-								input.click();
-
-								await wait(100);
-								// eslint-disable-next-line spellcheck/spell-checker
-								input.innerHTML = `SELECT * FROM pg_tables WHERE schemaname = 'public'`;
-
-								await wait(100);
-								input.dispatchEvent(
-									new KeyboardEvent('keydown', {
-										key: 'Enter',
-										keyCode: 13,
-										which: 13,
-										code: 'Enter',
-										bubbles: true,
-									}),
-								);
-								input.dispatchEvent(
-									new KeyboardEvent('keyup', {
-										key: 'Enter',
-										keyCode: 13,
-										which: 13,
-										code: 'Enter',
-										bubbles: true,
-									}),
-								);
-							});
-						} else if (attempts++ >= maxAttempts) {
-							clearInterval(interval);
-						}
-					}, 10);
+						await wait(100);
+						input.dispatchEvent(
+							new KeyboardEvent('keydown', {
+								key: 'Enter',
+								keyCode: 13,
+								which: 13,
+								code: 'Enter',
+								bubbles: true,
+							}),
+						);
+						input.dispatchEvent(
+							new KeyboardEvent('keyup', {
+								key: 'Enter',
+								keyCode: 13,
+								which: 13,
+								code: 'Enter',
+								bubbles: true,
+							}),
+						);
+					});
 				}}
 			>
 				<Repl pg={profile.db.get()} />
