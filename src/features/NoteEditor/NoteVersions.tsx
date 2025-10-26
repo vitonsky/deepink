@@ -68,7 +68,7 @@ export const NoteVersions = ({
 					size="sm"
 					title="Remove all saved versions of this note permanently"
 					onClick={(evt) => {
-						if (evt.ctrlKey) {
+						if (evt.ctrlKey || evt.metaKey) {
 							onDeleteAll();
 						} else {
 							confirm(({ onClose }) => ({
@@ -152,7 +152,7 @@ export const NoteVersions = ({
 												onVersionApply(version);
 
 											// Apply immediately
-											if (evt.ctrlKey) {
+											if (evt.ctrlKey || evt.metaKey) {
 												applyVersion();
 												return;
 											}
@@ -232,7 +232,7 @@ export const NoteVersions = ({
 											};
 
 											// Delete immediately
-											if (evt.ctrlKey) {
+											if (evt.ctrlKey || evt.metaKey) {
 												deleteVersion();
 												return;
 											}

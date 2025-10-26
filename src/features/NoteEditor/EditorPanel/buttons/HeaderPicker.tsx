@@ -43,7 +43,7 @@ export const HeaderPicker = ({
 				variant="ghost"
 				title={`Ctrl + click to insert header with level ${level}`}
 				onClick={(evt) => {
-					if (evt.ctrlKey) {
+					if (evt.ctrlKey || evt.metaKey) {
 						evt.preventDefault();
 						evt.stopPropagation();
 						onPress(level);
