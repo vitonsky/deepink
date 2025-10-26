@@ -17,7 +17,8 @@ export const useRegisterCommandShortcuts = () => {
 		// so when the user is focused on the note editor or any other input field, shortcuts won't work
 		// We force handling of shortcuts in these cases
 		// https://github.com/jaywcjlove/hotkeys-js?tab=readme-ov-file#filter
-		hotkeys.filter = () => true;
+		// We want to react only on events emitted by real user, not a synthetic
+		hotkeys.filter = (event) => event.isTrusted;
 
 		Object.entries(shortcuts).forEach(([shortcut, commandName]) => {
 			hotkeys(
