@@ -18,17 +18,17 @@ export function hasCommandPayload<K extends keyof CommandPayloadsMap>(
 export const useCommandCallback = <K extends keyof CommandPayloadsMap>(
 	commandName: K,
 	callback: (payload?: CommandPayloadsMap[K]) => void,
-	options?: { enabled?: boolean },
+	{ enabled = true }: { enabled?: boolean } = {},
 ) => {
 	const commandEvent = useContext(CommandEventContext);
 
 	useEffect(() => {
-		if (options?.enabled === false) return;
+		if (!enabled) return;
 
 		return commandEvent.watch((event) => {
 			if (event.name !== commandName) return;
 
 			hasCommandPayload(event) ? callback(event.payload) : callback();
 		});
-	}, [callback, commandName, commandEvent, options?.enabled]);
+	}, [callback, commandName, commandEvent, enabled]);
 };

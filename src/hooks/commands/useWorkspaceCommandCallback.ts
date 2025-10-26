@@ -1,8 +1,4 @@
-import { useMemo } from 'react';
-import { isEqual } from 'lodash';
-import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
+import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 
 import { useCommandCallback } from './useCommandCallback';
 import { CommandPayloadsMap } from '.';
@@ -14,17 +10,11 @@ import { CommandPayloadsMap } from '.';
 export const useWorkspaceCommandCallback = <K extends keyof CommandPayloadsMap>(
 	commandName: K,
 	callback: (payload: CommandPayloadsMap[K]) => void,
-	options?: { enabled?: boolean },
+	{ enabled = true }: { enabled?: boolean } = {},
 ) => {
-	const { profileId, workspaceId: contextWorkspaceId } = useWorkspaceData();
-	const activeWorkspace = useAppSelector(
-		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
-		isEqual,
-	);
-
-	const isEnabled = activeWorkspace?.id === contextWorkspaceId;
+	const isActiveWorkspace = useIsActiveWorkspace();
 
 	useCommandCallback(commandName, callback, {
-		enabled: isEnabled && (options?.enabled ?? true),
+		enabled: isActiveWorkspace && enabled,
 	});
 };
