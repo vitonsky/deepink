@@ -8,7 +8,6 @@ import { CommandPayloadsMap } from '.';
  *
  * Optionally, the subscription can be disabled using the `enabled` flag.
  */
-
 export const useCommandCallback = <K extends keyof CommandPayloadsMap>(
 	commandName: K,
 	callback: (payload: CommandPayloadsMap[K]) => void,

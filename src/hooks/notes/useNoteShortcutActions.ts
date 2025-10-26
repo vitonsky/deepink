@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
@@ -18,11 +17,6 @@ export const useNoteShortcutActions = () => {
 
 	const noteActions = useNoteActions();
 	const createNote = useCreateNote();
-
-	// All reducers used here update the active note, so when the active note ID changes — open the note
-	useEffect(() => {
-		if (activeNoteId) noteActions.click(activeNoteId);
-	}, [activeNoteId, noteActions]);
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
 
