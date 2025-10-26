@@ -100,12 +100,16 @@ export const openMainWindow = async () => {
 	createWatcher($shouldBeClosed, (shouldBeClosed) => {
 		const onClose = (evt: { preventDefault: () => void }) => {
 			// Allow to close window
-			if (shouldBeClosed) {
-				return;
-			}
+			if (shouldBeClosed) return;
 
+			// Hide window instead of close
 			evt.preventDefault();
 			win.hide();
+
+			// Hide app in dock
+			if (isPlatform('darwin')) {
+				app.dock.hide();
+			}
 		};
 
 		win.addListener('close', onClose);
@@ -114,15 +118,7 @@ export const openMainWindow = async () => {
 		};
 	});
 
-	// Dock
-	win.addListener('hide', () => {
-		if (win.isMinimized()) return;
-
-		if (isPlatform('darwin')) {
-			app.dock.hide();
-		}
-	});
-
+	// Show app in dock always when window becomes visible
 	win.addListener('show', () => {
 		if (isPlatform('darwin')) {
 			app.dock.show();
