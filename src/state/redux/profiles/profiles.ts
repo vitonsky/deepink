@@ -1,6 +1,7 @@
 import { INote, NoteId } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getItemByOffset } from '@utils/collections/getItemByOffset';
 
 import { createAppSelector } from '../utils';
 import { findNearNote } from './utils';
@@ -163,6 +164,53 @@ export const profilesSlice = createSlice({
 			if (!isOpenedNote) return;
 
 			workspace.activeNote = noteId;
+		},
+
+		setLastClosedNoteActive: (
+			state,
+			{
+				payload: { profileId, workspaceId },
+			}: PayloadAction<ProfileScoped<{ workspaceId: string }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			const lastClosedNote =
+				workspace.recentlyClosedNotes[workspace.recentlyClosedNotes.length - 1];
+			if (!lastClosedNote) return;
+
+			workspace.activeNote = lastClosedNote;
+
+			// update recentlyClosedNotes after restore
+			const filteredClosedNotes = workspace.recentlyClosedNotes.filter(
+				(id) => id !== lastClosedNote,
+			);
+			if (workspace.recentlyClosedNotes.length !== filteredClosedNotes.length) {
+				workspace.recentlyClosedNotes = filteredClosedNotes;
+			}
+		},
+
+		switchActiveNote: (
+			state,
+			{
+				payload: { profileId, workspaceId, offset },
+			}: PayloadAction<ProfileScoped<{ workspaceId: string; offset: number }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			const activeNoteId = workspace.activeNote;
+			if (!activeNoteId) return;
+
+			const noteIndex = workspace.openedNotes.findIndex(
+				(note) => note.id === activeNoteId,
+			);
+			if (noteIndex === -1) return;
+
+			const nextNote = getItemByOffset(workspace.openedNotes, noteIndex, offset);
+			if (!nextNote) return;
+
+			workspace.activeNote = nextNote.id;
 		},
 
 		setNotes: (
