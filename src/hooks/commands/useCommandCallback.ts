@@ -1,13 +1,7 @@
 import { useContext, useEffect } from 'react';
 
-import { Command, CommandEventContext } from './CommandEventProvider';
+import { CommandEventContext } from './CommandEventProvider';
 import { CommandPayloadsMap } from '.';
-
-export function hasCommandPayload<K extends keyof CommandPayloadsMap>(
-	command: Command<K>,
-): command is { name: K; payload: CommandPayloadsMap[K] } {
-	return 'payload' in command;
-}
 
 /**
  * Subscribes to a command event by its name and cleans up automatically
@@ -17,7 +11,7 @@ export function hasCommandPayload<K extends keyof CommandPayloadsMap>(
 
 export const useCommandCallback = <K extends keyof CommandPayloadsMap>(
 	commandName: K,
-	callback: (payload?: CommandPayloadsMap[K]) => void,
+	callback: (payload: CommandPayloadsMap[K]) => void,
 	{ enabled = true }: { enabled?: boolean } = {},
 ) => {
 	const commandEvent = useContext(CommandEventContext);
@@ -28,7 +22,7 @@ export const useCommandCallback = <K extends keyof CommandPayloadsMap>(
 		return commandEvent.watch((event) => {
 			if (event.name !== commandName) return;
 
-			hasCommandPayload(event) ? callback(event.payload) : callback();
+			callback(event.payload);
 		});
 	}, [callback, commandName, commandEvent, enabled]);
 };

@@ -17,14 +17,7 @@ export const useCommand = () => {
 				: [payload: CommandPayloadsMap[K]]
 		) => {
 			const [payload] = args;
-			const data =
-				payload === undefined
-					? { name: commandName }
-					: {
-							name: commandName,
-							payload,
-					  };
-			commandEvent(data);
+			commandEvent({ name: commandName, payload });
 		},
 		[commandEvent],
 	);
