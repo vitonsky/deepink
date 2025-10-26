@@ -107,6 +107,15 @@ export const TopBar: FC<TopBarProps> = ({
 
 								onClose(note.id);
 							}}
+							onContextMenu={(evt) => {
+								// Prevent text selection on macOS
+								evt.preventDefault();
+
+								openNoteContextMenu(note.id, {
+									x: evt.pageX,
+									y: evt.pageY,
+								});
+							}}
 						>
 							<HStack gap=".5rem" w="100%" justifyContent="space-between">
 								<Text
@@ -114,12 +123,6 @@ export const TopBar: FC<TopBarProps> = ({
 									whiteSpace="nowrap"
 									overflow="hidden"
 									textOverflow="ellipsis"
-									onContextMenu={(evt) => {
-										openNoteContextMenu(note.id, {
-											x: evt.pageX,
-											y: evt.pageY,
-										});
-									}}
 								>
 									{getNoteTitle(note.content, 25)}
 								</Text>
