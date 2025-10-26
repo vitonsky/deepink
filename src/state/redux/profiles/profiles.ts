@@ -179,23 +179,18 @@ export const profilesSlice = createSlice({
 				workspace.recentlyClosedNotes[workspace.recentlyClosedNotes.length - 1];
 			if (!lastClosedNote) return;
 
-			// update opened note
+			// find restored note
 			const foundNoteInList = workspace.notes.find(
 				({ id }) => id === lastClosedNote,
 			);
 			if (!foundNoteInList) return;
-			workspace.openedNotes.push(foundNoteInList);
 
-			// update active note
+			// update opened and active notes
+			workspace.openedNotes.push(foundNoteInList);
 			workspace.activeNote = lastClosedNote;
 
-			// update recentlyClosedNotes
-			const filteredClosedNotes = workspace.recentlyClosedNotes.filter(
-				(id) => id !== lastClosedNote,
-			);
-			if (workspace.recentlyClosedNotes.length !== filteredClosedNotes.length) {
-				workspace.recentlyClosedNotes = filteredClosedNotes;
-			}
+			// remove note from recentlyClosedNotes
+			workspace.recentlyClosedNotes.pop();
 		},
 
 		switchActiveNote: (
