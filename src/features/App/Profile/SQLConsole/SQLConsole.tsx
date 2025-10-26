@@ -73,12 +73,13 @@ export const SQLConsole = ({
 					// Init Repl with command
 					if (!node || isInitializedRef.current) return;
 
-					const input = node.querySelector('.cm-content');
-					if (!input || !(input instanceof HTMLDivElement)) return;
-
-					isInitializedRef.current = true;
-
 					wait(10).then(async () => {
+						// wait before Repl initializes the dom because otherwise the code will only be executed on the next render
+						const input = node.querySelector('.cm-content');
+						if (!input || !(input instanceof HTMLDivElement)) return;
+
+						isInitializedRef.current = true;
+
 						input.click();
 
 						await wait(100);
