@@ -2,6 +2,9 @@ import { app, Menu } from 'electron';
 import { openMainWindow } from 'src/windows/main/main';
 import { isDevMode } from '@electron/utils/app';
 import { getResourcesPath } from '@electron/utils/files';
+import { isPlatform } from '@electron/utils/platform';
+
+import { createAppMenu } from './createAppMenu';
 
 console.log({
 	isDev: isDevMode(),
@@ -33,4 +36,11 @@ app.whenReady().then(async () => {
 	}
 
 	openMainWindow();
+});
+
+app.on('ready', () => {
+	// Add application menu for mac
+	if (isPlatform('darwin')) {
+		Menu.setApplicationMenu(createAppMenu());
+	}
 });
