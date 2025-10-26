@@ -38,6 +38,10 @@ export const openMainWindow = async () => {
 	const win = new BrowserWindow({
 		width: 1300,
 		height: 800,
+
+		// Auto hide menu on linux and windows
+		autoHideMenuBar: true,
+
 		// show: false,
 		backgroundColor: '#fff', // required to enable sub pixel rendering, can't be in css
 		webPreferences: {
