@@ -3,15 +3,10 @@ import { createEvent, EventCallable } from 'effector';
 
 import { CommandPayloadsMap } from '.';
 
-export type Command<K extends keyof CommandPayloadsMap = keyof CommandPayloadsMap> =
-	CommandPayloadsMap[K] extends void
-		? {
-				name: K;
-		  }
-		: {
-				name: K;
-				payload: CommandPayloadsMap[K];
-		  };
+export type Command<K extends keyof CommandPayloadsMap = keyof CommandPayloadsMap> = {
+	name: K;
+	payload: CommandPayloadsMap[K];
+};
 
 export const CommandEventContext = createContext<EventCallable<Command>>(createEvent());
 
