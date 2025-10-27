@@ -6,31 +6,6 @@ import { wait } from '@utils/tests';
 
 import { useProfileControls } from '..';
 
-const findElement = (
-	parentNode: HTMLDivElement,
-	selector: string,
-	delay = 10,
-	maxAttempts = 300,
-): Promise<HTMLDivElement> => {
-	return new Promise((resolve) => {
-		let attempts = 0;
-
-		const interval = setInterval(() => {
-			const element = parentNode.querySelector(selector);
-
-			if (element && element instanceof HTMLDivElement) {
-				clearInterval(interval);
-				resolve(element);
-			} else if (attempts++ >= maxAttempts) {
-				clearInterval(interval);
-				console.warn(
-					`Element "${selector}" not found after ${maxAttempts} attempts.`,
-				);
-			}
-		}, delay);
-	});
-};
-
 export const SQLConsole = ({
 	isVisible,
 	onVisibilityChange,
@@ -99,7 +74,21 @@ export const SQLConsole = ({
 					if (!node || isInitializedRef.current) return;
 
 					wait(10).then(async () => {
-						const input = await findElement(node, '.cm-content');
+						let input: HTMLDivElement | null = null;
+						for (let attempt = 0; attempt < 200; attempt++) {
+							const element = node.querySelector('.cm-content');
+
+							if (element && element instanceof HTMLDivElement) {
+								input = element;
+								break;
+							}
+							await wait(10);
+						}
+
+						if (!input) {
+							console.warn(`Element '.cm-content' not found`);
+							return;
+						}
 
 						isInitializedRef.current = true;
 
