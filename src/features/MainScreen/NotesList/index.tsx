@@ -10,7 +10,6 @@ import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
 	selectNotes,
-	selectOpenedNotes,
 	selectSearch,
 } from '@state/redux/profiles/profiles';
 import { useVirtualizer } from '@tanstack/react-virtual';
