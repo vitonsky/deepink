@@ -34,7 +34,7 @@ export const useNoteContextMenuCallback = ({
 	closeNote,
 	updateNotes,
 }: ContextMenuOptions) => {
-	const notesRegistry = useNotesRegistry();
+	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
 	const notesExport = useNotesExport();
@@ -47,7 +47,7 @@ export const useNoteContextMenuCallback = ({
 		async ({ id, action }) => {
 			const actionsMap = {
 				[NoteActions.DELETE]: async (id: string) => {
-					const targetNote = await notesRegistry.getById(id);
+					const targetNote = await notes.getById(id);
 					const isConfirmed = confirm(
 						`Are you sure you want to ${
 							targetNote?.isDeleted
@@ -60,10 +60,10 @@ export const useNoteContextMenuCallback = ({
 					closeNote(id);
 
 					if (targetNote?.isDeleted) {
-						await notesRegistry.delete([id]);
+						await notes.delete([id]);
 						await tagsRegistry.setAttachedTags(id, []);
 					} else {
-						await notesRegistry.updateMeta([id], { isDeleted: true });
+						await notes.updateMeta([id], { isDeleted: true });
 						eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 					}
 
@@ -76,14 +76,14 @@ export const useNoteContextMenuCallback = ({
 					);
 					if (!isConfirmed) return;
 
-					await notesRegistry.updateMeta([id], { isDeleted: false });
+					await notes.updateMeta([id], { isDeleted: false });
 					eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
 					updateNotes();
 				},
 
 				[NoteActions.DUPLICATE]: async (id: string) => {
-					const sourceNote = await notesRegistry.getById(id);
+					const sourceNote = await notes.getById(id);
 
 					if (!sourceNote) {
 						console.warn(`Not found note with id ${sourceNote}`);
@@ -91,7 +91,7 @@ export const useNoteContextMenuCallback = ({
 					}
 
 					const { title, text } = sourceNote.content;
-					const newNoteId = await notesRegistry.add({
+					const newNoteId = await notes.add({
 						title: 'DUPLICATE: ' + title,
 						text,
 					});
@@ -105,7 +105,7 @@ export const useNoteContextMenuCallback = ({
 				},
 
 				[NoteActions.COPY_MARKDOWN_LINK]: async (id: string) => {
-					const note = await notesRegistry.getById(id);
+					const note = await notes.getById(id);
 					if (!note) {
 						console.error(`Can't get data of note #${id}`);
 						return;
@@ -123,10 +123,9 @@ export const useNoteContextMenuCallback = ({
 				},
 
 				[NoteActions.EXPORT]: async (id: string) => {
-					const note = await notesRegistry.getById(id);
+					const note = await notes.getById(id);
 					await notesExport.exportNote(
 						id,
-						true,
 						buildFileName(
 							workspaceData?.name,
 							note?.content.title.trim().slice(0, 50).trim() ||
@@ -144,7 +143,7 @@ export const useNoteContextMenuCallback = ({
 			closeNote,
 			eventBus,
 			notesExport,
-			notesRegistry,
+			notes,
 			tagsRegistry,
 			updateNotes,
 			workspaceData?.name,
