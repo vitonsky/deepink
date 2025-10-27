@@ -4,6 +4,9 @@
 	"version": "0.0.1",
 	"main": "dist/main.js",
 	"license": "MIT",
+	"engines": {
+		"node": ">=22"
+	},
 	"scripts": {
 		"test": "vitest",
 		"clean": "rm -Rf dist out",
