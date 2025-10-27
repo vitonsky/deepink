@@ -8,8 +8,9 @@ const devtool = isProduction ? undefined : 'source-map';
 const outputPath = path.join(__dirname, 'dist');
 
 console.log('Webpack run', {
-	devtool,
+	isProduction,
 	isFastBuild,
+	devtool,
 	outputPath,
 });
 
