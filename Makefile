@@ -5,4 +5,4 @@ build: prepare
 	npm run build
 
 make-win:
-	NODE_OPTIONS=--max-old-space-size=4096 NODE_ENV=production npm run build
+	set NODE_OPTIONS=--max-old-space-size=4096 && set NODE_ENV=production && npm run make
