@@ -1,4 +1,6 @@
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import type { MakerDMGConfig } from '@electron-forge/maker-dmg';
+import type { MakerPKGConfig } from '@electron-forge/maker-pkg';
 import type { MakerWixConfig } from '@electron-forge/maker-wix';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import type { ForgeConfig } from '@electron-forge/shared-types';
@@ -21,6 +23,10 @@ export default {
 	},
 	makers: [
 		{
+			name: '@electron-forge/maker-zip',
+			config: {},
+		},
+		{
 			name: '@electron-forge/maker-wix',
 			platforms: ['win32'],
 			config: {
@@ -36,9 +42,16 @@ export default {
 			} satisfies MakerWixConfig,
 		},
 		{
-			name: '@electron-forge/maker-zip',
+			name: '@electron-forge/maker-dmg',
 			platforms: ['darwin'],
-			config: {},
+			config: {
+				format: 'ULFO',
+			} satisfies MakerDMGConfig,
+		},
+		{
+			name: '@electron-forge/maker-pkg',
+			platforms: ['darwin'],
+			config: {} satisfies MakerPKGConfig,
 		},
 		{
 			name: '@reforged/maker-appimage',

@@ -70,6 +70,7 @@
 					"asar",
 					"appimage",
 					"wix",
+					"dmg",
 					"ico",
 					"unnest",
 					"tsquery",
