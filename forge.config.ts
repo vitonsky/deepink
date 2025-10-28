@@ -24,7 +24,7 @@ export default {
 			platforms: ['win32'],
 			config: {
 				autoRun: true,
-				icon: 'assets/icons/app.ico',
+				icon: 'dist/assets/icons/app.ico',
 				features: {
 					autoLaunch: true,
 					autoUpdate: false,
