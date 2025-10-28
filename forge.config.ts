@@ -9,6 +9,7 @@ const allowedPathPrefixes = ['/dist', '/package.json'];
 export default {
 	packagerConfig: {
 		asar: true,
+		icon: 'dist/assets/icons/app',
 		ignore(path) {
 			const isAllowed =
 				path.trim().length === 0 ||
