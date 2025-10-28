@@ -27,3 +27,12 @@ You may do it via choco:
 Next packages must be installed
 - `deb`
 - `rpm`
+
+# Trouble shooting
+
+## Linux
+
+Error when run `AppImage`. The problem occurs on latest Ubuntu.
+
+Run `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`
+
