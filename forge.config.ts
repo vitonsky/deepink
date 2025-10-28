@@ -1,7 +1,7 @@
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import type { MakerWixConfig } from '@electron-forge/maker-wix';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import type { ForgeConfig } from '@electron-forge/shared-types';
-
 // We do not need any files except those in dist
 const allowedPathPrefixes = ['/dist', '/package.json'];
 
@@ -20,11 +20,19 @@ export default {
 	},
 	makers: [
 		{
-			name: '@electron-forge/maker-squirrel',
+			name: '@electron-forge/maker-wix',
 			platforms: ['win32'],
 			config: {
-				authors: 'Robert Vitonsky',
-			},
+				autoRun: true,
+				icon: 'assets/icons/app.ico',
+				features: {
+					autoLaunch: true,
+					autoUpdate: false,
+				},
+				ui: {
+					chooseDirectory: true,
+				},
+			} satisfies MakerWixConfig,
 		},
 		{
 			name: '@electron-forge/maker-zip',
