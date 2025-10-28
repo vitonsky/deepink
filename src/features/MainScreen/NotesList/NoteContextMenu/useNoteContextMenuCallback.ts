@@ -28,7 +28,7 @@ const mdCharsForEscapeRegEx = new RegExp(
 );
 
 /**
- * Returns a callback that executes handlers for note context menu actions
+ * Returns a callback to handle note context menu actions
  */
 export const useNoteContextMenuCallback = ({
 	closeNote,
@@ -48,9 +48,10 @@ export const useNoteContextMenuCallback = ({
 			const actionsMap = {
 				[NoteActions.DELETE]: async (id: string) => {
 					const targetNote = await notes.getById(id);
+					if (!targetNote) return;
 					const isConfirmed = confirm(
 						`Are you sure you want to ${
-							targetNote?.isDeleted
+							targetNote.isDeleted
 								? 'delete the note permanently'
 								: 'move the note to the bin'
 						}?`,
@@ -59,7 +60,7 @@ export const useNoteContextMenuCallback = ({
 
 					closeNote(id);
 
-					if (targetNote?.isDeleted) {
+					if (targetNote.isDeleted) {
 						await notes.delete([id]);
 						await tagsRegistry.setAttachedTags(id, []);
 					} else {

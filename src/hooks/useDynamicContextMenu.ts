@@ -3,7 +3,7 @@ import { ContextMenu } from '@electron/requests/contextMenu';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 
 /**
- * Hook that returns a function to open the menu and supports dynamic menu selection
+ * Opens a context menu, allowing a dynamically chosen menu
  */
 export const useDynamicContextMenu = <T extends string>(
 	contextMenuCallback: ContextMenuCallback<T>,

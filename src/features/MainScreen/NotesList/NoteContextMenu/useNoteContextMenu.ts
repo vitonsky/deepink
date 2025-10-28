@@ -44,9 +44,9 @@ import {
 } from './useNoteContextMenuCallback';
 
 /**
- * Returns function for call note context menu
+ * Opens the context menu for a note.
+ * Automatically selects the appropriate menu based on the notes state
  */
-
 export const useNoteContextMenu = ({
 	closeNote,
 	updateNotes,
@@ -182,7 +182,6 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 		closeNote,
 		updateNotes,
 	});
-
 	const openMenu = useDynamicContextMenu(noteContextMenuCallback, defaultNoteMenu);
 
 	return useCallback(
