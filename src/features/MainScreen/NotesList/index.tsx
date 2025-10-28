@@ -2,7 +2,6 @@ import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
@@ -15,12 +14,11 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteContextMenu';
+import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
-	const notesRegistry = useNotesRegistry();
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
@@ -29,9 +27,8 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const search = useWorkspaceSelector(selectSearch);
 
-	const openNoteContextMenu = useDefaultNoteContextMenu({
+	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: noteActions.close,
-		notesRegistry,
 		updateNotes,
 	});
 
@@ -130,7 +127,7 @@ export const NotesList: FC<NotesListProps> = () => {
 										)
 									}
 									onContextMenu={(evt) => {
-										openNoteContextMenu(note.id, {
+										openNoteContextMenu(note, {
 											x: evt.pageX,
 											y: evt.pageY,
 										});

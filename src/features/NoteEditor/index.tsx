@@ -182,6 +182,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
+	// In the future, read-only mode will cover more cases than deleted notes
+	const isReadOnly = note.isDeleted;
+
 	return (
 		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
@@ -196,7 +199,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								? undefined
 								: (evt) => setTitle(evt.target.value)
 						}
-						isDisabled={versionPreview !== null}
+						isDisabled={versionPreview !== null || isReadOnly}
 					/>
 
 					{/* TODO: add options that may be toggled */}
@@ -205,16 +208,20 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			</HStack>
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				<HStack>
-					<Button variant="ghost" size="xs">
-						<FaBookmark />
-					</Button>
-					<Button variant="ghost" size="xs">
-						<FaFlag />
-					</Button>
-				</HStack>
+				{!note.isDeleted && (
+					<>
+						<HStack>
+							<Button variant="ghost" size="xs">
+								<FaBookmark />
+							</Button>
+							<Button variant="ghost" size="xs">
+								<FaFlag />
+							</Button>
+						</HStack>
 
-				<Divider orientation="vertical" h="1em" />
+						<Divider orientation="vertical" h="1em" />
+					</>
+				)}
 
 				{attachedTags.map((tag) => (
 					<Tag
@@ -236,100 +243,109 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							<FaHashtag />
 							<Text>{tag.resolvedName}</Text>
 						</HStack>
-						<Box
-							sx={{
-								'&:not(:hover)': {
-									opacity: '.6',
-								},
-							}}
-						>
-							<FaXmark
-								onClick={async (evt) => {
-									evt.stopPropagation();
-									console.warn('Remove attached tag', tag.resolvedName);
 
-									const updatedTags = attachedTags
-										.filter(({ id }) => id !== tag.id)
-										.map(({ id }) => id);
-									await tagsRegistry.setAttachedTags(
-										noteId,
-										updatedTags,
-									);
-									await updateTags();
+						{!isReadOnly && (
+							<Box
+								sx={{
+									'&:not(:hover)': {
+										opacity: '.6',
+									},
 								}}
-							/>
-						</Box>
+							>
+								<FaXmark
+									onClick={async (evt) => {
+										evt.stopPropagation();
+										console.warn(
+											'Remove attached tag',
+											tag.resolvedName,
+										);
+
+										const updatedTags = attachedTags
+											.filter(({ id }) => id !== tag.id)
+											.map(({ id }) => id);
+										await tagsRegistry.setAttachedTags(
+											noteId,
+											updatedTags,
+										);
+										await updateTags();
+									}}
+								/>
+							</Box>
+						)}
 					</Tag>
 				))}
 
-				<SuggestedTagsList
-					tags={notAttachedTags}
-					selectedTag={attachTagName ?? undefined}
-					inputValue={tagSearch}
-					onInputChange={setTagSearch}
-					sx={{
-						display: 'inline',
-						w: 'auto',
-						maxW: '150px',
-					}}
-					inputProps={{
-						variant: 'ghost',
-						placeholder: 'Add some tags...',
-						// size: 'sm',
-						size: 'xs',
-					}}
-					hasTagName={(tagName) =>
-						tags.some(({ resolvedName }) => resolvedName === tagName)
-					}
-					onPick={async (tag) => {
-						setAttachTagName(tag);
-						await tagsRegistry.setAttachedTags(noteId, [
-							...attachedTags.map(({ id }) => id),
-							tag.id,
-						]);
-
-						setTagSearch('');
-
-						await updateTags();
-					}}
-					onCreateTag={async (tagName) => {
-						setAttachTagName(null);
-
-						let shortenedTagName = tagName;
-						let parentTagId: string | null = null;
-						const tagSegments = tagName.split('/');
-						for (
-							let lastSegmentIndex = tagSegments.length - 1;
-							lastSegmentIndex > 0;
-							lastSegmentIndex--
-						) {
-							const resolvedParentTag = tagSegments
-								.slice(0, lastSegmentIndex)
-								.join('/');
-							const foundTag = tags.find(
-								({ resolvedName }) => resolvedName === resolvedParentTag,
-							);
-							if (foundTag) {
-								parentTagId = foundTag.id;
-								shortenedTagName = tagSegments
-									.slice(lastSegmentIndex)
-									.join('/');
-								break;
-							}
+				{!isReadOnly && (
+					<SuggestedTagsList
+						tags={notAttachedTags}
+						selectedTag={attachTagName ?? undefined}
+						inputValue={tagSearch}
+						onInputChange={setTagSearch}
+						sx={{
+							display: 'inline',
+							w: 'auto',
+							maxW: '150px',
+						}}
+						inputProps={{
+							variant: 'ghost',
+							placeholder: 'Add some tags...',
+							// size: 'sm',
+							size: 'xs',
+						}}
+						hasTagName={(tagName) =>
+							tags.some(({ resolvedName }) => resolvedName === tagName)
 						}
+						onPick={async (tag) => {
+							setAttachTagName(tag);
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								tag.id,
+							]);
 
-						const tagId = await tagsRegistry.add(
-							shortenedTagName,
-							parentTagId,
-						);
-						await tagsRegistry.setAttachedTags(noteId, [
-							...attachedTags.map(({ id }) => id),
-							tagId,
-						]);
+							setTagSearch('');
 
-						await updateTags();
-					}}
-				/>
+							await updateTags();
+						}}
+						onCreateTag={async (tagName) => {
+							setAttachTagName(null);
+
+							let shortenedTagName = tagName;
+							let parentTagId: string | null = null;
+							const tagSegments = tagName.split('/');
+							for (
+								let lastSegmentIndex = tagSegments.length - 1;
+								lastSegmentIndex > 0;
+								lastSegmentIndex--
+							) {
+								const resolvedParentTag = tagSegments
+									.slice(0, lastSegmentIndex)
+									.join('/');
+								const foundTag = tags.find(
+									({ resolvedName }) =>
+										resolvedName === resolvedParentTag,
+								);
+								if (foundTag) {
+									parentTagId = foundTag.id;
+									shortenedTagName = tagSegments
+										.slice(lastSegmentIndex)
+										.join('/');
+									break;
+								}
+							}
+
+							const tagId = await tagsRegistry.add(
+								shortenedTagName,
+								parentTagId,
+							);
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								tagId,
+							]);
+
+							await updateTags();
+						}}
+					/>
+				)}
 			</HStack>
 
 			{versionPreview && (
@@ -354,11 +370,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				</HStack>
 			)}
 
-			{versionPreview ? (
-				<NoteEditor text={versionPreview.text} setText={() => {}} isReadOnly />
-			) : (
-				<NoteEditor text={text} setText={setText} />
-			)}
+			<NoteEditor
+				text={versionPreview ? versionPreview.text : text}
+				setText={isReadOnly || versionPreview ? () => {} : setText}
+				isReadOnly={isReadOnly || Boolean(versionPreview)}
+			/>
 
 			{!sidePanel ? null : (
 				<NoteSidebar
@@ -372,6 +388,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							content() {
 								return (
 									<NoteVersions
+										isReadOnly={isReadOnly}
 										noteId={note.id}
 										recordControl={{
 											isDisabled: Boolean(note.isSnapshotsDisabled),
