@@ -1,8 +1,6 @@
-import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import type { MakerDMGConfig } from '@electron-forge/maker-dmg';
 import type { MakerPKGConfig } from '@electron-forge/maker-pkg';
 import type { MakerWixConfig } from '@electron-forge/maker-wix';
-import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 // We do not need any files except those in dist
 const allowedPathPrefixes = ['/dist', '/package.json'];
@@ -78,17 +76,5 @@ export default {
 			name: '@electron-forge/plugin-auto-unpack-natives',
 			config: {},
 		},
-
-		// Fuses are used to enable/disable various Electron functionality
-		// at package time, before code signing the application
-		new FusesPlugin({
-			version: FuseVersion.V1,
-			[FuseV1Options.RunAsNode]: false,
-			[FuseV1Options.EnableCookieEncryption]: true,
-			[FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
-			[FuseV1Options.EnableNodeCliInspectArguments]: false,
-			[FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
-			[FuseV1Options.OnlyLoadAppFromAsar]: true,
-		}),
 	],
 } satisfies ForgeConfig;
