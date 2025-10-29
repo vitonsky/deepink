@@ -1,5 +1,4 @@
 import type { MakerDMGConfig } from '@electron-forge/maker-dmg';
-import type { MakerPKGConfig } from '@electron-forge/maker-pkg';
 import type { MakerWixConfig } from '@electron-forge/maker-wix';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 // We do not need any files except those in dist
@@ -17,7 +16,6 @@ export default {
 			return !isAllowed;
 		},
 		extraResource: ['./dist/assets'],
-		osxSign: {},
 	},
 	makers: [
 		{
@@ -42,14 +40,7 @@ export default {
 		{
 			name: '@electron-forge/maker-dmg',
 			platforms: ['darwin'],
-			config: {
-				format: 'ULFO',
-			} satisfies MakerDMGConfig,
-		},
-		{
-			name: '@electron-forge/maker-pkg',
-			platforms: ['darwin'],
-			config: {} satisfies MakerPKGConfig,
+			config: { format: 'ULFO' } satisfies MakerDMGConfig,
 		},
 		{
 			name: '@reforged/maker-appimage',
