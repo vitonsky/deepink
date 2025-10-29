@@ -73,26 +73,14 @@ export const SQLConsole = ({
 					// Init Repl with command
 					if (!node || isInitializedRef.current) return;
 
+					const input = node.querySelector('.cm-content');
+					if (!input || !(input instanceof HTMLDivElement)) return;
+
+					isInitializedRef.current = true;
+
 					wait(10).then(async () => {
-						let input: HTMLDivElement | null = null;
-						for (let attempt = 0; attempt < 200; attempt++) {
-							const element = node.querySelector('.cm-content');
-
-							if (element && element instanceof HTMLDivElement) {
-								input = element;
-								break;
-							}
-							await wait(10);
-						}
-
-						if (!input) {
-							console.warn(`Element '.cm-content' not found`);
-							return;
-						}
-
-						isInitializedRef.current = true;
-
 						input.click();
+
 						await wait(100);
 						// eslint-disable-next-line spellcheck/spell-checker
 						input.innerHTML = `SELECT * FROM pg_tables WHERE schemaname = 'public'`;
