@@ -15,6 +15,7 @@
 		"typecheck": "tsc --noEmit --watch",
 		"prettify": "prettier --write \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint --fix \"{*,**/*}.{ts,tsx,js,jsx}\"",
 		"lint": "prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint \"{*,**/*}.{ts,tsx,js,jsx}\"",
+		"update-icons": "tsx ./scripts/icons/build.ts",
 		"upgrade": "npm-check-updates -u",
 		"prepare-electron-deps": "electron-builder install-app-deps",
 		"prepare": "husky install"
@@ -85,6 +86,7 @@
 		"tmp": "^0.2.1",
 		"ts-loader": "^9.4.3",
 		"tsconfig-paths-webpack-plugin": "^4.1.0",
+		"tsx": "^4.20.6",
 		"typescript": "^5.9.3",
 		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "^3.2.4",

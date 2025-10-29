@@ -8,7 +8,8 @@ const allowedPathPrefixes = ['/dist', '/package.json'];
 export default {
 	packagerConfig: {
 		asar: true,
-		icon: 'dist/assets/icons/app',
+		name: 'Deepink',
+		icon: 'assets/icons/app',
 		ignore(path) {
 			const isAllowed =
 				path.trim().length === 0 ||
@@ -40,7 +41,10 @@ export default {
 		{
 			name: '@electron-forge/maker-dmg',
 			platforms: ['darwin'],
-			config: { format: 'ULFO' } satisfies MakerDMGConfig,
+			config: {
+				format: 'ULFO',
+				overwrite: true,
+			} satisfies MakerDMGConfig,
 		},
 		{
 			name: '@reforged/maker-appimage',

@@ -1,7 +1,5 @@
 const { merge } = require('webpack-merge');
 const CopyPlugin = require('copy-webpack-plugin');
-const sharp = require('sharp');
-const ico = require('sharp-ico');
 
 const commonConfig = require('./webpack.common');
 const { statSync, existsSync, readdirSync } = require('fs');
@@ -36,26 +34,7 @@ module.exports = merge(commonConfig, {
 	},
 	plugins: [
 		new CopyPlugin({
-			patterns: [
-				{ from: 'assets', to: 'assets' },
-				{
-					// PNG icon for general purposes
-					from: 'assets/icons/app.svg',
-					to: 'assets/icons/app.png',
-					transform(content) {
-						return sharp(content).resize(512, 512).toBuffer();
-					},
-				},
-				{
-					// Icon for Windows app
-					from: 'assets/icons/app.svg',
-					to: 'assets/icons/app.ico',
-					async transform(content) {
-						const source = await sharp(content).resize(256, 256).toBuffer();
-						return ico.encode([source]);
-					},
-				},
-			],
+			patterns: [{ from: 'assets', to: 'assets' }],
 		}),
 	],
 	module: {
