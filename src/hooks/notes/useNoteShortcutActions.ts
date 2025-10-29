@@ -1,42 +1,59 @@
+import { useCallback } from 'react';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	selectActiveNoteId,
+	selectOpenedNotes,
+	selectRecentlyClosedNotes,
+} from '@state/redux/profiles/profiles';
+import { getItemByOffset } from '@utils/collections/getItemByOffset';
 
 /**
  * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
  */
 export const useNoteShortcutActions = () => {
-	const dispatch = useAppDispatch();
-	const workspaceData = useWorkspaceData();
-
-	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-
 	const noteActions = useNoteActions();
 	const createNote = useCreateNote();
 
+	const recentlyClosedNotes = useWorkspaceSelector(selectRecentlyClosedNotes);
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
+
+	const closeCurrentNote = useCallback(() => {
+		if (!activeNoteId) return;
+		noteActions.close(activeNoteId);
+	}, [activeNoteId, noteActions]);
+
+	const restoreClosedNote = useCallback(() => {
+		const lastClosedNote = recentlyClosedNotes[recentlyClosedNotes.length - 1];
+		if (!lastClosedNote) return;
+		noteActions.click(lastClosedNote);
+	}, [noteActions, recentlyClosedNotes]);
+
+	const focusPreviousNote = useCallback(() => {
+		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+		if (noteIndex === -1) return;
+		const previousNote = getItemByOffset(openedNotes, noteIndex, -1);
+		if (!previousNote) return;
+
+		noteActions.click(previousNote.id);
+	}, [activeNoteId, noteActions, openedNotes]);
+
+	const focusNextNote = useCallback(() => {
+		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+		if (noteIndex === -1) return;
+		const nextNote = getItemByOffset(openedNotes, noteIndex, 1);
+		if (!nextNote) return;
+
+		noteActions.click(nextNote.id);
+	}, [activeNoteId, noteActions, openedNotes]);
+
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE,
-		() => {
-			if (activeNoteId) noteActions.close(activeNoteId);
-		},
-		{ enabled: Boolean(activeNoteId) },
-	);
-
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () =>
-		dispatch(workspacesApi.setLastClosedNoteActive({ ...workspaceData })),
-	);
-
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE, () =>
-		dispatch(workspacesApi.switchActiveNote({ ...workspaceData, offset: -1 })),
-	);
-
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE, () =>
-		dispatch(workspacesApi.switchActiveNote({ ...workspaceData, offset: 1 })),
-	);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, restoreClosedNote);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE, closeCurrentNote);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE, focusPreviousNote);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE, focusNextNote);
 };
