@@ -64,7 +64,6 @@ Once chocolatey is ready, install all necessary packages (run in PowerShell as A
 
 ```powershell
 choco install -y git make nodejs-lts python
-choco install -y visualstudio2019buildtools --includeRecommended --includeOptional
 ```
 
 To package app for windows, a [WiX Toolset v3](https://docs.firegiant.com/wix/wix3/) must be installed:
