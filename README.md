@@ -81,11 +81,9 @@ setx /M PATH "%PATH%;C:\Program Files (x86)\WiX Toolset v3.14\bin"
 
 ## macOS
 
-Xcode tools must be installed via `xcode-select --install`
+Before start build, an [Xcode](https://developer.apple.com/xcode/) must be installed and user agreement must be accepted.
 
-In case you've update your OS recently and have problems with compiling anything, it may be a problem on Xcode side.
-
-The solution is to remove and install Xcode again.
+In case you've update your OS recently and have problems with compiling anything, it may be a problem on Xcode side. The solution is to remove and install Xcode again.
 
 ## Linux
 
