@@ -34,6 +34,14 @@ To setup environment
 - Optionally: Once Windows is installed, you may configure [Guest Tools](https://pve.proxmox.com/wiki/Windows_VirtIO_Drivers) to enable shared clipboard and directories
 	- Install a [guest tools](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.285-1/virtio-win-guest-tools.exe) to enable shared clipboard
 	- [Download WinFSP](https://winfsp.dev/rel/) and install. Once installed, go to "Services" find a "VirtIO-FS Service", start it and change "Startup type" in properties to an "Auto". See a [video guide](https://www.youtube.com/watch?v=UCy25VFMJCE&t=195s) "Share Files between KVM Host and Windows Virtual Machine" on YouTube
+- Optionally: Update `winget`, a windows packages manager
+	```powershell
+	Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile $HOME/Downloads/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+	Add-AppxPackage -Path $HOME/Downloads/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+
+	# Optionally - update env in curren shell
+	refreshenv
+	```
 
 Once you will done with these steps, it is good idea to backup disk image to not do all that steps again.
 
@@ -42,11 +50,19 @@ Once you will done with these steps, it is good idea to backup disk image to not
 
 To build on Windows, a dev environment is needed.
 
-First [install chocolatey](https://chocolatey.org/install), a packages manager.
+Update [security policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.5) to allow run dev tools:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope LocalMachine
+```
 
-Then install all necessary packages
+[Install chocolatey](https://chocolatey.org/install), a packages manager. If you have `winget` installed, just run
+```powershell
+winget install -e --id Chocolatey.Chocolatey
+```
 
-```sh
+Once chocolatey is ready, install all necessary packages (run in PowerShell as Administrator)
+
+```powershell
 choco install -y git make nodejs-lts python
 choco install -y visualstudio2019buildtools --includeRecommended --includeOptional
 ```
