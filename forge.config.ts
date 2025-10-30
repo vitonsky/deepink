@@ -1,6 +1,8 @@
+import type { MakerDebConfig } from '@electron-forge/maker-deb';
 import type { MakerDMGConfig } from '@electron-forge/maker-dmg';
 import type { MakerWixConfig } from '@electron-forge/maker-wix';
 import type { ForgeConfig } from '@electron-forge/shared-types';
+import type { MakerAppImageConfig } from '@reforged/maker-appimage';
 // We do not need any files except those in dist
 const allowedPathPrefixes = ['/dist', '/package.json'];
 
@@ -9,6 +11,7 @@ export default {
 	packagerConfig: {
 		asar: true,
 		name: 'Deepink',
+		executableName: 'deepink',
 		icon: 'assets/icons/app',
 		ignore(path) {
 			const isAllowed =
@@ -51,20 +54,31 @@ export default {
 			platforms: ['linux'],
 			config: {
 				options: {
-					categories: ['Office'],
+					categories: [
+						'Office',
+						'Education',
+						'Dictionary',
+						'Documentation',
+						'Presentation',
+						'ProjectManagement',
+						'Science',
+						'TextEditor',
+						'TextTools',
+						'Utility',
+					],
 					icon: 'assets/icons/app.svg',
 				},
-			},
+			} satisfies MakerAppImageConfig,
 		},
-		// {
-		// 	name: '@electron-forge/maker-deb',
-		// 	platforms: ['linux'],
-		// 	config: {},
-		// },
-		// {
-		// 	name: '@electron-forge/maker-rpm',
-		// 	config: {},
-		// },
+		{
+			name: '@electron-forge/maker-deb',
+			platforms: ['linux'],
+			config: {
+				options: {
+					categories: ['Office', 'Science', 'Education'],
+				},
+			} satisfies MakerDebConfig,
+		},
 	],
 	plugins: [
 		{
