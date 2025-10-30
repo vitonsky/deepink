@@ -1,4 +1,3 @@
-import { INote } from '@core/features/notes';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
@@ -10,12 +9,6 @@ import {
 	selectRecentlyClosedNotes,
 } from '@state/redux/profiles/profiles';
 import { getItemByOffset } from '@utils/collections/getItemByOffset';
-
-const findNoteByOffset = (notes: INote[], noteId: string, offset: number) => {
-	const noteIndex = notes.findIndex((note) => note.id === noteId);
-	if (noteIndex === -1) return null;
-	return getItemByOffset(notes, noteIndex, offset);
-};
 
 /**
  * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
@@ -49,25 +42,25 @@ export const useNoteShortcutActions = () => {
 		{ enabled: recentlyClosedNotes.length > 0 },
 	);
 
+	const focusNoteByOffset = (offset: number) => {
+		if (!activeNoteId) return;
+		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
+		if (noteIndex === -1) return;
+		const note = getItemByOffset(openedNotes, noteIndex, offset);
+		if (!note) return;
+
+		noteActions.click(note.id);
+	};
+
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
-		() => {
-			if (!activeNoteId) return;
-			const note = findNoteByOffset(openedNotes, activeNoteId, -1);
-			if (!note) return;
-			noteActions.click(note.id);
-		},
+		() => focusNoteByOffset(-1),
 		{ enabled: Boolean(activeNoteId) },
 	);
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
-		() => {
-			if (!activeNoteId) return;
-			const note = findNoteByOffset(openedNotes, activeNoteId, 1);
-			if (!note) return;
-			noteActions.click(note.id);
-		},
+		() => focusNoteByOffset(1),
 		{ enabled: Boolean(activeNoteId) },
 	);
 };
