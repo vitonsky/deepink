@@ -19,7 +19,7 @@ function getFilenameWithNoExtension(filename: string) {
  */
 export async function buildPng(sourcePath: string) {
 	const buffer = await sharp(sourcePath)
-		.resize(512, 512)
+		.resize(256, 256)
 		.png({ compressionLevel: 9 })
 		.toBuffer();
 	await writeFile(getFilenameWithNoExtension(sourcePath) + '.png', buffer);
