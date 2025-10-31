@@ -1,10 +1,11 @@
 import packageInfo from '../package.json';
 
 export const getAbout = () => {
-	const { version, name, description, author, license, homepage, bugs } = packageInfo;
+	const { version, name, productName, description, author, license, homepage, bugs } =
+		packageInfo;
 
 	return {
-		displayName: 'Deepink',
+		displayName: productName,
 		name,
 		description,
 		version,

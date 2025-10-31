@@ -120,7 +120,7 @@ export const openMainWindow = async () => {
 	appTray.enable();
 	appTray.update(
 		Menu.buildFromTemplate([
-			{ label: `Open Deepink`, click: trayApi.openWindow },
+			{ label: `Open notes`, click: trayApi.openWindow },
 			{ label: 'Quit', click: trayApi.quit },
 		]),
 	);

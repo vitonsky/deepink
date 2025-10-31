@@ -4,6 +4,7 @@ import { isDevMode } from '@electron/utils/app';
 import { getResourcesPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 
+import { getAbout } from './about';
 import { createAppMenu } from './createAppMenu';
 
 console.log({
@@ -14,11 +15,12 @@ console.log({
 	directory: __dirname,
 });
 
+const about = getAbout();
 app.setAboutPanelOptions({
-	applicationName: 'Deepink',
-	applicationVersion: '0.0.1-demo',
-	authors: ['Robert Vitonsky'],
-	website: 'https://google.com',
+	applicationName: about.displayName,
+	applicationVersion: about.version,
+	authors: [about.author],
+	website: about.homepage,
 });
 
 app.addListener('web-contents-created', (_event, webContents) => {

@@ -1,6 +1,7 @@
 import { createApi, createStore } from 'effector';
 import { nativeImage, Tray } from 'electron';
 import path from 'path';
+import { getAbout } from 'src/about';
 import { isPlatform } from '@electron/utils/platform';
 import { CleanupFn, createWatcher } from '@utils/effector/watcher';
 
@@ -39,7 +40,7 @@ export class AppTray {
 		trayIcon.setTemplateImage(true);
 
 		const tray = new Tray(trayIcon);
-		tray.setToolTip('Deepink');
+		tray.setToolTip(getAbout().displayName);
 
 		tray.addListener('click', () => {
 			// Prevent immediately open window for mac by click on tray menu

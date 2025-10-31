@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge');
 const { readdirSync } = require('fs');
 const { isFastBuild } = require('./scripts/webpack');
 const commonConfig = require('./webpack.common');
+const { getAbout } = require('./src/about');
 
 const windows = readdirSync('./src/windows', { withFileTypes: true })
 	.filter((file) => file.isDirectory())
@@ -23,7 +24,7 @@ module.exports = merge(commonConfig, {
 		...windows.map(
 			(name) =>
 				new HtmlWebpackPlugin({
-					title: 'Deepink',
+					title: getAbout().displayName,
 					filename: `window-${name}.html`,
 					chunks: [`window-${name}`],
 					template: './src/templates/window.html',

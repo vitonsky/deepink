@@ -7,16 +7,19 @@ import type { ForgeConfig } from '@electron-forge/shared-types';
 import type { MakerAppImageConfig } from '@reforged/maker-appimage';
 
 import projectInfo from './package.json';
+import { getAbout } from './src/about';
 
 // We do not need any files except those in dist
 const allowedPathPrefixes = ['/dist', '/package.json'];
+
+const about = getAbout();
 
 // Docs: https://electron.github.io/packager/main/interfaces/Options.html
 export default {
 	packagerConfig: {
 		asar: true,
-		name: 'Deepink',
-		executableName: 'deepink',
+		name: about.displayName,
+		executableName: about.name,
 		icon: 'assets/icons/app',
 		ignore(path) {
 			const isAllowed =
@@ -59,6 +62,7 @@ export default {
 			platforms: ['linux'],
 			config: {
 				options: {
+					icon: 'assets/icons/app.png',
 					categories: [
 						'Office',
 						'Education',
@@ -71,7 +75,6 @@ export default {
 						'TextTools',
 						'Utility',
 					],
-					icon: 'assets/icons/app.png',
 				},
 			} satisfies MakerAppImageConfig,
 		},
@@ -80,10 +83,10 @@ export default {
 			platforms: ['linux'],
 			config: {
 				options: {
-					productName: 'Deepink',
-					genericName: 'Privacy focused notes',
-					icon: 'assets/icons/app.png',
+					productName: about.displayName,
+					genericName: about.description,
 					maintainer: projectInfo.author,
+					icon: 'assets/icons/app.png',
 					categories: ['Office', 'Science', 'Education'],
 				},
 			} satisfies MakerDebConfig,
@@ -92,12 +95,12 @@ export default {
 			name: '@electron-forge/maker-rpm',
 			config: {
 				options: {
-					productName: 'Deepink',
-					productDescription: 'Privacy focused notes',
-					genericName: 'genericName: Privacy focused notes',
+					productName: about.displayName,
+					productDescription: about.description,
+					genericName: about.description,
+					license: about.license,
+					homepage: about.homepage,
 					icon: 'assets/icons/app.png',
-					license: 'MIT',
-					homepage: 'http://example.com',
 					categories: ['Office', 'Science', 'Education'],
 				},
 			} satisfies MakerRpmConfig,
