@@ -19,7 +19,7 @@ export default {
 	packagerConfig: {
 		asar: true,
 		name: about.displayName,
-		executableName: about.name,
+		executableName: process.platform === 'darwin' ? about.displayName : about.name,
 		icon: 'assets/icons/app',
 		ignore(path) {
 			const isAllowed =
@@ -53,6 +53,7 @@ export default {
 			name: '@electron-forge/maker-dmg',
 			platforms: ['darwin'],
 			config: {
+				title: about.displayName,
 				format: 'ULFO',
 				overwrite: true,
 			} satisfies MakerDMGConfig,
