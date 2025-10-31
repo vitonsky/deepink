@@ -5,6 +5,9 @@
 	"version": "0.0.1",
 	"main": "dist/main.js",
 	"homepage": "https://github.com/vitonsky/deepink",
+	"bugs": {
+		"url": "https://github.com/vitonsky/deepink/issues"
+	},
 	"license": "MIT",
 	"scripts": {
 		"test": "vitest",

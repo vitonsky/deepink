@@ -1,14 +1,19 @@
 /* eslint-disable spellcheck/spell-checker */
 import { app, Menu, MenuItem, MenuItemConstructorOptions } from 'electron';
 
+import { openAboutWindow } from './windows/about';
+
 export function createAppMenu() {
 	type MenuObject = MenuItemConstructorOptions | MenuItem;
 	const application: MenuObject = {
 		label: 'Application',
+		role: 'about',
 		submenu: [
 			{
 				label: 'About Application',
-				role: 'about',
+				click(_item, window) {
+					openAboutWindow(window);
+				},
 			},
 			{
 				type: 'separator',
