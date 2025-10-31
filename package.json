@@ -4,6 +4,7 @@
 	"author": "Robert Vitonsky",
 	"version": "0.0.1",
 	"main": "dist/main.js",
+	"homepage": "https://github.com/vitonsky/deepink",
 	"license": "MIT",
 	"scripts": {
 		"test": "vitest",

@@ -1,8 +1,13 @@
 import type { MakerDebConfig } from '@electron-forge/maker-deb';
 import type { MakerDMGConfig } from '@electron-forge/maker-dmg';
+import type { MakerRpmConfig } from '@electron-forge/maker-rpm';
 import type { MakerWixConfig } from '@electron-forge/maker-wix';
+import type { MakerZIPConfig } from '@electron-forge/maker-zip';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import type { MakerAppImageConfig } from '@reforged/maker-appimage';
+
+import projectInfo from './package.json';
+
 // We do not need any files except those in dist
 const allowedPathPrefixes = ['/dist', '/package.json'];
 
@@ -24,7 +29,7 @@ export default {
 	makers: [
 		{
 			name: '@electron-forge/maker-zip',
-			config: {},
+			config: {} satisfies MakerZIPConfig,
 		},
 		{
 			name: '@electron-forge/maker-wix',
@@ -66,7 +71,7 @@ export default {
 						'TextTools',
 						'Utility',
 					],
-					icon: 'assets/icons/app.svg',
+					icon: 'assets/icons/app.png',
 				},
 			} satisfies MakerAppImageConfig,
 		},
@@ -75,9 +80,27 @@ export default {
 			platforms: ['linux'],
 			config: {
 				options: {
+					productName: 'Deepink',
+					genericName: 'Privacy focused notes',
+					icon: 'assets/icons/app.png',
+					maintainer: projectInfo.author,
 					categories: ['Office', 'Science', 'Education'],
 				},
 			} satisfies MakerDebConfig,
+		},
+		{
+			name: '@electron-forge/maker-rpm',
+			config: {
+				options: {
+					productName: 'Deepink',
+					productDescription: 'Privacy focused notes',
+					genericName: 'genericName: Privacy focused notes',
+					icon: 'assets/icons/app.png',
+					license: 'MIT',
+					homepage: 'http://example.com',
+					categories: ['Office', 'Science', 'Education'],
+				},
+			} satisfies MakerRpmConfig,
 		},
 	],
 	plugins: [
