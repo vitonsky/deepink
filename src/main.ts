@@ -8,7 +8,16 @@ import { createAppMenu } from './createAppMenu';
 console.log({
 	isDev: isDevMode(),
 	appDir: app.getAppPath(),
+	platform: process.platform,
 	resourcesPath: getResourcesPath(),
+	directory: __dirname,
+});
+
+app.setAboutPanelOptions({
+	applicationName: 'Deepink',
+	applicationVersion: '0.0.1-demo',
+	authors: ['Robert Vitonsky'],
+	website: 'https://google.com',
 });
 
 const onShutdown = (callback: () => any) => {
