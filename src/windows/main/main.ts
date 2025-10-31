@@ -7,7 +7,6 @@ import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
-import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { createWatcher } from '@utils/effector/watcher';
 
 import { AppTray } from './components/AppTray';
@@ -50,26 +49,6 @@ export const openMainWindow = async () => {
 			contextIsolation: true,
 			spellcheck: true,
 		},
-	});
-
-	win.webContents.setWindowOpenHandler(({ url }) => {
-		console.log('Prevent open new window, and open URL as external link', url);
-
-		openUrlWithExternalBrowser(url);
-
-		return { action: 'deny' };
-	});
-
-	win.webContents.on('will-navigate', (event, url) => {
-		if (url !== win.webContents.getURL()) {
-			console.log(
-				'Prevent navigation in main window, and open URL as external link',
-				url,
-			);
-
-			event.preventDefault();
-			openUrlWithExternalBrowser(url);
-		}
 	});
 
 	if (isDevMode()) {

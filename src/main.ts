@@ -2,6 +2,7 @@ import { app, Menu } from 'electron';
 import { openMainWindow } from 'src/windows/main/main';
 import { isDevMode } from '@electron/utils/app';
 import { getResourcesPath } from '@electron/utils/files';
+import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 
 import { createAppMenu } from './createAppMenu';
 
@@ -18,6 +19,28 @@ app.setAboutPanelOptions({
 	applicationVersion: '0.0.1-demo',
 	authors: ['Robert Vitonsky'],
 	website: 'https://google.com',
+});
+
+app.addListener('web-contents-created', (_event, webContents) => {
+	webContents.setWindowOpenHandler(({ url }) => {
+		console.log('Prevent open new window, and open URL as external link', url);
+
+		openUrlWithExternalBrowser(url);
+
+		return { action: 'deny' };
+	});
+
+	webContents.on('will-navigate', (event, url) => {
+		if (url !== webContents.getURL()) {
+			console.log(
+				'Prevent navigation in main window, and open URL as external link',
+				url,
+			);
+
+			event.preventDefault();
+			openUrlWithExternalBrowser(url);
+		}
+	});
 });
 
 const onShutdown = (callback: () => any) => {
