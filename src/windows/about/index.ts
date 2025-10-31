@@ -21,8 +21,8 @@ export const openAboutWindow = async (parent?: BaseWindow) => {
 
 	// Close with parent
 	if (parent) {
-		parent.on('close', () => {
-			win.close();
+		parent.once('close', () => {
+			if (!win.isDestroyed()) win.close();
 		});
 	}
 
