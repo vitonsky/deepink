@@ -62,5 +62,19 @@ export function createAppMenu() {
 		],
 	};
 
-	return Menu.buildFromTemplate([application, edit]);
+	return Menu.buildFromTemplate([
+		application,
+		edit,
+		{
+			label: 'Help',
+			role: 'help',
+			submenu: [
+				{
+					label: 'Toggle dev tools',
+					role: 'toggleDevTools',
+					accelerator: 'CmdOrCtrl+Alt+Shift+I',
+				},
+			],
+		},
+	]);
 }
