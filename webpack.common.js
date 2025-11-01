@@ -1,3 +1,4 @@
+/* eslint-disable spellcheck/spell-checker */
 const path = require('path');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
@@ -32,14 +33,56 @@ module.exports = {
 		cachedAssets: true,
 	},
 	optimization: {
-		// usedExports: true,
-		// minimize: true,
-		minimizer: [
-			// swc-based minifier (faster than terser)
-			new SwcMinifyWebpackPlugin(),
-		],
+		// enable tree-shaking
+		usedExports: true,
+		minimize: isProduction,
+		minimizer: [new SwcMinifyWebpackPlugin()],
+
+		// Extract runtime into separate chunk for better caching
+		runtimeChunk: isProduction ? 'single' : false,
+
+		// Split vendor chunks to enable better caching
+		splitChunks: {
+			chunks: (chunk) => {
+				// Don't split preload scripts - bundle them completely
+				if (chunk.name && chunk.name.endsWith('-preload')) {
+					return false;
+				}
+
+				// Apply normal splitting for other chunks
+				return 'all';
+			},
+
+			cacheGroups: {
+				// Vendor libraries (stable, rarely change)
+				vendor: {
+					test: /[\\/]node_modules[\\/]/,
+					name: 'vendors',
+					priority: 10,
+					reuseExistingChunk: true,
+					enforce: true,
+				},
+				// Shared code between windows
+				common: {
+					minChunks: 2, // Extracted if used in 2+ chunks
+					priority: 5,
+					reuseExistingChunk: true,
+					name: 'common',
+				},
+			},
+		},
+
+		// Deterministic module IDs for better caching
+		moduleIds: isProduction ? 'deterministic' : 'named',
 	},
-	cache: { type: 'filesystem' },
+	// TODO: depends on all webpack configs files
+	// cache: {
+	// 	type: 'filesystem',
+	// 	// Invalidate cache on config changes
+	// 	buildDependencies: {
+	// 		config: [__filename],
+	// 	},
+	// },
 	node: {
 		__dirname: false,
 	},
@@ -50,6 +93,23 @@ module.exports = {
 	output: {
 		path: outputPath,
 		publicPath: '',
+
+		// Better chunk naming for caching
+		// filename: isProduction ? '[name].[contenthash].js' : '[name].js',
+		chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].js',
+		filename: (pathData) => {
+			if (pathData.chunk.name === 'main') {
+				return 'main.js';
+			}
+
+			// Preload scripts: no hash, just exact name
+			if (pathData.chunk.name.endsWith('-preload')) {
+				return '[name].js';
+			}
+
+			// Other chunks: keep hashed
+			return '[name].[contenthash].js';
+		},
 	},
 	module: {
 		rules: [
@@ -99,7 +159,8 @@ module.exports = {
 	plugins: [
 		// run full TS type check in parallel; async: false -> build waits for typecheck and fails on errors
 		new ForkTsCheckerWebpackPlugin({
-			async: false,
+			// Allow async in dev for faster builds
+			async: !isProduction,
 			typescript: { configFile: path.resolve(__dirname, 'tsconfig.json') },
 		}),
 	],

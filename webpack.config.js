@@ -1,4 +1,6 @@
 const electron = require('./webpack.electron');
 const app = require('./webpack.app');
+const preloadScripts = require('./webpack.preload-scripts');
 
-module.exports = [electron, app];
+// TODO: group configs into dir
+module.exports = [electron, preloadScripts, app];
