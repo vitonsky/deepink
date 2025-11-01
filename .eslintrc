@@ -74,6 +74,7 @@
 					"swc",
 					"Minify",
 					"pragma",
+					"contenthash",
 					"ico",
 					"unnest",
 					"tsquery",

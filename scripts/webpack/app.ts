@@ -1,22 +1,26 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { merge } = require('webpack-merge');
-const { readdirSync } = require('fs');
-const { isFastBuild } = require('./scripts/webpack');
-const commonConfig = require('./webpack.common');
-const { productName } = require('./package.json');
+import { readdirSync } from 'fs';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import path from 'path';
+import { Configuration, WebpackPluginInstance } from 'webpack';
+import { merge } from 'webpack-merge';
+
+import { productName } from '../../package.json';
+
+import commonConfig from './shared';
+import { projectRoot } from './utils';
 
 const windows = readdirSync('./src/windows', { withFileTypes: true })
 	.filter((file) => file.isDirectory())
 	.map((file) => file.name);
 
-module.exports = merge(commonConfig, {
+export default merge(commonConfig, {
 	target: 'web',
 	entry: {
 		...Object.fromEntries(
 			windows.map((name) => [
 				`window-${name}`,
-				`./src/windows/${name}/renderer.tsx`,
+				path.join(projectRoot, `src/windows/${name}/renderer.tsx`),
 			]),
 		),
 	},
@@ -27,11 +31,11 @@ module.exports = merge(commonConfig, {
 					title: productName,
 					filename: `window-${name}.html`,
 					chunks: [`window-${name}`],
-					template: './src/templates/window.html',
+					template: path.join(projectRoot, 'src/templates/window.html'),
 				}),
 		),
 		new MiniCssExtractPlugin({}),
-	],
+	] as unknown as WebpackPluginInstance[],
 	// We explicitly define external imports instead of use `electron-renderer` target
 	externals: {
 		electron: 'global electron',
@@ -45,7 +49,6 @@ module.exports = merge(commonConfig, {
 						loader: 'worker-loader',
 						options: {
 							worker: 'Worker',
-							// eslint-disable-next-line spellcheck/spell-checker
 							filename: '[name].[contenthash].js',
 						},
 					},
@@ -80,7 +83,7 @@ module.exports = merge(commonConfig, {
 						loader: 'css-loader',
 						options: {
 							modules: {
-								mode: (resourcePath) => {
+								mode: (resourcePath: string) => {
 									const isModule = resourcePath.endsWith('.module.css');
 									return isModule ? 'local' : 'global';
 								},
@@ -122,4 +125,4 @@ module.exports = merge(commonConfig, {
 			},
 		],
 	},
-});
+} as Configuration);

@@ -1,26 +1,23 @@
 /* eslint-disable spellcheck/spell-checker */
-const path = require('path');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import path from 'path';
+import { SwcMinifyWebpackPlugin } from 'swc-minify-webpack-plugin';
+import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin';
+import { Configuration } from 'webpack';
 
-const { mode, isProduction, isFastBuild } = require('./scripts/webpack');
+import { isFastBuild, isPreloadChunk, isProduction, mode, projectRoot } from './utils';
 
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const { SwcMinifyWebpackPlugin } = require('swc-minify-webpack-plugin');
-
-const devtool = isProduction ? undefined : 'source-map';
-
-const outputPath = path.join(__dirname, 'dist');
+const outputPath = path.join(projectRoot, 'dist');
 
 console.log('Webpack run', {
 	isProduction,
 	isFastBuild,
-	devtool,
 	outputPath,
 });
 
-module.exports = {
+export default {
 	mode,
-	devtool,
+	devtool: isProduction ? undefined : 'source-map',
 	stats: {
 		colors: true,
 		reasons: true,
@@ -45,9 +42,7 @@ module.exports = {
 		splitChunks: {
 			chunks: (chunk) => {
 				// Don't split preload scripts - bundle them completely
-				if (chunk.name && chunk.name.endsWith('-preload')) {
-					return false;
-				}
+				if (isPreloadChunk(chunk)) return false;
 
 				// Apply normal splitting for other chunks
 				return 'all';
@@ -75,7 +70,7 @@ module.exports = {
 		// Deterministic module IDs for better caching
 		moduleIds: isProduction ? 'deterministic' : 'named',
 	},
-	// TODO: depends on all webpack configs files
+	// TODO: depend on all webpack configs files
 	// cache: {
 	// 	type: 'filesystem',
 	// 	// Invalidate cache on config changes
@@ -95,15 +90,14 @@ module.exports = {
 		publicPath: '',
 
 		// Better chunk naming for caching
-		// filename: isProduction ? '[name].[contenthash].js' : '[name].js',
 		chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].js',
 		filename: (pathData) => {
-			if (pathData.chunk.name === 'main') {
+			if (pathData.chunk?.name === 'main') {
 				return 'main.js';
 			}
 
 			// Preload scripts: no hash, just exact name
-			if (pathData.chunk.name.endsWith('-preload')) {
+			if (pathData.chunk && isPreloadChunk(pathData.chunk)) {
 				return '[name].js';
 			}
 
@@ -113,10 +107,9 @@ module.exports = {
 	},
 	module: {
 		rules: [
-			// Replace ts-loader rule (preserves your negative lookbehind to skip .worker)
 			{
+				// compiles TS/TSX excluding workers with SWC (fast)
 				test: /(?<!\.worker)\.tsx?$/,
-				// compile TS/TSX with SWC (fast)
 				loader: 'swc-loader',
 				options: {
 					jsc: {
@@ -132,8 +125,6 @@ module.exports = {
 					},
 					sourceMaps: true,
 				},
-				// note: if you previously used allowTsInNodeModules: true, remove the default exclude or
-				// explicitly include the packages you need (see note below).
 			},
 
 			// Replace babel-loader rule for .js
@@ -161,7 +152,7 @@ module.exports = {
 		new ForkTsCheckerWebpackPlugin({
 			// Allow async in dev for faster builds
 			async: !isProduction,
-			typescript: { configFile: path.resolve(__dirname, 'tsconfig.json') },
+			typescript: { configFile: path.join(projectRoot, 'tsconfig.json') },
 		}),
 	],
-};
+} as Configuration;
