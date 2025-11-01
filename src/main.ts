@@ -3,6 +3,7 @@ import { openMainWindow } from 'src/windows/main/main';
 import { isDevMode } from '@electron/utils/app';
 import { getResourcesPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
+import { detectLinuxDesktopEnv } from '@utils/os/detectLinuxDesktopEnv';
 
 import { getAbout } from './about';
 import { createAppMenu } from './createAppMenu';
@@ -13,6 +14,9 @@ console.log({
 	platform: process.platform,
 	resourcesPath: getResourcesPath(),
 	directory: __dirname,
+	...(process.platform === 'linux'
+		? { linuxEnvironment: detectLinuxDesktopEnv() }
+		: {}),
 });
 
 const about = getAbout();

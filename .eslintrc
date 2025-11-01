@@ -75,6 +75,7 @@
 					"Minify",
 					"pragma",
 					"contenthash",
+					"linux",
 					"ico",
 					"unnest",
 					"tsquery",
