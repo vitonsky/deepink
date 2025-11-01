@@ -12,15 +12,6 @@ export const isFastBuild = process.env.FAST_BUILD === 'on';
 export const isPreloadChunk = (chunk: Exclude<PathData['chunk'], void>) =>
 	Boolean(chunk.name && chunk.name.endsWith('-preload'));
 
-export const getBuildConfigFiles = () => {
-	return readdirSync(__dirname, {
-		withFileTypes: true,
-	})
-		.filter((file) => file.isFile())
-		.map((file) => path.join(file.parentPath, file.name))
-		.concat([path.resolve(path.join(__dirname, '../../webpack.config.ts'))]);
-};
-
 export const getAppWindows = () => {
 	const windowObjects: Array<{
 		name: string;

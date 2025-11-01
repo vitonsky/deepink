@@ -5,14 +5,7 @@ import { SwcMinifyWebpackPlugin } from 'swc-minify-webpack-plugin';
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin';
 import { Configuration } from 'webpack';
 
-import {
-	getBuildConfigFiles,
-	isFastBuild,
-	isPreloadChunk,
-	isProduction,
-	mode,
-	projectRoot,
-} from './utils';
+import { isFastBuild, isPreloadChunk, isProduction, mode, projectRoot } from './utils';
 
 const outputPath = path.join(projectRoot, 'dist');
 
@@ -77,13 +70,14 @@ export default {
 		// Deterministic module IDs for better caching
 		moduleIds: isProduction ? 'deterministic' : 'named',
 	},
-	cache: {
-		type: 'filesystem',
-		// Invalidate cache on config changes
-		buildDependencies: {
-			config: getBuildConfigFiles(),
-		},
-	},
+	// TODO: depend on all webpack configs files
+	// cache: {
+	// 	type: 'filesystem',
+	// 	// Invalidate cache on config changes
+	// 	buildDependencies: {
+	// 		config: [__filename],
+	// 	},
+	// },
 	node: {
 		__dirname: false,
 	},
