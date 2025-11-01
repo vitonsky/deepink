@@ -111,13 +111,10 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 			win.close();
 		},
 		openWindow: () => {
-			if (!win.isVisible()) {
-				win.show();
-			}
+			if (win.isMinimized()) win.restore();
 
-			if (!win.isFocused()) {
-				win.focus();
-			}
+			win.show();
+			win.focus();
 		},
 	};
 
