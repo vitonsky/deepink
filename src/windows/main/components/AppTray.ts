@@ -41,15 +41,13 @@ export class AppTray {
 		const tray = new Tray(trayIcon);
 		tray.setToolTip(getAbout().displayName);
 
-		// Clear menu by mouse down
-		tray.addListener('mouse-down', () => {
-			tray.setContextMenu(null);
-		});
-
-		// Set menu and force show by right click
+		// TODO: implement menu for Linux platform
+		// Show menu by right click (for win,darwin platforms only)
 		tray.addListener('right-click', () => {
-			tray.setContextMenu(this.$trayMenu.getState());
-			tray.popUpContextMenu();
+			const menu = this.$trayMenu.getState();
+			if (menu) {
+				tray.popUpContextMenu(menu);
+			}
 		});
 
 		// Show app by click
