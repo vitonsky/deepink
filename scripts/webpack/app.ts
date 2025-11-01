@@ -1,4 +1,3 @@
-import { readdirSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
@@ -8,25 +7,23 @@ import { merge } from 'webpack-merge';
 import { productName } from '../../package.json';
 
 import commonConfig from './shared';
-import { projectRoot } from './utils';
+import { getAppWindows, projectRoot } from './utils';
 
-const windows = readdirSync('./src/windows', { withFileTypes: true })
-	.filter((file) => file.isDirectory())
-	.map((file) => file.name);
+const windows = getAppWindows();
 
 export default merge(commonConfig, {
 	target: 'web',
 	entry: {
 		...Object.fromEntries(
-			windows.map((name) => [
+			windows.map(({ name, renderer }) => [
 				`window-${name}`,
-				path.join(projectRoot, `src/windows/${name}/renderer.tsx`),
+				path.join(projectRoot, renderer),
 			]),
 		),
 	},
 	plugins: [
 		...windows.map(
-			(name) =>
+			({ name }) =>
 				new HtmlWebpackPlugin({
 					title: productName,
 					filename: `window-${name}.html`,
