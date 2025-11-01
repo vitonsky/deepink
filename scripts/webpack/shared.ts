@@ -70,14 +70,6 @@ export default {
 		// Deterministic module IDs for better caching
 		moduleIds: isProduction ? 'deterministic' : 'named',
 	},
-	// TODO: depend on all webpack configs files
-	// cache: {
-	// 	type: 'filesystem',
-	// 	// Invalidate cache on config changes
-	// 	buildDependencies: {
-	// 		config: [__filename],
-	// 	},
-	// },
 	node: {
 		__dirname: false,
 	},
