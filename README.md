@@ -95,7 +95,57 @@ Next packages must be installed
 
 ## Linux
 
-Error when run `AppImage`. The problem occurs on latest Ubuntu.
+### The SUID sandbox helper binary was found, but is not configured correctly
 
-Run `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`
+Error occurs on Ubuntu when run `AppImage` and looks like that
 
+```
+[31456:1101/232759.563532:FATAL:sandbox/linux/suid/client/setuid_sandbox_host.cc:166] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /tmp/.mount_DeepinGiNBDl/usr/lib/deepink/chrome-sandbox is owned by root and has mode 4755.
+Trace/breakpoint trap (core dumped)
+```
+
+The issue is with the AppArmor configuration in Ubuntu 24.04, not the AppImage. The change in the configuration is explained in the release notes of Ubuntu 24.04 (security reasons). For example Fedora Linux have no such problem.
+
+To fix this error you have few options.
+
+**Run with `--no-sandbox`**
+
+You can just run app with no sandbox like that
+
+```
+./Deepink-0.0.1-x64.AppImage --no-sandbox
+```
+
+**Disable restriction**
+
+To disable restriction for a current session run
+
+```sh
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+```
+
+this changes will be reverted back after reboot.
+
+To persist this change, you can run
+
+```sh
+# create a local sysctl file with the setting
+echo "kernel.apparmor_restrict_unprivileged_userns = 0" | sudo tee /etc/sysctl.d/local.conf
+
+# apply now (reload all sysctl configs)
+sudo sysctl --system
+```
+
+**Add AppArmor profile**
+
+Configure profile and write at `/etc/apparmor.d/home.app.deepink`
+
+```
+abi <abi/4.0>
+include <tunables/global>
+
+profile deepink /home/your_username/apps/deepink.AppImage flags=(unconfined) {
+  userns,
+  include if exists <local/deepink>
+}
+```
