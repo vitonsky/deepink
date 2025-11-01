@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { defineConfig } from 'vitest/config';
+import { defaultExclude, defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	plugins: [
@@ -20,7 +20,7 @@ export default defineConfig({
 	test: {
 		globals: true,
 		setupFiles: ['scripts/vitest.setup.ts'],
-		dir: 'src',
+		exclude: defaultExclude.concat(['tmp/**', 'dist/**', 'out/**']),
 
 		// DB initialization takes some time at first time,
 		// so we increase default timeout.

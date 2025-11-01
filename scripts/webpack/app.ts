@@ -1,36 +1,38 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { merge } = require('webpack-merge');
-const { readdirSync } = require('fs');
-const { isFastBuild } = require('./scripts/webpack');
-const commonConfig = require('./webpack.common');
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import path from 'path';
+import { Configuration, WebpackPluginInstance } from 'webpack';
+import { merge } from 'webpack-merge';
 
-const windows = readdirSync('./src/windows', { withFileTypes: true })
-	.filter((file) => file.isDirectory())
-	.map((file) => file.name);
+import { productName } from '../../package.json';
 
-module.exports = merge(commonConfig, {
+import commonConfig from './shared';
+import { getAppWindows, projectRoot } from './utils';
+
+const windows = getAppWindows();
+
+export default merge(commonConfig, {
 	target: 'web',
 	entry: {
 		...Object.fromEntries(
-			windows.map((name) => [
+			windows.map(({ name, renderer }) => [
 				`window-${name}`,
-				`./src/windows/${name}/renderer.tsx`,
+				path.join(projectRoot, renderer),
 			]),
 		),
 	},
 	plugins: [
 		...windows.map(
-			(name) =>
+			({ name }) =>
 				new HtmlWebpackPlugin({
-					title: 'Deepink',
+					title: productName,
 					filename: `window-${name}.html`,
 					chunks: [`window-${name}`],
-					template: './src/templates/window.html',
+					template: path.join(projectRoot, 'src/templates/window.html'),
 				}),
 		),
 		new MiniCssExtractPlugin({}),
-	],
+	] as unknown as WebpackPluginInstance[],
 	// We explicitly define external imports instead of use `electron-renderer` target
 	externals: {
 		electron: 'global electron',
@@ -44,15 +46,28 @@ module.exports = merge(commonConfig, {
 						loader: 'worker-loader',
 						options: {
 							worker: 'Worker',
-							// eslint-disable-next-line spellcheck/spell-checker
 							filename: '[name].[contenthash].js',
 						},
 					},
 					{
-						loader: 'ts-loader',
+						loader: 'swc-loader',
 						options: {
-							allowTsInNodeModules: true,
-							transpileOnly: isFastBuild,
+							jsc: {
+								parser: {
+									syntax: 'typescript',
+									tsx: true,
+									decorators: true,
+								},
+								transform: {
+									react: {
+										runtime: 'automatic',
+										pragma: 'React.createElement',
+										pragmaFrag: 'React.Fragment',
+									},
+								},
+								target: 'es2022',
+							},
+							sourceMaps: true,
 						},
 					},
 				],
@@ -65,7 +80,7 @@ module.exports = merge(commonConfig, {
 						loader: 'css-loader',
 						options: {
 							modules: {
-								mode: (resourcePath) => {
+								mode: (resourcePath: string) => {
 									const isModule = resourcePath.endsWith('.module.css');
 									return isModule ? 'local' : 'global';
 								},
@@ -107,4 +122,4 @@ module.exports = merge(commonConfig, {
 			},
 		],
 	},
-});
+} as Configuration);

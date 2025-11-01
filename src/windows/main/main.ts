@@ -1,5 +1,5 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow, globalShortcut, Menu } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 import path from 'path';
 import url from 'url';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
@@ -7,10 +7,14 @@ import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
-import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { createWatcher } from '@utils/effector/watcher';
 
 import { AppTray } from './components/AppTray';
+
+export type MainWindowAPI = {
+	quit: () => void;
+	openWindow: () => void;
+};
 
 type WindowState = {
 	hideByClose: boolean;
@@ -19,7 +23,7 @@ type WindowState = {
 
 const quitRequested = createEvent();
 
-export const openMainWindow = async () => {
+export const openMainWindow = async (): Promise<MainWindowAPI> => {
 	// Requests handlers
 	serveFiles();
 	enableStorage();
@@ -52,37 +56,9 @@ export const openMainWindow = async () => {
 		},
 	});
 
-	win.webContents.setWindowOpenHandler(({ url }) => {
-		console.log('Prevent open new window, and open URL as external link', url);
-
-		openUrlWithExternalBrowser(url);
-
-		return { action: 'deny' };
-	});
-
-	win.webContents.on('will-navigate', (event, url) => {
-		if (url !== win.webContents.getURL()) {
-			console.log(
-				'Prevent navigation in main window, and open URL as external link',
-				url,
-			);
-
-			event.preventDefault();
-			openUrlWithExternalBrowser(url);
-		}
-	});
-
 	if (isDevMode()) {
 		win.webContents.openDevTools();
 	}
-
-	// Toggle dev tools
-	// eslint-disable-next-line spellcheck/spell-checker
-	globalShortcut.register('CmdOrCtrl+Alt+Shift+I', () => {
-		if (!win.isFocused()) return;
-
-		win.webContents.toggleDevTools();
-	});
 
 	// Load page
 	const start = performance.now();
@@ -135,13 +111,10 @@ export const openMainWindow = async () => {
 			win.close();
 		},
 		openWindow: () => {
-			if (!win.isVisible()) {
-				win.show();
-			}
+			if (win.isMinimized()) win.restore();
 
-			if (!win.isFocused()) {
-				win.focus();
-			}
+			win.show();
+			win.focus();
 		},
 	};
 
@@ -149,7 +122,7 @@ export const openMainWindow = async () => {
 	appTray.enable();
 	appTray.update(
 		Menu.buildFromTemplate([
-			{ label: `Open Deepink`, click: trayApi.openWindow },
+			{ label: `Open notes`, click: trayApi.openWindow },
 			{ label: 'Quit', click: trayApi.quit },
 		]),
 	);
