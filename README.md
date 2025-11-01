@@ -18,7 +18,7 @@ There are specific prerequisites per each platform. All instructions listed belo
 Once requirements are meet
 - Clone repo `git clone https://github.com/vitonsky/deepink.git`
 - Checkout `cd deepink`
-- Build and pack. Example for Windows: `make build make-win`
+- Build and pack. Example for Windows: `make build package`
 
 ## Windows
 
