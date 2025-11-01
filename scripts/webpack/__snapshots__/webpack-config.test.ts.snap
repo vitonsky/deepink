@@ -1,5 +1,17 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`All config files must be found 1`] = `
+[
+  "app.ts",
+  "electron-main.ts",
+  "electron-preload.ts",
+  "shared.ts",
+  "utils.ts",
+  "webpack-config.test.ts",
+  "../../webpack.config.ts",
+]
+`;
+
 exports[`All windows and preload scripts must be found 1`] = `
 [
   {
