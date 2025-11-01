@@ -50,10 +50,24 @@ module.exports = merge(commonConfig, {
 						},
 					},
 					{
-						loader: 'ts-loader',
+						loader: 'swc-loader',
 						options: {
-							allowTsInNodeModules: true,
-							transpileOnly: isFastBuild,
+							jsc: {
+								parser: {
+									syntax: 'typescript',
+									tsx: true,
+									decorators: true,
+								},
+								transform: {
+									react: {
+										runtime: 'automatic',
+										pragma: 'React.createElement',
+										pragmaFrag: 'React.Fragment',
+									},
+								},
+								target: 'es2022',
+							},
+							sourceMaps: true,
 						},
 					},
 				],
