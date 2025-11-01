@@ -2,8 +2,7 @@ import { createApi, createStore } from 'effector';
 import { nativeImage, Tray } from 'electron';
 import path from 'path';
 import { getAbout } from 'src/about';
-import { isPlatform } from '@electron/utils/platform';
-import { CleanupFn, createWatcher } from '@utils/effector/watcher';
+import { CleanupFn } from '@utils/effector/watcher';
 
 export type AppTrayProps = { openWindow: () => void };
 
@@ -42,19 +41,23 @@ export class AppTray {
 		const tray = new Tray(trayIcon);
 		tray.setToolTip(getAbout().displayName);
 
-		tray.addListener('click', () => {
-			// Prevent immediately open window for mac by click on tray menu
-			if (isPlatform('darwin')) return;
+		// Clear menu by mouse down
+		tray.addListener('mouse-down', () => {
+			tray.setContextMenu(null);
+		});
 
+		// Set menu and force show by right click
+		tray.addListener('right-click', () => {
+			tray.setContextMenu(this.$trayMenu.getState());
+			tray.popUpContextMenu();
+		});
+
+		// Show app by click
+		tray.addListener('click', () => {
 			this.api.openWindow();
 		});
 
-		const menuCleanup = createWatcher(this.$trayMenu, (menu) => {
-			tray.setContextMenu(menu);
-		});
-
 		this.trayCleanup = () => {
-			menuCleanup();
 			tray.destroy();
 			this.$trayMenu.reset();
 		};
