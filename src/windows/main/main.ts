@@ -11,6 +11,11 @@ import { createWatcher } from '@utils/effector/watcher';
 
 import { AppTray } from './components/AppTray';
 
+export type MainWindowAPI = {
+	quit: () => void;
+	openWindow: () => void;
+};
+
 type WindowState = {
 	hideByClose: boolean;
 	isForcedClosing: boolean;
@@ -18,7 +23,7 @@ type WindowState = {
 
 const quitRequested = createEvent();
 
-export const openMainWindow = async () => {
+export const openMainWindow = async (): Promise<MainWindowAPI> => {
 	// Requests handlers
 	serveFiles();
 	enableStorage();

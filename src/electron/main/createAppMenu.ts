@@ -1,7 +1,7 @@
 /* eslint-disable spellcheck/spell-checker */
 import { app, Menu, MenuItem, MenuItemConstructorOptions } from 'electron';
 
-import { openAboutWindow } from './windows/about';
+import { openAboutWindow } from '../../windows/about';
 
 export function createAppMenu() {
 	type MenuObject = MenuItemConstructorOptions | MenuItem;
