@@ -26,8 +26,6 @@
 		"prepare": "husky install"
 	},
 	"devDependencies": {
-		"@babel/preset-env": "^7.22.5",
-		"@babel/preset-react": "^7.22.5",
 		"@commitlint/cli": "^17.0.0",
 		"@commitlint/config-conventional": "^17.0.0",
 		"@electron-forge/cli": "^7.10.2",
