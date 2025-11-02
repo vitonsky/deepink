@@ -32,7 +32,7 @@ export class MainProcess {
 		// Init app
 		this.setListeners();
 		Menu.setApplicationMenu(createAppMenu());
-		app.whenReady().then(this.onReady);
+		app.whenReady().then(() => this.onReady());
 	}
 
 	private window: MainWindowAPI | null = null;
