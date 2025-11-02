@@ -9,7 +9,7 @@
 	"bugs": {
 		"url": "https://github.com/vitonsky/deepink/issues"
 	},
-	"license": "MIT",
+	"license": " AGPL-3.0",
 	"scripts": {
 		"test": "vitest",
 		"clean": "rm -Rf dist out",
