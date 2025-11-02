@@ -7,7 +7,10 @@ import commonConfig from './shared';
 import { projectRoot } from './utils';
 
 export default merge(commonConfig, {
-	target: 'electron-main',
+	target: 'node',
+	externals: {
+		electron: 'commonjs2 electron',
+	},
 	entry: {
 		main: path.join(projectRoot, 'src/main.ts'),
 	},

@@ -6,7 +6,10 @@ import commonConfig from './shared';
 import { getAppWindows, projectRoot } from './utils';
 
 export default merge(commonConfig, {
-	target: 'electron-main',
+	target: 'node',
+	externals: {
+		electron: 'commonjs2 electron',
+	},
 	entry: {
 		...Object.fromEntries(
 			getAppWindows()
