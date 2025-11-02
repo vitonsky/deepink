@@ -5,13 +5,12 @@ import { SwcMinifyWebpackPlugin } from 'swc-minify-webpack-plugin';
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin';
 import { Configuration } from 'webpack';
 
-import { isFastBuild, isPreloadChunk, isProduction, mode, projectRoot } from './utils';
+import { isPreloadChunk, isProduction, mode, projectRoot } from './utils';
 
 const outputPath = path.join(projectRoot, 'dist');
 
 console.log('Webpack run', {
 	isProduction,
-	isFastBuild,
 	outputPath,
 });
 
