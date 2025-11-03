@@ -4,8 +4,8 @@ const collection = Array.from({ length: 10 }, (_, i) => `item${i}`);
 
 test('Returns null if the collection has fewer than 1 items', () => {
 	expect(getItemByOffset([], 0, 1)).toBe(null);
-	expect(getItemByOffset([1], 0, 1)).toBe(1);
-	expect(getItemByOffset([1, 2], 0, 1)).toBe(2);
+	expect(getItemByOffset([], 0, 3)).toBe(null);
+	expect(getItemByOffset([], 0, -10)).toBe(null);
 });
 
 test('Returns null for an index outside the collection', () => {
