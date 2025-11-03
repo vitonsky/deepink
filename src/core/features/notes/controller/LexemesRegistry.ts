@@ -41,7 +41,7 @@ export class LexemesRegistry {
 		return this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
-			const textsQuery = qb.sql`SELECT text_tsv FROM notes WHERE updated_at >= COALESCE((SELECT executed_at FROM lexeme_ops ORDER BY executed_at DESC LIMIT 1), to_timestamp(0))`;
+			const textsQuery = qb.sql`SELECT text_tsv FROM notes WHERE updated_at >= COALESCE((SELECT executed_at FROM lexeme_ops WHERE action = ''scan'' ORDER BY executed_at DESC LIMIT 1), to_timestamp(0))`;
 
 			const { rows } = await db.query(
 				qb.sql`INSERT INTO lexemes(word, query) SELECT word, plainto_tsquery('simple', word) AS query FROM ts_stat(E'${textsQuery}') ON CONFLICT DO NOTHING RETURNING word`,

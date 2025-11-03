@@ -124,3 +124,41 @@ describe('prune method', () => {
 		await expect(lexemes.getList()).resolves.toContain('3');
 	});
 });
+
+describe('Words scanner must find a new words after prune #147', () => {
+	const dbFile = createFileControllerMock();
+	const dbPromise = openDatabase(dbFile);
+
+	afterAll(async () => {
+		const db = await dbPromise;
+		await db.close();
+	});
+
+	test('add few notes', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		await Promise.all(
+			Array(3)
+				.fill(null)
+				.map((_, index) =>
+					registry.add({
+						title: `Title ${index + 1}`,
+						text: `Text ${index + 1}`,
+					}),
+				),
+		);
+	});
+
+	test('index call after prune finds a new words', async () => {
+		const db = await dbPromise;
+		const lexemes = new LexemesRegistry(db);
+
+		await expect(lexemes.getList()).resolves.toHaveLength(0);
+		await expect(lexemes.prune()).resolves.toEqual([]);
+		await expect(lexemes.getList()).resolves.toHaveLength(0);
+
+		await expect(lexemes.index()).resolves.toEqual(['title', 'text', '3', '2', '1']);
+		await expect(lexemes.getList()).resolves.not.toHaveLength(0);
+	});
+});
