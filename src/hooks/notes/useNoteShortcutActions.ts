@@ -23,44 +23,34 @@ export const useNoteShortcutActions = () => {
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
 
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE,
-		() => {
-			if (!activeNoteId) return;
-			noteActions.close(activeNoteId);
-		},
-		{ enabled: Boolean(activeNoteId) },
-	);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE, () => {
+		if (!activeNoteId) return;
+		noteActions.close(activeNoteId);
+	});
 
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE,
-		() => {
-			const lastClosedNote = recentlyClosedNotes[recentlyClosedNotes.length - 1];
-			if (!lastClosedNote) return;
-			noteActions.click(lastClosedNote);
-		},
-		{ enabled: recentlyClosedNotes.length > 0 },
-	);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
+		const lastClosedNote = recentlyClosedNotes[recentlyClosedNotes.length - 1];
+		if (!lastClosedNote) return;
+		noteActions.click(lastClosedNote);
+	});
 
-	const focusNoteByOffset = (offset: number) => {
+	const focusNoteInDirection = (direction: 'next' | 'previous') => {
 		if (!activeNoteId) return;
 		const noteIndex = openedNotes.findIndex((note) => note.id === activeNoteId);
 		if (noteIndex === -1) return;
+
+		const offset = direction === 'next' ? 1 : -1;
 		const note = getItemByOffset(openedNotes, noteIndex, offset);
 		if (!note) return;
 
 		noteActions.click(note.id);
 	};
 
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
-		() => focusNoteByOffset(-1),
-		{ enabled: Boolean(activeNoteId) },
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE, () =>
+		focusNoteInDirection('previous'),
 	);
 
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
-		() => focusNoteByOffset(1),
-		{ enabled: Boolean(activeNoteId) },
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE, () =>
+		focusNoteInDirection('next'),
 	);
 };
