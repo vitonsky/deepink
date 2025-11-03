@@ -7,7 +7,7 @@ export function createAppMenu() {
 	type MenuObject = MenuItemConstructorOptions | MenuItem;
 	const application: MenuObject = {
 		label: 'Application',
-		role: 'about',
+		role: 'appMenu',
 		submenu: [
 			{
 				label: 'About Application',
