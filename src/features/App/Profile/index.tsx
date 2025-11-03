@@ -3,6 +3,9 @@ import { isEqual } from 'lodash';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
+import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
@@ -99,6 +102,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			delete (globalThis as any)[Symbol.for('db')];
 		};
 	}, [db, isDevMode]);
+
+	useShortcutsBinding();
+
+	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

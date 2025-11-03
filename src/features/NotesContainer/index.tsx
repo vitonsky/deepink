@@ -11,6 +11,7 @@ import {
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
+import { useNoteShortcutActions } from '@hooks/notes/useNoteShortcutActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -84,6 +85,8 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 		},
 		[eventBus, noteHistory, noteUpdated, notesRegistry, updateNotes],
 	);
+
+	useNoteShortcutActions();
 
 	return (
 		<VStack align="start" w="100%" h="100%" gap={0} overflow="hidden" {...props}>

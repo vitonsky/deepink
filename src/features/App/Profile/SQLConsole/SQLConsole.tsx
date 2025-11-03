@@ -95,6 +95,15 @@ export const SQLConsole = ({
 								bubbles: true,
 							}),
 						);
+						input.dispatchEvent(
+							new KeyboardEvent('keyup', {
+								key: 'Enter',
+								keyCode: 13,
+								which: 13,
+								code: 'Enter',
+								bubbles: true,
+							}),
+						);
 					});
 				}}
 			>
