@@ -1,0 +1,16 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`All windows and preload scripts must be found 1`] = `
+[
+  {
+    "name": "about",
+    "preloadScript": "src/windows/about/preload.ts",
+    "renderer": "src/windows/about/renderer.tsx",
+  },
+  {
+    "name": "main",
+    "preloadScript": "src/windows/main/preload.ts",
+    "renderer": "src/windows/main/renderer.tsx",
+  },
+]
+`;

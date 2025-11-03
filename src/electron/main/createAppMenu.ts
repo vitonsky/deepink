@@ -1,14 +1,19 @@
 /* eslint-disable spellcheck/spell-checker */
 import { app, Menu, MenuItem, MenuItemConstructorOptions } from 'electron';
 
+import { openAboutWindow } from '../../windows/about';
+
 export function createAppMenu() {
 	type MenuObject = MenuItemConstructorOptions | MenuItem;
 	const application: MenuObject = {
 		label: 'Application',
+		role: 'appMenu',
 		submenu: [
 			{
 				label: 'About Application',
-				role: 'about',
+				click(_item, window) {
+					openAboutWindow(window);
+				},
 			},
 			{
 				type: 'separator',
@@ -62,5 +67,19 @@ export function createAppMenu() {
 		],
 	};
 
-	return Menu.buildFromTemplate([application, edit]);
+	return Menu.buildFromTemplate([
+		application,
+		edit,
+		{
+			label: 'Help',
+			role: 'help',
+			submenu: [
+				{
+					label: 'Toggle dev tools',
+					role: 'toggleDevTools',
+					accelerator: 'CmdOrCtrl+Alt+Shift+I',
+				},
+			],
+		},
+	]);
 }
