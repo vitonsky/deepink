@@ -146,4 +146,8 @@ export default {
 			typescript: { configFile: path.join(projectRoot, 'tsconfig.json') },
 		}),
 	],
+
+	watchOptions: {
+		ignored: '**/node_modules',
+	},
 } as Configuration;
