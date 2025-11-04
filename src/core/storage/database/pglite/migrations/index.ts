@@ -29,7 +29,7 @@ export const getMigrationsList = async (): Promise<PGMigration[]> =>
 			import('./sql/2_full_text_search_for_notes.sql'),
 		),
 		convertSQLToMigrationObject(
-			'3_add_deleted_to_notes',
-			import('./sql/3_add_deleted_to_notes.sql'),
+			'3_add_deleted_column_to_notes',
+			import('./sql/3_add_deleted_column_to_notes.sql'),
 		),
 	]);
