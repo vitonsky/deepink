@@ -99,7 +99,7 @@ describe('CRUD operations', () => {
 });
 
 describe('data fetching', () => {
-	let dbFile: any;
+	const dbFile = createFileControllerMock();
 
 	const notesSample = Array(300)
 		.fill(null)
@@ -110,11 +110,7 @@ describe('data fetching', () => {
 			};
 		});
 
-	// Ensure each test runs with fresh, isolated data
-	// Insert sample entries
-	beforeEach(async () => {
-		dbFile = createFileControllerMock();
-
+	test('insert sample entries', async () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
@@ -173,45 +169,6 @@ describe('data fetching', () => {
 		await db.close();
 	});
 
-	test('method getLength consider filters', async () => {
-		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-
-		const notesId = await registry
-			.get({ limit: 10 })
-			.then((notes) => notes.map((note) => note.id));
-		await registry.updateMeta(notesId, { isVisible: false });
-
-		await expect(registry.getLength({ meta: { isVisible: false } })).resolves.toBe(
-			10,
-		);
-		await expect(registry.getLength({ meta: { isVisible: true } })).resolves.toBe(
-			notesSample.length - 10,
-		);
-
-		await db.close();
-	});
-
-	test('get entries by deletion status', async () => {
-		const db = await openDatabase(dbFile);
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-
-		const notesId = await registry
-			.get({ limit: 10 })
-			.then((notes) => notes.map((note) => note.id));
-
-		// update status for 10 notes
-		await registry.updateMeta(notesId, { isDeleted: true });
-		await expect(registry.getLength({ meta: { isDeleted: true } })).resolves.toBe(10);
-
-		// check only not deleted notes
-		await expect(registry.getLength({ meta: { isDeleted: false } })).resolves.toBe(
-			notesSample.length - 10,
-		);
-
-		await db.close();
-	});
-
 	test('filter by tags and the deleted status', async () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
@@ -244,6 +201,47 @@ describe('data fetching', () => {
 				meta: { isDeleted: true },
 			}),
 		).resolves.toHaveLength(0);
+
+		await db.close();
+	});
+
+	test('get entries by deletion status', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		// update status for 10 notes
+		await registry.updateMeta(notesId, { isDeleted: true });
+		await expect(registry.get({ meta: { isDeleted: true } })).resolves.toHaveLength(
+			10,
+		);
+
+		// check only not deleted notes
+		await expect(registry.get({ meta: { isDeleted: false } })).resolves.toHaveLength(
+			notesSample.length - 10,
+		);
+
+		await db.close();
+	});
+
+	test('method getLength consider filters', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+		await registry.updateMeta(notesId, { isVisible: false });
+
+		await expect(registry.getLength({ meta: { isVisible: false } })).resolves.toBe(
+			10,
+		);
+		await expect(registry.getLength({ meta: { isVisible: true } })).resolves.toBe(
+			notesSample.length - 10,
+		);
 
 		await db.close();
 	});
