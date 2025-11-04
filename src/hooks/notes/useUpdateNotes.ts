@@ -41,8 +41,6 @@ export const useUpdateNotes = () => {
 			console.debug('Notes indexing is completed', performance.now() - start);
 		}
 
-		const deleted = notesView === NOTES_VIEW.BIN ? true : false;
-
 		const tags =
 			activeTag !== null && notesView === NOTES_VIEW.All_NOTES
 				? [activeTag.id]
@@ -57,7 +55,7 @@ export const useUpdateNotes = () => {
 						text: searchText,
 				  }
 				: undefined,
-			meta: { isDeleted: deleted },
+			meta: { isDeleted: notesView === NOTES_VIEW.BIN ? true : false },
 		});
 
 		if (isRequestCanceled()) return;
