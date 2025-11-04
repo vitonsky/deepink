@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
-import { WorkspaceEvents } from '@api/events/workspace';
 import { formatNoteLink } from '@core/features/links';
 import { INote, NoteId } from '@core/features/notes';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
-	useEventBus,
+	useNotesContext,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
@@ -71,7 +70,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
-	const eventBus = useEventBus();
+	const { noteUpdated } = useNotesContext();
 
 	const noteContextMenuCallback = useCallback<ContextMenuCallback<NoteActions>>(
 		async ({ id, action }) => {
@@ -85,7 +84,8 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 					closeNote(id);
 
 					await notes.updateMeta([id], { isDeleted: true });
-					eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
+					const updatedNote = await notes.getById(id);
+					if (updatedNote) noteUpdated(updatedNote);
 
 					updateNotes();
 				},
@@ -113,7 +113,8 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 					if (!isConfirmed) return;
 
 					await notes.updateMeta([id], { isDeleted: false });
-					eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
+					const updatedNote = await notes.getById(id);
+					if (updatedNote) noteUpdated(updatedNote);
 
 					updateNotes();
 				},
@@ -177,11 +178,11 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 		},
 		[
 			closeNote,
-			eventBus,
-			notesExport,
 			notes,
-			tagsRegistry,
+			noteUpdated,
 			updateNotes,
+			tagsRegistry,
+			notesExport,
 			workspaceData?.name,
 		],
 	);
