@@ -31,44 +31,30 @@ const mdCharsForEscapeRegEx = new RegExp(
 	'g',
 );
 
-const buildNoteMenu = (note: INote) => {
-	const baseMenu: ContextMenu = [
+const buildNoteMenu = (note: INote): ContextMenu => {
+	const commonActions: ContextMenu = [
 		{
 			id: NoteActions.EXPORT,
 			label: 'Export',
 		},
+		{
+			id: NoteActions.COPY_MARKDOWN_LINK,
+			label: 'Copy markdown link',
+		},
 		{ type: 'separator' },
 	];
 
-	const noteMenu: ContextMenu = note?.isDeleted
+	return note.isDeleted
 		? [
-				{
-					id: NoteActions.RESTORE_FROM_BIN,
-					label: 'Restore',
-				},
-				...baseMenu,
-				{
-					id: NoteActions.DELETE_PERMANENTLY,
-					label: 'Delete permanently',
-				},
+				{ id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' },
+				...commonActions,
+				{ id: NoteActions.DELETE_PERMANENTLY, label: 'Delete permanently' },
 		  ]
 		: [
-				{
-					id: NoteActions.DUPLICATE,
-					label: 'Duplicate',
-				},
-				{
-					id: NoteActions.COPY_MARKDOWN_LINK,
-					label: 'Copy markdown link',
-				},
-				...baseMenu,
-				{
-					id: NoteActions.DELETE_TO_BIN,
-					label: 'Delete to bin',
-				},
+				{ id: NoteActions.DUPLICATE, label: 'Duplicate' },
+				...commonActions,
+				{ id: NoteActions.DELETE_TO_BIN, label: 'Delete to bin' },
 		  ];
-
-	return noteMenu;
 };
 
 /**

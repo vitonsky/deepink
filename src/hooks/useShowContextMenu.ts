@@ -8,7 +8,7 @@ export const useShowContextMenu = <T extends string>(
 	callback: ContextMenuCallback<T>,
 ) => {
 	return useCallback(
-		async (id: string, point: { x: number; y: number }, menu: ContextMenu) => {
+		(id: string, point: { x: number; y: number }, menu: ContextMenu) => {
 			const contextMenu = new ElectronContextMenu<T>(menu);
 
 			contextMenu.open(point);

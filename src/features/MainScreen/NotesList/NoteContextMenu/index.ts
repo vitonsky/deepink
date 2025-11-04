@@ -4,5 +4,5 @@ export enum NoteActions {
 	COPY_MARKDOWN_LINK = 'copyMdLink',
 	DELETE_TO_BIN = 'deleteToBin',
 	DELETE_PERMANENTLY = 'deletePermanently',
-	RESTORE_FROM_BIN = 'restore',
+	RESTORE_FROM_BIN = 'restoreFromBin',
 }
