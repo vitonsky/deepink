@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import { ElectronContextMenu } from '@features/MainScreen/NotesList/NoteContextMenu/ElectronContextMenu';
 
@@ -15,9 +15,14 @@ export const useContextMenu = <T extends string>(
 	menu: ContextMenu,
 	callback: ContextMenuCallback<T>,
 ) => {
-	const contextMenu = useMemo(() => {
+	const [contextMenu, setContextMenu] = useState(() => {
 		// TODO: provide constructor in react context
 		return new ElectronContextMenu<T>(menu);
+	});
+
+	// Update menu
+	useEffect(() => {
+		setContextMenu(new ElectronContextMenu(menu));
 	}, [menu]);
 
 	const contextMenuTargetRef = useRef<string | null>(null);

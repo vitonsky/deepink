@@ -1,117 +1,139 @@
-import { useCallback, useEffect, useState } from 'react';
-
+import { useCallback } from 'react';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { formatNoteLink } from '@core/features/links';
-import { NoteId } from '@core/features/notes';
-import { INotesController } from '@core/features/notes/controller';
-import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-
+import { INote, NoteId } from '@core/features/notes';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
+	useEventBus,
 	useNotesRegistry,
-	useNotesContext,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useTelemetryTracker } from '@features/telemetry';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
-import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
+import { ContextMenuCallback } from '@hooks/useContextMenu';
+import { useShowContextMenu } from '@hooks/useShowContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { copyTextToClipboard } from '@utils/clipboard';
 
-import { mkdir, writeFile } from 'fs/promises';
-
-import { ContextMenu } from '@electron/requests/contextMenu';
-import { useContextMenu } from '@hooks/useContextMenu';
-
-import { defaultNoteMenu } from './noteMenus';
-import { useNoteContextMenuCallback } from './useNoteContextMenuCallback';
-import { useDynamicContextMenu } from '@hooks/useDynamicContextMenu';
 import { NoteActions } from '.';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useTelemetryTracker } from '@features/telemetry';
 
 export type ContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
 };
-import { useCallback } from 'react';
-import { INote } from '@core/features/notes';
-import { useDynamicContextMenu } from '@hooks/useDynamicContextMenu';
 
-import { defaultNoteMenu, deletedNoteMenu } from './noteMenus';
-import {
-	ContextMenuOptions,
-	useNoteContextMenuCallback,
-} from './useNoteContextMenuCallback';
+const mdCharsForEscape = ['\\', '[', ']'];
+const mdCharsForEscapeRegEx = new RegExp(
+	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
+	'g',
+);
+
+const buildNoteMenu = (note: INote) => {
+	const baseMenu: ContextMenu = [
+		{
+			id: NoteActions.EXPORT,
+			label: 'Export',
+		},
+		{ type: 'separator' },
+	];
+
+	const noteMenu: ContextMenu = note?.isDeleted
+		? [
+				{
+					id: NoteActions.RESTORE_FROM_BIN,
+					label: 'Restore',
+				},
+				...baseMenu,
+				{
+					id: NoteActions.DELETE_PERMANENTLY,
+					label: 'Delete permanently',
+				},
+		  ]
+		: [
+				{
+					id: NoteActions.DUPLICATE,
+					label: 'Duplicate',
+				},
+				{
+					id: NoteActions.COPY_MARKDOWN_LINK,
+					label: 'Copy markdown link',
+				},
+				...baseMenu,
+				{
+					id: NoteActions.DELETE_TO_BIN,
+					label: 'Delete to bin',
+				},
+		  ];
+
+	return noteMenu;
+};
 
 /**
  * Opens the context menu for a note.
  * Automatically selects the appropriate menu based on the notes state
  */
-export const useNoteContextMenu = ({
-	closeNote,
-	updateNotes,
-	notesRegistry,
-}: DefaultContextMenuOptions) => {
+export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOptions) => {
 	const telemetry = useTelemetryTracker();
 
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
-	const { noteUpdated: updateNote } = useNotesContext();
 
 	const notesExport = useNotesExport();
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
-	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
-		async ({ id, action }) => {
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CONTEXT_MENU_CLICK, {
-				action,
-			});
+	const eventBus = useEventBus();
 
-			switch (action) {
-				case NoteActions.DELETE: {
-					const targetNote = await notesRegistry.getById(id);
+	const noteContextMenuCallback = useCallback<ContextMenuCallback<NoteActions>>(
+		async ({ id, action }) => {
+			const actionsMap = {
+				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
 					const isConfirmed = confirm(
-						`Are you sure to ${
-							targetNote?.isDeleted ? 'permanently delete' : 'delete'
-						} note?`,
+						`Are you sure you want to move the note to the bin?`,
 					);
 					if (!isConfirmed) return;
 
 					closeNote(id);
 
-					// permanently delete the note
-					if (targetNote?.isDeleted) {
-						await notesRegistry.delete([id]);
-						await tagsRegistry.setAttachedTags(id, []);
-					} else {
-						// mark the note as deleted
-						await notesRegistry.updateStatus([id], { deleted: true });
+					await notes.updateMeta([id], { isDeleted: true });
+					eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
-						// refresh the note status
-						const deletedNote = await notesRegistry.getById(id);
-						if (deletedNote) updateNote(deletedNote);
-					}
+					updateNotes();
+				},
+
+				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
+					const isConfirmed = confirm(
+						`Are you sure you want to delete the note permanently?`,
+					);
+					if (!isConfirmed) return;
+
+					closeNote(id);
+
+					await notes.delete([id]);
+					await tagsRegistry.setAttachedTags(id, []);
 
 					updateNotes();
 
 					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED);
-					break;
-				}
-				case NoteActions.RESTORE: {
-					const isConfirmed = confirm('Are you sure to restore note?');
+				},
+
+				[NoteActions.RESTORE_FROM_BIN]: async (id: string) => {
+					const isConfirmed = confirm(
+						'Are you sure you want to restore the note',
+					);
 					if (!isConfirmed) return;
 
-					await notesRegistry.updateStatus([id], { deleted: false });
-
-					const restoredNote = await notesRegistry.getById(id);
-					if (restoredNote) updateNote(restoredNote);
+					await notes.updateMeta([id], { isDeleted: false });
+					eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
 					updateNotes();
-					break;
-				}
-				case NoteActions.DUPLICATE: {
-					const sourceNote = await notesRegistry.getById(id);
+				},
+
+				[NoteActions.DUPLICATE]: async (id: string) => {
+					const sourceNote = await notes.getById(id);
 
 					if (!sourceNote) {
 						console.warn(`Not found note with id ${sourceNote}`);
@@ -119,7 +141,7 @@ export const useNoteContextMenu = ({
 					}
 
 					const { title, text } = sourceNote.content;
-					const newNoteId = await notesRegistry.add({
+					const newNoteId = await notes.add({
 						title: 'DUPLICATE: ' + title,
 						text,
 					});
@@ -130,10 +152,10 @@ export const useNoteContextMenu = ({
 					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
 
 					updateNotes();
-					break;
-				}
-				case NoteActions.COPY_MARKDOWN_LINK: {
-					const note = await notesRegistry.getById(id);
+				},
+
+				[NoteActions.COPY_MARKDOWN_LINK]: async (id: string) => {
+					const note = await notes.getById(id);
 					if (!note) {
 						console.error(`Can't get data of note #${id}`);
 						return;
@@ -148,9 +170,9 @@ export const useNoteContextMenu = ({
 					console.log(`Copy markdown link ${markdownLink}`);
 
 					copyTextToClipboard(markdownLink);
-					break;
-				}
-				case NoteActions.EXPORT: {
+				},
+
+				[NoteActions.EXPORT]: async (id: string) => {
 					const note = await notes.getById(id);
 					await notesExport.exportNote(
 						id,
@@ -160,36 +182,30 @@ export const useNoteContextMenu = ({
 								`note_${id}`,
 						),
 					);
-					break;
-				}
+				},
+			};
+
+			if (action in actionsMap) {
+				actionsMap[action](id);
 			}
 		},
 		[
 			closeNote,
-			notes,
+			eventBus,
 			notesExport,
-			updateNote,
-			notesRegistry,
+			notes,
 			tagsRegistry,
-			telemetry,
 			updateNotes,
 			workspaceData?.name,
 		],
 	);
 
-export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOptions) => {
-	const noteContextMenuCallback = useNoteContextMenuCallback({
-		closeNote,
-		updateNotes,
-	});
-	const openMenu = useDynamicContextMenu(noteContextMenuCallback, defaultNoteMenu);
+	const showMenu = useShowContextMenu(noteContextMenuCallback);
 
 	return useCallback(
 		(note: INote, point: { x: number; y: number }) => {
-			const menu = note.isDeleted ? deletedNoteMenu : defaultNoteMenu;
-
-			openMenu(note.id, point, menu);
+			showMenu(note.id, point, buildNoteMenu(note));
 		},
-		[openMenu],
+		[showMenu],
 	);
 };
