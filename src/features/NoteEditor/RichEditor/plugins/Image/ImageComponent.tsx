@@ -58,7 +58,7 @@ function useSuspenseImage(src: string) {
 					return;
 				}
 
-				actualSrc = URL.createObjectURL(new Blob([file]));
+				actualSrc = URL.createObjectURL(new Blob([file], { type: file.type }));
 			}
 
 			const img = new Image();
