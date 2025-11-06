@@ -21,7 +21,14 @@ const StateScheme = z.object({
 });
 export class Telemetry {
 	private readonly stateFile;
-	constructor(file: IFileController, private readonly plausible: Plausible) {
+	constructor(
+		file: IFileController,
+		private readonly plausible: Plausible,
+		private readonly options: {
+			contextProps?: EventProps['props'];
+			onEventSent?: (event: { name: string; payload: EventProps['props'] }) => void;
+		} = {},
+	) {
 		this.stateFile = new StateFile(file, StateScheme, {
 			defaultValue: {
 				uid: randomUUID(),
@@ -34,18 +41,23 @@ export class Telemetry {
 		const { uid } = await this.getState();
 
 		// Extend properties
-		payload = {
+		const composedPayload = {
+			...this.options.contextProps,
 			...payload,
 			uid,
 		};
 
 		try {
-			await this.plausible.trackEvent(eventName, { props: payload });
+			await this.plausible.trackEvent(eventName, {
+				props: composedPayload,
+			});
+
+			this.options.onEventSent?.({ name: eventName, payload: composedPayload });
 		} catch (error) {
 			console.error(error);
 
 			// Schedule sending event later
-			await this.enqueue(eventName, payload);
+			await this.enqueue(eventName, composedPayload);
 		}
 	}
 
@@ -56,6 +68,8 @@ export class Telemetry {
 		for (const event of state.queue) {
 			try {
 				await this.plausible.trackEvent(event.name, { props: event.props });
+
+				this.options.onEventSent?.({ name: event.name, payload: event.props });
 			} catch (error) {
 				newQueue.push(event);
 			}

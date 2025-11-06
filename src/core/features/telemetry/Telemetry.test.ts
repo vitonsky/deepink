@@ -19,16 +19,31 @@ beforeEach(() => {
 describe('Broken state file must be automatically recreated', () => {
 	const plausible = new Plausible(dummyPlausibleConfig);
 
+	const onEventSent = vi.fn();
 	const telemetryStateFile = createFileControllerMock();
-	const telemetry = new Telemetry(telemetryStateFile, plausible);
+	const telemetry = new Telemetry(telemetryStateFile, plausible, { onEventSent });
 
 	test('Send few requests', async () => {
+		expect(onEventSent).toBeCalledTimes(0);
+
 		await telemetry.track('test', { foo: 'Event 1' });
+		expect(onEventSent).toBeCalledTimes(1);
+
 		await telemetry.track('test', { foo: 'Event 2' });
+		expect(onEventSent).toBeCalledTimes(2);
+
 		await telemetry.track('test', { foo: 'Event 3' });
+		expect(onEventSent).toBeCalledTimes(3);
 
 		await expect(telemetry.getState()).resolves.toEqual(
 			expect.objectContaining({ uid: expect.any(String), queue: [] }),
+		);
+
+		expect(onEventSent).toBeCalledWith(
+			expect.objectContaining({
+				name: 'test',
+				payload: { foo: 'Event 1', uid: expect.any(String) },
+			}),
 		);
 	});
 
@@ -38,7 +53,8 @@ describe('Broken state file must be automatically recreated', () => {
 
 		await telemetryStateFile.write(new Uint8Array(100).buffer);
 
-		const telemetry2 = new Telemetry(telemetryStateFile, plausible);
+		const onEventSent = vi.fn();
+		const telemetry2 = new Telemetry(telemetryStateFile, plausible, { onEventSent });
 
 		await telemetry2.track('test', { foo: 'Event 1' });
 		await telemetry2.track('test', { foo: 'Event 2' });
@@ -47,14 +63,17 @@ describe('Broken state file must be automatically recreated', () => {
 		await expect(telemetry2.getState()).resolves.toEqual(
 			expect.objectContaining({ uid: expect.not.stringMatching(uid), queue: [] }),
 		);
+
+		expect(onEventSent).toBeCalledTimes(3);
 	});
 });
 
 describe('Failed requests must be accumulated in queue and sent later', () => {
 	const plausible = new Plausible(dummyPlausibleConfig);
 
+	const onEventSent = vi.fn();
 	const telemetryStateFile = createFileControllerMock();
-	const telemetry = new Telemetry(telemetryStateFile, plausible);
+	const telemetry = new Telemetry(telemetryStateFile, plausible, { onEventSent });
 
 	test('Failed requests must be queued', async () => {
 		// Emulate network error
@@ -64,6 +83,8 @@ describe('Failed requests must be accumulated in queue and sent later', () => {
 
 		await telemetry.track('test', { foo: 'Event 1' });
 		await telemetry.track('test', { foo: 'Event 2' });
+
+		expect(onEventSent).toBeCalledTimes(0);
 
 		await expect(telemetry.getState()).resolves.toEqual(
 			expect.objectContaining({
@@ -108,6 +129,8 @@ describe('Failed requests must be accumulated in queue and sent later', () => {
 			expect.objectContaining({ queue: expect.objectContaining({ length: 2 }) }),
 		);
 
+		expect(onEventSent).toBeCalledTimes(0);
+
 		// When network restored, queued events must be sent
 		mockFetch.mockClear();
 		expect(mockFetch).toBeCalledTimes(0);
@@ -128,5 +151,7 @@ describe('Failed requests must be accumulated in queue and sent later', () => {
 		await expect(telemetry.getState()).resolves.toEqual(
 			expect.objectContaining({ queue: [] }),
 		);
+
+		expect(onEventSent).toBeCalledTimes(2);
 	});
 });
