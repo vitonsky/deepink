@@ -3,6 +3,7 @@ import { EventProps, Plausible } from 'plausible-client';
 import { z } from 'zod';
 
 import { IFileController } from '../files';
+import { StateFile } from './StateFile';
 
 const StateScheme = z.object({
 	uid: z.string(),
@@ -19,10 +20,15 @@ const StateScheme = z.object({
 		.array(),
 });
 export class Telemetry {
-	constructor(
-		private readonly file: IFileController,
-		private readonly plausible: Plausible,
-	) {}
+	private readonly stateFile;
+	constructor(file: IFileController, private readonly plausible: Plausible) {
+		this.stateFile = new StateFile(file, StateScheme, {
+			defaultValue: {
+				uid: randomUUID(),
+				queue: [],
+			},
+		});
+	}
 
 	public async track(eventName: string, payload: EventProps['props'] = {}) {
 		const { uid } = await this.getState();
@@ -85,33 +91,14 @@ export class Telemetry {
 	async getState() {
 		if (this.state) return structuredClone(this.state);
 
-		// Parse data in state file
-		const rawJson = await this.file.get();
-		if (rawJson) {
-			try {
-				const parseResult = StateScheme.safeParse(
-					JSON.parse(new TextDecoder().decode(rawJson)),
-				);
-				if (parseResult.success) return parseResult.data;
-			} catch (error) {
-				console.error(error);
-			}
-		}
+		const state = await this.stateFile.get({ onError: console.error });
+		await this.sync(state);
 
-		// Create new state file
-		const newState = {
-			uid: randomUUID(),
-			queue: [],
-		} satisfies z.TypeOf<typeof StateScheme>;
-
-		this.state = newState;
-		await this.sync(newState);
-
-		return structuredClone(newState);
+		return structuredClone(state);
 	}
 
 	private async sync(data: z.TypeOf<typeof StateScheme>) {
 		this.state = data;
-		await this.file.write(new TextEncoder().encode(JSON.stringify(data)).buffer);
+		await this.stateFile.set(data);
 	}
 }
