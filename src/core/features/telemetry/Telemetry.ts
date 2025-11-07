@@ -20,8 +20,10 @@ const StateScheme = z.object({
 		.array(),
 });
 
+type EventPayload = EventProps['props'];
+
 export interface TelemetryTracker {
-	track(eventName: string, payload?: EventProps['props']): Promise<void>;
+	track(eventName: string, payload?: EventPayload): Promise<void>;
 
 	handleQueue(): Promise<{
 		total: number;
@@ -37,8 +39,8 @@ export class Telemetry implements TelemetryTracker {
 		file: IFileController,
 		private readonly plausible: Plausible,
 		private readonly options: {
-			contextProps?: EventProps['props'];
-			onEventSent?: (event: { name: string; payload: EventProps['props'] }) => void;
+			contextProps?: () => EventPayload | Promise<EventPayload>;
+			onEventSent?: (event: { name: string; payload: EventPayload }) => void;
 		} = {},
 	) {
 		this.stateFile = new StateFile(file, StateScheme, {
@@ -49,12 +51,15 @@ export class Telemetry implements TelemetryTracker {
 		});
 	}
 
-	public async track(eventName: string, payload: EventProps['props'] = {}) {
+	public async track(eventName: string, payload: EventPayload = {}) {
 		const { uid } = await this.getState();
 
 		// Extend properties
+		const contextProps = this.options.contextProps
+			? await this.options.contextProps()
+			: {};
 		const composedPayload = {
-			...this.options.contextProps,
+			...contextProps,
 			...payload,
 			uid,
 		};
@@ -101,7 +106,7 @@ export class Telemetry implements TelemetryTracker {
 		return stats;
 	}
 
-	private async enqueue(eventName: string, payload: EventProps['props'] = {}) {
+	private async enqueue(eventName: string, payload: EventPayload = {}) {
 		const state = await this.getState();
 
 		state.queue.push({
