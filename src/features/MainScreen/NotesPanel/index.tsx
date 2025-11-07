@@ -14,7 +14,6 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { NotesList } from '@features/MainScreen/NotesList';
-import { usePreventMiddleClickPaste } from '@hooks/usePreventMiddleClickPaste';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -59,8 +58,6 @@ export const NotesPanel = () => {
 		setSearch('');
 		setSearchInput('');
 	};
-
-	usePreventMiddleClickPaste();
 
 	return (
 		<VStack
