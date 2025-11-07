@@ -76,6 +76,7 @@
 					"pragma",
 					"contenthash",
 					"linux",
+					"cpu",
 					"ico",
 					"unnest",
 					"tsquery",

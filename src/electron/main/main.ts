@@ -1,4 +1,6 @@
-import { app, Menu } from 'electron';
+import { randomUUID } from 'crypto';
+import { app, Menu, screen, session } from 'electron';
+import os from 'os';
 import { Plausible } from 'plausible-client';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -132,17 +134,49 @@ export class MainProcess {
 	}
 
 	private setupTelemetry() {
+		const displayInfo = screen.getPrimaryDisplay();
+
+		const cpus = os.cpus();
+		const ramSizeInGb = Math.floor(os.totalmem() / 1024 ** 3);
+
 		// TODO: use real config
 		const plausible = new Plausible({
 			apiHost: 'https://uxt.vitonsky.net',
 			domain: 'test',
+			transform(event) {
+				event.deviceWidth = displayInfo.workAreaSize.width;
+				return event;
+			},
 		});
 
 		const telemetryStateFile = createFileControllerMock();
 		const telemetry = new Telemetry(telemetryStateFile, plausible, {
 			onEventSent: console.log,
 			contextProps: {
+				// Used to group events per session
+				sessionId: randomUUID(),
 				version: app.getVersion(),
+				userAgent: session.defaultSession.getUserAgent(),
+
+				// User bucket info
+				language: app.getPreferredSystemLanguages()[0],
+				languages: app.getPreferredSystemLanguages().join(',') || undefined,
+				timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+
+				// Hardware info
+				platform: process.platform,
+
+				cpuModel: cpus[0].model,
+				cpuCores: cpus.length,
+				cpuSpeed: cpus[0].speed,
+
+				ramSize: ramSizeInGb,
+
+				displaySizeWidth: displayInfo.size.width,
+				displaySizeHeight: displayInfo.size.height,
+				displayWorkAreaWidth: displayInfo.workArea.width,
+				displayWorkAreaHeight: displayInfo.workArea.height,
+				displayFrequency: Math.floor(displayInfo.displayFrequency),
 			},
 		});
 
