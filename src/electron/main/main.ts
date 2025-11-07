@@ -1,7 +1,12 @@
 import { app, Menu } from 'electron';
+import { Plausible } from 'plausible-client';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { Telemetry } from '@core/features/telemetry/Telemetry';
+import { serveTelemetry } from '@electron/requests/telemetry/main';
 import { isDevMode } from '@electron/utils/app';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { createAppMenu } from './createAppMenu';
 
@@ -39,6 +44,10 @@ export class MainProcess {
 	private async onReady() {
 		console.log('App ready');
 
+		const telemetry = this.setupTelemetry();
+
+		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
+
 		if (isDevMode()) {
 			console.log('Install dev tools');
 
@@ -59,14 +68,21 @@ export class MainProcess {
 			);
 		}
 
+		// TODO: manage tray here, in entrypoint class
 		const windowControls = await openMainWindow();
 		this.window = windowControls;
+
+		app.on('window-all-closed', async () => {
+			await telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED);
+			app.quit();
+		});
 
 		// Force app shutdown
 		onShutdown(() => {
 			windowControls.quit();
-			app.exit();
 			this.window = null;
+
+			app.exit();
 		});
 	}
 
@@ -113,5 +129,25 @@ export class MainProcess {
 				}
 			});
 		});
+	}
+
+	private setupTelemetry() {
+		// TODO: use real config
+		const plausible = new Plausible({
+			apiHost: 'https://uxt.vitonsky.net',
+			domain: 'test',
+		});
+
+		const telemetryStateFile = createFileControllerMock();
+		const telemetry = new Telemetry(telemetryStateFile, plausible, {
+			onEventSent: console.log,
+			contextProps: {
+				version: app.getVersion(),
+			},
+		});
+
+		serveTelemetry(telemetry);
+
+		return telemetry;
 	}
 }

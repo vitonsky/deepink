@@ -107,10 +107,14 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 	// Tray
 	const trayApi = {
 		quit: () => {
+			if (win.isDestroyed()) return;
+
 			quitRequested();
 			win.close();
 		},
 		openWindow: () => {
+			if (win.isDestroyed()) return;
+
 			if (win.isMinimized()) win.restore();
 
 			win.show();

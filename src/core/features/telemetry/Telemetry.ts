@@ -19,7 +19,19 @@ const StateScheme = z.object({
 		})
 		.array(),
 });
-export class Telemetry {
+
+export interface TelemetryTracker {
+	track(eventName: string, payload?: EventProps['props']): Promise<void>;
+
+	handleQueue(): Promise<{
+		total: number;
+		processed: number;
+	}>;
+
+	getState(): Promise<z.TypeOf<typeof StateScheme>>;
+}
+
+export class Telemetry implements TelemetryTracker {
 	private readonly stateFile;
 	constructor(
 		file: IFileController,
@@ -102,7 +114,7 @@ export class Telemetry {
 	}
 
 	private state: z.TypeOf<typeof StateScheme> | null = null;
-	async getState() {
+	public async getState() {
 		if (this.state) return structuredClone(this.state);
 
 		const state = await this.stateFile.get({ onError: console.error });
