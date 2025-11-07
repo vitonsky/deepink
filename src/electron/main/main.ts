@@ -1,19 +1,15 @@
-import checkDiskSpace from 'check-disk-space';
-import { randomUUID } from 'crypto';
-import { app, Menu, nativeTheme, powerMonitor, screen, session } from 'electron';
-import os from 'os';
+import { app, Menu } from 'electron';
 import { Plausible } from 'plausible-client';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
-import si from 'systeminformation';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { Telemetry } from '@core/features/telemetry/Telemetry';
 import { serveTelemetry } from '@electron/requests/telemetry/main';
 import { isDevMode } from '@electron/utils/app';
-import { getUserDataPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { createAppMenu } from './createAppMenu';
+import { createTelemetrySession } from './createTelemetrySession';
 
 const onShutdown = (callback: () => any) => {
 	process.once('beforeExit', callback);
@@ -137,60 +133,6 @@ export class MainProcess {
 	}
 
 	private setupTelemetry() {
-		function convertBooleanValue(value?: boolean) {
-			return typeof value === 'boolean' ? String(Boolean(value)) : value;
-		}
-
-		function clampDiskGB(size: number, clamp = 10): number {
-			return Math.floor(size / clamp) * clamp;
-		}
-
-		async function getStaticInfo() {
-			const displayInfo = screen.getPrimaryDisplay();
-
-			const cpus = os.cpus();
-			const ramSizeInGb = Math.floor(os.totalmem() / 1024 ** 3);
-
-			const [system, cpu] = await Promise.all([si.system(), si.cpu()]);
-
-			return {
-				// Used to group events per session
-				sessionId: randomUUID(),
-				version: app.getVersion(),
-				userAgent: session.defaultSession.getUserAgent(),
-
-				// User bucket info
-				language: app.getPreferredSystemLanguages()[0],
-				languages: app.getPreferredSystemLanguages().join(',') || undefined,
-				timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-
-				screenReaderEnabled: convertBooleanValue(
-					app.isAccessibilitySupportEnabled(),
-				),
-
-				// Hardware info
-				platform: process.platform,
-
-				systemManufacturer: system.manufacturer,
-				systemModel: system.model,
-				isVirtualSystem: convertBooleanValue(system.virtual),
-
-				cpuModel: cpus[0].model,
-				cpuSpeed: cpus[0].speed,
-				cpuCores: cpus.length,
-				cpuPhysicalCores: cpu.physicalCores,
-
-				ramSize: ramSizeInGb,
-
-				displaySizeWidth: displayInfo.size.width,
-				displaySizeHeight: displayInfo.size.height,
-				displayWorkAreaWidth: displayInfo.workArea.width,
-				displayWorkAreaHeight: displayInfo.workArea.height,
-				displayFrequency: Math.floor(displayInfo.displayFrequency),
-				displayScaleFactor: displayInfo.scaleFactor,
-			};
-		}
-
 		// TODO: use real config
 		const plausible = new Plausible({
 			apiHost: 'https://uxt.vitonsky.net',
@@ -202,46 +144,9 @@ export class MainProcess {
 
 		const telemetryStateFile = createFileControllerMock();
 
-		let staticInfo: ReturnType<typeof getStaticInfo> | null = null;
 		const telemetry = new Telemetry(telemetryStateFile, plausible, {
 			onEventSent: console.log,
-			contextProps: async () => {
-				// TODO: add install age in days
-				// TODO: add session time in minutes
-
-				// Fetch static info once
-				if (!staticInfo) {
-					staticInfo = getStaticInfo();
-				}
-
-				const [staticProps, diskSpace, battery] = await Promise.all([
-					staticInfo,
-					checkDiskSpace(getUserDataPath()),
-					si.battery(),
-				]);
-
-				return {
-					...staticProps,
-
-					deviceHasBattery: convertBooleanValue(battery.hasBattery),
-					deviceBatteryPercent: battery.percent,
-					deviceBatteryCharging: convertBooleanValue(battery.isCharging),
-					isOnBatteryPower: convertBooleanValue(
-						powerMonitor.isOnBatteryPower(),
-					),
-
-					// Preferred themes
-					highContrast: convertBooleanValue(
-						nativeTheme.shouldUseHighContrastColors,
-					),
-					shouldUseDarkColors: convertBooleanValue(
-						nativeTheme.shouldUseDarkColors,
-					),
-
-					diskSpaceTotal: clampDiskGB(diskSpace.size / 1024 ** 3),
-					diskSpaceFree: clampDiskGB(diskSpace.free / 1024 ** 3),
-				};
-			},
+			contextProps: createTelemetrySession(),
 		});
 
 		serveTelemetry(telemetry);
