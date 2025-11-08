@@ -17,6 +17,8 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -84,6 +86,10 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 			if (response !== undefined) {
 				setProfileNameError(response);
+			} else {
+				telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_CREATED, {
+					encryption: usePassword ? algorithm : 'none',
+				});
 			}
 		},
 		[

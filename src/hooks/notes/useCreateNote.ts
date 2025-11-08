@@ -1,4 +1,6 @@
 import { useCallback } from 'react';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useNotesContext,
 	useNotesRegistry,
@@ -32,5 +34,7 @@ export const useCreateNote = () => {
 		if (note) {
 			openNote(note);
 		}
+
+		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CREATED);
 	}, [activeTag, notesRegistry, openNote, tagsRegistry, updateNotes]);
 };
