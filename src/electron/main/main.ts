@@ -268,6 +268,13 @@ export class MainProcess {
 					);
 				}
 
+				if (result.processed > 0) {
+					await telemetry.track(
+						TELEMETRY_EVENT_NAME.TELEMETRY_QUEUE_PROCESSED,
+						result,
+					);
+				}
+
 				await wait(syncInterval);
 			}
 		};
