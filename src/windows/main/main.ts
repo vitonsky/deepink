@@ -2,6 +2,8 @@ import { createEvent, createStore } from 'effector';
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import url from 'url';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { AppContext } from '@electron/main/main';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
 import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
@@ -21,7 +23,9 @@ type WindowState = {
 
 const quitRequested = createEvent();
 
-export const openMainWindow = async (): Promise<MainWindowAPI> => {
+export const openMainWindow = async ({
+	telemetry,
+}: AppContext): Promise<MainWindowAPI> => {
 	// Requests handlers
 	serveFiles();
 	enableStorage();
@@ -37,6 +41,7 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 	$windowState.on(quitRequested, (state) => ({ ...state, isForcedClosing: true }));
 
 	// Open window
+	// TODO: remember size
 	const win = new BrowserWindow({
 		width: 1300,
 		height: 800,
@@ -54,10 +59,6 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 		},
 	});
 
-	if (isDevMode()) {
-		win.webContents.openDevTools();
-	}
-
 	// Load page
 	const start = performance.now();
 	await win.loadURL(
@@ -67,7 +68,22 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 			slashes: true,
 		}),
 	);
-	console.log(performance.measure('page loaded', { start }));
+
+	const pageLoadingMeasure = performance.measure('page loaded', { start });
+	console.log(pageLoadingMeasure);
+	telemetry.track(TELEMETRY_EVENT_NAME.MAIN_WINDOW_LOADED, {
+		duration: pageLoadingMeasure.duration,
+	});
+
+	if (isDevMode()) {
+		win.webContents.openDevTools();
+	}
+	win.webContents.on('devtools-opened', () => {
+		telemetry.track(TELEMETRY_EVENT_NAME.DEV_TOOLS_TOGGLED, { state: 'opened' });
+	});
+	win.webContents.on('devtools-closed', () => {
+		telemetry.track(TELEMETRY_EVENT_NAME.DEV_TOOLS_TOGGLED, { state: 'closed' });
+	});
 
 	// Hide instead of close
 	const $shouldBeClosed = $windowState.map(

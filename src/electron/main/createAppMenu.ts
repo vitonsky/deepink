@@ -1,9 +1,12 @@
 /* eslint-disable spellcheck/spell-checker */
 import { app, Menu, MenuItem, MenuItemConstructorOptions } from 'electron';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 
 import { openAboutWindow } from '../../windows/about';
 
-export function createAppMenu() {
+import { AppContext } from './main';
+
+export function createAppMenu({ telemetry }: AppContext) {
 	type MenuObject = MenuItemConstructorOptions | MenuItem;
 	const application: MenuObject = {
 		label: 'Application',
@@ -13,6 +16,8 @@ export function createAppMenu() {
 				label: 'About Application',
 				click(_item, window) {
 					openAboutWindow(window);
+
+					telemetry.track(TELEMETRY_EVENT_NAME.ABOUT_WINDOW_CLICK);
 				},
 			},
 			{

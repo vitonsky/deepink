@@ -27,6 +27,10 @@ const onShutdown = (callback: () => any) => {
 	};
 };
 
+export type AppContext = {
+	telemetry: Telemetry;
+};
+
 export class MainProcess {
 	private readonly userDataFs;
 	constructor() {
@@ -45,25 +49,11 @@ export class MainProcess {
 			return;
 		}
 
+		// Force app shutdown by OS requests
+		onShutdown(() => this.quit());
+
 		// Init app
 		this.setListeners();
-		Menu.setApplicationMenu(createAppMenu());
-
-		// Init tray
-		this.tray = new AppTray({
-			openWindow: () => {
-				this.mainWindow?.openWindow();
-			},
-		});
-		this.tray.enable();
-		this.tray.update(
-			Menu.buildFromTemplate([
-				{
-					label: 'Quit',
-					click: () => this.quit(),
-				},
-			]),
-		);
 
 		app.whenReady().then(() => this.onReady());
 	}
@@ -81,9 +71,7 @@ export class MainProcess {
 	private async onReady() {
 		console.log('App ready');
 
-		// Force app shutdown by OS requests
-		onShutdown(() => this.quit());
-
+		// Setup telemetry
 		const telemetry = await this.setupTelemetry();
 
 		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
@@ -92,6 +80,23 @@ export class MainProcess {
 			this.quit();
 		});
 
+		// Init tray
+		this.tray = new AppTray({
+			openWindow: () => {
+				this.mainWindow?.openWindow();
+			},
+		});
+		this.tray.enable();
+		this.tray.update(
+			Menu.buildFromTemplate([
+				{
+					label: 'Quit',
+					click: () => this.quit(),
+				},
+			]),
+		);
+
+		// Install dev tools
 		if (isDevMode()) {
 			console.log('Install dev tools');
 
@@ -112,7 +117,9 @@ export class MainProcess {
 			);
 		}
 
-		this.mainWindow = await openMainWindow();
+		// Create main window
+		Menu.setApplicationMenu(createAppMenu({ telemetry }));
+		this.mainWindow = await openMainWindow({ telemetry });
 
 		if (this.tray) {
 			this.tray.update(
