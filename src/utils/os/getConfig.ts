@@ -1,4 +1,6 @@
+import ms from 'ms';
 import { z } from 'zod';
+import { isDevMode } from '@electron/utils/app';
 
 /**
  * Get app config including environment variables
@@ -11,8 +13,14 @@ export const getConfig = () => {
 
 	return {
 		telemetry: {
-			enabled: FLAG_SCHEME.parse(process.env.TELEMETRY),
-			verbose: FLAG_SCHEME.parse(process.env.TELEMETRY_DEBUG),
+			enabled: FLAG_SCHEME.parse(process.env.TELEMETRY) ?? !isDevMode(),
+			verbose: FLAG_SCHEME.parse(process.env.TELEMETRY_DEBUG) ?? isDevMode(),
+			syncInterval: z
+				.string()
+				.optional()
+				.default('1h')
+				.transform((time) => ms(time))
+				.parse(process.env.TELEMETRY_SYNC_INTERVAL),
 		},
 	};
 };

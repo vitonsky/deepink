@@ -15,6 +15,7 @@ import { isDevMode } from '@electron/utils/app';
 import { getUserDataPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { getConfig } from '@utils/os/getConfig';
+import { wait } from '@utils/tests';
 
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
@@ -204,13 +205,14 @@ export class MainProcess {
 
 	private async setupTelemetry() {
 		const {
-			telemetry: { enabled: shouldSend = !isDevMode(), verbose = isDevMode() },
+			telemetry: { enabled: shouldSend, verbose, syncInterval },
 		} = getConfig();
 
 		if (verbose) {
 			console.log(chalk.magenta('Telemetry config'), {
 				shouldSend,
 				verbose,
+				syncInterval,
 			});
 		}
 
@@ -237,7 +239,7 @@ export class MainProcess {
 				contextProps: createTelemetrySession(initVersions),
 				onEventSent(event) {
 					if (verbose) {
-						console.log(chalk.magenta('TelemetryEvent'), event);
+						console.log(chalk.magenta('Telemetry > Event'), event);
 					}
 				},
 			},
@@ -253,6 +255,24 @@ export class MainProcess {
 		}
 
 		serveTelemetry(telemetry);
+
+		// Handle queue in background periodically
+		const runQueueDaemon = async () => {
+			while (true) {
+				const result = await telemetry.handleQueue();
+				if (verbose) {
+					console.log(
+						chalk.magenta(
+							`Telemetry > Handled queued events ${result.processed}/${result.total}`,
+						),
+					);
+				}
+
+				await wait(syncInterval);
+			}
+		};
+
+		runQueueDaemon();
 
 		return telemetry;
 	}
