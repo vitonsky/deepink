@@ -1,5 +1,5 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import url from 'url';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
@@ -8,8 +8,6 @@ import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
 import { createWatcher } from '@utils/effector/watcher';
-
-import { AppTray } from './components/AppTray';
 
 export type MainWindowAPI = {
 	quit: () => void;
@@ -104,8 +102,7 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 		}
 	});
 
-	// Tray
-	const trayApi = {
+	return {
 		quit: () => {
 			if (win.isDestroyed()) return;
 
@@ -121,15 +118,4 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 			win.focus();
 		},
 	};
-
-	const appTray = new AppTray(trayApi);
-	appTray.enable();
-	appTray.update(
-		Menu.buildFromTemplate([
-			{ label: `Open notes`, click: trayApi.openWindow },
-			{ label: 'Quit', click: trayApi.quit },
-		]),
-	);
-
-	return trayApi;
 };

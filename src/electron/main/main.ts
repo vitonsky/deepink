@@ -6,6 +6,7 @@ import { NodeFS } from '@core/features/files/NodeFS';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { AppVersions } from '@core/features/telemetry/AppVersions';
 import { Telemetry } from '@core/features/telemetry/Telemetry';
+import { AppTray } from '@electron/main/AppTray';
 import { serveTelemetry } from '@electron/requests/telemetry/main';
 import { isDevMode } from '@electron/utils/app';
 import { getUserDataPath } from '@electron/utils/files';
@@ -32,6 +33,7 @@ export class MainProcess {
 		this.userDataFs = new NodeFS({ root: getUserDataPath() });
 	}
 
+	private tray: AppTray | null = null;
 	public async start() {
 		// TODO: pass arguments when take a lock
 		const gotTheLock = app.requestSingleInstanceLock();
@@ -46,16 +48,49 @@ export class MainProcess {
 		// Init app
 		this.setListeners();
 		Menu.setApplicationMenu(createAppMenu());
+
+		// Init tray
+		this.tray = new AppTray({
+			openWindow: () => {
+				this.mainWindow?.openWindow();
+			},
+		});
+		this.tray.enable();
+		this.tray.update(
+			Menu.buildFromTemplate([
+				{
+					label: 'Quit',
+					click: () => this.quit(),
+				},
+			]),
+		);
+
 		app.whenReady().then(() => this.onReady());
 	}
 
-	private window: MainWindowAPI | null = null;
+	public quit() {
+		if (this.mainWindow) {
+			this.mainWindow.quit();
+			this.mainWindow = null;
+		}
+
+		app.exit();
+	}
+
+	private mainWindow: MainWindowAPI | null = null;
 	private async onReady() {
 		console.log('App ready');
+
+		// Force app shutdown by OS requests
+		onShutdown(() => this.quit());
 
 		const telemetry = await this.setupTelemetry();
 
 		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
+		app.once('window-all-closed', async () => {
+			await telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED);
+			this.quit();
+		});
 
 		if (isDevMode()) {
 			console.log('Install dev tools');
@@ -77,22 +112,26 @@ export class MainProcess {
 			);
 		}
 
-		// TODO: manage tray here, in entrypoint class
-		const windowControls = await openMainWindow();
-		this.window = windowControls;
+		this.mainWindow = await openMainWindow();
 
-		app.on('window-all-closed', async () => {
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED);
-			app.quit();
-		});
-
-		// Force app shutdown
-		onShutdown(() => {
-			windowControls.quit();
-			this.window = null;
-
-			app.exit();
-		});
+		if (this.tray) {
+			this.tray.update(
+				this.tray.update(
+					Menu.buildFromTemplate([
+						{
+							label: `Open notes`,
+							click: () => {
+								this.mainWindow?.openWindow();
+							},
+						},
+						{
+							label: 'Quit',
+							click: () => this.quit(),
+						},
+					]),
+				),
+			);
+		}
 	}
 
 	private setListeners() {
@@ -107,8 +146,8 @@ export class MainProcess {
 				);
 
 				// Someone tried to run a second instance, we should focus our window.
-				if (this.window) {
-					this.window.openWindow();
+				if (this.mainWindow) {
+					this.mainWindow.openWindow();
 				}
 			},
 		);
