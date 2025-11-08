@@ -1,6 +1,6 @@
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { AppVersions } from './AppVersions';
+import { AppVersions, VersionsSummary } from './AppVersions';
 
 beforeEach(() => {
 	vi.clearAllMocks();
@@ -11,11 +11,12 @@ const stateFile = createFileControllerMock();
 test('First used version that is not logged yet must be considered as "just installed"', async () => {
 	const versions = new AppVersions('0.0.1', stateFile);
 
-	const onInstalledState = {
+	const onInstalledState: VersionsSummary = {
 		currentVersion: '0.0.1',
 		previousVersion: null,
 		isJustInstalled: true,
 		isVersionUpdated: true,
+		versions: [],
 	};
 
 	await expect(versions.getInfo()).resolves.toEqual(onInstalledState);
@@ -36,6 +37,12 @@ test('Logged version must not be considered as update', async () => {
 		previousVersion: null,
 		isJustInstalled: false,
 		isVersionUpdated: false,
+		versions: [
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.1',
+			},
+		],
 	});
 });
 
@@ -50,6 +57,12 @@ test('New version must be considered as update', async () => {
 		},
 		isJustInstalled: false,
 		isVersionUpdated: true,
+		versions: [
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.1',
+			},
+		],
 	});
 
 	await versions.logVersion();
@@ -61,6 +74,16 @@ test('New version must be considered as update', async () => {
 		},
 		isJustInstalled: false,
 		isVersionUpdated: false,
+		versions: [
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.1',
+			},
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.2',
+			},
+		],
 	});
 });
 
@@ -75,6 +98,16 @@ test('Downgrade must be considered as update', async () => {
 		},
 		isJustInstalled: false,
 		isVersionUpdated: true,
+		versions: [
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.1',
+			},
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.2',
+			},
+		],
 	});
 
 	await versions.logVersion();
@@ -86,5 +119,19 @@ test('Downgrade must be considered as update', async () => {
 		},
 		isJustInstalled: false,
 		isVersionUpdated: false,
+		versions: [
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.1',
+			},
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.2',
+			},
+			{
+				installedAt: expect.any(Number),
+				version: '0.0.1',
+			},
+		],
 	});
 });
