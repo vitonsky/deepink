@@ -1,3 +1,6 @@
+import 'dotenv/config';
+
+import chalk from 'chalk';
 import { app, Menu } from 'electron';
 import { Plausible } from 'plausible-client';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
@@ -11,6 +14,7 @@ import { serveTelemetry } from '@electron/requests/telemetry/main';
 import { isDevMode } from '@electron/utils/app';
 import { getUserDataPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
+import { getConfig } from '@utils/os/getConfig';
 
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
@@ -199,6 +203,17 @@ export class MainProcess {
 	}
 
 	private async setupTelemetry() {
+		const {
+			telemetry: { enabled: shouldSend = !isDevMode(), verbose = isDevMode() },
+		} = getConfig();
+
+		if (verbose) {
+			console.log(chalk.magenta('Telemetry config'), {
+				shouldSend,
+				verbose,
+			});
+		}
+
 		const appVersions = new AppVersions(
 			app.getVersion(),
 			new FileController('meta/versions.json', this.userDataFs),
@@ -211,7 +226,6 @@ export class MainProcess {
 			apiHost: 'https://uxt.vitonsky.net',
 			domain: 'test',
 			filter() {
-				const shouldSend = !isDevMode();
 				return shouldSend;
 			},
 		});
@@ -222,8 +236,8 @@ export class MainProcess {
 			{
 				contextProps: createTelemetrySession(initVersions),
 				onEventSent(event) {
-					if (isDevMode()) {
-						console.log('Telemetry data', event);
+					if (verbose) {
+						console.log(chalk.magenta('TelemetryEvent'), event);
 					}
 				},
 			},
