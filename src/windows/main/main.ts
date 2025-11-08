@@ -72,7 +72,7 @@ export const openMainWindow = async ({
 	const pageLoadingMeasure = performance.measure('page loaded', { start });
 	console.log(pageLoadingMeasure);
 	telemetry.track(TELEMETRY_EVENT_NAME.MAIN_WINDOW_LOADED, {
-		duration: pageLoadingMeasure.duration,
+		duration: Math.floor(pageLoadingMeasure.duration),
 	});
 
 	if (isDevMode()) {

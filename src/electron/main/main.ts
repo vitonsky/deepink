@@ -37,7 +37,6 @@ export class MainProcess {
 		this.userDataFs = new NodeFS({ root: getUserDataPath() });
 	}
 
-	private tray: AppTray | null = null;
 	public async start() {
 		// TODO: pass arguments when take a lock
 		const gotTheLock = app.requestSingleInstanceLock();
@@ -58,16 +57,33 @@ export class MainProcess {
 		app.whenReady().then(() => this.onReady());
 	}
 
-	public quit() {
+	private isQuitInProcess = false;
+	public async quit() {
+		if (this.isQuitInProcess) return;
+		this.isQuitInProcess = true;
+
+		// Clear context
 		if (this.mainWindow) {
 			this.mainWindow.quit();
 			this.mainWindow = null;
+		}
+
+		// Clear context
+		if (this.context) {
+			const { telemetry } = this.context;
+			this.context = null;
+
+			await telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED);
 		}
 
 		app.exit();
 	}
 
 	private mainWindow: MainWindowAPI | null = null;
+	private context: {
+		tray: AppTray;
+		telemetry: Telemetry;
+	} | null = null;
 	private async onReady() {
 		console.log('App ready');
 
@@ -75,19 +91,16 @@ export class MainProcess {
 		const telemetry = await this.setupTelemetry();
 
 		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
-		app.once('window-all-closed', async () => {
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED);
-			this.quit();
-		});
+		app.once('window-all-closed', () => this.quit());
 
 		// Init tray
-		this.tray = new AppTray({
+		const tray = new AppTray({
 			openWindow: () => {
 				this.mainWindow?.openWindow();
 			},
 		});
-		this.tray.enable();
-		this.tray.update(
+		tray.enable();
+		tray.update(
 			Menu.buildFromTemplate([
 				{
 					label: 'Quit',
@@ -95,6 +108,8 @@ export class MainProcess {
 				},
 			]),
 		);
+
+		this.context = { telemetry, tray };
 
 		// Install dev tools
 		if (isDevMode()) {
@@ -120,25 +135,22 @@ export class MainProcess {
 		// Create main window
 		Menu.setApplicationMenu(createAppMenu({ telemetry }));
 		this.mainWindow = await openMainWindow({ telemetry });
-
-		if (this.tray) {
-			this.tray.update(
-				this.tray.update(
-					Menu.buildFromTemplate([
-						{
-							label: `Open notes`,
-							click: () => {
-								this.mainWindow?.openWindow();
-							},
+		tray.update(
+			tray.update(
+				Menu.buildFromTemplate([
+					{
+						label: `Open notes`,
+						click: () => {
+							this.mainWindow?.openWindow();
 						},
-						{
-							label: 'Quit',
-							click: () => this.quit(),
-						},
-					]),
-				),
-			);
-		}
+					},
+					{
+						label: 'Quit',
+						click: () => this.quit(),
+					},
+				]),
+			),
+		);
 	}
 
 	private setListeners() {
