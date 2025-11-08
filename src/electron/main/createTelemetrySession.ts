@@ -4,6 +4,7 @@ import { app, nativeTheme, powerMonitor, screen, session } from 'electron';
 import os from 'os';
 import si from 'systeminformation';
 import { VersionsSummary } from '@core/features/telemetry/AppVersions';
+import { isDevMode } from '@electron/utils/app';
 import { getUserDataPath } from '@electron/utils/files';
 
 function convertBooleanValue(value?: boolean) {
@@ -27,6 +28,7 @@ async function getStaticInfo() {
 		sessionId: randomUUID(),
 		version: app.getVersion(),
 		userAgent: session.defaultSession.getUserAgent(),
+		developer: convertBooleanValue(isDevMode()),
 
 		// User bucket info
 		language: app.getPreferredSystemLanguages()[0],
