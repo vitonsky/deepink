@@ -17,7 +17,6 @@ export class NodeFS implements IFilesStorage {
 		const resolvedRoot = resolve(root ?? cwd());
 		const resolvedPath = resolve(join(resolvedRoot, path));
 
-		console.log({ resolvedRoot, resolvedPath });
 		if (!resolvedPath.startsWith(resolvedRoot))
 			throw new Error('Path is out of root directory');
 

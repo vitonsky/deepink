@@ -3,14 +3,15 @@ import { randomUUID } from 'crypto';
 import { app, nativeTheme, powerMonitor, screen, session } from 'electron';
 import os from 'os';
 import si from 'systeminformation';
+import { VersionsSummary } from '@core/features/telemetry/AppVersions';
 import { getUserDataPath } from '@electron/utils/files';
 
 function convertBooleanValue(value?: boolean) {
 	return typeof value === 'boolean' ? String(Boolean(value)) : value;
 }
 
-function clampDiskGB(size: number, clamp = 10): number {
-	return Math.floor(size / clamp) * clamp;
+function clampNumber(number: number, clamp = 10): number {
+	return Math.floor(number / clamp) * clamp;
 }
 
 async function getStaticInfo() {
@@ -57,17 +58,31 @@ async function getStaticInfo() {
 	};
 }
 
-export const createTelemetrySession = () => {
+export const createTelemetrySession = (versionsInfo: VersionsSummary) => {
 	const sessionStartTime = Date.now();
 	const getSessionTime = () => Math.floor((Date.now() - sessionStartTime) / 1000);
 
-	let staticInfo: ReturnType<typeof getStaticInfo> | null = null;
+	const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
 
-	// TODO: add install age in days
+	let staticInfo: ReturnType<typeof getStaticInfo> | null = null;
+	let installTime: {
+		firstVersion: number;
+		currentVersion: number;
+	} | null = null;
+
 	return async () => {
 		// Fetch static info once
 		if (!staticInfo) {
 			staticInfo = getStaticInfo();
+		}
+
+		if (installTime === null) {
+			installTime = {
+				firstVersion: versionsInfo.versions[0]?.installedAt ?? Date.now(),
+				currentVersion: versionsInfo.isVersionUpdated
+					? Date.now()
+					: versionsInfo.versions.slice(-1)[0]?.installedAt ?? Date.now(),
+			};
 		}
 
 		const [staticProps, diskSpace, battery] = await Promise.all([
@@ -78,6 +93,13 @@ export const createTelemetrySession = () => {
 
 		return {
 			...staticProps,
+
+			installAgeInDays: Math.floor(
+				(Date.now() - installTime.currentVersion) / ONE_DAY_IN_MS,
+			),
+			firstInstallInDays: Math.floor(
+				(Date.now() - installTime.firstVersion) / ONE_DAY_IN_MS,
+			),
 
 			sessionTimeInSeconds: getSessionTime(),
 
@@ -91,8 +113,8 @@ export const createTelemetrySession = () => {
 			highContrast: convertBooleanValue(nativeTheme.shouldUseHighContrastColors),
 			shouldUseDarkColors: convertBooleanValue(nativeTheme.shouldUseDarkColors),
 
-			diskSpaceTotal: clampDiskGB(diskSpace.size / 1024 ** 3),
-			diskSpaceFree: clampDiskGB(diskSpace.free / 1024 ** 3),
+			diskSpaceTotal: clampNumber(diskSpace.size / 1024 ** 3, 10),
+			diskSpaceFree: clampNumber(diskSpace.free / 1024 ** 3, 10),
 		};
 	};
 };

@@ -1,12 +1,15 @@
 import { app, Menu } from 'electron';
 import { Plausible } from 'plausible-client';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
+import { FileController } from '@core/features/files/FileController';
+import { NodeFS } from '@core/features/files/NodeFS';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { AppVersions } from '@core/features/telemetry/AppVersions';
 import { Telemetry } from '@core/features/telemetry/Telemetry';
 import { serveTelemetry } from '@electron/requests/telemetry/main';
 import { isDevMode } from '@electron/utils/app';
+import { getUserDataPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
@@ -24,6 +27,11 @@ const onShutdown = (callback: () => any) => {
 };
 
 export class MainProcess {
+	private readonly userDataFs;
+	constructor() {
+		this.userDataFs = new NodeFS({ root: getUserDataPath() });
+	}
+
 	public async start() {
 		// TODO: pass arguments when take a lock
 		const gotTheLock = app.requestSingleInstanceLock();
@@ -45,7 +53,7 @@ export class MainProcess {
 	private async onReady() {
 		console.log('App ready');
 
-		const telemetry = this.setupTelemetry();
+		const telemetry = await this.setupTelemetry();
 
 		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
 
@@ -132,22 +140,45 @@ export class MainProcess {
 		});
 	}
 
-	private setupTelemetry() {
+	private async setupTelemetry() {
+		const appVersions = new AppVersions(
+			app.getVersion(),
+			new FileController('meta/versions.json', this.userDataFs),
+		);
+		const initVersions = await appVersions.getInfo();
+		await appVersions.logVersion();
+
 		// TODO: use real config
 		const plausible = new Plausible({
 			apiHost: 'https://uxt.vitonsky.net',
 			domain: 'test',
 			filter() {
-				return false;
+				const shouldSend = !isDevMode();
+				return shouldSend;
 			},
 		});
 
-		const telemetryStateFile = createFileControllerMock();
+		const telemetry = new Telemetry(
+			new FileController('meta/telemetry.json', this.userDataFs),
+			plausible,
+			{
+				contextProps: createTelemetrySession(initVersions),
+				onEventSent(event) {
+					if (isDevMode()) {
+						console.log('Telemetry data', event);
+					}
+				},
+			},
+		);
 
-		const telemetry = new Telemetry(telemetryStateFile, plausible, {
-			onEventSent: console.log,
-			contextProps: createTelemetrySession(),
-		});
+		// Log app installs and updates
+		if (initVersions.isJustInstalled) {
+			await telemetry.track(TELEMETRY_EVENT_NAME.APP_INSTALLED);
+		} else if (initVersions.isVersionUpdated) {
+			await telemetry.track(TELEMETRY_EVENT_NAME.APP_UPDATED, {
+				previousVersion: initVersions.previousVersion?.version,
+			});
+		}
 
 		serveTelemetry(telemetry);
 
