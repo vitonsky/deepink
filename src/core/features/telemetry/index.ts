@@ -24,7 +24,6 @@ export enum TELEMETRY_EVENT_NAME {
 	NOTE_CONTEXT_MENU_CLICK = 'Note context menu click',
 
 	NOTE_SIDE_PANEL_SHOWN = 'Note side panel shown',
-	NOTE_SIDE_PANEL_CLOSED = 'Note side panel closed',
 
 	NOTE_VERSION_VIEWED = 'Note version viewed',
 	NOTE_VERSION_APPLIED = 'Note version applied',

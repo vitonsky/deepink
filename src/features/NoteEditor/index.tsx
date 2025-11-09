@@ -187,8 +187,6 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_SHOWN, {
 				tab: sidePanel,
 			});
-		} else {
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_CLOSED);
 		}
 	}, [sidePanel]);
 
@@ -307,7 +305,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							tag.id,
 						]);
 						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
-							count: attachedTags.length + 1,
+							tagsCount: attachedTags.length + 1,
 							context: 'tags suggest list',
 						});
 
@@ -355,7 +353,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							tagId,
 						]);
 						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
-							count: attachedTags.length + 1,
+							tagsCount: attachedTags.length + 1,
 							context: 'create tag option',
 						});
 
