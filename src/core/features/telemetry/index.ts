@@ -5,6 +5,7 @@ export enum TELEMETRY_EVENT_NAME {
 	APP_UPDATED = 'App updated',
 
 	NOTE_CREATED = 'Note created',
+	SETTINGS_CLICK = 'Settings click',
 
 	PROFILE_LOGIN = 'Profile log in',
 	PROFILE_CREATED = 'Profile created',

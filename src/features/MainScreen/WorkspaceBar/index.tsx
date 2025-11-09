@@ -2,6 +2,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FaGear, FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
 import { Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -16,6 +18,8 @@ export const WorkspaceBar = () => {
 	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
 	const editWorkspace = useCallback(() => {
 		setIsWorkspaceEditing(true);
+
+		telemetry.track(TELEMETRY_EVENT_NAME.SETTINGS_CLICK, { scope: 'workspace' });
 	}, []);
 
 	const { profileId, workspaceId } = useWorkspaceData();

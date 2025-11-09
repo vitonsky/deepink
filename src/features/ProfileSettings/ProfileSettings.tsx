@@ -5,6 +5,8 @@ import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 export const ProfileSettings = () => {
@@ -18,7 +20,12 @@ export const ProfileSettings = () => {
 				visible: true,
 				title: 'Preferences',
 				icon: <FaWrench />,
-				onClick: () => setIsOpened(true),
+				onClick: () => {
+					setIsOpened(true);
+					telemetry.track(TELEMETRY_EVENT_NAME.SETTINGS_CLICK, {
+						scope: 'global settings',
+					});
+				},
 			},
 			{
 				placement: 'start',
