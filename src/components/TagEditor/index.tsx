@@ -14,6 +14,10 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
+import {
+	checkTagUniqueness,
+	validateTagName,
+} from '@core/features/tags/controller/utils';
 import { WorkspaceModal } from '@features/WorkspaceModal';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
@@ -132,50 +136,36 @@ export const TagEditor: FC<ITagEditorProps> = ({
 						<Button
 							variant="primary"
 							onClick={() => {
-								const name = tagName.trim();
+								try {
+									const name = tagName.trim();
 
-								if (name.length === 0) {
-									setTagNameError('Name must not be empty');
-									return;
-								}
+									validateTagName(name);
+									checkTagUniqueness(name, parentTagId, tags);
 
-								if (isEditingMode) {
-									const isHaveSeparatorChar = name.includes('/');
-									if (isHaveSeparatorChar) {
-										setTagNameError(
-											'Name of tag for editing cannot create sub tags',
-										);
-										return;
+									if (isEditingMode) {
+										const isHaveSeparatorChar = name.includes('/');
+										if (isHaveSeparatorChar) {
+											setTagNameError(
+												'Name of tag for editing cannot create sub tags',
+											);
+											return;
+										}
 									}
+
+									const editedData: TagEditorData = {
+										name,
+										parent: parentTagId,
+									};
+
+									if (isEditingMode && editedTag.id) {
+										editedData.id = editedTag.id;
+									}
+
+									onSave(editedData);
+								} catch (error) {
+									if (error instanceof Error)
+										setTagNameError(error.message);
 								}
-
-								const parentTag = tags.find(
-									({ id }) => id === parentTagId,
-								);
-								const fullName = [parentTag?.resolvedName, name]
-									.filter(Boolean)
-									.join('/');
-
-								const isTagExists = tags.some(({ id, resolvedName }) => {
-									const isItEditedTag =
-										editedTag && editedTag.id === id;
-									return resolvedName === fullName && !isItEditedTag;
-								});
-								if (isTagExists) {
-									setTagNameError('Tag already exists');
-									return;
-								}
-
-								const editedData: TagEditorData = {
-									name,
-									parent: parentTagId,
-								};
-
-								if (isEditingMode && editedTag.id) {
-									editedData.id = editedTag.id;
-								}
-
-								onSave(editedData);
 							}}
 						>
 							{isEditingMode ? 'Save' : 'Add'}
