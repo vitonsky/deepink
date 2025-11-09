@@ -37,54 +37,29 @@ describe('manage tags', () => {
 		});
 	});
 
-	// TODO:fox that cases. Paths must be normalized
-	test('weird tags', async () => {
+	test('prevent creating weird tags', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await tags.add('///foo', null);
-		await tags.add('/foo/bar', null);
+		await expect(tags.add('///foo', null)).rejects.toThrowError();
+		await expect(tags.add('/foo/bar', null)).rejects.toThrowError();
+		await expect(tags.add('/foo//bar', null)).rejects.toThrowError();
+		await expect(tags.add('foo/bar/', null)).rejects.toThrowError();
+	});
 
-		await tags.getTags().then((tags) => {
-			expect(tags).toEqual([
-				expect.objectContaining({
-					name: '',
-					parent: null,
-					resolvedName: '',
-				}),
-				expect.objectContaining({
-					name: '',
-					parent: expect.any(String),
-					resolvedName: '/',
-				}),
-				expect.objectContaining({
-					name: '',
-					parent: expect.any(String),
-					resolvedName: '//',
-				}),
-				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: '///foo',
-				}),
+	test('prevent duplicate tags', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-				expect.objectContaining({
-					name: '',
-					parent: null,
-					resolvedName: '',
-				}),
-				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: '/foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: '/foo/bar',
-				}),
-			]);
-		});
+		await expect(tags.add('foo', null)).resolves.toBeDefined();
+		await expect(tags.add('foo', null)).rejects.toThrowError();
+
+		const tagsList = await tags.getTags();
+		const parentTagsId = tagsList[0].id;
+
+		// duplicate nested tags
+		await expect(tags.add('baz', parentTagsId)).resolves.toBeDefined();
+		await expect(tags.add('baz', parentTagsId)).rejects.toThrowError();
 	});
 
 	test('update tags', async () => {
