@@ -8,6 +8,7 @@ export enum TELEMETRY_EVENT_NAME {
 
 	PROFILE_LOGIN = 'Profile log in',
 	PROFILE_CREATED = 'Profile created',
+	PROFILE_SELECTED = 'Profile selected',
 
 	MAIN_WINDOW_LOADED = 'Main window loaded',
 	MAIN_WINDOW_RESIZE = 'Main window resize',
