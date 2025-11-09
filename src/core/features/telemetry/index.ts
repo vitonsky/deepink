@@ -4,6 +4,8 @@ export enum TELEMETRY_EVENT_NAME {
 	APP_INSTALLED = 'App installed',
 	APP_UPDATED = 'App updated',
 
+	COMMAND_USE = 'Command use',
+
 	SETTINGS_CLICK = 'Settings click',
 
 	SEARCH_IN_NOTES = 'Search in notes',
