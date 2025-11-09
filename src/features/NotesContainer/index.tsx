@@ -36,13 +36,6 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
-	const openedNotesCount = openedNotes.length;
-	useEffect(() => {
-		telemetry.track(TELEMETRY_EVENT_NAME.OPENED_NOTES_CHANGED, {
-			openedNotesCount,
-		});
-	}, [openedNotesCount]);
-
 	const tabs = useWorkspaceSelector((state) =>
 		createWorkspaceSelector([selectOpenedNotes], (notes) =>
 			notes.map((note) => note.id),
@@ -106,8 +99,18 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					notes: openedNotes,
 					tabs,
 					activeTab: activeNoteId ?? null,
-					onClose: noteActions.close,
-					onPick: noteActions.click,
+					onClose(id) {
+						noteActions.close(id);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CLOSED, {
+							context: 'top bar',
+						});
+					},
+					onPick(id) {
+						noteActions.click(id);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_OPENED, {
+							context: 'top bar',
+						});
+					},
 				}}
 			/>
 			<Box

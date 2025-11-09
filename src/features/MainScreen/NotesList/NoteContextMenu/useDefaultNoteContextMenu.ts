@@ -81,6 +81,8 @@ export const useDefaultNoteContextMenu = ({
 					await tagsRegistry.setAttachedTags(id, []);
 
 					updateNotes();
+
+					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED);
 					break;
 				}
 				case NoteActions.DUPLICATE: {
