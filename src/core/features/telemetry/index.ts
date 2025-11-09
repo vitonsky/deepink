@@ -30,6 +30,7 @@ export enum TELEMETRY_EVENT_NAME {
 
 	WORKSPACE_ADDED = 'Workspace added',
 	WORKSPACE_DELETE_CLICK = 'Workspace delete click',
+	WORKSPACE_SELECTED = 'Workspace selected',
 
 	PROFILE_LOGIN = 'Profile log in',
 	PROFILE_CREATED = 'Profile created',

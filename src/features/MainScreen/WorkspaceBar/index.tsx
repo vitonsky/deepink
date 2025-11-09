@@ -80,6 +80,10 @@ export const WorkspaceBar = () => {
 								workspaceId,
 							}),
 						);
+
+						telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_SELECTED, {
+							totalWorkspacesCount: workspaces.length,
+						});
 					}}
 				>
 					{workspaces.map((workspace) => (
