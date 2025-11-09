@@ -7,6 +7,9 @@ export enum TELEMETRY_EVENT_NAME {
 	NOTE_CREATED = 'Note created',
 	SETTINGS_CLICK = 'Settings click',
 
+	WORKSPACE_ADDED = 'Workspace added',
+	WORKSPACE_DELETE_CLICK = 'Workspace delete click',
+
 	PROFILE_LOGIN = 'Profile log in',
 	PROFILE_CREATED = 'Profile created',
 	PROFILE_SELECTED = 'Profile selected',

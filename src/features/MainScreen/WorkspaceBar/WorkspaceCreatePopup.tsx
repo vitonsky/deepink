@@ -9,7 +9,9 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
@@ -75,6 +77,10 @@ export const WorkspaceCreatePopup = () => {
 												workspaceId,
 												profileId,
 											}),
+										);
+
+										telemetry.track(
+											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
 										);
 									});
 							}}
