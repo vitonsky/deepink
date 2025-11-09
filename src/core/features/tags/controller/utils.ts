@@ -2,14 +2,16 @@ import { IResolvedTag } from '..';
 
 export const validateTagName = (tag: string) => {
 	if (tag.length === 0) {
-		throw new Error('Name must not be empty');
+		return { valid: false, message: 'Name must not be empty' };
 	}
 	if (tag.startsWith('/') || tag.endsWith('/')) {
-		throw new Error('Tag cannot start or end with "/"');
+		return { valid: false, message: 'Tag cannot start or end with "/"' };
 	}
 	if (tag.split('/').some((s) => s.trim() === '')) {
-		throw new Error('Tag contains an empty segment');
+		return { valid: false, message: 'Tag contains an empty segment' };
 	}
+
+	return { valid: true };
 };
 
 export const checkTagUniqueness = (
@@ -24,6 +26,7 @@ export const checkTagUniqueness = (
 		(tag) => tag.parent === parent && tag.resolvedName === fullName,
 	);
 	if (duplicate) {
-		throw new Error(`Tag "${fullName}" already exists`);
+		return { valid: false, message: `Tag "${fullName}" already exists` };
 	}
+	return { valid: true };
 };
