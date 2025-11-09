@@ -13,6 +13,8 @@ export enum TELEMETRY_EVENT_NAME {
 
 	EDITOR_MODE_CHANGED = 'Editor mode changed',
 
+	OPENED_NOTES_CHANGED = 'Opened notes changed',
+
 	NOTE_CREATED = 'Note created',
 	NOTE_TAG_ATTACHED = 'Tag attached',
 	NOTE_TAG_DETACHED = 'Tag detached',

@@ -2,6 +2,8 @@ import React, { FC, useEffect, useRef } from 'react';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useEventBus,
 	useNotesContext,
@@ -33,6 +35,13 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
+
+	const openedNotesCount = openedNotes.length;
+	useEffect(() => {
+		telemetry.track(TELEMETRY_EVENT_NAME.OPENED_NOTES_CHANGED, {
+			openedNotesCount,
+		});
+	}, [openedNotesCount]);
 
 	const tabs = useWorkspaceSelector((state) =>
 		createWorkspaceSelector([selectOpenedNotes], (notes) =>
