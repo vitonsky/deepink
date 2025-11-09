@@ -15,6 +15,8 @@ export enum TELEMETRY_EVENT_NAME {
 	NOTE_TAG_ATTACHED = 'Tag attached',
 	NOTE_TAG_DETACHED = 'Tag detached',
 
+	NOTE_CONTEXT_MENU_CLICK = 'Note context menu click',
+
 	NOTE_SIDE_PANEL_SHOWN = 'Note side panel shown',
 	NOTE_SIDE_PANEL_CLOSED = 'Note side panel closed',
 

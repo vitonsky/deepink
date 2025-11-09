@@ -2,7 +2,9 @@ import { useCallback } from 'react';
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useNotesRegistry,
 	useTagsRegistry,
@@ -64,6 +66,10 @@ export const useDefaultNoteContextMenu = ({
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CONTEXT_MENU_CLICK, {
+				action,
+			});
+
 			switch (action) {
 				case NoteActions.DELETE: {
 					const isConfirmed = confirm('Are you sure to delete note?');
