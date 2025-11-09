@@ -11,6 +11,8 @@ export enum TELEMETRY_EVENT_NAME {
 	IMPORT_NOTES = 'Import notes',
 	EXPORT_NOTES = 'Export notes',
 
+	EDITOR_MODE_CHANGED = 'Editor mode changed',
+
 	NOTE_CREATED = 'Note created',
 	NOTE_TAG_ATTACHED = 'Tag attached',
 	NOTE_TAG_DETACHED = 'Tag detached',
