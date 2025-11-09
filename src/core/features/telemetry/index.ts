@@ -10,8 +10,10 @@ export enum TELEMETRY_EVENT_NAME {
 	PROFILE_CREATED = 'Profile created',
 
 	MAIN_WINDOW_LOADED = 'Main window loaded',
-	DEV_TOOLS_TOGGLED = 'Dev Tools toggled',
+	MAIN_WINDOW_RESIZE = 'Main window resize',
+
 	ABOUT_WINDOW_CLICK = 'Click for About window',
+	DEV_TOOLS_TOGGLED = 'Dev Tools toggled',
 
 	TELEMETRY_QUEUE_PROCESSED = 'Queued telemetry events sent',
 }

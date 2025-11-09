@@ -78,6 +78,7 @@
 					"linux",
 					"cpu",
 					"devtools",
+					"resize",
 					"ico",
 					"unnest",
 					"tsquery",

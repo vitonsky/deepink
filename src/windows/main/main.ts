@@ -9,6 +9,7 @@ import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
+import { debounce } from '@utils/debounce/debounce';
 import { createWatcher } from '@utils/effector/watcher';
 
 export type MainWindowAPI = {
@@ -117,6 +118,18 @@ export const openMainWindow = async ({
 			app.dock.show();
 		}
 	});
+
+	const onTrackResize = () => {
+		const [width, height] = win.getSize();
+		return telemetry.track(TELEMETRY_EVENT_NAME.MAIN_WINDOW_RESIZE, {
+			width,
+			height,
+		});
+	};
+
+	// We throttle to avoid intermediate changes, since
+	// `resized` event works not on all platforms
+	win.on('resize', debounce(onTrackResize, { wait: 5000 }));
 
 	return {
 		quit: () => {
