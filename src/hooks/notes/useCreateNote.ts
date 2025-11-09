@@ -1,19 +1,15 @@
 import { useCallback } from 'react';
-import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
 	useNotesContext,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveTag } from '@state/redux/profiles/profiles';
 
 import { useUpdateNotes } from './useUpdateNotes';
 
 export const useCreateNote = () => {
-	const telemetry = useTelemetryTracker();
-
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
@@ -36,7 +32,5 @@ export const useCreateNote = () => {
 		if (note) {
 			openNote(note);
 		}
-
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CREATED);
-	}, [activeTag, notesRegistry, openNote, tagsRegistry, telemetry, updateNotes]);
+	}, [activeTag, notesRegistry, openNote, tagsRegistry, updateNotes]);
 };

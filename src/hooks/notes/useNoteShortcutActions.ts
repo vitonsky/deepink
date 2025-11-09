@@ -1,3 +1,5 @@
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
@@ -14,6 +16,8 @@ import { getItemByOffset } from '@utils/collections/getItemByOffset';
  * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
  */
 export const useNoteShortcutActions = () => {
+	const telemetry = useTelemetryTracker();
+
 	const noteActions = useNoteActions();
 	const createNote = useCreateNote();
 
@@ -21,11 +25,21 @@ export const useNoteShortcutActions = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, createNote);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, () => {
+		createNote();
+
+		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CREATED, {
+			context: 'shortcut',
+		});
+	});
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE, () => {
 		if (!activeNoteId) return;
 		noteActions.close(activeNoteId);
+
+		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CLOSED, {
+			context: 'shortcut',
+		});
 	});
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE, () => {
