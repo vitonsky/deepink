@@ -6,8 +6,8 @@ import { BoxWithCenteredContent } from '@components/BoxWithCenteredContent';
 import { TextWithIcon } from '@components/TextWithIcon';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useConfirmDialog } from '@hooks/useConfirmDialog';
 
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
@@ -36,6 +36,7 @@ export const NoteVersions = ({
 		onChange: (isDisabled: boolean) => void;
 	};
 }) => {
+	const telemetry = useTelemetryTracker();
 	const noteHistory = useNotesHistory();
 
 	const [versions, setVersions] = useState<NoteVersion[] | null>(null);

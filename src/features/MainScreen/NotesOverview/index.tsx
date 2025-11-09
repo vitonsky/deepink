@@ -13,8 +13,8 @@ import { NestedList } from '@components/NestedList';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -29,6 +29,8 @@ import { TagsList } from './TagsList';
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
+	const telemetry = useTelemetryTracker();
+
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
@@ -96,7 +98,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				}}
 			/>
 		);
-	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry]);
+	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry, telemetry]);
 
 	// TODO: show spinner while loading tags
 	return (

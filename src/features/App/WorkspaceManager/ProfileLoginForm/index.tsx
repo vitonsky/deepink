@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Button, Input, Text, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { telemetry } from '@electron/requests/telemetry/renderer';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
@@ -19,6 +19,8 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 	onLogin,
 	onPickAnotherProfile,
 }) => {
+	const telemetry = useTelemetryTracker();
+
 	const [secret, setSecret] = useState('');
 	const [isPending, setIsPending] = useState(false);
 
@@ -42,7 +44,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_LOGIN, {
 			status: response.status === 'error' ? 'error' : 'ok',
 		});
-	}, [onLogin, profile, secret]);
+	}, [onLogin, profile, secret, telemetry]);
 
 	const firstInputRef = useFocusableRef<HTMLInputElement>();
 

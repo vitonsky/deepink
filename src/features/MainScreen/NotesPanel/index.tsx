@@ -14,8 +14,8 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { NotesList } from '@features/MainScreen/NotesList';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -25,6 +25,8 @@ import {
 } from '@state/redux/profiles/profiles';
 
 export const NotesPanel = () => {
+	const telemetry = useTelemetryTracker();
+
 	const dispatch = useAppDispatch();
 
 	const search = useWorkspaceSelector(selectSearch);
@@ -44,7 +46,7 @@ export const NotesPanel = () => {
 				telemetry.track(TELEMETRY_EVENT_NAME.SEARCH_IN_NOTES);
 			}
 		},
-		[dispatch, workspaceData],
+		[dispatch, telemetry, workspaceData],
 	);
 
 	const [searchInput, setSearchInput] = useState(search);

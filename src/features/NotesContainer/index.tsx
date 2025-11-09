@@ -3,7 +3,6 @@ import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, StackProps, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useEventBus,
 	useNotesContext,
@@ -12,6 +11,7 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useNoteShortcutActions } from '@hooks/notes/useNoteShortcutActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -26,6 +26,8 @@ import { EditorModePicker } from './EditorModePicker/EditorModePicker';
 export type NotesContainerProps = Partial<StackProps>;
 
 export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
+	const telemetry = useTelemetryTracker();
+
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 

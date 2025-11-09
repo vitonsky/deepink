@@ -6,10 +6,12 @@ import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 
 export const ProfileSettings = () => {
+	const telemetry = useTelemetryTracker();
+
 	const [isOpened, setIsOpened] = useState(false);
 
 	const { controls } = useStatusBarManager();
@@ -36,7 +38,7 @@ export const ProfileSettings = () => {
 		return () => {
 			controls.unregister('preferences');
 		};
-	}, [controls]);
+	}, [controls, telemetry]);
 
 	const onClose = useCallback(() => setIsOpened(false), []);
 

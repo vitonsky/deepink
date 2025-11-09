@@ -18,7 +18,6 @@ import { NoteMeta } from '@core/features/notes/controller';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { IResolvedTag } from '@core/features/tags';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useAttachmentsController,
 	useEventBus,
@@ -26,6 +25,7 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -51,6 +51,7 @@ export type NoteEditorProps = {
  * TODO: create note context to interact with note from deep components
  */
 export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta }) => {
+	const telemetry = useTelemetryTracker();
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
@@ -188,7 +189,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				tab: sidePanel,
 			});
 		}
-	}, [sidePanel]);
+	}, [sidePanel, telemetry]);
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 

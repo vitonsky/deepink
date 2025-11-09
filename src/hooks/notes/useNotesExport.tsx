@@ -8,12 +8,12 @@ import {
 	NoteExportData,
 	NotesExporter,
 } from '@core/storage/interop/export';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useFilesRegistry,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { escapeFileName, getResolvedPath } from '@utils/fs/paths';
 import { uniqueName } from '@utils/fs/uniqueName';
 
@@ -59,6 +59,8 @@ export const configureNoteNameGetter = (isSingleNoteMode = false) =>
 
 // TODO: notify for successful export
 export const useNotesExport = () => {
+	const telemetry = useTelemetryTracker();
+
 	const [status, setStatus] = useState<{
 		status: 'noteExport' | 'notesExport';
 		progress?: {
@@ -120,7 +122,7 @@ export const useNotesExport = () => {
 				processingTime: Math.floor(Date.now() - startTime),
 			});
 		},
-		[filesRegistry, notesRegistry, status, tagsRegistry],
+		[filesRegistry, notesRegistry, status, tagsRegistry, telemetry],
 	);
 
 	const exportNote = useCallback(

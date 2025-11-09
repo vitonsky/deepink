@@ -11,9 +11,9 @@ import {
 } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -26,6 +26,7 @@ export const workspacePropsValidator = z.object({
 });
 
 export const WorkspaceCreatePopup = () => {
+	const telemetry = useTelemetryTracker();
 	const dispatch = useAppDispatch();
 
 	const { onClose } = useModalApi();

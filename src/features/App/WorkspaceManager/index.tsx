@@ -4,7 +4,7 @@ import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { telemetry } from '@electron/requests/telemetry/renderer';
+import { useTelemetryTracker } from '@features/telemetry';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -38,6 +38,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	currentProfile,
 	onChooseProfile,
 }) => {
+	const telemetry = useTelemetryTracker();
+
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
 			// Profiles with no password
@@ -166,6 +168,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onOpenProfile,
 		profilesManager,
 		screenName,
+		telemetry,
 	]);
 
 	return (

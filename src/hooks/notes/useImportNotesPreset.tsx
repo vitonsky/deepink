@@ -4,7 +4,7 @@ import { FilesFS } from '@core/features/files/FilesFS';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { ZipFS } from '@core/features/files/ZipFS';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
+import { useTelemetryTracker } from '@features/telemetry';
 import { joinPathSegments } from '@utils/fs/paths';
 
 import { useNotesImport } from './useNotesImport';
@@ -17,6 +17,8 @@ export const importOptions = [
 export type ImportTypes = (typeof importOptions)[number]['type'];
 
 export const useImportNotesPreset = () => {
+	const telemetry = useTelemetryTracker();
+
 	const notesImport = useNotesImport();
 
 	const importFiles = useCallback(
@@ -99,7 +101,7 @@ export const useImportNotesPreset = () => {
 				processingTime: Math.floor(Date.now() - startTime),
 			});
 		},
-		[notesImport],
+		[notesImport, telemetry],
 	);
 
 	return {

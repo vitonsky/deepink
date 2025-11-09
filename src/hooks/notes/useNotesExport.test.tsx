@@ -17,6 +17,7 @@ import {
 	NotesRegistryContext,
 	TagsRegistryContext,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { TelemetryContext } from '@features/telemetry';
 import { renderHook } from '@testing-library/react';
 import * as fsClientMock from '@utils/fs/__tests__/client.mock';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
@@ -82,13 +83,21 @@ describe('Export notes', async () => {
 		const { result } = renderHook(useNotesExport, {
 			wrapper(props) {
 				return (
-					<FilesRegistryContext.Provider value={filesRegistry}>
-						<NotesRegistryContext.Provider value={notesRegistry}>
-							<TagsRegistryContext.Provider value={tagsRegistry}>
-								{props.children}
-							</TagsRegistryContext.Provider>
-						</NotesRegistryContext.Provider>
-					</FilesRegistryContext.Provider>
+					<TelemetryContext
+						value={{
+							track: vi.fn(),
+							handleQueue: vi.fn(),
+							getState: vi.fn(),
+						}}
+					>
+						<FilesRegistryContext.Provider value={filesRegistry}>
+							<NotesRegistryContext.Provider value={notesRegistry}>
+								<TagsRegistryContext.Provider value={tagsRegistry}>
+									{props.children}
+								</TagsRegistryContext.Provider>
+							</NotesRegistryContext.Provider>
+						</FilesRegistryContext.Provider>
+					</TelemetryContext>
 				);
 			},
 		});
@@ -126,13 +135,21 @@ describe('Export notes', async () => {
 		const { result } = renderHook(useNotesExport, {
 			wrapper(props) {
 				return (
-					<FilesRegistryContext.Provider value={filesRegistry}>
-						<NotesRegistryContext.Provider value={notesRegistry}>
-							<TagsRegistryContext.Provider value={tagsRegistry}>
-								{props.children}
-							</TagsRegistryContext.Provider>
-						</NotesRegistryContext.Provider>
-					</FilesRegistryContext.Provider>
+					<TelemetryContext
+						value={{
+							track: vi.fn(),
+							handleQueue: vi.fn(),
+							getState: vi.fn(),
+						}}
+					>
+						<FilesRegistryContext.Provider value={filesRegistry}>
+							<NotesRegistryContext.Provider value={notesRegistry}>
+								<TagsRegistryContext.Provider value={tagsRegistry}>
+									{props.children}
+								</TagsRegistryContext.Provider>
+							</NotesRegistryContext.Provider>
+						</FilesRegistryContext.Provider>
+					</TelemetryContext>
 				);
 			},
 		});

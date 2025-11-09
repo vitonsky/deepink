@@ -23,7 +23,6 @@ import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import {
 	useAttachmentsController,
@@ -37,6 +36,7 @@ import {
 	WorkspaceCreatePopup,
 	workspacePropsValidator,
 } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDirectoryPicker } from '@hooks/files/useDirectoryPicker';
@@ -60,6 +60,8 @@ export interface WorkspaceSettingsProps {
 }
 
 export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
+	const telemetry = useTelemetryTracker();
+
 	const {
 		profile: { db },
 	} = useProfileControls();
@@ -178,6 +180,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		filesController,
 		notes,
 		tags,
+		telemetry,
 		workspaceInfo.name,
 		workspaces,
 		workspacesManager,

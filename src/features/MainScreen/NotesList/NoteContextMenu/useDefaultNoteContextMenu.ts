@@ -4,11 +4,11 @@ import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
@@ -57,6 +57,8 @@ export const useDefaultNoteContextMenu = ({
 	updateNotes,
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
+	const telemetry = useTelemetryTracker();
+
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
@@ -145,6 +147,7 @@ export const useDefaultNoteContextMenu = ({
 			notesExport,
 			notesRegistry,
 			tagsRegistry,
+			telemetry,
 			updateNotes,
 			workspaceData?.name,
 		],

@@ -3,7 +3,7 @@ import { FaGear, FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
 import { Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { telemetry } from '@electron/requests/telemetry/renderer';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -13,6 +13,8 @@ import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles'
 import { WorkspaceCreatePopup } from './WorkspaceCreatePopup';
 
 export const WorkspaceBar = () => {
+	const telemetry = useTelemetryTracker();
+
 	const dispatch = useAppDispatch();
 
 	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
@@ -20,7 +22,7 @@ export const WorkspaceBar = () => {
 		setIsWorkspaceEditing(true);
 
 		telemetry.track(TELEMETRY_EVENT_NAME.SETTINGS_CLICK, { scope: 'workspace' });
-	}, []);
+	}, [telemetry]);
 
 	const { profileId, workspaceId } = useWorkspaceData();
 
