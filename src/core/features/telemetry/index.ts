@@ -4,8 +4,15 @@ export enum TELEMETRY_EVENT_NAME {
 	APP_INSTALLED = 'App installed',
 	APP_UPDATED = 'App updated',
 
-	NOTE_CREATED = 'Note created',
 	SETTINGS_CLICK = 'Settings click',
+
+	NOTE_CREATED = 'Note created',
+	NOTE_TAG_ATTACHED = 'Tag attached',
+	NOTE_TAG_DETACHED = 'Tag detached',
+
+	TAG_CREATED = 'Tag created',
+	TAG_EDITED = 'Tag edited',
+	TAG_DELETED = 'Tag deleted',
 
 	WORKSPACE_ADDED = 'Workspace added',
 	WORKSPACE_DELETE_CLICK = 'Workspace delete click',

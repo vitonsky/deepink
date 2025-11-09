@@ -17,6 +17,8 @@ import { INote, INoteContent } from '@core/features/notes';
 import { NoteMeta } from '@core/features/notes/controller';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { IResolvedTag } from '@core/features/tags';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useAttachmentsController,
 	useEventBus,
@@ -256,6 +258,13 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 										updatedTags,
 									);
 									await updateTags();
+
+									telemetry.track(
+										TELEMETRY_EVENT_NAME.NOTE_TAG_DETACHED,
+										{
+											count: Math.max(0, attachedTags.length - 1),
+										},
+									);
 								}}
 							/>
 						</Box>
@@ -287,6 +296,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							...attachedTags.map(({ id }) => id),
 							tag.id,
 						]);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+							count: attachedTags.length + 1,
+							context: 'tags suggest list',
+						});
 
 						setTagSearch('');
 
@@ -322,10 +335,19 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							shortenedTagName,
 							parentTagId,
 						);
+						telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
+							scope: 'note editor',
+							hasParent: parentTagId === null ? 'no' : 'yes',
+						});
+
 						await tagsRegistry.setAttachedTags(noteId, [
 							...attachedTags.map(({ id }) => id),
 							tagId,
 						]);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+							count: attachedTags.length + 1,
+							context: 'create tag option',
+						});
 
 						await updateTags();
 					}}
