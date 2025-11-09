@@ -95,7 +95,7 @@ export class MainProcess {
 		// Setup telemetry
 		const telemetry = await this.setupTelemetry();
 
-		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
+		await telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
 		app.once('window-all-closed', () => this.quit());
 
 		// Init tray
