@@ -8,6 +8,9 @@ export enum TELEMETRY_EVENT_NAME {
 
 	SEARCH_IN_NOTES = 'Search in notes',
 
+	IMPORT_NOTES = 'Import notes',
+	EXPORT_NOTES = 'Export notes',
+
 	NOTE_CREATED = 'Note created',
 	NOTE_TAG_ATTACHED = 'Tag attached',
 	NOTE_TAG_DETACHED = 'Tag detached',

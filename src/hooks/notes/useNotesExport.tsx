@@ -2,11 +2,13 @@ import { useCallback, useState } from 'react';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { dumpFilesStorage } from '@core/features/files/utils/dumpFilesStorage';
 import { NoteId } from '@core/features/notes';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
 	ExportProgress,
 	NoteExportData,
 	NotesExporter,
 } from '@core/storage/interop/export';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import {
 	useFilesRegistry,
 	useNotesRegistry,
@@ -78,6 +80,8 @@ export const useNotesExport = () => {
 				return;
 			}
 
+			const startTime = Date.now();
+
 			setStatus({
 				status: 'notesExport',
 				progress: {
@@ -110,6 +114,11 @@ export const useNotesExport = () => {
 
 			// Save
 			await dumpFilesStorage(files, { name });
+
+			await telemetry.track(TELEMETRY_EVENT_NAME.EXPORT_NOTES, {
+				filesCount: (await files.list()).length,
+				processingTime: Math.floor(Date.now() - startTime),
+			});
 		},
 		[filesRegistry, notesRegistry, status, tagsRegistry],
 	);
