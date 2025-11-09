@@ -205,7 +205,7 @@ export class MainProcess {
 
 	private async setupTelemetry() {
 		const {
-			telemetry: { enabled: shouldSend, verbose, syncInterval },
+			telemetry: { enabled: shouldSend, verbose, syncInterval, api },
 		} = getConfig();
 
 		if (verbose) {
@@ -213,6 +213,7 @@ export class MainProcess {
 				shouldSend,
 				verbose,
 				syncInterval,
+				api,
 			});
 		}
 
@@ -223,10 +224,9 @@ export class MainProcess {
 		const initVersions = await appVersions.getInfo();
 		await appVersions.logVersion();
 
-		// TODO: use real config
 		const plausible = new Plausible({
-			apiHost: 'https://uxt.vitonsky.net',
-			domain: 'test',
+			apiHost: api.baseURL,
+			domain: api.appName,
 			filter() {
 				return shouldSend;
 			},

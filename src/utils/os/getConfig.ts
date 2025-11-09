@@ -21,6 +21,18 @@ export const getConfig = () => {
 				.default('1h')
 				.transform((time) => ms(time))
 				.parse(process.env.TELEMETRY_SYNC_INTERVAL),
+			api: {
+				baseURL: z
+					.string()
+					.optional()
+					.default('https://uxt.vitonsky.net')
+					.parse(process.env.TELEMETRY_URL),
+				appName: z
+					.string()
+					.optional()
+					.default('deepink')
+					.parse(process.env.TELEMETRY_APP_NAME),
+			},
 		},
 	};
 };
