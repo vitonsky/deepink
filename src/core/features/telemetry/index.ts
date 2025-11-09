@@ -6,6 +6,8 @@ export enum TELEMETRY_EVENT_NAME {
 
 	SETTINGS_CLICK = 'Settings click',
 
+	SEARCH_IN_NOTES = 'Search in notes',
+
 	NOTE_CREATED = 'Note created',
 	NOTE_TAG_ATTACHED = 'Tag attached',
 	NOTE_TAG_DETACHED = 'Tag detached',
