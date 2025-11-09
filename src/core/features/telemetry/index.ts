@@ -10,6 +10,13 @@ export enum TELEMETRY_EVENT_NAME {
 	NOTE_TAG_ATTACHED = 'Tag attached',
 	NOTE_TAG_DETACHED = 'Tag detached',
 
+	NOTE_SIDE_PANEL_SHOWN = 'Note side panel shown',
+	NOTE_SIDE_PANEL_CLOSED = 'Note side panel closed',
+
+	NOTE_VERSION_VIEWED = 'Note version viewed',
+	NOTE_VERSION_APPLIED = 'Note version applied',
+	NOTE_VERSION_DELETED = 'Note version deleted',
+
 	TAG_CREATED = 'Tag created',
 	TAG_EDITED = 'Tag edited',
 	TAG_DELETED = 'Tag deleted',

@@ -182,6 +182,16 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 		setSidePanel((state) => (state === tabName ? null : tabName));
 	}, []);
 
+	useEffect(() => {
+		if (sidePanel) {
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_SHOWN, {
+				tab: sidePanel,
+			});
+		} else {
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_CLOSED);
+		}
+	}, [sidePanel]);
+
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
 	return (

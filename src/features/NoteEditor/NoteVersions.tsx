@@ -5,8 +5,14 @@ import { Box, Button, HStack, Switch, Text, VStack } from '@chakra-ui/react';
 import { BoxWithCenteredContent } from '@components/BoxWithCenteredContent';
 import { TextWithIcon } from '@components/TextWithIcon';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useEventBus, useNotesHistory } from '@features/App/Workspace/WorkspaceProvider';
 import { useConfirmDialog } from '@hooks/useConfirmDialog';
+
+const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
+const timestampToDays = (ms: number) => Math.floor(ms / ONE_DAY_IN_MS);
+const getTimestampAgeInDays = (ms: number) => timestampToDays(Date.now() - ms);
 
 export const formatNoteVersionPreview = (version: NoteVersion) =>
 	`${new Date(version.createdAt).toLocaleString()} (${version.text.length} chars)`;
@@ -148,8 +154,18 @@ export const NoteVersions = ({
 										size="sm"
 										title="Apply version"
 										onClick={(evt) => {
-											const applyVersion = () =>
+											const applyVersion = () => {
 												onVersionApply(version);
+												telemetry.track(
+													TELEMETRY_EVENT_NAME.NOTE_VERSION_APPLIED,
+													{
+														versionAgeInDays:
+															getTimestampAgeInDays(
+																version.createdAt,
+															),
+													},
+												);
+											};
 
 											// Apply immediately
 											if (evt.ctrlKey || evt.metaKey) {
@@ -215,7 +231,19 @@ export const NoteVersions = ({
 									<Button
 										size="sm"
 										title="Open version"
-										onClick={() => onShowVersion(version)}
+										onClick={() => {
+											onShowVersion(version);
+
+											telemetry.track(
+												TELEMETRY_EVENT_NAME.NOTE_VERSION_VIEWED,
+												{
+													versionAgeInDays:
+														getTimestampAgeInDays(
+															version.createdAt,
+														),
+												},
+											);
+										}}
 									>
 										<FaGlasses />
 									</Button>
@@ -223,11 +251,21 @@ export const NoteVersions = ({
 										size="sm"
 										title="Delete version"
 										onClick={(evt) => {
-											const deleteVersion = () => {
-												noteHistory.delete([version.id]);
+											const deleteVersion = async () => {
+												await noteHistory.delete([version.id]);
 												eventBus.emit(
 													WorkspaceEvents.NOTE_HISTORY_UPDATED,
 													noteId,
+												);
+
+												telemetry.track(
+													TELEMETRY_EVENT_NAME.NOTE_VERSION_DELETED,
+													{
+														versionAgeInDays:
+															getTimestampAgeInDays(
+																version.createdAt,
+															),
+													},
 												);
 											};
 
