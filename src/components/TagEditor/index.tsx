@@ -136,36 +136,43 @@ export const TagEditor: FC<ITagEditorProps> = ({
 						<Button
 							variant="primary"
 							onClick={() => {
-								try {
-									const name = tagName.trim();
+								const name = tagName.trim();
 
-									validateTagName(name);
-									checkTagUniqueness(name, parentTagId, tags);
-
-									if (isEditingMode) {
-										const isHaveSeparatorChar = name.includes('/');
-										if (isHaveSeparatorChar) {
-											setTagNameError(
-												'Name of tag for editing cannot create sub tags',
-											);
-											return;
-										}
-									}
-
-									const editedData: TagEditorData = {
-										name,
-										parent: parentTagId,
-									};
-
-									if (isEditingMode && editedTag.id) {
-										editedData.id = editedTag.id;
-									}
-
-									onSave(editedData);
-								} catch (error) {
-									if (error instanceof Error)
-										setTagNameError(error.message);
+								const isTagNameValid = validateTagName(name);
+								const isTagNameUnique = checkTagUniqueness(
+									name,
+									parentTagId,
+									tags,
+								);
+								if (!isTagNameValid.valid || !isTagNameUnique.valid) {
+									setTagNameError(
+										isTagNameValid.message ??
+											isTagNameUnique.message ??
+											'Invalid tag',
+									);
+									return;
 								}
+
+								if (isEditingMode) {
+									const isHaveSeparatorChar = name.includes('/');
+									if (isHaveSeparatorChar) {
+										setTagNameError(
+											'Name of tag for editing cannot create sub tags',
+										);
+										return;
+									}
+								}
+
+								const editedData: TagEditorData = {
+									name,
+									parent: parentTagId,
+								};
+
+								if (isEditingMode && editedTag.id) {
+									editedData.id = editedTag.id;
+								}
+
+								onSave(editedData);
 							}}
 						>
 							{isEditingMode ? 'Save' : 'Add'}

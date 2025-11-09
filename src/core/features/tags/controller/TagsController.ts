@@ -58,8 +58,10 @@ export class TagsController {
 	public async add(name: string, parent: null | string): Promise<string> {
 		const db = wrapDB(this.db.get());
 
-		validateTagName(name);
-		checkTagUniqueness(name, parent, await this.getTags());
+		const isTagNameValid = validateTagName(name);
+		if (!isTagNameValid.valid) throw new Error(isTagNameValid.message);
+		const isTagNameUnique = checkTagUniqueness(name, parent, await this.getTags());
+		if (!isTagNameUnique.valid) throw new Error(isTagNameUnique.message);
 
 		const segments = name.split('/');
 
