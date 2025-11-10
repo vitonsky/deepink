@@ -177,14 +177,13 @@ describe('data fetching', () => {
 		const tagsList = await tags.getTags();
 
 		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string;
-		const [{ id: noteId }] = await registry
-			.get({
-				limit: 1,
-				tags: [barTag],
-			});
+		const [{ id: noteId }] = await registry.get({
+			limit: 1,
+			tags: [barTag],
+		});
 
 		// set deleted status
-		await registry.updateMeta(noteId, { isDeleted: true });
+		await registry.updateMeta([noteId], { isDeleted: true });
 		await expect(
 			registry.get({
 				tags: [barTag],
@@ -193,7 +192,7 @@ describe('data fetching', () => {
 		).resolves.toHaveLength(1);
 
 		// reset deleted status
-		await registry.updateMeta(noteId, { isDeleted: false });
+		await registry.updateMeta([noteId], { isDeleted: false });
 		await expect(
 			registry.get({
 				tags: [barTag],

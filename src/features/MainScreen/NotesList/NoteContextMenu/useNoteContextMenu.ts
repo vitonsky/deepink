@@ -1,12 +1,14 @@
 import { useCallback } from 'react';
 import { formatNoteLink } from '@core/features/links';
 import { INote, NoteId } from '@core/features/notes';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
 	useNotesContext,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
@@ -17,8 +19,6 @@ import { selectConfirmMoveToBin } from '@state/redux/settings/settings';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { NoteActions } from '.';
-import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { useTelemetryTracker } from '@features/telemetry';
 
 export type ContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
@@ -74,6 +74,10 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 	const noteContextMenuCallback = useCallback<ContextMenuCallback<NoteActions>>(
 		async ({ id, action }) => {
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CONTEXT_MENU_CLICK, {
+				action,
+			});
+
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
 					if (isConfirmMoveToBin) {
@@ -90,6 +94,10 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 					if (updatedNote) noteUpdated(updatedNote);
 
 					updateNotes();
+
+					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
+						permanently: 'false',
+					});
 				},
 
 				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
@@ -105,7 +113,9 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 					updateNotes();
 
-					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED);
+					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
+						permanently: 'true',
+					});
 				},
 
 				[NoteActions.RESTORE_FROM_BIN]: async (id: string) => {
@@ -114,6 +124,8 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 					if (updatedNote) noteUpdated(updatedNote);
 
 					updateNotes();
+
+					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED);
 				},
 
 				[NoteActions.DUPLICATE]: async (id: string) => {
@@ -180,6 +192,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 			noteUpdated,
 			updateNotes,
 			tagsRegistry,
+			telemetry,
 			notesExport,
 			workspaceData?.name,
 		],
