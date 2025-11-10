@@ -1,5 +1,8 @@
 name: Build Electron App
 
+permissions:
+  contents: write # required to create releases / upload assets
+
 on:
   push:
     branches:
