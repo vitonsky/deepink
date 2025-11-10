@@ -30,6 +30,32 @@ export const MainScreen: FC = () => {
 		});
 	}, [tagsRegistry, updateNotes]);
 
+	useEffect(() => {
+		// Prevent a KDE/X11 issue where pressing the middle mouse button pastes text
+		// from the clipboard into the focused element, even when clicking another element
+		const preventTextInsert = (e: MouseEvent) => {
+			// 1 is the middle mouse button
+			if (e.button !== 1) return;
+
+			const isEditable = e.composedPath().some((element) => {
+				if (!(element instanceof HTMLElement)) return false;
+
+				return (
+					element.tagName === 'INPUT' ||
+					element.tagName === 'TEXTAREA' ||
+					element.isContentEditable
+				);
+			});
+
+			if (!isEditable) {
+				e.preventDefault();
+			}
+		};
+
+		document.addEventListener('mouseup', preventTextInsert);
+		return () => document.removeEventListener('mouseup', preventTextInsert);
+	}, []);
+
 	return (
 		<VStack gap={0} w="100%" h="100%">
 			<HStack
