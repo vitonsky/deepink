@@ -1,0 +1,59 @@
+name: Build Electron App
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    # build for macOS, Windows and Linux
+    strategy:
+      matrix:
+        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: "macOS: accept Xcode license (required before building)"
+        if: runner.os == 'macOS'
+        run: |
+          # ensure Xcode path and accept license
+          if [ -d "/Applications/Xcode.app" ]; then
+            sudo xcode-select --switch /Applications/Xcode.app || true
+            sudo xcodebuild -license accept || true
+          else
+            echo "Warning: /Applications/Xcode.app not found on runner. If this step fails on self-hosted mac runners, ensure Xcode is installed."
+          fi
+
+      - name: Build app
+        run: make package artifacts
+
+      - name: List artifacts (debug)
+        run: |
+          echo "Artifacts on runner (${RUNNER_OS}):"
+          ls -R out
+        shell: bash
+
+      - name: Upload artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx tsx ./scripts/publish --dir ./out/make --tag v0.0.0-test --overwrite
+
+      - name: Success log
+        run: echo "Build finished for ${{ matrix.os }}"
