@@ -7,6 +7,7 @@ export type Args = {
 	overwrite: boolean;
 	owner?: string;
 	repo?: string;
+	extensions?: string[];
 };
 
 export function parseArgs(): Args {
@@ -19,13 +20,14 @@ export function parseArgs(): Args {
 		else if (a === '--overwrite') out.overwrite = true;
 		else if (a === '--owner') out.owner = argv[++i];
 		else if (a === '--repo') out.repo = argv[++i];
+		else if (a === '--extensions') out.extensions = (argv[++i] ?? '').split(',');
 		else {
 			console.warn(`Unknown arg: ${a}`);
 		}
 	}
 	if (!out.dir || !out.tag) {
 		console.error(
-			'Missing required args. Usage: --dir <path> --tag <tag> [--overwrite] [--owner OWNER] [--repo REPO]',
+			'Missing required args. Usage: --dir <path> --tag <tag> [--overwrite] [--owner OWNER] [--repo REPO] [--extensions EXTENSIONS_LIST]',
 		);
 		process.exit(1);
 	}

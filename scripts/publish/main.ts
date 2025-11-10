@@ -22,7 +22,11 @@ function getArtifactName(filename: string, version: string) {
 	return shouldLowercaseName ? artifactName.toLowerCase() : artifactName;
 }
 
-async function findArtifacts(dir: string): Promise<string[]> {
+async function findArtifacts(dir: string, extensions?: string[]): Promise<string[]> {
+	const extensionsList = extensions
+		? new Set(extensions.map((ext) => '.' + ext))
+		: EXT_WHITELIST;
+
 	// find all files, then filter by ext (case-insensitive)
 	const entries = await fg(['**/*'], {
 		cwd: dir,
@@ -33,7 +37,7 @@ async function findArtifacts(dir: string): Promise<string[]> {
 	});
 	return entries
 		.map((p) => path.join(dir, p))
-		.filter((p) => EXT_WHITELIST.has(path.extname(p).toLowerCase()));
+		.filter((p) => extensionsList.has(path.extname(p).toLowerCase()));
 }
 
 async function ensureRelease(octokit: Octokit, owner: string, repo: string, tag: string) {
@@ -141,7 +145,7 @@ export default async function (args: Args) {
 
 	const octokit = new Octokit({ auth: token });
 
-	const artifacts = await findArtifacts(args.dir);
+	const artifacts = await findArtifacts(args.dir, args.extensions);
 	if (artifacts.length === 0) {
 		console.log('No artifacts found.');
 		return;

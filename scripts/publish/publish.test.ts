@@ -61,6 +61,9 @@ beforeAll(async () => {
 	addFile('/foo/bar/out/make/ios/x64/Deepink-0.0.1-x64.dmg');
 	addFile('/foo/bar/out/make/deb/x64/deepink_0.0.1_amd64.deb');
 	addFile('/foo/bar/out/make/zip/linux/x64/Deepink-linux-x64-0.0.1.zip');
+
+	addFile('/foo/bar/out/make/zip/linux/x64/Deepink-linux-x64-0.0.1.txt');
+	addFile('/foo/bar/out/make/zip/linux/x64/Deepink-linux-x64-0.0.1.jpg');
 });
 
 test('Publish script uploads all found artifacts as a new release', async () => {
@@ -93,6 +96,8 @@ test('Publish script uploads all found artifacts as a new release', async () => 
 			}),
 		),
 	);
+
+	expect(uploadReleaseAsset).toBeCalledTimes(5);
 });
 
 test('Publish script uploads all found artifacts to an exists release with overriding', async () => {
@@ -107,6 +112,41 @@ test('Publish script uploads all found artifacts to an exists release with overr
 
 	expect(Octokit).toBeCalledWith({ auth: 'FAKE_TOKEN' });
 	expect(uploadReleaseAsset).toBeCalledWith(
+		expect.objectContaining({
+			name: 'deepink-0.0.0.deb',
+			owner: 'ownerName',
+			repo: 'repoName',
+			release_id: FAKE_RELEASE_ID,
+		}),
+	);
+});
+
+test('Publish script filter artifacts by extensions', async () => {
+	const { default: main } = await import('./main');
+
+	getReleaseByTag.mockReturnValueOnce(
+		Promise.resolve({
+			data: { id: FAKE_RELEASE_ID },
+		}),
+	);
+	await main({
+		dir: '/foo/bar',
+		tag: FAKE_RELEASE_ID,
+		overwrite: true,
+		extensions: ['msi'],
+	});
+
+	expect(Octokit).toBeCalledWith({ auth: 'FAKE_TOKEN' });
+	expect(uploadReleaseAsset).toBeCalledWith(
+		expect.objectContaining({
+			name: 'Deepink-0.0.0.msi',
+			owner: 'ownerName',
+			repo: 'repoName',
+			release_id: FAKE_RELEASE_ID,
+		}),
+	);
+
+	expect(uploadReleaseAsset).not.toBeCalledWith(
 		expect.objectContaining({
 			name: 'deepink-0.0.0.deb',
 			owner: 'ownerName',
