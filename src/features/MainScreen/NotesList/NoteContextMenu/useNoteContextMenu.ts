@@ -31,7 +31,12 @@ const mdCharsForEscapeRegEx = new RegExp(
 );
 
 const buildNoteMenu = (note: INote): ContextMenu => {
-	const commonActions: ContextMenu = [
+	// in the future menu items can be added like this: ...(x ? [{}, {}] : [])
+	return [
+		note.isDeleted
+			? { id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' }
+			: { id: NoteActions.DUPLICATE, label: 'Duplicate' },
+
 		{
 			id: NoteActions.EXPORT,
 			label: 'Export',
@@ -41,14 +46,6 @@ const buildNoteMenu = (note: INote): ContextMenu => {
 			label: 'Copy markdown link',
 		},
 		{ type: 'separator' },
-	];
-
-	return [
-		note.isDeleted
-			? { id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' }
-			: { id: NoteActions.DUPLICATE, label: 'Duplicate' },
-
-		...commonActions,
 
 		note.isDeleted
 			? { id: NoteActions.DELETE_PERMANENTLY, label: 'Delete permanently' }
