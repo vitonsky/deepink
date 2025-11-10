@@ -7,6 +7,12 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
+	preferences: {
+		/**
+		 * Indicates if a confirmation is required before moving note to the bin
+		 */
+		confirmBeforeMoveToBin: boolean;
+	};
 };
 
 export const settingsSlice = createSlice({
@@ -14,6 +20,9 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
+		preferences: {
+			confirmBeforeMoveToBin: false,
+		},
 	} as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
@@ -27,6 +36,12 @@ export const settingsSlice = createSlice({
 		},
 		setTheme: (state, { payload }: PayloadAction<GlobalSettings['theme']>) => {
 			return { ...state, theme: payload } as GlobalSettings;
+		},
+		setPreferences: (
+			state,
+			{ payload }: PayloadAction<GlobalSettings['preferences']>,
+		) => {
+			return { ...state, preferences: payload } as GlobalSettings;
 		},
 	},
 });
@@ -43,4 +58,9 @@ export const selectEditorMode = createAppSelector(
 export const selectTheme = createAppSelector(
 	selectSettings,
 	(settings) => settings.theme,
+);
+
+export const selectConfirmMoveToBin = createAppSelector(
+	selectSettings,
+	(settings) => settings.preferences.confirmBeforeMoveToBin,
 );

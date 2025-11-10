@@ -13,6 +13,7 @@ import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
+import { selectConfirmMoveToBin } from '@state/redux/settings/settings';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { NoteActions } from '.';
@@ -67,16 +68,20 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
+	const isConfirmMoveToBin = useAppSelector(selectConfirmMoveToBin);
+
 	const { noteUpdated } = useNotesContext();
 
 	const noteContextMenuCallback = useCallback<ContextMenuCallback<NoteActions>>(
 		async ({ id, action }) => {
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
-					const isConfirmed = confirm(
-						`Really want to move this note to the bin`,
-					);
-					if (!isConfirmed) return;
+					if (isConfirmMoveToBin) {
+						const isConfirmed = confirm(
+							`Really want to move this note to the bin`,
+						);
+						if (!isConfirmed) return;
+					}
 
 					closeNote(id);
 
@@ -169,6 +174,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 			}
 		},
 		[
+			isConfirmMoveToBin,
 			closeNote,
 			notes,
 			noteUpdated,
