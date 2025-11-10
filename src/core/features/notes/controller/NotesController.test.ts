@@ -177,12 +177,11 @@ describe('data fetching', () => {
 		const tagsList = await tags.getTags();
 
 		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string;
-		const noteId = await registry
+		const [{ id: noteId }] = await registry
 			.get({
 				limit: 1,
 				tags: [barTag],
-			})
-			.then((notes) => notes.map((note) => note.id));
+			});
 
 		// set deleted status
 		await registry.updateMeta(noteId, { isDeleted: true });
