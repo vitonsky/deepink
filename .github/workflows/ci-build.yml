@@ -1,15 +1,15 @@
-name: Build Electron App
+name: Release tag
 
 permissions:
-  contents: write # required to create releases / upload assets
+  # required to create releases / upload assets
+  contents: write
 
 on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 jobs:
@@ -17,8 +17,7 @@ jobs:
     # build for macOS, Windows and Linux
     strategy:
       matrix:
-        # os: [macos-latest, ubuntu-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
 
