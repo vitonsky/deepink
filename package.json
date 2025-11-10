@@ -25,7 +25,7 @@
 		"lint": "prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint \"{*,**/*}.{ts,tsx,js,jsx}\"",
 		"update-icons": "tsx ./scripts/icons/build.ts",
 		"upgrade": "npm-check-updates -u",
-		"release-review": "npm version prerelease --preid=preview",
+		"release-review": "npm version prerelease --preid=preview && git push --tags",
 		"prepare": "husky install"
 	},
 	"devDependencies": {
