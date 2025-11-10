@@ -14,10 +14,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
-import {
-	checkTagUniqueness,
-	validateTagName,
-} from '@core/features/tags/controller/utils';
+import { TAG_ERROR_CODE, TagError } from '@core/features/tags/controller/utils';
 import { WorkspaceModal } from '@features/WorkspaceModal';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
@@ -135,44 +132,54 @@ export const TagEditor: FC<ITagEditorProps> = ({
 						</Button>
 						<Button
 							variant="primary"
-							onClick={() => {
-								const name = tagName.trim();
+							onClick={async () => {
+								try {
+									const name = tagName.trim();
 
-								const isTagNameValid = validateTagName(name);
-								const isTagNameUnique = checkTagUniqueness(
-									name,
-									parentTagId,
-									tags,
-								);
-								if (!isTagNameValid.valid || !isTagNameUnique.valid) {
-									setTagNameError(
-										isTagNameValid.message ??
-											isTagNameUnique.message ??
-											'Invalid tag',
-									);
-									return;
-								}
+									if (isEditingMode) {
+										const isHaveSeparatorChar = name.includes('/');
+										if (isHaveSeparatorChar) {
+											setTagNameError(
+												'Name of tag for editing cannot create sub tags',
+											);
+											return;
+										}
+									}
 
-								if (isEditingMode) {
-									const isHaveSeparatorChar = name.includes('/');
-									if (isHaveSeparatorChar) {
-										setTagNameError(
-											'Name of tag for editing cannot create sub tags',
-										);
-										return;
+									const editedData: TagEditorData = {
+										name,
+										parent: parentTagId,
+									};
+
+									if (isEditingMode && editedTag.id) {
+										editedData.id = editedTag.id;
+									}
+
+									await onSave(editedData);
+								} catch (error) {
+									if (error instanceof TagError) {
+										switch (error.code) {
+											case TAG_ERROR_CODE.TAG_NOT_UNIQUE:
+												setTagNameError('Tag already exists');
+												break;
+											case TAG_ERROR_CODE.TAG_EMPTY:
+												setTagNameError('Tag cannot be empty');
+												break;
+											case TAG_ERROR_CODE.TAG_BOUNDARY_SLASH:
+												setTagNameError(
+													'Tag cannot start or end with a slash "/"',
+												);
+												break;
+											case TAG_ERROR_CODE.TAG_MULTIPLE_SLASHES:
+												setTagNameError(
+													'Tag cannot contain consecutive "/"',
+												);
+												break;
+											default:
+												setTagNameError('Invalid tag name');
+										}
 									}
 								}
-
-								const editedData: TagEditorData = {
-									name,
-									parent: parentTagId,
-								};
-
-								if (isEditingMode && editedTag.id) {
-									editedData.id = editedTag.id;
-								}
-
-								onSave(editedData);
 							}}
 						>
 							{isEditingMode ? 'Save' : 'Add'}
