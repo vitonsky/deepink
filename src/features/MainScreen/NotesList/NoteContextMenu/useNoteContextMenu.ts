@@ -54,10 +54,6 @@ const buildNoteMenu = (note: INote): ContextMenu => {
 	];
 };
 
-/**
- * Opens the context menu for a note.
- * Automatically selects the appropriate menu based on the notes state
- */
 export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOptions) => {
 	const telemetry = useTelemetryTracker();
 
@@ -68,7 +64,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
-	const isConfirmMoveToBin = useAppSelector(selectConfirmMoveToBin);
+	const requiresConfirmMoveToBin = useAppSelector(selectConfirmMoveToBin);
 
 	const { noteUpdated } = useNotesContext();
 
@@ -80,7 +76,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
-					if (isConfirmMoveToBin) {
+					if (requiresConfirmMoveToBin) {
 						const isConfirmed = confirm(
 							`Really want to move this note to the bin`,
 						);
@@ -186,7 +182,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 			}
 		},
 		[
-			isConfirmMoveToBin,
+			requiresConfirmMoveToBin,
 			closeNote,
 			notes,
 			noteUpdated,
