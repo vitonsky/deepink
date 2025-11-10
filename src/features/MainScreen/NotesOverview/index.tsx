@@ -44,7 +44,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const tags = useWorkspaceSelector(selectTags);
 	const tagsTree = useWorkspaceSelector(selectTagsTree);
 
-	const notesOverviewMode = useWorkspaceSelector(selectNotesView);
+	const notesViewMode = useWorkspaceSelector(selectNotesView);
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -170,7 +170,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 				]}
-				activeItem={notesOverviewMode || NOTES_VIEW.All_NOTES}
+				activeItem={notesViewMode}
 				onPick={(id) => {
 					if (!isNotesView(id)) return;
 
