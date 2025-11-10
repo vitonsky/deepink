@@ -1,24 +1,41 @@
 import { IResolvedTag } from '..';
 
-export const validateTagName = (tag: string) => {
-	if (tag.length === 0) {
-		return { valid: false, message: 'Name must not be empty' };
-	}
-	if (tag.startsWith('/') || tag.endsWith('/')) {
-		return { valid: false, message: 'Tag cannot start or end with "/"' };
-	}
-	if (tag.split('/').some((s) => s.trim() === '')) {
-		return { valid: false, message: 'Tag contains an empty segment' };
-	}
+export enum TAG_ERROR_CODE {
+	TAG_NOT_UNIQUE = 'TAG_NOT_UNIQUE',
+	TAG_EMPTY = 'TAG_EMPTY',
+	TAG_BOUNDARY_SLASH = 'TAG_INVALID_BOUNDARY_SLASH',
+	TAG_MULTIPLE_SLASHES = 'TAG_MULTIPLE_CONSECUTIVE_SLASHES',
+}
 
-	return { valid: true };
-};
+export class TagError extends Error {
+	constructor(message: string, public readonly code: TAG_ERROR_CODE) {
+		super(message);
+		this.name = this.constructor.name;
+	}
+}
 
-export const checkTagUniqueness = (
+export const validateTagName = (
 	name: string,
 	parent: string | null,
 	tagsList: IResolvedTag[],
 ) => {
+	if (name.length === 0) {
+		throw new TagError('Tag name must not be empty', TAG_ERROR_CODE.TAG_EMPTY);
+	}
+	if (name.startsWith('/') || name.endsWith('/')) {
+		throw new TagError(
+			'Tag name must not start or end with a slash "/"',
+			TAG_ERROR_CODE.TAG_BOUNDARY_SLASH,
+		);
+	}
+	if (name.includes('//')) {
+		throw new TagError(
+			'Tag name must not contain consecutive slashes "//"',
+			TAG_ERROR_CODE.TAG_MULTIPLE_SLASHES,
+		);
+	}
+
+	// check tag uniqueness
 	const parentTag = tagsList.find(({ id }) => id === parent);
 	const fullName = [parentTag?.resolvedName, name].filter(Boolean).join('/');
 
@@ -26,7 +43,9 @@ export const checkTagUniqueness = (
 		(tag) => tag.parent === parent && tag.resolvedName === fullName,
 	);
 	if (duplicate) {
-		return { valid: false, message: `Tag "${fullName}" already exists` };
+		throw new TagError(
+			`Tag "${fullName}" already exists under the specified parent`,
+			TAG_ERROR_CODE.TAG_NOT_UNIQUE,
+		);
 	}
-	return { valid: true };
 };

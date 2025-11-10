@@ -6,7 +6,7 @@ import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
 import tagsQuery from './selectTagsWithResolvedNames.sql';
-import { checkTagUniqueness, validateTagName } from './utils';
+import { validateTagName } from './utils';
 import { IResolvedTag, ITag } from '..';
 
 type ChangeEvent = 'tags' | 'noteTags';
@@ -58,10 +58,7 @@ export class TagsController {
 	public async add(name: string, parent: null | string): Promise<string> {
 		const db = wrapDB(this.db.get());
 
-		const isTagNameValid = validateTagName(name);
-		if (!isTagNameValid.valid) throw new Error(isTagNameValid.message);
-		const isTagNameUnique = checkTagUniqueness(name, parent, await this.getTags());
-		if (!isTagNameUnique.valid) throw new Error(isTagNameUnique.message);
+		validateTagName(name, parent, await this.getTags());
 
 		const segments = name.split('/');
 
