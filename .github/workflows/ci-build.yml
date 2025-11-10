@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         # os: [macos-latest, ubuntu-latest, windows-latest]
-        os: [macos-latest]
+        os: [windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
 
@@ -32,6 +32,7 @@ jobs:
           node-version: "22"
           cache: "npm"
 
+      # Setup macOS
       - name: "macOS: accept Xcode license (required before building)"
         if: runner.os == 'macOS'
         run: |
@@ -43,14 +44,50 @@ jobs:
             echo "Warning: /Applications/Xcode.app not found on runner. If this step fails on self-hosted mac runners, ensure Xcode is installed."
           fi
 
+      # Setup Windows
+      - name: Install WiX Toolset v3 (via Chocolatey)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install -y wixtoolset --version=3.14.0
+          echo "C:\Program Files (x86)\WiX Toolset v3.14\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Verify WiX installation
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $env:PATH = "C:\wix314;$env:PATH"
+          candle.exe -? | Select-Object -First 1
+          light.exe -? | Select-Object -First 1
+
       - name: Build app
         run: make package artifacts
 
       - name: List artifacts (debug)
+        if: runner.os == 'macOS'
         run: |
           echo "Artifacts on runner (${RUNNER_OS}):"
           ls -R out
         shell: bash
+
+      - name: Debug - List dist directory
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: powershell
+        run: |
+          Write-Host "===== Listing dist directory recursively ====="
+          if (Test-Path "dist") {
+            Get-ChildItem -Path "dist" -Recurse | ForEach-Object {
+              $relativePath = $_.FullName.Replace((Get-Location).Path, "").TrimStart("\")
+              $size = if ($_.PSIsContainer) { "<DIR>" } else { "{0:N0} bytes" -f $_.Length }
+              Write-Host "$relativePath - $size"
+            }
+          } else {
+            Write-Host "dist directory does not exist!"
+          }
+
+          Write-Host "`n===== Listing root directory ====="
+          Get-ChildItem -Path "." -Name
 
       - name: Upload artifacts to release
         env:
