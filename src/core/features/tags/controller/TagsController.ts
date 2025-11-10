@@ -6,7 +6,7 @@ import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
 import tagsQuery from './selectTagsWithResolvedNames.sql';
-import { validateTagName } from './utils';
+import { validateTagName } from './validateTagName';
 import { IResolvedTag, ITag } from '..';
 
 type ChangeEvent = 'tags' | 'noteTags';
