@@ -67,13 +67,8 @@ export const NoteVersions = ({
 		<VStack w="100%" maxH="100%">
 			<HStack w="100%">
 				<Button
-					isDisabled={Boolean(isReadOnly)}
 					size="sm"
-					title={
-						isReadOnly
-							? 'Saving a new history version is not available for read-only note'
-							: 'Save the current state of this note as a new version in history'
-					}
+					title="Save the current state of this note as a new version in history"
 					onClick={onSnapshot}
 				>
 					<TextWithIcon icon={<FaFloppyDisk />}>Save version</TextWithIcon>
@@ -119,12 +114,6 @@ export const NoteVersions = ({
 
 				<HStack as="label">
 					<Switch
-						disabled={Boolean(isReadOnly)}
-						title={`${
-							isReadOnly
-								? 'This option is not available for for read-only note'
-								: ''
-						} `}
 						size="sm"
 						isChecked={recordControl.isDisabled}
 						onChange={(event) => recordControl.onChange(event.target.checked)}
@@ -169,7 +158,7 @@ export const NoteVersions = ({
 										size="sm"
 										title={
 											isReadOnly
-												? 'Not available for for read-only notes'
+												? 'Version cannot be applied for a read-only note'
 												: 'Apply version'
 										}
 										onClick={(evt) => {

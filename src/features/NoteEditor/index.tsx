@@ -219,20 +219,16 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			</HStack>
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				{!note.isDeleted && (
-					<>
-						<HStack>
-							<Button variant="ghost" size="xs">
-								<FaBookmark />
-							</Button>
-							<Button variant="ghost" size="xs">
-								<FaFlag />
-							</Button>
-						</HStack>
+				<HStack>
+					<Button variant="ghost" size="xs">
+						<FaBookmark />
+					</Button>
+					<Button variant="ghost" size="xs">
+						<FaFlag />
+					</Button>
+				</HStack>
 
-						<Divider orientation="vertical" h="1em" />
-					</>
-				)}
+				<Divider orientation="vertical" h="1em" />
 
 				{attachedTags.map((tag) => (
 					<Tag
@@ -255,131 +251,120 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							<Text>{tag.resolvedName}</Text>
 						</HStack>
 
-						{!isReadOnly && (
-							<Box
-								sx={{
-									'&:not(:hover)': {
-										opacity: '.6',
-									},
+						<Box
+							sx={{
+								'&:not(:hover)': {
+									opacity: '.6',
+								},
+							}}
+						>
+							<FaXmark
+								onClick={async (evt) => {
+									evt.stopPropagation();
+									console.warn('Remove attached tag', tag.resolvedName);
+
+									const updatedTags = attachedTags
+										.filter(({ id }) => id !== tag.id)
+										.map(({ id }) => id);
+									await tagsRegistry.setAttachedTags(
+										noteId,
+										updatedTags,
+									);
+									await updateTags();
+
+									telemetry.track(
+										TELEMETRY_EVENT_NAME.NOTE_TAG_DETACHED,
+										{
+											count: Math.max(0, attachedTags.length - 1),
+										},
+									);
 								}}
-							>
-								<FaXmark
-									onClick={async (evt) => {
-										evt.stopPropagation();
-										console.warn(
-											'Remove attached tag',
-											tag.resolvedName,
-										);
-
-										const updatedTags = attachedTags
-											.filter(({ id }) => id !== tag.id)
-											.map(({ id }) => id);
-										await tagsRegistry.setAttachedTags(
-											noteId,
-											updatedTags,
-										);
-										await updateTags();
-
-										telemetry.track(
-											TELEMETRY_EVENT_NAME.NOTE_TAG_DETACHED,
-											{
-												count: Math.max(
-													0,
-													attachedTags.length - 1,
-												),
-											},
-										);
-									}}
-								/>
-							</Box>
-						)}
+							/>
+						</Box>
 					</Tag>
 				))}
 
-				{!isReadOnly && (
-					<SuggestedTagsList
-						tags={notAttachedTags}
-						selectedTag={attachTagName ?? undefined}
-						inputValue={tagSearch}
-						onInputChange={setTagSearch}
-						sx={{
-							display: 'inline',
-							w: 'auto',
-							maxW: '150px',
-						}}
-						inputProps={{
-							variant: 'ghost',
-							placeholder: 'Add some tags...',
-							// size: 'sm',
-							size: 'xs',
-						}}
-						hasTagName={(tagName) =>
-							tags.some(({ resolvedName }) => resolvedName === tagName)
-						}
-						onPick={async (tag) => {
-							setAttachTagName(tag);
-							await tagsRegistry.setAttachedTags(noteId, [
-								...attachedTags.map(({ id }) => id),
-								tag.id,
-							]);
-							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
-								tagsCount: attachedTags.length + 1,
-								context: 'tags suggest list',
-							});
+				<SuggestedTagsList
+					tags={notAttachedTags}
+					selectedTag={attachTagName ?? undefined}
+					inputValue={tagSearch}
+					onInputChange={setTagSearch}
+					sx={{
+						display: 'inline',
+						w: 'auto',
+						maxW: '150px',
+					}}
+					inputProps={{
+						variant: 'ghost',
+						placeholder: 'Add some tags...',
+						// size: 'sm',
+						size: 'xs',
+					}}
+					hasTagName={(tagName) =>
+						tags.some(({ resolvedName }) => resolvedName === tagName)
+					}
+					onPick={async (tag) => {
+						setAttachTagName(tag);
+						await tagsRegistry.setAttachedTags(noteId, [
+							...attachedTags.map(({ id }) => id),
+							tag.id,
+						]);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+							tagsCount: attachedTags.length + 1,
+							context: 'tags suggest list',
+						});
 
-							setTagSearch('');
+						setTagSearch('');
 
-							await updateTags();
-						}}
-						onCreateTag={async (tagName) => {
-							setAttachTagName(null);
+						await updateTags();
+					}}
+					onCreateTag={async (tagName) => {
+						setAttachTagName(null);
 
-							let shortenedTagName = tagName;
-							let parentTagId: string | null = null;
-							const tagSegments = tagName.split('/');
-							for (
-								let lastSegmentIndex = tagSegments.length - 1;
-								lastSegmentIndex > 0;
-								lastSegmentIndex--
-							) {
-								const resolvedParentTag = tagSegments
-									.slice(0, lastSegmentIndex)
-									.join('/');
-								const foundTag = tags.find(
-									({ resolvedName }) =>
-										resolvedName === resolvedParentTag,
-								);
-								if (foundTag) {
-									parentTagId = foundTag.id;
-									shortenedTagName = tagSegments
-										.slice(lastSegmentIndex)
-										.join('/');
-									break;
-								}
-							}
-
-							const tagId = await tagsRegistry.add(
-								shortenedTagName,
-								parentTagId,
+						let shortenedTagName = tagName;
+						let parentTagId: string | null = null;
+						const tagSegments = tagName.split('/');
+						for (
+							let lastSegmentIndex = tagSegments.length - 1;
+							lastSegmentIndex > 0;
+							lastSegmentIndex--
+						) {
+							const resolvedParentTag = tagSegments
+								.slice(0, lastSegmentIndex)
+								.join('/');
+							const foundTag = tags.find(
+								({ resolvedName }) => resolvedName === resolvedParentTag,
 							);
-							telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
-								scope: 'note editor',
-								hasParent: parentTagId === null ? 'no' : 'yes',
-							});
+							if (foundTag) {
+								parentTagId = foundTag.id;
+								shortenedTagName = tagSegments
+									.slice(lastSegmentIndex)
+									.join('/');
+								break;
+							}
+						}
 
-							await tagsRegistry.setAttachedTags(noteId, [
-								...attachedTags.map(({ id }) => id),
-								tagId,
-							]);
-							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
-								tagsCount: attachedTags.length + 1,
-								context: 'create tag option',
-							});
+						const tagId = await tagsRegistry.add(
+							shortenedTagName,
+							parentTagId,
+						);
+						telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
+							scope: 'note editor',
+							hasParent: parentTagId === null ? 'no' : 'yes',
+						});
 
-							await updateTags();
-						}}
-					/>
-				)}
+						await tagsRegistry.setAttachedTags(noteId, [
+							...attachedTags.map(({ id }) => id),
+							tagId,
+						]);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+							tagsCount: attachedTags.length + 1,
+							context: 'create tag option',
+						});
+
+						await updateTags();
+					}}
+				/>
 			</HStack>
 
 			{versionPreview && (
@@ -406,7 +391,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 			<NoteEditor
 				text={versionPreview ? versionPreview.text : text}
-				setText={isReadOnly || versionPreview ? () => {} : setText}
+				setText={(noteText) => {
+					if (isReadOnly || versionPreview) return;
+					setText(noteText);
+				}}
 				isReadOnly={isReadOnly || Boolean(versionPreview)}
 			/>
 
