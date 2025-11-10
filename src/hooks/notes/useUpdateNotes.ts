@@ -55,7 +55,7 @@ export const useUpdateNotes = () => {
 						text: searchText,
 				  }
 				: undefined,
-			meta: { isDeleted: notesView === NOTES_VIEW.BIN ? true : false },
+			meta: { isDeleted: notesView === NOTES_VIEW.BIN },
 		});
 
 		if (isRequestCanceled()) return;

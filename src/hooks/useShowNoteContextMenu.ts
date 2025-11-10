@@ -1,15 +1,14 @@
 import { useCallback } from 'react';
 import { ContextMenu } from '@electron/requests/contextMenu';
+import { NoteActions } from '@features/MainScreen/NotesList/NoteContextMenu';
 import { ElectronContextMenu } from '@features/MainScreen/NotesList/NoteContextMenu/ElectronContextMenu';
 
 import { ContextMenuCallback } from './useContextMenu';
 
-export const useShowContextMenu = <T extends string>(
-	callback: ContextMenuCallback<T>,
-) => {
+export const useShowNoteContextMenu = (callback: ContextMenuCallback<NoteActions>) => {
 	return useCallback(
 		(id: string, point: { x: number; y: number }, menu: ContextMenu) => {
-			const contextMenu = new ElectronContextMenu<T>(menu);
+			const contextMenu = new ElectronContextMenu<NoteActions>(menu);
 
 			contextMenu.open(point);
 

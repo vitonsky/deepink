@@ -9,7 +9,7 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
-import { useShowContextMenu } from '@hooks/useShowContextMenu';
+import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
@@ -182,7 +182,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 		],
 	);
 
-	const showMenu = useShowContextMenu(noteContextMenuCallback);
+	const showMenu = useShowNoteContextMenu(noteContextMenuCallback);
 
 	return useCallback(
 		(note: INote, point: { x: number; y: number }) => {
