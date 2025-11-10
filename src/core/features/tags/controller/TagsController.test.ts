@@ -2,6 +2,7 @@ import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 
 import { TagsController } from './TagsController';
+import { TAG_ERROR_CODE, TagError } from './validateTagName';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -41,10 +42,10 @@ describe('manage tags', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await expect(tags.add('///foo', null)).rejects.toThrowError();
-		await expect(tags.add('/foo/bar', null)).rejects.toThrowError();
-		await expect(tags.add('/foo//bar', null)).rejects.toThrowError();
-		await expect(tags.add('foo/bar/', null)).rejects.toThrowError();
+		await expect(tags.add('///foo', null)).rejects.toThrowError(TagError);
+		await expect(tags.add('/foo/bar', null)).rejects.toThrowError(TagError);
+		await expect(tags.add('foo/bar/', null)).rejects.toThrowError(TagError);
+		await expect(tags.add('foo//bar', null)).rejects.toThrowError(TagError);
 	});
 
 	test('prevent duplicate tags', async () => {
@@ -52,14 +53,18 @@ describe('manage tags', () => {
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await expect(tags.add('foo', null)).resolves.toBeDefined();
-		await expect(tags.add('foo', null)).rejects.toThrowError();
+		await expect(tags.add('foo', null)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.NOT_UNIQUE,
+		});
 
 		const tagsList = await tags.getTags();
 		const parentTagsId = tagsList[0].id;
 
 		// duplicate nested tags
 		await expect(tags.add('baz', parentTagsId)).resolves.toBeDefined();
-		await expect(tags.add('baz', parentTagsId)).rejects.toThrowError();
+		await expect(tags.add('baz', parentTagsId)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.NOT_UNIQUE,
+		});
 	});
 
 	test('update tags', async () => {

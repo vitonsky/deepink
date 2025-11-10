@@ -1,10 +1,10 @@
 import { IResolvedTag } from '..';
 
 export enum TAG_ERROR_CODE {
-	TAG_NOT_UNIQUE = 'TAG_NOT_UNIQUE',
-	TAG_EMPTY = 'TAG_EMPTY',
-	TAG_BOUNDARY_SLASH = 'TAG_INVALID_BOUNDARY_SLASH',
-	TAG_MULTIPLE_SLASHES = 'TAG_MULTIPLE_CONSECUTIVE_SLASHES',
+	NOT_UNIQUE = 'notUnique',
+	EMPTY = 'empty',
+	BOUNDARY_SLASH = 'invalidBoundarySlash',
+	MULTIPLE_SLASHES = 'multipleConsecutiveSlashes',
 }
 
 export class TagError extends Error {
@@ -20,18 +20,18 @@ export const validateTagName = (
 	tagsList: IResolvedTag[],
 ) => {
 	if (name.length === 0) {
-		throw new TagError('Tag name must not be empty', TAG_ERROR_CODE.TAG_EMPTY);
+		throw new TagError('Tag name must not be empty', TAG_ERROR_CODE.EMPTY);
 	}
 	if (name.startsWith('/') || name.endsWith('/')) {
 		throw new TagError(
 			'Tag name must not start or end with a slash "/"',
-			TAG_ERROR_CODE.TAG_BOUNDARY_SLASH,
+			TAG_ERROR_CODE.BOUNDARY_SLASH,
 		);
 	}
 	if (name.includes('//')) {
 		throw new TagError(
 			'Tag name must not contain consecutive slashes "//"',
-			TAG_ERROR_CODE.TAG_MULTIPLE_SLASHES,
+			TAG_ERROR_CODE.MULTIPLE_SLASHES,
 		);
 	}
 
@@ -45,7 +45,7 @@ export const validateTagName = (
 	if (duplicate) {
 		throw new TagError(
 			`Tag "${fullName}" already exists under the specified parent`,
-			TAG_ERROR_CODE.TAG_NOT_UNIQUE,
+			TAG_ERROR_CODE.NOT_UNIQUE,
 		);
 	}
 };
