@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { dumpFilesStorage } from '@core/features/files/utils/dumpFilesStorage';
 import { NoteId } from '@core/features/notes';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
 	ExportProgress,
 	NoteExportData,
@@ -12,6 +13,7 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { escapeFileName, getResolvedPath } from '@utils/fs/paths';
 import { uniqueName } from '@utils/fs/uniqueName';
 
@@ -57,6 +59,8 @@ export const configureNoteNameGetter = (isSingleNoteMode = false) =>
 
 // TODO: notify for successful export
 export const useNotesExport = () => {
+	const telemetry = useTelemetryTracker();
+
 	const [status, setStatus] = useState<{
 		status: 'noteExport' | 'notesExport';
 		progress?: {
@@ -77,6 +81,8 @@ export const useNotesExport = () => {
 				);
 				return;
 			}
+
+			const startTime = Date.now();
 
 			setStatus({
 				status: 'notesExport',
@@ -110,8 +116,14 @@ export const useNotesExport = () => {
 
 			// Save
 			await dumpFilesStorage(files, { name });
+
+			await telemetry.track(TELEMETRY_EVENT_NAME.EXPORT_NOTES, {
+				mode: 'all notes',
+				filesCount: (await files.list()).length,
+				processingTime: Math.floor(Date.now() - startTime),
+			});
 		},
-		[filesRegistry, notesRegistry, status, tagsRegistry],
+		[filesRegistry, notesRegistry, status, tagsRegistry, telemetry],
 	);
 
 	const exportNote = useCallback(
@@ -122,6 +134,8 @@ export const useNotesExport = () => {
 				);
 				return;
 			}
+
+			const startTime = Date.now();
 
 			setStatus({
 				status: 'noteExport',
@@ -144,8 +158,14 @@ export const useNotesExport = () => {
 
 			// Save
 			await dumpFilesStorage(files, { name });
+
+			await telemetry.track(TELEMETRY_EVENT_NAME.EXPORT_NOTES, {
+				mode: 'single note',
+				filesCount: (await files.list()).length,
+				processingTime: Math.floor(Date.now() - startTime),
+			});
 		},
-		[filesRegistry, notesRegistry, status, tagsRegistry],
+		[filesRegistry, notesRegistry, status, tagsRegistry, telemetry],
 	);
 
 	return {

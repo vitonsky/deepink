@@ -1,15 +1,16 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import url from 'url';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { AppContext } from '@electron/main/main';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
 import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
+import { debounce } from '@utils/debounce/debounce';
 import { createWatcher } from '@utils/effector/watcher';
-
-import { AppTray } from './components/AppTray';
 
 export type MainWindowAPI = {
 	quit: () => void;
@@ -23,7 +24,9 @@ type WindowState = {
 
 const quitRequested = createEvent();
 
-export const openMainWindow = async (): Promise<MainWindowAPI> => {
+export const openMainWindow = async ({
+	telemetry,
+}: AppContext): Promise<MainWindowAPI> => {
 	// Requests handlers
 	serveFiles();
 	enableStorage();
@@ -39,6 +42,7 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 	$windowState.on(quitRequested, (state) => ({ ...state, isForcedClosing: true }));
 
 	// Open window
+	// TODO: remember size
 	const win = new BrowserWindow({
 		width: 1300,
 		height: 800,
@@ -56,10 +60,6 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 		},
 	});
 
-	if (isDevMode()) {
-		win.webContents.openDevTools();
-	}
-
 	// Load page
 	const start = performance.now();
 	await win.loadURL(
@@ -69,7 +69,22 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 			slashes: true,
 		}),
 	);
-	console.log(performance.measure('page loaded', { start }));
+
+	const pageLoadingMeasure = performance.measure('page loaded', { start });
+	console.log(pageLoadingMeasure);
+	telemetry.track(TELEMETRY_EVENT_NAME.MAIN_WINDOW_LOADED, {
+		duration: Math.floor(pageLoadingMeasure.duration),
+	});
+
+	if (isDevMode()) {
+		win.webContents.openDevTools();
+	}
+	win.webContents.on('devtools-opened', () => {
+		telemetry.track(TELEMETRY_EVENT_NAME.DEV_TOOLS_TOGGLED, { state: 'opened' });
+	});
+	win.webContents.on('devtools-closed', () => {
+		telemetry.track(TELEMETRY_EVENT_NAME.DEV_TOOLS_TOGGLED, { state: 'closed' });
+	});
 
 	// Hide instead of close
 	const $shouldBeClosed = $windowState.map(
@@ -104,28 +119,32 @@ export const openMainWindow = async (): Promise<MainWindowAPI> => {
 		}
 	});
 
-	// Tray
-	const trayApi = {
+	const onTrackResize = () => {
+		const [width, height] = win.getSize();
+		return telemetry.track(TELEMETRY_EVENT_NAME.MAIN_WINDOW_RESIZE, {
+			width,
+			height,
+		});
+	};
+
+	// We throttle to avoid intermediate changes, since
+	// `resized` event works not on all platforms
+	win.on('resize', debounce(onTrackResize, { wait: 5000 }));
+
+	return {
 		quit: () => {
+			if (win.isDestroyed()) return;
+
 			quitRequested();
 			win.close();
 		},
 		openWindow: () => {
+			if (win.isDestroyed()) return;
+
 			if (win.isMinimized()) win.restore();
 
 			win.show();
 			win.focus();
 		},
 	};
-
-	const appTray = new AppTray(trayApi);
-	appTray.enable();
-	appTray.update(
-		Menu.buildFromTemplate([
-			{ label: `Open notes`, click: trayApi.openWindow },
-			{ label: 'Quit', click: trayApi.quit },
-		]),
-	);
-
-	return trayApi;
 };

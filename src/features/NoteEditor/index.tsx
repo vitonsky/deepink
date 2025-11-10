@@ -17,6 +17,7 @@ import { INote, INoteContent } from '@core/features/notes';
 import { NoteMeta } from '@core/features/notes/controller';
 import { NoteVersion } from '@core/features/notes/history/NoteVersions';
 import { IResolvedTag } from '@core/features/tags';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
 	useAttachmentsController,
 	useEventBus,
@@ -24,6 +25,7 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -49,6 +51,7 @@ export type NoteEditorProps = {
  * TODO: create note context to interact with note from deep components
  */
 export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta }) => {
+	const telemetry = useTelemetryTracker();
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
@@ -180,6 +183,14 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 		setSidePanel((state) => (state === tabName ? null : tabName));
 	}, []);
 
+	useEffect(() => {
+		if (sidePanel) {
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_SHOWN, {
+				tab: sidePanel,
+			});
+		}
+	}, [sidePanel, telemetry]);
+
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
 	return (
@@ -256,6 +267,13 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 										updatedTags,
 									);
 									await updateTags();
+
+									telemetry.track(
+										TELEMETRY_EVENT_NAME.NOTE_TAG_DETACHED,
+										{
+											count: Math.max(0, attachedTags.length - 1),
+										},
+									);
 								}}
 							/>
 						</Box>
@@ -287,6 +305,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							...attachedTags.map(({ id }) => id),
 							tag.id,
 						]);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+							tagsCount: attachedTags.length + 1,
+							context: 'tags suggest list',
+						});
 
 						setTagSearch('');
 
@@ -322,10 +344,19 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							shortenedTagName,
 							parentTagId,
 						);
+						telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
+							scope: 'note editor',
+							hasParent: parentTagId === null ? 'no' : 'yes',
+						});
+
 						await tagsRegistry.setAttachedTags(noteId, [
 							...attachedTags.map(({ id }) => id),
 							tagId,
 						]);
+						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+							tagsCount: attachedTags.length + 1,
+							context: 'create tag option',
+						});
 
 						await updateTags();
 					}}

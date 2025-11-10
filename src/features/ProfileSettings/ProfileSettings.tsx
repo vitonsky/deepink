@@ -5,9 +5,13 @@ import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 
 export const ProfileSettings = () => {
+	const telemetry = useTelemetryTracker();
+
 	const [isOpened, setIsOpened] = useState(false);
 
 	const { controls } = useStatusBarManager();
@@ -18,7 +22,12 @@ export const ProfileSettings = () => {
 				visible: true,
 				title: 'Preferences',
 				icon: <FaWrench />,
-				onClick: () => setIsOpened(true),
+				onClick: () => {
+					setIsOpened(true);
+					telemetry.track(TELEMETRY_EVENT_NAME.SETTINGS_CLICK, {
+						scope: 'global settings',
+					});
+				},
 			},
 			{
 				placement: 'start',
@@ -29,7 +38,7 @@ export const ProfileSettings = () => {
 		return () => {
 			controls.unregister('preferences');
 		};
-	}, [controls]);
+	}, [controls, telemetry]);
 
 	const onClose = useCallback(() => setIsOpened(false), []);
 

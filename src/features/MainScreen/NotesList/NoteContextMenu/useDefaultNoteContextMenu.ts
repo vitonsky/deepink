@@ -2,11 +2,13 @@ import { useCallback } from 'react';
 import { formatNoteLink } from '@core/features/links';
 import { NoteId } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
@@ -55,6 +57,8 @@ export const useDefaultNoteContextMenu = ({
 	updateNotes,
 	notesRegistry,
 }: DefaultContextMenuOptions) => {
+	const telemetry = useTelemetryTracker();
+
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
@@ -64,6 +68,10 @@ export const useDefaultNoteContextMenu = ({
 
 	const noteContextMenuCallback: ContextMenuCallback<NoteActions> = useCallback(
 		async ({ id, action }) => {
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CONTEXT_MENU_CLICK, {
+				action,
+			});
+
 			switch (action) {
 				case NoteActions.DELETE: {
 					const isConfirmed = confirm('Are you sure to delete note?');
@@ -75,6 +83,8 @@ export const useDefaultNoteContextMenu = ({
 					await tagsRegistry.setAttachedTags(id, []);
 
 					updateNotes();
+
+					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED);
 					break;
 				}
 				case NoteActions.DUPLICATE: {
@@ -137,6 +147,7 @@ export const useDefaultNoteContextMenu = ({
 			notesExport,
 			notesRegistry,
 			tagsRegistry,
+			telemetry,
 			updateNotes,
 			workspaceData?.name,
 		],

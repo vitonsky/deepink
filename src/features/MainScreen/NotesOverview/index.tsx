@@ -12,7 +12,9 @@ import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -27,6 +29,8 @@ import { TagsList } from './TagsList';
 export type NotesOverviewProps = {};
 
 export const NotesOverview: FC<NotesOverviewProps> = () => {
+	const telemetry = useTelemetryTracker();
+
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
@@ -61,6 +65,10 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 						await tagsRegistry.update({ id: data.id, ...data });
 						setEditedTag(null);
+
+						telemetry.track(TELEMETRY_EVENT_NAME.TAG_EDITED, {
+							hasParent: data.parent === null ? 'no' : 'yes',
+						});
 					}}
 					onCancel={() => {
 						setEditedTag(null);
@@ -79,13 +87,18 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					console.warn('Create tag', data);
 					await tagsRegistry.add(data.name, data.parent);
 					setIsAddTagPopupOpened(false);
+
+					telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
+						scope: 'side panel',
+						hasParent: data.parent === null ? 'no' : 'yes',
+					});
 				}}
 				onCancel={() => {
 					setIsAddTagPopupOpened(false);
 				}}
 			/>
 		);
-	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry]);
+	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry, telemetry]);
 
 	// TODO: show spinner while loading tags
 	return (
@@ -218,6 +231,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								if (!isConfirmed) return;
 
 								await tagsRegistry.delete(id);
+
+								telemetry.track(TELEMETRY_EVENT_NAME.TAG_DELETED);
 							},
 							onEdit(id) {
 								const tag = tags.find((tag) => id === tag.id);

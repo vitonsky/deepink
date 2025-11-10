@@ -1,11 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import z from 'zod';
+import { z } from 'zod';
 // eslint-disable-next-line spellcheck/spell-checker
 import { ChakraProvider } from '@chakra-ui/react';
 import { theme } from '@components/theme';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
+import { TelemetryContext } from '@features/telemetry';
 import { selectSettings, settingsApi } from '@state/redux/settings/settings';
 import { store } from '@state/redux/store';
 
@@ -46,9 +48,11 @@ store.subscribe(() => {
 
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
-	<Provider store={store}>
-		<ChakraProvider theme={theme}>
-			<App />
-		</ChakraProvider>
-	</Provider>,
+	<TelemetryContext value={telemetry}>
+		<Provider store={store}>
+			<ChakraProvider theme={theme}>
+				<App />
+			</ChakraProvider>
+		</Provider>
+	</TelemetryContext>,
 );

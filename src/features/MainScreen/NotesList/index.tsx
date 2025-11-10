@@ -2,7 +2,9 @@ import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
@@ -20,6 +22,8 @@ import { useDefaultNoteContextMenu } from './NoteContextMenu/useDefaultNoteConte
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
+	const telemetry = useTelemetryTracker();
+
 	const notesRegistry = useNotesRegistry();
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
@@ -137,6 +141,12 @@ export const NotesList: FC<NotesListProps> = () => {
 									}}
 									onClick={() => {
 										noteActions.click(note.id);
+										telemetry.track(
+											TELEMETRY_EVENT_NAME.NOTE_OPENED,
+											{
+												context: 'notes list',
+											},
+										);
 									}}
 								/>
 							);

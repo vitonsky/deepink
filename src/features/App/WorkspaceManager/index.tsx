@@ -2,7 +2,9 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
+import { useTelemetryTracker } from '@features/telemetry';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -36,6 +38,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	currentProfile,
 	onChooseProfile,
 }) => {
+	const telemetry = useTelemetryTracker();
+
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
 			// Profiles with no password
@@ -144,6 +148,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
 									}
+
+									telemetry.track(
+										TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
+									);
 								}}
 							>
 								<FaUser />
@@ -160,6 +168,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onOpenProfile,
 		profilesManager,
 		screenName,
+		telemetry,
 	]);
 
 	return (

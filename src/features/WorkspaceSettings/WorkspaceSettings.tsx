@@ -21,6 +21,7 @@ import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { ModalScreen } from '@components/ModalScreen/ModalScreen';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
 import {
@@ -35,6 +36,7 @@ import {
 	WorkspaceCreatePopup,
 	workspacePropsValidator,
 } from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDirectoryPicker } from '@hooks/files/useDirectoryPicker';
@@ -58,6 +60,8 @@ export interface WorkspaceSettingsProps {
 }
 
 export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
+	const telemetry = useTelemetryTracker();
+
 	const {
 		profile: { db },
 	} = useProfileControls();
@@ -130,6 +134,10 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		const isConfirmed = confirm(
 			`You are about to delete workspace "${workspaceInfo.name}". Are you sure you want to do it?\n\nIf you will continue, all data related to this workspace will be deleted, including notes, tags and files.`,
 		);
+
+		telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_DELETE_CLICK, {
+			confirmed: isConfirmed ? 'yes' : 'no',
+		});
 		if (!isConfirmed) return;
 
 		// TODO: emit event and react on it
@@ -172,6 +180,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		filesController,
 		notes,
 		tags,
+		telemetry,
 		workspaceInfo.name,
 		workspaces,
 		workspacesManager,

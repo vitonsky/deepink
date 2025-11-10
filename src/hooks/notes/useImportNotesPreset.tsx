@@ -3,6 +3,8 @@ import { FlateErrorCode } from 'fflate';
 import { FilesFS } from '@core/features/files/FilesFS';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { ZipFS } from '@core/features/files/ZipFS';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useTelemetryTracker } from '@features/telemetry';
 import { joinPathSegments } from '@utils/fs/paths';
 
 import { useNotesImport } from './useNotesImport';
@@ -15,10 +17,14 @@ export const importOptions = [
 export type ImportTypes = (typeof importOptions)[number]['type'];
 
 export const useImportNotesPreset = () => {
+	const telemetry = useTelemetryTracker();
+
 	const notesImport = useNotesImport();
 
 	const importFiles = useCallback(
 		async (type: ImportTypes, files: File[]) => {
+			const startTime = Date.now();
+
 			// NotesImporterOptions
 			switch (type) {
 				case 'zip': {
@@ -88,8 +94,14 @@ export const useImportNotesPreset = () => {
 					break;
 				}
 			}
+
+			await telemetry.track(TELEMETRY_EVENT_NAME.IMPORT_NOTES, {
+				type,
+				filesCount: files.length,
+				processingTime: Math.floor(Date.now() - startTime),
+			});
 		},
-		[notesImport],
+		[notesImport, telemetry],
 	);
 
 	return {

@@ -3,6 +3,8 @@ import { FaFeather } from 'react-icons/fa6';
 import { Divider, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { Popper } from '@components/Popper';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectOpenedNotes } from '@state/redux/profiles/profiles';
@@ -21,6 +23,8 @@ export const editorModes = {
 } satisfies Record<EditorMode, string>;
 
 export const EditorModePicker = () => {
+	const telemetry = useTelemetryTracker();
+
 	const { controls } = useStatusBarManager();
 
 	const dispatch = useAppDispatch();
@@ -87,6 +91,10 @@ export const EditorModePicker = () => {
 					onPick={(id) => {
 						dispatch(settingsApi.setEditorMode(id as EditorMode));
 						onClose();
+
+						telemetry.track(TELEMETRY_EVENT_NAME.EDITOR_MODE_CHANGED, {
+							editorMode: id,
+						});
 					}}
 				/>
 			</VStack>
