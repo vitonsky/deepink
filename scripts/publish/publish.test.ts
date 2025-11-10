@@ -81,8 +81,8 @@ test('Publish script uploads all found artifacts as a new release', async () => 
 
 	expect(Octokit).toBeCalledWith({ auth: 'FAKE_TOKEN' });
 	[
+		'deepink-linux-x64-0.0.1.zip',
 		'deepink-0.0.0.deb',
-		'deepink-0.0.0.zip',
 		'Deepink-0.0.0.AppImage',
 		'Deepink-0.0.0.msi',
 		'Deepink-0.0.0.dmg',

@@ -16,7 +16,11 @@ const EXT_WHITELIST = new Set(['.appimage', '.msi', '.dmg', '.zip', '.deb', '.rp
 function getArtifactName(filename: string, version: string) {
 	const appName = 'Deepink';
 	const extension = path.extname(filename);
-	const artifactName = `${appName}-${version.replace(/^v/, '')}${extension}`;
+
+	const artifactName =
+		extension === '.zip'
+			? path.basename(filename)
+			: `${appName}-${version.replace(/^v/, '')}${extension}`;
 
 	const shouldLowercaseName = ['.zip', '.deb', '.rpm'].includes(extension);
 	return shouldLowercaseName ? artifactName.toLowerCase() : artifactName;
