@@ -46,6 +46,8 @@ describe('manage tags', () => {
 		await expect(tags.add('/foo/bar', null)).rejects.toThrowError(TagError);
 		await expect(tags.add('foo/bar/', null)).rejects.toThrowError(TagError);
 		await expect(tags.add('foo//bar', null)).rejects.toThrowError(TagError);
+
+		await expect(tags.getTags()).resolves.toEqual([]);
 	});
 
 	test('prevent duplicate tags', async () => {
@@ -60,11 +62,27 @@ describe('manage tags', () => {
 		const tagsList = await tags.getTags();
 		const parentTagsId = tagsList[0].id;
 
-		// duplicate nested tags
 		await expect(tags.add('baz', parentTagsId)).resolves.toBeDefined();
+
+		// duplicate nested tags
 		await expect(tags.add('baz', parentTagsId)).rejects.toMatchObject({
 			code: TAG_ERROR_CODE.NOT_UNIQUE,
 		});
+
+		await expect(tags.getTags()).resolves.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					name: 'foo',
+					parent: null,
+					resolvedName: 'foo',
+				}),
+				expect.objectContaining({
+					name: 'baz',
+					parent: expect.any(String),
+					resolvedName: 'foo/baz',
+				}),
+			]),
+		);
 	});
 
 	test('update tags', async () => {
