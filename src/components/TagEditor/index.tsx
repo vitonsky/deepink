@@ -31,7 +31,7 @@ export type ITagEditorProps = {
 	 */
 	tags: IResolvedTag[];
 	parentTag?: IResolvedTag;
-	onSave: (tagData: TagEditorData) => void;
+	onSave: (tagData: TagEditorData) => Promise<void>;
 	onCancel: () => void;
 	editedTag?: TagEditorData;
 };
