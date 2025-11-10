@@ -118,6 +118,7 @@ export const useNotesExport = () => {
 			await dumpFilesStorage(files, { name });
 
 			await telemetry.track(TELEMETRY_EVENT_NAME.EXPORT_NOTES, {
+				mode: 'all notes',
 				filesCount: (await files.list()).length,
 				processingTime: Math.floor(Date.now() - startTime),
 			});
@@ -133,6 +134,8 @@ export const useNotesExport = () => {
 				);
 				return;
 			}
+
+			const startTime = Date.now();
 
 			setStatus({
 				status: 'noteExport',
@@ -155,8 +158,14 @@ export const useNotesExport = () => {
 
 			// Save
 			await dumpFilesStorage(files, { name });
+
+			await telemetry.track(TELEMETRY_EVENT_NAME.EXPORT_NOTES, {
+				mode: 'single note',
+				filesCount: (await files.list()).length,
+				processingTime: Math.floor(Date.now() - startTime),
+			});
 		},
-		[filesRegistry, notesRegistry, status, tagsRegistry],
+		[filesRegistry, notesRegistry, status, tagsRegistry, telemetry],
 	);
 
 	return {

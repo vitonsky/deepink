@@ -10,6 +10,7 @@ import { ZipFS } from '@core/features/files/ZipFS';
 import { formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { NoteExportData } from '@core/storage/interop/export';
 import {
@@ -80,12 +81,13 @@ describe('Export notes', async () => {
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
 		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
+		const trackMock = vi.fn();
 		const { result } = renderHook(useNotesExport, {
 			wrapper(props) {
 				return (
 					<TelemetryContext
 						value={{
-							track: vi.fn(),
+							track: trackMock,
 							handleQueue: vi.fn(),
 							getState: vi.fn(),
 						}}
@@ -124,6 +126,12 @@ describe('Export notes', async () => {
 			expect.stringMatching('/_resources/[\\w\\d-]+-attachment.txt'),
 			'/Note_with_attachment.md',
 		]);
+
+		expect(trackMock).toBeCalledWith(TELEMETRY_EVENT_NAME.EXPORT_NOTES, {
+			mode: 'all notes',
+			filesCount: 4,
+			processingTime: expect.any(Number),
+		});
 	});
 
 	test('Export single note via useNotesExport', async () => {
@@ -132,12 +140,13 @@ describe('Export notes', async () => {
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
 		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
+		const trackMock = vi.fn();
 		const { result } = renderHook(useNotesExport, {
 			wrapper(props) {
 				return (
 					<TelemetryContext
 						value={{
-							track: vi.fn(),
+							track: trackMock,
 							handleQueue: vi.fn(),
 							getState: vi.fn(),
 						}}
@@ -184,6 +193,12 @@ describe('Export notes', async () => {
 			expect.stringMatching('/_resources/[\\w\\d-]+-attachment.txt'),
 			'/Note_with_attachment.md',
 		]);
+
+		expect(trackMock).toBeCalledWith(TELEMETRY_EVENT_NAME.EXPORT_NOTES, {
+			mode: 'single note',
+			filesCount: 2,
+			processingTime: expect.any(Number),
+		});
 	});
 });
 
