@@ -43,17 +43,17 @@ const buildNoteMenu = (note: INote): ContextMenu => {
 		{ type: 'separator' },
 	];
 
-	return note.isDeleted
-		? [
-				{ id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' },
-				...commonActions,
-				{ id: NoteActions.DELETE_PERMANENTLY, label: 'Delete permanently' },
-		  ]
-		: [
-				{ id: NoteActions.DUPLICATE, label: 'Duplicate' },
-				...commonActions,
-				{ id: NoteActions.DELETE_TO_BIN, label: 'Delete to bin' },
-		  ];
+	return [
+		note.isDeleted
+			? { id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' }
+			: { id: NoteActions.DUPLICATE, label: 'Duplicate' },
+
+		...commonActions,
+
+		note.isDeleted
+			? { id: NoteActions.DELETE_PERMANENTLY, label: 'Delete permanently' }
+			: { id: NoteActions.DELETE_TO_BIN, label: 'Delete to bin' },
+	];
 };
 
 /**
@@ -77,7 +77,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
 					const isConfirmed = confirm(
-						`Are you sure you want to move the note to the bin?`,
+						`Really want to move this note to the bin`,
 					);
 					if (!isConfirmed) return;
 
@@ -92,7 +92,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
 					const isConfirmed = confirm(
-						`Are you sure you want to delete the note permanently?`,
+						`Really want to permanently delete this note?`,
 					);
 					if (!isConfirmed) return;
 
@@ -107,11 +107,6 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				},
 
 				[NoteActions.RESTORE_FROM_BIN]: async (id: string) => {
-					const isConfirmed = confirm(
-						'Are you sure you want to restore the note',
-					);
-					if (!isConfirmed) return;
-
 					await notes.updateMeta([id], { isDeleted: false });
 					const updatedNote = await notes.getById(id);
 					if (updatedNote) noteUpdated(updatedNote);
