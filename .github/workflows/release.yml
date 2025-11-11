@@ -1,4 +1,4 @@
-name: Release tag
+name: Release version
 
 permissions:
   # required to create releases / upload assets
@@ -6,8 +6,6 @@ permissions:
 
 on:
   push:
-    branches:
-      - master
     tags:
       - "v*.*.*"
   workflow_dispatch:
@@ -17,6 +15,8 @@ jobs:
     # build for macOS, Windows and Linux
     strategy:
       matrix:
+        # TODO: add `macos-15-intel` for production releases
+        # See docs https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#standard-github-hosted-runners-for-public-repositories
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
@@ -64,37 +64,8 @@ jobs:
       - name: Build app
         run: make package artifacts
 
-      - name: List artifacts (debug)
-        if: runner.os == 'macOS'
-        run: |
-          echo "Artifacts on runner (${RUNNER_OS}):"
-          ls -R out
-        shell: bash
-
-      - name: Debug - List dist directory
-        if: runner.os == 'Windows'
-        continue-on-error: true
-        shell: powershell
-        run: |
-          Write-Host "===== Listing dist directory recursively ====="
-          if (Test-Path "dist") {
-            Get-ChildItem -Path "dist" -Recurse | ForEach-Object {
-              $relativePath = $_.FullName.Replace((Get-Location).Path, "").TrimStart("\")
-              $size = if ($_.PSIsContainer) { "<DIR>" } else { "{0:N0} bytes" -f $_.Length }
-              Write-Host "$relativePath - $size"
-            }
-          } else {
-            Write-Host "dist directory does not exist!"
-          }
-
-          Write-Host "`n===== Listing root directory ====="
-          Get-ChildItem -Path "." -Name
-
       - name: Upload artifacts to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx tsx ./scripts/publish --dir ./out/make
-
-      - name: Success log
-        run: echo "Build finished for ${{ matrix.os }}"
+          make publish

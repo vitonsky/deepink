@@ -12,3 +12,6 @@ package: clean build
 
 artifacts:
 	npm run make
+
+publish:
+	npx tsx ./scripts/publish --dir ./out/make
