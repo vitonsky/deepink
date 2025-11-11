@@ -1,6 +1,8 @@
 /* eslint-disable spellcheck/spell-checker */
 import 'dotenv/config';
 
+import packageInfo from '../../package.json';
+
 export type Args = {
 	dir: string;
 	tag: string;
@@ -12,7 +14,7 @@ export type Args = {
 
 export function parseArgs(): Args {
 	const argv = process.argv.slice(2);
-	const out: Partial<Args> = { overwrite: false };
+	const out: Partial<Args> = { overwrite: false, tag: `v${packageInfo.version}` };
 	for (let i = 0; i < argv.length; i++) {
 		const a = argv[i];
 		if (a === '--dir') out.dir = argv[++i];
@@ -25,9 +27,10 @@ export function parseArgs(): Args {
 			console.warn(`Unknown arg: ${a}`);
 		}
 	}
+
 	if (!out.dir || !out.tag) {
 		console.error(
-			'Missing required args. Usage: --dir <path> --tag <tag> [--overwrite] [--owner OWNER] [--repo REPO] [--extensions EXTENSIONS_LIST]',
+			'Missing required args. Usage: --dir <path> [--tag <tag>] [--overwrite] [--owner OWNER] [--repo REPO] [--extensions EXTENSIONS_LIST]',
 		);
 		process.exit(1);
 	}

@@ -3,6 +3,10 @@
 import { vol } from 'memfs';
 import path from 'path';
 
+import packageInfo from '../../package.json';
+
+import { parseArgs } from './args';
+
 vi.mock('fs', () => vi.importActual('@mocks/fs'));
 vi.mock('fs/promises', () => vi.importActual('@mocks/fs/promises'));
 
@@ -12,7 +16,7 @@ process.env.GITHUB_REPOSITORY = 'ownerName/repoName';
 process.env.GITHUB_TOKEN = 'FAKE_TOKEN';
 
 const createRelease = vi.fn();
-const getReleaseByTag = vi.fn();
+const getReleaseByTag = vi.fn(async ({ tag }) => ({ data: { id: tag } }));
 const listReleaseAssets = vi.fn(async () => ({
 	data: [],
 }));
@@ -154,4 +158,40 @@ test('Publish script filter artifacts by extensions', async () => {
 			release_id: FAKE_RELEASE_ID,
 		}),
 	);
+});
+
+describe('CLI arguments parser', () => {
+	const originalArgv = process.argv;
+	beforeEach(async () => {
+		process.argv = [...originalArgv];
+	});
+
+	test('Contains all necessary properties after parsing', async () => {
+		process.argv.push('--dir', '/foo/bar');
+
+		expect(parseArgs()).toEqual({
+			dir: '/foo/bar',
+			overwrite: false,
+			tag: 'v' + packageInfo.version,
+		});
+	});
+
+	test('Pass custom tag', async () => {
+		process.argv.push('--dir', '/foo/bar');
+
+		expect(parseArgs(), 'current tag from package.json').toHaveProperty(
+			'tag',
+			'v' + packageInfo.version,
+		);
+
+		process.argv = [...originalArgv, '--dir', '/foo/bar', '--tag', '1.1.1'];
+		expect(parseArgs(), 'current tag from package.json').toHaveProperty(
+			'tag',
+			'1.1.1',
+		);
+	});
+
+	test('Throw error if no arguments provided', async () => {
+		expect(() => parseArgs()).toThrow('process.exit unexpectedly called with "1"');
+	});
 });
