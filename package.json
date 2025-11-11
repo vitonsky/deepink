@@ -3,7 +3,7 @@
 	"productName": "Deepink",
 	"description": "Privacy focused notes",
 	"author": "Robert Vitonsky",
-	"version": "0.0.2-preview.3",
+	"version": "0.0.2-preview.4",
 	"main": "dist/main.js",
 	"homepage": "https://github.com/vitonsky/deepink",
 	"bugs": {
