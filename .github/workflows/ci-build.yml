@@ -94,7 +94,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx tsx ./scripts/publish --dir ./out/make --tag v0.0.0-test --overwrite
+          npx tsx ./scripts/publish --dir ./out/make
 
       - name: Success log
         run: echo "Build finished for ${{ matrix.os }}"
