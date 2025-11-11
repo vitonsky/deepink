@@ -17,6 +17,8 @@ import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { getConfig } from '@utils/os/getConfig';
 import { wait } from '@utils/tests';
 
+import { getAbout } from '../../about';
+
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
 
@@ -218,7 +220,7 @@ export class MainProcess {
 		}
 
 		const appVersions = new AppVersions(
-			app.getVersion(),
+			getAbout().version,
 			new FileController('meta/versions.json', this.userDataFs),
 		);
 		const initVersions = await appVersions.getInfo();

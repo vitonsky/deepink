@@ -7,6 +7,8 @@ import { VersionsSummary } from '@core/features/telemetry/AppVersions';
 import { isDevMode } from '@electron/utils/app';
 import { getUserDataPath } from '@electron/utils/files';
 
+import { getAbout } from '../../about';
+
 function convertBooleanValue(value?: boolean) {
 	return typeof value === 'boolean' ? String(Boolean(value)) : value;
 }
@@ -26,7 +28,7 @@ async function getStaticInfo() {
 	return {
 		// Used to group events per session
 		sessionId: randomUUID(),
-		version: app.getVersion(),
+		version: getAbout().version,
 		userAgent: session.defaultSession.getUserAgent(),
 		developer: convertBooleanValue(isDevMode()),
 
