@@ -149,3 +149,33 @@ profile deepink /home/your_username/apps/deepink.AppImage flags=(unconfined) {
   include if exists <local/deepink>
 }
 ```
+
+# Releases
+
+To release new version we have to
+
+- Update version in `package.json`
+- Create new tag
+- Push changes and tag via `git push --follow-tags`
+
+CI will automatically build app for all platforms, create new release on GitHub and publish artifacts.
+
+## Pre-release
+
+To publish pre release in one command run `npm run release-preview`.
+
+This command will automatically bump version to something like `0.0.2-preview.5` and CI will publish it as pre-release.
+
+We may create as many pre release versions as necessary before public release for such purposes as manual testing on specific target hardware.
+
+Preview versions may be deleted anytime, and they will once public release will be published.
+
+Pre release may have no descriptions.
+
+## Publish new release
+
+To publish new release bump version via `npm version` first. For example `npm version major` for major version or `npm version minor` for a minor version.
+
+Then push changes and tag via `git push --follow-tags`.
+
+Once new release is published, changelog must be added on releases page.
