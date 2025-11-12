@@ -51,7 +51,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	const eventBus = useEventBus();
 	useEffect(() => {
 		return joinCallbacks(
-			eventBus.listen(WorkspaceEvents.NOTES_UPDATED, updateNotes),
+			eventBus.listen(WorkspaceEvents.NOTES_UPDATED, () => updateNotes()),
 			eventBus.listen(WorkspaceEvents.NOTE_UPDATED, (noteId) => {
 				updateNotes();
 				notesRegistry.getById(noteId).then((note) => {

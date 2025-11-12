@@ -17,6 +17,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
+import { useNoteLazyLoad } from './useNoteLazyLoad';
 
 export type NotesListProps = {};
 
@@ -47,6 +48,16 @@ export const NotesList: FC<NotesListProps> = () => {
 	});
 
 	const items = virtualizer.getVirtualItems();
+
+	const loadMoreNotes = useNoteLazyLoad(updateNotes);
+	useEffect(() => {
+		if (!notes.length) return;
+		const lastVisibleIndex = items[items.length - 1].index ?? 0;
+
+		if (lastVisibleIndex >= notes.length - 10) {
+			loadMoreNotes(notes);
+		}
+	}, [items]);
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
