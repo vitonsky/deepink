@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { INote } from '@core/features/notes';
 import { useProfileControls } from '@features/App/Profile';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -27,44 +28,49 @@ export const useUpdateNotes = () => {
 	const search = useWorkspaceSelector(selectSearch);
 
 	const requestContextRef = useRef(0);
-	return useCallback(async () => {
-		const contextId = ++requestContextRef.current;
-		const isRequestCanceled = () => contextId !== requestContextRef.current;
+	return useCallback(
+		async (page?: number, oldNotes?: INote[]) => {
+			const contextId = ++requestContextRef.current;
+			const isRequestCanceled = () => contextId !== requestContextRef.current;
 
-		const searchText = search.trim();
-		if (searchText) {
-			console.debug('Notes text indexing...');
-			const start = performance.now();
-			await lexemes.index();
+			const searchText = search.trim();
+			if (searchText) {
+				console.debug('Notes text indexing...');
+				const start = performance.now();
+				await lexemes.index();
+
+				if (isRequestCanceled()) return;
+				console.debug('Notes indexing is completed', performance.now() - start);
+			}
+
+			const tags = activeTag !== null ? [activeTag.id] : [];
+
+			const notes = await notesRegistry.get({
+				limit: 100,
+				tags,
+				sort: { by: 'updatedAt', order: 'desc' },
+				search: searchText
+					? {
+							text: searchText,
+					  }
+					: undefined,
+				meta: {
+					isDeleted: notesView === NOTES_VIEW.BIN,
+					// show archived notes only in archive view
+					// but do not filter by the archived flag in bin view
+					...(notesView !== NOTES_VIEW.BIN && {
+						isArchived: notesView === NOTES_VIEW.ARCHIVE,
+					}),
+					...(notesView === NOTES_VIEW.BOOKMARK && { isBookmarked: true }),
+				},
+			});
 
 			if (isRequestCanceled()) return;
-			console.debug('Notes indexing is completed', performance.now() - start);
-		}
 
-		const tags = activeTag !== null ? [activeTag.id] : [];
+			const mergedNotes = page && oldNotes ? [...oldNotes, ...notes] : [...notes];
 
-		const notes = await notesRegistry.get({
-			limit: 100,
-			tags,
-			sort: { by: 'updatedAt', order: 'desc' },
-			search: searchText
-				? {
-						text: searchText,
-				  }
-				: undefined,
-			meta: {
-				isDeleted: notesView === NOTES_VIEW.BIN,
-				// show archived notes only in archive view
-				// but do not filter by the archived flag in bin view
-				...(notesView !== NOTES_VIEW.BIN && {
-					isArchived: notesView === NOTES_VIEW.ARCHIVE,
-				}),
-				...(notesView === NOTES_VIEW.BOOKMARK && { isBookmarked: true }),
-			},
-		});
-
-		if (isRequestCanceled()) return;
-
-		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
-	}, [activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData]);
+			dispatch(workspacesApi.setNotes({ ...workspaceData, notes: mergedNotes }));
+		},
+		[activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData],
+	);
 };
