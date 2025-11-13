@@ -30,10 +30,6 @@ import { TagsList } from './TagsList';
 
 export type NotesOverviewProps = {};
 
-const isNotesView = (id: string): id is NOTES_VIEW => {
-	return Object.values(NOTES_VIEW).includes(id as NOTES_VIEW);
-};
-
 export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const telemetry = useTelemetryTracker();
 
@@ -129,7 +125,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBookOpen />
-								<Text>{NOTES_VIEW.All_NOTES}</Text>
+								<Text>All notes</Text>
 							</HStack>
 						),
 					},
@@ -165,14 +161,14 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaTrash />
-								<Text>{NOTES_VIEW.BIN}</Text>
+								<Text>Bin</Text>
 							</HStack>
 						),
 					},
 				]}
 				activeItem={notesViewMode}
 				onPick={(id) => {
-					if (!isNotesView(id)) return;
+					if (id !== NOTES_VIEW.All_NOTES && id !== NOTES_VIEW.BIN) return;
 
 					dispatch(
 						workspacesApi.setView({
