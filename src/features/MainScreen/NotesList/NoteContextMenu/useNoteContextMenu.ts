@@ -15,7 +15,7 @@ import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
-import { selectConfirmMoveToBin } from '@state/redux/settings/settings';
+import { selectConfirmMoveToBin } from '@state/redux/settings/selectors/preferences';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { NoteActions } from '.';
@@ -32,11 +32,12 @@ const mdCharsForEscapeRegEx = new RegExp(
 );
 
 const buildNoteMenu = (note: INote): ContextMenu => {
-	// in the future menu items can be added like this: ...(x ? [{}, {}] : [])
 	return [
-		note.isDeleted
-			? { id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' }
-			: { id: NoteActions.DUPLICATE, label: 'Duplicate' },
+		...(note.isDeleted
+			? [{ id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' }]
+			: []),
+
+		...(!note.isDeleted ? [{ id: NoteActions.DUPLICATE, label: 'Duplicate' }] : []),
 
 		{
 			id: NoteActions.EXPORT,
@@ -78,7 +79,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
 					if (requiresConfirmMoveToBin) {
 						const isConfirmed = confirm(
-							`Really want to move this note to the bin`,
+							`Do you want to move this note to the bin?`,
 						);
 						if (!isConfirmed) return;
 					}
@@ -98,7 +99,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
 					const isConfirmed = confirm(
-						`Really want to permanently delete this note?`,
+						`Do you want to permanently delete this note?`,
 					);
 					if (!isConfirmed) return;
 
@@ -121,7 +122,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 					updateNotes();
 
-					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED);
+					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
 				},
 
 				[NoteActions.DUPLICATE]: async (id: string) => {

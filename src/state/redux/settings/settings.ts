@@ -59,8 +59,3 @@ export const selectTheme = createAppSelector(
 	selectSettings,
 	(settings) => settings.theme,
 );
-
-export const selectConfirmMoveToBin = createAppSelector(
-	selectSettings,
-	(settings) => settings.preferences.confirmBeforeMoveToBin,
-);
