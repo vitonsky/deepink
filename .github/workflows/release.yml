@@ -1,0 +1,71 @@
+name: Release version
+
+permissions:
+  # required to create releases / upload assets
+  contents: write
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    # build for macOS, Windows and Linux
+    strategy:
+      matrix:
+        # TODO: add `macos-15-intel` for production releases
+        # See docs https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#standard-github-hosted-runners-for-public-repositories
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      # Setup macOS
+      - name: "macOS: accept Xcode license (required before building)"
+        if: runner.os == 'macOS'
+        run: |
+          # ensure Xcode path and accept license
+          if [ -d "/Applications/Xcode.app" ]; then
+            sudo xcode-select --switch /Applications/Xcode.app || true
+            sudo xcodebuild -license accept || true
+          else
+            echo "Warning: /Applications/Xcode.app not found on runner. If this step fails on self-hosted mac runners, ensure Xcode is installed."
+          fi
+
+      # Setup Windows
+      # - name: Install WiX Toolset v3 (via Chocolatey)
+      #   if: runner.os == 'Windows'
+      #   shell: powershell
+      #   run: |
+      #     choco install -y wixtoolset --version=3.14.0
+      #     echo "C:\Program Files (x86)\WiX Toolset v3.14\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Verify WiX installation
+        if: runner.os == 'Windows'
+        shell: powershell
+        continue-on-error: true
+        run: |
+          $env:PATH = "C:\wix314;$env:PATH"
+          candle.exe -? 2>&1 | Select-Object -First 1
+          light.exe -? 2>&1 | Select-Object -First 1
+          exit 0  # Force success exit code
+
+      - name: Build app
+        run: make package artifacts
+
+      - name: Upload artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          make publish
