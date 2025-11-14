@@ -1,8 +1,7 @@
 import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 
-import { TagsController } from './TagsController';
-import { TAG_ERROR_CODE, TagError } from './validateTagName';
+import { TAG_ERROR_CODE, TagsController } from './TagsController';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -42,10 +41,18 @@ describe('manage tags', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await expect(tags.add('///foo', null)).rejects.toThrowError(TagError);
-		await expect(tags.add('/foo/bar', null)).rejects.toThrowError(TagError);
-		await expect(tags.add('foo/bar/', null)).rejects.toThrowError(TagError);
-		await expect(tags.add('foo//bar', null)).rejects.toThrowError(TagError);
+		await expect(tags.add('///foo', null)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.INVALID_FORMAT,
+		});
+		await expect(tags.add('/foo/bar', null)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.INVALID_FORMAT,
+		});
+		await expect(tags.add('foo/bar/', null)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.INVALID_FORMAT,
+		});
+		await expect(tags.add('foo//bar', null)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.INVALID_FORMAT,
+		});
 
 		await expect(tags.getTags()).resolves.toEqual([]);
 	});
@@ -54,20 +61,24 @@ describe('manage tags', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await expect(tags.add('foo', null)).resolves.toBeDefined();
+		// change toBeDefined to check string
+		await expect(tags.add('foo', null)).resolves.toEqual(expect.any(String));
 		await expect(tags.add('foo', null)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.NOT_UNIQUE,
+			code: TAG_ERROR_CODE.DUPLICATE,
 		});
 
-		const tagsList = await tags.getTags();
-		const parentTagsId = tagsList[0].id;
+		await expect(tags.add('foo/bar', null)).resolves.toEqual(expect.any(String));
+		await expect(tags.add('foo/bar', null)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.DUPLICATE,
+		});
 
-		await expect(tags.add('baz', parentTagsId)).resolves.toBeDefined();
+		const bazId = await tags.add('baz', null);
+		await expect(tags.add('foo/bar', bazId)).resolves.toEqual(expect.any(String));
+		await expect(tags.add('foo/bar', bazId)).rejects.toMatchObject({
+			code: TAG_ERROR_CODE.DUPLICATE,
+		});
 
 		// duplicate nested tags
-		await expect(tags.add('baz', parentTagsId)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.NOT_UNIQUE,
-		});
 
 		await expect(tags.getTags()).resolves.toEqual(
 			expect.arrayContaining([
@@ -77,9 +88,25 @@ describe('manage tags', () => {
 					resolvedName: 'foo',
 				}),
 				expect.objectContaining({
-					name: 'baz',
+					name: 'bar',
 					parent: expect.any(String),
-					resolvedName: 'foo/baz',
+					resolvedName: 'foo/bar',
+				}),
+				expect.objectContaining({
+					id: bazId,
+					name: 'baz',
+					parent: null,
+					resolvedName: 'baz',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					parent: expect.any(String),
+					resolvedName: 'baz/foo',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.any(String),
+					resolvedName: 'baz/foo/bar',
 				}),
 			]),
 		);
