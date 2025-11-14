@@ -14,7 +14,10 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
-import { TAG_ERROR_CODE, TagError } from '@core/features/tags/controller/validateTagName';
+import {
+	TAG_ERROR_CODE,
+	TagControllerError,
+} from '@core/features/tags/controller/TagsController';
 import { WorkspaceModal } from '@features/WorkspaceModal';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
@@ -157,29 +160,15 @@ export const TagEditor: FC<ITagEditorProps> = ({
 
 									await onSave(editedData);
 								} catch (error) {
-									if (error instanceof TagError) {
-										switch (error.code) {
-											case TAG_ERROR_CODE.NOT_UNIQUE:
-												setTagNameError('Tag already exists');
-												break;
-											case TAG_ERROR_CODE.EMPTY:
-												setTagNameError('Tag cannot be empty');
-												break;
-											case TAG_ERROR_CODE.BOUNDARY_SLASH:
-												setTagNameError(
-													'Tag cannot start or end with a slash "/"',
-												);
-												break;
-											case TAG_ERROR_CODE.MULTIPLE_SLASHES:
-												setTagNameError(
-													'Tag cannot contain consecutive "/"',
-												);
-												break;
-											default:
-												setTagNameError('Invalid tag name');
-										}
+									if (error instanceof TagControllerError) {
+										const message =
+											error.code === TAG_ERROR_CODE.DUPLICATE
+												? 'Tag already exists'
+												: 'Tag cannot be empty, start or end with "/", or contain "//".';
+										setTagNameError(message);
 										return;
 									}
+
 									setTagNameError(
 										'Something went wrong. Please try again.',
 									);
