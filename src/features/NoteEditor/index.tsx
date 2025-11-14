@@ -193,6 +193,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
+	// In the future, read-only mode will cover more cases than deleted notes
+	const isReadOnly = note.isDeleted;
+
 	return (
 		<VStack w="100%" align="start">
 			<HStack w="100%" align="start">
@@ -207,7 +210,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								? undefined
 								: (evt) => setTitle(evt.target.value)
 						}
-						isDisabled={versionPreview !== null}
+						isDisabled={versionPreview !== null || isReadOnly}
 					/>
 
 					{/* TODO: add options that may be toggled */}
@@ -247,6 +250,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							<FaHashtag />
 							<Text>{tag.resolvedName}</Text>
 						</HStack>
+
 						<Box
 							sx={{
 								'&:not(:hover)': {
@@ -385,11 +389,14 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				</HStack>
 			)}
 
-			{versionPreview ? (
-				<NoteEditor text={versionPreview.text} setText={() => {}} isReadOnly />
-			) : (
-				<NoteEditor text={text} setText={setText} />
-			)}
+			<NoteEditor
+				text={versionPreview ? versionPreview.text : text}
+				setText={(noteText) => {
+					if (isReadOnly || versionPreview) return;
+					setText(noteText);
+				}}
+				isReadOnly={isReadOnly || Boolean(versionPreview)}
+			/>
 
 			{!sidePanel ? null : (
 				<NoteSidebar
@@ -403,6 +410,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							content() {
 								return (
 									<NoteVersions
+										isReadOnly={isReadOnly}
 										noteId={note.id}
 										recordControl={{
 											isDisabled: Boolean(note.isSnapshotsDisabled),

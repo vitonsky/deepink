@@ -18,11 +18,13 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
+	NOTES_VIEW,
 	selectActiveTag,
 	selectTags,
 	selectTagsTree,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 
 import { TagsList } from './TagsList';
 
@@ -37,6 +39,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 	const tags = useWorkspaceSelector(selectTags);
 	const tagsTree = useWorkspaceSelector(selectTagsTree);
+
+	const notesViewMode = useWorkspaceSelector(selectNotesView);
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -117,7 +121,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'all',
+						id: NOTES_VIEW.All_NOTES,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBookOpen />
@@ -153,7 +157,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'bin',
+						id: NOTES_VIEW.BIN,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaTrash />
@@ -162,16 +166,23 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 				]}
-				activeItem={activeTag === null ? 'all' : undefined}
+				activeItem={notesViewMode}
 				onPick={(id) => {
-					if (id === 'all') {
-						dispatch(
-							workspacesApi.setSelectedTag({
-								...workspaceData,
-								tag: null,
-							}),
-						);
-					}
+					if (id !== NOTES_VIEW.All_NOTES && id !== NOTES_VIEW.BIN) return;
+
+					dispatch(
+						workspacesApi.setView({
+							...workspaceData,
+							view: id,
+						}),
+					);
+
+					dispatch(
+						workspacesApi.setSelectedTag({
+							...workspaceData,
+							tag: null,
+						}),
+					);
 				}}
 			/>
 

@@ -25,6 +25,7 @@ export const NoteVersions = ({
 	onVersionApply,
 	onShowVersion,
 	recordControl,
+	isReadOnly,
 }: {
 	noteId: string;
 	onSnapshot: () => void;
@@ -35,6 +36,7 @@ export const NoteVersions = ({
 		isDisabled: boolean;
 		onChange: (isDisabled: boolean) => void;
 	};
+	isReadOnly?: Boolean;
 }) => {
 	const telemetry = useTelemetryTracker();
 	const noteHistory = useNotesHistory();
@@ -152,8 +154,13 @@ export const NoteVersions = ({
 								</HStack>
 								<HStack marginLeft="auto">
 									<Button
+										isDisabled={Boolean(isReadOnly)}
 										size="sm"
-										title="Apply version"
+										title={
+											isReadOnly
+												? 'Version cannot be applied for a read-only note'
+												: 'Apply version'
+										}
 										onClick={(evt) => {
 											const applyVersion = () => {
 												onVersionApply(version);
@@ -229,6 +236,7 @@ export const NoteVersions = ({
 									>
 										<FaCheck />
 									</Button>
+
 									<Button
 										size="sm"
 										title="Open version"

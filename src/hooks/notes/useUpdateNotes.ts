@@ -4,14 +4,18 @@ import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
+	NOTES_VIEW,
 	selectActiveTag,
 	selectSearch,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 
 export const useUpdateNotes = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
+
+	const notesView = useWorkspaceSelector(selectNotesView);
 
 	const {
 		api: { lexemes },
@@ -37,7 +41,11 @@ export const useUpdateNotes = () => {
 			console.debug('Notes indexing is completed', performance.now() - start);
 		}
 
-		const tags = activeTag === null ? [] : [activeTag.id];
+		const tags =
+			activeTag !== null && notesView === NOTES_VIEW.All_NOTES
+				? [activeTag.id]
+				: [];
+
 		const notes = await notesRegistry.get({
 			limit: 100,
 			tags,
@@ -47,10 +55,11 @@ export const useUpdateNotes = () => {
 						text: searchText,
 				  }
 				: undefined,
+			meta: { isDeleted: notesView === NOTES_VIEW.BIN },
 		});
 
 		if (isRequestCanceled()) return;
 
 		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
-	}, [activeTag, dispatch, lexemes, notesRegistry, search, workspaceData]);
+	}, [activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData]);
 };

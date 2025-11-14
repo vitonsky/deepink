@@ -169,6 +169,62 @@ describe('data fetching', () => {
 		await db.close();
 	});
 
+	test('filter by tags and the deleted status', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		const tagsList = await tags.getTags();
+
+		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string;
+		const [{ id: noteId }] = await registry.get({
+			limit: 1,
+			tags: [barTag],
+		});
+
+		// set deleted status
+		await registry.updateMeta([noteId], { isDeleted: true });
+		await expect(
+			registry.get({
+				tags: [barTag],
+				meta: { isDeleted: true },
+			}),
+		).resolves.toHaveLength(1);
+
+		// reset deleted status
+		await registry.updateMeta([noteId], { isDeleted: false });
+		await expect(
+			registry.get({
+				tags: [barTag],
+				meta: { isDeleted: true },
+			}),
+		).resolves.toHaveLength(0);
+
+		await db.close();
+	});
+
+	test('get entries by deletion status', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		// update status for 10 notes
+		await registry.updateMeta(notesId, { isDeleted: true });
+		await expect(registry.get({ meta: { isDeleted: true } })).resolves.toHaveLength(
+			10,
+		);
+
+		// check only not deleted notes
+		await expect(registry.get({ meta: { isDeleted: false } })).resolves.toHaveLength(
+			notesSample.length - 10,
+		);
+
+		await db.close();
+	});
+
 	test('method getLength consider filters', async () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
@@ -294,6 +350,32 @@ describe('Notes meta control', () => {
 				id: noteId,
 			}),
 		);
+	});
+
+	test('toggle note deletion status', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		// Create notes
+		const noteId = await registry.add({ title: 'Title', text: 'Text' });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isDeleted: false,
+		});
+
+		// toggle deleted status
+		await registry.updateMeta([noteId], { isDeleted: true });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isDeleted: true,
+		});
+
+		// toggle deleted status back
+		await registry.updateMeta([noteId], { isDeleted: false });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isDeleted: false,
+		});
 	});
 });
 
