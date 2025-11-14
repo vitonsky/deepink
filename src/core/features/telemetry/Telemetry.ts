@@ -1,26 +1,19 @@
 import { randomUUID } from 'crypto';
-import { EventProps, Plausible } from 'plausible-client';
 import { z } from 'zod';
 
 import { IFileController } from '../files';
 import { StateFile } from './StateFile';
+import { EventPayload, EventTracker } from '.';
 
 const StateScheme = z.object({
 	uid: z.string(),
 	queue: z
 		.object({
 			name: z.string(),
-			props: z
-				.record(
-					z.string(),
-					z.union([z.string(), z.number(), z.null(), z.undefined()]),
-				)
-				.optional(),
+			props: z.record(z.string(), z.any()).optional(),
 		})
 		.array(),
 });
-
-type EventPayload = EventProps['props'];
 
 export interface TelemetryTracker {
 	track(eventName: string, payload?: EventPayload): Promise<void>;
@@ -37,7 +30,7 @@ export class Telemetry implements TelemetryTracker {
 	private readonly stateFile;
 	constructor(
 		file: IFileController,
-		private readonly plausible: Plausible,
+		private readonly eventTracker: EventTracker,
 		private readonly options: {
 			contextProps?: () => EventPayload | Promise<EventPayload>;
 			onEventSent?: (event: { name: string; payload: EventPayload }) => void;
@@ -65,9 +58,7 @@ export class Telemetry implements TelemetryTracker {
 		};
 
 		try {
-			await this.plausible.trackEvent(eventName, {
-				props: composedPayload,
-			});
+			await this.eventTracker.sendEvent(eventName, composedPayload);
 
 			this.options.onEventSent?.({ name: eventName, payload: composedPayload });
 		} catch (error) {
@@ -84,9 +75,12 @@ export class Telemetry implements TelemetryTracker {
 		const newQueue: z.TypeOf<typeof StateScheme>['queue'] = [];
 		for (const event of state.queue) {
 			try {
-				await this.plausible.trackEvent(event.name, { props: event.props });
+				await this.eventTracker.sendEvent(event.name, event.props);
 
-				this.options.onEventSent?.({ name: event.name, payload: event.props });
+				this.options.onEventSent?.({
+					name: event.name,
+					payload: event.props ?? {},
+				});
 			} catch (error) {
 				newQueue.push(event);
 			}

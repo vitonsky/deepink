@@ -2,12 +2,12 @@ import 'dotenv/config';
 
 import chalk from 'chalk';
 import { app, Menu } from 'electron';
-import { Plausible } from 'plausible-client';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
 import { FileController } from '@core/features/files/FileController';
 import { NodeFS } from '@core/features/files/NodeFS';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { AppVersions } from '@core/features/telemetry/AppVersions';
+import { RybbitTracker } from '@core/features/telemetry/RybbitTracker';
 import { Telemetry } from '@core/features/telemetry/Telemetry';
 import { AppTray } from '@electron/main/AppTray';
 import { serveTelemetry } from '@electron/requests/telemetry/main';
@@ -226,17 +226,15 @@ export class MainProcess {
 		const initVersions = await appVersions.getInfo();
 		await appVersions.logVersion();
 
-		const plausible = new Plausible({
-			apiHost: api.baseURL,
-			domain: api.appName,
-			filter() {
-				return shouldSend;
-			},
-		});
-
 		const telemetry = new Telemetry(
 			new FileController('meta/telemetry.json', this.userDataFs),
-			plausible,
+			new RybbitTracker({
+				apiHost: api.baseURL,
+				siteId: api.appName,
+				filter() {
+					return shouldSend;
+				},
+			}),
 			{
 				contextProps: createTelemetrySession(initVersions),
 				onEventSent(event) {
