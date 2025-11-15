@@ -25,12 +25,12 @@ export const getConfig = () => {
 				baseURL: z
 					.string()
 					.optional()
-					.default('https://uxt.vitonsky.net')
+					.default('https://events.vitonsky.net')
 					.parse(process.env.TELEMETRY_URL),
 				appName: z
 					.string()
 					.optional()
-					.default('deepink')
+					.default('e49852fce3b4')
 					.parse(process.env.TELEMETRY_APP_NAME),
 			},
 		},

@@ -1,11 +1,11 @@
-import { Plausible, PlausibleInitOptions } from 'plausible-client';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { RybbitConfig, RybbitTracker } from './RybbitTracker';
 import { Telemetry } from './Telemetry';
 
-const dummyPlausibleConfig: PlausibleInitOptions = {
+const dummyConfig: RybbitConfig = {
 	apiHost: 'https://example.com',
-	domain: 'test',
+	siteId: 'test',
 };
 
 const mockFetch = vi.fn();
@@ -13,11 +13,11 @@ globalThis.fetch = mockFetch;
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	mockFetch.mockImplementation(() => new Response('ok'));
+	mockFetch.mockImplementation(() => new Response('ok', { status: 200 }));
 });
 
 describe('Broken state file must be automatically recreated', () => {
-	const plausible = new Plausible(dummyPlausibleConfig);
+	const plausible = new RybbitTracker(dummyConfig);
 
 	const onEventSent = vi.fn();
 	const telemetryStateFile = createFileControllerMock();
@@ -69,7 +69,7 @@ describe('Broken state file must be automatically recreated', () => {
 });
 
 describe('Failed requests must be accumulated in queue and sent later', () => {
-	const plausible = new Plausible(dummyPlausibleConfig);
+	const plausible = new RybbitTracker(dummyConfig);
 
 	const onEventSent = vi.fn();
 	const telemetryStateFile = createFileControllerMock();
