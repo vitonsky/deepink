@@ -98,16 +98,14 @@ export class TagsController {
 					await db.query(
 						qb.sql`SELECT name FROM tags WHERE id = ${parent} AND workspace_id=${this.workspace}`,
 					)
-			  ).rows[0]?.name
+			  ).rows[0].name
 			: null;
 		const resolvedName = parentName ? `${parentName}/${name}` : name;
 
 		const { rows: duplicatedTag } = await db.query(
-			qb.line(
-				qb.line(`SELECT x.id FROM (${tagsQuery}) AS x 
+			qb.line(`SELECT x.id FROM (${tagsQuery}) AS x 
 				JOIN tags ON x.id=tags.id AND tags.workspace_id='${this.workspace}' 
 				WHERE x.resolved_name='${resolvedName}'`),
-			),
 		);
 		if (duplicatedTag.length > 0) {
 			throw new TagControllerError(
