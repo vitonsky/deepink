@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -47,6 +47,24 @@ export const NotesList: FC<NotesListProps> = () => {
 	});
 
 	const items = virtualizer.getVirtualItems();
+
+	// Load notes by scroll
+	const [limit, setLimit] = useState(100);
+	const [loading, setLoading] = useState(false);
+	useEffect(() => {
+		if (!notes.length) return;
+		const lastVisibleIndex = items[items.length - 1].index;
+
+		if (lastVisibleIndex >= notes.length - 10) {
+			if (loading) return;
+			setLoading(true);
+
+			updateNotes(limit).then(() => {
+				setLimit((prev) => prev + 100);
+				setLoading(false);
+			});
+		}
+	}, [items]);
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
