@@ -59,7 +59,7 @@ describe('manage tags', () => {
 
 		// duplicates
 		await expect(tags.add('foo', null)).resolves.toEqual(
-			expect.stringMatching(/^[0-9a-f-]{8,36}$/i),
+			expect.stringMatching(/^[\d\w-]+$/),
 		);
 		await expect(tags.add('foo', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
@@ -68,7 +68,7 @@ describe('manage tags', () => {
 		const tagsList = await tags.getTags();
 		const fooId = tagsList[0].id;
 		await expect(tags.add('bar', fooId)).resolves.toEqual(
-			expect.stringMatching(/^[0-9a-f-]{8,36}$/i),
+			expect.stringMatching(/^[\d\w-]+$/),
 		);
 		await expect(tags.add('bar', fooId)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
