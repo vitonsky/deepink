@@ -14,6 +14,10 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
+import {
+	TAG_ERROR_CODE,
+	TagControllerError,
+} from '@core/features/tags/controller/TagsController';
 import { WorkspaceModal } from '@features/WorkspaceModal';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
@@ -30,7 +34,7 @@ export type ITagEditorProps = {
 	 */
 	tags: IResolvedTag[];
 	parentTag?: IResolvedTag;
-	onSave: (tagData: TagEditorData) => void;
+	onSave: (tagData: TagEditorData) => Promise<void>;
 	onCancel: () => void;
 	editedTag?: TagEditorData;
 };
@@ -131,51 +135,41 @@ export const TagEditor: FC<ITagEditorProps> = ({
 						</Button>
 						<Button
 							variant="primary"
-							onClick={() => {
-								const name = tagName.trim();
+							onClick={async () => {
+								try {
+									const name = tagName.trim();
 
-								if (name.length === 0) {
-									setTagNameError('Name must not be empty');
-									return;
-								}
+									if (isEditingMode) {
+										const isHaveSeparatorChar = name.includes('/');
+										if (isHaveSeparatorChar) {
+											setTagNameError(
+												'Name of tag for editing cannot create sub tags',
+											);
+											return;
+										}
+									}
 
-								if (isEditingMode) {
-									const isHaveSeparatorChar = name.includes('/');
-									if (isHaveSeparatorChar) {
+									await onSave({
+										name,
+										parent: parentTagId,
+										...(isEditingMode && editedTag.id
+											? { id: editedTag.id }
+											: {}),
+									});
+								} catch (error) {
+									if (error instanceof TagControllerError) {
 										setTagNameError(
-											'Name of tag for editing cannot create sub tags',
+											error.code === TAG_ERROR_CODE.DUPLICATE
+												? 'Tag already exists'
+												: 'Tag cannot be empty, start or end with "/", or contain "//".',
 										);
 										return;
 									}
+
+									setTagNameError(
+										'Unable to save the tag. Please try again.',
+									);
 								}
-
-								const parentTag = tags.find(
-									({ id }) => id === parentTagId,
-								);
-								const fullName = [parentTag?.resolvedName, name]
-									.filter(Boolean)
-									.join('/');
-
-								const isTagExists = tags.some(({ id, resolvedName }) => {
-									const isItEditedTag =
-										editedTag && editedTag.id === id;
-									return resolvedName === fullName && !isItEditedTag;
-								});
-								if (isTagExists) {
-									setTagNameError('Tag already exists');
-									return;
-								}
-
-								const editedData: TagEditorData = {
-									name,
-									parent: parentTagId,
-								};
-
-								if (isEditingMode && editedTag.id) {
-									editedData.id = editedTag.id;
-								}
-
-								onSave(editedData);
 							}}
 						>
 							{isEditingMode ? 'Save' : 'Add'}

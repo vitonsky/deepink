@@ -1,7 +1,7 @@
 import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 
-import { TagsController } from './TagsController';
+import { TAG_ERROR_CODE, TagsController } from './TagsController';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -37,54 +37,61 @@ describe('manage tags', () => {
 		});
 	});
 
-	// TODO:fox that cases. Paths must be normalized
-	test('weird tags', async () => {
+	test('tags with invalid names and duplicates cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await tags.add('///foo', null);
-		await tags.add('/foo/bar', null);
+		// invalid name
+		await expect(tags.add('///foo', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('/foo/bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('foo/bar/', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('foo//bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
 
-		await tags.getTags().then((tags) => {
-			expect(tags).toEqual([
-				expect.objectContaining({
-					name: '',
-					parent: null,
-					resolvedName: '',
-				}),
-				expect.objectContaining({
-					name: '',
-					parent: expect.any(String),
-					resolvedName: '/',
-				}),
-				expect.objectContaining({
-					name: '',
-					parent: expect.any(String),
-					resolvedName: '//',
-				}),
+		await expect(tags.getTags()).resolves.toEqual([]);
+
+		// duplicates
+		await expect(tags.add('foo', null)).resolves.toEqual(
+			expect.stringMatching(/^[\d\w-]+$/),
+		);
+		await expect(tags.add('foo', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		const tagsList = await tags.getTags();
+		const fooId = tagsList[0].id;
+		await expect(tags.add('bar', fooId)).resolves.toEqual(
+			expect.stringMatching(/^[\d\w-]+$/),
+		);
+		await expect(tags.add('bar', fooId)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		await expect(tags.add('foo/bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		await expect(tags.getTags()).resolves.toEqual(
+			expect.arrayContaining([
 				expect.objectContaining({
 					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: '///foo',
-				}),
-
-				expect.objectContaining({
-					name: '',
 					parent: null,
-					resolvedName: '',
-				}),
-				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: '/foo',
+					resolvedName: 'foo',
 				}),
 				expect.objectContaining({
 					name: 'bar',
 					parent: expect.any(String),
-					resolvedName: '/foo/bar',
+					resolvedName: 'foo/bar',
 				}),
-			]);
-		});
+			]),
+		);
 	});
 
 	test('update tags', async () => {

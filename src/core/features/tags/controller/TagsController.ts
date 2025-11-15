@@ -10,6 +10,39 @@ import { IResolvedTag, ITag } from '..';
 
 type ChangeEvent = 'tags' | 'noteTags';
 
+export enum TAG_ERROR_CODE {
+	DUPLICATE = 'Duplicate',
+	INVALID_FORMAT = 'InvalidFormat',
+}
+
+export class TagControllerError extends Error {
+	constructor(message: string, public readonly code: TAG_ERROR_CODE) {
+		super(message);
+		this.name = this.constructor.name;
+	}
+}
+
+export const validateTagName = (name: string) => {
+	if (name.length === 0) {
+		throw new TagControllerError(
+			'Tag name must not be empty',
+			TAG_ERROR_CODE.INVALID_FORMAT,
+		);
+	}
+	if (name.startsWith('/') || name.endsWith('/')) {
+		throw new TagControllerError(
+			'Tag name must not start or end with a slash "/"',
+			TAG_ERROR_CODE.INVALID_FORMAT,
+		);
+	}
+	if (name.includes('//')) {
+		throw new TagControllerError(
+			'Tag name must not contain consecutive slashes "//"',
+			TAG_ERROR_CODE.INVALID_FORMAT,
+		);
+	}
+};
+
 const RowScheme = z
 	.object({
 		id: z.string(),
@@ -57,6 +90,30 @@ export class TagsController {
 	public async add(name: string, parent: null | string): Promise<string> {
 		const db = wrapDB(this.db.get());
 
+		validateTagName(name);
+
+		//check tag unique
+		const parentName = parent
+			? (
+					await db.query(
+						qb.sql`SELECT name FROM tags WHERE id = ${parent} AND workspace_id=${this.workspace}`,
+					)
+			  ).rows[0].name
+			: null;
+		const resolvedName = parentName ? `${parentName}/${name}` : name;
+
+		const { rows: duplicatedTag } = await db.query(
+			qb.line(`SELECT x.id FROM (${tagsQuery}) AS x 
+				JOIN tags ON x.id=tags.id AND tags.workspace_id='${this.workspace}' 
+				WHERE x.resolved_name='${resolvedName}'`),
+		);
+		if (duplicatedTag.length > 0) {
+			throw new TagControllerError(
+				`Tag ${name} already exists`,
+				TAG_ERROR_CODE.DUPLICATE,
+			);
+		}
+
 		const segments = name.split('/');
 
 		let lastId: string | null = null;
@@ -67,6 +124,17 @@ export class TagsController {
 				for (let idx = 0; idx < segments.length; idx++) {
 					const name = segments[idx];
 					const isFirstItem = idx === 0;
+
+					const { rows: existing } = await db.query(
+						qb.sql`SELECT * FROM tags WHERE name = ${name} 
+						AND workspace_id = ${this.workspace} AND parent IS NOT DISTINCT FROM ${
+							isFirstItem ? parent : lastId
+						}`,
+					);
+					if (existing.length > 0) {
+						lastId = existing[0].id;
+						continue;
+					}
 
 					if (isFirstItem) {
 						await db
