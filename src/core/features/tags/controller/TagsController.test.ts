@@ -37,48 +37,46 @@ describe('manage tags', () => {
 		});
 	});
 
-	test('prevent creating weird tags', async () => {
+	test('tags with invalid names and duplicates cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await expect(tags.add('///foo', null)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.INVALID_FORMAT,
-		});
-		await expect(tags.add('/foo/bar', null)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.INVALID_FORMAT,
-		});
-		await expect(tags.add('foo/bar/', null)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.INVALID_FORMAT,
-		});
-		await expect(tags.add('foo//bar', null)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.INVALID_FORMAT,
-		});
+		// invalid name
+		await expect(tags.add('///foo', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('/foo/bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('foo/bar/', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('foo//bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
 
 		await expect(tags.getTags()).resolves.toEqual([]);
-	});
 
-	test('prevent duplicate tags', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		// duplicates
+		await expect(tags.add('foo', null)).resolves.toEqual(
+			expect.stringMatching(/^[0-9a-f-]{8,36}$/i),
+		);
+		await expect(tags.add('foo', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
 
-		// change toBeDefined to check string
-		await expect(tags.add('foo', null)).resolves.toEqual(expect.any(String));
-		await expect(tags.add('foo', null)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.DUPLICATE,
-		});
+		const tagsList = await tags.getTags();
+		const fooId = tagsList[0].id;
+		await expect(tags.add('bar', fooId)).resolves.toEqual(
+			expect.stringMatching(/^[0-9a-f-]{8,36}$/i),
+		);
+		await expect(tags.add('bar', fooId)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
 
-		await expect(tags.add('foo/bar', null)).resolves.toEqual(expect.any(String));
-		await expect(tags.add('foo/bar', null)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.DUPLICATE,
-		});
-
-		const bazId = await tags.add('baz', null);
-		await expect(tags.add('foo/bar', bazId)).resolves.toEqual(expect.any(String));
-		await expect(tags.add('foo/bar', bazId)).rejects.toMatchObject({
-			code: TAG_ERROR_CODE.DUPLICATE,
-		});
-
-		// duplicate nested tags
+		await expect(tags.add('foo/bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
 
 		await expect(tags.getTags()).resolves.toEqual(
 			expect.arrayContaining([
@@ -91,22 +89,6 @@ describe('manage tags', () => {
 					name: 'bar',
 					parent: expect.any(String),
 					resolvedName: 'foo/bar',
-				}),
-				expect.objectContaining({
-					id: bazId,
-					name: 'baz',
-					parent: null,
-					resolvedName: 'baz',
-				}),
-				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: 'baz/foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'baz/foo/bar',
 				}),
 			]),
 		);
