@@ -149,28 +149,25 @@ export const TagEditor: FC<ITagEditorProps> = ({
 										}
 									}
 
-									const editedData: TagEditorData = {
+									await onSave({
 										name,
 										parent: parentTagId,
-									};
-
-									if (isEditingMode && editedTag.id) {
-										editedData.id = editedTag.id;
-									}
-
-									await onSave(editedData);
+										...(isEditingMode && editedTag.id
+											? { id: editedTag.id }
+											: {}),
+									});
 								} catch (error) {
 									if (error instanceof TagControllerError) {
-										const message =
+										setTagNameError(
 											error.code === TAG_ERROR_CODE.DUPLICATE
 												? 'Tag already exists'
-												: 'Tag cannot be empty, start or end with "/", or contain "//".';
-										setTagNameError(message);
+												: 'Tag cannot be empty, start or end with "/", or contain "//".',
+										);
 										return;
 									}
 
 									setTagNameError(
-										'Something went wrong. Please try again.',
+										'Unable to save the tag. Please try again.',
 									);
 								}
 							}}
