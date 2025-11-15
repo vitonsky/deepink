@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -17,7 +17,6 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
-import { useNoteLazyLoad } from './useNoteLazyLoad';
 
 export type NotesListProps = {};
 
@@ -49,13 +48,21 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const items = virtualizer.getVirtualItems();
 
-	const loadMoreNotes = useNoteLazyLoad(updateNotes);
+	// Load notes by scroll
+	const [limit, setLimit] = useState(100);
+	const [loading, setLoading] = useState(false);
 	useEffect(() => {
 		if (!notes.length) return;
-		const lastVisibleIndex = items[items.length - 1].index ?? 0;
+		const lastVisibleIndex = items[items.length - 1].index;
 
 		if (lastVisibleIndex >= notes.length - 10) {
-			loadMoreNotes(notes);
+			if (loading) return;
+			setLoading(true);
+
+			updateNotes(limit).then(() => {
+				setLimit((prev) => prev + 100);
+				setLoading(false);
+			});
 		}
 	}, [items]);
 
