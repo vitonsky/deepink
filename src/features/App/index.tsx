@@ -6,12 +6,15 @@ import { SplashScreen } from '@features/SplashScreen';
 
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { useAppUpdater } from './useAppUpdater';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
 
 export const App: FC = () => {
+	useAppUpdater();
+
 	const [config] = useState(
 		() =>
 			new ConfigStorage(
