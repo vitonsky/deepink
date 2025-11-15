@@ -1,5 +1,4 @@
 import { useCallback, useRef } from 'react';
-import { INote } from '@core/features/notes';
 import { useProfileControls } from '@features/App/Profile';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -29,7 +28,7 @@ export const useUpdateNotes = () => {
 
 	const requestContextRef = useRef(0);
 	return useCallback(
-		async (page?: number, oldNotes?: INote[]) => {
+		async (limit?: number) => {
 			const contextId = ++requestContextRef.current;
 			const isRequestCanceled = () => contextId !== requestContextRef.current;
 
@@ -49,8 +48,7 @@ export const useUpdateNotes = () => {
 					: [];
 
 			const notes = await notesRegistry.get({
-				limit: 100,
-				page: page,
+				limit: limit ?? 100,
 				tags,
 				sort: { by: 'updatedAt', order: 'desc' },
 				search: searchText
@@ -63,9 +61,7 @@ export const useUpdateNotes = () => {
 
 			if (isRequestCanceled()) return;
 
-			const mergedNotes = page && oldNotes ? [...oldNotes, ...notes] : [...notes];
-
-			dispatch(workspacesApi.setNotes({ ...workspaceData, notes: mergedNotes }));
+			dispatch(workspacesApi.setNotes({ ...workspaceData, notes: notes }));
 		},
 		[activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData],
 	);
