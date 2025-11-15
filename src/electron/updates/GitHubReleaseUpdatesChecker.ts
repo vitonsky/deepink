@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import semver from 'semver';
 import { z } from 'zod';
 
 export const ReleaseObjectScheme = z.object({
@@ -28,11 +29,11 @@ export class GitHubReleaseUpdatesChecker {
 
 			const releases = ReleaseObjectScheme.array().parse(await response.json());
 
-			if (releases.length === 0) return null;
-
 			const latestRelease = releases[0];
+			if (!latestRelease) return null;
+
 			const latestVersion = latestRelease.tag_name.replace(/^v/, '');
-			const isNewVersion = latestVersion !== context.version;
+			const isNewVersion = semver.gt(latestVersion, context.version);
 
 			return isNewVersion
 				? {
