@@ -5,7 +5,6 @@ import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
-import getTagQuery from './getTagIdByResolvedName.sql';
 import tagsQuery from './selectTagsWithResolvedNames.sql';
 import { IResolvedTag, ITag } from '..';
 
@@ -95,16 +94,26 @@ export class TagsController {
 
 		//check tag unique
 		const parentName = parent
-			? (await db.query(qb.sql`SELECT name FROM tags WHERE id = ${parent}`)).rows[0]
-					?.name
+			? (
+					await db.query(
+						qb.sql`SELECT name FROM tags WHERE id = ${parent} AND workspace_id=${this.workspace}`,
+					)
+			  ).rows[0]?.name
 			: null;
 		const resolvedName = parentName ? `${parentName}/${name}` : name;
 
 		const { rows: duplicatedTag } = await db.query(
-			qb.line(getTagQuery, qb.sql`WHERE resolved_name = ${resolvedName} LIMIT 1`),
+			qb.line(
+				qb.line(`SELECT x.id FROM (${tagsQuery}) AS x 
+				JOIN tags ON x.id=tags.id AND tags.workspace_id='${this.workspace}' 
+				WHERE x.resolved_name='${resolvedName}'`),
+			),
 		);
 		if (duplicatedTag.length > 0) {
-			throw new TagControllerError(`Tag already exists`, TAG_ERROR_CODE.DUPLICATE);
+			throw new TagControllerError(
+				`Tag ${name} already exists`,
+				TAG_ERROR_CODE.DUPLICATE,
+			);
 		}
 
 		const segments = name.split('/');
@@ -119,7 +128,8 @@ export class TagsController {
 					const isFirstItem = idx === 0;
 
 					const { rows: existing } = await db.query(
-						qb.sql`SELECT * FROM tags WHERE name = ${name} AND parent IS NOT DISTINCT FROM ${
+						qb.sql`SELECT * FROM tags WHERE name = ${name} 
+						AND workspace_id = ${this.workspace} AND parent IS NOT DISTINCT FROM ${
 							isFirstItem ? parent : lastId
 						}`,
 					);
