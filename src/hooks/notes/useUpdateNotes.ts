@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useProfileControls } from '@features/App/Profile';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -6,6 +6,7 @@ import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/ho
 import {
 	NOTES_VIEW,
 	selectActiveTag,
+	selectNotesLimit,
 	selectSearch,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -25,49 +26,61 @@ export const useUpdateNotes = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 
 	const search = useWorkspaceSelector(selectSearch);
+	const limit = useWorkspaceSelector(selectNotesLimit);
+
+	// Reset limit when filter changes
+	useEffect(() => {
+		dispatch(workspacesApi.setNotesLimit({ ...workspaceData, limit: 100 }));
+	}, [dispatch, workspaceData, search, activeTag, notesView]);
 
 	const requestContextRef = useRef(0);
-	return useCallback(
-		async (limit?: number) => {
-			const contextId = ++requestContextRef.current;
-			const isRequestCanceled = () => contextId !== requestContextRef.current;
+	return useCallback(async () => {
+		const contextId = ++requestContextRef.current;
+		const isRequestCanceled = () => contextId !== requestContextRef.current;
 
-			const searchText = search.trim();
-			if (searchText) {
-				console.debug('Notes text indexing...');
-				const start = performance.now();
-				await lexemes.index();
-
-				if (isRequestCanceled()) return;
-				console.debug('Notes indexing is completed', performance.now() - start);
-			}
-
-			const tags = activeTag !== null ? [activeTag.id] : [];
-
-			const notes = await notesRegistry.get({
-				limit: 100,
-				tags,
-				sort: { by: 'updatedAt', order: 'desc' },
-				search: searchText
-					? {
-							text: searchText,
-					  }
-					: undefined,
-				meta: {
-					isDeleted: notesView === NOTES_VIEW.BIN,
-					// show archived notes only in archive view
-					// but do not filter by the archived flag in bin view
-					...(notesView !== NOTES_VIEW.BIN && {
-						isArchived: notesView === NOTES_VIEW.ARCHIVE,
-					}),
-					...(notesView === NOTES_VIEW.BOOKMARK && { isBookmarked: true }),
-				},
-			});
+		const searchText = search.trim();
+		if (searchText) {
+			console.debug('Notes text indexing...');
+			const start = performance.now();
+			await lexemes.index();
 
 			if (isRequestCanceled()) return;
+			console.debug('Notes indexing is completed', performance.now() - start);
+		}
 
-			dispatch(workspacesApi.setNotes({ ...workspaceData, notes: notes }));
-		},
-		[activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData],
-	);
+		const tags = activeTag !== null ? [activeTag.id] : [];
+
+		const notes = await notesRegistry.get({
+			limit,
+			tags,
+			sort: { by: 'updatedAt', order: 'desc' },
+			search: searchText
+				? {
+						text: searchText,
+				  }
+				: undefined,
+			meta: {
+				isDeleted: notesView === NOTES_VIEW.BIN,
+				// show archived notes only in archive view
+				// but do not filter by the archived flag in bin view
+				...(notesView !== NOTES_VIEW.BIN && {
+					isArchived: notesView === NOTES_VIEW.ARCHIVE,
+				}),
+				...(notesView === NOTES_VIEW.BOOKMARK && { isBookmarked: true }),
+			},
+		});
+
+		if (isRequestCanceled()) return;
+
+		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
+	}, [
+		search,
+		activeTag,
+		notesView,
+		notesRegistry,
+		limit,
+		dispatch,
+		workspaceData,
+		lexemes,
+	]);
 };
