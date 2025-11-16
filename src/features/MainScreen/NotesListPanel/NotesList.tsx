@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -7,11 +7,14 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
 	selectNotes,
+	selectNotesLimit,
 	selectSearch,
+	workspacesApi,
 } from '@state/redux/profiles/profiles';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
@@ -48,21 +51,22 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const items = virtualizer.getVirtualItems();
 
-	// Load notes by scroll
-	const [limit, setLimit] = useState(100);
-	const [loading, setLoading] = useState(false);
+	// Loads notes on scroll
+	const limit = useWorkspaceSelector(selectNotesLimit);
+
+	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
 	useEffect(() => {
 		if (!notes.length) return;
 		const lastVisibleIndex = items[items.length - 1].index;
 
 		if (lastVisibleIndex >= notes.length - 10) {
-			if (loading) return;
-			setLoading(true);
-
-			updateNotes(limit).then(() => {
-				setLimit((prev) => prev + 100);
-				setLoading(false);
-			});
+			dispatch(
+				workspacesApi.setNotesLimit({
+					...workspaceData,
+					limit: limit + 100,
+				}),
+			);
 		}
 	}, [items]);
 
