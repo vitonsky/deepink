@@ -70,12 +70,6 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 	);
 }
 
-function getBookmarksFilter(bookmarks?: boolean) {
-	if (bookmarks === true) return qb.sql`id IN (SELECT note_id FROM bookmarks)`;
-	if (bookmarks === false) return qb.sql`id NOT IN (SELECT note_id FROM bookmarks)`;
-	return undefined;
-}
-
 function getFetchQuery(
 	{
 		select,
@@ -170,6 +164,13 @@ function getFetchQuery(
 				tags,
 			)}))`,
 		);
+	}
+
+	// Filter by bookmarks
+	if (typeof bookmarks === 'boolean') {
+		bookmarks
+			? filterQuery.push(qb.sql`id IN (SELECT note_id FROM bookmarks)`)
+			: filterQuery.push(qb.sql`id NOT IN (SELECT note_id FROM bookmarks)`);
 	}
 
 	if (metaEntries.length > 0) {

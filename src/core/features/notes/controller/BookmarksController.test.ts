@@ -2,8 +2,8 @@ import { getUUID } from 'src/__tests__/utils/uuid';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { NotesController } from '../controller/NotesController';
 import { BookmarksController } from './BookmarksController';
+import { NotesController } from './NotesController';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
