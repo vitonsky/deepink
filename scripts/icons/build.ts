@@ -10,7 +10,7 @@ async function buildIcons() {
 
 	// Build only if CLI tools available
 	if (process.platform === 'darwin') {
-		tasks.push(buildIconSet(sourceIcon));
+		tasks.push(buildIconSet(sourceIcon, path.join(__dirname, 'icon-mask.svg')));
 	}
 
 	await Promise.all(tasks);
