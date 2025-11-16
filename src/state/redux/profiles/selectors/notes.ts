@@ -78,3 +78,11 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 		return workspace.recentlyClosedNotes;
 	},
 );
+
+export const selectNotesLimit = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return 100;
+		return workspace.notesLimit;
+	},
+);
