@@ -13,6 +13,7 @@ type ChangeEvent = 'tags' | 'noteTags';
 export enum TAG_ERROR_CODE {
 	DUPLICATE = 'Duplicate',
 	INVALID_FORMAT = 'InvalidFormat',
+	INSERTION_FAILED = 'InsertionFailed',
 }
 
 export class TagControllerError extends Error {
@@ -177,7 +178,10 @@ export class TagsController {
 		}
 
 		if (!lastId) {
-			throw new Error("Can't get id of inserted row");
+			throw new TagControllerError(
+				"Can't get id of inserted row",
+				TAG_ERROR_CODE.INSERTION_FAILED,
+			);
 		}
 
 		this.onChanged('tags');
