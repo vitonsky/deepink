@@ -4,6 +4,7 @@ import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { BookmarksController } from './BookmarksController';
 import { LexemesRegistry } from './LexemesRegistry';
 import { NotesController } from './NotesController';
 
@@ -243,6 +244,46 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
+
+	test('filter notes by archived', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		// update status for 10 notes
+		await registry.updateMeta(notesId, { isArchived: true });
+		await expect(registry.get({ meta: { isArchived: true } })).resolves.toHaveLength(
+			10,
+		);
+
+		// check only not deleted notes
+		await expect(registry.get({ meta: { isArchived: false } })).resolves.toHaveLength(
+			notesSample.length - 20,
+		);
+
+		await db.close();
+	});
+});
+
+test('filter notes by bookmarks', async () => {
+	const dbFile = createFileControllerMock();
+	const db = await openDatabase(dbFile);
+	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+	const bookmark = new BookmarksController(db);
+
+	const noteId = await registry.add({ title: 'Title', text: 'Text' });
+
+	await bookmark.add(noteId);
+	await expect(bookmark.has(noteId)).resolves.toEqual(true);
+
+	await expect(registry.get({ bookmarks: true })).resolves.toHaveLength(1);
+
+	await expect(registry.get({ bookmarks: false })).resolves.toHaveLength(0);
+
+	await db.close();
 });
 
 describe('multi instances', () => {
