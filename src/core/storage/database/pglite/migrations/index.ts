@@ -41,7 +41,7 @@ export const getMigrationsList = async (): Promise<PGMigration[]> =>
 			import('./sql/2_add_bookmarks_tab.sql'),
 		),
 		convertSQLToMigrationObject(
-			'3_add_archived_to_notes',
-			import('./sql/3_add_archived_to_notes.sql'),
+			'5_add_bookmarks_tab',
+			import('./sql/5_add_bookmarks_tab.sql'),
 		),
 	]);
