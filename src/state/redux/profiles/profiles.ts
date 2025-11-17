@@ -18,6 +18,8 @@ const selectWorkspaceObject = (
 export enum NOTES_VIEW {
 	All_NOTES = 'All notes',
 	BIN = 'Bin',
+	BOOKMARK = 'Bookmark',
+	ARCHIVE = 'Archive',
 }
 
 export const createWorkspaceObject = (workspace: {

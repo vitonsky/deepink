@@ -42,9 +42,7 @@ export const useUpdateNotes = () => {
 		}
 
 		const tags =
-			activeTag !== null && notesView === NOTES_VIEW.All_NOTES
-				? [activeTag.id]
-				: [];
+			activeTag !== null && notesView !== NOTES_VIEW.BIN ? [activeTag.id] : [];
 
 		const notes = await notesRegistry.get({
 			limit: 100,
@@ -55,7 +53,11 @@ export const useUpdateNotes = () => {
 						text: searchText,
 				  }
 				: undefined,
-			meta: { isDeleted: notesView === NOTES_VIEW.BIN },
+			meta: {
+				isDeleted: notesView === NOTES_VIEW.BIN,
+				isArchived: notesView === NOTES_VIEW.ARCHIVE,
+			},
+			...(notesView === NOTES_VIEW.BOOKMARK && { bookmarks: true }),
 		});
 
 		if (isRequestCanceled()) return;

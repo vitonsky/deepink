@@ -172,7 +172,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'bookmarks',
+						id: NOTES_VIEW.BOOKMARK,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBookmark />
@@ -181,7 +181,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						),
 					},
 					{
-						id: 'archive',
+						id: NOTES_VIEW.ARCHIVE,
 						content: (
 							<HStack padding="0.5rem 1rem" gap="0.8rem">
 								<FaBoxArchive />
@@ -210,12 +210,12 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				]}
 				activeItem={notesViewMode}
 				onPick={(id) => {
-					if (id !== NOTES_VIEW.All_NOTES && id !== NOTES_VIEW.BIN) return;
+					if (!Object.values(NOTES_VIEW).includes(id as NOTES_VIEW)) return;
 
 					dispatch(
 						workspacesApi.setView({
 							...workspaceData,
-							view: id,
+							view: id as NOTES_VIEW,
 						}),
 					);
 

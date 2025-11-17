@@ -280,7 +280,7 @@ test('filter notes by bookmarks', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
 	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const bookmark = new BookmarksController(db);
+	const bookmark = new BookmarksController(db, FAKE_WORKSPACE_ID);
 
 	const noteId = await registry.add({ title: 'Title', text: 'Text' });
 

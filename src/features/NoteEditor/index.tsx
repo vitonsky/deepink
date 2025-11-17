@@ -7,7 +7,14 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
+import {
+	FaArrowLeft,
+	FaBookmark,
+	FaFlag,
+	FaHashtag,
+	FaRegBookmark,
+	FaXmark,
+} from 'react-icons/fa6';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
@@ -25,6 +32,7 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useBookmark } from '@features/NoteEditor/useBookmarks';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -193,6 +201,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
+	const { inBookmark, toggle: toggleBookmark } = useBookmark(note.id);
+
 	// In the future, read-only mode will cover more cases than deleted notes
 	const isReadOnly = note.isDeleted;
 
@@ -220,8 +230,13 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
 				<HStack>
-					<Button variant="ghost" size="xs">
-						<FaBookmark />
+					<Button
+						variant="ghost"
+						size="xs"
+						title={Boolean(inBookmark) ? 'Remove bookmark' : 'Add bookmark'}
+						onClick={toggleBookmark}
+					>
+						{inBookmark ? <FaBookmark /> : <FaRegBookmark />}
 					</Button>
 					<Button variant="ghost" size="xs">
 						<FaFlag />

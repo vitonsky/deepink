@@ -11,7 +11,7 @@ test('add bookmark', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
 	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const bookmarks = new BookmarksController(db);
+	const bookmarks = new BookmarksController(db, FAKE_WORKSPACE_ID);
 
 	// prepare data
 	const note = await registry.add({ title: 'Title 1', text: 'Text 1' });
@@ -25,7 +25,7 @@ test('remove bookmarks', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
 	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const bookmarks = new BookmarksController(db);
+	const bookmarks = new BookmarksController(db, FAKE_WORKSPACE_ID);
 
 	// Create note
 	const entities = [

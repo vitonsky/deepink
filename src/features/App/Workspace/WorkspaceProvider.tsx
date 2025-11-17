@@ -7,6 +7,7 @@ import { IFilesStorage } from '@core/features/files';
 import { FilesController } from '@core/features/files/FilesController';
 import { INote } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
+import { BookmarksController } from '@core/features/notes/controller/BookmarksController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
@@ -46,6 +47,9 @@ export const useFilesRegistry = createContextGetterHook(FilesRegistryContext);
 export const FilesControllerContext = createContext<IFilesStorage | null>(null);
 export const useFilesController = createContextGetterHook(FilesControllerContext);
 
+export const BookmarksRegistryContext = createContext<BookmarksController | null>(null);
+export const useBookmarksRegistry = createContextGetterHook(BookmarksRegistryContext);
+
 export interface WorkspaceProviderProps extends PropsWithChildren {
 	notesApi: NotesApi;
 	filesController: IFilesStorage;
@@ -54,6 +58,7 @@ export interface WorkspaceProviderProps extends PropsWithChildren {
 	tagsRegistry: TagsController;
 	notesRegistry: INotesController;
 	notesHistory: NoteVersions;
+	bookmarksRegistry: BookmarksController;
 }
 
 export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
@@ -64,6 +69,7 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 	tagsRegistry,
 	notesRegistry,
 	notesHistory,
+	bookmarksRegistry,
 	children,
 }) => {
 	const [eventBus] = useState(() => {
@@ -96,7 +102,11 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 							<TagsRegistryContext.Provider value={tagsRegistry}>
 								<NotesRegistryContext.Provider value={notesRegistry}>
 									<NotesHistoryContext.Provider value={notesHistory}>
-										{children}
+										<BookmarksRegistryContext.Provider
+											value={bookmarksRegistry}
+										>
+											{children}
+										</BookmarksRegistryContext.Provider>
 									</NotesHistoryContext.Provider>
 								</NotesRegistryContext.Provider>
 							</TagsRegistryContext.Provider>

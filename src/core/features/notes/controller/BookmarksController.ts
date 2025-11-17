@@ -5,22 +5,28 @@ import { wrapDB } from '@utils/db/wrapDB';
 import { NoteId } from '..';
 
 export class BookmarksController {
-	private db;
-
-	constructor(db: PGLiteDatabase) {
-		this.db = db;
-	}
+	constructor(
+		private readonly db: PGLiteDatabase,
+		private readonly workspace: string,
+	) {}
 
 	async add(id: NoteId) {
 		const db = wrapDB(this.db.get());
-		await db.query(qb.sql`INSERT INTO bookmarks VALUES (${qb.values([id])})`);
+		await db.query(
+			qb.sql`INSERT INTO bookmarks (note_id, workspace_id) VALUES (${qb.values([
+				id,
+				this.workspace,
+			])})`,
+		);
 	}
 
 	async remove(ids: NoteId[]) {
 		const db = wrapDB(this.db.get());
 
 		const { affectedRows = 0 } = await db.query(
-			qb.sql`DELETE FROM bookmarks WHERE note_id IN (${qb.values(ids)})`,
+			qb.sql`DELETE FROM bookmarks WHERE workspace_id=${
+				this.workspace
+			} AND note_id IN (${qb.values(ids)})`,
 		);
 
 		if (affectedRows !== ids.length) {
@@ -37,7 +43,7 @@ export class BookmarksController {
 		const db = wrapDB(this.db.get());
 
 		const { rows } = await db.query(
-			qb.sql`SELECT note_id FROM bookmarks WHERE note_id = ${id}`,
+			qb.sql`SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace} AND note_id = ${id}`,
 		);
 		return rows.length > 0;
 	}
