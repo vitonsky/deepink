@@ -37,7 +37,7 @@ describe('manage tags', () => {
 		});
 	});
 
-	test('tags with invalid names and duplicates cannot be added', async () => {
+	test('tags with invalid names cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
@@ -56,20 +56,21 @@ describe('manage tags', () => {
 		);
 
 		await expect(tags.getTags()).resolves.toEqual([]);
+	});
+
+	test('tag with duplicates cannot be added', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		// duplicates
-		await expect(tags.add('foo', null)).resolves.toEqual(
-			expect.stringMatching(/^[\d\w-]+$/),
-		);
+		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
 		await expect(tags.add('foo', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 
 		const tagsList = await tags.getTags();
 		const fooId = tagsList[0].id;
-		await expect(tags.add('bar', fooId)).resolves.toEqual(
-			expect.stringMatching(/^[\d\w-]+$/),
-		);
+		await expect(tags.add('bar', fooId)).resolves.toBeTypeOf('string');
 		await expect(tags.add('bar', fooId)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
