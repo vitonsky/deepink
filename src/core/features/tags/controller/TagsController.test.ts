@@ -58,7 +58,7 @@ describe('manage tags', () => {
 		await expect(tags.getTags()).resolves.toEqual([]);
 	});
 
-	test('tag with duplicates cannot be added', async () => {
+	test('duplicate tag cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
