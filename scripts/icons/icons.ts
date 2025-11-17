@@ -37,24 +37,46 @@ export async function buildIco(sourcePath: string) {
 /**
  * Build icons for macOS
  */
-export async function buildIconSet(sourceFile: string) {
+export async function buildIconSet(
+	sourceFile: string,
+	backgroundFile: string,
+	iconScale = 0.9,
+) {
 	const iconName = path.basename(getFilenameWithNoExtension(sourceFile));
 	const iconDir = path.dirname(sourceFile);
 
 	const iconSetDir = path.join(iconDir, iconName + '.iconset');
 	mkdirSync(iconSetDir, { recursive: true });
 
-	const sizes = [512, 256];
+	const sizes = [1024, 512, 256];
 
 	await Promise.all(
-		sizes.map((size) =>
-			sharp(sourceFile)
-				.resize(size, size)
-				.toBuffer()
-				.then(async (buffer) =>
-					writeFile(path.join(iconSetDir, `icon_${size}.png`), buffer),
-				),
-		),
+		sizes.map(async (size) => {
+			for (let multiplier = 1; multiplier <= 2; multiplier++) {
+				const sizeName =
+					multiplier === 1 ? String(size) : `${size}@${multiplier}x`;
+
+				const iconSize = size * multiplier;
+				const sourceSize = Math.floor(iconSize * iconScale);
+
+				// In case icon is not a square, macOS will insert square "mask" on background
+				// To control an icon design we insert our own mask
+				// The mask may be designed in .svg file
+				await sharp(backgroundFile)
+					.resize(iconSize, iconSize)
+					.composite([
+						{
+							input: await sharp(sourceFile)
+								.resize(sourceSize, sourceSize)
+								.toBuffer(),
+						},
+					])
+					.toBuffer()
+					.then(async (buffer) =>
+						writeFile(path.join(iconSetDir, `icon_${sizeName}.png`), buffer),
+					);
+			}
+		}),
 	);
 
 	execFileSync(

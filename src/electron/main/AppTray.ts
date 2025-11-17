@@ -34,7 +34,7 @@ export class AppTray {
 
 		// Tray
 		const appIcon = nativeImage.createFromPath(
-			path.join(__dirname, 'assets/icons/app.png'),
+			path.join(__dirname, 'assets/icons/icon-simple.png'),
 		);
 		const trayIcon = appIcon.resize({ width: 24 });
 		trayIcon.setTemplateImage(true);
