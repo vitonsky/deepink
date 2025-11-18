@@ -13,6 +13,7 @@ type ChangeEvent = 'tags' | 'noteTags';
 export enum TAG_ERROR_CODE {
 	DUPLICATE = 'Duplicate',
 	INVALID_FORMAT = 'InvalidFormat',
+	INVALID_TAG_PATH = 'invalidTagPath',
 }
 
 export class TagControllerError extends Error {
@@ -87,27 +88,32 @@ export class TagsController {
 		return rows;
 	}
 
+	/**
+	 * Params: either a full name like 'foo/bar/baz' with parent null, or a single tag name like 'bar' with parent 'fooId'
+	 */
 	public async add(name: string, parent: null | string): Promise<string> {
+		if (name.includes('/') && parent) {
+			throw new TagControllerError(
+				'Tag name must be either a full tag path or a single tag name with parent',
+				TAG_ERROR_CODE.INVALID_TAG_PATH,
+			);
+		}
 		const db = wrapDB(this.db.get());
 
 		validateTagName(name);
 
 		//check tag unique
-		const parentName = parent
-			? (
-					await db.query(
-						qb.sql`SELECT name FROM tags WHERE id = ${parent} AND workspace_id=${this.workspace}`,
-					)
-			  ).rows[0].name
-			: null;
-		const resolvedName = parentName ? `${parentName}/${name}` : name;
-
-		const { rows: duplicatedTag } = await db.query(
-			qb.line(`SELECT x.id FROM (${tagsQuery}) AS x 
-				JOIN tags ON x.id=tags.id AND tags.workspace_id='${this.workspace}' 
-				WHERE x.resolved_name='${resolvedName}'`),
+		const {
+			rows: [duplicatedTag],
+		} = await db.query(
+			qb.line(
+				`SELECT count(*) FROM (${tagsQuery}) as tags`,
+				qb.sql`WHERE tags.workspace_id=${this.workspace} AND(
+				(tags.resolved_name=${name}) OR (tags.name=${name} AND tags.parent IS NOT DISTINCT FROM ${parent}))`,
+			),
+			z.object({ count: z.number() }),
 		);
-		if (duplicatedTag.length > 0) {
+		if (duplicatedTag.count) {
 			throw new TagControllerError(
 				`Tag ${name} already exists`,
 				TAG_ERROR_CODE.DUPLICATE,

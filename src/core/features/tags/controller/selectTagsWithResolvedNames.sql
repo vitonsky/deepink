@@ -21,7 +21,8 @@ SELECT
     t.id,
     t.name,
     x.resolved_name,
-    t.parent
+    t.parent,
+    t.workspace_id
 FROM tags t
 JOIN (
     SELECT

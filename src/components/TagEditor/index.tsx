@@ -157,17 +157,22 @@ export const TagEditor: FC<ITagEditorProps> = ({
 											: {}),
 									});
 								} catch (error) {
-									if (error instanceof TagControllerError) {
+									if (!(error instanceof TagControllerError)) {
 										setTagNameError(
-											error.code === TAG_ERROR_CODE.DUPLICATE
-												? 'Tag already exists'
-												: 'Tag cannot be empty, start or end with "/", or contain "//".',
+											'Unable to save the tag. Please try again.',
 										);
 										return;
 									}
-
+									if (error.code === TAG_ERROR_CODE.INVALID_TAG_PATH) {
+										setTagNameError(
+											'Tag must be full path (like foo/bar) or single name with a parent.',
+										);
+										return;
+									}
 									setTagNameError(
-										'Unable to save the tag. Please try again.',
+										error.code === TAG_ERROR_CODE.DUPLICATE
+											? 'Tag already exists'
+											: 'Tag cannot be empty, start or end with "/", or contain "//".',
 									);
 								}
 							}}
