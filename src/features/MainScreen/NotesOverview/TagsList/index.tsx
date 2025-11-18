@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useMemo, useState } from 'react';
-import { FaAngleDown, FaHashtag } from 'react-icons/fa6';
+import { FaChevronDown, FaChevronUp, FaHashtag } from 'react-icons/fa6';
 import { Box, HStack, Text } from '@chakra-ui/react';
 import { ListItem, NestedList } from '@components/NestedList';
 
@@ -63,35 +63,37 @@ export const TagsList: FC<ITagsListProps> = ({
 							onTagMenu(id, { x: evt.clientX, y: evt.clientY });
 						}}
 					>
-						<Box
-							padding="2px"
-							sx={{
-								...(isHaveChilds
-									? {
-											borderRadius: '4px',
-											'&:hover': {
-												backdropFilter: 'contrast(0.7)',
-											},
-									  }
-									: { display: 'none' }),
-								...(isOpenedGroup ? {} : { transform: 'rotate(-90deg)' }),
-							}}
-							onClick={(evt) => {
-								evt.stopPropagation();
-								setToggledTags((tags) => {
-									if (isOpenedGroup) return [...tags, id];
-									return tags.filter((tag) => tag !== id);
-								});
-							}}
-						>
-							<FaAngleDown size={14} />
-						</Box>
-
 						<FaHashtag size={14} />
 
 						<Text overflow="hidden" textOverflow="ellipsis">
 							{content}
 						</Text>
+
+						{isHaveChilds ? (
+							<Box
+								marginLeft="auto"
+								padding="2px"
+								sx={{
+									borderRadius: '4px',
+									'&:hover': {
+										backdropFilter: 'contrast(0.7)',
+									},
+								}}
+								onClick={(evt) => {
+									evt.stopPropagation();
+									setToggledTags((tags) => {
+										if (isOpenedGroup) return [...tags, id];
+										return tags.filter((tag) => tag !== id);
+									});
+								}}
+							>
+								{isOpenedGroup ? (
+									<FaChevronUp size={14} />
+								) : (
+									<FaChevronDown size={14} />
+								)}
+							</Box>
+						) : undefined}
 					</HStack>
 				),
 				collapsed: !isOpenedGroup,
