@@ -26,8 +26,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		<NestedList
 			overflow="auto"
 			w="100%"
-			minHeight="150px"
-			flexShrink={10}
+			minHeight="8rem"
+			flexShrink={999_999}
 			items={[
 				{
 					id: 'inbox',
