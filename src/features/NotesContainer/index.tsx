@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef } from 'react';
 import { FaPenToSquare } from 'react-icons/fa6';
 import { WorkspaceEvents } from '@api/events/workspace';
-import { Box, Link, StackProps, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, StackProps, Text, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
@@ -145,7 +145,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					<VStack fontSize="1.2rem" color="typography.secondary">
 						<Text>No note selected</Text>
 						<Text fontSize="1rem">
-							<Link
+							<Button
 								onClick={async () => {
 									await createNote();
 
@@ -153,11 +153,14 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 										context: 'empty notes container',
 									});
 								}}
+								size="sm"
+								variant="link"
+								leftIcon={<FaPenToSquare />}
+								iconSpacing=".2rem"
 							>
-								<FaPenToSquare style={{ display: 'inline-block' }} /> Add
-								note
-							</Link>
-							, or use search to find anything
+								Add note
+							</Button>{' '}
+							or use search to find anything
 						</Text>
 					</VStack>
 				</Box>

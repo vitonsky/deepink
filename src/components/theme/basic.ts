@@ -194,6 +194,23 @@ export const basicTheme = extendTheme({
 						color: 'variants.ghost.active.text',
 					},
 				},
+				link: {
+					color: 'link.base',
+					backgroundColor: 'unset',
+					textDecoration: 'underline',
+					padding: 0,
+					fontWeight: 'normal',
+					fontSize: 'inherit',
+					alignItems: 'baseline',
+					'&:hover, &:active, &[data-active]': {
+						color: 'link.hover',
+					},
+					textUnderlineOffset: '.2em',
+
+					'&:not(:disabled):active': {
+						transform: 'none',
+					},
+				},
 			},
 			defaultProps: {
 				variant: 'secondary',
