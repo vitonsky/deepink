@@ -9,6 +9,7 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
 import { NotesOverview } from './NotesOverview';
+import { TagsBar } from './NotesOverview/TagsBar';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
@@ -91,6 +92,8 @@ export const MainScreen: FC = () => {
 					<NewNoteButton />
 
 					<NotesOverview />
+
+					<TagsBar />
 
 					<WorkspaceBar />
 				</VStack>
