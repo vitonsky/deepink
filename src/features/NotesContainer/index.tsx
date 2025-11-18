@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef } from 'react';
+import { FaPenToSquare } from 'react-icons/fa6';
 import { WorkspaceEvents } from '@api/events/workspace';
-import { Box, StackProps, VStack } from '@chakra-ui/react';
+import { Box, Link, StackProps, Text, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
@@ -12,6 +13,7 @@ import {
 import { Notes } from '@features/MainScreen/Notes';
 import { TopBar } from '@features/MainScreen/TopBar';
 import { useTelemetryTracker } from '@features/telemetry';
+import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useNoteShortcutActions } from '@hooks/notes/useNoteShortcutActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -27,6 +29,8 @@ export type NotesContainerProps = Partial<StackProps>;
 
 export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	const telemetry = useTelemetryTracker();
+
+	const createNote = useCreateNote();
 
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
@@ -94,43 +98,70 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 
 	return (
 		<VStack align="start" w="100%" h="100%" gap={0} overflow="hidden" {...props}>
-			<TopBar
-				{...{
-					updateNotes,
-					notes: openedNotes,
-					tabs,
-					activeTab: activeNoteId ?? null,
-					onClose(id) {
-						noteActions.close(id);
-						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CLOSED, {
-							context: 'top bar',
-						});
-					},
-					onPick(id) {
-						noteActions.click(id);
-						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_OPENED, {
-							context: 'top bar',
-						});
-					},
-				}}
-			/>
-			<Box
-				display="flex"
-				flexGrow="100"
-				width="100%"
-				overflow="auto"
-				padding=".5rem"
-			>
-				<Notes
-					{...{
-						notes: openedNotes,
-						tabs,
-						activeTab: activeNoteId ?? null,
-						updateNote,
-					}}
-				/>
-			</Box>
-			<EditorModePicker />
+			{openedNotes.length > 0 ? (
+				<>
+					<TopBar
+						{...{
+							updateNotes,
+							notes: openedNotes,
+							tabs,
+							activeTab: activeNoteId ?? null,
+							onClose(id) {
+								noteActions.close(id);
+								telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CLOSED, {
+									context: 'top bar',
+								});
+							},
+							onPick(id) {
+								noteActions.click(id);
+								telemetry.track(TELEMETRY_EVENT_NAME.NOTE_OPENED, {
+									context: 'top bar',
+								});
+							},
+						}}
+					/>
+
+					<Box
+						display="flex"
+						flexGrow="100"
+						width="100%"
+						overflow="auto"
+						padding=".5rem"
+					>
+						<Notes
+							{...{
+								notes: openedNotes,
+								tabs,
+								activeTab: activeNoteId ?? null,
+								updateNote,
+							}}
+						/>
+					</Box>
+
+					<EditorModePicker />
+				</>
+			) : (
+				<Box margin="auto">
+					<VStack fontSize="1.2rem" color="typography.secondary">
+						<Text>No note selected</Text>
+						<Text fontSize="1rem">
+							<Link
+								onClick={async () => {
+									await createNote();
+
+									telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CREATED, {
+										context: 'empty notes container',
+									});
+								}}
+							>
+								<FaPenToSquare style={{ display: 'inline-block' }} /> Add
+								note
+							</Link>
+							, or use search to find anything
+						</Text>
+					</VStack>
+				</Box>
+			)}
 		</VStack>
 	);
 };
