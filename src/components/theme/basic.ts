@@ -179,6 +179,23 @@ export const basicTheme = extendTheme({
 						backgroundColor: 'dim.400',
 					},
 				},
+				link: {
+					color: 'link.base',
+					backgroundColor: 'unset',
+					textDecoration: 'underline',
+					padding: 0,
+					fontWeight: 'normal',
+					fontSize: 'inherit',
+					alignItems: 'baseline',
+					'&:hover, &:active, &[data-active]': {
+						color: 'link.hover',
+					},
+					textUnderlineOffset: '.2em',
+
+					'&:not(:disabled):active': {
+						transform: 'none',
+					},
+				},
 			},
 			defaultProps: {
 				variant: 'secondary',
