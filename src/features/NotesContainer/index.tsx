@@ -143,7 +143,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 			) : (
 				<Box margin="auto">
 					<VStack fontSize="1.2rem" color="typography.secondary">
-						<Text>No note selected</Text>
+						<Text>Select notes to read</Text>
 						<Text fontSize="1rem">
 							<Button
 								onClick={async () => {
