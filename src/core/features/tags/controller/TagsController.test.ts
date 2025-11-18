@@ -58,20 +58,72 @@ describe('manage tags', () => {
 		await expect(tags.getTags()).resolves.toEqual([]);
 	});
 
+	test('creates tag by full path and rejects partial path with parent', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		await expect(tags.add('tag1/tag2/tag3', null)).resolves.toBeTypeOf('string');
+
+		const list = await tags.getTags();
+		const tag1 = list.find((t) => t.name === 'tag1')!;
+		expect(tag1).not.toBeUndefined();
+
+		// Cannot pass both a full path ('foo/bar') and a parent ID
+		await expect(tags.add('tag2/tag3', tag1.id)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_TAG_PATH }),
+		);
+
+		await expect(tags.getTags()).resolves.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					name: 'tag1',
+					parent: null,
+					resolvedName: 'tag1',
+				}),
+				expect.objectContaining({
+					name: 'tag2',
+					parent: expect.any(String),
+					resolvedName: 'tag1/tag2',
+				}),
+				expect.objectContaining({
+					name: 'tag3',
+					parent: expect.any(String),
+					resolvedName: 'tag1/tag2/tag3',
+				}),
+			]),
+		);
+	});
+
 	test('duplicate tag cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		// duplicates
+		await expect(tags.add('seg1/seg2/seg3', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('seg1/seg2/seg3', null)).rejects.toThrow(
+			expect.objectContaining({
+				code: TAG_ERROR_CODE.DUPLICATE,
+			}),
+		);
+
+		const list = await tags.getTags();
+		const seg2 = list.find((t) => t.name === 'seg2')!;
+		expect(seg2).not.toBeUndefined();
+
+		await expect(tags.add('seg3', seg2.id)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
 		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
 		await expect(tags.add('foo', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 
 		const tagsList = await tags.getTags();
-		const fooId = tagsList[0].id;
-		await expect(tags.add('bar', fooId)).resolves.toBeTypeOf('string');
-		await expect(tags.add('bar', fooId)).rejects.toThrow(
+		const fooTag = tagsList.find((t) => t.name == 'foo')!;
+		expect(fooTag).not.toBeUndefined();
+
+		await expect(tags.add('bar', fooTag.id)).resolves.toBeTypeOf('string');
+		await expect(tags.add('bar', fooTag.id)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 
