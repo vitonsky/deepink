@@ -78,7 +78,7 @@ export const NotesPanel = () => {
 			}}
 		>
 			<VStack align="start" w="100%" gap="0.5rem">
-				<HStack>
+				<HStack w="100%">
 					<InputGroup size="sm">
 						<InputLeftElement pointerEvents="none">
 							<FaMagnifyingGlass />
