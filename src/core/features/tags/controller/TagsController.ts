@@ -92,7 +92,7 @@ export class TagsController {
 
 		validateTagName(name);
 
-		// check tag unique; tags like (name: 'foo', parent: id), (name: 'foo/bar', parent: id)
+		// check tag unique
 		const filter = parent
 			? qb.sql`tags.resolved_name = (SELECT resolved_name || '/' || ${name} FROM tags WHERE id = ${parent})`
 			: qb.sql`tags.resolved_name = ${name}`;
