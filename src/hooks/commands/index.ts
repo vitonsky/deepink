@@ -28,6 +28,11 @@ export enum GLOBAL_COMMANDS {
 	 * Lock the currently active user profile
 	 */
 	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
+
+	/**
+	 * Open global settings window
+	 */
+	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
 }
 
 // In the future, we can define a type for the payload like this:
