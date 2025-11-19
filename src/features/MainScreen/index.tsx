@@ -1,4 +1,5 @@
 import React, { FC, useEffect } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Box, HStack, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
@@ -85,51 +86,64 @@ export const MainScreen: FC = () => {
 					<ActivityBar />
 				</Box>
 
-				<VStack
-					sx={{
-						alignItems: 'start',
+				{/* TODO: update panel size by changes in other workspace */}
+				<PanelGroup direction="horizontal" autoSaveId="panel.main">
+					<VStack
+						as={Panel}
+						defaultSize={20}
+						sx={{
+							alignItems: 'start',
 
-						width: '100%',
-						height: '100%',
-						minWidth: '250px',
-						maxWidth: '250px',
-						padding: '.5rem',
-						overflow: 'hidden',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '1rem',
-						borderRight: '1px solid',
-						borderColor: 'surface.border',
-					}}
-				>
-					<NotesOverview />
+							// width: '100%',
+							// height: '100%',
+							minWidth: 'min-content',
+							maxWidth: '350px',
+							padding: '.5rem',
+							overflow: 'hidden',
+							display: 'flex',
+							flexDirection: 'column',
+							gap: '1rem',
+							// borderRight: '1px solid',
+							// borderColor: 'surface.border',
+						}}
+					>
+						<NotesOverview />
 
-					<TagsBar />
+						<TagsBar />
 
-					<WorkspaceBar marginTop="auto" />
-				</VStack>
+						<WorkspaceBar marginTop="auto" />
+					</VStack>
 
-				<VStack
-					sx={{
-						alignItems: 'start',
+					<Box as={PanelResizeHandle} color="surface.border" />
 
-						width: '100%',
-						height: '100%',
-						minWidth: '250px',
-						maxWidth: '250px',
-						padding: '.5rem',
-						overflow: 'hidden',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '1rem',
-						borderRight: '1px solid',
-						borderColor: 'surface.border',
-					}}
-				>
-					<NotesPanel />
-				</VStack>
+					<VStack
+						as={Panel}
+						defaultSize={20}
+						sx={{
+							alignItems: 'start',
 
-				<NotesContainer />
+							// width: '100%',
+							// height: '100%',
+							minWidth: '200px',
+							maxWidth: '350px',
+							padding: '.5rem',
+							overflow: 'hidden',
+							display: 'flex',
+							flexDirection: 'column',
+							gap: '1rem',
+							// borderRight: '1px solid',
+							// borderColor: 'surface.border',
+						}}
+					>
+						<NotesPanel />
+					</VStack>
+
+					<Box as={PanelResizeHandle} color="surface.border" />
+
+					<Box as={Panel} minSize={50}>
+						<NotesContainer />
+					</Box>
+				</PanelGroup>
 			</HStack>
 
 			<StatusBar />
