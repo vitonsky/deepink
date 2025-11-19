@@ -10,6 +10,7 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
+import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
@@ -61,7 +62,7 @@ export const WorkspaceBar = (props: StackProps) => {
 					Workspaces
 				</Text>
 
-				<Button
+				<IconButton
 					variant="ghost"
 					size="xs"
 					marginLeft="auto"
@@ -70,9 +71,9 @@ export const WorkspaceBar = (props: StackProps) => {
 							content: () => <WorkspaceCreatePopup />,
 						});
 					}}
-				>
-					<FaPlus />
-				</Button>
+					icon={<FaPlus />}
+					title="Add workspace"
+				/>
 			</HStack>
 
 			<Divider />

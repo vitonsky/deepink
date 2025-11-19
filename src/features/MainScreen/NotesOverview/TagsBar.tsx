@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
-import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Divider, HStack, Text, VStack } from '@chakra-ui/react';
+import { IconButton } from '@components/IconButton';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import {
@@ -149,16 +150,16 @@ export const TagsBar = () => {
 						Tags
 					</Text>
 
-					<Button
+					<IconButton
 						variant="ghost"
 						onClick={() => {
 							setIsAddTagPopupOpened(true);
 						}}
 						size="xs"
 						marginLeft="auto"
-					>
-						<FaPlus />
-					</Button>
+						icon={<FaPlus />}
+						title="Add tag"
+					/>
 				</HStack>
 
 				<Divider />
