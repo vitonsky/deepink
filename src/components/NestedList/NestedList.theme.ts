@@ -27,6 +27,7 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 		},
 		content: {
 			w: '100%',
+			borderRadius: '4px',
 		},
 		group: {
 			w: '100%',
