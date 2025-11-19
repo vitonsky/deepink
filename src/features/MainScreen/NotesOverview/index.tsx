@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { FaBookmark, FaBoxArchive, FaRegCompass, FaTrashCan } from 'react-icons/fa6';
-import { ButtonGroup, HStack, IconButton } from '@chakra-ui/react';
+import { ButtonGroup, HStack } from '@chakra-ui/react';
+import { IconButton } from '@components/IconButton';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { NOTES_VIEW, workspacesApi } from '@state/redux/profiles/profiles';
@@ -43,7 +44,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					<IconButton
 						key={id}
 						icon={<option.icon />}
-						aria-label={label}
 						title={label}
 						data-no-animation
 						isActive={id === notesViewMode}
