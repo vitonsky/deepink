@@ -13,7 +13,6 @@ type ChangeEvent = 'tags' | 'noteTags';
 export enum TAG_ERROR_CODE {
 	DUPLICATE = 'Duplicate',
 	INVALID_FORMAT = 'InvalidFormat',
-	INVALID_TAG_PATH = 'invalidTagPath',
 }
 
 export class TagControllerError extends Error {
@@ -88,28 +87,21 @@ export class TagsController {
 		return rows;
 	}
 
-	/**
-	 * Add tag: full path (name='foo/bar', parent=null) or single name with parent
-	 */
 	public async add(name: string, parent: null | string): Promise<string> {
-		if (name.includes('/') && parent) {
-			throw new TagControllerError(
-				'Tag must be a full path with no parent, or a single name with a parent.',
-				TAG_ERROR_CODE.INVALID_TAG_PATH,
-			);
-		}
 		const db = wrapDB(this.db.get());
 
 		validateTagName(name);
 
 		//check tag unique
+		const filter = parent
+			? qb.sql`tags.resolved_name = (SELECT resolved_name || '/' || ${name} FROM tags WHERE id = ${parent})`
+			: qb.sql`tags.resolved_name = ${name}`;
 		const {
 			rows: [duplicatedTag],
 		} = await db.query(
 			qb.line(
-				`SELECT count(*) FROM (${tagsQuery}) as tags`,
-				qb.sql`WHERE tags.workspace_id=${this.workspace} AND(
-				(tags.resolved_name=${name}) OR (tags.name=${name} AND tags.parent IS NOT DISTINCT FROM ${parent}))`,
+				`WITH tags AS (${tagsQuery}) SELECT count(*) FROM tags`,
+				qb.sql`WHERE tags.workspace_id = ${this.workspace} AND (${filter})`,
 			),
 			z.object({ count: z.number() }),
 		);

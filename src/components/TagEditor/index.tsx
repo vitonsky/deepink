@@ -163,12 +163,6 @@ export const TagEditor: FC<ITagEditorProps> = ({
 										);
 										return;
 									}
-									if (error.code === TAG_ERROR_CODE.INVALID_TAG_PATH) {
-										setTagNameError(
-											'Tag must be full path (like foo/bar) or single name with a parent.',
-										);
-										return;
-									}
 									setTagNameError(
 										error.code === TAG_ERROR_CODE.DUPLICATE
 											? 'Tag already exists'
