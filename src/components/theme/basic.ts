@@ -87,12 +87,14 @@ export const basicTheme = extendTheme({
 		},
 		typography: {
 			primary: '#000',
+			inverted: '#fff',
 			secondary: '#727272',
 			additional: '#3e3d3d',
 			ghost: '#6e6e6e',
 		},
 		surface: {
 			background: '#ffffff',
+			invertedBackground: '#000',
 			panel: '#fdfdfd',
 			contrastPanel: '#f7f7f7',
 			border: '#e2e8f0',
@@ -136,6 +138,14 @@ export const basicTheme = extendTheme({
 		},
 	},
 	components: {
+		Tooltip: defineStyleConfig({
+			baseStyle: {
+				borderRadius: '4px',
+				color: 'typography.inverted',
+				backgroundColor: 'surface.invertedBackground',
+				'--popper-arrow-bg': 'var(--chakra-colors-surface-invertedBackground)',
+			},
+		}),
 		Link: defineStyleConfig({
 			baseStyle: {
 				color: 'link.base',
