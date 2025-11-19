@@ -10,7 +10,7 @@ export type IconButtonProps = Omit<BaseIconButtonProps, 'icon' | 'aria-label'> &
 	icon: Exclude<BaseIconButtonProps['icon'], void>;
 	title: string;
 	tooltipPlacement?: TooltipProps['placement'];
-	tooltipProps?: TooltipProps;
+	tooltipProps?: Omit<TooltipProps, 'children'>;
 };
 
 export const IconButton = forwardRef<HTMLDivElement, IconButtonProps>(
