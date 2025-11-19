@@ -72,6 +72,7 @@ export const MainScreen: FC = () => {
 				}}
 			>
 				<Box
+					className="invisible-scroll"
 					sx={{
 						flexShrink: 0,
 						height: '100%',
