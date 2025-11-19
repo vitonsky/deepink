@@ -158,49 +158,55 @@ export const TagsBar = () => {
 				<Divider />
 
 				<Box w="100%" overflow="auto">
-					<TagsList
-						tags={tagsTree}
-						activeTag={activeTag ? activeTag.id : undefined}
-						onTagClick={(tagId) =>
-							dispatch(
-								workspacesApi.setSelectedTag({
-									...workspaceData,
-									tag: tagId,
-								}),
-							)
-						}
-						contextMenu={{
-							onAdd(id) {
-								const tag = tags.find((tag) => id === tag.id);
-								if (tag) {
-									parentTagForNewTagRef.current = tag;
-								}
+					{tagsTree.length > 0 ? (
+						<TagsList
+							tags={tagsTree}
+							activeTag={activeTag ? activeTag.id : undefined}
+							onTagClick={(tagId) =>
+								dispatch(
+									workspacesApi.setSelectedTag({
+										...workspaceData,
+										tag: tagId,
+									}),
+								)
+							}
+							contextMenu={{
+								onAdd(id) {
+									const tag = tags.find((tag) => id === tag.id);
+									if (tag) {
+										parentTagForNewTagRef.current = tag;
+									}
 
-								setIsAddTagPopupOpened(true);
-							},
-							async onDelete(id) {
-								const tag = tags.find((tag) => id === tag.id);
-								if (!tag) return;
+									setIsAddTagPopupOpened(true);
+								},
+								async onDelete(id) {
+									const tag = tags.find((tag) => id === tag.id);
+									if (!tag) return;
 
-								const isConfirmed = confirm(
-									`Really want to delete tag "${tag.resolvedName}" and all sub tags?`,
-								);
-								if (!isConfirmed) return;
+									const isConfirmed = confirm(
+										`Really want to delete tag "${tag.resolvedName}" and all sub tags?`,
+									);
+									if (!isConfirmed) return;
 
-								await tagsRegistry.delete(id);
+									await tagsRegistry.delete(id);
 
-								telemetry.track(TELEMETRY_EVENT_NAME.TAG_DELETED);
-							},
-							onEdit(id) {
-								const tag = tags.find((tag) => id === tag.id);
+									telemetry.track(TELEMETRY_EVENT_NAME.TAG_DELETED);
+								},
+								onEdit(id) {
+									const tag = tags.find((tag) => id === tag.id);
 
-								if (!tag) return;
+									if (!tag) return;
 
-								const { name, parent } = tag;
-								setEditedTag({ id, name, parent });
-							},
-						}}
-					/>
+									const { name, parent } = tag;
+									setEditedTag({ id, name, parent });
+								},
+							}}
+						/>
+					) : (
+						<Text color="typography.secondary" fontSize="sm">
+							Add tags in this workspace to organize notes
+						</Text>
+					)}
 				</Box>
 			</VStack>
 
