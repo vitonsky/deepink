@@ -57,13 +57,12 @@ describe('manage tags', () => {
 		await expect(tags.getTags()).resolves.toEqual([]);
 	});
 
-	test('duplicate tags', async () => {
+	test('existing tags are not duplicated when adding nested tags', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
 		await expect(tags.add('foo/bar', null)).resolves.toBeTypeOf('string');
-
 		await expect(tags.getTags()).resolves.toHaveLength(2);
 
 		await expect(tags.add('foo/bar/baz', null)).resolves.toBeTypeOf('string');
