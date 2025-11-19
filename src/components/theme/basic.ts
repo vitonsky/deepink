@@ -4,6 +4,7 @@ import {
 	defineStyleConfig,
 	extendTheme,
 	StyleFunctionProps,
+	SystemStyleObject,
 } from '@chakra-ui/react';
 import { ModalScreenTheme } from '@components/ModalScreen/ModalScreen.theme';
 import { NestedListTheme } from '@components/NestedList/NestedList.theme';
@@ -20,11 +21,19 @@ export const getScrollBarStyles = ({
 	scrollColor?: string;
 	scrollHoverColor?: string;
 } = {}) => {
+	const styles: SystemStyleObject = {
+		'.invisible-scroll::-webkit-scrollbar': {
+			display: 'none',
+		},
+	};
+
 	// Disable custom scrolls for some environments
-	if (navigator.userAgent.includes('Mac OS')) return {};
+	if (navigator.userAgent.includes('Mac OS')) return styles;
 
 	// TODO: automatically hide scroll bar when not needed
 	return {
+		...styles,
+
 		'::-webkit-scrollbar': {
 			width: '10px',
 			// For horizontal scroll
@@ -47,7 +56,7 @@ export const getScrollBarStyles = ({
 		'::-webkit-scrollbar-thumb:hover': {
 			background: scrollHoverColor,
 		},
-	};
+	} satisfies SystemStyleObject;
 };
 
 export const basicTheme = extendTheme({
