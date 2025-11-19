@@ -133,13 +133,7 @@ export const TagsBar = () => {
 
 	return (
 		<>
-			<VStack
-				w="100%"
-				align="start"
-				overflow="hidden"
-				minHeight="150px"
-				gap=".4rem"
-			>
+			<VStack w="100%" align="start" minHeight="150px" gap=".4rem">
 				<HStack w="100%">
 					<Text
 						as="h2"
