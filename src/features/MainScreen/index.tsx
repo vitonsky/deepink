@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { Box, HStack, VStack } from '@chakra-ui/react';
+import { SyncedPanelGroup } from '@components/SyncedPanelGroup';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
@@ -86,8 +87,7 @@ export const MainScreen: FC = () => {
 					<ActivityBar />
 				</Box>
 
-				{/* TODO: update panel size by changes in other workspace */}
-				<PanelGroup direction="horizontal" autoSaveId="panel.main">
+				<SyncedPanelGroup direction="horizontal" autoSaveId="MainScreen.content">
 					<VStack
 						as={Panel}
 						defaultSize={20}
@@ -143,7 +143,7 @@ export const MainScreen: FC = () => {
 					<Box as={Panel} minSize={50}>
 						<NotesContainer />
 					</Box>
-				</PanelGroup>
+				</SyncedPanelGroup>
 			</HStack>
 
 			<StatusBar />
