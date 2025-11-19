@@ -8,7 +8,6 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { ActivityBar } from './ActivityBar';
 import { NotesOverview } from './NotesOverview';
 import { TagsBar } from './NotesOverview/TagsBar';
@@ -149,7 +148,6 @@ export const MainScreen: FC = () => {
 			<StatusBar />
 
 			<NotificationsPopup />
-			<ProfileSettings />
 		</VStack>
 	);
 };

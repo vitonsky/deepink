@@ -8,10 +8,14 @@ import { ButtonGroup, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 
 export const ActivityBar = () => {
 	const telemetry = useTelemetryTracker();
+
+	const command = useCommand();
 
 	const createNote = useCreateNote();
 	const debouncedCreateNote = useDebouncedCallback(async () => {
@@ -93,12 +97,22 @@ export const ActivityBar = () => {
 					title="Lock profile"
 					tooltipPlacement="right"
 					data-no-animation
+					onClick={() => {
+						command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE);
+					}}
 				/>
 				<IconButton
 					icon={<GrSettingsOption style={{ scale: 1.2 }} />}
 					title="Global settings"
 					tooltipPlacement="right"
 					data-no-animation
+					onClick={() => {
+						command(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS);
+
+						telemetry.track(TELEMETRY_EVENT_NAME.SETTINGS_CLICK, {
+							scope: 'global settings',
+						});
+					}}
 				/>
 			</ButtonGroup>
 		</VStack>

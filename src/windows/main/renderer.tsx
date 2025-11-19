@@ -11,6 +11,7 @@ import { theme } from '@components/theme';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
 import { TelemetryContext } from '@features/telemetry';
+import { CommandEventProvider } from '@hooks/commands/CommandEventProvider';
 import { GlobalEventBusContext } from '@hooks/events/useEventBus';
 import { selectSettings, settingsApi } from '@state/redux/settings/settings';
 import { store } from '@state/redux/store';
@@ -73,9 +74,11 @@ reactRoot.render(
 	<TelemetryContext value={telemetry}>
 		<Provider store={store}>
 			<GlobalEventBusContext value={globalEventBus}>
-				<ChakraProvider theme={theme}>
-					<App />
-				</ChakraProvider>
+				<CommandEventProvider>
+					<ChakraProvider theme={theme}>
+						<App />
+					</ChakraProvider>
+				</CommandEventProvider>
 			</GlobalEventBusContext>
 		</Provider>
 	</TelemetryContext>,

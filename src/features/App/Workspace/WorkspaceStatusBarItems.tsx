@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaLock, FaUserLarge } from 'react-icons/fa6';
+import { FaUserLarge } from 'react-icons/fa6';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
 
@@ -13,28 +13,16 @@ export const WorkspaceStatusBarItems = () => {
 	const profileControls = useProfileControls();
 	useFirstRender(() => {
 		statusBarButtons.controls.register(
-			'dbChange',
+			'changeProfile',
 			{
 				visible: true,
-				title: 'Change database',
+				title: 'Change profile',
 				onClick: () => profileControls.close(),
 				icon: <FaUserLarge />,
 			},
 			{
 				placement: 'start',
 				priority: 1,
-			},
-		);
-		statusBarButtons.controls.register(
-			'dbLock',
-			{
-				visible: true,
-				title: 'Lock database',
-				icon: <FaLock />,
-			},
-			{
-				placement: 'start',
-				priority: 2,
 			},
 		);
 	});
