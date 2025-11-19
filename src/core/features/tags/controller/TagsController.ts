@@ -89,12 +89,12 @@ export class TagsController {
 	}
 
 	/**
-	 * Params: either a full name like 'foo/bar/baz' with parent null, or a single tag name like 'bar' with parent 'fooId'
+	 * Add tag: full path (name='foo/bar', parent=null) or single name with parent
 	 */
 	public async add(name: string, parent: null | string): Promise<string> {
 		if (name.includes('/') && parent) {
 			throw new TagControllerError(
-				'Tag name must be either a full tag path or a single tag name with parent',
+				'Tag must be a full path with no parent, or a single name with a parent.',
 				TAG_ERROR_CODE.INVALID_TAG_PATH,
 			);
 		}
@@ -130,17 +130,6 @@ export class TagsController {
 				for (let idx = 0; idx < segments.length; idx++) {
 					const name = segments[idx];
 					const isFirstItem = idx === 0;
-
-					const { rows: existing } = await db.query(
-						qb.sql`SELECT * FROM tags WHERE name = ${name} 
-						AND workspace_id = ${this.workspace} AND parent IS NOT DISTINCT FROM ${
-							isFirstItem ? parent : lastId
-						}`,
-					);
-					if (existing.length > 0) {
-						lastId = existing[0].id;
-						continue;
-					}
 
 					if (isFirstItem) {
 						await db

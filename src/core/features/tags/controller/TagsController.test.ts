@@ -54,11 +54,10 @@ describe('manage tags', () => {
 		await expect(tags.add('foo//bar', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
 		);
-
 		await expect(tags.getTags()).resolves.toEqual([]);
 	});
 
-	test('creates tag by full path and rejects partial path with parent', async () => {
+	test('creates tags from segments and prevents invalid segment+parent combination', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
@@ -68,7 +67,9 @@ describe('manage tags', () => {
 		const tag1 = list.find((t) => t.name === 'tag1')!;
 		expect(tag1).not.toBeUndefined();
 
-		// Cannot pass both a full path ('foo/bar') and a parent ID
+		await expect(tags.add('tagNew', tag1.id)).resolves.toBeTypeOf('string');
+
+		// Cannot pass a segment path ('foo/bar') together with a parent ID
 		await expect(tags.add('tag2/tag3', tag1.id)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_TAG_PATH }),
 		);
@@ -90,6 +91,11 @@ describe('manage tags', () => {
 					parent: expect.any(String),
 					resolvedName: 'tag1/tag2/tag3',
 				}),
+				expect.objectContaining({
+					name: 'tagNew',
+					parent: expect.any(String),
+					resolvedName: 'tag1/tagNew',
+				}),
 			]),
 		);
 	});
@@ -97,21 +103,6 @@ describe('manage tags', () => {
 	test('duplicate tag cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
-
-		await expect(tags.add('seg1/seg2/seg3', null)).resolves.toBeTypeOf('string');
-		await expect(tags.add('seg1/seg2/seg3', null)).rejects.toThrow(
-			expect.objectContaining({
-				code: TAG_ERROR_CODE.DUPLICATE,
-			}),
-		);
-
-		const list = await tags.getTags();
-		const seg2 = list.find((t) => t.name === 'seg2')!;
-		expect(seg2).not.toBeUndefined();
-
-		await expect(tags.add('seg3', seg2.id)).rejects.toThrow(
-			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
-		);
 
 		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
 		await expect(tags.add('foo', null)).rejects.toThrow(
@@ -126,8 +117,21 @@ describe('manage tags', () => {
 		await expect(tags.add('bar', fooTag.id)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
-
 		await expect(tags.add('foo/bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		await expect(tags.add('seg1/seg2/seg3', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('seg1/seg2/seg3', null)).rejects.toThrow(
+			expect.objectContaining({
+				code: TAG_ERROR_CODE.DUPLICATE,
+			}),
+		);
+
+		const list = await tags.getTags();
+		const seg2 = list.find((t) => t.name === 'seg2')!;
+		expect(seg2).not.toBeUndefined();
+		await expect(tags.add('seg3', seg2.id)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 

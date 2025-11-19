@@ -12,6 +12,7 @@ import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
+import { findParentTag } from '@core/features/tags/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
@@ -89,7 +90,19 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				parentTag={parentTagForNewTagRef.current ?? undefined}
 				onSave={async (data) => {
 					console.warn('Create tag', data);
-					await tagsRegistry.add(data.name, data.parent);
+
+					const parentTag = findParentTag(data.name, tags);
+					if (parentTag) {
+						const parentTagWithPrefixLength =
+							parentTag.resolvedName.length + 1;
+						const tagNamePartToAdd = data.name.slice(
+							parentTagWithPrefixLength,
+						);
+						await tagsRegistry.add(tagNamePartToAdd, parentTag.id);
+					} else {
+						await tagsRegistry.add(data.name, null);
+					}
+
 					setIsAddTagPopupOpened(false);
 
 					telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
