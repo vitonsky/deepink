@@ -92,7 +92,7 @@ export class TagsController {
 
 		validateTagName(name);
 
-		//check tag unique
+		// check tag unique; tags like (name: 'foo', parent: id), (name: 'foo/bar', parent: id), (name: 'foo/bar', parent: null)
 		const filter = parent
 			? qb.sql`tags.resolved_name = (SELECT resolved_name || '/' || ${name} FROM tags WHERE id = ${parent})`
 			: qb.sql`tags.resolved_name = ${name}`;
@@ -105,6 +105,7 @@ export class TagsController {
 			),
 			z.object({ count: z.number() }),
 		);
+
 		if (duplicatedTag.count) {
 			throw new TagControllerError(
 				`Tag ${name} already exists`,
@@ -113,7 +114,6 @@ export class TagsController {
 		}
 
 		const segments = name.split('/');
-
 		let lastId: string | null = null;
 		if (segments.length > 1) {
 			await this.db.get().transaction(async (tx) => {
@@ -123,7 +123,19 @@ export class TagsController {
 					const name = segments[idx];
 					const isFirstItem = idx === 0;
 
-					if (isFirstItem) {
+					// reuse existing tags
+					const { rows: existing } = await db.query(
+						qb.sql`SELECT * FROM tags WHERE name = ${name} 
+						AND workspace_id = ${this.workspace} AND parent IS NOT DISTINCT FROM ${
+							isFirstItem ? parent : lastId
+						}`,
+					);
+					if (existing.length > 0) {
+						lastId = existing[0].id;
+						continue;
+					}
+
+					if (isFirstItem && !lastId) {
 						await db
 							.query(
 								qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
@@ -137,6 +149,8 @@ export class TagsController {
 
 						continue;
 					}
+
+					console.log('create first', name);
 
 					await db
 						.query(
