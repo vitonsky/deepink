@@ -1,5 +1,5 @@
 import React, { FC, useEffect } from 'react';
-import { HStack, VStack } from '@chakra-ui/react';
+import { Box, HStack, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
@@ -7,7 +7,7 @@ import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
-import { NewNoteButton } from './NewNoteButton';
+import { ActivityBar } from './ActivityBar';
 import { NotesOverview } from './NotesOverview';
 import { TagsBar } from './NotesOverview/TagsBar';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
@@ -71,9 +71,21 @@ export const MainScreen: FC = () => {
 					overflow: 'hidden',
 				}}
 			>
+				<Box
+					sx={{
+						flexShrink: 0,
+						height: '100%',
+						overflow: 'auto',
+						borderRight: '1px solid',
+						borderColor: 'surface.border',
+						bgColor: 'surface.panel',
+					}}
+				>
+					<ActivityBar />
+				</Box>
+
 				<VStack
 					sx={{
-						bgColor: 'surface.panel',
 						alignItems: 'start',
 
 						width: '100%',
@@ -89,13 +101,11 @@ export const MainScreen: FC = () => {
 						borderColor: 'surface.border',
 					}}
 				>
-					<NewNoteButton />
-
 					<NotesOverview />
 
 					<TagsBar />
 
-					<WorkspaceBar />
+					<WorkspaceBar marginTop="auto" />
 				</VStack>
 
 				<VStack
