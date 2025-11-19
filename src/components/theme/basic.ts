@@ -146,9 +146,11 @@ export const basicTheme = extendTheme({
 		}),
 		Button: defineStyleConfig({
 			baseStyle: {
-				transition: 'transform .20ms ease',
-				'&:not(:disabled):active': {
-					transform: 'scale(.95)',
+				'&:not([data-no-animation])': {
+					transition: 'transform .20ms ease',
+					'&:not(:disabled):active': {
+						transform: 'scale(.95)',
+					},
 				},
 			},
 			variants: {
@@ -184,6 +186,9 @@ export const basicTheme = extendTheme({
 					'&:not([disabled]):hover': {
 						backgroundColor: 'dim.400',
 					},
+					'&[data-active]': {
+						backgroundColor: 'primary.100',
+					},
 				},
 				ghost: {
 					color: 'variants.ghost.text',
@@ -195,7 +200,7 @@ export const basicTheme = extendTheme({
 					},
 				},
 				link: {
-					color: 'link.base',
+					color: 'typography.accent',
 					backgroundColor: 'unset',
 					textDecoration: 'underline',
 					padding: 0,
@@ -203,7 +208,7 @@ export const basicTheme = extendTheme({
 					fontSize: 'inherit',
 					alignItems: 'baseline',
 					'&:hover, &:active, &[data-active]': {
-						color: 'link.hover',
+						color: 'typography.accent',
 					},
 					textUnderlineOffset: '.2em',
 
