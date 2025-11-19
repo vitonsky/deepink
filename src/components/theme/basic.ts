@@ -19,30 +19,36 @@ export const getScrollBarStyles = ({
 	trackColor?: string;
 	scrollColor?: string;
 	scrollHoverColor?: string;
-} = {}) => ({
-	'::-webkit-scrollbar': {
-		width: '10px',
-		// For horizontal scroll
-		height: '10px',
-	},
+} = {}) => {
+	// Disable custom scrolls for some environments
+	if (navigator.userAgent.includes('Mac OS')) return {};
 
-	'::-webkit-scrollbar-track': {
-		background: trackColor,
-		borderRadius: '0px',
-		border: '1px solid transparent',
-	},
+	// TODO: automatically hide scroll bar when not needed
+	return {
+		'::-webkit-scrollbar': {
+			width: '10px',
+			// For horizontal scroll
+			height: '10px',
+		},
 
-	'::-webkit-scrollbar-thumb': {
-		background: scrollColor,
-		borderRadius: '0px',
-		border: '0px solid transparent',
-		backgroundClip: 'padding-box',
-	},
+		'::-webkit-scrollbar-track': {
+			background: trackColor,
+			borderRadius: '0px',
+			border: '1px solid transparent',
+		},
 
-	'::-webkit-scrollbar-thumb:hover': {
-		background: scrollHoverColor,
-	},
-});
+		'::-webkit-scrollbar-thumb': {
+			background: scrollColor,
+			borderRadius: '0px',
+			border: '0px solid transparent',
+			backgroundClip: 'padding-box',
+		},
+
+		'::-webkit-scrollbar-thumb:hover': {
+			background: scrollHoverColor,
+		},
+	};
+};
 
 export const basicTheme = extendTheme({
 	styles: {
