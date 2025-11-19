@@ -12,6 +12,8 @@ import { NotePreviewTheme } from '@components/NotePreview/NotePreview.theme';
 import { NotificationsTheme } from '@components/Notifications/Notifications.theme';
 import { RichEditorTheme } from '@features/NoteEditor/RichEditor/RichEditor.theme';
 
+import './resizable-panels.css';
+
 export const getScrollBarStyles = ({
 	trackColor = '#f1f1f1',
 	scrollColor = '#c5c5c5',
@@ -75,6 +77,10 @@ export const basicTheme = extendTheme({
 			body: {
 				background: 'surface.background',
 				margin: 0,
+			},
+
+			'[data-resize-handle]': {
+				'--resize-handle-active-color': 'var(--chakra-colors-accent-500)',
 			},
 
 			...getScrollBarStyles(),

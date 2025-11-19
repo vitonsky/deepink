@@ -1,0 +1,52 @@
+[data-resize-handle] {
+	position: relative;
+	color: currentcolor;
+	background-color: currentcolor;
+
+	--resize-handle-active-color: currentcolor;
+	--resize-handle-size: 4px;
+	--resize-handle-delay: 500ms;
+}
+
+[data-resize-handle]::after {
+	position: absolute;
+	display: block;
+	content: '';
+	background-color: transparent;
+
+	/* Reset to default value immediately */
+	transition: none;
+	isolation: isolate;
+	z-index: 1;
+}
+
+/* Delay highlighting for hovered handle, to prevent blinking by accidental hover */
+:is([data-resize-handle-state='hover'])::after {
+	background-color: var(--resize-handle-active-color);
+	transition: all 200ms var(--resize-handle-delay);
+}
+
+[data-panel-group-direction='horizontal'] {
+	width: 1px;
+
+	::after {
+		width: var(--resize-handle-size);
+		height: 100%;
+		left: calc(var(--resize-handle-size) / -2);
+	}
+}
+
+[data-panel-group-direction='vertical']::after {
+	height: 1px;
+
+	::after {
+		width: 100%;
+		height: var(--resize-handle-size);
+		left: calc(var(--resize-handle-size) / -2);
+	}
+}
+
+/* Highlight immediately by focus */
+:is([data-resize-handle]:focus, [data-resize-handle-state='drag'])::after {
+	background-color: var(--resize-handle-active-color);
+}
