@@ -36,7 +36,7 @@
 	}
 }
 
-[data-panel-group-direction='vertical']::after {
+[data-panel-group-direction='vertical'] {
 	height: 1px;
 
 	::after {
