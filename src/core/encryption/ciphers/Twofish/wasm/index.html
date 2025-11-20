@@ -1,0 +1,8 @@
+<script src="./out/twofish.js"></script>
+<script>
+	console.log("Init...");
+	TwofishModule().then((mod) => {
+		console.log("Module is loaded", mod)
+		globalThis.Module = mod;
+	})
+</script>
