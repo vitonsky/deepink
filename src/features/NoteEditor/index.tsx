@@ -391,7 +391,6 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				</HStack>
 			)}
 
-			{/* TODO: sync panels across workspace */}
 			<SyncedPanelGroup direction="vertical" autoSaveId="MainScreen.noteContent">
 				<Box as={Panel} defaultSize={80} minH="min(200px, 100%)">
 					<NoteEditor
