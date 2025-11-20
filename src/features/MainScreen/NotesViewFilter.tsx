@@ -32,7 +32,7 @@ const FilterOptions = [
 	},
 ];
 
-export const NotesOverview: FC<NotesOverviewProps> = () => {
+export const NotesViewFilter: FC<NotesOverviewProps> = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 

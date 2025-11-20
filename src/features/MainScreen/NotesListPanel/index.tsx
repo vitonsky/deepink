@@ -14,7 +14,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { NotesList } from '@features/MainScreen/NotesList';
+import { NotesList } from '@features/MainScreen/NotesListPanel/NotesList';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -24,7 +24,7 @@ import {
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 
-export const NotesPanel = () => {
+export const NotesListPanel = () => {
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();

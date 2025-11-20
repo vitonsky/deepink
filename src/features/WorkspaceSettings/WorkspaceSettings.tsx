@@ -31,11 +31,11 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useWorkspacesList } from '@features/MainScreen/WorkspaceBar/useWorkspacesList';
+import { useWorkspacesList } from '@features/MainScreen/WorkspacesPanel/useWorkspacesList';
 import {
 	WorkspaceCreatePopup,
 	workspacePropsValidator,
-} from '@features/MainScreen/WorkspaceBar/WorkspaceCreatePopup';
+} from '@features/MainScreen/WorkspacesPanel/WorkspaceCreatePopup';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
