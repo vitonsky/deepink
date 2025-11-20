@@ -43,18 +43,6 @@ export const validateTagName = (name: string) => {
 	}
 };
 
-const getResolvedNameSequence = (name: string) => {
-	const resolvedNames: string[] = [];
-	name.split('/').forEach((segment, index) => {
-		if (index === 0) {
-			resolvedNames.push(segment);
-		} else {
-			resolvedNames.push(resolvedNames[index - 1] + '/' + segment);
-		}
-	});
-	return resolvedNames;
-};
-
 const RowScheme = z
 	.object({
 		id: z.string(),
@@ -100,9 +88,9 @@ export class TagsController {
 	}
 
 	public async add(name: string, parent: null | string): Promise<string> {
-		const db = wrapDB(this.db.get());
-
 		validateTagName(name);
+
+		let lastId: string | null = null;
 
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
@@ -133,15 +121,14 @@ export class TagsController {
 					TAG_ERROR_CODE.DUPLICATE,
 				);
 			}
-		});
 
-		const segments = name.split('/');
-		let lastId: string | null = null;
-		if (segments.length > 1) {
-			await this.db.get().transaction(async (tx) => {
-				const db = wrapDB(tx);
-
-				const resolvedNames = getResolvedNameSequence(name);
+			const segments = name.split('/');
+			if (segments.length > 1) {
+				// create an array of resolved names from a string: 'foo/bar' - ['foo', 'foo/bar']
+				const resolvedNames = segments.map((segment, index) =>
+					index === 0 ? segment : `${segments.slice(0, index + 1).join('/')}`,
+				);
+				// find the parent tag to reuse when creating the tag hierarchy
 				const {
 					rows: [parentTag],
 				} = await db.query(
@@ -150,7 +137,7 @@ export class TagsController {
 							tagsQuery,
 							qb.sql`WHERE workspace_id = ${this.workspace}`,
 						)})
-						WHERE resolved_name = ANY(${resolvedNames}) 
+						WHERE resolved_name IN (${qb.values(resolvedNames)}) 
 						ORDER BY LENGTH(resolved_name) DESC
 						LIMIT 1`,
 					),
@@ -201,19 +188,19 @@ export class TagsController {
 							lastId = id;
 						});
 				}
-			});
-		} else {
-			await db
-				.query(
-					qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-						[this.workspace, name, parent],
-					)}) RETURNING id`,
-					z.object({ id: z.string() }),
-				)
-				.then(({ rows: [{ id }] }) => {
-					lastId = id;
-				});
-		}
+			} else {
+				await db
+					.query(
+						qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
+							[this.workspace, name, parent],
+						)}) RETURNING id`,
+						z.object({ id: z.string() }),
+					)
+					.then(({ rows: [{ id }] }) => {
+						lastId = id;
+					});
+			}
+		});
 
 		if (!lastId) {
 			throw new Error("Can't get id of inserted row");
