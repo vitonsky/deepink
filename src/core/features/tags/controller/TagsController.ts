@@ -23,7 +23,7 @@ export class TagControllerError extends Error {
 }
 
 export const validateTagName = (name: string) => {
-	if (name.length === 0) {
+	if (name.split('/').find((t) => t.trim().length === 0)) {
 		throw new TagControllerError(
 			'Tag name must not be empty',
 			TAG_ERROR_CODE.INVALID_FORMAT,
@@ -93,21 +93,22 @@ export class TagsController {
 		validateTagName(name);
 
 		// check tag unique
-		const filter = parent
-			? qb.sql`tags.resolved_name = (SELECT resolved_name || '/' || ${name} FROM tags WHERE id = ${parent})`
-			: qb.sql`tags.resolved_name = ${name}`;
 		const {
 			rows: [duplicatedTag],
 		} = await db.query(
 			qb.line(
-				`WITH tags AS (${tagsQuery}) SELECT count(*) FROM tags`,
-				qb.sql`WHERE tags.workspace_id = ${this.workspace} AND (${filter})`,
+				qb.sql`WITH tags AS (${qb.raw(tagsQuery)}) SELECT tags.name FROM tags
+				WHERE tags.workspace_id = ${this.workspace} AND (${
+					parent
+						? qb.sql`tags.resolved_name = (SELECT resolved_name || '/' || ${name} FROM tags WHERE id = ${parent})`
+						: qb.sql`tags.resolved_name = ${name}`
+				})`,
 			),
-			z.object({ count: z.number() }),
+			z.object({ name: z.string() }),
 		);
-		if (duplicatedTag.count) {
+		if (duplicatedTag) {
 			throw new TagControllerError(
-				`Tag ${name} already exists`,
+				`Tag ${duplicatedTag.name} already exists`,
 				TAG_ERROR_CODE.DUPLICATE,
 			);
 		}
@@ -122,7 +123,7 @@ export class TagsController {
 					const name = segments[idx];
 					const isFirstItem = idx === 0;
 
-					// reuse existing code
+					// Reuse existing code, if the tag exists use it as the parent tag for the next segment
 					const {
 						rows: [existingTag],
 					} = await db.query(
