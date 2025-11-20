@@ -47,6 +47,11 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 	}, [onLogin, profile, secret, telemetry]);
 
 	const firstInputRef = useFocusableRef<HTMLInputElement>();
+	useEffect(() => {
+		if (isPending || !firstInputRef.current) return;
+
+		firstInputRef.current.focus();
+	}, [firstInputRef, isPending]);
 
 	return (
 		<ProfilesForm
