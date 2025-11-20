@@ -21,7 +21,7 @@ import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles'
 
 import { WorkspaceCreatePopup } from './WorkspaceCreatePopup';
 
-export const WorkspaceBar = (props: StackProps) => {
+export const WorkspacesPanel = (props: StackProps) => {
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();

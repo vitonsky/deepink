@@ -18,7 +18,7 @@ import {
 
 import { TagsList } from './TagsList';
 
-export const TagsBar = () => {
+export const TagsPanel = () => {
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();

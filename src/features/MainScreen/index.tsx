@@ -3,16 +3,16 @@ import { Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { Box, HStack, VStack } from '@chakra-ui/react';
 import { SyncedPanelGroup } from '@components/SyncedPanelGroup';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
-import { NotesPanel } from '@features/MainScreen/NotesPanel';
-import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
+import { NotesListPanel } from '@features/MainScreen/NotesListPanel';
+import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
+import { NotificationsPopup } from '../NotificationsPopup';
 import { ActivityBar } from './ActivityBar';
-import { NotesOverview } from './NotesOverview';
-import { TagsBar } from './NotesOverview/TagsBar';
-import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
+import { NotesViewFilter } from './NotesViewFilter';
 import { StatusBar } from './StatusBar';
+import { TagsPanel } from './TagsPanel';
 
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
@@ -106,11 +106,11 @@ export const MainScreen: FC = () => {
 							// borderColor: 'surface.border',
 						}}
 					>
-						<NotesOverview />
+						<NotesViewFilter />
 
-						<TagsBar />
+						<TagsPanel />
 
-						<WorkspaceBar marginTop="auto" />
+						<WorkspacesPanel marginTop="auto" />
 					</VStack>
 
 					<Box as={PanelResizeHandle} color="surface.border" />
@@ -134,7 +134,7 @@ export const MainScreen: FC = () => {
 							// borderColor: 'surface.border',
 						}}
 					>
-						<NotesPanel />
+						<NotesListPanel />
 					</VStack>
 
 					<Box as={PanelResizeHandle} color="surface.border" />

@@ -10,8 +10,8 @@ import {
 	useNotesHistory,
 	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { Notes } from '@features/MainScreen/Notes';
-import { TopBar } from '@features/MainScreen/TopBar';
+import { Notes } from '@features/NotesContainer/Notes';
+import { OpenedNotesPanel } from '@features/NotesContainer/OpenedNotesPanel';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
@@ -100,7 +100,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 		<VStack align="start" w="100%" h="100%" gap={0} overflow="hidden" {...props}>
 			{openedNotes.length > 0 ? (
 				<>
-					<TopBar
+					<OpenedNotesPanel
 						{...{
 							updateNotes,
 							notes: openedNotes,
