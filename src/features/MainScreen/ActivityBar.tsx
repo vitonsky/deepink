@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaInbox, FaPenToSquare, FaRegClock, FaRegFolder } from 'react-icons/fa6';
+import { FaFeather, FaInbox, FaRegClock, FaRegFolder } from 'react-icons/fa6';
 import { GrSettingsOption } from 'react-icons/gr';
 import { IoCloudUploadOutline, IoExtensionPuzzleOutline } from 'react-icons/io5';
 import { MdLockOutline } from 'react-icons/md';
@@ -44,7 +44,7 @@ export const ActivityBar = () => {
 		>
 			<ButtonGroup orientation="vertical" size="sm" variant="ghost">
 				<IconButton
-					icon={<FaPenToSquare />}
+					icon={<FaFeather />}
 					tooltipPlacement="right"
 					title="New note"
 					variant="primary"
