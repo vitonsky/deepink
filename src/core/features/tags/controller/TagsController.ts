@@ -92,26 +92,35 @@ export class TagsController {
 
 		validateTagName(name);
 
-		// check tag unique
-		const {
-			rows: [duplicatedTag],
-		} = await db.query(
-			qb.line(
-				qb.sql`WITH tags AS (${qb.raw(tagsQuery)}) SELECT tags.name FROM tags
-				WHERE tags.workspace_id = ${this.workspace} AND (${
-					parent
-						? qb.sql`tags.resolved_name = (SELECT resolved_name || '/' || ${name} FROM tags WHERE id = ${parent})`
-						: qb.sql`tags.resolved_name = ${name}`
-				})`,
-			),
-			z.object({ name: z.string() }),
-		);
-		if (duplicatedTag) {
-			throw new TagControllerError(
-				`Tag ${duplicatedTag.name} already exists`,
-				TAG_ERROR_CODE.DUPLICATE,
+		await this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
+
+			// check tag unique
+			const {
+				rows: [duplicatedTag],
+			} = await db.query(
+				qb.line(
+					qb.sql`WITH resolved_tags AS 
+					(${qb.raw(tagsQuery, qb.sql`WHERE workspace_id = ${this.workspace}`)})
+					SELECT resolved_name FROM resolved_tags WHERE resolved_name = (${
+						parent
+							? qb.sql`(SELECT resolved_name || '/' || ${name} FROM resolved_tags WHERE id = ${parent})`
+							: qb.value(name)
+					})`,
+				),
+				z
+					.object({ resolved_name: z.string() })
+					.transform(({ resolved_name }) => ({
+						resolvedName: resolved_name,
+					})),
 			);
-		}
+			if (duplicatedTag) {
+				throw new TagControllerError(
+					`Tag ${duplicatedTag.resolvedName} already exists`,
+					TAG_ERROR_CODE.DUPLICATE,
+				);
+			}
+		});
 
 		const segments = name.split('/');
 		let lastId: string | null = null;
