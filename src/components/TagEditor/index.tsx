@@ -157,16 +157,16 @@ export const TagEditor: FC<ITagEditorProps> = ({
 											: {}),
 									});
 								} catch (error) {
-									if (!(error instanceof TagControllerError)) {
+									if (error instanceof TagControllerError) {
 										setTagNameError(
-											'Unable to save the tag. Please try again.',
+											error.code === TAG_ERROR_CODE.DUPLICATE
+												? 'Tag already exists'
+												: 'Tag cannot be empty, start or end with "/", or contain "//".',
 										);
 										return;
 									}
 									setTagNameError(
-										error.code === TAG_ERROR_CODE.DUPLICATE
-											? 'Tag already exists'
-											: 'Tag cannot be empty, start or end with "/", or contain "//".',
+										'Unable to save the tag. Please try again.',
 									);
 								}
 							}}
