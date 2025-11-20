@@ -67,7 +67,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 				</>
 			}
 		>
-			<VStack w="100%" alignItems="start">
+			<VStack as="form" w="100%" alignItems="start" onSubmit={onPressLogin}>
 				<Input
 					ref={firstInputRef}
 					variant="filled"
