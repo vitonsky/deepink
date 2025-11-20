@@ -1,4 +1,4 @@
-import { TagItem } from '@features/MainScreen/NotesOverview/TagsList';
+import { TagItem } from '@features/MainScreen/TagsPanel/TagsList';
 
 import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
 
