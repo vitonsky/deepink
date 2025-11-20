@@ -43,6 +43,18 @@ export const validateTagName = (name: string) => {
 	}
 };
 
+const getResolvedNameSequence = (name: string) => {
+	const resolvedNames: string[] = [];
+	name.split('/').forEach((segment, index) => {
+		if (index === 0) {
+			resolvedNames.push(segment);
+		} else {
+			resolvedNames.push(resolvedNames[index - 1] + '/' + segment);
+		}
+	});
+	return resolvedNames;
+};
+
 const RowScheme = z
 	.object({
 		id: z.string(),
@@ -106,7 +118,8 @@ export class TagsController {
 						parent
 							? qb.sql`(SELECT resolved_name || '/' || ${name} FROM resolved_tags WHERE id = ${parent})`
 							: qb.value(name)
-					})`,
+					}) 
+					LIMIT 1`,
 				),
 				z
 					.object({ resolved_name: z.string() })
@@ -128,28 +141,45 @@ export class TagsController {
 			await this.db.get().transaction(async (tx) => {
 				const db = wrapDB(tx);
 
-				for (let idx = 0; idx < segments.length; idx++) {
-					const name = segments[idx];
-					const isFirstItem = idx === 0;
+				const resolvedNames = getResolvedNameSequence(name);
+				const {
+					rows: [parentTag],
+				} = await db.query(
+					qb.line(
+						qb.sql`SELECT resolved_name, id FROM (${qb.raw(
+							tagsQuery,
+							qb.sql`WHERE workspace_id = ${this.workspace}`,
+						)})
+						WHERE resolved_name = ANY(${resolvedNames}) 
+						ORDER BY LENGTH(resolved_name) DESC
+						LIMIT 1`,
+					),
+					z
+						.object({ id: z.string(), resolved_name: z.string() })
+						.transform(({ resolved_name, ...props }) => ({
+							...props,
+							resolvedName: resolved_name,
+						})),
+				);
 
-					// Reuse existing code, if the tag exists use it as the parent tag for the next segment
-					const {
-						rows: [existingTag],
-					} = await db.query(
-						qb.sql`SELECT * FROM tags WHERE workspace_id=${this.workspace} 
-						AND name=${name} AND parent IS NOT DISTINCT FROM ${isFirstItem ? parent : lastId}`,
-						z.object({ id: z.string() }),
+				let segmentsToCreate = segments;
+				let parentId = parent;
+				if (parentTag) {
+					segmentsToCreate = segments.filter(
+						(seg) => !parentTag.resolvedName.split('/').includes(seg),
 					);
-					if (existingTag) {
-						lastId = existingTag.id;
-						continue;
-					}
+					parentId = parentTag.id;
+				}
+
+				for (let idx = 0; idx < segmentsToCreate.length; idx++) {
+					const name = segmentsToCreate[idx];
+					const isFirstItem = idx === 0;
 
 					if (isFirstItem) {
 						await db
 							.query(
 								qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-									[this.workspace, name, parent],
+									[this.workspace, name, parentId],
 								)}) RETURNING id`,
 								z.object({ id: z.string() }),
 							)

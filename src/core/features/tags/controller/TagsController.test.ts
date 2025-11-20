@@ -77,6 +77,9 @@ describe('manage tags', () => {
 
 		await expect(tags.add('foo/bar/baz', null)).resolves.toBeTypeOf('string');
 		await expect(tags.getTags()).resolves.toHaveLength(3);
+
+		await expect(tags.add('foo/bar/baz/x/y/z', null)).resolves.toBeTypeOf('string');
+		await expect(tags.getTags()).resolves.toHaveLength(6);
 	});
 
 	test('duplicate tag cannot be added', async () => {
