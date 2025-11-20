@@ -7,18 +7,13 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import {
-	FaArrowLeft,
-	FaBookmark,
-	FaBoxArchive,
-	FaFlag,
-	FaHashtag,
-	FaXmark,
-} from 'react-icons/fa6';
+import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
+import { Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
+import { SyncedPanelGroup } from '@components/SyncedPanelGroup';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
 import { NoteMeta } from '@core/features/notes/controller';
@@ -436,92 +431,122 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				</HStack>
 			)}
 
-			<NoteEditor
-				text={versionPreview ? versionPreview.text : text}
-				setText={(noteText) => {
-					if (isReadOnly) return;
-					setText(noteText);
-				}}
-				isReadOnly={isReadOnly}
-			/>
+			{/* TODO: sync panels across workspace */}
+			<SyncedPanelGroup direction="vertical" autoSaveId="MainScreen.noteContent">
+				<Box as={Panel} defaultSize={80} minH="min(200px, 100%)">
+					<NoteEditor
+						text={versionPreview ? versionPreview.text : text}
+						setText={(noteText) => {
+							if (isReadOnly) return;
+							setText(noteText);
+						}}
+						isReadOnly={isReadOnly}
+					/>
+				</Box>
 
-			{!sidePanel ? null : (
-				<NoteSidebar
-					onClose={() => setSidePanel(null)}
-					activeTab={sidePanel as string}
-					onActiveTabChanged={(id) => setSidePanel(id as NoteSidebarTabs)}
-					tabs={[
-						{
-							id: NoteSidebarTabs.HISTORY,
-							title: 'Note versions',
-							content() {
-								return (
-									<NoteVersions
-										isReadOnly={isReadOnly}
-										noteId={note.id}
-										recordControl={{
-											isDisabled: Boolean(note.isSnapshotsDisabled),
-											onChange(isDisabled) {
-												updateMeta({
-													isSnapshotsDisabled: isDisabled,
-												});
-											},
-										}}
-										onShowVersion={(version) =>
-											setVersionPreview(version)
-										}
-										onVersionApply={async (version) => {
-											await noteHistory.snapshot(note.id);
-											await notesRegistry.update(note.id, version);
-											await noteHistory.snapshot(note.id);
+				{!sidePanel ? null : (
+					<>
+						<Box as={PanelResizeHandle} color="surface.border" />
+						<Box as={Panel} defaultSize={30} minH="200px">
+							<NoteSidebar
+								onClose={() => setSidePanel(null)}
+								activeTab={sidePanel as string}
+								onActiveTabChanged={(id) =>
+									setSidePanel(id as NoteSidebarTabs)
+								}
+								tabs={[
+									{
+										id: NoteSidebarTabs.HISTORY,
+										title: 'Note versions',
+										content() {
+											return (
+												<NoteVersions
+													isReadOnly={isReadOnly}
+													noteId={note.id}
+													recordControl={{
+														isDisabled: Boolean(
+															note.isSnapshotsDisabled,
+														),
+														onChange(isDisabled) {
+															updateMeta({
+																isSnapshotsDisabled:
+																	isDisabled,
+															});
+														},
+													}}
+													onShowVersion={(version) =>
+														setVersionPreview(version)
+													}
+													onVersionApply={async (version) => {
+														await noteHistory.snapshot(
+															note.id,
+														);
+														await notesRegistry.update(
+															note.id,
+															version,
+														);
+														await noteHistory.snapshot(
+															note.id,
+														);
 
-											eventBus.emit(
-												WorkspaceEvents.NOTE_HISTORY_UPDATED,
-												note.id,
+														eventBus.emit(
+															WorkspaceEvents.NOTE_HISTORY_UPDATED,
+															note.id,
+														);
+														eventBus.emit(
+															WorkspaceEvents.NOTE_UPDATED,
+															note.id,
+														);
+														forceUpdateLocalStateRef.current =
+															true;
+													}}
+													onSnapshot={async () => {
+														await noteHistory.snapshot(
+															note.id,
+															{
+																force: true,
+															},
+														);
+														eventBus.emit(
+															WorkspaceEvents.NOTE_HISTORY_UPDATED,
+															note.id,
+														);
+													}}
+													onDeleteAll={async () => {
+														await noteHistory.purge([
+															note.id,
+														]);
+														eventBus.emit(
+															WorkspaceEvents.NOTE_HISTORY_UPDATED,
+															note.id,
+														);
+													}}
+												/>
 											);
-											eventBus.emit(
-												WorkspaceEvents.NOTE_UPDATED,
-												note.id,
+										},
+									},
+									{
+										id: NoteSidebarTabs.BACKLINKS,
+										title: 'Back links',
+										content() {
+											return <div>TODO: Note back links</div>;
+										},
+									},
+									{
+										id: 'files',
+										title: 'Attached files',
+										content() {
+											return (
+												<div>TODO: Files attached to note</div>
 											);
-											forceUpdateLocalStateRef.current = true;
-										}}
-										onSnapshot={async () => {
-											await noteHistory.snapshot(note.id, {
-												force: true,
-											});
-											eventBus.emit(
-												WorkspaceEvents.NOTE_HISTORY_UPDATED,
-												note.id,
-											);
-										}}
-										onDeleteAll={async () => {
-											await noteHistory.purge([note.id]);
-											eventBus.emit(
-												WorkspaceEvents.NOTE_HISTORY_UPDATED,
-												note.id,
-											);
-										}}
-									/>
-								);
-							},
-						},
-						{
-							id: NoteSidebarTabs.BACKLINKS,
-							title: 'Back links',
-							content() {
-								return <div>TODO: Note back links</div>;
-							},
-						},
-						{
-							id: 'files',
-							title: 'Attached files',
-							content() {
-								return <div>TODO: Files attached to note</div>;
-							},
-						},
-					]}
-				/>
-			)}
+										},
+									},
+								]}
+							/>
+						</Box>
+					</>
+				)}
+			</SyncedPanelGroup>
 		</VStack>
 	);
 });

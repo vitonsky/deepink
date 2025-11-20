@@ -39,15 +39,7 @@ export const NoteSidebar = ({
 	);
 
 	return (
-		<VStack
-			align="start"
-			w="100%"
-			h="300px"
-			maxH="300px"
-			minH="300px"
-			flex={1}
-			gap="1rem"
-		>
+		<VStack align="start" w="100%" h="100%" flex={1} gap="1rem">
 			<HStack
 				w="100%"
 				alignItems="start"
