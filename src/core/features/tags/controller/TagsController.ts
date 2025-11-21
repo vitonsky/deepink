@@ -10,6 +10,39 @@ import { IResolvedTag, ITag } from '..';
 
 type ChangeEvent = 'tags' | 'noteTags';
 
+export enum TAG_ERROR_CODE {
+	DUPLICATE = 'Duplicate',
+	INVALID_FORMAT = 'InvalidFormat',
+}
+
+export class TagControllerError extends Error {
+	constructor(message: string, public readonly code: TAG_ERROR_CODE) {
+		super(message);
+		this.name = this.constructor.name;
+	}
+}
+
+export const validateTagName = (name: string) => {
+	if (name.split('/').find((t) => t.trim().length === 0)) {
+		throw new TagControllerError(
+			'Tag name must not be empty',
+			TAG_ERROR_CODE.INVALID_FORMAT,
+		);
+	}
+	if (name.startsWith('/') || name.endsWith('/')) {
+		throw new TagControllerError(
+			'Tag name must not start or end with a slash "/"',
+			TAG_ERROR_CODE.INVALID_FORMAT,
+		);
+	}
+	if (name.includes('//')) {
+		throw new TagControllerError(
+			'Tag name must not contain consecutive slashes "//"',
+			TAG_ERROR_CODE.INVALID_FORMAT,
+		);
+	}
+};
+
 const RowScheme = z
 	.object({
 		id: z.string(),
@@ -55,24 +88,85 @@ export class TagsController {
 	}
 
 	public async add(name: string, parent: null | string): Promise<string> {
-		const db = wrapDB(this.db.get());
-
-		const segments = name.split('/');
+		validateTagName(name);
 
 		let lastId: string | null = null;
-		if (segments.length > 1) {
-			await this.db.get().transaction(async (tx) => {
-				const db = wrapDB(tx);
 
-				for (let idx = 0; idx < segments.length; idx++) {
-					const name = segments[idx];
+		await this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
+
+			// check tag unique
+			const {
+				rows: [duplicatedTag],
+			} = await db.query(
+				qb.line(
+					qb.sql`WITH resolved_tags AS 
+					(${qb.raw(tagsQuery, qb.sql`WHERE workspace_id = ${this.workspace}`)})
+					SELECT resolved_name FROM resolved_tags WHERE resolved_name = (${
+						parent
+							? qb.sql`(SELECT resolved_name || '/' || ${name} FROM resolved_tags WHERE id = ${parent})`
+							: qb.value(name)
+					}) 
+					LIMIT 1`,
+				),
+				z
+					.object({ resolved_name: z.string() })
+					.transform(({ resolved_name }) => ({
+						resolvedName: resolved_name,
+					})),
+			);
+			if (duplicatedTag) {
+				throw new TagControllerError(
+					`Tag ${duplicatedTag.resolvedName} already exists`,
+					TAG_ERROR_CODE.DUPLICATE,
+				);
+			}
+
+			const segments = name.split('/');
+			if (segments.length > 1) {
+				// create an array of resolved names from a string: 'foo/bar' - ['foo', 'foo/bar']
+				const resolvedNames = segments.map((segment, index) =>
+					index === 0 ? segment : `${segments.slice(0, index + 1).join('/')}`,
+				);
+				// find the parent tag to reuse when creating the tag hierarchy
+				const {
+					rows: [parentTag],
+				} = await db.query(
+					qb.line(
+						qb.sql`SELECT resolved_name, id FROM (${qb.raw(
+							tagsQuery,
+							qb.sql`WHERE workspace_id = ${this.workspace}`,
+						)})
+						WHERE resolved_name IN (${qb.values(resolvedNames)}) 
+						ORDER BY LENGTH(resolved_name) DESC
+						LIMIT 1`,
+					),
+					z
+						.object({ id: z.string(), resolved_name: z.string() })
+						.transform(({ resolved_name, ...props }) => ({
+							...props,
+							resolvedName: resolved_name,
+						})),
+				);
+
+				let segmentsToCreate = segments;
+				let parentId = parent;
+				if (parentTag) {
+					segmentsToCreate = segments.filter(
+						(seg) => !parentTag.resolvedName.split('/').includes(seg),
+					);
+					parentId = parentTag.id;
+				}
+
+				for (let idx = 0; idx < segmentsToCreate.length; idx++) {
+					const name = segmentsToCreate[idx];
 					const isFirstItem = idx === 0;
 
 					if (isFirstItem) {
 						await db
 							.query(
 								qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-									[this.workspace, name, parent],
+									[this.workspace, name, parentId],
 								)}) RETURNING id`,
 								z.object({ id: z.string() }),
 							)
@@ -94,19 +188,19 @@ export class TagsController {
 							lastId = id;
 						});
 				}
-			});
-		} else {
-			await db
-				.query(
-					qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-						[this.workspace, name, parent],
-					)}) RETURNING id`,
-					z.object({ id: z.string() }),
-				)
-				.then(({ rows: [{ id }] }) => {
-					lastId = id;
-				});
-		}
+			} else {
+				await db
+					.query(
+						qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
+							[this.workspace, name, parent],
+						)}) RETURNING id`,
+						z.object({ id: z.string() }),
+					)
+					.then(({ rows: [{ id }] }) => {
+						lastId = id;
+					});
+			}
+		});
 
 		if (!lastId) {
 			throw new Error("Can't get id of inserted row");

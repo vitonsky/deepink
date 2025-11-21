@@ -1,7 +1,7 @@
 import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 
-import { TagsController } from './TagsController';
+import { TAG_ERROR_CODE, TagsController } from './TagsController';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -37,54 +37,125 @@ describe('manage tags', () => {
 		});
 	});
 
-	// TODO:fox that cases. Paths must be normalized
-	test('weird tags', async () => {
+	test('tags with invalid names cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await tags.add('///foo', null);
-		await tags.add('/foo/bar', null);
+		// invalid name
+		await expect(tags.add('   ', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add(' / / ', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add(' / //  ', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('///foo', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('/foo/bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('foo/bar/', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.add('foo//bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+		await expect(tags.getTags()).resolves.toEqual([]);
+	});
 
-		await tags.getTags().then((tags) => {
-			expect(tags).toEqual([
-				expect.objectContaining({
-					name: '',
-					parent: null,
-					resolvedName: '',
-				}),
-				expect.objectContaining({
-					name: '',
-					parent: expect.any(String),
-					resolvedName: '/',
-				}),
-				expect.objectContaining({
-					name: '',
-					parent: expect.any(String),
-					resolvedName: '//',
-				}),
+	test('existing tags are not duplicated when adding nested tags', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('foo/bar', null)).resolves.toBeTypeOf('string');
+		await expect(tags.getTags()).resolves.toHaveLength(2);
+
+		await expect(tags.add('foo/bar/baz', null)).resolves.toBeTypeOf('string');
+		await expect(tags.getTags()).resolves.toHaveLength(3);
+
+		await expect(tags.add('foo/bar/baz/x/y/z', null)).resolves.toBeTypeOf('string');
+		await expect(tags.getTags()).resolves.toHaveLength(6);
+	});
+
+	test('duplicate tag cannot be added', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('foo', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		const tagsList = await tags.getTags();
+		const fooTag = tagsList.find((t) => t.name == 'foo')!;
+		expect(fooTag).not.toBeUndefined();
+
+		// "foo/foo"
+		await expect(tags.add('foo', fooTag.id)).resolves.toBeTypeOf('string');
+
+		// "foo/bar"
+		await expect(tags.add('bar', fooTag.id)).resolves.toBeTypeOf('string');
+		await expect(tags.add('bar', fooTag.id)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+		await expect(tags.add('foo/bar', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		await expect(tags.add('seg1/seg2/seg3', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('seg1/seg2/seg3', null)).rejects.toThrow(
+			expect.objectContaining({
+				code: TAG_ERROR_CODE.DUPLICATE,
+			}),
+		);
+
+		const list = await tags.getTags();
+		const seg2 = list.find((t) => t.name === 'seg2')!;
+		expect(seg2).not.toBeUndefined();
+
+		await expect(tags.add('seg3', seg2.id)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		const seg1 = list.find((t) => t.name === 'seg1')!;
+		expect(seg1).not.toBeUndefined();
+		await expect(tags.add('seg2/seg3', seg1.id)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
+		);
+
+		await expect(tags.getTags()).resolves.toEqual(
+			expect.arrayContaining([
 				expect.objectContaining({
 					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: '///foo',
-				}),
-
-				expect.objectContaining({
-					name: '',
 					parent: null,
-					resolvedName: '',
-				}),
-				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: '/foo',
+					resolvedName: 'foo',
 				}),
 				expect.objectContaining({
 					name: 'bar',
 					parent: expect.any(String),
-					resolvedName: '/foo/bar',
+					resolvedName: 'foo/bar',
 				}),
-			]);
-		});
+				expect.objectContaining({
+					name: 'seg1',
+					parent: null,
+					resolvedName: 'seg1',
+				}),
+				expect.objectContaining({
+					name: 'seg2',
+					parent: expect.any(String),
+					resolvedName: 'seg1/seg2',
+				}),
+				expect.objectContaining({
+					name: 'seg3',
+					parent: expect.any(String),
+					resolvedName: 'seg1/seg2/seg3',
+				}),
+			]),
+		);
 	});
 
 	test('update tags', async () => {
