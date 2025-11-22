@@ -33,6 +33,7 @@ export const createWorkspaceObject = (workspace: {
 	notes: [],
 
 	search: '',
+	notesLimit: 100,
 
 	view: NOTES_VIEW.All_NOTES,
 
@@ -68,6 +69,7 @@ export type WorkspaceData = {
 	notes: INote[];
 
 	search: string;
+	notesLimit: number;
 
 	view: NOTES_VIEW;
 
@@ -338,6 +340,16 @@ export const profilesSlice = createSlice({
 			if (view !== NOTES_VIEW.All_NOTES) {
 				workspace.tags.selected = null;
 			}
+		},
+		setNotesLimit: (
+			state,
+			{
+				payload: { profileId, workspaceId, limit },
+			}: PayloadAction<WorkspaceScoped<{ limit: number }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+			workspace.notesLimit = limit;
 		},
 	},
 });
