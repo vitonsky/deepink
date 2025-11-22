@@ -10,9 +10,9 @@ import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
+	BASE_NOTE_OFFSET,
 	selectActiveNoteId,
 	selectNotes,
-	selectNotesLimit,
 	selectSearch,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -51,24 +51,23 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const items = virtualizer.getVirtualItems();
 
-	// Loads notes on scroll
-	const limit = useWorkspaceSelector(selectNotesLimit);
-
+	// Loads more notes when reaching the bottom of the notes list
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	useEffect(() => {
-		if (!notes.length) return;
-		const lastVisibleIndex = items[items.length - 1].index;
+		if (!notes.length && !items.length) return;
+		if (notes.length < BASE_NOTE_OFFSET) return;
 
+		const lastVisibleIndex = items[items.length - 1]?.index;
 		if (lastVisibleIndex >= notes.length - 10) {
 			dispatch(
-				workspacesApi.setNotesLimit({
+				workspacesApi.setNotesOffset({
 					...workspaceData,
-					limit: limit + 100,
+					offset: notes.length + BASE_NOTE_OFFSET,
 				}),
 			);
 		}
-	}, [items]);
+	}, [items, dispatch, workspaceData]);
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
