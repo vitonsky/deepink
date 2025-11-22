@@ -1,3 +1,4 @@
+import { BASE_NOTE_OFFSET } from '../profiles';
 import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
 
 export const selectWorkspaceName = createWorkspaceSelector(
@@ -82,7 +83,7 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 export const selectNotesLimit = createWorkspaceSelector(
 	[selectWorkspaceRoot],
 	(workspace) => {
-		if (!workspace) return 100;
-		return workspace.notesLimit;
+		if (!workspace) return BASE_NOTE_OFFSET;
+		return workspace.notesOffset;
 	},
 );

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useProfileControls } from '@features/App/Profile';
 import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -27,11 +27,6 @@ export const useUpdateNotes = () => {
 
 	const search = useWorkspaceSelector(selectSearch);
 	const limit = useWorkspaceSelector(selectNotesLimit);
-
-	// Reset limit when filter changes
-	useEffect(() => {
-		dispatch(workspacesApi.setNotesLimit({ ...workspaceData, limit: 100 }));
-	}, [dispatch, workspaceData, search, activeTag, notesView]);
 
 	const requestContextRef = useRef(0);
 	return useCallback(async () => {
