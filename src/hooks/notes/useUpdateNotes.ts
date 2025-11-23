@@ -6,7 +6,7 @@ import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/ho
 import {
 	NOTES_VIEW,
 	selectActiveTag,
-	selectNotesLimit,
+	selectNotesOffset,
 	selectSearch,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -26,7 +26,7 @@ export const useUpdateNotes = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 
 	const search = useWorkspaceSelector(selectSearch);
-	const limit = useWorkspaceSelector(selectNotesLimit);
+	const notesOffset = useWorkspaceSelector(selectNotesOffset);
 
 	const requestContextRef = useRef(0);
 	return useCallback(async () => {
@@ -46,7 +46,7 @@ export const useUpdateNotes = () => {
 		const tags = activeTag !== null ? [activeTag.id] : [];
 
 		const notes = await notesRegistry.get({
-			limit,
+			limit: notesOffset,
 			tags,
 			sort: { by: 'updatedAt', order: 'desc' },
 			search: searchText
@@ -73,7 +73,7 @@ export const useUpdateNotes = () => {
 		activeTag,
 		notesView,
 		notesRegistry,
-		limit,
+		notesOffset,
 		dispatch,
 		workspaceData,
 		lexemes,

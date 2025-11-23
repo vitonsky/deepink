@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -13,6 +13,7 @@ import {
 	BASE_NOTE_OFFSET,
 	selectActiveNoteId,
 	selectNotes,
+	selectNotesOffset,
 	selectSearch,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -20,6 +21,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
+// import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 
 export type NotesListProps = {};
 
@@ -51,14 +53,28 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const items = virtualizer.getVirtualItems();
 
+	const [isReloading, setIsReloading] = useState(false);
+	const notesOffset = useWorkspaceSelector(selectNotesOffset);
+	useEffect(() => {
+		// when offset changes - the date is outdated
+		setIsReloading(true);
+	}, [notesOffset]);
+	useEffect(() => {
+		// new date is ready, reload finish
+		if (isReloading) {
+			setIsReloading(false);
+		}
+	}, [notes, isReloading]);
+
 	// Loads more notes when reaching the bottom of the notes list
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	useEffect(() => {
-		if (!notes.length && !items.length) return;
-		if (notes.length < BASE_NOTE_OFFSET) return;
+		if (!notes.length) return;
+		if (isReloading) return;
 
-		const lastVisibleIndex = items[items.length - 1]?.index;
+		const lastVisibleIndex = items[items.length - 1].index;
+
 		if (lastVisibleIndex >= notes.length - 10) {
 			dispatch(
 				workspacesApi.setNotesOffset({
@@ -67,7 +83,7 @@ export const NotesList: FC<NotesListProps> = () => {
 				}),
 			);
 		}
-	}, [items, dispatch, workspaceData]);
+	}, [items, notes, dispatch, workspaceData]);
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
