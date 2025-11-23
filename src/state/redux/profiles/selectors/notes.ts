@@ -80,7 +80,7 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 	},
 );
 
-export const selectNotesLimit = createWorkspaceSelector(
+export const selectNotesOffset = createWorkspaceSelector(
 	[selectWorkspaceRoot],
 	(workspace) => {
 		if (!workspace) return BASE_NOTE_OFFSET;
