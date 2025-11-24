@@ -124,22 +124,27 @@ export class TagsController {
 
 			const segments = name.split('/');
 			if (segments.length > 1) {
-				// create an array of resolved names from a string: 'foo/bar' - ['foo', 'foo/bar']
+				// Create an array of resolved names from a string: 'foo/bar' - ['foo', 'foo/bar']
 				const resolvedNames = segments.map((segment, index) =>
 					index === 0 ? segment : `${segments.slice(0, index + 1).join('/')}`,
 				);
-				// find the parent tag to reuse when creating the tag hierarchy
+
+				// Find the existing parent tag to reuse when creating the tag hierarchy
+				// If a parent is provided, construct the full resolved name for each segment relative to that parent
 				const {
 					rows: [parentTag],
 				} = await db.query(
 					qb.line(
-						qb.sql`SELECT resolved_name, id FROM (${qb.raw(
-							tagsQuery,
-							qb.sql`WHERE workspace_id = ${this.workspace}`,
-						)})
-						WHERE resolved_name IN (${qb.values(resolvedNames)}) 
-						ORDER BY LENGTH(resolved_name) DESC
-						LIMIT 1`,
+						qb.sql`WITH resolved_tags AS 
+					(${qb.raw(tagsQuery, qb.sql`WHERE workspace_id = ${this.workspace}`)})
+					SELECT resolved_name, id FROM resolved_tags WHERE resolved_name IN (${
+						parent
+							? qb.sql`(SELECT resolved_name || '/' || segment FROM resolved_tags,
+  						unnest(ARRAY[${qb.values(resolvedNames)}]) AS segment WHERE id = ${parent})`
+							: qb.sql`${qb.values(resolvedNames)}`
+					}) 
+					ORDER BY LENGTH(resolved_name) DESC
+					LIMIT 1`,
 					),
 					z
 						.object({ id: z.string(), resolved_name: z.string() })
