@@ -66,6 +66,15 @@ describe('manage tags', () => {
 		await expect(tags.getTags()).resolves.toEqual([]);
 	});
 
+	test('cannot create a tag under a non-existing parent', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		// this parent tag not exist
+		const nonExistentTag = getUUID();
+		await expect(tags.add('foo/bar/foo', nonExistentTag)).rejects.toThrowError();
+	});
+
 	test('existing tags are not duplicated when adding nested tags', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
@@ -88,7 +97,7 @@ describe('manage tags', () => {
 		);
 
 		const tagsList = await tags.getTags();
-		const fooTag = tagsList.find((t) => t.name === 'foo')!;
+		const fooTag = tagsList.find((t) => t.name === 'foo' && t.parent === null)!;
 		expect(fooTag).not.toBeUndefined();
 		await expect(tags.add('bar/baz', fooTag.id)).resolves.toBeTypeOf('string');
 		await expect(tags.getTags()).resolves.toEqual(
@@ -107,6 +116,61 @@ describe('manage tags', () => {
 					name: 'baz',
 					parent: expect.any(String),
 					resolvedName: 'foo/bar/baz',
+				}),
+			]),
+		);
+
+		const newTagsList = await tags.getTags();
+		const barTag = newTagsList.find((t) => t.name === 'bar')!;
+		expect(barTag).not.toBeUndefined();
+		await expect(tags.add('bar/bar', barTag.id)).resolves.toBeTypeOf('string');
+		await expect(tags.getTags()).resolves.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					name: 'foo',
+					parent: null,
+					resolvedName: 'foo',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.any(String),
+					resolvedName: 'foo/bar',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.any(String),
+					resolvedName: 'foo/bar/bar',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.any(String),
+					resolvedName: 'foo/bar/bar/bar',
+				}),
+			]),
+		);
+
+		await expect(tags.add('foo/bar/foo/bar', null)).resolves.toBeTypeOf('string');
+		await expect(tags.getTags()).resolves.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					name: 'foo',
+					parent: null,
+					resolvedName: 'foo',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.any(String),
+					resolvedName: 'foo/bar',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					parent: expect.any(String),
+					resolvedName: 'foo/bar/foo',
+				}),
+				expect.objectContaining({
+					name: 'bar',
+					parent: expect.any(String),
+					resolvedName: 'foo/bar/foo/bar',
 				}),
 			]),
 		);
