@@ -69,7 +69,6 @@ describe('manage tags', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		// this parent tag not exist
 		const nonExistentTag = getUUID();
 		await expect(tags.add('foo/bar/foo', nonExistentTag)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.TAG_NOT_EXIST }),
@@ -81,6 +80,28 @@ describe('manage tags', () => {
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
+
+		const tagsList1 = await tags.getTags();
+		const fooTag = tagsList1.find((t) => t.name === 'foo')!;
+		expect(fooTag).not.toBeUndefined();
+
+		// "foo/foo"
+		await expect(tags.add('foo', fooTag.id)).resolves.toBeTypeOf('string');
+		await expect(tags.getTags()).resolves.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					name: 'foo',
+					parent: null,
+					resolvedName: 'foo',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					parent: expect.any(String),
+					resolvedName: 'foo/foo',
+				}),
+			]),
+		);
+
 		await expect(tags.add('foo/bar', null)).resolves.toBeTypeOf('string');
 		await expect(tags.getTags()).resolves.toEqual(
 			expect.arrayContaining([
@@ -97,9 +118,6 @@ describe('manage tags', () => {
 			]),
 		);
 
-		const tagsList1 = await tags.getTags();
-		const fooTag = tagsList1.find((t) => t.name === 'foo' && t.parent === null)!;
-		expect(fooTag).not.toBeUndefined();
 		await expect(tags.add('bar/baz', fooTag.id)).resolves.toBeTypeOf('string');
 		await expect(tags.getTags()).resolves.toEqual(
 			expect.arrayContaining([
@@ -192,9 +210,6 @@ describe('manage tags', () => {
 		const fooTag = tagsList1.find((t) => t.name === 'foo')!;
 		expect(fooTag).not.toBeUndefined();
 
-		// "foo/foo"
-		await expect(tags.add('foo', fooTag.id)).resolves.toBeTypeOf('string');
-
 		// "foo/bar"
 		await expect(tags.add('bar', fooTag.id)).resolves.toBeTypeOf('string');
 		await expect(tags.add('bar', fooTag.id)).rejects.toThrow(
@@ -204,26 +219,18 @@ describe('manage tags', () => {
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 
-		await expect(tags.add('x/y/z', null)).resolves.toBeTypeOf('string');
-		await expect(tags.add('x/y/z', null)).rejects.toThrow(
+		await expect(tags.add('bar/baz', fooTag.id)).resolves.toBeTypeOf('string');
+		await expect(tags.add('bar/baz', fooTag.id)).rejects.toThrow(
 			expect.objectContaining({
 				code: TAG_ERROR_CODE.DUPLICATE,
 			}),
 		);
 
+		// create baz from bar parent
 		const tagsList2 = await tags.getTags();
-
-		// create y/z from x parent
-		const tagX = tagsList2.find((t) => t.name === 'x')!;
-		expect(tagX).not.toBeUndefined();
-		await expect(tags.add('y/z', tagX.id)).rejects.toThrow(
-			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
-		);
-
-		// create z from y parent
-		const tagY = tagsList2.find((t) => t.name === 'y')!;
-		expect(tagY).not.toBeUndefined();
-		await expect(tags.add('z', tagY.id)).rejects.toThrow(
+		const barTag = tagsList2.find((t) => t.name === 'bar')!;
+		expect(barTag).not.toBeUndefined();
+		await expect(tags.add('baz', barTag.id)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 
@@ -235,29 +242,14 @@ describe('manage tags', () => {
 					resolvedName: 'foo',
 				}),
 				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: 'foo/foo',
-				}),
-				expect.objectContaining({
 					name: 'bar',
 					parent: expect.any(String),
 					resolvedName: 'foo/bar',
 				}),
 				expect.objectContaining({
-					name: 'x',
-					parent: null,
-					resolvedName: 'x',
-				}),
-				expect.objectContaining({
-					name: 'y',
+					name: 'baz',
 					parent: expect.any(String),
-					resolvedName: 'x/y',
-				}),
-				expect.objectContaining({
-					name: 'z',
-					parent: expect.any(String),
-					resolvedName: 'x/y/z',
+					resolvedName: 'foo/bar/baz',
 				}),
 			]),
 		);

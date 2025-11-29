@@ -135,20 +135,24 @@ export class TagsController {
 					index === 0 ? segment : `${segments.slice(0, index + 1).join('/')}`,
 				);
 
-				// Find the most qualified root tag to reuse when creating the tag hierarchy.
-				// Get the parent resolved name so we can build the complete path for a given segment ('bar/bar', parent: fooID)
-				// and determine which segments actually need to be created.
+				// Find the most qualified root tag to reuse when creating the tag hierarchy:
+				// build an array of all possible tag name variants and select the longest match among existing resolved names
+				// Also fetch the parent’s resolved name to construct the full tag name and determine which segments need to be created
 				const {
 					rows: [{ rootTag, parentResolvedName } = {}],
 				} = await db.query(
 					qb.line(
 						qb.sql`${selectResolvedTags(this.workspace)}
-					SELECT resolved_name, id, (SELECT resolved_name FROM resolved_tags WHERE id IS NOT DISTINCT FROM ${parent}) AS parent_name
-					FROM resolved_tags WHERE resolved_name IN (${
+					SELECT resolved_name, id,
+					(SELECT resolved_name FROM resolved_tags WHERE id IS NOT DISTINCT FROM ${parent}) AS parent_resolved_name
+					FROM resolved_tags 
+					WHERE resolved_name IN (${
 						parent
-							? qb.sql`SELECT resolved_name || '/' || segment FROM resolved_tags,
-     				unnest(ARRAY[${qb.values(tagNameVariants)}]) AS segment WHERE id = ${parent}
-    				UNION ALL SELECT resolved_name FROM resolved_tags WHERE id = ${parent}`
+							? qb.sql`SELECT resolved_name || '/' || segment 
+							FROM resolved_tags, unnest(ARRAY[${qb.values(tagNameVariants)}]) AS segment 
+							WHERE id = ${parent}
+    						UNION ALL
+							SELECT resolved_name FROM resolved_tags WHERE id = ${parent}`
 							: qb.sql`${qb.values(tagNameVariants)}`
 					}) 
 					ORDER BY LENGTH(resolved_name) DESC
@@ -158,10 +162,10 @@ export class TagsController {
 						.object({
 							id: z.string(),
 							resolved_name: z.string(),
-							parent_name: z.string().nullable(),
+							parent_resolved_name: z.string().nullable(),
 						})
-						.transform(({ resolved_name, id, parent_name }) => ({
-							parentResolvedName: parent_name,
+						.transform(({ resolved_name, id, parent_resolved_name }) => ({
+							parentResolvedName: parent_resolved_name,
 							rootTag: { id, resolvedName: resolved_name },
 						})),
 				);
@@ -176,14 +180,13 @@ export class TagsController {
 				let parentTagId = parent;
 				let segmentsForCreation = segments;
 				if (rootTag) {
-					const fullSegments = parentResolvedName
+					const allSegments = parentResolvedName
 						? `${parentResolvedName}/${name}`.split('/')
 						: segments;
 
-					segmentsForCreation = fullSegments.slice(
+					segmentsForCreation = allSegments.slice(
 						rootTag.resolvedName.split('/').length,
 					);
-
 					parentTagId = rootTag.id;
 				}
 
