@@ -94,7 +94,6 @@ function getFetchQuery(
 	const metaEntries = Object.entries(
 		formatNoteMeta({
 			isVisible: true,
-			isArchived: false,
 			...meta,
 		}),
 	);
@@ -256,6 +255,8 @@ export class NotesController implements INotesController {
 
 	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		const db = wrapDB(this.db.get());
+
+		console.log('meta', query.meta);
 
 		const { rows } = await db.query(
 			getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query),

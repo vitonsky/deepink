@@ -15,6 +15,7 @@ import {
 	FaRegBookmark,
 	FaXmark,
 } from 'react-icons/fa6';
+import { MdArchive, MdUnarchive } from 'react-icons/md';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
@@ -34,6 +35,8 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useBookmark } from '@features/NoteEditor/useBookmarks';
 import { useTelemetryTracker } from '@features/telemetry';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -42,6 +45,7 @@ import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
 import { NoteSidebar } from './NoteSidebar';
 import { NoteVersions } from './NoteVersions';
+import { useUpdateArchivedStatus } from './useUpdateArchivedStatus';
 
 export enum NoteSidebarTabs {
 	HISTORY = 'HISTORY',
@@ -201,10 +205,12 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
+	useUpdateArchivedStatus(note);
+	const runCommand = useCommand();
+
 	const { inBookmark, toggle: toggleBookmark } = useBookmark(note.id);
 
-	// In the future, read-only mode will cover more cases than deleted notes
-	const isReadOnly = note.isDeleted;
+	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
 
 	return (
 		<VStack w="100%" align="start">
@@ -220,7 +226,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								? undefined
 								: (evt) => setTitle(evt.target.value)
 						}
-						isDisabled={versionPreview !== null || isReadOnly}
+						isDisabled={isReadOnly}
 					/>
 
 					{/* TODO: add options that may be toggled */}
@@ -233,10 +239,24 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					<Button
 						variant="ghost"
 						size="xs"
-						title={Boolean(inBookmark) ? 'Remove bookmark' : 'Add bookmark'}
+						title={inBookmark ? 'Remove bookmark' : 'Add bookmark'}
 						onClick={toggleBookmark}
 					>
 						{inBookmark ? <FaBookmark /> : <FaRegBookmark />}
+					</Button>
+					<Button
+						variant="ghost"
+						size="xs"
+						onClick={() =>
+							runCommand(GLOBAL_COMMANDS.UPDATE_NOTE_ARCHIVE_STATUS)
+						}
+						title={note.isArchived ? 'Unarchive' : 'Archive'}
+					>
+						{note.isArchived ? (
+							<MdUnarchive size={'1rem'} />
+						) : (
+							<MdArchive size={'1rem'} />
+						)}
 					</Button>
 					<Button variant="ghost" size="xs">
 						<FaFlag />
@@ -407,10 +427,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			<NoteEditor
 				text={versionPreview ? versionPreview.text : text}
 				setText={(noteText) => {
-					if (isReadOnly || versionPreview) return;
+					if (isReadOnly) return;
 					setText(noteText);
 				}}
-				isReadOnly={isReadOnly || Boolean(versionPreview)}
+				isReadOnly={isReadOnly}
 			/>
 
 			{!sidePanel ? null : (

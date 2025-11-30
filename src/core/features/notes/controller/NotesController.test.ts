@@ -261,13 +261,13 @@ describe('data fetching', () => {
 			.get({ limit: 10 })
 			.then((notes) => notes.map((note) => note.id));
 
-		// update status for 10 notes
+		// update archive status for 10 notes
 		await registry.updateMeta(notesId, { isArchived: true });
 		await expect(registry.get({ meta: { isArchived: true } })).resolves.toHaveLength(
 			10,
 		);
 
-		// check only not deleted notes
+		// check only not archived notes
 		await expect(registry.get({ meta: { isArchived: false } })).resolves.toHaveLength(
 			notesSample.length - 20,
 		);

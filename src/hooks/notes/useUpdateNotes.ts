@@ -55,7 +55,11 @@ export const useUpdateNotes = () => {
 				: undefined,
 			meta: {
 				isDeleted: notesView === NOTES_VIEW.BIN,
-				isArchived: notesView === NOTES_VIEW.ARCHIVE,
+				...(notesView !== NOTES_VIEW.BIN
+					? {
+							isArchived: notesView === NOTES_VIEW.ARCHIVE,
+					  }
+					: {}),
 			},
 			...(notesView === NOTES_VIEW.BOOKMARK && { bookmarks: true }),
 		});
