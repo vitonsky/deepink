@@ -45,7 +45,7 @@ export const validateTagName = (name: string) => {
 };
 
 const selectResolvedTags = (workspaceId: string) => {
-	return qb.sql`WITH resolved_tags AS (${qb.raw(
+	return qb.sql`SELECT * FROM (${qb.raw(
 		tagsQuery,
 	)} WHERE workspace_id = ${workspaceId})`;
 };
@@ -102,19 +102,17 @@ export class TagsController {
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
-			// check tag unique
+			// check tag uniqueness
 			const {
 				rows: [duplicatedTag],
 			} = await db.query(
-				qb.line(
-					qb.sql`${selectResolvedTags(this.workspace)}
+				qb.sql`WITH resolved_tags AS (${selectResolvedTags(this.workspace)})
 					SELECT resolved_name FROM resolved_tags WHERE resolved_name = (${
 						parent
 							? qb.sql`(SELECT resolved_name || '/' || ${name} FROM resolved_tags WHERE id = ${parent})`
 							: qb.value(name)
 					}) 
 					LIMIT 1`,
-				),
 				z
 					.object({ resolved_name: z.string() })
 					.transform(({ resolved_name }) => ({
@@ -135,29 +133,29 @@ export class TagsController {
 					index === 0 ? segment : `${segments.slice(0, index + 1).join('/')}`,
 				);
 
-				// Find the most qualified root tag to reuse when creating the tag hierarchy:
-				// build an array of all possible tag name variants and select the longest match among existing resolved names
-				// Also fetch the parent’s resolved name to construct the full tag name and determine which segments need to be created
+				// Find the most qualified root tag to reuse:
+				// - Build a list of tag names by combining the parent resolved name with each segment from tagNameVariants
+				// also including the parent itself and select the longest existing match.
+				// - Fetch the parent's resolved name because if the user passes parent tag and tag name - 'bar/baz'
+				// without building the full resolved tag name, it cannot detect which tag segments in the name should be trimmed
 				const {
 					rows: [{ rootTag, parentResolvedName } = {}],
 				} = await db.query(
-					qb.line(
-						qb.sql`${selectResolvedTags(this.workspace)}
+					qb.sql`WITH resolved_tags AS (${selectResolvedTags(this.workspace)})
 					SELECT resolved_name, id,
 					(SELECT resolved_name FROM resolved_tags WHERE id IS NOT DISTINCT FROM ${parent}) AS parent_resolved_name
 					FROM resolved_tags 
 					WHERE resolved_name IN (${
 						parent
-							? qb.sql`SELECT resolved_name || '/' || segment 
-							FROM resolved_tags, unnest(ARRAY[${qb.values(tagNameVariants)}]) AS segment 
-							WHERE id = ${parent}
+							? qb.sql`SELECT resolved_name FROM resolved_tags WHERE id = ${parent}
     						UNION ALL
-							SELECT resolved_name FROM resolved_tags WHERE id = ${parent}`
-							: qb.sql`${qb.values(tagNameVariants)}`
+							SELECT resolved_name || '/' || segment 
+							FROM resolved_tags, unnest(ARRAY[${qb.values(tagNameVariants)}]) AS segment 
+							WHERE id = ${parent}`
+							: qb.values(tagNameVariants)
 					}) 
 					ORDER BY LENGTH(resolved_name) DESC
 					LIMIT 1`,
-					),
 					z
 						.object({
 							id: z.string(),
@@ -170,7 +168,7 @@ export class TagsController {
 						})),
 				);
 
-				// If parent tag name is not found in the database, the tag hierarchy cannot be created
+				// If parent tag name is not found in the database, the tag cannot be created
 				if (parent && !parentResolvedName)
 					throw new TagControllerError(
 						`Parent tag: ${parent} not exist`,
