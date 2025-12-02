@@ -107,9 +107,11 @@ export class TagsController {
 			const db = wrapDB(tx);
 
 			let resolvedTag: string;
-			if (parent) {
+			if (!parent) {
+				resolvedTag = name;
+			} else {
 				const {
-					rows: [parentResolvedName],
+					rows: [parentResolvedTag],
 				} = await db.query(
 					qb.sql`SELECT resolved_name FROM (${selectResolvedTags(
 						this.workspace,
@@ -118,18 +120,15 @@ export class TagsController {
 					resolvedNameSchema,
 				);
 				// If parent tag is not found in the database, the tag cannot be created
-				if (parent && !parentResolvedName)
+				if (parent && !parentResolvedTag)
 					throw new TagControllerError(
 						`Parent tag: ${parent} not exist`,
 						TAG_ERROR_CODE.TAG_NOT_EXIST,
 					);
-
-				resolvedTag = `${parentResolvedName.resolvedName}/${name}`;
-			} else {
-				resolvedTag = name;
+				resolvedTag = `${parentResolvedTag.resolvedName}/${name}`;
 			}
 
-			// check tag uniqueness
+			// Check tag uniqueness
 			const {
 				rows: [duplicatedTag],
 			} = await db.query(
@@ -158,7 +157,7 @@ export class TagsController {
 					return prevSegment;
 				});
 
-				// Find the most qualified root tag to reuse
+				// Find the longest existing tag segment that matches parts of resolvedTag to avoid duplicating it when creating a new tag
 				const {
 					rows: [rootTag],
 				} = await db.query(
