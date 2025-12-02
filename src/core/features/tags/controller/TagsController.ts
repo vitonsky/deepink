@@ -106,9 +106,9 @@ export class TagsController {
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
-			let resolvedTag: string;
+			let resolvedTagToCreate: string;
 			if (!parent) {
-				resolvedTag = name;
+				resolvedTagToCreate = name;
 			} else {
 				const {
 					rows: [parentResolvedTag],
@@ -125,7 +125,7 @@ export class TagsController {
 						`Parent tag: ${parent} not exist`,
 						TAG_ERROR_CODE.TAG_NOT_EXIST,
 					);
-				resolvedTag = `${parentResolvedTag.resolvedName}/${name}`;
+				resolvedTagToCreate = `${parentResolvedTag.resolvedName}/${name}`;
 			}
 
 			// Check tag uniqueness
@@ -134,7 +134,7 @@ export class TagsController {
 			} = await db.query(
 				qb.sql`SELECT resolved_name FROM (${selectResolvedTags(
 					this.workspace,
-				)}) WHERE resolved_name = ${resolvedTag} 
+				)}) WHERE resolved_name = ${resolvedTagToCreate} 
 					LIMIT 1`,
 				resolvedNameSchema,
 			);
@@ -145,15 +145,12 @@ export class TagsController {
 				);
 			}
 
-			const segments = resolvedTag.split('/');
+			const segments = resolvedTagToCreate.split('/');
 			if (segments.length > 1) {
 				// Create an array of names variants from a string: 'foo/bar' - ['foo', 'foo/bar']
 				let prevSegment = '';
 				const tagNameVariants = segments.map((segment, index) => {
-					prevSegment =
-						index === 0
-							? (prevSegment = segment)
-							: (prevSegment = `${prevSegment}/${segment}`);
+					prevSegment = index === 0 ? segment : `${prevSegment}/${segment}`;
 					return prevSegment;
 				});
 
