@@ -45,9 +45,7 @@ export const validateTagName = (name: string) => {
 };
 
 const selectResolvedTags = (workspaceId: string) => {
-	return qb.sql`SELECT * FROM (${qb.raw(
-		tagsQuery,
-	)} WHERE workspace_id = ${workspaceId})`;
+	return qb.sql`${qb.raw(tagsQuery)} WHERE workspace_id = ${workspaceId}`;
 };
 
 const RowScheme = z
@@ -59,6 +57,12 @@ const RowScheme = z
 	})
 	.transform(({ resolved_name, ...props }) => ({
 		...props,
+		resolvedName: resolved_name,
+	}));
+
+const resolvedNameSchema = z
+	.object({ resolved_name: z.string() })
+	.transform(({ resolved_name }) => ({
 		resolvedName: resolved_name,
 	}));
 
@@ -102,22 +106,38 @@ export class TagsController {
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
+			let resolvedTag: string;
+			if (parent) {
+				const {
+					rows: [parentResolvedName],
+				} = await db.query(
+					qb.sql`SELECT resolved_name FROM (${selectResolvedTags(
+						this.workspace,
+					)}) WHERE id=${parent} 
+					LIMIT 1`,
+					resolvedNameSchema,
+				);
+				// If parent tag is not found in the database, the tag cannot be created
+				if (parent && !parentResolvedName)
+					throw new TagControllerError(
+						`Parent tag: ${parent} not exist`,
+						TAG_ERROR_CODE.TAG_NOT_EXIST,
+					);
+
+				resolvedTag = `${parentResolvedName.resolvedName}/${name}`;
+			} else {
+				resolvedTag = name;
+			}
+
 			// check tag uniqueness
 			const {
 				rows: [duplicatedTag],
 			} = await db.query(
-				qb.sql`WITH resolved_tags AS (${selectResolvedTags(this.workspace)})
-					SELECT resolved_name FROM resolved_tags WHERE resolved_name = (${
-						parent
-							? qb.sql`(SELECT resolved_name || '/' || ${name} FROM resolved_tags WHERE id = ${parent})`
-							: qb.value(name)
-					}) 
+				qb.sql`SELECT resolved_name FROM (${selectResolvedTags(
+					this.workspace,
+				)}) WHERE resolved_name = ${resolvedTag} 
 					LIMIT 1`,
-				z
-					.object({ resolved_name: z.string() })
-					.transform(({ resolved_name }) => ({
-						resolvedName: resolved_name,
-					})),
+				resolvedNameSchema,
 			);
 			if (duplicatedTag) {
 				throw new TagControllerError(
@@ -126,63 +146,43 @@ export class TagsController {
 				);
 			}
 
-			const segments = name.split('/');
+			const segments = resolvedTag.split('/');
 			if (segments.length > 1) {
 				// Create an array of names variants from a string: 'foo/bar' - ['foo', 'foo/bar']
-				const tagNameVariants = segments.map((segment, index) =>
-					index === 0 ? segment : `${segments.slice(0, index + 1).join('/')}`,
-				);
+				let prevSegment = '';
+				const tagNameVariants = segments.map((segment, index) => {
+					prevSegment =
+						index === 0
+							? (prevSegment = segment)
+							: (prevSegment = `${prevSegment}/${segment}`);
+					return prevSegment;
+				});
 
-				// Find the most qualified root tag to reuse:
-				// - Build a list of tag names by combining the parent resolved name with each segment from tagNameVariants
-				// also including the parent itself and select the longest existing match.
-				// - Fetch the parent's resolved name because if the user passes parent tag and tag name - 'bar/baz'
-				// without building the full resolved tag name, it cannot detect which tag segments in the name should be trimmed
+				// Find the most qualified root tag to reuse
 				const {
-					rows: [{ rootTag, parentResolvedName } = {}],
+					rows: [rootTag],
 				} = await db.query(
-					qb.sql`WITH resolved_tags AS (${selectResolvedTags(this.workspace)})
-					SELECT resolved_name, id,
-					(SELECT resolved_name FROM resolved_tags WHERE id IS NOT DISTINCT FROM ${parent}) AS parent_resolved_name
-					FROM resolved_tags 
-					WHERE resolved_name IN (${
-						parent
-							? qb.sql`SELECT resolved_name FROM resolved_tags WHERE id = ${parent}
-    						UNION ALL
-							SELECT resolved_name || '/' || segment 
-							FROM resolved_tags, unnest(ARRAY[${qb.values(tagNameVariants)}]) AS segment 
-							WHERE id = ${parent}`
-							: qb.values(tagNameVariants)
-					}) 
+					qb.sql`SELECT resolved_name, id FROM (${selectResolvedTags(
+						this.workspace,
+					)})
+					WHERE resolved_name IN (${qb.values(tagNameVariants)})
 					ORDER BY LENGTH(resolved_name) DESC
 					LIMIT 1`,
 					z
 						.object({
 							id: z.string(),
 							resolved_name: z.string(),
-							parent_resolved_name: z.string().nullable(),
 						})
-						.transform(({ resolved_name, id, parent_resolved_name }) => ({
-							parentResolvedName: parent_resolved_name,
-							rootTag: { id, resolvedName: resolved_name },
+						.transform(({ resolved_name, id }) => ({
+							id,
+							resolvedName: resolved_name,
 						})),
 				);
-
-				// If parent tag name is not found in the database, the tag cannot be created
-				if (parent && !parentResolvedName)
-					throw new TagControllerError(
-						`Parent tag: ${parent} not exist`,
-						TAG_ERROR_CODE.TAG_NOT_EXIST,
-					);
 
 				let parentTagId = parent;
 				let segmentsForCreation = segments;
 				if (rootTag) {
-					const allSegments = parentResolvedName
-						? `${parentResolvedName}/${name}`.split('/')
-						: segments;
-
-					segmentsForCreation = allSegments.slice(
+					segmentsForCreation = segments.slice(
 						rootTag.resolvedName.split('/').length,
 					);
 					parentTagId = rootTag.id;
