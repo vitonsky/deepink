@@ -93,12 +93,6 @@ const RowScheme = z
 		resolvedName: resolved_name,
 	}));
 
-const resolvedNameSchema = z
-	.object({ resolved_name: z.string() })
-	.transform(({ resolved_name }) => ({
-		resolvedName: resolved_name,
-	}));
-
 export class TagsController {
 	private readonly db;
 	private readonly workspace;
@@ -150,7 +144,7 @@ export class TagsController {
 						where: [qb.sql`id = ${parent}`],
 						limit: 1,
 					}),
-					resolvedNameSchema,
+					RowScheme,
 				);
 				// If the parent tag is not found in the database, the tag cannot be created
 				if (!parentTag)
@@ -169,7 +163,7 @@ export class TagsController {
 					where: [qb.sql`resolved_name = ${resolvedTagName}`],
 					limit: 1,
 				}),
-				resolvedNameSchema,
+				RowScheme,
 			);
 			if (duplicateTag) {
 				throw new TagControllerError(
@@ -198,15 +192,7 @@ export class TagsController {
 						order: qb.sql`ORDER BY LENGTH(resolved_name) DESC`,
 						limit: 1,
 					}),
-					z
-						.object({
-							id: z.string(),
-							resolved_name: z.string(),
-						})
-						.transform(({ resolved_name, id }) => ({
-							id,
-							resolvedName: resolved_name,
-						})),
+					RowScheme,
 				);
 
 				const parentTagId = rootTag ? rootTag.id : parent;
