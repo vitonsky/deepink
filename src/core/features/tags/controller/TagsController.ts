@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
 import { createEvent } from 'effector';
+import { Query } from 'nano-queries/core/Query';
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { qb } from '@utils/db/query-builder';
+import { DBTypes, qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
 
 import tagsQuery from './selectTagsWithResolvedNames.sql';
@@ -44,8 +45,30 @@ export const validateTagName = (name: string) => {
 	}
 };
 
-const selectResolvedTags = (workspaceId: string) => {
-	return qb.sql`${qb.raw(tagsQuery)} WHERE workspace_id = ${workspaceId}`;
+const selectResolvedTags = (
+	workspaceId: string,
+	queries?: {
+		filter?: Query<DBTypes>[];
+		order?: Query<DBTypes>;
+		limit?: number;
+	},
+) => {
+	return qb.line(
+		qb.raw(tagsQuery),
+		qb
+			.where(qb.sql`workspace_id=${workspaceId}`)
+			.and(
+				queries?.filter
+					? qb.line(
+							...queries.filter.map((query, index) =>
+								index === 0 ? query : qb.sql`AND ${query}`,
+							),
+					  )
+					: undefined,
+			),
+		queries?.order ? queries.order : undefined,
+		queries?.limit ? qb.limit(queries.limit) : undefined,
+	);
 };
 
 const RowScheme = z
@@ -113,10 +136,10 @@ export class TagsController {
 				const {
 					rows: [parentResolvedTag],
 				} = await db.query(
-					qb.sql`SELECT resolved_name FROM (${selectResolvedTags(
-						this.workspace,
-					)}) WHERE id=${parent} 
-					LIMIT 1`,
+					selectResolvedTags(this.workspace, {
+						filter: [qb.sql`t.id=${parent}`],
+						limit: 1,
+					}),
 					resolvedNameSchema,
 				);
 				// If parent tag is not found in the database, the tag cannot be created
@@ -132,10 +155,10 @@ export class TagsController {
 			const {
 				rows: [duplicatedTag],
 			} = await db.query(
-				qb.sql`SELECT resolved_name FROM (${selectResolvedTags(
-					this.workspace,
-				)}) WHERE resolved_name = ${resolvedTagToCreate} 
-					LIMIT 1`,
+				selectResolvedTags(this.workspace, {
+					filter: [qb.sql`resolved_name = ${resolvedTagToCreate}`],
+					limit: 1,
+				}),
 				resolvedNameSchema,
 			);
 			if (duplicatedTag) {
@@ -158,12 +181,13 @@ export class TagsController {
 				const {
 					rows: [rootTag],
 				} = await db.query(
-					qb.sql`SELECT resolved_name, id FROM (${selectResolvedTags(
-						this.workspace,
-					)})
-					WHERE resolved_name IN (${qb.values(tagNameVariants)})
-					ORDER BY LENGTH(resolved_name) DESC
-					LIMIT 1`,
+					selectResolvedTags(this.workspace, {
+						filter: [
+							qb.sql`resolved_name IN (${qb.values(tagNameVariants)})`,
+						],
+						order: qb.sql`ORDER BY LENGTH(resolved_name) DESC`,
+						limit: 1,
+					}),
 					z
 						.object({
 							id: z.string(),
