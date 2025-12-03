@@ -26,8 +26,8 @@ SELECT
 FROM tags t
 JOIN (
     SELECT
-        tag_tree_id AS id,
+        tag_tree_id AS tag_id,
         string_agg(name, '/' ORDER BY segment_id DESC) AS resolved_name
     FROM tagtree
     GROUP BY tag_tree_id
-) x ON t.id = x.id
+) x ON t.id = x.tag_id

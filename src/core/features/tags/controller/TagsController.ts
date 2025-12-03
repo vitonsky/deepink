@@ -45,29 +45,39 @@ export const validateTagName = (name: string) => {
 	}
 };
 
+/**
+ * Returns resolved tags for a given workspace
+ */
 const selectResolvedTags = (
 	workspaceId: string,
-	queries?: {
-		filter?: Query<DBTypes>[];
+	options: {
+		/**
+		 * Additional conditions for the WHERE clause, joined with `AND` if multiple
+		 */
+		where?: Query<DBTypes>[];
 		order?: Query<DBTypes>;
+		/**
+		 * The maximum number of rows to return
+		 */
 		limit?: number;
-	},
+	} = {},
 ) => {
+	const { where, order, limit } = options;
 	return qb.line(
 		qb.raw(tagsQuery),
 		qb
-			.where(qb.sql`workspace_id=${workspaceId}`)
+			.where(qb.sql`workspace_id = ${workspaceId}`)
 			.and(
-				queries?.filter
+				where
 					? qb.line(
-							...queries.filter.map((query, index) =>
+							...where.map((query, index) =>
 								index === 0 ? query : qb.sql`AND ${query}`,
 							),
 					  )
 					: undefined,
 			),
-		queries?.order ? queries.order : undefined,
-		queries?.limit ? qb.limit(queries.limit) : undefined,
+		order ?? undefined,
+		limit ? qb.limit(limit) : undefined,
 	);
 };
 
@@ -137,7 +147,7 @@ export class TagsController {
 					rows: [parentTag],
 				} = await db.query(
 					selectResolvedTags(this.workspace, {
-						filter: [qb.sql`t.id = ${parent}`],
+						where: [qb.sql`id = ${parent}`],
 						limit: 1,
 					}),
 					resolvedNameSchema,
@@ -156,7 +166,7 @@ export class TagsController {
 				rows: [duplicateTag],
 			} = await db.query(
 				selectResolvedTags(this.workspace, {
-					filter: [qb.sql`resolved_name = ${resolvedTagName}`],
+					where: [qb.sql`resolved_name = ${resolvedTagName}`],
 					limit: 1,
 				}),
 				resolvedNameSchema,
@@ -184,9 +194,7 @@ export class TagsController {
 					rows: [rootTag],
 				} = await db.query(
 					selectResolvedTags(this.workspace, {
-						filter: [
-							qb.sql`resolved_name IN (${qb.values(tagNameVariants)})`,
-						],
+						where: [qb.sql`resolved_name IN (${qb.values(tagNameVariants)})`],
 						order: qb.sql`ORDER BY LENGTH(resolved_name) DESC`,
 						limit: 1,
 					}),
