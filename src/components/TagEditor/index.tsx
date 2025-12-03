@@ -158,11 +158,20 @@ export const TagEditor: FC<ITagEditorProps> = ({
 									});
 								} catch (error) {
 									if (error instanceof TagControllerError) {
-										setTagNameError(
-											error.code === TAG_ERROR_CODE.DUPLICATE
-												? 'Tag already exists'
-												: 'Tag cannot be empty, start or end with "/", or contain "//".',
-										);
+										switch (error.code) {
+											case TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST:
+												setTagNameError(
+													'Parent tag not found, please select another tag',
+												);
+												break;
+											case TAG_ERROR_CODE.DUPLICATE:
+												setTagNameError('Tag already exists');
+												break;
+											default:
+												setTagNameError(
+													'Tag cannot be empty, start or end with "/", or contain "//".',
+												);
+										}
 										return;
 									}
 									setTagNameError(

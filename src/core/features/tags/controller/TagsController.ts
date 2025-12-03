@@ -25,7 +25,7 @@ export class TagControllerError extends Error {
 }
 
 export const validateTagName = (name: string) => {
-	if (name.split('/').find((t) => t.trim().length === 0)) {
+	if (!name.length || name.split('/').find((t) => t.trim().length === 0)) {
 		throw new TagControllerError(
 			'Tag name must not be empty',
 			TAG_ERROR_CODE.INVALID_FORMAT,

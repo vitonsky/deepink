@@ -41,6 +41,9 @@ describe('manage tags', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
+		await expect(tags.add('', null)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
 		await expect(tags.add('   ', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
 		);
