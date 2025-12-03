@@ -25,7 +25,7 @@ export class TagControllerError extends Error {
 }
 
 export const validateTagName = (name: string) => {
-	if (!name.length || name.split('/').find((t) => t.trim().length === 0)) {
+	if (name.split('/').some((t) => t.trim().length === 0)) {
 		throw new TagControllerError(
 			'Tag name must not be empty',
 			TAG_ERROR_CODE.INVALID_FORMAT,
@@ -46,9 +46,9 @@ export const validateTagName = (name: string) => {
 };
 
 /**
- * Returns resolved tags for a given workspace
+ * Returns a SQL query for retrieving resolved tags in the specified workspace
  */
-const selectResolvedTags = (
+export const selectResolvedTags = (
 	workspaceId: string,
 	options: {
 		/**
