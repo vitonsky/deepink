@@ -14,7 +14,7 @@ type ChangeEvent = 'tags' | 'noteTags';
 export enum TAG_ERROR_CODE {
 	DUPLICATE = 'Duplicate',
 	INVALID_FORMAT = 'InvalidFormat',
-	TAG_NOT_EXIST = 'TagNotExist',
+	PARENT_TAG_NOT_EXIST = 'ParentTagNotExist',
 }
 
 export class TagControllerError extends Error {
@@ -129,55 +129,57 @@ export class TagsController {
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
-			let resolvedTagToCreate: string;
+			let resolvedTagName: string;
 			if (!parent) {
-				resolvedTagToCreate = name;
+				resolvedTagName = name;
 			} else {
 				const {
-					rows: [parentResolvedTag],
+					rows: [parentTag],
 				} = await db.query(
 					selectResolvedTags(this.workspace, {
-						filter: [qb.sql`t.id=${parent}`],
+						filter: [qb.sql`t.id = ${parent}`],
 						limit: 1,
 					}),
 					resolvedNameSchema,
 				);
-				// If parent tag is not found in the database, the tag cannot be created
-				if (parent && !parentResolvedTag)
+				// If the parent tag is not found in the database, the tag cannot be created
+				if (!parentTag)
 					throw new TagControllerError(
-						`Parent tag: ${parent} not exist`,
-						TAG_ERROR_CODE.TAG_NOT_EXIST,
+						`Parent tag ${parent} does not exist`,
+						TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST,
 					);
-				resolvedTagToCreate = `${parentResolvedTag.resolvedName}/${name}`;
+				resolvedTagName = `${parentTag.resolvedName}/${name}`;
 			}
 
 			// Check tag uniqueness
 			const {
-				rows: [duplicatedTag],
+				rows: [duplicateTag],
 			} = await db.query(
 				selectResolvedTags(this.workspace, {
-					filter: [qb.sql`resolved_name = ${resolvedTagToCreate}`],
+					filter: [qb.sql`resolved_name = ${resolvedTagName}`],
 					limit: 1,
 				}),
 				resolvedNameSchema,
 			);
-			if (duplicatedTag) {
+			if (duplicateTag) {
 				throw new TagControllerError(
-					`Tag ${duplicatedTag.resolvedName} already exists`,
+					`Tag ${duplicateTag.resolvedName} already exists`,
 					TAG_ERROR_CODE.DUPLICATE,
 				);
 			}
 
-			const segments = resolvedTagToCreate.split('/');
-			if (segments.length > 1) {
-				// Create an array of names variants from a string: 'foo/bar' - ['foo', 'foo/bar']
-				let prevSegment = '';
-				const tagNameVariants = segments.map((segment, index) => {
-					prevSegment = index === 0 ? segment : `${prevSegment}/${segment}`;
-					return prevSegment;
-				});
-
-				// Find the longest existing tag segment that matches parts of resolvedTag to avoid duplicating it when creating a new tag
+			const resolvedTagSegments = resolvedTagName.split('/');
+			if (resolvedTagSegments.length > 1) {
+				// Build an array of all path variants to find existing tags that match exactly this one
+				// 'foo/bar/baz' - ['foo', 'foo/bar', 'foo/bar/baz']
+				// The found tag allows detecting non-existing segments from resolvedTagSegments and creating only those
+				const tagNameVariants = resolvedTagSegments.reduce<string[]>(
+					(prev, segment) => [
+						...prev,
+						prev.length ? `${prev[prev.length - 1]}/${segment}` : segment,
+					],
+					[],
+				);
 				const {
 					rows: [rootTag],
 				} = await db.query(
@@ -199,14 +201,10 @@ export class TagsController {
 						})),
 				);
 
-				let parentTagId = parent;
-				let segmentsForCreation = segments;
-				if (rootTag) {
-					segmentsForCreation = segments.slice(
-						rootTag.resolvedName.split('/').length,
-					);
-					parentTagId = rootTag.id;
-				}
+				const parentTagId = rootTag ? rootTag.id : parent;
+				const segmentsForCreation = rootTag
+					? resolvedTagSegments.slice(rootTag.resolvedName.split('/').length)
+					: resolvedTagSegments;
 
 				for (let idx = 0; idx < segmentsForCreation.length; idx++) {
 					const name = segmentsForCreation[idx];

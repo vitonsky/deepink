@@ -71,7 +71,7 @@ describe('manage tags', () => {
 
 		const nonExistentTag = getUUID();
 		await expect(tags.add('foo/bar/foo', nonExistentTag)).rejects.toThrow(
-			expect.objectContaining({ code: TAG_ERROR_CODE.TAG_NOT_EXIST }),
+			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
 		);
 	});
 
