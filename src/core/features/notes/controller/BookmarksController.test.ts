@@ -10,45 +10,39 @@ const FAKE_WORKSPACE_ID = getUUID();
 test('add bookmark', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
-	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const bookmarks = new BookmarksController(db, FAKE_WORKSPACE_ID);
+	const noteRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+	const bookmarksRegistry = new BookmarksController(db, FAKE_WORKSPACE_ID);
 
 	// prepare data
-	const note = await registry.add({ title: 'Title 1', text: 'Text 1' });
-	await bookmarks.add(note);
+	const note = await noteRegistry.add({ title: 'Title 1', text: 'Text 1' });
+	await bookmarksRegistry.add(note);
+	await expect(bookmarksRegistry.has(note)).resolves.toBeTruthy();
 
-	// checks
-	await expect(bookmarks.has(note)).resolves.toBeTruthy();
+	await bookmarksRegistry.remove([note]);
+	await expect(bookmarksRegistry.has(note)).resolves.toBeFalsy();
 });
 
 test('remove bookmarks', async () => {
+	const notesSample = Array(100)
+		.fill(null)
+		.map((_, idx) => {
+			return {
+				title: 'Note title #' + idx,
+				text: 'Note text #' + idx,
+			};
+		});
+
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
-	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const bookmarks = new BookmarksController(db, FAKE_WORKSPACE_ID);
+	const noteRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+	const bookmarksRegistry = new BookmarksController(db, FAKE_WORKSPACE_ID);
 
-	// Create note
-	const entities = [
-		{ title: 'Title 1', text: 'Text 1' },
-		{ title: 'Title 2', text: 'Text 2' },
-		{ title: 'Title 3', text: 'Text 3' },
-		{ title: 'Title 4', text: 'Text 4' },
-	];
-	const notes = await Promise.all(entities.map((note) => registry.add(note)));
+	// prepare data
+	const ids = await Promise.all(notesSample.map((note) => noteRegistry.add(note)));
+	await Promise.all(ids.slice(0, 50).map((id) => bookmarksRegistry.add(id)));
 
-	// bookmarking notes
-	const toBookmark = notes.slice(0, 3);
-	await Promise.all(toBookmark.map((id) => bookmarks.add(id)));
-	for (const id of toBookmark) {
-		await expect(bookmarks.has(id)).resolves.toBe(true);
-	}
+	await expect(bookmarksRegistry.getList()).resolves.toHaveLength(50);
 
-	const toRemove = toBookmark;
-	await expect(bookmarks.remove(toRemove)).resolves.not.toThrow();
-
-	for (const id of toRemove) {
-		await expect(bookmarks.has(id)).resolves.toBe(false);
-	}
-
-	await expect(bookmarks.has(notes[3])).resolves.toBe(false);
+	await expect(bookmarksRegistry.remove(ids.slice(0, 30))).resolves.toBeUndefined();
+	await expect(bookmarksRegistry.getList()).resolves.toHaveLength(20);
 });

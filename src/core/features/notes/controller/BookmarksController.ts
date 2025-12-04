@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+import z from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
@@ -23,6 +25,7 @@ export class BookmarksController {
 	async remove(ids: NoteId[]) {
 		const db = wrapDB(this.db.get());
 
+		if (ids.length === 0) return;
 		const { affectedRows = 0 } = await db.query(
 			qb.sql`DELETE FROM bookmarks WHERE workspace_id=${
 				this.workspace
@@ -37,14 +40,33 @@ export class BookmarksController {
 	}
 
 	/**
-	 * Checks if a note is bookmarked
+	 * Check if a note is bookmarked
 	 */
 	async has(id: NoteId) {
 		const db = wrapDB(this.db.get());
 
-		const { rows } = await db.query(
+		const {
+			rows: [noteId],
+		} = await db.query(
 			qb.sql`SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace} AND note_id = ${id}`,
+			z
+				.object({ note_id: z.string() })
+				.transform(({ note_id }) => ({ noteId: note_id })),
 		);
-		return rows.length > 0;
+
+		return Boolean(noteId);
+	}
+
+	/**
+	 * Get all bookmarked notes in this workspace
+	 */
+	async getList() {
+		const db = wrapDB(this.db.get());
+
+		const { rows } = await db.query(
+			qb.sql`SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace}`,
+			z.object({ note_id: z.string() }),
+		);
+		return rows;
 	}
 }
