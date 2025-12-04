@@ -1,33 +1,48 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useBookmarksRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useCallback, useMemo } from 'react';
+import {
+	useBookmarksRegistry,
+	useNotesRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectBookmarks, workspacesApi } from '@state/redux/profiles/profiles';
 
-export const useBookmark = (noteId: string) => {
+export const useUpdateBookmarksList = () => {
+	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
+	const notesRegistry = useNotesRegistry();
+
+	const updateBookmarksList = useCallback(() => {
+		notesRegistry.get({ bookmarks: true }).then((note) => {
+			dispatch(
+				workspacesApi.setBookmarks({
+					...workspaceData,
+					notes: note.map((n) => n.id),
+				}),
+			);
+		});
+	}, [dispatch, notesRegistry, workspaceData]);
+	return updateBookmarksList;
+};
+
+export const useBookmarkToggle = (noteId: string) => {
 	const bookmarksRegistry = useBookmarksRegistry();
 	const updateNotes = useUpdateNotes();
+	const updateBookmarksList = useUpdateBookmarksList();
 
-	const [inBookmark, setInBookmark] = useState<boolean | null>(null);
+	const bookmarks = useWorkspaceSelector(selectBookmarks);
+	const bookmarkNoteIdSet = useMemo(() => new Set(bookmarks), [bookmarks]);
 
-	useEffect(() => {
-		bookmarksRegistry.has(noteId).then((exists) => {
-			setInBookmark(exists);
-		});
-	}, [noteId, bookmarksRegistry]);
-
-	const toggle = useCallback(async () => {
-		if (inBookmark === null) return;
-
-		const newValue = !inBookmark;
-		setInBookmark(newValue);
-
-		if (newValue) {
-			await bookmarksRegistry.add(noteId);
-		} else {
-			await bookmarksRegistry.remove([noteId]);
-		}
+	const isBookmarked = bookmarkNoteIdSet.has(noteId);
+	const toggleBookmark = useCallback(async () => {
+		isBookmarked
+			? await bookmarksRegistry.remove([noteId])
+			: await bookmarksRegistry.add(noteId);
 
 		updateNotes();
-	}, [noteId, inBookmark, bookmarksRegistry, updateNotes]);
+		updateBookmarksList();
+	}, [isBookmarked, updateNotes, updateBookmarksList, bookmarksRegistry, noteId]);
 
-	return { inBookmark, toggle };
+	return { isBookmarked, toggleBookmark };
 };

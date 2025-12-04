@@ -33,7 +33,7 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useBookmark } from '@features/NoteEditor/useBookmarks';
+import { useBookmarkToggle } from '@features/NoteEditor/useBookmarks';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
@@ -208,7 +208,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 	useUpdateArchivedStatus(note);
 	const runCommand = useCommand();
 
-	const { inBookmark, toggle: toggleBookmark } = useBookmark(note.id);
+	const { isBookmarked, toggleBookmark } = useBookmarkToggle(note.id);
 
 	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
 
@@ -239,10 +239,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					<Button
 						variant="ghost"
 						size="xs"
-						title={inBookmark ? 'Remove bookmark' : 'Add bookmark'}
+						title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
 						onClick={toggleBookmark}
 					>
-						{inBookmark ? <FaBookmark /> : <FaRegBookmark />}
+						{isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
 					</Button>
 					<Button
 						variant="ghost"

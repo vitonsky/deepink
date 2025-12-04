@@ -3,6 +3,7 @@ import { HStack, VStack } from '@chakra-ui/react';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
+import { useUpdateBookmarksList } from '@features/NoteEditor/useBookmarks';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
@@ -15,11 +16,13 @@ import { StatusBar } from './StatusBar';
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
+	const updateBookmarksList = useUpdateBookmarksList();
 
 	// Init notes list
 	useEffect(() => {
 		updateNotes();
-	}, [updateNotes]);
+		updateBookmarksList();
+	}, [updateNotes, updateBookmarksList]);
 
 	// Update notes list by attach tags
 	useEffect(() => {
