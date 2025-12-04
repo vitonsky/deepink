@@ -41,8 +41,7 @@ export const useUpdateNotes = () => {
 			console.debug('Notes indexing is completed', performance.now() - start);
 		}
 
-		const tags =
-			activeTag !== null && notesView !== NOTES_VIEW.BIN ? [activeTag.id] : [];
+		const tags = activeTag !== null ? [activeTag.id] : [];
 
 		const notes = await notesRegistry.get({
 			limit: 100,
@@ -63,7 +62,7 @@ export const useUpdateNotes = () => {
 			},
 			...(notesView === NOTES_VIEW.BOOKMARK && { bookmarks: true }),
 		});
-
+		console.log('update note list', notes.length);
 		if (isRequestCanceled()) return;
 
 		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
