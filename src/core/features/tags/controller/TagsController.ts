@@ -46,7 +46,7 @@ export const validateTagName = (name: string) => {
 };
 
 /**
- * Returns a SQL query for retrieving resolved tags in the specified workspace
+ * Returns a query for retrieving resolved tags in the specified workspace
  */
 export const selectResolvedTags = (
 	workspaceId: string,
@@ -68,16 +68,15 @@ export const selectResolvedTags = (
 		qb
 			.where(qb.sql`workspace_id = ${workspaceId}`)
 			.and(
-				where
-					? qb.line(
-							...where.map((query, index) =>
-								index === 0 ? query : qb.sql`AND ${query}`,
-							),
-					  )
-					: undefined,
+				where &&
+					qb.line(
+						...where.map((query, index) =>
+							index === 0 ? query : qb.sql`AND ${query}`,
+						),
+					),
 			),
-		order ?? undefined,
-		limit ? qb.limit(limit) : undefined,
+		order,
+		limit && qb.limit(limit),
 	);
 };
 

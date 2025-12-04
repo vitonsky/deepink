@@ -78,7 +78,7 @@ describe('manage tags', () => {
 		);
 	});
 
-	test('does not duplicate existing tags and reuse them', async () => {
+	test('adds only the missing segments of the tag name without recreating existing ones', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
