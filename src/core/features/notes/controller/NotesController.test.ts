@@ -276,9 +276,8 @@ describe('data fetching', () => {
 	});
 });
 
-describe.only('filter notes', async () => {
+describe('filter notes', async () => {
 	let dbFile: any;
-	// let db: any;
 
 	beforeEach(async () => {
 		dbFile = createFileControllerMock();

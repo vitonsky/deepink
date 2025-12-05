@@ -166,10 +166,12 @@ function getFetchQuery(
 	}
 
 	// Filter by bookmarks
-	if (typeof bookmarks === 'boolean') {
-		bookmarks
-			? filterQuery.push(qb.sql`id IN (SELECT note_id FROM bookmarks)`)
-			: filterQuery.push(qb.sql`id NOT IN (SELECT note_id FROM bookmarks)`);
+	if (bookmarks !== undefined) {
+		filterQuery.push(
+			qb.sql`id ${qb.raw(
+				bookmarks ? 'IN' : 'NOT IN',
+			)} (SELECT note_id FROM bookmarks)`,
+		);
 	}
 
 	if (metaEntries.length > 0) {

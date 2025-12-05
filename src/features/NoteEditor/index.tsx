@@ -10,12 +10,12 @@ import React, {
 import {
 	FaArrowLeft,
 	FaBookmark,
+	FaBoxArchive,
 	FaFlag,
 	FaHashtag,
 	FaRegBookmark,
 	FaXmark,
 } from 'react-icons/fa6';
-import { MdArchive, MdUnarchive } from 'react-icons/md';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
@@ -35,8 +35,6 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useBookmarkToggle } from '@features/NoteEditor/useBookmarks';
 import { useTelemetryTracker } from '@features/telemetry';
-import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useCommand } from '@hooks/commands/useCommand';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -45,7 +43,7 @@ import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
 import { NoteSidebar } from './NoteSidebar';
 import { NoteVersions } from './NoteVersions';
-import { useUpdateArchivedStatus } from './useUpdateArchivedStatus';
+import { useNoteArchiveToggle } from './useNoteArchiveToggle';
 
 export enum NoteSidebarTabs {
 	HISTORY = 'HISTORY',
@@ -205,10 +203,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	useUpdateArchivedStatus(note);
-	const runCommand = useCommand();
-
 	const { isBookmarked, toggleBookmark } = useBookmarkToggle(note.id);
+	const toggleArchive = useNoteArchiveToggle(note);
 
 	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
 
@@ -244,22 +240,20 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					>
 						{isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
 					</Button>
+					<Button variant="ghost" size="xs">
+						<FaFlag />
+					</Button>
 					<Button
 						variant="ghost"
 						size="xs"
-						onClick={() =>
-							runCommand(GLOBAL_COMMANDS.UPDATE_NOTE_ARCHIVE_STATUS)
-						}
+						onClick={toggleArchive}
 						title={note.isArchived ? 'Unarchive' : 'Archive'}
 					>
 						{note.isArchived ? (
-							<MdUnarchive size={'1rem'} />
+							<FaBoxArchive color="gray" />
 						) : (
-							<MdArchive size={'1rem'} />
+							<FaBoxArchive />
 						)}
-					</Button>
-					<Button variant="ghost" size="xs">
-						<FaFlag />
 					</Button>
 				</HStack>
 

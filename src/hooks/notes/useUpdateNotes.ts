@@ -62,7 +62,7 @@ export const useUpdateNotes = () => {
 			},
 			...(notesView === NOTES_VIEW.BOOKMARK && { bookmarks: true }),
 		});
-		console.log('update note list', notes.length);
+
 		if (isRequestCanceled()) return;
 
 		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
