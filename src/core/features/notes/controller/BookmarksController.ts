@@ -23,20 +23,22 @@ export class BookmarksController {
 	}
 
 	async remove(ids: NoteId[]) {
-		const db = wrapDB(this.db.get());
-
 		if (ids.length === 0) return;
-		const { affectedRows = 0 } = await db.query(
-			qb.sql`DELETE FROM bookmarks WHERE workspace_id=${
-				this.workspace
-			} AND note_id IN (${qb.values(ids)})`,
-		);
+		await this.db.get().transaction(async (tx) => {
+			const db = wrapDB(tx);
 
-		if (affectedRows !== ids.length) {
-			console.warn(
-				`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
+			const { affectedRows = 0 } = await db.query(
+				qb.sql`DELETE FROM bookmarks WHERE workspace_id=${
+					this.workspace
+				} AND note_id IN (${qb.values(ids)})`,
 			);
-		}
+
+			if (affectedRows !== ids.length) {
+				console.warn(
+					`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
+				);
+			}
+		});
 	}
 
 	/**
