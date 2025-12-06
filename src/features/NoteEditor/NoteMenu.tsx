@@ -24,8 +24,6 @@ import {
 	Text,
 } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
-import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useCommand } from '@hooks/commands/useCommand';
 
 import { NoteSidebarTabs } from '.';
 
@@ -38,7 +36,6 @@ export const NoteMenu = memo(
 		note: INote;
 		onClick?: (command: NoteSidebarTabs) => void;
 	}) => {
-		const runCommand = useCommand();
 		return (
 			<Menu>
 				<MenuButton as={Button} variant="primary" size="sm">
@@ -109,14 +106,10 @@ export const NoteMenu = memo(
 							<Text>Disable sync</Text>
 						</HStack>
 					</MenuItem>
-					<MenuItem
-						onClick={() =>
-							runCommand(GLOBAL_COMMANDS.UPDATE_NOTE_ARCHIVE_STATUS)
-						}
-					>
+					<MenuItem>
 						<HStack>
 							<FaBoxArchive />
-							<Text>{note.isArchived ? 'Unarchive' : 'Archive'}</Text>
+							<Text>Archive</Text>
 						</HStack>
 					</MenuItem>
 					<MenuItem>
