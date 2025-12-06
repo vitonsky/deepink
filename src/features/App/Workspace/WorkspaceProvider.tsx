@@ -47,8 +47,8 @@ export const useFilesRegistry = createContextGetterHook(FilesRegistryContext);
 export const FilesControllerContext = createContext<IFilesStorage | null>(null);
 export const useFilesController = createContextGetterHook(FilesControllerContext);
 
-export const BookmarksControllerContext = createContext<BookmarksController | null>(null);
-export const useBookmarksController = createContextGetterHook(BookmarksControllerContext);
+export const BookmarksRegistryContext = createContext<BookmarksController | null>(null);
+export const useBookmarksRegistry = createContextGetterHook(BookmarksRegistryContext);
 
 export interface WorkspaceProviderProps extends PropsWithChildren {
 	notesApi: NotesApi;
@@ -102,11 +102,11 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 							<TagsRegistryContext.Provider value={tagsRegistry}>
 								<NotesRegistryContext.Provider value={notesRegistry}>
 									<NotesHistoryContext.Provider value={notesHistory}>
-										<BookmarksControllerContext.Provider
+										<BookmarksRegistryContext.Provider
 											value={bookmarksRegistry}
 										>
 											{children}
-										</BookmarksControllerContext.Provider>
+										</BookmarksRegistryContext.Provider>
 									</NotesHistoryContext.Provider>
 								</NotesRegistryContext.Provider>
 							</TagsRegistryContext.Provider>

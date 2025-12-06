@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { useBookmarksController } from '@features/App/Workspace/WorkspaceProvider';
+import { useBookmarksRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useUpdateBookmarksList } from '@hooks/useUpdateBookmarksList';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectBookmarks } from '@state/redux/profiles/profiles';
 
 export const useBookmarkToggle = (noteId: string) => {
-	const bookmarksRegistry = useBookmarksController();
+	const bookmarksRegistry = useBookmarksRegistry();
 	const updateNotes = useUpdateNotes();
 	const updateBookmarksList = useUpdateBookmarksList();
 

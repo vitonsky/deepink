@@ -28,11 +28,6 @@ export enum GLOBAL_COMMANDS {
 	 * Lock the currently active user profile
 	 */
 	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
-
-	/**
-	 * Update note archived status
-	 */
-	UPDATE_NOTE_ARCHIVE_STATUS = 'UpdateNoteArchivedStatus',
 }
 
 // In the future, we can define a type for the payload like this:
