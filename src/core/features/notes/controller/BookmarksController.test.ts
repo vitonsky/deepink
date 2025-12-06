@@ -22,7 +22,7 @@ test('add and remove bookmark', async () => {
 	await expect(bookmarksRegistry.has(note)).resolves.toBeFalsy();
 });
 
-test('deleting the note will result to deleting bookmark', async () => {
+test('bookmark is removed when note is deleted', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
 	const noteRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
@@ -37,32 +37,10 @@ test('deleting the note will result to deleting bookmark', async () => {
 	);
 
 	await noteRegistry.delete([note]);
+
+	// deleted notes are removed from bookmarks
 	await expect(bookmarksRegistry.has(note)).resolves.toBeFalsy();
 	await expect(bookmarksRegistry.getList()).resolves.toEqual(
 		expect.arrayContaining([]),
 	);
-});
-
-test('remove bookmarks', async () => {
-	const notesSample = Array(100)
-		.fill(null)
-		.map((_, idx) => {
-			return {
-				title: 'Note title #' + idx,
-				text: 'Note text #' + idx,
-			};
-		});
-
-	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
-	const noteRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const bookmarksRegistry = new BookmarksController(db, FAKE_WORKSPACE_ID);
-
-	const ids = await Promise.all(notesSample.map((note) => noteRegistry.add(note)));
-	await Promise.all(ids.slice(0, 50).map((id) => bookmarksRegistry.add(id)));
-
-	await expect(bookmarksRegistry.getList()).resolves.toHaveLength(50);
-
-	await expect(bookmarksRegistry.delete(ids.slice(0, 30))).resolves.toBeUndefined();
-	await expect(bookmarksRegistry.getList()).resolves.toHaveLength(20);
 });

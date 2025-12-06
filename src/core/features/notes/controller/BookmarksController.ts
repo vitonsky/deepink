@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import z from 'zod';
+import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { qb } from '@utils/db/query-builder';
 import { wrapDB } from '@utils/db/wrapDB';
@@ -32,7 +32,6 @@ export class BookmarksController {
 					this.workspace
 				} AND note_id IN (${qb.values(ids)})`,
 			);
-
 			if (affectedRows !== ids.length) {
 				console.warn(
 					`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
@@ -46,17 +45,13 @@ export class BookmarksController {
 	 */
 	async has(id: NoteId) {
 		const db = wrapDB(this.db.get());
-
 		const {
-			rows: [noteId],
+			rows: [isBookmarked],
 		} = await db.query(
-			qb.sql`SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace} AND note_id = ${id}`,
-			z
-				.object({ note_id: z.string() })
-				.transform(({ note_id }) => ({ noteId: note_id })),
+			qb.sql`SELECT EXISTS (SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace} AND note_id = ${id} LIMIT 1)`,
+			z.object({ exists: z.boolean() }).transform(({ exists }) => exists),
 		);
-
-		return Boolean(noteId);
+		return isBookmarked;
 	}
 
 	/**
@@ -64,7 +59,6 @@ export class BookmarksController {
 	 */
 	async getList() {
 		const db = wrapDB(this.db.get());
-
 		const { rows } = await db.query(
 			qb.sql`SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace}`,
 			z

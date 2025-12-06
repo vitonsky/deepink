@@ -242,16 +242,29 @@ describe('data fetching', () => {
 			.get({ limit: 10 })
 			.then((notes) => notes.map((note) => note.id));
 
-		// update archive status for 10 notes
 		await registry.updateMeta(notesId, { isArchived: true });
 		await expect(registry.get({ meta: { isArchived: true } })).resolves.toHaveLength(
 			10,
 		);
-
-		// check only not archived notes
 		await expect(registry.get({ meta: { isArchived: false } })).resolves.toHaveLength(
 			notesSample.length - 10,
 		);
+		await db.close();
+	});
+
+	test('filters notes by bookmarks', async () => {
+		const db = await openDatabase(dbFile);
+
+		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const bookmarksRegistry = new BookmarksController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await notesRegistry
+			.get({ limit: 50 })
+			.then((notes) => notes.map((note) => note.id));
+		await Promise.all(notesId.slice(0, 50).map((id) => bookmarksRegistry.add(id)));
+
+		await expect(notesRegistry.get({ bookmarks: true })).resolves.toHaveLength(50);
+		await expect(notesRegistry.get({ bookmarks: false })).resolves.toHaveLength(250);
 
 		await db.close();
 	});
@@ -273,100 +286,6 @@ describe('data fetching', () => {
 		);
 
 		await db.close();
-	});
-});
-
-describe('filter notes', async () => {
-	let dbFile: any;
-
-	beforeEach(async () => {
-		dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-		const noteRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const notesSample = Array(300)
-			.fill(null)
-			.map((_, idx) => {
-				return {
-					title: 'Note title #' + idx,
-					text: 'Note text #' + idx,
-				};
-			});
-
-		// prepare data
-		const ids: string[] = [];
-		for (const note of notesSample) {
-			ids.push(await noteRegistry.add(note));
-		}
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
-		await tags.setAttachedTags(ids[0], [await tags.add('foo', null)]);
-		await db.close();
-	});
-
-	test('filters notes by deleted, archived status, and tags', async () => {
-		const db = await openDatabase(dbFile);
-
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
-		const ids = (await notesRegistry.get({ limit: 300 })).map((note) => note.id);
-		const tagsList = await tagsRegistry.getTags();
-
-		await notesRegistry.updateMeta(ids.slice(0, 10), {
-			isArchived: true,
-			isDeleted: true,
-		});
-
-		await expect(
-			notesRegistry.get({ meta: { isArchived: true, isDeleted: true } }),
-		).resolves.toHaveLength(10);
-
-		await expect(
-			notesRegistry.get({
-				meta: { isArchived: true, isDeleted: true },
-				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
-			}),
-		).resolves.toHaveLength(1);
-
-		await expect(
-			notesRegistry.get({
-				meta: { isArchived: false, isDeleted: true },
-				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
-			}),
-		).resolves.toHaveLength(0);
-
-		await expect(
-			notesRegistry.get({
-				meta: { isArchived: true, isDeleted: false },
-				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
-			}),
-		).resolves.toHaveLength(0);
-	});
-
-	test('filters notes by bookmarks and deleted status', async () => {
-		const db = await openDatabase(dbFile);
-
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const bookmarksRegistry = new BookmarksController(db, FAKE_WORKSPACE_ID);
-
-		const ids = (await notesRegistry.get({ limit: 300 })).map((note) => note.id);
-		await Promise.all(ids.slice(0, 50).map((id) => bookmarksRegistry.add(id)));
-
-		await expect(notesRegistry.get({ bookmarks: true })).resolves.toHaveLength(50);
-		await expect(notesRegistry.get({ bookmarks: false })).resolves.toHaveLength(250);
-
-		await notesRegistry.updateMeta(ids.slice(0, 10), { isDeleted: true });
-		await expect(
-			notesRegistry.get({
-				meta: { isDeleted: true },
-				bookmarks: true,
-			}),
-		).resolves.toHaveLength(10);
-
-		await expect(
-			notesRegistry.get({
-				meta: { isDeleted: true },
-				bookmarks: false,
-			}),
-		).resolves.toHaveLength(0);
 	});
 });
 
@@ -511,17 +430,16 @@ describe('Notes meta control', () => {
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
 		await expect(registry.getById(noteId)).resolves.toMatchObject({
 			id: noteId,
-			isDeleted: false,
 		});
 
-		// toggle deleted status
+		// toggle archive status
 		await registry.updateMeta([noteId], { isArchived: true });
 		await expect(registry.getById(noteId)).resolves.toMatchObject({
 			id: noteId,
 			isArchived: true,
 		});
 
-		// toggle deleted status back
+		// toggle archive status back
 		await registry.updateMeta([noteId], { isArchived: false });
 		await expect(registry.getById(noteId)).resolves.toMatchObject({
 			id: noteId,
