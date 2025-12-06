@@ -213,7 +213,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 		[bookmarks, note.id],
 	);
 
-	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
+	const isReadOnly = note.isDeleted || Boolean(versionPreview);
 
 	return (
 		<VStack w="100%" align="start">

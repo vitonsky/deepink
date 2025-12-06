@@ -239,15 +239,15 @@ describe('data fetching', () => {
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notesId = await registry
-			.get({ limit: 10 })
+			.get({ limit: 30 })
 			.then((notes) => notes.map((note) => note.id));
 
 		await registry.updateMeta(notesId, { isArchived: true });
 		await expect(registry.get({ meta: { isArchived: true } })).resolves.toHaveLength(
-			10,
+			30,
 		);
 		await expect(registry.get({ meta: { isArchived: false } })).resolves.toHaveLength(
-			notesSample.length - 10,
+			notesSample.length - 30,
 		);
 		await db.close();
 	});
@@ -430,6 +430,7 @@ describe('Notes meta control', () => {
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
 		await expect(registry.getById(noteId)).resolves.toMatchObject({
 			id: noteId,
+			isArchived: false,
 		});
 
 		// toggle archive status
