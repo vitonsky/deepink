@@ -208,7 +208,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const bookmarksRegistry = useBookmarksRegistry();
 	const bookmarks = useWorkspaceSelector(selectBookmarks);
-	const isBookmarked = useMemo(() => new Set(bookmarks).has(note.id), [bookmarks]);
+	const isBookmarked = useMemo(
+		() => new Set(bookmarks).has(note.id),
+		[bookmarks, note.id],
+	);
 
 	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
 
@@ -262,9 +265,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					<Button
 						variant="ghost"
 						size="xs"
-						onClick={() => {
-							updateMeta({ isArchived: !note.isArchived });
-							eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+						onClick={async () => {
+							await notesRegistry.updateMeta([note.id], {
+								isArchived: !note.isArchived,
+							});
 							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
 						}}
 						title={note.isArchived ? 'Unarchive' : 'Archive'}

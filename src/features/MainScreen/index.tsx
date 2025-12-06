@@ -40,7 +40,7 @@ export const MainScreen: FC = () => {
 				}),
 			);
 		});
-	}, []);
+	}, [dispatch, workspaceData, bookmarksRegistry]);
 
 	// Update notes list by attach tags
 	useEffect(() => {
