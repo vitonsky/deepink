@@ -5,7 +5,7 @@ import { useUpdateBookmarksList } from '@hooks/useUpdateBookmarksList';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectBookmarks } from '@state/redux/profiles/profiles';
 
-export const useBookmarkToggle = (noteId: string) => {
+export const useNoteBookmarkToggle = (noteId: string) => {
 	const bookmarksRegistry = useBookmarksRegistry();
 	const updateNotes = useUpdateNotes();
 	const updateBookmarksList = useUpdateBookmarksList();

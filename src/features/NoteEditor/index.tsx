@@ -34,8 +34,8 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useBookmarkToggle } from '@hooks/useBookmarkToggle';
 import { useNoteArchiveToggle } from '@hooks/useNoteArchiveToggle';
+import { useNoteBookmarkToggle } from '@hooks/useNoteBookmarkToggle';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -203,7 +203,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	const { isBookmarked, toggleBookmarkStatus } = useBookmarkToggle(note.id);
+	const { isBookmarked, toggleBookmarkStatus } = useNoteBookmarkToggle(note.id);
 	const toggleArchiveStatus = useNoteArchiveToggle();
 
 	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
