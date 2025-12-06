@@ -203,8 +203,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	const { isBookmarked, toggleBookmark } = useBookmarkToggle(note.id);
-	const toggleArchive = useNoteArchiveToggle();
+	const { isBookmarked, toggleBookmarkStatus } = useBookmarkToggle(note.id);
+	const toggleArchiveStatus = useNoteArchiveToggle();
 
 	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
 
@@ -236,7 +236,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 						variant="ghost"
 						size="xs"
 						title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-						onClick={toggleBookmark}
+						onClick={toggleBookmarkStatus}
 					>
 						{isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
 					</Button>
@@ -246,7 +246,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					<Button
 						variant="ghost"
 						size="xs"
-						onClick={() => toggleArchive(note)}
+						onClick={() => toggleArchiveStatus(note)}
 						title={note.isArchived ? 'Unarchive' : 'Archive'}
 					>
 						{note.isArchived ? (

@@ -22,7 +22,7 @@ export class BookmarksController {
 		);
 	}
 
-	async remove(ids: NoteId[]) {
+	async delete(ids: NoteId[]) {
 		if (ids.length === 0) return;
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
@@ -60,15 +60,17 @@ export class BookmarksController {
 	}
 
 	/**
-	 * Get all bookmarked notes in this workspace
+	 * Get all bookmarked note ids for the current workspace
 	 */
 	async getList() {
 		const db = wrapDB(this.db.get());
 
 		const { rows } = await db.query(
 			qb.sql`SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace}`,
-			z.object({ note_id: z.string() }),
+			z
+				.object({ note_id: z.string() })
+				.transform(({ note_id }) => ({ noteId: note_id })),
 		);
-		return rows;
+		return rows.map((note) => note.noteId);
 	}
 }

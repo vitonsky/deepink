@@ -14,14 +14,14 @@ export const useBookmarkToggle = (noteId: string) => {
 	const bookmarkNoteIdSet = useMemo(() => new Set(bookmarks), [bookmarks]);
 
 	const isBookmarked = bookmarkNoteIdSet.has(noteId);
-	const toggleBookmark = useCallback(async () => {
+	const toggleBookmarkStatus = useCallback(async () => {
 		isBookmarked
-			? await bookmarksRegistry.remove([noteId])
+			? await bookmarksRegistry.delete([noteId])
 			: await bookmarksRegistry.add(noteId);
 
 		updateNotes();
 		updateBookmarksList();
 	}, [isBookmarked, updateNotes, updateBookmarksList, bookmarksRegistry, noteId]);
 
-	return { isBookmarked, toggleBookmark };
+	return { isBookmarked, toggleBookmarkStatus };
 };
