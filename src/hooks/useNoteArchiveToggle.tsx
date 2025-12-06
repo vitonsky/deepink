@@ -9,15 +9,15 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 export const useNoteArchiveToggle = () => {
 	const { noteUpdated } = useNotesContext();
 	const updateNotes = useUpdateNotes();
-	const notes = useNotesRegistry();
+	const notesRegistry = useNotesRegistry();
 
 	return useCallback(
 		async (note: INote) => {
-			await notes.updateMeta([note.id], { isArchived: !note.isArchived });
-			const updatedNote = await notes.getById(note.id);
+			await notesRegistry.updateMeta([note.id], { isArchived: !note.isArchived });
+			const updatedNote = await notesRegistry.getById(note.id);
 			if (updatedNote) noteUpdated(updatedNote);
 			updateNotes();
 		},
-		[updateNotes, noteUpdated],
+		[updateNotes, noteUpdated, notesRegistry],
 	);
 };

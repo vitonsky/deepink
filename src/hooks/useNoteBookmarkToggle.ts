@@ -11,9 +11,9 @@ export const useNoteBookmarkToggle = (noteId: string) => {
 	const updateBookmarksList = useUpdateBookmarksList();
 
 	const bookmarks = useWorkspaceSelector(selectBookmarks);
-	const bookmarkNoteIdSet = useMemo(() => new Set(bookmarks), [bookmarks]);
+	const bookmarkedIds = useMemo(() => new Set(bookmarks), [bookmarks]);
 
-	const isBookmarked = bookmarkNoteIdSet.has(noteId);
+	const isBookmarked = bookmarkedIds.has(noteId);
 	const toggleBookmarkStatus = useCallback(async () => {
 		isBookmarked
 			? await bookmarksRegistry.delete([noteId])
