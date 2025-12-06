@@ -28,17 +28,20 @@ import { IResolvedTag } from '@core/features/tags';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
 	useAttachmentsController,
+	useBookmarksRegistry,
 	useEventBus,
 	useNotesHistory,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useNoteArchiveToggle } from '@hooks/useNoteArchiveToggle';
-import { useNoteBookmarkToggle } from '@hooks/useNoteBookmarkToggle';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	selectBookmarks,
+	selectTags,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
@@ -203,8 +206,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	const { isBookmarked, toggleBookmarkStatus } = useNoteBookmarkToggle(note.id);
-	const toggleArchiveStatus = useNoteArchiveToggle();
+	const bookmarksRegistry = useBookmarksRegistry();
+	const bookmarks = useWorkspaceSelector(selectBookmarks);
+	const isBookmarked = useMemo(() => new Set(bookmarks).has(note.id), [bookmarks]);
 
 	const isReadOnly = note.isDeleted || note.isArchived || Boolean(versionPreview);
 
@@ -236,7 +240,19 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 						variant="ghost"
 						size="xs"
 						title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-						onClick={toggleBookmarkStatus}
+						onClick={async () => {
+							isBookmarked
+								? await bookmarksRegistry.delete([note.id])
+								: await bookmarksRegistry.add(note.id);
+
+							dispatch(
+								workspacesApi.setBookmarks({
+									...workspaceData,
+									notes: await bookmarksRegistry.getList(),
+								}),
+							);
+							eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+						}}
 					>
 						{isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
 					</Button>
@@ -246,7 +262,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					<Button
 						variant="ghost"
 						size="xs"
-						onClick={() => toggleArchiveStatus(note)}
+						onClick={() => {
+							updateMeta({ isArchived: !note.isArchived });
+							eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+						}}
 						title={note.isArchived ? 'Unarchive' : 'Archive'}
 					>
 						{note.isArchived ? (

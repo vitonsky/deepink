@@ -1,11 +1,16 @@
 import React, { FC, useEffect } from 'react';
 import { HStack, VStack } from '@chakra-ui/react';
-import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import {
+	useBookmarksRegistry,
+	useTagsRegistry,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
-import { useUpdateBookmarksList } from '@hooks/useUpdateBookmarksList';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
@@ -16,7 +21,6 @@ import { StatusBar } from './StatusBar';
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
-	const updateBookmarksList = useUpdateBookmarksList();
 
 	// Init notes list
 	useEffect(() => {
@@ -24,9 +28,19 @@ export const MainScreen: FC = () => {
 	}, [updateNotes]);
 
 	// Init bookmarks list
+	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
+	const bookmarksRegistry = useBookmarksRegistry();
 	useEffect(() => {
-		updateBookmarksList();
-	}, [updateBookmarksList]);
+		bookmarksRegistry.getList().then((notes) => {
+			dispatch(
+				workspacesApi.setBookmarks({
+					...workspaceData,
+					notes,
+				}),
+			);
+		});
+	}, []);
 
 	// Update notes list by attach tags
 	useEffect(() => {
