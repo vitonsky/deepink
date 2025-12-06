@@ -33,8 +33,9 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
-import { useBookmarkToggle } from '@features/NoteEditor/useBookmarks';
 import { useTelemetryTracker } from '@features/telemetry';
+import { useBookmarkToggle } from '@hooks/useBookmarkToggle';
+import { useNoteArchiveToggle } from '@hooks/useNoteArchiveToggle';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -43,7 +44,6 @@ import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
 import { NoteSidebar } from './NoteSidebar';
 import { NoteVersions } from './NoteVersions';
-import { useNoteArchiveToggle } from './useNoteArchiveToggle';
 
 export enum NoteSidebarTabs {
 	HISTORY = 'HISTORY',
