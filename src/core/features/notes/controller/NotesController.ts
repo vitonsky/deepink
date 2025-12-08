@@ -166,11 +166,11 @@ function getFetchQuery(
 	}
 
 	// Filter by bookmarks
-	if (bookmarks !== undefined) {
+	if (typeof bookmarks === 'boolean') {
 		filterQuery.push(
 			qb.sql`id ${qb.raw(
 				bookmarks ? 'IN' : 'NOT IN',
-			)} (SELECT note_id FROM bookmarks)`,
+			)} (SELECT note_id FROM bookmarks WHERE workspace_id=${workspace})`,
 		);
 	}
 

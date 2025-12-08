@@ -45,13 +45,10 @@ export class BookmarksController {
 	 */
 	async has(id: NoteId) {
 		const db = wrapDB(this.db.get());
-		const {
-			rows: [isBookmarked],
-		} = await db.query(
-			qb.sql`SELECT EXISTS (SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace} AND note_id = ${id} LIMIT 1)`,
-			z.object({ exists: z.boolean() }).transform(({ exists }) => exists),
+		const { rows } = await db.query(
+			qb.sql`SELECT note_id FROM bookmarks WHERE workspace_id=${this.workspace} AND note_id=${id} LIMIT 1`,
 		);
-		return isBookmarked;
+		return rows.length > 0;
 	}
 
 	/**
