@@ -42,8 +42,6 @@ export const createWorkspaceObject = (workspace: {
 		selected: null,
 		list: [],
 	},
-
-	bookmarks: [],
 });
 
 export type ProfileScoped<T extends {} = {}> = T & {
@@ -79,8 +77,6 @@ export type WorkspaceData = {
 		selected: string | null;
 		list: IResolvedTag[];
 	};
-
-	bookmarks: NoteId[];
 };
 
 export type ProfileData = {
@@ -336,18 +332,6 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.view = view;
-		},
-
-		setBookmarks: (
-			state,
-			{
-				payload: { profileId, workspaceId, notes },
-			}: PayloadAction<WorkspaceScoped<{ notes: NoteId[] }>>,
-		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
-			if (!workspace) return;
-
-			workspace.bookmarks = notes;
 		},
 	},
 });

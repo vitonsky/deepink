@@ -28,7 +28,6 @@ import { IResolvedTag } from '@core/features/tags';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
 	useAttachmentsController,
-	useBookmarksRegistry,
 	useEventBus,
 	useNotesHistory,
 	useNotesRegistry,
@@ -37,11 +36,7 @@ import {
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import {
-	selectBookmarks,
-	selectTags,
-	workspacesApi,
-} from '@state/redux/profiles/profiles';
+import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
@@ -206,13 +201,6 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	const bookmarksRegistry = useBookmarksRegistry();
-	const bookmarks = useWorkspaceSelector(selectBookmarks);
-	const isBookmarked = useMemo(
-		() => new Set(bookmarks).has(note.id),
-		[bookmarks, note.id],
-	);
-
 	const isReadOnly = note.isDeleted || Boolean(versionPreview);
 
 	return (
@@ -242,22 +230,15 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					<Button
 						variant="ghost"
 						size="xs"
-						title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+						title={note.isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
 						onClick={async () => {
-							isBookmarked
-								? await bookmarksRegistry.delete([note.id])
-								: await bookmarksRegistry.add(note.id);
-
-							dispatch(
-								workspacesApi.setBookmarks({
-									...workspaceData,
-									notes: await bookmarksRegistry.getList(),
-								}),
-							);
-							eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+							await notesRegistry.updateMeta([note.id], {
+								isBookmarked: !note.isBookmarked,
+							});
+							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
 						}}
 					>
-						{isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
+						{note.isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
 					</Button>
 					<Button variant="ghost" size="xs">
 						<FaFlag />

@@ -25,6 +25,7 @@ const RowScheme = z
 		visible: z.boolean(),
 		deleted: z.boolean(),
 		archived: z.boolean(),
+		bookmarked: z.boolean(),
 	})
 	.transform(
 		({
@@ -37,6 +38,7 @@ const RowScheme = z
 			visible,
 			deleted,
 			archived,
+			bookmarked,
 		}): INote => ({
 			id,
 			createdTimestamp: created_at.getTime(),
@@ -45,6 +47,7 @@ const RowScheme = z
 			isVisible: visible,
 			isDeleted: deleted,
 			isArchived: archived,
+			isBookmarked: bookmarked,
 			content: { title, text },
 		}),
 	);
@@ -65,6 +68,8 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 					return ['deleted', Boolean(value)];
 				case 'isArchived':
 					return ['archived', Boolean(value)];
+				case 'isBookmarked':
+					return ['bookmarked', Boolean(value)];
 			}
 		}),
 	);
@@ -78,15 +83,7 @@ function getFetchQuery(
 		select: Query<DBTypes>;
 		workspace?: string;
 	},
-	{
-		limit,
-		page,
-		tags = [],
-		meta,
-		search,
-		sort,
-		bookmarks,
-	}: NotesControllerFetchOptions = {},
+	{ limit, page, tags = [], meta, search, sort }: NotesControllerFetchOptions = {},
 ) {
 	if (page !== undefined && page < 1)
 		throw new TypeError('Page value must not be less than 1');
@@ -162,15 +159,6 @@ function getFetchQuery(
 			qb.sql`id IN (SELECT target FROM attached_tags WHERE source IN (${qb.values(
 				tags,
 			)}))`,
-		);
-	}
-
-	// Filter by bookmarks
-	if (typeof bookmarks === 'boolean') {
-		filterQuery.push(
-			qb.sql`id ${qb.raw(
-				bookmarks ? 'IN' : 'NOT IN',
-			)} (SELECT note_id FROM bookmarks WHERE workspace_id=${workspace})`,
 		);
 	}
 

@@ -5,6 +5,7 @@ export type NoteMeta = {
 	isVisible: boolean;
 	isDeleted: boolean;
 	isArchived: boolean;
+	isBookmarked: boolean;
 };
 
 export type NoteSortField = 'id' | 'createdAt' | 'updatedAt';
@@ -47,11 +48,6 @@ export type NotesControllerFetchOptions = {
 		by: NoteSortField;
 		order?: 'desc' | 'asc';
 	};
-
-	/**
-	 * Filters notes by bookmarked
-	 */
-	bookmarks?: boolean;
 };
 
 /**

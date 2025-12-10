@@ -4,7 +4,6 @@ import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { BookmarksController } from './BookmarksController';
 import { LexemesRegistry } from './LexemesRegistry';
 import { NotesController } from './NotesController';
 
@@ -255,16 +254,19 @@ describe('data fetching', () => {
 	test('filters notes by bookmarks', async () => {
 		const db = await openDatabase(dbFile);
 
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const bookmarksRegistry = new BookmarksController(db, FAKE_WORKSPACE_ID);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
-		const notesId = await notesRegistry
-			.get({ limit: 50 })
+		const notesId = await registry
+			.get({ limit: 40 })
 			.then((notes) => notes.map((note) => note.id));
-		await Promise.all(notesId.slice(0, 50).map((id) => bookmarksRegistry.add(id)));
 
-		await expect(notesRegistry.get({ bookmarks: true })).resolves.toHaveLength(50);
-		await expect(notesRegistry.get({ bookmarks: false })).resolves.toHaveLength(250);
+		await registry.updateMeta(notesId, { isBookmarked: true });
+		await expect(
+			registry.get({ meta: { isBookmarked: true } }),
+		).resolves.toHaveLength(40);
+		await expect(
+			registry.get({ meta: { isBookmarked: false } }),
+		).resolves.toHaveLength(notesSample.length - 40);
 
 		await db.close();
 	});
@@ -445,6 +447,29 @@ describe('Notes meta control', () => {
 		await expect(registry.getById(noteId)).resolves.toMatchObject({
 			id: noteId,
 			isArchived: false,
+		});
+	});
+
+	test('toggle note bookmarked status', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const noteId = await registry.add({ title: 'Title', text: 'Text' });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isBookmarked: false,
+		});
+
+		await registry.updateMeta([noteId], { isBookmarked: true });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isBookmarked: true,
+		});
+
+		await registry.updateMeta([noteId], { isBookmarked: false });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isBookmarked: false,
 		});
 	});
 });

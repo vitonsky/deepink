@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
-import { BookmarksController } from '@core/features/notes/controller/BookmarksController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
@@ -17,7 +16,6 @@ export type WorkspaceContainer = {
 	tagsRegistry: TagsController;
 	notesRegistry: NotesController;
 	notesHistory: NoteVersions;
-	bookmarksRegistry: BookmarksController;
 };
 
 export const useWorkspace = (currentProfile: ProfileContainer) => {
@@ -42,7 +40,6 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 			tagsRegistry: new TagsController(db, workspaceId),
 			notesRegistry: new NotesController(db, workspaceId),
 			notesHistory: new NoteVersions(db, workspaceId),
-			bookmarksRegistry: new BookmarksController(db, workspaceId),
 		});
 	}, [currentProfile, workspaceId]);
 

@@ -59,8 +59,8 @@ export const useUpdateNotes = () => {
 					: {
 							isArchived: notesView === NOTES_VIEW.ARCHIVE,
 					  }),
+				...(notesView === NOTES_VIEW.BOOKMARK ? { isBookmarked: true } : {}),
 			},
-			...(notesView === NOTES_VIEW.BOOKMARK && { bookmarks: true }),
 		});
 
 		if (isRequestCanceled()) return;

@@ -1,1 +1,2 @@
 ALTER TABLE "notes" ADD COLUMN "archived" BOOLEAN DEFAULT false;
+ALTER TABLE "notes" ADD COLUMN "bookmarked" BOOLEAN DEFAULT false;

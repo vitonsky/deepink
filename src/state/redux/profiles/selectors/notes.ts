@@ -78,11 +78,3 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 		return workspace.recentlyClosedNotes;
 	},
 );
-
-export const selectBookmarks = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) return [];
-		return workspace.bookmarks;
-	},
-);
