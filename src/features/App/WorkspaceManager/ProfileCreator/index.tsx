@@ -32,11 +32,13 @@ export type NewProfile = {
 export type ProfileCreatorProps = {
 	onCreateProfile: (profile: NewProfile) => Promise<void | string>;
 	onCancel: () => void;
+	isFirstProfile?: boolean;
 };
 
 export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	onCreateProfile,
 	onCancel,
+	isFirstProfile,
 }) => {
 	const telemetry = useTelemetryTracker();
 
@@ -45,7 +47,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [isPending, setIsPending] = useState(false);
 
-	const [profileName, setProfileName] = useState('');
+	const [profileName, setProfileName] = useState(isFirstProfile ? 'My Notes' : '');
 	const [profileNameError, setProfileNameError] = useState<null | string>(null);
 	useEffect(() => {
 		setProfileNameError(null);
@@ -105,6 +107,10 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		],
 	);
 
+	useEffect(() => {
+		if (isFirstProfile) passwordInputRef.current?.focus();
+	}, []);
+
 	const noPasswordDialogState = useDisclosure();
 
 	return (
@@ -128,14 +134,16 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Continue with no password
 					</Button>
-					<Button
-						variant="secondary"
-						w="100%"
-						onClick={onCancel}
-						disabled={isPending}
-					>
-						Cancel
-					</Button>
+					{!isFirstProfile && (
+						<Button
+							variant="secondary"
+							w="100%"
+							onClick={onCancel}
+							disabled={isPending}
+						>
+							Cancel
+						</Button>
+					)}
 
 					<Modal
 						isOpen={noPasswordDialogState.isOpen}
