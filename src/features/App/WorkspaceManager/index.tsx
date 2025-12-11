@@ -73,8 +73,9 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 
 	const [screenName, setScreenName] = useState<'main' | 'createProfile'>('main');
 
+	const isFirstProfile = profilesManager.profiles.length === 0;
 	const content = useMemo(() => {
-		if (screenName === 'createProfile') {
+		if (isFirstProfile || screenName === 'createProfile') {
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
@@ -86,6 +87,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 						})
 					}
 					onCancel={() => setScreenName('main')}
+					isFirstProfile={isFirstProfile}
 				/>
 			);
 		}
