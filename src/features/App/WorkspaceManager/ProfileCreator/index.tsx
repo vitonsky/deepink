@@ -47,7 +47,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [isPending, setIsPending] = useState(false);
 
-	const [profileName, setProfileName] = useState(isFirstProfile ? 'My Notes' : '');
+	const [profileName, setProfileName] = useState(isFirstProfile ? 'My notes' : '');
 	const [profileNameError, setProfileNameError] = useState<null | string>(null);
 	useEffect(() => {
 		setProfileNameError(null);
@@ -185,13 +185,20 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				</>
 			}
 		>
-			<VStack w="100%" alignItems="start">
+			<VStack
+				w="100%"
+				alignItems="start"
+				gap={'0.8rem'}
+				fontSize="18px"
+				color="typography.additional"
+			>
 				<VStack w="100%" alignItems="start">
+					<Text>Profile name</Text>
 					<Input
 						ref={profileNameInputRef}
 						variant="filled"
 						size="lg"
-						placeholder="Profile name"
+						placeholder="My work"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
 						focusBorderColor={profileNameError ? 'red.500' : undefined}
@@ -200,14 +207,14 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
 				</VStack>
-
 				<VStack w="100%" alignItems="start">
+					<Text>Password</Text>
 					<Input
 						ref={passwordInputRef}
 						variant="filled"
 						size="lg"
 						type="password"
-						placeholder="Enter password"
+						placeholder="MyPa$$word"
 						value={password}
 						onChange={(evt) => setPassword(evt.target.value)}
 						focusBorderColor={passwordError ? 'red.500' : undefined}
@@ -216,11 +223,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 					{passwordError && <Text color="red.500">{passwordError}</Text>}
 				</VStack>
-
-				<VStack w="100%" gap="0.1rem">
-					<Text color="typography.additional" fontSize="18px" alignSelf="start">
-						Encryption algorithm
-					</Text>
+				<VStack w="100%" alignItems="start">
+					<Text>Encryption algorithm</Text>
 					<Select
 						variant="secondary"
 						value={algorithm}
