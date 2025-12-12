@@ -154,7 +154,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	useShortcutsBinding();
 
-	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
+	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close, {
+		enabled: controls.profile.profile.isEncrypted,
+	});
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
