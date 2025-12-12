@@ -4,6 +4,11 @@ import { createAppSelector } from '../utils';
 
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
+export enum PROFILE_SCREEN_MODE {
+	LOCK = 'lockScreen',
+	CHANGE = 'changeProfileScreen',
+}
+
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
@@ -20,6 +25,7 @@ export type GlobalSettings = {
 		 */
 		confirmBeforeMoveToBin: boolean;
 	};
+	profileScreenMode: PROFILE_SCREEN_MODE | null;
 };
 
 export const settingsSlice = createSlice({
@@ -39,6 +45,7 @@ export const settingsSlice = createSlice({
 		preferences: {
 			confirmBeforeMoveToBin: false,
 		},
+		profileScreenMode: null,
 	} satisfies GlobalSettings as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
@@ -58,6 +65,12 @@ export const settingsSlice = createSlice({
 			{ payload }: PayloadAction<GlobalSettings['preferences']>,
 		) => {
 			return { ...state, preferences: payload } as GlobalSettings;
+		},
+		setProfileScreenMode: (
+			state,
+			{ payload }: PayloadAction<GlobalSettings['profileScreenMode']>,
+		) => {
+			return { ...state, profileScreenMode: payload } as GlobalSettings;
 		},
 	},
 });
