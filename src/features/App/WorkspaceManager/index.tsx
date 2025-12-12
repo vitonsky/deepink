@@ -65,7 +65,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				return { status: 'error', message: 'Invalid password' };
 			}
 		},
-		[profiles, dispatch],
+		[profiles],
 	);
 
 	const currentProfileObject = useMemo(
@@ -75,12 +75,12 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [screenName, setScreenName] = useState<'main' | 'createProfile' | 'lock'>(
-		'main',
-	);
+	const [screenName, setScreenName] = useState<
+		'main' | 'createProfile' | 'profileLogin'
+	>('main');
 	const profileScreenMode = useAppSelector(selectProfileScreenMode);
 	useEffect(() => {
-		if (profileScreenMode === PROFILE_SCREEN_MODE.LOCK) setScreenName('lock');
+		if (profileScreenMode === PROFILE_SCREEN_MODE.LOCK) setScreenName('profileLogin');
 
 		if (screenName === 'main') dispatch(settingsApi.setProfileScreenMode(null));
 	}, [profileScreenMode, screenName]);
@@ -104,7 +104,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			);
 		}
 
-		if (screenName === 'lock' && currentProfileObject) {
+		if (screenName === 'profileLogin' && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
@@ -160,7 +160,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
 									} else {
-										setScreenName('lock');
+										setScreenName('profileLogin');
 									}
 
 									telemetry.track(
@@ -183,7 +183,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		profilesManager,
 		screenName,
 		telemetry,
-		profileScreenMode,
 	]);
 
 	return (

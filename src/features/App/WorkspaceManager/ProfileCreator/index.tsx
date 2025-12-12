@@ -32,7 +32,7 @@ export type NewProfile = {
 export type ProfileCreatorProps = {
 	onCreateProfile: (profile: NewProfile) => Promise<void | string>;
 	onCancel: () => void;
-	isFirstProfile?: boolean;
+	isFirstProfile: boolean;
 };
 
 export const ProfileCreator: FC<ProfileCreatorProps> = ({
@@ -107,6 +107,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		],
 	);
 
+	// Focus password input (name has a default value)
 	useEffect(() => {
 		if (isFirstProfile) passwordInputRef.current?.focus();
 	}, []);
