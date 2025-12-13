@@ -110,7 +110,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	// Focus password input (name has a default value)
 	useEffect(() => {
 		if (isFirstProfile) passwordInputRef.current?.focus();
-	}, []);
+	}, [isFirstProfile, passwordInputRef]);
 
 	const noPasswordDialogState = useDisclosure();
 
