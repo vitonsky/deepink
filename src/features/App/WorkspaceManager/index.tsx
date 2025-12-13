@@ -76,17 +76,18 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	);
 
 	const [screenName, setScreenName] = useState<
-		'main' | 'createProfile' | 'profileLogin'
+		'main' | 'createProfile' | 'changeProfile'
 	>('main');
+
 	const profileScreenMode = useAppSelector(selectProfileScreenMode);
 	useEffect(() => {
-		if (profileScreenMode === PROFILE_SCREEN_MODE.LOCK) setScreenName('profileLogin');
-
 		if (screenName === 'main') dispatch(settingsApi.setProfileScreenMode(null));
-	}, [profileScreenMode, screenName]);
+		if (profileScreenMode === PROFILE_SCREEN_MODE.CHANGE)
+			setScreenName('changeProfile');
+	}, [profileScreenMode, screenName, dispatch]);
 
-	const isFirstProfile = profilesManager.profiles.length === 0;
 	const content = useMemo(() => {
+		const isFirstProfile = profilesManager.profiles.length === 0;
 		if (screenName === 'createProfile' || isFirstProfile) {
 			return (
 				<ProfileCreator
@@ -98,19 +99,19 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							);
 						})
 					}
-					onCancel={() => setScreenName('main')}
+					onCancel={() => setScreenName('changeProfile')}
 					isFirstProfile={isFirstProfile}
 				/>
 			);
 		}
 
-		if (screenName === 'profileLogin' && currentProfileObject) {
+		if (screenName !== 'changeProfile' && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
 					onLogin={onOpenProfile}
 					onPickAnotherProfile={() => {
-						setScreenName('main');
+						setScreenName('changeProfile');
 						onChooseProfile(null);
 					}}
 				/>
@@ -160,7 +161,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
 									} else {
-										setScreenName('profileLogin');
+										setScreenName('main');
 									}
 
 									telemetry.track(
