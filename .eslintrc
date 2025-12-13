@@ -162,7 +162,8 @@
 					"Tsconfig",
 					"readdir",
 					"workspaces",
-					"unarchive"
+					"unarchive",
+					"unarchived"
 				],
 				// Check if word contains numbers
 				"skipIfMatch": ["\\d+", "^[a-z]+$"],

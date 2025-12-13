@@ -26,6 +26,9 @@ export enum TELEMETRY_EVENT_NAME {
 	NOTE_CLOSED = 'Note closed',
 	NOTE_RESTORED_FROM_BIN = 'Note restored from bin',
 
+	NOTE_ARCHIVE_TOGGLE = 'Note archive toggled',
+	NOTE_BOOKMARK_TOGGLE = 'Note bookmark toggled',
+
 	NOTE_TAG_ATTACHED = 'Tag attached',
 	NOTE_TAG_DETACHED = 'Tag detached',
 

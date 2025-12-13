@@ -232,10 +232,15 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 						size="xs"
 						title={note.isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
 						onClick={async () => {
+							const newBookmarkedState = !note.isBookmarked;
 							await notesRegistry.updateMeta([note.id], {
-								isBookmarked: !note.isBookmarked,
+								isBookmarked: newBookmarkedState,
 							});
 							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
+								action: newBookmarkedState ? 'Added' : 'Removed',
+							});
 						}}
 					>
 						{note.isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
@@ -247,10 +252,15 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 						variant="ghost"
 						size="xs"
 						onClick={async () => {
+							const newArchivedState = !note.isArchived;
 							await notesRegistry.updateMeta([note.id], {
-								isArchived: !note.isArchived,
+								isArchived: newArchivedState,
 							});
 							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+								action: newArchivedState ? 'Archived' : 'Unarchived',
+							});
 						}}
 						title={note.isArchived ? 'Unarchive' : 'Archive'}
 					>
