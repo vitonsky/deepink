@@ -5,3 +5,7 @@ contextBridge.exposeInMainWorld('electron', {
 		invoke: ipcRenderer.invoke,
 	},
 });
+
+contextBridge.exposeInMainWorld('electronAPI', {
+	confirm: (message?: string) => ipcRenderer.sendSync('show-confirm', message),
+});
