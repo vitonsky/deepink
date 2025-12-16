@@ -1,5 +1,5 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import url from 'url';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -132,19 +132,6 @@ export const openMainWindow = async ({
 	// We throttle to avoid intermediate changes, since
 	// `resized` event works not on all platforms
 	win.on('resize', debounce(onTrackResize, { wait: 5000 }));
-
-	// Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
-	ipcMain.on('show-confirm', (event, message: string) => {
-		const result = dialog.showMessageBoxSync(win, {
-			type: 'question',
-			buttons: ['OK', 'Cancel'],
-			defaultId: 1,
-			cancelId: 0,
-			message,
-		});
-		event.returnValue = result === 0;
-		win.focus();
-	});
 
 	return {
 		quit: () => {
