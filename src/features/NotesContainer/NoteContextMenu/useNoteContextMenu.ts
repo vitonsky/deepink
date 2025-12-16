@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { formatNoteLink } from '@core/features/links';
 import { INote, NoteId } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { showConfirmDialog } from '@electron/requests/confirm/renderer';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
 	useNotesContext,
@@ -78,7 +79,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
 					if (requiresConfirmMoveToBin) {
-						const isConfirmed = confirm(
+						const isConfirmed = await showConfirmDialog(
 							`Do you want to move this note to the bin?`,
 						);
 						if (!isConfirmed) return;
@@ -98,7 +99,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				},
 
 				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
-					const isConfirmed = confirm(
+					const isConfirmed = await showConfirmDialog(
 						`Do you want to permanently delete this note?`,
 					);
 					if (!isConfirmed) return;

@@ -13,7 +13,3 @@ contextBridge.exposeInMainWorld('electron', {
 		setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),
 	},
 });
-
-contextBridge.exposeInMainWorld('electronAPI', {
-	confirm: (message?: string) => ipcRenderer.sendSync('show-confirm', message),
-});

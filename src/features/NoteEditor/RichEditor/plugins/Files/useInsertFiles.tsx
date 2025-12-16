@@ -9,6 +9,7 @@ import {
 } from 'lexical';
 import prettyBytes from 'pretty-bytes';
 import { formatResourceLink } from '@core/features/links';
+import { showConfirmDialog } from '@electron/requests/confirm/renderer';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { $createLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -40,7 +41,7 @@ export const useInsertFiles = () => {
 				// May be replaced to Intl: https://stackoverflow.com/a/73974452/18680275
 				const humanReadableBytes = prettyBytes(filesSize);
 
-				const isConfirmed = confirm(
+				const isConfirmed = await showConfirmDialog(
 					`Are you sure to upload ${files.length} files with ${humanReadableBytes}?`,
 				);
 				if (!isConfirmed) return;
