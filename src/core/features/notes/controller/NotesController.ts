@@ -299,6 +299,7 @@ export class NotesController implements INotesController {
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
+		if (!ids.length) return;
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 

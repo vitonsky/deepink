@@ -96,6 +96,14 @@ describe('CRUD operations', () => {
 
 		await db.close();
 	});
+
+	test('delete with empty list does not throw', async () => {
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		await expect(registry.delete([])).resolves.toBeUndefined();
+	});
 });
 
 describe('data fetching', () => {
