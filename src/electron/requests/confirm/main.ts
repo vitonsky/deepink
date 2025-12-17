@@ -5,10 +5,8 @@ import { dialogChannel } from '.';
 
 export const enableConfirmDialog = () => {
 	dialogChannel.server(ipcMainHandler, {
-		async open({ ctx: evt, req: [props] }) {
-			const window = BrowserWindow.getAllWindows().find(
-				(win) => win.webContents.id === evt.sender.id,
-			);
+		async open({ ctx: event, req: [message] }) {
+			const window = BrowserWindow.fromWebContents(event.sender);
 			if (!window) return;
 
 			const result = await dialog.showMessageBox(window, {
@@ -16,7 +14,7 @@ export const enableConfirmDialog = () => {
 				buttons: ['OK', 'Cancel'],
 				defaultId: 0,
 				cancelId: 1,
-				message: props,
+				message,
 			});
 			return result.response === 0;
 		},
