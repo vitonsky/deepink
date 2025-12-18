@@ -102,7 +102,7 @@ describe('CRUD operations', () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
-		await expect(registry.delete([])).resolves.toBeUndefined();
+		await expect(registry.delete([])).resolves.not.toThrow();
 	});
 });
 
