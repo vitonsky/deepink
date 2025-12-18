@@ -75,7 +75,7 @@ export const selectResolvedTags = (
 						),
 					),
 			),
-		order,
+		order && qb.sql`ORDER BY ${order}`,
 		limit && qb.limit(limit),
 	);
 };
@@ -140,7 +140,7 @@ export class TagsController {
 					rows: [parentTag],
 				} = await db.query(
 					selectResolvedTags(this.workspace, {
-						where: [qb.sql`id = ${parent}`],
+						where: [qb.sql`t.id = ${parent}`],
 						limit: 1,
 					}),
 					RowScheme,
@@ -184,7 +184,7 @@ export class TagsController {
 			} = await db.query(
 				selectResolvedTags(this.workspace, {
 					where: [qb.sql`resolved_name IN (${qb.values(tagNameVariants)})`],
-					order: qb.sql`ORDER BY LENGTH(resolved_name) DESC`,
+					order: qb.sql`LENGTH(resolved_name) DESC`,
 					limit: 1,
 				}),
 				RowScheme,
