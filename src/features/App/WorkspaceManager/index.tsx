@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
@@ -6,8 +6,11 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectProfileScreenMode } from '@state/redux/settings/selectors/profileScreenMode';
-import { PROFILE_SCREEN_MODE, settingsApi } from '@state/redux/settings/settings';
+import {
+	PROFILE_SCREEN_MODE,
+	selectProfileScreenMode,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -75,43 +78,43 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [screenName, setScreenName] = useState<
-		'main' | 'createProfile' | 'changeProfile'
-	>('main');
-
 	const profileScreenMode = useAppSelector(selectProfileScreenMode);
-	useEffect(() => {
-		if (screenName === 'main') dispatch(settingsApi.setProfileScreenMode(null));
-		if (profileScreenMode === PROFILE_SCREEN_MODE.CHANGE)
-			setScreenName('changeProfile');
-	}, [profileScreenMode, screenName, dispatch]);
 
 	const content = useMemo(() => {
 		const isFirstProfile = profilesManager.profiles.length === 0;
-		if (screenName === 'createProfile' || isFirstProfile) {
+		if (profileScreenMode === PROFILE_SCREEN_MODE.CREATE || isFirstProfile) {
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
 						profilesManager.createProfile(profile).then((newProfile) => {
-							setScreenName('main');
 							onOpenProfile(newProfile, profile.password ?? undefined).then(
 								console.warn,
 							);
 						})
 					}
-					onCancel={() => setScreenName('changeProfile')}
+					onCancel={() =>
+						dispatch(
+							workspacesApi.setProfileScreenMode(
+								PROFILE_SCREEN_MODE.CHANGE,
+							),
+						)
+					}
 					isFirstProfile={isFirstProfile}
 				/>
 			);
 		}
 
-		if (screenName !== 'changeProfile' && currentProfileObject) {
+		if (profileScreenMode !== PROFILE_SCREEN_MODE.CHANGE && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
 					onLogin={onOpenProfile}
 					onPickAnotherProfile={() => {
-						setScreenName('changeProfile');
+						dispatch(
+							workspacesApi.setProfileScreenMode(
+								PROFILE_SCREEN_MODE.CHANGE,
+							),
+						);
 						onChooseProfile(null);
 					}}
 				/>
@@ -127,7 +130,13 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							variant="accent"
 							size="lg"
 							w="100%"
-							onClick={() => setScreenName('createProfile')}
+							onClick={() =>
+								dispatch(
+									workspacesApi.setProfileScreenMode(
+										PROFILE_SCREEN_MODE.CREATE,
+									),
+								)
+							}
 						>
 							Create new profile
 						</Button>
@@ -160,8 +169,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									onChooseProfile(profile.id);
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
-									} else {
-										setScreenName('main');
 									}
 
 									telemetry.track(
@@ -182,8 +189,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onChooseProfile,
 		onOpenProfile,
 		profilesManager,
-		screenName,
 		telemetry,
+		profileScreenMode,
 	]);
 
 	return (
