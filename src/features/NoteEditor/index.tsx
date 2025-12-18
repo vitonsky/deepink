@@ -259,7 +259,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
 
 							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
-								action: newArchivedState ? 'Archived' : 'Unarchived',
+								action: newArchivedState ? 'Added' : 'Removed',
 							});
 						}}
 						title={note.isArchived ? 'Unarchive' : 'Archive'}
