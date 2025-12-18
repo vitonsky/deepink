@@ -172,74 +172,60 @@ export class TagsController {
 			}
 
 			const resolvedTagSegments = resolvedTagName.split('/');
-			if (resolvedTagSegments.length > 1) {
-				// Build an array of all path variants to find existing tags that match exactly this one
-				// 'foo/bar/baz' - ['foo', 'foo/bar', 'foo/bar/baz']
-				// The found tag allows detecting non-existing segments from resolvedTagSegments and creating only those
-				const tagNameVariants = resolvedTagSegments.reduce<string[]>(
-					(prev, segment) => [
-						...prev,
-						prev.length ? `${prev[prev.length - 1]}/${segment}` : segment,
-					],
-					[],
-				);
-				const {
-					rows: [rootTag],
-				} = await db.query(
-					selectResolvedTags(this.workspace, {
-						where: [qb.sql`resolved_name IN (${qb.values(tagNameVariants)})`],
-						order: qb.sql`ORDER BY LENGTH(resolved_name) DESC`,
-						limit: 1,
-					}),
-					RowScheme,
-				);
 
-				const parentTagId = rootTag ? rootTag.id : parent;
-				const segmentsForCreation = rootTag
-					? resolvedTagSegments.slice(rootTag.resolvedName.split('/').length)
-					: resolvedTagSegments;
+			// Build an array of all path variants to find existing tags that match exactly this one
+			// 'foo/bar/baz' - ['foo', 'foo/bar', 'foo/bar/baz']
+			// The found tag allows detecting non-existing segments from resolvedTagSegments and creating only those
+			const tagNameVariants = resolvedTagSegments.map((_, index) => {
+				return resolvedTagSegments.slice(0, index + 1).join('/');
+			});
+			const {
+				rows: [rootTag],
+			} = await db.query(
+				selectResolvedTags(this.workspace, {
+					where: [qb.sql`resolved_name IN (${qb.values(tagNameVariants)})`],
+					order: qb.sql`ORDER BY LENGTH(resolved_name) DESC`,
+					limit: 1,
+				}),
+				RowScheme,
+			);
 
-				for (let idx = 0; idx < segmentsForCreation.length; idx++) {
-					const name = segmentsForCreation[idx];
-					const isFirstItem = idx === 0;
+			if (!rootTag && parent !== null)
+				throw new Error('Parent tag provided but root tag not founded');
 
-					if (isFirstItem) {
-						await db
-							.query(
-								qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-									[this.workspace, name, parentTagId],
-								)}) RETURNING id`,
-								z.object({ id: z.string() }),
-							)
-							.then(({ rows: [{ id }] }) => {
-								lastId = id;
-							});
+			// For single-segment tags or when starting a new path, there is no parent or root yet, so we set parentTagId to null
+			const parentTagId = rootTag ? rootTag.id : null;
+			const segmentsForCreation = rootTag
+				? resolvedTagSegments.slice(rootTag.resolvedName.split('/').length)
+				: resolvedTagSegments;
 
-						continue;
-					}
+			for (let idx = 0; idx < segmentsForCreation.length; idx++) {
+				const name = segmentsForCreation[idx];
+				const isFirstItem = idx === 0;
 
-					await db
-						.query(
-							qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-								[this.workspace, name],
-							)}, (SELECT id FROM tags WHERE id=${lastId})) RETURNING id`,
-							z.object({ id: z.string() }),
-						)
-						.then(({ rows: [{ id }] }) => {
-							lastId = id;
-						});
-				}
-			} else {
-				await db
-					.query(
+				if (isFirstItem) {
+					const {
+						rows: [newTag],
+					} = await db.query(
 						qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-							[this.workspace, name, parent],
+							[this.workspace, name, parentTagId],
 						)}) RETURNING id`,
 						z.object({ id: z.string() }),
-					)
-					.then(({ rows: [{ id }] }) => {
-						lastId = id;
-					});
+					);
+					lastId = newTag.id;
+
+					continue;
+				}
+
+				const {
+					rows: [newTag],
+				} = await db.query(
+					qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
+						[this.workspace, name],
+					)}, (SELECT id FROM tags WHERE id=${lastId})) RETURNING id`,
+					z.object({ id: z.string() }),
+				);
+				lastId = newTag.id;
 			}
 		});
 
