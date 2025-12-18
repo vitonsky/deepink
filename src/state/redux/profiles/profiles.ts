@@ -79,6 +79,12 @@ export type WorkspaceData = {
 	};
 };
 
+export enum PROFILE_SCREEN_MODE {
+	LOCK = 'lockProfileScreen',
+	CHANGE = 'changeProfileScreen',
+	CREATE = 'createProfileScreen',
+}
+
 export type ProfileData = {
 	activeWorkspace: string | null;
 	workspaces: Record<string, WorkspaceData | undefined>;
@@ -87,6 +93,7 @@ export type ProfileData = {
 export type ProfilesState = {
 	activeProfile: string | null;
 	profiles: Record<string, ProfileData | undefined>;
+	profileScreenMode: PROFILE_SCREEN_MODE | null;
 };
 
 export const profilesSlice = createSlice({
@@ -94,6 +101,7 @@ export const profilesSlice = createSlice({
 	initialState: {
 		activeProfile: null,
 		profiles: {},
+		profileScreenMode: null,
 	} as ProfilesState,
 	reducers: {
 		setProfiles: (state, { payload }: PayloadAction<Record<string, ProfileData>>) => {
@@ -114,6 +122,13 @@ export const profilesSlice = createSlice({
 			{ payload: { profileId } }: PayloadAction<{ profileId: string }>,
 		) => {
 			delete state.profiles[profileId];
+		},
+
+		setProfileScreenMode: (
+			state,
+			{ payload }: PayloadAction<PROFILE_SCREEN_MODE>,
+		) => {
+			state.profileScreenMode = payload;
 		},
 
 		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
@@ -350,6 +365,11 @@ export const selectProfile = ({ profileId }: ProfileScoped) =>
 		const profile = state.profiles[profileId];
 		return profile ?? null;
 	});
+
+export const selectProfileScreenMode = createAppSelector(
+	profilesSlice.selectSlice,
+	(state) => state.profileScreenMode,
+);
 
 export const selectWorkspaces = ({ profileId }: ProfileScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
