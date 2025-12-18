@@ -76,6 +76,7 @@ export const basicTheme = extendTheme({
 		accent: {
 			// Accent color
 			100: '#e8e6ff',
+			400: '#7a1dd0',
 			500: '#6b00cb',
 		},
 		primary: {

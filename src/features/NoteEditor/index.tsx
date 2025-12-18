@@ -18,7 +18,17 @@ import {
 } from 'react-icons/fa6';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
-import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Divider,
+	HStack,
+	Icon,
+	Input,
+	Tag,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
@@ -229,8 +239,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				<HStack>
 					<Button
 						variant="ghost"
-						size="xs"
 						title={note.isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+						size="xs"
 						onClick={async () => {
 							const newBookmarkedState = !note.isBookmarked;
 							await notesRegistry.updateMeta([note.id], {
@@ -250,6 +260,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					</Button>
 					<Button
 						variant="ghost"
+						title={note.isArchived ? 'Unarchive' : 'Archive'}
 						size="xs"
 						onClick={async () => {
 							const newArchivedState = !note.isArchived;
@@ -262,13 +273,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								action: newArchivedState ? 'Added' : 'Removed',
 							});
 						}}
-						title={note.isArchived ? 'Unarchive' : 'Archive'}
 					>
-						{note.isArchived ? (
-							<FaBoxArchive color="gray" />
-						) : (
-							<FaBoxArchive />
-						)}
+						<Icon
+							as={FaBoxArchive}
+							color={note.isArchived ? 'accent.400' : undefined}
+						></Icon>
 					</Button>
 				</HStack>
 
