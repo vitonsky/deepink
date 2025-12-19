@@ -47,7 +47,19 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [isPending, setIsPending] = useState(false);
 
-	const [profileName, setProfileName] = useState(isFirstProfile ? 'My notes' : '');
+	const defaultProfileName = [
+		'Creative drafts',
+		'Second brain',
+		'Digital garden',
+		'Creative space',
+		'Digital thoughts',
+		'Idea cloud',
+	];
+	const [profileName, setProfileName] = useState(
+		isFirstProfile
+			? defaultProfileName[Math.floor(Math.random() * defaultProfileName.length)]
+			: '',
+	);
 	const [profileNameError, setProfileNameError] = useState<null | string>(null);
 	useEffect(() => {
 		setProfileNameError(null);
@@ -190,7 +202,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Input
 						ref={profileNameInputRef}
 						size="lg"
-						placeholder="My work"
+						placeholder="e.g. Business"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
 						focusBorderColor={profileNameError ? 'red.500' : undefined}
@@ -200,12 +212,12 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
 				</VStack>
 				<VStack w="100%" alignItems="start">
-					<Text>Password</Text>
+					<Text>Encryption password (recommended)</Text>
 					<Input
 						ref={passwordInputRef}
 						size="lg"
 						type="password"
-						placeholder="MyPa$$word"
+						placeholder="e.g. SecretPa$$word"
 						value={password}
 						onChange={(evt) => setPassword(evt.target.value)}
 						focusBorderColor={passwordError ? 'red.500' : undefined}
