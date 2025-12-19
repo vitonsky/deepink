@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { createEvent } from 'effector';
 import { Query } from 'nano-queries/core/Query';
+import { RawSegment } from 'nano-queries/core/RawSegment';
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { DBTypes, qb } from '@utils/db/query-builder';
@@ -63,14 +64,30 @@ export const selectResolvedTags = (
 	} = {},
 ) => {
 	const { where, order, limit } = options;
+
+	// prepends the table alias 't' to id column
+	const whereWithAlias = where?.map((q) =>
+		qb.line(
+			...q.getSegments().map((segment) => {
+				if (segment instanceof RawSegment) {
+					const val = segment.getValue();
+					if (typeof val === 'string' && val.trim().startsWith('id')) {
+						return new RawSegment(val.replace(/^id/, 't.id'));
+					}
+				}
+				return segment;
+			}),
+		),
+	);
+
 	return qb.line(
 		qb.raw(tagsQuery),
 		qb
 			.where(qb.sql`workspace_id = ${workspaceId}`)
 			.and(
-				where &&
+				whereWithAlias &&
 					qb.line(
-						...where.map((query, index) =>
+						...whereWithAlias.map((query, index) =>
 							index === 0 ? query : qb.sql`AND ${query}`,
 						),
 					),
@@ -140,7 +157,7 @@ export class TagsController {
 					rows: [parentTag],
 				} = await db.query(
 					selectResolvedTags(this.workspace, {
-						where: [qb.sql`t.id = ${parent}`],
+						where: [qb.sql`id = ${parent}`],
 						limit: 1,
 					}),
 					RowScheme,
