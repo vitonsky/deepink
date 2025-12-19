@@ -190,10 +190,11 @@ export class TagsController {
 				RowScheme,
 			);
 
+			// If parent was provided, at least one existing segment root must be found
 			if (!rootTag && parent !== null)
 				throw new Error('Parent tag provided but root tag not founded');
 
-			// For single-segment tags or when starting a new path, there is no parent or root yet, so we set parentTagId to null
+			// For newly created tags with no root or parent yet, parentTagId is set to null
 			const parentTagId = rootTag ? rootTag.id : null;
 			const segmentsForCreation = rootTag
 				? resolvedTagSegments.slice(rootTag.resolvedName.split('/').length)
