@@ -81,8 +81,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	const profileScreenMode = useAppSelector(selectProfileScreenMode);
 
 	const content = useMemo(() => {
-		const isFirstProfile = profilesManager.profiles.length === 0;
-		if (profileScreenMode === PROFILE_SCREEN_MODE.CREATE || isFirstProfile) {
+		const hasNoProfiles = profilesManager.profiles.length === 0;
+		if (profileScreenMode === PROFILE_SCREEN_MODE.CREATE || hasNoProfiles) {
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
@@ -99,7 +99,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							),
 						)
 					}
-					isFirstProfile={isFirstProfile}
+					isFirstProfile={hasNoProfiles}
 				/>
 			);
 		}
@@ -169,6 +169,12 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									onChooseProfile(profile.id);
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
+									} else {
+										dispatch(
+											workspacesApi.setProfileScreenMode(
+												PROFILE_SCREEN_MODE.LOCK,
+											),
+										);
 									}
 
 									telemetry.track(
