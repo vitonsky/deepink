@@ -13,7 +13,6 @@ import {
 	FaBoxArchive,
 	FaFlag,
 	FaHashtag,
-	FaRegBookmark,
 	FaXmark,
 } from 'react-icons/fa6';
 import { debounce } from 'lodash';
@@ -253,10 +252,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							});
 						}}
 					>
-						{note.isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
-					</Button>
-					<Button variant="ghost" size="xs">
-						<FaFlag />
+						<Icon
+							as={FaBookmark}
+							color={note.isBookmarked ? 'accent.400' : undefined}
+						></Icon>
 					</Button>
 					<Button
 						variant="ghost"
@@ -278,6 +277,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							as={FaBoxArchive}
 							color={note.isArchived ? 'accent.400' : undefined}
 						></Icon>
+					</Button>
+					<Button variant="ghost" size="xs">
+						<FaFlag />
 					</Button>
 				</HStack>
 
