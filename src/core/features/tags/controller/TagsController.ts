@@ -193,9 +193,7 @@ export class TagsController {
 			// Build an array of all path variants to find existing tags that match exactly this one
 			// 'foo/bar/baz' - ['foo', 'foo/bar', 'foo/bar/baz']
 			// The found tag allows detecting non-existing segments from resolvedTagSegments and creating only those
-			const tagNameVariants = resolvedTagSegments.map((_, index) => {
-				return resolvedTagSegments.slice(0, index + 1).join('/');
-			});
+			const tagNameVariants = resolvedTagSegments.map((_, index, segments) => segments.slice(0, index + 1).join('/'));
 			const {
 				rows: [rootTag],
 			} = await db.query(
