@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import { createEvent } from 'effector';
 import { Query } from 'nano-queries/core/Query';
-import { RawSegment } from 'nano-queries/core/RawSegment';
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { DBTypes, qb } from '@utils/db/query-builder';
@@ -65,29 +64,14 @@ export const selectResolvedTags = (
 ) => {
 	const { where, order, limit } = options;
 
-	// prepends the table alias 't' to id column
-	const whereWithAlias = where?.map((q) =>
-		qb.line(
-			...q.getSegments().map((segment) => {
-				if (segment instanceof RawSegment) {
-					const val = segment.getValue();
-					if (typeof val === 'string' && val.trim().startsWith('id')) {
-						return new RawSegment(val.replace(/^id/, 't.id'));
-					}
-				}
-				return segment;
-			}),
-		),
-	);
-
 	return qb.line(
-		qb.raw(tagsQuery),
+		qb.sql`SELECT * FROM (${qb.raw(tagsQuery)})`,
 		qb
 			.where(qb.sql`workspace_id = ${workspaceId}`)
 			.and(
-				whereWithAlias &&
+				where &&
 					qb.line(
-						...whereWithAlias.map((query, index) =>
+						...where.map((query, index) =>
 							index === 0 ? query : qb.sql`AND ${query}`,
 						),
 					),
@@ -153,6 +137,7 @@ export class TagsController {
 			if (!parent) {
 				resolvedTagName = name;
 			} else {
+				// find parent resolved name
 				const {
 					rows: [parentTag],
 				} = await db.query(
@@ -193,12 +178,14 @@ export class TagsController {
 			// Build an array of all path variants to find existing tags that match exactly this one
 			// 'foo/bar/baz' - ['foo', 'foo/bar', 'foo/bar/baz']
 			// The found tag allows detecting non-existing segments from resolvedTagSegments and creating only those
-			const tagNameVariants = resolvedTagSegments.map((_, index, segments) => segments.slice(0, index + 1).join('/'));
+			const resolvedTagVariants = resolvedTagSegments.map((_, index, segments) =>
+				segments.slice(0, index + 1).join('/'),
+			);
 			const {
 				rows: [rootTag],
 			} = await db.query(
 				selectResolvedTags(this.workspace, {
-					where: [qb.sql`resolved_name IN (${qb.values(tagNameVariants)})`],
+					where: [qb.sql`resolved_name IN (${qb.values(resolvedTagVariants)})`],
 					order: qb.sql`LENGTH(resolved_name) DESC`,
 					limit: 1,
 				}),
