@@ -73,13 +73,13 @@ describe('manage tags', () => {
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const nonExistentTag = getUUID();
-		await expect(tags.add('foo', nonExistentTag)).rejects.toThrowError(
+		await expect(tags.add('foo', nonExistentTag)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
 		);
 		await expect(tags.add('foo/bar', nonExistentTag)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
 		);
-		await expect(tags.add('foo/bar/foo', nonExistentTag)).rejects.toThrow(
+		await expect(tags.add('foo/bar/baz', nonExistentTag)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
 		);
 	});
