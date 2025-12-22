@@ -12,6 +12,10 @@ import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
+import {
+	TAG_ERROR_CODE,
+	TagControllerError,
+} from '@core/features/tags/controller/TagsController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
@@ -65,7 +69,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					onSave={async (data) => {
 						console.warn('Update tag', data);
 
-						if (data.id === undefined) return;
+						if (data.id === undefined)
+							return { ok: false, error: 'Tag ID is required' };
 
 						await tagsRegistry.update({ id: data.id, ...data });
 						setEditedTag(null);
@@ -73,6 +78,8 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						telemetry.track(TELEMETRY_EVENT_NAME.TAG_EDITED, {
 							hasParent: data.parent === null ? 'no' : 'yes',
 						});
+
+						return { ok: true };
 					}}
 					onCancel={() => {
 						setEditedTag(null);
@@ -88,14 +95,35 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 				tags={tags}
 				parentTag={parentTagForNewTagRef.current ?? undefined}
 				onSave={async (data) => {
-					console.warn('Create tag', data);
-					await tagsRegistry.add(data.name, data.parent);
-					setIsAddTagPopupOpened(false);
+					try {
+						console.warn('Create tag', data);
+						await tagsRegistry.add(data.name, data.parent);
+						setIsAddTagPopupOpened(false);
 
-					telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
-						scope: 'side panel',
-						hasParent: data.parent === null ? 'no' : 'yes',
-					});
+						telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
+							scope: 'side panel',
+							hasParent: data.parent === null ? 'no' : 'yes',
+						});
+
+						return { ok: true };
+					} catch (error) {
+						if (!(error instanceof TagControllerError)) throw error;
+
+						let message: string;
+						switch (error.code) {
+							case TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST:
+								message =
+									'Parent tag not found, please select another tag';
+								break;
+							case TAG_ERROR_CODE.DUPLICATE:
+								message = 'Tag already exists';
+								break;
+							default:
+								message =
+									'Tag cannot be empty, start or end with "/", or contain "//".';
+						}
+						return { ok: false, error: message };
+					}
 				}}
 				onCancel={() => {
 					setIsAddTagPopupOpened(false);

@@ -14,10 +14,6 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
-import {
-	TAG_ERROR_CODE,
-	TagControllerError,
-} from '@core/features/tags/controller/TagsController';
 import { WorkspaceModal } from '@features/WorkspaceModal';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
@@ -34,7 +30,11 @@ export type ITagEditorProps = {
 	 */
 	tags: IResolvedTag[];
 	parentTag?: IResolvedTag;
-	onSave: (tagData: TagEditorData) => Promise<void>;
+	/**
+	 * Saves the tag, returns a Promise with { ok: true } on success or { ok: false; error: string } for known errors
+	 * or throws for unexpected errors
+	 */
+	onSave: (tagData: TagEditorData) => Promise<{ ok: boolean; error?: string }>;
 	onCancel: () => void;
 	editedTag?: TagEditorData;
 };
@@ -149,31 +149,18 @@ export const TagEditor: FC<ITagEditorProps> = ({
 										}
 									}
 
-									await onSave({
+									const result = await onSave({
 										name,
 										parent: parentTagId,
 										...(isEditingMode && editedTag.id
 											? { id: editedTag.id }
 											: {}),
 									});
-								} catch (error) {
-									if (error instanceof TagControllerError) {
-										switch (error.code) {
-											case TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST:
-												setTagNameError(
-													'Parent tag not found, please select another tag',
-												);
-												break;
-											case TAG_ERROR_CODE.DUPLICATE:
-												setTagNameError('Tag already exists');
-												break;
-											default:
-												setTagNameError(
-													'Tag cannot be empty, start or end with "/", or contain "//".',
-												);
-										}
-										return;
+
+									if (!result.ok && result.error) {
+										setTagNameError(result.error);
 									}
+								} catch (error) {
 									setTagNameError(
 										'Unable to save the tag. Please try again.',
 									);
