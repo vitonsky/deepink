@@ -17,17 +17,7 @@ import {
 } from 'react-icons/fa6';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
-import {
-	Box,
-	Button,
-	Divider,
-	HStack,
-	Icon,
-	Input,
-	Tag,
-	Text,
-	VStack,
-} from '@chakra-ui/react';
+import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
 import { findLinksInText, getResourceIdInUrl } from '@core/features/links';
 import { INote, INoteContent } from '@core/features/notes';
@@ -251,11 +241,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								action: newBookmarkedState ? 'Added' : 'Removed',
 							});
 						}}
+						isActive={note.isBookmarked}
 					>
-						<Icon
-							as={FaBookmark}
-							color={note.isBookmarked ? 'accent.400' : undefined}
-						></Icon>
+						<FaBookmark />
 					</Button>
 					<Button
 						variant="ghost"
@@ -272,11 +260,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								action: newArchivedState ? 'Added' : 'Removed',
 							});
 						}}
+						isActive={note.isArchived}
 					>
-						<Icon
-							as={FaBoxArchive}
-							color={note.isArchived ? 'accent.400' : undefined}
-						></Icon>
+						<FaBoxArchive />
 					</Button>
 					<Button variant="ghost" size="xs">
 						<FaFlag />

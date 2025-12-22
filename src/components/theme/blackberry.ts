@@ -15,7 +15,6 @@ export const blackberryTheme = extendTheme(basicTheme, {
 		accent: {
 			// Accent color
 			100: '#ffe6ff',
-			400: '#b332b3',
 			500: '#8c258c',
 			600: '#4e0095',
 		},
@@ -49,6 +48,9 @@ export const blackberryTheme = extendTheme(basicTheme, {
 		},
 		overlay: {
 			500: '#ffffff75',
+		},
+		interactive: {
+			pressed: '#b332b3',
 		},
 	},
 	components: {

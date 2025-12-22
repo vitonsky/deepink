@@ -76,7 +76,6 @@ export const basicTheme = extendTheme({
 		accent: {
 			// Accent color
 			100: '#e8e6ff',
-			400: '#7a1dd0',
 			500: '#6b00cb',
 		},
 		primary: {
@@ -113,6 +112,9 @@ export const basicTheme = extendTheme({
 		},
 		message: {
 			error: '#b30606',
+		},
+		interactive: {
+			pressed: '#7a1dd0',
 		},
 	},
 	semanticTokens: {
@@ -177,6 +179,13 @@ export const basicTheme = extendTheme({
 				ghost: {
 					color: 'typography.primary',
 					'&:hover, &:active, &[data-active]': {
+						backgroundColor: 'dim.400',
+					},
+					'&[data-active]': {
+						color: 'interactive.pressed',
+						backgroundColor: 'transparent',
+					},
+					'&[data-active]:hover': {
 						backgroundColor: 'dim.400',
 					},
 				},

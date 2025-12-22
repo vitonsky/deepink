@@ -23,7 +23,6 @@ export const zenTheme = extendTheme(basicTheme, {
 		accent: {
 			// Accent color
 			100: '#e5d8cb',
-			400: '#88592b',
 			500: '#493017',
 		},
 		primary: {
@@ -57,6 +56,9 @@ export const zenTheme = extendTheme(basicTheme, {
 		},
 		overlay: {
 			500: '#00000075',
+		},
+		interactive: {
+			pressed: '#88592b',
 		},
 	},
 	components: {
