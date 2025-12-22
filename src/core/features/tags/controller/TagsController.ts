@@ -204,28 +204,14 @@ export class TagsController {
 
 			for (let idx = 0; idx < segmentsForCreation.length; idx++) {
 				const name = segmentsForCreation[idx];
-				const isFirstItem = idx === 0;
-
-				if (isFirstItem) {
-					const {
-						rows: [newTag],
-					} = await db.query(
-						qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-							[this.workspace, name, parentTagId],
-						)}) RETURNING id`,
-						z.object({ id: z.string() }),
-					);
-					lastId = newTag.id;
-
-					continue;
-				}
+				const parent = idx === 0 ? parentTagId : lastId;
 
 				const {
 					rows: [newTag],
 				} = await db.query(
 					qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-						[this.workspace, name],
-					)}, (SELECT id FROM tags WHERE id=${lastId})) RETURNING id`,
+						[this.workspace, name, parent],
+					)}) RETURNING id`,
 					z.object({ id: z.string() }),
 				);
 				lastId = newTag.id;
