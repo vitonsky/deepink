@@ -73,6 +73,12 @@ describe('manage tags', () => {
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const nonExistentTag = getUUID();
+		await expect(tags.add('foo', nonExistentTag)).rejects.toThrowError(
+			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
+		);
+		await expect(tags.add('foo/bar', nonExistentTag)).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
+		);
 		await expect(tags.add('foo/bar/foo', nonExistentTag)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
 		);
@@ -82,180 +88,207 @@ describe('manage tags', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
+		const fooId = await tags.add('foo', null);
 
-		const tagsList1 = await tags.getTags();
-		const fooTag = tagsList1.find((t) => t.name === 'foo')!;
-		expect(fooTag).not.toBeUndefined();
+		await expect(tags.add('foo', fooId)).resolves.toBeTypeOf('string');
+		await tags.getTags().then((tags) => {
+			expect(tags).toHaveLength(2);
 
-		// "foo/foo"
-		await expect(tags.add('foo', fooTag.id)).resolves.toBeTypeOf('string');
-		await expect(tags.getTags()).resolves.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					name: 'foo',
-					parent: null,
-					resolvedName: 'foo',
-				}),
-				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: 'foo/foo',
-				}),
-			]),
-		);
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'foo',
+						parent: null,
+						resolvedName: 'foo',
+					}),
+					expect.objectContaining({
+						name: 'foo',
+						parent: expect.any(String),
+						resolvedName: 'foo/foo',
+					}),
+				]),
+			);
+		});
 
-		await expect(tags.add('foo/bar', null)).resolves.toBeTypeOf('string');
-		await expect(tags.getTags()).resolves.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					name: 'foo',
-					parent: null,
-					resolvedName: 'foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar',
-				}),
-			]),
-		);
+		const barId = await tags.add('foo/bar', null);
+		await tags.getTags().then((tags) => {
+			expect(tags).toHaveLength(3);
 
-		await expect(tags.add('bar/baz', fooTag.id)).resolves.toBeTypeOf('string');
-		await expect(tags.getTags()).resolves.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					name: 'foo',
-					parent: null,
-					resolvedName: 'foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar',
-				}),
-				expect.objectContaining({
-					name: 'baz',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar/baz',
-				}),
-			]),
-		);
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'foo',
+						parent: null,
+						resolvedName: 'foo',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar',
+					}),
+				]),
+			);
+		});
 
-		const tagsList2 = await tags.getTags();
-		const barTag = tagsList2.find((t) => t.name === 'bar')!;
-		expect(barTag).not.toBeUndefined();
+		await expect(tags.add('bar/baz', fooId)).resolves.toBeTypeOf('string');
+		await tags.getTags().then((tags) => {
+			expect(tags).toHaveLength(4);
 
-		// foo/bar/bar/bar
-		await expect(tags.add('bar/bar', barTag.id)).resolves.toBeTypeOf('string');
-		await expect(tags.getTags()).resolves.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					name: 'foo',
-					parent: null,
-					resolvedName: 'foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar/bar',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar/bar/bar',
-				}),
-			]),
-		);
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'foo',
+						parent: null,
+						resolvedName: 'foo',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar',
+					}),
+					expect.objectContaining({
+						name: 'baz',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar/baz',
+					}),
+				]),
+			);
+		});
+
+		await expect(tags.add('bar/bar', barId)).resolves.toBeTypeOf('string');
+		await tags.getTags().then((tags) => {
+			expect(tags).toHaveLength(6);
+
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'foo',
+						parent: null,
+						resolvedName: 'foo',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar/bar',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar/bar/bar',
+					}),
+				]),
+			);
+		});
 
 		await expect(tags.add('foo/bar/foo/bar', null)).resolves.toBeTypeOf('string');
-		await expect(tags.getTags()).resolves.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					name: 'foo',
-					parent: null,
-					resolvedName: 'foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar',
-				}),
-				expect.objectContaining({
-					name: 'foo',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar/foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar/foo/bar',
-				}),
-			]),
-		);
+		await tags.getTags().then((tags) => {
+			expect(tags).toHaveLength(8);
+
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'foo',
+						parent: null,
+						resolvedName: 'foo',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar',
+					}),
+					expect.objectContaining({
+						name: 'foo',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar/foo',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar/foo/bar',
+					}),
+				]),
+			);
+		});
+
+		await expect(tags.add('tag1/tag2/tag3', null)).resolves.toBeTypeOf('string');
+		await tags.getTags().then((tags) => {
+			expect(tags).toHaveLength(11);
+
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'tag1',
+						parent: null,
+						resolvedName: 'tag1',
+					}),
+					expect.objectContaining({
+						name: 'tag2',
+						parent: expect.any(String),
+						resolvedName: 'tag1/tag2',
+					}),
+					expect.objectContaining({
+						name: 'tag3',
+						parent: expect.any(String),
+						resolvedName: 'tag1/tag2/tag3',
+					}),
+				]),
+			);
+		});
 	});
 
 	test('duplicate tag cannot be added', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
+		const fooId = await tags.add('foo', null);
+
 		await expect(tags.add('foo', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 
-		const tagsList1 = await tags.getTags();
-		const fooTag = tagsList1.find((t) => t.name === 'foo')!;
-		expect(fooTag).not.toBeUndefined();
-
-		// "foo/bar"
-		await expect(tags.add('bar', fooTag.id)).resolves.toBeTypeOf('string');
-		await expect(tags.add('bar', fooTag.id)).rejects.toThrow(
+		await expect(tags.add('bar', fooId)).resolves.toBeTypeOf('string');
+		await expect(tags.add('bar', fooId)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 		await expect(tags.add('foo/bar', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
 		);
 
-		await expect(tags.add('bar/baz', fooTag.id)).resolves.toBeTypeOf('string');
-		await expect(tags.add('bar/baz', fooTag.id)).rejects.toThrow(
+		await expect(tags.add('bar/baz', fooId)).resolves.toBeTypeOf('string');
+		await expect(tags.add('bar/baz', fooId)).rejects.toThrow(
 			expect.objectContaining({
 				code: TAG_ERROR_CODE.DUPLICATE,
 			}),
 		);
 
-		// create baz from bar parent
-		const tagsList2 = await tags.getTags();
-		const barTag = tagsList2.find((t) => t.name === 'bar')!;
-		expect(barTag).not.toBeUndefined();
-		await expect(tags.add('baz', barTag.id)).rejects.toThrow(
-			expect.objectContaining({ code: TAG_ERROR_CODE.DUPLICATE }),
-		);
+		await tags.getTags().then((tags) => {
+			expect(tags).toHaveLength(3);
 
-		await expect(tags.getTags()).resolves.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					name: 'foo',
-					parent: null,
-					resolvedName: 'foo',
-				}),
-				expect.objectContaining({
-					name: 'bar',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar',
-				}),
-				expect.objectContaining({
-					name: 'baz',
-					parent: expect.any(String),
-					resolvedName: 'foo/bar/baz',
-				}),
-			]),
-		);
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'foo',
+						parent: null,
+						resolvedName: 'foo',
+					}),
+					expect.objectContaining({
+						name: 'bar',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar',
+					}),
+					expect.objectContaining({
+						name: 'baz',
+						parent: expect.any(String),
+						resolvedName: 'foo/bar/baz',
+					}),
+				]),
+			);
+		});
 	});
 
 	test('update tags', async () => {
