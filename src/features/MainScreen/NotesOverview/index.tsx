@@ -132,6 +132,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 									message =
 										'Tag cannot be empty, start or end with "/", or contain "//"';
 							}
+
 							return { ok: false, error: message };
 						}
 
