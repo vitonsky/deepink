@@ -8,6 +8,38 @@ const FAKE_WORKSPACE_ID = getUUID();
 describe('manage tags', () => {
 	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
 
+	test('tags can be added', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add(' foo ', null)).resolves.toBeTypeOf('string');
+
+		await expect(tags.add('1.2', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('1/2/3', null)).resolves.toBeTypeOf('string');
+
+		await expect(tags.add('&&&', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('^/*/)', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('ё', null)).resolves.toBeTypeOf('string');
+		await expect(tags.add('天地', null)).resolves.toBeTypeOf('string');
+
+		await tags.getTags().then((tags) => {
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({ resolvedName: 'foo' }),
+					expect.objectContaining({ resolvedName: ' foo ' }),
+					expect.objectContaining({ resolvedName: '1.2' }),
+					expect.objectContaining({ resolvedName: '1/2/3' }),
+
+					expect.objectContaining({ resolvedName: '&&&' }),
+					expect.objectContaining({ resolvedName: '^/*/)' }),
+					expect.objectContaining({ resolvedName: 'ё' }),
+					expect.objectContaining({ resolvedName: '天地' }),
+				]),
+			);
+		});
+	});
+
 	test('nested tags', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
