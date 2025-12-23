@@ -54,6 +54,7 @@ export const useUpdateNotes = () => {
 				: undefined,
 			meta: {
 				isDeleted: notesView === NOTES_VIEW.BIN,
+				// show archived notes only in archive view; pass undefined for bin view to get only deleted notes, regardless of their archived status
 				...(notesView !== NOTES_VIEW.BIN && {
 					isArchived: notesView === NOTES_VIEW.ARCHIVE,
 				}),

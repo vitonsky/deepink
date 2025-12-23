@@ -178,7 +178,7 @@ export const basicTheme = extendTheme({
 				},
 				ghost: {
 					color: 'typography.primary',
-					'&:hover, &:active, &[data-active]': {
+					'&:hover, &:active': {
 						backgroundColor: 'dim.400',
 					},
 					'&[data-active]': {
