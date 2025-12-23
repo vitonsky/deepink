@@ -61,7 +61,7 @@ export const zenTheme = extendTheme(basicTheme, {
 	semanticTokens: {
 		variants: {
 			ghost: {
-				color: 'typography.primary',
+				color: 'accent.500',
 				hoverFill: 'dim.400',
 
 				active: {
