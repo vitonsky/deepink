@@ -122,13 +122,15 @@ export const basicTheme = extendTheme({
 				hover: '#9B2C2C',
 			},
 		},
-		variants: {
-			ghost: {
-				color: 'typography.primary',
-				hoverFill: 'dim.400',
+		colors: {
+			variants: {
+				ghost: {
+					text: 'typography.primary',
+					hoverFill: 'dim.400',
 
-				active: {
-					color: 'accent.500',
+					active: {
+						text: 'accent.500',
+					},
 				},
 			},
 		},
@@ -183,18 +185,14 @@ export const basicTheme = extendTheme({
 						backgroundColor: 'dim.400',
 					},
 				},
-				ghost(props: StyleFunctionProps) {
-					const { ghost } = props.theme.semanticTokens.variants;
-
-					return {
-						color: ghost.color,
-						'&:hover, &:active': {
-							backgroundColor: ghost.hoverFill,
-						},
-						'&[data-active]': {
-							color: ghost.active.color,
-						},
-					};
+				ghost: {
+					color: 'variants.ghost.text',
+					'&:hover, &:active': {
+						backgroundColor: 'variants.ghost.hoverFill',
+					},
+					'&[data-active]': {
+						color: 'variants.ghost.active.text',
+					},
 				},
 			},
 			defaultProps: {

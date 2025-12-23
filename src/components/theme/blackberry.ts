@@ -51,13 +51,15 @@ export const blackberryTheme = extendTheme(basicTheme, {
 		},
 	},
 	semanticTokens: {
-		variants: {
-			ghost: {
-				color: 'typography.primary',
-				hoverFill: 'dim.400',
+		colors: {
+			variants: {
+				ghost: {
+					text: 'typography.primary',
+					hoverFill: 'dim.400',
 
-				active: {
-					color: 'primary.200',
+					active: {
+						text: 'primary.200',
+					},
 				},
 			},
 		},

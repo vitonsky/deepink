@@ -59,13 +59,15 @@ export const zenTheme = extendTheme(basicTheme, {
 		},
 	},
 	semanticTokens: {
-		variants: {
-			ghost: {
-				color: 'accent.500',
-				hoverFill: 'dim.400',
+		colors: {
+			variants: {
+				ghost: {
+					text: 'accent.500',
+					hoverFill: 'dim.400',
 
-				active: {
-					color: 'primary.700',
+					active: {
+						text: 'primary.700',
+					},
 				},
 			},
 		},
