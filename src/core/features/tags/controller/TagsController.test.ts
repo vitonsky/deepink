@@ -295,27 +295,26 @@ describe('manage tags', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await tags.add('foo', null).then(async (tagId) => {
-			await expect(
-				tags.update({
-					id: tagId,
-					name: 'renamedFoo/',
-					parent: null,
-				}),
-			).rejects.toThrow(
-				expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
-			);
+		const fooId = await tags.add('foo', null);
+		await expect(
+			tags.update({
+				id: fooId,
+				name: 'renamedFoo/',
+				parent: null,
+			}),
+		).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
 
-			await expect(
-				tags.update({
-					id: tagId,
-					name: '',
-					parent: null,
-				}),
-			).rejects.toThrow(
-				expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
-			);
-		});
+		await expect(
+			tags.update({
+				id: fooId,
+				name: '',
+				parent: null,
+			}),
+		).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
 	});
 
 	test('update tags', async () => {
