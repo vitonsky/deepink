@@ -113,9 +113,6 @@ export const basicTheme = extendTheme({
 		message: {
 			error: '#b30606',
 		},
-		interactive: {
-			pressed: '#7a1dd0',
-		},
 	},
 	semanticTokens: {
 		schemes: {
@@ -123,6 +120,16 @@ export const basicTheme = extendTheme({
 				text: '#fff',
 				base: '#C53030',
 				hover: '#9B2C2C',
+			},
+		},
+		variants: {
+			ghost: {
+				color: 'typography.primary',
+				hoverFill: 'dim.400',
+
+				active: {
+					color: 'accent.500',
+				},
 			},
 		},
 	},
@@ -176,18 +183,18 @@ export const basicTheme = extendTheme({
 						backgroundColor: 'dim.400',
 					},
 				},
-				ghost: {
-					color: 'typography.primary',
-					'&:hover, &:active': {
-						backgroundColor: 'dim.400',
-					},
-					'&[data-active]': {
-						color: 'interactive.pressed',
-						backgroundColor: 'transparent',
-					},
-					'&[data-active]:hover': {
-						backgroundColor: 'dim.400',
-					},
+				ghost(props: StyleFunctionProps) {
+					const { ghost } = props.theme.semanticTokens.variants;
+
+					return {
+						color: ghost.color,
+						'&:hover, &:active': {
+							backgroundColor: ghost.hoverFill,
+						},
+						'&[data-active]': {
+							color: ghost.active.color,
+						},
+					};
 				},
 			},
 			defaultProps: {

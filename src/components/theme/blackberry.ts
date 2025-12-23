@@ -49,8 +49,17 @@ export const blackberryTheme = extendTheme(basicTheme, {
 		overlay: {
 			500: '#ffffff75',
 		},
-		interactive: {
-			pressed: '#b332b3',
+	},
+	semanticTokens: {
+		variants: {
+			ghost: {
+				color: 'typography.primary',
+				hoverFill: 'dim.400',
+
+				active: {
+					color: 'primary.200',
+				},
+			},
 		},
 	},
 	components: {
