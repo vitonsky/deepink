@@ -58,18 +58,18 @@ export const zenTheme = extendTheme(basicTheme, {
 			500: '#00000075',
 		},
 	},
-	// semanticTokens: {
-	variants: {
-		ghost: {
-			color: 'typography.primary',
-			hoverFill: 'dim.400',
+	semanticTokens: {
+		variants: {
+			ghost: {
+				color: 'typography.primary',
+				hoverFill: 'dim.400',
 
-			active: {
-				color: 'primary.700',
+				active: {
+					color: 'primary.700',
+				},
 			},
 		},
 	},
-	// },
 	components: {
 		Input: createMultiStyleConfigHelpers([
 			'field',
