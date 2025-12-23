@@ -67,19 +67,28 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					parentTag={parent}
 					editedTag={editedTag}
 					onSave={async (data) => {
-						console.warn('Update tag', data);
+						try {
+							console.warn('Update tag', data);
 
-						if (data.id === undefined)
-							throw new Error('Tag ID is required but not found');
+							if (data.id === undefined)
+								throw new Error('Tag ID is required but not found');
 
-						await tagsRegistry.update({ id: data.id, ...data });
-						setEditedTag(null);
+							await tagsRegistry.update({ id: data.id, ...data });
+							setEditedTag(null);
 
-						telemetry.track(TELEMETRY_EVENT_NAME.TAG_EDITED, {
-							hasParent: data.parent === null ? 'no' : 'yes',
-						});
+							telemetry.track(TELEMETRY_EVENT_NAME.TAG_EDITED, {
+								hasParent: data.parent === null ? 'no' : 'yes',
+							});
 
-						return { ok: true };
+							return { ok: true };
+						} catch (error) {
+							if (!(error instanceof TagControllerError)) throw error;
+
+							return {
+								ok: false,
+								error: 'Name of tag for editing cannot create sub tags or be empty',
+							};
+						}
 					}}
 					onCancel={() => {
 						setEditedTag(null);

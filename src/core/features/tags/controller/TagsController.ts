@@ -228,6 +228,13 @@ export class TagsController {
 	}
 
 	public async update({ name, parent, id }: ITag): Promise<void> {
+		if (name.includes('/') || !name.trim().length) {
+			throw new TagControllerError(
+				"Invalid tag name for update: empty name or contain '/'",
+				TAG_ERROR_CODE.INVALID_FORMAT,
+			);
+		}
+
 		const db = wrapDB(this.db.get());
 
 		await db.query(

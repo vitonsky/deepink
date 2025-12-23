@@ -141,16 +141,6 @@ export const TagEditor: FC<ITagEditorProps> = ({
 								try {
 									const name = tagName.trim();
 
-									if (isEditingMode) {
-										const isHaveSeparatorChar = name.includes('/');
-										if (isHaveSeparatorChar) {
-											setTagNameError(
-												'Name of tag for editing cannot create sub tags',
-											);
-											return;
-										}
-									}
-
 									const result = await onSave({
 										name,
 										parent: parentTagId,
