@@ -92,8 +92,6 @@ describe('manage tags', () => {
 
 		await expect(tags.add('foo', fooId)).resolves.toBeTypeOf('string');
 		await tags.getTags().then((tags) => {
-			expect(tags).toHaveLength(2);
-
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -108,12 +106,12 @@ describe('manage tags', () => {
 					}),
 				]),
 			);
+
+			expect(tags).toHaveLength(2);
 		});
 
 		const barId = await tags.add('foo/bar', null);
 		await tags.getTags().then((tags) => {
-			expect(tags).toHaveLength(3);
-
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -128,12 +126,12 @@ describe('manage tags', () => {
 					}),
 				]),
 			);
+
+			expect(tags).toHaveLength(3);
 		});
 
 		await expect(tags.add('bar/baz', fooId)).resolves.toBeTypeOf('string');
 		await tags.getTags().then((tags) => {
-			expect(tags).toHaveLength(4);
-
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -153,12 +151,12 @@ describe('manage tags', () => {
 					}),
 				]),
 			);
+
+			expect(tags).toHaveLength(4);
 		});
 
 		await expect(tags.add('bar/bar', barId)).resolves.toBeTypeOf('string');
 		await tags.getTags().then((tags) => {
-			expect(tags).toHaveLength(6);
-
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -183,12 +181,12 @@ describe('manage tags', () => {
 					}),
 				]),
 			);
+
+			expect(tags).toHaveLength(6);
 		});
 
 		await expect(tags.add('foo/bar/foo/bar', null)).resolves.toBeTypeOf('string');
 		await tags.getTags().then((tags) => {
-			expect(tags).toHaveLength(8);
-
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -213,12 +211,12 @@ describe('manage tags', () => {
 					}),
 				]),
 			);
+
+			expect(tags).toHaveLength(8);
 		});
 
 		await expect(tags.add('tag1/tag2/tag3', null)).resolves.toBeTypeOf('string');
 		await tags.getTags().then((tags) => {
-			expect(tags).toHaveLength(11);
-
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -238,6 +236,8 @@ describe('manage tags', () => {
 					}),
 				]),
 			);
+
+			expect(tags).toHaveLength(11);
 		});
 	});
 
@@ -267,8 +267,6 @@ describe('manage tags', () => {
 		);
 
 		await tags.getTags().then((tags) => {
-			expect(tags).toHaveLength(3);
-
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -288,6 +286,8 @@ describe('manage tags', () => {
 					}),
 				]),
 			);
+
+			expect(tags).toHaveLength(3);
 		});
 	});
 
