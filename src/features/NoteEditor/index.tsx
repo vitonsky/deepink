@@ -228,7 +228,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 				<HStack>
 					<Button
 						variant="ghost"
-						title={note.isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+						title={
+							note.isBookmarked
+								? 'Remove from bookmarks'
+								: 'Add to bookmarks'
+						}
 						size="xs"
 						onClick={async () => {
 							const newBookmarkedState = !note.isBookmarked;
@@ -247,7 +251,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					</Button>
 					<Button
 						variant="ghost"
-						title={note.isArchived ? 'Unarchive' : 'Archive'}
+						title={
+							note.isArchived ? 'Remove from archive' : 'Move to archive'
+						}
 						size="xs"
 						onClick={async () => {
 							const newArchivedState = !note.isArchived;
