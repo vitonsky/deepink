@@ -88,6 +88,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 									error: 'Name of tag for editing cannot create sub tags or be empty',
 								};
 							}
+
 							throw error;
 						}
 					}}
@@ -133,6 +134,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 							}
 							return { ok: false, error: message };
 						}
+
 						throw error;
 					}
 				}}
