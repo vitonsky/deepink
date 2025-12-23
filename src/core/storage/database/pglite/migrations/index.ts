@@ -37,7 +37,7 @@ export const getMigrationsList = async (): Promise<PGMigration[]> =>
 			import('./sql/4_add_unique_constraint_on_tags_name_parent.sql'),
 		),
 		convertSQLToMigrationObject(
-			'4_add_archived_column_to_notes',
-			import('./sql/4_add_archived_column_to_notes.sql'),
+			'5_add_archived_and_bookmarks_column_to_notes',
+			import('./sql/5_add_archived_and_bookmarks_column_to_notes.sql'),
 		),
 	]);
