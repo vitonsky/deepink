@@ -18,6 +18,8 @@ const selectWorkspaceObject = (
 export enum NOTES_VIEW {
 	All_NOTES = 'All notes',
 	BIN = 'Bin',
+	BOOKMARK = 'Bookmark',
+	ARCHIVE = 'Archive',
 }
 
 export const createWorkspaceObject = (workspace: {
@@ -287,11 +289,6 @@ export const profilesSlice = createSlice({
 			if (!isSelectedTagExists) {
 				workspace.tags.selected = null;
 			}
-
-			// Only all notes list may be filtered by tags
-			if (workspace.tags.selected) {
-				workspace.view = NOTES_VIEW.All_NOTES;
-			}
 		},
 
 		setTags: (
@@ -335,9 +332,6 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.view = view;
-			if (view !== NOTES_VIEW.All_NOTES) {
-				workspace.tags.selected = null;
-			}
 		},
 	},
 });

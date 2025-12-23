@@ -41,10 +41,7 @@ export const useUpdateNotes = () => {
 			console.debug('Notes indexing is completed', performance.now() - start);
 		}
 
-		const tags =
-			activeTag !== null && notesView === NOTES_VIEW.All_NOTES
-				? [activeTag.id]
-				: [];
+		const tags = activeTag !== null ? [activeTag.id] : [];
 
 		const notes = await notesRegistry.get({
 			limit: 100,
@@ -55,7 +52,15 @@ export const useUpdateNotes = () => {
 						text: searchText,
 				  }
 				: undefined,
-			meta: { isDeleted: notesView === NOTES_VIEW.BIN },
+			meta: {
+				isDeleted: notesView === NOTES_VIEW.BIN,
+				// show archived notes only in archive view
+				// but do not filter by the archived flag in bin view
+				...(notesView !== NOTES_VIEW.BIN && {
+					isArchived: notesView === NOTES_VIEW.ARCHIVE,
+				}),
+				...(notesView === NOTES_VIEW.BOOKMARK && { isBookmarked: true }),
+			},
 		});
 
 		if (isRequestCanceled()) return;

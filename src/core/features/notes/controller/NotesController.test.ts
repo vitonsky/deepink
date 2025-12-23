@@ -233,6 +233,44 @@ describe('data fetching', () => {
 		await db.close();
 	});
 
+	test('filter notes by archived status', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 30 })
+			.then((notes) => notes.map((note) => note.id));
+
+		await registry.updateMeta(notesId, { isArchived: true });
+		await expect(registry.get({ meta: { isArchived: true } })).resolves.toHaveLength(
+			30,
+		);
+		await expect(registry.get({ meta: { isArchived: false } })).resolves.toHaveLength(
+			notesSample.length - 30,
+		);
+		await db.close();
+	});
+
+	test('filters notes by bookmarks', async () => {
+		const db = await openDatabase(dbFile);
+
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 40 })
+			.then((notes) => notes.map((note) => note.id));
+
+		await registry.updateMeta(notesId, { isBookmarked: true });
+		await expect(
+			registry.get({ meta: { isBookmarked: true } }),
+		).resolves.toHaveLength(40);
+		await expect(
+			registry.get({ meta: { isBookmarked: false } }),
+		).resolves.toHaveLength(notesSample.length - 40);
+
+		await db.close();
+	});
+
 	test('method getLength consider filters', async () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
@@ -383,6 +421,55 @@ describe('Notes meta control', () => {
 		await expect(registry.getById(noteId)).resolves.toMatchObject({
 			id: noteId,
 			isDeleted: false,
+		});
+	});
+
+	test('toggle note archived status', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		// Create notes
+		const noteId = await registry.add({ title: 'Title', text: 'Text' });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isArchived: false,
+		});
+
+		// toggle archive status
+		await registry.updateMeta([noteId], { isArchived: true });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isArchived: true,
+		});
+
+		// toggle archive status back
+		await registry.updateMeta([noteId], { isArchived: false });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isArchived: false,
+		});
+	});
+
+	test('toggle note bookmarked status', async () => {
+		const db = await dbPromise;
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const noteId = await registry.add({ title: 'Title', text: 'Text' });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isBookmarked: false,
+		});
+
+		await registry.updateMeta([noteId], { isBookmarked: true });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isBookmarked: true,
+		});
+
+		await registry.updateMeta([noteId], { isBookmarked: false });
+		await expect(registry.getById(noteId)).resolves.toMatchObject({
+			id: noteId,
+			isBookmarked: false,
 		});
 	});
 });

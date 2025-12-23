@@ -122,6 +122,18 @@ export const basicTheme = extendTheme({
 				hover: '#9B2C2C',
 			},
 		},
+		colors: {
+			variants: {
+				ghost: {
+					text: 'typography.primary',
+					hoverFill: 'dim.400',
+
+					active: {
+						text: 'accent.500',
+					},
+				},
+			},
+		},
 	},
 	components: {
 		Link: defineStyleConfig({
@@ -174,9 +186,12 @@ export const basicTheme = extendTheme({
 					},
 				},
 				ghost: {
-					color: 'typography.primary',
-					'&:hover, &:active, &[data-active]': {
-						backgroundColor: 'dim.400',
+					color: 'variants.ghost.text',
+					'&:hover, &:active': {
+						backgroundColor: 'variants.ghost.hoverFill',
+					},
+					'&[data-active]': {
+						color: 'variants.ghost.active.text',
 					},
 				},
 			},

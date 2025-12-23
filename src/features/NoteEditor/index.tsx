@@ -7,7 +7,14 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
+import {
+	FaArrowLeft,
+	FaBookmark,
+	FaBoxArchive,
+	FaFlag,
+	FaHashtag,
+	FaXmark,
+} from 'react-icons/fa6';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
@@ -193,8 +200,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
-	// In the future, read-only mode will cover more cases than deleted notes
-	const isReadOnly = note.isDeleted;
+	const isReadOnly = note.isDeleted || Boolean(versionPreview);
 
 	return (
 		<VStack w="100%" align="start">
@@ -210,7 +216,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 								? undefined
 								: (evt) => setTitle(evt.target.value)
 						}
-						isDisabled={versionPreview !== null || isReadOnly}
+						isDisabled={isReadOnly}
 					/>
 
 					{/* TODO: add options that may be toggled */}
@@ -220,8 +226,49 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 			<HStack alignItems="center" w="100%" flexWrap="wrap">
 				<HStack>
-					<Button variant="ghost" size="xs">
+					<Button
+						variant="ghost"
+						title={
+							note.isBookmarked
+								? 'Remove from bookmarks'
+								: 'Add to bookmarks'
+						}
+						size="xs"
+						onClick={async () => {
+							const newBookmarkedState = !note.isBookmarked;
+							await notesRegistry.updateMeta([note.id], {
+								isBookmarked: newBookmarkedState,
+							});
+							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
+								action: newBookmarkedState ? 'Added' : 'Removed',
+							});
+						}}
+						isActive={note.isBookmarked}
+					>
 						<FaBookmark />
+					</Button>
+					<Button
+						variant="ghost"
+						title={
+							note.isArchived ? 'Remove from archive' : 'Move to archive'
+						}
+						size="xs"
+						onClick={async () => {
+							const newArchivedState = !note.isArchived;
+							await notesRegistry.updateMeta([note.id], {
+								isArchived: newArchivedState,
+							});
+							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+								action: newArchivedState ? 'Added' : 'Removed',
+							});
+						}}
+						isActive={note.isArchived}
+					>
+						<FaBoxArchive />
 					</Button>
 					<Button variant="ghost" size="xs">
 						<FaFlag />
@@ -392,10 +439,10 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			<NoteEditor
 				text={versionPreview ? versionPreview.text : text}
 				setText={(noteText) => {
-					if (isReadOnly || versionPreview) return;
+					if (isReadOnly) return;
 					setText(noteText);
 				}}
-				isReadOnly={isReadOnly || Boolean(versionPreview)}
+				isReadOnly={isReadOnly}
 			/>
 
 			{!sidePanel ? null : (

@@ -50,6 +50,20 @@ export const blackberryTheme = extendTheme(basicTheme, {
 			500: '#ffffff75',
 		},
 	},
+	semanticTokens: {
+		colors: {
+			variants: {
+				ghost: {
+					text: 'typography.primary',
+					hoverFill: 'dim.400',
+
+					active: {
+						text: 'primary.200',
+					},
+				},
+			},
+		},
+	},
 	components: {
 		Input: createMultiStyleConfigHelpers([
 			'field',

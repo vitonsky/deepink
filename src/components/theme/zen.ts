@@ -58,6 +58,20 @@ export const zenTheme = extendTheme(basicTheme, {
 			500: '#00000075',
 		},
 	},
+	semanticTokens: {
+		colors: {
+			variants: {
+				ghost: {
+					text: 'accent.500',
+					hoverFill: 'dim.400',
+
+					active: {
+						text: 'primary.700',
+					},
+				},
+			},
+		},
+	},
 	components: {
 		Input: createMultiStyleConfigHelpers([
 			'field',
