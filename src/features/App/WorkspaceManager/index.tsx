@@ -1,9 +1,10 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
+import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
@@ -80,18 +81,27 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 
 	const profileScreenMode = useAppSelector(selectProfileScreenMode);
 
+	const [isLoading, setIsLoading] = useState(false);
+
 	const content = useMemo(() => {
+		if (isLoading === true) return <SplashScreen />;
+
 		const hasNoProfiles = profilesManager.profiles.length === 0;
 		if (profileScreenMode === PROFILE_SCREEN_MODE.CREATE || hasNoProfiles) {
 			return (
 				<ProfileCreator
-					onCreateProfile={(profile) =>
-						profilesManager.createProfile(profile).then((newProfile) => {
-							onOpenProfile(newProfile, profile.password ?? undefined).then(
-								console.warn,
-							);
-						})
-					}
+					onCreateProfile={async (profile) => {
+						setIsLoading(true);
+
+						const newProfile = await profilesManager.createProfile(profile);
+						const openedProfile = await onOpenProfile(
+							newProfile,
+							profile.password ?? undefined,
+						);
+						console.warn(openedProfile);
+
+						setIsLoading(false);
+					}}
 					onCancel={() =>
 						dispatch(
 							workspacesApi.setProfileScreenMode(
@@ -197,6 +207,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		profilesManager,
 		telemetry,
 		profileScreenMode,
+		isLoading,
 	]);
 
 	return (
