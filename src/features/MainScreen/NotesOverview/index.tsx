@@ -82,12 +82,13 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 							return { ok: true };
 						} catch (error) {
-							if (!(error instanceof TagControllerError)) throw error;
-
-							return {
-								ok: false,
-								error: 'Name of tag for editing cannot create sub tags or be empty',
-							};
+							if (error instanceof TagControllerError) {
+								return {
+									ok: false,
+									error: 'Name of tag for editing cannot create sub tags or be empty',
+								};
+							}
+							throw error;
 						}
 					}}
 					onCancel={() => {
@@ -116,22 +117,23 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 						return { ok: true };
 					} catch (error) {
-						if (!(error instanceof TagControllerError)) throw error;
-
-						let message: string;
-						switch (error.code) {
-							case TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST:
-								message =
-									'Parent tag not found, please select another tag';
-								break;
-							case TAG_ERROR_CODE.DUPLICATE:
-								message = 'Tag already exists';
-								break;
-							default:
-								message =
-									'Tag cannot be empty, start or end with "/", or contain "//"';
+						if (error instanceof TagControllerError) {
+							let message: string;
+							switch (error.code) {
+								case TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST:
+									message =
+										'Parent tag not found, please select another tag';
+									break;
+								case TAG_ERROR_CODE.DUPLICATE:
+									message = 'Tag already exists';
+									break;
+								default:
+									message =
+										'Tag cannot be empty, start or end with "/", or contain "//"';
+							}
+							return { ok: false, error: message };
 						}
-						return { ok: false, error: message };
+						throw error;
 					}
 				}}
 				onCancel={() => {
