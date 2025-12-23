@@ -291,32 +291,6 @@ describe('manage tags', () => {
 		});
 	});
 
-	test('cannot update tag with an invalid name', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
-
-		const fooId = await tags.add('foo', null);
-		await expect(
-			tags.update({
-				id: fooId,
-				name: 'renamedFoo/',
-				parent: null,
-			}),
-		).rejects.toThrow(
-			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
-		);
-
-		await expect(
-			tags.update({
-				id: fooId,
-				name: '',
-				parent: null,
-			}),
-		).rejects.toThrow(
-			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
-		);
-	});
-
 	test('update tags', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
@@ -359,6 +333,52 @@ describe('manage tags', () => {
 				]),
 			);
 		});
+	});
+
+	test('cannot update tag with an invalid name', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		const fooId = await tags.add('foo', null);
+		await expect(
+			tags.update({
+				id: fooId,
+				name: 'renamedFoo/',
+				parent: null,
+			}),
+		).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+
+		await expect(
+			tags.update({
+				id: fooId,
+				name: 'foo/bar',
+				parent: null,
+			}),
+		).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+
+		await expect(
+			tags.update({
+				id: fooId,
+				name: '',
+				parent: null,
+			}),
+		).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
+
+		await expect(
+			tags.update({
+				id: fooId,
+				name: '  ',
+				parent: null,
+			}),
+		).rejects.toThrow(
+			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
+		);
 	});
 
 	test('delete tags', async () => {
