@@ -34,7 +34,9 @@ export type ITagEditorProps = {
 	 * Saves the tag, returns a Promise with { ok: true } on success or { ok: false; error: string } for known errors
 	 * or throws for unexpected errors
 	 */
-	onSave: (tagData: TagEditorData) => Promise<{ ok: boolean; error?: string }>;
+	onSave: (
+		tagData: TagEditorData,
+	) => Promise<{ ok: true } | { ok: false; error: string }>;
 	onCancel: () => void;
 	editedTag?: TagEditorData;
 };
@@ -157,10 +159,12 @@ export const TagEditor: FC<ITagEditorProps> = ({
 											: {}),
 									});
 
-									if (!result.ok && result.error) {
+									if (!result.ok) {
 										setTagNameError(result.error);
 									}
 								} catch (error) {
+									console.error(error);
+
 									setTagNameError(
 										'Unable to save the tag. Please try again.',
 									);

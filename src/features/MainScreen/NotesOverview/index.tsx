@@ -70,7 +70,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						console.warn('Update tag', data);
 
 						if (data.id === undefined)
-							return { ok: false, error: 'Tag ID is required' };
+							throw new Error('Tag ID is required but not found');
 
 						await tagsRegistry.update({ id: data.id, ...data });
 						setEditedTag(null);
@@ -120,7 +120,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								break;
 							default:
 								message =
-									'Tag cannot be empty, start or end with "/", or contain "//".';
+									'Tag cannot be empty, start or end with "/", or contain "//"';
 						}
 						return { ok: false, error: message };
 					}
