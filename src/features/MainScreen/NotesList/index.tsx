@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -10,12 +10,12 @@ import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
-	BASE_NOTE_OFFSET,
 	selectActiveNoteId,
 	selectNotes,
 	selectSearch,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
@@ -54,19 +54,40 @@ export const NotesList: FC<NotesListProps> = () => {
 	// Loads more notes when reaching the bottom of the notes list
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
+	const isLoadMoreNotesRef = useRef(0);
 	useEffect(() => {
 		if (!notes.length) return;
 
+		const lazyLoadingThreshold = Math.ceil(300 * 0.2);
 		const lastVisibleIndex = items[items.length - 1].index;
-		if (lastVisibleIndex >= notes.length - 10) {
+
+		if (
+			lastVisibleIndex >= notes.length - lazyLoadingThreshold &&
+			isLoadMoreNotesRef.current !== notes.length
+		) {
+			isLoadMoreNotesRef.current = notes.length;
 			dispatch(
-				workspacesApi.setNotesOffset({
+				workspacesApi.updateNotesOffset({
 					...workspaceData,
-					offset: notes.length + BASE_NOTE_OFFSET,
+					offset: 100,
 				}),
 			);
 		}
 	}, [items, notes, dispatch, workspaceData]);
+
+	// On view change check if the active note is present in the list
+	// Scroll to it if found in current notes list, otherwise reset scroll to the top
+	const notesView = useWorkspaceSelector(selectNotesView);
+	const isNoteVisibleInView = useMemo(() => {
+		return notes.findIndex((n) => n.id === activeNoteId);
+	}, [notes]);
+	useEffect(() => {
+		if (isNoteVisibleInView !== -1) {
+			virtualizer.scrollToIndex(isNoteVisibleInView);
+			return;
+		}
+		virtualizer.scrollToIndex(0);
+	}, [notesView, isNoteVisibleInView]);
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
