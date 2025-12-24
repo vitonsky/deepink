@@ -47,17 +47,17 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [isPending, setIsPending] = useState(false);
 
-	const defaultProfileName = [
+	const defaultProfileNames = [
 		'Creative drafts',
 		'Second brain',
 		'Digital garden',
 		'Creative space',
-		'Digital thoughts',
-		'Idea cloud',
+		'Mind space',
+		'Idea lab',
 	];
 	const [profileName, setProfileName] = useState(
 		isFirstProfile
-			? defaultProfileName[Math.floor(Math.random() * defaultProfileName.length)]
+			? defaultProfileNames[Math.floor(Math.random() * defaultProfileNames.length)]
 			: '',
 	);
 	const [profileNameError, setProfileNameError] = useState<null | string>(null);
@@ -211,7 +211,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						ref={profileNameInputRef}
 						variant="filled"
 						size="lg"
-						placeholder="e.g. Business"
+						placeholder="e.g. Notes"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
 						focusBorderColor={profileNameError ? 'red.500' : undefined}
