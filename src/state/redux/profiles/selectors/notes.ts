@@ -1,4 +1,4 @@
-import { BASE_NOTE_OFFSET } from '../profiles';
+import { NOTES_PAGE_SIZE } from '../profiles';
 import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
 
 export const selectWorkspaceName = createWorkspaceSelector(
@@ -83,7 +83,7 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 export const selectNotesOffset = createWorkspaceSelector(
 	[selectWorkspaceRoot],
 	(workspace) => {
-		if (!workspace) return BASE_NOTE_OFFSET;
+		if (!workspace) return NOTES_PAGE_SIZE;
 		return workspace.notesOffset;
 	},
 );

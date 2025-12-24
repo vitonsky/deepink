@@ -22,7 +22,7 @@ export enum NOTES_VIEW {
 	ARCHIVE = 'Archive',
 }
 
-export const BASE_NOTE_OFFSET = 100;
+export const NOTES_PAGE_SIZE = 300;
 
 export const createWorkspaceObject = (workspace: {
 	id: string;
@@ -37,7 +37,7 @@ export const createWorkspaceObject = (workspace: {
 	notes: [],
 
 	search: '',
-	notesOffset: BASE_NOTE_OFFSET,
+	notesOffset: NOTES_PAGE_SIZE,
 
 	view: NOTES_VIEW.All_NOTES,
 
@@ -295,7 +295,7 @@ export const profilesSlice = createSlice({
 			}
 
 			// reset notes offset
-			workspace.notesOffset = BASE_NOTE_OFFSET;
+			workspace.notesOffset = NOTES_PAGE_SIZE;
 		},
 
 		setTags: (
@@ -330,7 +330,7 @@ export const profilesSlice = createSlice({
 			workspace.search = search;
 
 			// reset notes offset
-			workspace.notesOffset = BASE_NOTE_OFFSET;
+			workspace.notesOffset = NOTES_PAGE_SIZE;
 		},
 		setView: (
 			state,
@@ -344,10 +344,10 @@ export const profilesSlice = createSlice({
 			workspace.view = view;
 
 			// reset notes offset
-			workspace.notesOffset = BASE_NOTE_OFFSET;
+			workspace.notesOffset = NOTES_PAGE_SIZE;
 		},
 
-		setNotesOffset: (
+		updateNotesOffset: (
 			state,
 			{
 				payload: { profileId, workspaceId, offset },
@@ -355,7 +355,7 @@ export const profilesSlice = createSlice({
 		) => {
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
-			workspace.notesOffset = offset;
+			workspace.notesOffset += offset;
 		},
 	},
 });
