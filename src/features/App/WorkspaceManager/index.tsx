@@ -84,6 +84,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	const [isLoading, setIsLoading] = useState(false);
 
 	const content = useMemo(() => {
+		// show a loading screen while the profile is being created
 		if (isLoading === true) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
@@ -94,11 +95,11 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 						setIsLoading(true);
 
 						const newProfile = await profilesManager.createProfile(profile);
-						const openedProfile = await onOpenProfile(
+						const response = await onOpenProfile(
 							newProfile,
 							profile.password ?? undefined,
 						);
-						console.warn(openedProfile);
+						console.warn(response);
 
 						setIsLoading(false);
 					}}
@@ -114,7 +115,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			);
 		}
 
-		if (profileScreenMode !== PROFILE_SCREEN_MODE.CHANGE && currentProfileObject) {
+		if (profileScreenMode === PROFILE_SCREEN_MODE.LOCK && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
@@ -206,6 +207,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onOpenProfile,
 		profilesManager,
 		telemetry,
+		dispatch,
 		profileScreenMode,
 		isLoading,
 	]);
