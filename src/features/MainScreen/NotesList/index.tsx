@@ -51,6 +51,8 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const items = virtualizer.getVirtualItems();
 
+	const notesView = useWorkspaceSelector(selectNotesView);
+
 	// Loads more notes when reaching the bottom of the notes list
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -77,7 +79,6 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	// On view change check if the active note is present in the list
 	// Scroll to it if found in current notes list, otherwise reset scroll to the top
-	const notesView = useWorkspaceSelector(selectNotesView);
 	const isNoteVisibleInView = useMemo(() => {
 		return notes.findIndex((n) => n.id === activeNoteId);
 	}, [notes]);
@@ -88,6 +89,35 @@ export const NotesList: FC<NotesListProps> = () => {
 		}
 		virtualizer.scrollToIndex(0);
 	}, [notesView, isNoteVisibleInView]);
+
+	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
+	const prevViewRef = useRef<string | null>(null);
+	const viewOffsetsRef = useRef<Record<string, number>>({});
+
+	useEffect(() => {
+		const prev = prevViewRef.current;
+		if (prev && prev !== notesView) {
+			viewOffsetsRef.current[prev] = notes.length;
+		}
+
+		const saved = viewOffsetsRef.current[notesView];
+		if (saved > notes.length) {
+			const delta = saved - notes.length;
+			dispatch(
+				workspacesApi.updateNotesOffset({
+					...workspaceData,
+					offset: delta,
+				}),
+			);
+		}
+
+		prevViewRef.current = notesView;
+
+		// reset flag
+		isLoadMoreNotesRef.current = 0;
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [notesView]);
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
