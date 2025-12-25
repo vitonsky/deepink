@@ -92,21 +92,20 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const prevViewRef = useRef<string | null>(null);
-	const viewOffsetsRef = useRef<Record<string, number>>({});
+	const prevOffsetsRef = useRef<Record<string, number>>({});
 
 	useEffect(() => {
 		const prev = prevViewRef.current;
 		if (prev && prev !== notesView) {
-			viewOffsetsRef.current[prev] = notes.length;
+			prevOffsetsRef.current[prev] = notes.length;
 		}
 
-		const saved = viewOffsetsRef.current[notesView];
+		const saved = prevOffsetsRef.current[notesView];
 		if (saved > notes.length) {
-			const delta = saved - notes.length;
 			dispatch(
 				workspacesApi.updateNotesOffset({
 					...workspaceData,
-					offset: delta,
+					offset: saved - notes.length,
 				}),
 			);
 		}
