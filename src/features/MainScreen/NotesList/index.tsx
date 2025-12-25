@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useRef } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { Box, Spinner, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -78,47 +78,6 @@ export const NotesList: FC<NotesListProps> = () => {
 		}
 	}, [items, notes, dispatch, workspaceData]);
 
-	// On view change check if the active note is present in the list
-	// Scroll to it if found in current notes list, otherwise reset scroll to the top
-	const isNoteVisibleInView = useMemo(() => {
-		return notes.findIndex((n) => n.id === activeNoteId);
-	}, [notes]);
-	useEffect(() => {
-		if (isNoteVisibleInView !== -1) {
-			virtualizer.scrollToIndex(isNoteVisibleInView);
-			return;
-		}
-		virtualizer.scrollToIndex(0);
-	}, [notesView, isNoteVisibleInView]);
-
-	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
-	const prevViewRef = useRef<string | null>(null);
-	const prevOffsetsRef = useRef<Record<string, number>>({});
-
-	useEffect(() => {
-		const prev = prevViewRef.current;
-		if (prev && prev !== notesView) {
-			prevOffsetsRef.current[prev] = notes.length;
-		}
-
-		const saved = prevOffsetsRef.current[notesView];
-		if (saved > notes.length) {
-			dispatch(
-				workspacesApi.updateNotesOffset({
-					...workspaceData,
-					offset: saved - notes.length,
-				}),
-			);
-		}
-
-		prevViewRef.current = notesView;
-
-		// reset flag
-		isLoadMoreNotesRef.current = 0;
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [notesView]);
-
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
 	useEffect(() => {
@@ -132,10 +91,37 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
+	}, [activeNoteId, notes, notesView]);
 
-		// We only need scroll to active note once by its change
+	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
+	const previousViewRef = useRef<string | null>(null);
+	const previousOffsetsRef = useRef<Record<string, number>>({});
+	useEffect(() => {
+		// Reset scroll position on view change
+		virtualizer.scrollToIndex(0);
+
+		// Save the offset from previous view
+		if (previousViewRef.current && previousViewRef.current !== notesView) {
+			previousOffsetsRef.current[previousViewRef.current] = notes.length;
+		}
+
+		// Restore offset for current view if needed
+		if (previousOffsetsRef.current[notesView] > notes.length) {
+			dispatch(
+				workspacesApi.updateNotesOffset({
+					...workspaceData,
+					offset: previousOffsetsRef.current[notesView] - notes.length,
+				}),
+			);
+		}
+
+		// Update flags
+		previousViewRef.current = notesView;
+		isLoadMoreNotesRef.current = 0;
+
+		// Save previously offset only when view changed
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [activeNoteId]);
+	}, [notesView]);
 
 	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
 
