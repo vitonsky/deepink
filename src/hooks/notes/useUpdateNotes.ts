@@ -33,6 +33,8 @@ export const useUpdateNotes = () => {
 		const contextId = ++requestContextRef.current;
 		const isRequestCanceled = () => contextId !== requestContextRef.current;
 
+		dispatch(workspacesApi.setIsNotesLoading({ ...workspaceData, isLoading: true }));
+
 		const searchText = search.trim();
 		if (searchText) {
 			console.debug('Notes text indexing...');
@@ -65,9 +67,18 @@ export const useUpdateNotes = () => {
 			},
 		});
 
-		if (isRequestCanceled()) return;
+		if (isRequestCanceled()) {
+			dispatch(
+				workspacesApi.setIsNotesLoading({
+					...workspaceData,
+					isLoading: false,
+				}),
+			);
+			return;
+		}
 
 		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
+		dispatch(workspacesApi.setIsNotesLoading({ ...workspaceData, isLoading: false }));
 	}, [
 		search,
 		activeTag,
