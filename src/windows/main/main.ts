@@ -4,6 +4,7 @@ import path from 'path';
 import url from 'url';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { AppContext } from '@electron/main/main';
+import { enableConfirmDialog } from '@electron/requests/confirm/main';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
 import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
@@ -32,6 +33,7 @@ export const openMainWindow = async ({
 	enableStorage();
 	enableContextMenu();
 	enableInteractions();
+	enableConfirmDialog();
 
 	// State
 	const $windowState = createStore<WindowState>({
