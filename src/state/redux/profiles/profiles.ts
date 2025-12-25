@@ -45,6 +45,8 @@ export const createWorkspaceObject = (workspace: {
 		selected: null,
 		list: [],
 	},
+
+	isNotesLoading: null,
 });
 
 export type ProfileScoped<T extends {} = {}> = T & {
@@ -81,6 +83,8 @@ export type WorkspaceData = {
 		selected: string | null;
 		list: IResolvedTag[];
 	};
+
+	isNotesLoading: boolean | null;
 };
 
 export type ProfileData = {
@@ -356,6 +360,17 @@ export const profilesSlice = createSlice({
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 			workspace.notesOffset += offset;
+		},
+
+		setIsNotesLoading: (
+			state,
+			{
+				payload: { profileId, workspaceId, isLoading },
+			}: PayloadAction<WorkspaceScoped<{ isLoading: boolean }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+			workspace.isNotesLoading = isLoading;
 		},
 	},
 });

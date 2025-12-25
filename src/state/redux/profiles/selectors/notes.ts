@@ -87,3 +87,11 @@ export const selectNotesOffset = createWorkspaceSelector(
 		return workspace.notesOffset;
 	},
 );
+
+export const selectIsNotesLoading = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return false;
+		return workspace.isNotesLoading;
+	},
+);

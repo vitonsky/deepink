@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useMemo, useRef } from 'react';
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, Spinner, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -11,6 +11,7 @@ import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
+	selectIsNotesLoading,
 	selectNotes,
 	selectSearch,
 	workspacesApi,
@@ -136,6 +137,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId]);
 
+	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
+
 	// TODO: implement dragging and moving items
 	return (
 		<VStack
@@ -153,73 +156,83 @@ export const NotesList: FC<NotesListProps> = () => {
 					Nothing added yet
 				</Text>
 			) : (
-				<Box
-					sx={{
-						display: 'block',
-						position: 'relative',
-						width: '100%',
-						height: virtualizer.getTotalSize(),
-						flexShrink: 0,
-					}}
-				>
-					<VStack
+				<>
+					<Box
 						sx={{
-							position: 'absolute',
+							display: 'block',
+							position: 'relative',
 							width: '100%',
-							top: 0,
-							left: 0,
-							transform: `translateY(${items[0]?.start ?? 0}px)`,
-							gap: '4px',
+							height: virtualizer.getTotalSize(),
+							flexShrink: 0,
 						}}
 					>
-						{virtualizer.getVirtualItems().map((virtualRow) => {
-							const note = notes[virtualRow.index];
+						<VStack
+							sx={{
+								position: 'absolute',
+								width: '100%',
+								top: 0,
+								left: 0,
+								transform: `translateY(${items[0]?.start ?? 0}px)`,
+								gap: '4px',
+							}}
+						>
+							{virtualizer.getVirtualItems().map((virtualRow) => {
+								const note = notes[virtualRow.index];
 
-							const date = note.createdTimestamp ?? note.updatedTimestamp;
-							const isActive = note.id === activeNoteId;
+								const date =
+									note.createdTimestamp ?? note.updatedTimestamp;
+								const isActive = note.id === activeNoteId;
 
-							// TODO: get preview text from DB as prepared value
-							// TODO: show attachments
-							return (
-								<NotePreview
-									key={note.id}
-									ref={(node) => {
-										if (isActive) {
-											activeNoteRef.current = node;
+								// TODO: get preview text from DB as prepared value
+								// TODO: show attachments
+								return (
+									<NotePreview
+										key={note.id}
+										ref={(node) => {
+											if (isActive) {
+												activeNoteRef.current = node;
+											}
+
+											virtualizer.measureElement(node);
+										}}
+										data-index={virtualRow.index}
+										isSelected={isActive}
+										textToHighlight={search}
+										title={getNoteTitle(note.content)}
+										text={note.content.text}
+										meta={
+											date && (
+												<Text>
+													{new Date(date).toDateString()}
+												</Text>
+											)
 										}
-
-										virtualizer.measureElement(node);
-									}}
-									data-index={virtualRow.index}
-									isSelected={isActive}
-									textToHighlight={search}
-									title={getNoteTitle(note.content)}
-									text={note.content.text}
-									meta={
-										date && (
-											<Text>{new Date(date).toDateString()}</Text>
-										)
-									}
-									onContextMenu={(evt) => {
-										openNoteContextMenu(note, {
-											x: evt.pageX,
-											y: evt.pageY,
-										});
-									}}
-									onClick={() => {
-										noteActions.click(note.id);
-										telemetry.track(
-											TELEMETRY_EVENT_NAME.NOTE_OPENED,
-											{
-												context: 'notes list',
-											},
-										);
-									}}
-								/>
-							);
-						})}
-					</VStack>
-				</Box>
+										onContextMenu={(evt) => {
+											openNoteContextMenu(note, {
+												x: evt.pageX,
+												y: evt.pageY,
+											});
+										}}
+										onClick={() => {
+											noteActions.click(note.id);
+											telemetry.track(
+												TELEMETRY_EVENT_NAME.NOTE_OPENED,
+												{
+													context: 'notes list',
+												},
+											);
+										}}
+									/>
+								);
+							})}
+						</VStack>
+					</Box>
+					{isNotesLoading && (
+						<Box w="90%" display={'flex'} justifyContent="end">
+							<Spinner />
+						</Box>
+					)}
+				</>
 			)}
 		</VStack>
 	);
