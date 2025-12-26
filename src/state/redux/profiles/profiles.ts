@@ -77,14 +77,14 @@ export type WorkspaceData = {
 	search: string;
 	notesOffset: number;
 
+	isNotesLoading: boolean | null;
+
 	view: NOTES_VIEW;
 
 	tags: {
 		selected: string | null;
 		list: IResolvedTag[];
 	};
-
-	isNotesLoading: boolean | null;
 };
 
 export type ProfileData = {
