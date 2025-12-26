@@ -115,8 +115,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		const state = viewStateRef.current;
 
 		// Restore scroll position on view change
-		const scrollTarget = !activeNoteId ? state.lastIndex : 0;
-		virtualizer.scrollToIndex(scrollTarget);
+		virtualizer.scrollToIndex(!activeNoteId ? state.lastIndex : 0);
 
 		// Save the offset from previous view
 		if (state.previousView !== notesView) {
