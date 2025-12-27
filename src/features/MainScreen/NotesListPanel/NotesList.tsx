@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { Box, Spinner, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -19,7 +19,7 @@ import {
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 import { selectNotesView } from '@state/redux/profiles/selectors/view';
-import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
@@ -44,17 +44,12 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const parentRef = useRef<HTMLDivElement>(null);
 	const isActiveWorkspace = useIsActiveWorkspace();
-	const currentVisibleIndex = useRef(0);
 	const virtualizer = useVirtualizer({
 		enabled: isActiveWorkspace,
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
 		overscan: 5,
-		rangeExtractor: useCallback((range: any) => {
-			currentVisibleIndex.current = range.startIndex + 2;
-			return defaultRangeExtractor(range);
-		}, []),
 	});
 
 	const items = virtualizer.getVirtualItems();
@@ -96,48 +91,45 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-	}, [activeNoteId, notes, virtualizer]);
+	}, [activeNoteId, notes]);
 
+	const notesView = useWorkspaceSelector(selectNotesView);
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
 
-	// Save the offset and the index of the visible item so that the scroll position can be restored when changing views
-	const notesView = useWorkspaceSelector(selectNotesView);
+	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const viewStateRef = useRef<{
-		previousView: string;
+		previousView: string | null;
 		offsets: Record<string, number>;
-		lastIndex: number;
 	}>({
-		previousView: notesView,
+		previousView: null,
 		offsets: {},
-		lastIndex: 0,
 	});
 	useEffect(() => {
-		const state = viewStateRef.current;
+		// Reset scroll position on view change
+		virtualizer.scrollToIndex(0);
 
-		// Restore scroll position on view change
-		virtualizer.scrollToIndex(!activeNoteId ? state.lastIndex : 0);
+		const { previousView, offsets } = viewStateRef.current;
 
 		// Save the offset from previous view
-		if (state.previousView !== notesView) {
-			state.offsets[state.previousView] = notesOffset;
+		if (previousView && previousView !== notesView) {
+			offsets[previousView] = notes.length;
 		}
 
 		// Restore offset for current view if needed
-		const savedOffset = state.offsets[notesView];
-		if (savedOffset > notes.length) {
+		if (offsets[notesView] > notesOffset) {
 			dispatch(
 				workspacesApi.updateNotesOffset({
 					...workspaceData,
-					offset: savedOffset - notesOffset,
+					offset: offsets[notesView] - notesOffset,
 				}),
 			);
 		}
 
-		state.previousView = notesView;
-		state.lastIndex = currentVisibleIndex.current;
+		// Update flags
+		viewStateRef.current.previousView = notesView;
 		isLoadMoreNotesRef.current = 0;
 
-		// Save previously offset and visible index only when view changed
+		// Save previously offset only when view changed
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [notesView]);
 
