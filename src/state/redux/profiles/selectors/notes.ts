@@ -1,3 +1,4 @@
+import { NOTES_PAGE_SIZE } from '../profiles';
 import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
 
 export const selectWorkspaceName = createWorkspaceSelector(
@@ -76,5 +77,21 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 	(workspace) => {
 		if (!workspace) return [];
 		return workspace.recentlyClosedNotes;
+	},
+);
+
+export const selectNotesOffset = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return NOTES_PAGE_SIZE;
+		return workspace.notesOffset;
+	},
+);
+
+export const selectIsNotesLoading = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return false;
+		return workspace.isNotesLoading;
 	},
 );

@@ -22,6 +22,8 @@ export enum NOTES_VIEW {
 	ARCHIVE = 'Archive',
 }
 
+export const NOTES_PAGE_SIZE = 300;
+
 export const createWorkspaceObject = (workspace: {
 	id: string;
 	name: string;
@@ -35,6 +37,7 @@ export const createWorkspaceObject = (workspace: {
 	notes: [],
 
 	search: '',
+	notesOffset: NOTES_PAGE_SIZE,
 
 	view: NOTES_VIEW.All_NOTES,
 
@@ -42,6 +45,8 @@ export const createWorkspaceObject = (workspace: {
 		selected: null,
 		list: [],
 	},
+
+	isNotesLoading: null,
 });
 
 export type ProfileScoped<T extends {} = {}> = T & {
@@ -70,6 +75,9 @@ export type WorkspaceData = {
 	notes: INote[];
 
 	search: string;
+	notesOffset: number;
+
+	isNotesLoading: boolean | null;
 
 	view: NOTES_VIEW;
 
@@ -289,6 +297,9 @@ export const profilesSlice = createSlice({
 			if (!isSelectedTagExists) {
 				workspace.tags.selected = null;
 			}
+
+			// reset notes offset
+			workspace.notesOffset = NOTES_PAGE_SIZE;
 		},
 
 		setTags: (
@@ -321,6 +332,9 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.search = search;
+
+			// reset notes offset
+			workspace.notesOffset = NOTES_PAGE_SIZE;
 		},
 		setView: (
 			state,
@@ -332,6 +346,31 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.view = view;
+
+			// reset notes offset
+			workspace.notesOffset = NOTES_PAGE_SIZE;
+		},
+
+		updateNotesOffset: (
+			state,
+			{
+				payload: { profileId, workspaceId, offset },
+			}: PayloadAction<WorkspaceScoped<{ offset: number }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+			workspace.notesOffset += offset;
+		},
+
+		setIsNotesLoading: (
+			state,
+			{
+				payload: { profileId, workspaceId, isLoading },
+			}: PayloadAction<WorkspaceScoped<{ isLoading: boolean }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+			workspace.isNotesLoading = isLoading;
 		},
 	},
 });
