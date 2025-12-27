@@ -93,7 +93,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (noteIndex === -1) virtualizer.scrollToIndex(0);
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-	}, [activeNoteId, notes, notesView]);
+	}, [activeNoteId, notes, notesView, virtualizer]);
 
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
 
@@ -132,10 +132,6 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [notesView]);
 
 	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
-
-	useEffect(() => {
-		console.log('isNotesLoading', isNotesLoading);
-	}, [isNotesLoading]);
 
 	// TODO: implement dragging and moving items
 	return (
