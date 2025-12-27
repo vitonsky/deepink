@@ -110,7 +110,7 @@ export const NotesList: FC<NotesListProps> = () => {
 
 		// Save the offset from previous view
 		if (state.previousView !== notesView) {
-			state.offsets[state.previousView] = notes.length;
+			state.offsets[state.previousView] = notesOffset;
 		}
 
 		// Restore offset for current view if needed
