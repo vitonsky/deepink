@@ -78,6 +78,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		}
 	}, [items, notes, dispatch, workspaceData]);
 
+	const notesView = useWorkspaceSelector(selectNotesView);
+
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
 	useEffect(() => {
@@ -88,39 +90,35 @@ export const NotesList: FC<NotesListProps> = () => {
 			return;
 
 		const noteIndex = notes.findIndex((note) => note.id === activeNoteId);
-		if (noteIndex === -1) return;
+		if (noteIndex === -1) virtualizer.scrollToIndex(0);
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-	}, [activeNoteId, notes]);
+	}, [activeNoteId, notes, notesView]);
 
-	const notesView = useWorkspaceSelector(selectNotesView);
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const viewStateRef = useRef<{
-		previousView: string | null;
+		previousView: string;
 		offsets: Record<string, number>;
 	}>({
-		previousView: null,
+		previousView: notesView,
 		offsets: {},
 	});
 	useEffect(() => {
-		// Reset scroll position on view change
-		virtualizer.scrollToIndex(0);
-
-		const { previousView, offsets } = viewStateRef.current;
+		const state = viewStateRef.current;
 
 		// Save the offset from previous view
-		if (previousView && previousView !== notesView) {
-			offsets[previousView] = notes.length;
+		if (state.previousView !== notesView) {
+			state.offsets[state.previousView] = notes.length;
 		}
 
 		// Restore offset for current view if needed
-		if (offsets[notesView] > notesOffset) {
+		if (state.offsets[notesView] > notesOffset) {
 			dispatch(
 				workspacesApi.updateNotesOffset({
 					...workspaceData,
-					offset: offsets[notesView] - notesOffset,
+					offset: state.offsets[notesView] - notesOffset,
 				}),
 			);
 		}
@@ -134,6 +132,10 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [notesView]);
 
 	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
+
+	useEffect(() => {
+		console.log('isNotesLoading', isNotesLoading);
+	}, [isNotesLoading]);
 
 	// TODO: implement dragging and moving items
 	return (
