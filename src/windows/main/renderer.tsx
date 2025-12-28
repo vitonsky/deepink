@@ -46,6 +46,9 @@ store.subscribe(() => {
 	localStorage.setItem('settings', JSON.stringify(settings));
 });
 
+// Patch confirm: for prevent focus loss
+window.confirm = (message?: string) => window.electronAPI.confirm(message);
+
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
 	<TelemetryContext value={telemetry}>
