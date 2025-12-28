@@ -132,16 +132,15 @@ export const openMainWindow = async ({
 	win.on('resize', debounce(onTrackResize, { wait: 5000 }));
 
 	// Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
-	ipcMain.on('show-confirm', (event, message: string) => {
+	ipcMain.on('show-confirm', (event, message?: string) => {
 		const result = dialog.showMessageBoxSync(win, {
-			type: 'question',
+			type: 'none',
 			buttons: ['OK', 'Cancel'],
-			defaultId: 1,
-			cancelId: 0,
-			message,
+			defaultId: 0,
+			cancelId: 1,
+			message: message ?? '',
 		});
 		event.returnValue = result === 0;
-		win.focus();
 	});
 
 	return {
