@@ -38,12 +38,10 @@ export const LEFT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> = createComman
 	'LEFT_CLICK_IMAGE_COMMAND',
 );
 
-let count = 0;
 function useSuspenseImage(src: string) {
 	const filesRegistry = useFilesRegistry();
 
 	if (!imageCache.has(src)) {
-		console.log(count++);
 		throw new Promise(async (resolve, reject) => {
 			let actualSrc = src;
 
@@ -72,7 +70,7 @@ function useSuspenseImage(src: string) {
 				resolve(null);
 			};
 			img.onerror = () => {
-				imageCache.set(src, actualSrc);
+				imageCache.set(src, null);
 				reject(new Error('Error while load image'));
 			};
 		});
@@ -264,7 +262,10 @@ export default function ImageComponent({
 						width={width}
 						height={height}
 						maxWidth={maxWidth}
-						onError={() => setIsLoadError(true)}
+						onError={() => {
+							console.log('call');
+							setIsLoadError(true);
+						}}
 						onLoad={markDirty}
 					/>
 				)}
