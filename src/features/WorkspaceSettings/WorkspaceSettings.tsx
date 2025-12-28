@@ -29,7 +29,6 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { showConfirmDialog } from '@electron/requests/confirm/renderer';
 import { useProfileControls } from '@features/App/Profile';
 import {
 	useAttachmentsController,
@@ -138,7 +137,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 		);
 		if (!nextWorkspace) return;
 
-		const isConfirmed = await showConfirmDialog(
+		const isConfirmed = confirm(
 			`You are about to delete workspace "${workspaceInfo.name}". Are you sure you want to do it?\n\nIf you will continue, all data related to this workspace will be deleted, including notes, tags and files.`,
 		);
 

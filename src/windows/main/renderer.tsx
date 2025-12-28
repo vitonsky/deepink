@@ -41,6 +41,9 @@ const globalEventBus = {
 	},
 } satisfies EventBus<GlobalEventsPayloadMap>;
 
+// Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
+window.confirm = (message?: string) => window.electronAPI.confirm(message);
+
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
 	<TelemetryContext value={telemetry}>
