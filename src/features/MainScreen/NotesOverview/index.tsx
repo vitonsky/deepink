@@ -17,7 +17,6 @@ import {
 	TagControllerError,
 } from '@core/features/tags/controller/TagsController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { showConfirmDialog } from '@electron/requests/confirm/renderer';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -279,7 +278,7 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								const tag = tags.find((tag) => id === tag.id);
 								if (!tag) return;
 
-								const isConfirmed = await showConfirmDialog(
+								const isConfirmed = confirm(
 									`Really want to delete tag "${tag.resolvedName}" and all sub tags?`,
 								);
 								if (!isConfirmed) return;
