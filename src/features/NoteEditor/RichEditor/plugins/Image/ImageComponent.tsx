@@ -38,10 +38,12 @@ export const LEFT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> = createComman
 	'LEFT_CLICK_IMAGE_COMMAND',
 );
 
+let count = 0;
 function useSuspenseImage(src: string) {
 	const filesRegistry = useFilesRegistry();
 
 	if (!imageCache.has(src)) {
+		console.log(count++);
 		throw new Promise(async (resolve, reject) => {
 			let actualSrc = src;
 
@@ -70,7 +72,7 @@ function useSuspenseImage(src: string) {
 				resolve(null);
 			};
 			img.onerror = () => {
-				imageCache.set(src, null);
+				imageCache.set(src, actualSrc);
 				reject(new Error('Error while load image'));
 			};
 		});
