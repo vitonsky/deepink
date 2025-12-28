@@ -29,7 +29,7 @@ import { mergeRegister } from '@lexical/utils';
 
 import { $isImageNode } from './ImageNode';
 
-const imageCache = new Map<string, string>();
+const imageCache = new Map<string, string | null>();
 
 export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> = createCommand(
 	'RIGHT_CLICK_IMAGE_COMMAND',
@@ -48,12 +48,14 @@ function useSuspenseImage(src: string) {
 			const resourceData = getAppResourceDataInUrl(src);
 			if (resourceData) {
 				if (resourceData.type !== 'resource') {
+					imageCache.set(src, null);
 					reject(new Error('Not a resource type'));
 					return;
 				}
 
 				const file = await filesRegistry.get(resourceData.id);
 				if (!file) {
+					imageCache.set(src, null);
 					reject(new Error('File not found'));
 					return;
 				}
@@ -68,7 +70,8 @@ function useSuspenseImage(src: string) {
 				resolve(null);
 			};
 			img.onerror = () => {
-				imageCache.set(src, actualSrc);
+				imageCache.set(src, null);
+				reject(new Error('Error while load image'));
 			};
 		});
 	}
