@@ -1,10 +1,9 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
 import url from 'url';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { AppContext } from '@electron/main/main';
-import { enableConfirmDialog } from '@electron/requests/confirm/main';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
 import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
@@ -33,7 +32,6 @@ export const openMainWindow = async ({
 	enableStorage();
 	enableContextMenu();
 	enableInteractions();
-	enableConfirmDialog();
 
 	// State
 	const $windowState = createStore<WindowState>({
@@ -132,6 +130,19 @@ export const openMainWindow = async ({
 	// We throttle to avoid intermediate changes, since
 	// `resized` event works not on all platforms
 	win.on('resize', debounce(onTrackResize, { wait: 5000 }));
+
+	// Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
+	ipcMain.on('show-confirm', (event, message: string) => {
+		const result = dialog.showMessageBoxSync(win, {
+			type: 'question',
+			buttons: ['OK', 'Cancel'],
+			defaultId: 1,
+			cancelId: 0,
+			message,
+		});
+		event.returnValue = result === 0;
+		win.focus();
+	});
 
 	return {
 		quit: () => {
