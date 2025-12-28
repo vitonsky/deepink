@@ -71,7 +71,7 @@ function useSuspenseImage(src: string) {
 			};
 			img.onerror = () => {
 				imageCache.set(src, null);
-				reject(new Error('Error while load image'));
+				reject(new Error('Failed to load image'));
 			};
 		});
 	}
@@ -262,10 +262,7 @@ export default function ImageComponent({
 						width={width}
 						height={height}
 						maxWidth={maxWidth}
-						onError={() => {
-							console.log('call');
-							setIsLoadError(true);
-						}}
+						onError={() => setIsLoadError(true)}
 						onLoad={markDirty}
 					/>
 				)}
