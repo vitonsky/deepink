@@ -366,7 +366,7 @@ export class NotesImporter {
 			tagsToAttach.push(createdTagId);
 		}
 
-		return tagsToAttach;
+		return Array.from(new Set(tagsToAttach));
 	}
 
 	private readonly uploadedFiles: Record<string, Promise<string | null>> = {};
