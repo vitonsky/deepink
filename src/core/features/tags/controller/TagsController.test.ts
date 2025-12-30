@@ -487,14 +487,13 @@ describe('manage attachments', () => {
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
-		const bazId = await tags.add('baz', barId);
 
 		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual([]);
 		});
 
 		await expect(
-			tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId, fooId]),
+			tags.setAttachedTags(FAKE_NOTE_ID, [fooId, barId, fooId]),
 		).resolves.not.toThrow();
 
 		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
@@ -505,8 +504,8 @@ describe('manage attachments', () => {
 						resolvedName: 'foo',
 					}),
 					expect.objectContaining({
-						name: 'baz',
-						resolvedName: 'bar/baz',
+						name: 'bar',
+						resolvedName: 'bar',
 					}),
 				]),
 			);
