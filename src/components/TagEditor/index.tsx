@@ -121,6 +121,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 								onChange={(evt) => {
 									setTagName(evt.target.value);
 								}}
+								autoFocus={true}
 							/>
 
 							{tagNameError && (
@@ -132,9 +133,6 @@ export const TagEditor: FC<ITagEditorProps> = ({
 
 				<ModalFooter>
 					<HStack w="100%" justifyContent="end">
-						<Button variant="secondary" onClick={onCancel}>
-							Cancel
-						</Button>
 						<Button
 							variant="primary"
 							onClick={async () => {
@@ -162,6 +160,9 @@ export const TagEditor: FC<ITagEditorProps> = ({
 							}}
 						>
 							{isEditingMode ? 'Save' : 'Add'}
+						</Button>
+						<Button variant="secondary" onClick={onCancel}>
+							Cancel
 						</Button>
 					</HStack>
 				</ModalFooter>
