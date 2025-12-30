@@ -452,7 +452,7 @@ describe('manage attachments', () => {
 			expect(tags).toEqual([]);
 		});
 
-		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId, fooId]);
+		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
 		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
@@ -475,6 +475,38 @@ describe('manage attachments', () => {
 					expect.objectContaining({
 						name: 'bar',
 						resolvedName: 'bar',
+					}),
+				]),
+			);
+		});
+	});
+
+	test('does not throw when attach duplicate tags', async () => {
+		const db = await getDB();
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		const fooId = await tags.add('foo', null);
+		const barId = await tags.add('bar', null);
+		const bazId = await tags.add('baz', barId);
+
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
+			expect(tags).toEqual([]);
+		});
+
+		await expect(
+			tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId, fooId]),
+		).resolves.not.toThrow();
+
+		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
+			expect(tags).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						name: 'foo',
+						resolvedName: 'foo',
+					}),
+					expect.objectContaining({
+						name: 'baz',
+						resolvedName: 'bar/baz',
 					}),
 				]),
 			);
