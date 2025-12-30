@@ -77,15 +77,15 @@ export const EditorPanelPlugin = () => {
 						const parent = target.getParent();
 						if (parent && !$canInsertElementsToNode(parent)) return;
 
+						// Update existing heading (toggle to paragraph or change level)
 						if ($isHeadingNode(parent)) {
-							// Replace the heading with a paragraph
 							const currentHeadingLevel = Number(parent.getTag().slice(1));
 							if (currentHeadingLevel === level) {
 								parent.replace($createParagraphNode(), true);
 							} else {
-								// Update the heading level
 								parent.replace($createHeadingNode(`h${level}`), true);
 							}
+
 							return;
 						}
 
