@@ -306,8 +306,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 								<Spinner size="sm" />
 								<Text>
 									Notes import is in progress. Stage:{' '}
-									{importProgress.stage} {importProgress.total}/
-									{importProgress.processed}
+									{importProgress.stage} {importProgress.processed}/
+									{importProgress.total}
 								</Text>
 							</HStack>
 						)}
