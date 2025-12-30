@@ -437,6 +437,36 @@ describe('Import notes with different options', () => {
 			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([]);
 		});
 	});
+
+	test('does not throw when importing note with duplicate tags', async () => {
+		const db = await dbPromise;
+		const appContext = createAppContext(db, fileManager);
+
+		const importer = new NotesImporter(appContext, {
+			noteExtensions: ['.md'],
+		});
+
+		await expect(
+			importer.import(
+				createFileManagerMock({
+					'/foo/bar/note.md': createTextBuffer(
+						'---\ntags:\n - another tag\n - another tag\n - new tag\n---\nHello world!',
+					),
+				}),
+			),
+		).resolves.not.toThrow();
+
+		await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+			expect.objectContaining({
+				name: 'another tag',
+				resolvedName: 'another tag',
+			}),
+			expect.objectContaining({
+				name: 'new tag',
+				resolvedName: 'new tag',
+			}),
+		]);
+	});
 });
 
 describe('Import interruptions', () => {
