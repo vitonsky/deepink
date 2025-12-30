@@ -315,7 +315,7 @@ export class TagsController {
 			if (tags.length > 0) {
 				await db.query(
 					qb.sql`INSERT INTO attached_tags(workspace_id,source,target) VALUES ${qb.set(
-						tags.map((tagId) =>
+						Array.from(new Set(tags)).map((tagId) =>
 							qb.values([this.workspace, tagId, target]).withParenthesis(),
 						),
 					)}`,

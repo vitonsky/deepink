@@ -452,7 +452,7 @@ describe('manage attachments', () => {
 			expect(tags).toEqual([]);
 		});
 
-		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
+		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId, fooId]);
 		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
