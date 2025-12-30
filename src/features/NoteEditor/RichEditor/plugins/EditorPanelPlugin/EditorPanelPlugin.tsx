@@ -20,7 +20,7 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
-import { $setBlocksType } from '@lexical/selection';
+// import { $setBlocksType } from '@lexical/selection';
 import { $dfs } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../../EditorPanel';
@@ -78,15 +78,13 @@ export const EditorPanelPlugin = () => {
 						if (parent && !$canInsertElementsToNode(parent)) return;
 
 						if ($isHeadingNode(parent)) {
-							const headerLevel = Number(parent.getTag().slice(1));
-							if (headerLevel === level) {
-								$setBlocksType($getSelection(), () =>
-									$createParagraphNode(),
-								);
+							// Replace the heading with a paragraph
+							const currentHeadingLevel = Number(parent.getTag().slice(1));
+							if (currentHeadingLevel === level) {
+								parent.replace($createParagraphNode(), true);
 							} else {
-								$setBlocksType($getSelection(), () =>
-									$createHeadingNode(`h${level}`),
-								);
+								// Update the heading level
+								parent.replace($createHeadingNode(`h${level}`), true);
 							}
 							return;
 						}
