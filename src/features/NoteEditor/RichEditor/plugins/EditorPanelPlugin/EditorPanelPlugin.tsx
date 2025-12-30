@@ -20,7 +20,6 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
-// import { $setBlocksType } from '@lexical/selection';
 import { $dfs } from '@lexical/utils';
 
 import { InsertingPayloadMap, useEditorPanelContext } from '../../../EditorPanel';
