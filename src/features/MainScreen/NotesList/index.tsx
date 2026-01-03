@@ -79,6 +79,10 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [items, notes, dispatch, workspaceData]);
 
 	const notesView = useWorkspaceSelector(selectNotesView);
+	useEffect(() => {
+		// Reset lazy load flag when switching views to allow loading notes
+		isLoadMoreNotesRef.current = 0;
+	}, [notesView]);
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
@@ -122,12 +126,10 @@ export const NotesList: FC<NotesListProps> = () => {
 					}),
 				);
 			}
-
-			state.previousView = notesView;
-			isLoadMoreNotesRef.current = 0;
 		}
 
-		// Always track latest offset
+		// Always track latest offset and view
+		state.previousView = notesView;
 		state.previousOffset = notesOffset;
 	}, [notesView, notesOffset, dispatch, workspaceData]);
 
