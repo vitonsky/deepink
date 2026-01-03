@@ -164,9 +164,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (isNotesLoading) {
 			setIsShowSpinner(true);
 		} else {
-			new Promise((resolve) => setTimeout(resolve, 400)).then(() =>
-				setIsShowSpinner(false),
-			);
+			setTimeout(() => setIsShowSpinner(false), 400);
 		}
 	}, [isNotesLoading]);
 
