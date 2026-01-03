@@ -95,45 +95,45 @@ export const NotesList: FC<NotesListProps> = () => {
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 	}, [activeNoteId, notes, notesView, virtualizer]);
 
-	const notesOffset = useWorkspaceSelector(selectNotesOffset);
-
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
+	const notesOffset = useWorkspaceSelector(selectNotesOffset);
 	const viewStateRef = useRef<{
 		previousView: string;
-		offsets: Record<string, number>;
+		previousOffset: number;
+		offsetsByView: Record<string, number>;
 	}>({
 		previousView: notesView,
-		offsets: {},
+		previousOffset: notesOffset,
+		offsetsByView: {},
 	});
 	useEffect(() => {
 		const state = viewStateRef.current;
 
-		// Save the offset from previous view
+		// Save offset of previous view
 		if (state.previousView !== notesView) {
-			state.offsets[state.previousView] = notesOffset;
+			state.offsetsByView[state.previousView] = state.previousOffset;
+
+			// Restore offset for new view if needed
+			if (state.offsetsByView[notesView] > notesOffset) {
+				dispatch(
+					workspacesApi.updateNotesOffset({
+						...workspaceData,
+						offset: state.offsetsByView[notesView] - notesOffset,
+					}),
+				);
+			}
+
+			state.previousView = notesView;
+			isLoadMoreNotesRef.current = 0;
 		}
 
-		// Restore offset for current view if needed
-		if (state.offsets[notesView] > notesOffset) {
-			dispatch(
-				workspacesApi.updateNotesOffset({
-					...workspaceData,
-					offset: state.offsets[notesView] - notesOffset,
-				}),
-			);
-		}
+		// Always track latest offset
+		state.previousOffset = notesOffset;
+	}, [notesView, notesOffset, dispatch, workspaceData]);
 
-		// Update flags
-		viewStateRef.current.previousView = notesView;
-		isLoadMoreNotesRef.current = 0;
-
-		// Save previously offset only when view changed
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [notesView]);
-
-	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
-	const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
 	// Show the spinner for a minimum amount of time
+	const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
+	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
 	useEffect(() => {
 		if (isNotesLoading) {
 			setIsShowSpinner(true);
