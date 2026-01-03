@@ -125,36 +125,21 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
-	const viewStateRef = useRef<{
-		previousView: string;
-		previousOffset: number;
-		offsetsByView: Record<string, number>;
-	}>({
-		previousView: notesView,
-		previousOffset: notesOffset,
-		offsetsByView: {},
+	const offsetsByViewRef = useRef<Record<string, number>>({
+		[notesView]: notesOffset,
 	});
 	useEffect(() => {
-		const state = viewStateRef.current;
-
-		// Save offset of previous view
-		if (state.previousView !== notesView) {
-			state.offsetsByView[state.previousView] = state.previousOffset;
-
-			// Restore offset for new view if needed
-			if (state.offsetsByView[notesView] > notesOffset) {
-				dispatch(
-					workspacesApi.updateNotesOffset({
-						...workspaceData,
-						offset: state.offsetsByView[notesView] - notesOffset,
-					}),
-				);
-			}
+		const previousOffset = offsetsByViewRef.current[notesView] ?? 0;
+		if (notesOffset < previousOffset) {
+			dispatch(
+				workspacesApi.updateNotesOffset({
+					...workspaceData,
+					offset: previousOffset - notesOffset,
+				}),
+			);
 		}
 
-		// Always track latest offset and view
-		state.previousView = notesView;
-		state.previousOffset = notesOffset;
+		offsetsByViewRef.current[notesView] = notesOffset;
 	}, [notesView, notesOffset, dispatch, workspaceData]);
 
 	// Show the spinner for a minimum amount of time
