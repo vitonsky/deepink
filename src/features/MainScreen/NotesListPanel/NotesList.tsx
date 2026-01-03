@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Box, Spinner, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -132,6 +132,17 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [notesView]);
 
 	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
+	const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
+	// Show the spinner for a minimum amount of time
+	useEffect(() => {
+		if (isNotesLoading) {
+			setIsShowSpinner(true);
+		} else {
+			new Promise((resolve) => setTimeout(resolve, 400)).then(() =>
+				setIsShowSpinner(false),
+			);
+		}
+	}, [isNotesLoading]);
 
 	// TODO: implement dragging and moving items
 	return (
@@ -221,8 +232,14 @@ export const NotesList: FC<NotesListProps> = () => {
 							})}
 						</VStack>
 					</Box>
-					{isNotesLoading && (
-						<Box w="90%" display={'flex'} justifyContent="end">
+					{isShowSpinner && (
+						<Box
+							position="sticky"
+							display="flex"
+							justifyContent="end"
+							w="90%"
+							bottom="16px"
+						>
 							<Spinner />
 						</Box>
 					)}
