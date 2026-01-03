@@ -97,7 +97,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (noteIndex === -1) virtualizer.scrollToIndex(0);
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-	}, [activeNoteId, notes, notesView, virtualizer]);
+	}, [activeNoteId, notes, virtualizer]);
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
