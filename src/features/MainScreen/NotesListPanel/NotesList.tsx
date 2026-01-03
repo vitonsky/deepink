@@ -115,12 +115,16 @@ export const NotesList: FC<NotesListProps> = () => {
 			return;
 		}
 		scrollTargetIdRef.current = null;
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeNoteId, notesView]);
 
 	// Update scroll when notes are updated
 	useEffect(() => {
 		if (!scrollTargetIdRef.current) return;
 		scrollToActiveNotes();
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [notes]);
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
