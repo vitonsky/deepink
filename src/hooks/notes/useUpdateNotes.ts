@@ -6,6 +6,7 @@ import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/ho
 import {
 	NOTES_VIEW,
 	selectActiveTag,
+	selectNotesOffset,
 	selectSearch,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -25,46 +26,66 @@ export const useUpdateNotes = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 
 	const search = useWorkspaceSelector(selectSearch);
+	const notesOffset = useWorkspaceSelector(selectNotesOffset);
 
 	const requestContextRef = useRef(0);
 	return useCallback(async () => {
-		const contextId = ++requestContextRef.current;
-		const isRequestCanceled = () => contextId !== requestContextRef.current;
+		try {
+			const contextId = ++requestContextRef.current;
+			const isRequestCanceled = () => contextId !== requestContextRef.current;
 
-		const searchText = search.trim();
-		if (searchText) {
-			console.debug('Notes text indexing...');
-			const start = performance.now();
-			await lexemes.index();
+			dispatch(
+				workspacesApi.setIsNotesLoading({ ...workspaceData, isLoading: true }),
+			);
+
+			const searchText = search.trim();
+			if (searchText) {
+				console.debug('Notes text indexing...');
+				const start = performance.now();
+				await lexemes.index();
+
+				if (isRequestCanceled()) return;
+				console.debug('Notes indexing is completed', performance.now() - start);
+			}
+
+			const tags = activeTag !== null ? [activeTag.id] : [];
+
+			const notes = await notesRegistry.get({
+				limit: notesOffset,
+				tags,
+				sort: { by: 'updatedAt', order: 'desc' },
+				search: searchText
+					? {
+							text: searchText,
+					  }
+					: undefined,
+				meta: {
+					isDeleted: notesView === NOTES_VIEW.BIN,
+					// show archived notes only in archive view
+					// but do not filter by the archived flag in bin view
+					...(notesView !== NOTES_VIEW.BIN && {
+						isArchived: notesView === NOTES_VIEW.ARCHIVE,
+					}),
+					...(notesView === NOTES_VIEW.BOOKMARK && { isBookmarked: true }),
+				},
+			});
 
 			if (isRequestCanceled()) return;
-			console.debug('Notes indexing is completed', performance.now() - start);
+
+			dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
+		} finally {
+			dispatch(
+				workspacesApi.setIsNotesLoading({ ...workspaceData, isLoading: false }),
+			);
 		}
-
-		const tags = activeTag !== null ? [activeTag.id] : [];
-
-		const notes = await notesRegistry.get({
-			limit: 100,
-			tags,
-			sort: { by: 'updatedAt', order: 'desc' },
-			search: searchText
-				? {
-						text: searchText,
-				  }
-				: undefined,
-			meta: {
-				isDeleted: notesView === NOTES_VIEW.BIN,
-				// show archived notes only in archive view
-				// but do not filter by the archived flag in bin view
-				...(notesView !== NOTES_VIEW.BIN && {
-					isArchived: notesView === NOTES_VIEW.ARCHIVE,
-				}),
-				...(notesView === NOTES_VIEW.BOOKMARK && { isBookmarked: true }),
-			},
-		});
-
-		if (isRequestCanceled()) return;
-
-		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
-	}, [activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData]);
+	}, [
+		search,
+		activeTag,
+		notesView,
+		notesRegistry,
+		notesOffset,
+		dispatch,
+		workspaceData,
+		lexemes,
+	]);
 };
