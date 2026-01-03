@@ -251,7 +251,7 @@ export const NotesList: FC<NotesListProps> = () => {
 							display="flex"
 							justifyContent="end"
 							w="90%"
-							bottom="16px"
+							bottom="0"
 						>
 							<Spinner />
 						</Box>
