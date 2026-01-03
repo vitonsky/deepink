@@ -84,20 +84,44 @@ export const NotesList: FC<NotesListProps> = () => {
 		isLoadMoreNotesRef.current = 0;
 	}, [notesView]);
 
-	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
-	useEffect(() => {
-		if (!activeNoteId) return;
+	const scrollTargetIdRef = useRef<string | null>(null);
+	const scrollToActiveNotes = () => {
+		if (!scrollTargetIdRef.current) return;
 
 		// Skip if active note is in viewport
-		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
+		if (
+			activeNoteRef.current !== null &&
+			isElementInViewport(activeNoteRef.current)
+		) {
+			scrollTargetIdRef.current = null;
 			return;
+		}
 
-		const noteIndex = notes.findIndex((note) => note.id === activeNoteId);
-		if (noteIndex === -1) virtualizer.scrollToIndex(0);
+		const noteIndex = notes.findIndex(
+			(note) => note.id === scrollTargetIdRef.current,
+		);
+		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-	}, [activeNoteId, notes, virtualizer]);
+		scrollTargetIdRef.current = null;
+	};
+
+	// Scroll to active note
+	useEffect(() => {
+		if (activeNoteId) {
+			scrollTargetIdRef.current = activeNoteId;
+			scrollToActiveNotes();
+			return;
+		}
+		scrollTargetIdRef.current = null;
+	}, [activeNoteId, notesView]);
+
+	// Update scroll when notes are updated
+	useEffect(() => {
+		if (!scrollTargetIdRef.current) return;
+		scrollToActiveNotes();
+	}, [notes]);
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
@@ -134,8 +158,8 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [notesView, notesOffset, dispatch, workspaceData]);
 
 	// Show the spinner for a minimum amount of time
-	const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
 	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
+	const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
 	useEffect(() => {
 		if (isNotesLoading) {
 			setIsShowSpinner(true);
