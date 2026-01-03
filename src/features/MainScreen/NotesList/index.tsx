@@ -234,7 +234,7 @@ export const NotesList: FC<NotesListProps> = () => {
 							})}
 						</VStack>
 					</Box>
-					{isShowSpinner && (
+					{isShowSpinner && notes.length > 0 && (
 						<Box
 							position="sticky"
 							display="flex"
