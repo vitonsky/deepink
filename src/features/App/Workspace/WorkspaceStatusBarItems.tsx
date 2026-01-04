@@ -2,12 +2,15 @@ import React from 'react';
 import { FaLock, FaUserLarge } from 'react-icons/fa6';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
+import { useAppDispatch } from '@state/redux/hooks';
+import { PROFILE_SCREEN_MODE, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useProfileControls } from '../Profile';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
 
 export const WorkspaceStatusBarItems = () => {
 	const statusBarButtons = useStatusBarManager();
+	const dispatch = useAppDispatch();
 
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
@@ -16,8 +19,13 @@ export const WorkspaceStatusBarItems = () => {
 			'dbChange',
 			{
 				visible: true,
-				title: 'Change database',
-				onClick: () => profileControls.close(),
+				title: 'Change profile',
+				onClick: () => {
+					profileControls.close();
+					dispatch(
+						workspacesApi.setProfileScreenMode(PROFILE_SCREEN_MODE.CHANGE),
+					);
+				},
 				icon: <FaUserLarge />,
 			},
 			{
@@ -25,18 +33,27 @@ export const WorkspaceStatusBarItems = () => {
 				priority: 1,
 			},
 		);
-		statusBarButtons.controls.register(
-			'dbLock',
-			{
-				visible: true,
-				title: 'Lock database',
-				icon: <FaLock />,
-			},
-			{
-				placement: 'start',
-				priority: 2,
-			},
-		);
+		// Only encrypted profiles can be locked
+		if (profileControls.profile.profile.isEncrypted) {
+			statusBarButtons.controls.register(
+				'dbLock',
+				{
+					visible: true,
+					title: 'Lock profile',
+					onClick: () => {
+						profileControls.close();
+						dispatch(
+							workspacesApi.setProfileScreenMode(PROFILE_SCREEN_MODE.LOCK),
+						);
+					},
+					icon: <FaLock />,
+				},
+				{
+					placement: 'start',
+					priority: 2,
+				},
+			);
+		}
 	});
 
 	useActiveNoteHistoryButton();

@@ -4,7 +4,14 @@ import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
+import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import {
+	PROFILE_SCREEN_MODE,
+	selectProfileScreenMode,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -39,6 +46,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	onChooseProfile,
 }) => {
 	const telemetry = useTelemetryTracker();
+	const dispatch = useAppDispatch();
 
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
@@ -71,31 +79,53 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [screenName, setScreenName] = useState<'main' | 'createProfile'>('main');
+	const profileScreenMode = useAppSelector(selectProfileScreenMode);
+
+	const [isLoading, setIsLoading] = useState(false);
 
 	const content = useMemo(() => {
-		if (screenName === 'createProfile') {
+		// show a loading screen while the profile is being created
+		if (isLoading === true) return <SplashScreen />;
+
+		const hasNoProfiles = profilesManager.profiles.length === 0;
+		if (profileScreenMode === PROFILE_SCREEN_MODE.CREATE || hasNoProfiles) {
 			return (
 				<ProfileCreator
-					onCreateProfile={(profile) =>
-						profilesManager.createProfile(profile).then((newProfile) => {
-							setScreenName('main');
-							onOpenProfile(newProfile, profile.password ?? undefined).then(
-								console.warn,
-							);
-						})
+					onCreateProfile={async (profile) => {
+						setIsLoading(true);
+
+						const newProfile = await profilesManager.createProfile(profile);
+						const response = await onOpenProfile(
+							newProfile,
+							profile.password ?? undefined,
+						);
+						console.warn(response);
+
+						setIsLoading(false);
+					}}
+					onCancel={() =>
+						dispatch(
+							workspacesApi.setProfileScreenMode(
+								PROFILE_SCREEN_MODE.CHANGE,
+							),
+						)
 					}
-					onCancel={() => setScreenName('main')}
+					isFirstProfile={hasNoProfiles}
 				/>
 			);
 		}
 
-		if (currentProfileObject) {
+		if (profileScreenMode === PROFILE_SCREEN_MODE.LOCK && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
 					onLogin={onOpenProfile}
 					onPickAnotherProfile={() => {
+						dispatch(
+							workspacesApi.setProfileScreenMode(
+								PROFILE_SCREEN_MODE.CHANGE,
+							),
+						);
 						onChooseProfile(null);
 					}}
 				/>
@@ -111,7 +141,13 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							variant="primary"
 							size="lg"
 							w="100%"
-							onClick={() => setScreenName('createProfile')}
+							onClick={() =>
+								dispatch(
+									workspacesApi.setProfileScreenMode(
+										PROFILE_SCREEN_MODE.CREATE,
+									),
+								)
+							}
 						>
 							Create new profile
 						</Button>
@@ -147,6 +183,12 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									onChooseProfile(profile.id);
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
+									} else {
+										dispatch(
+											workspacesApi.setProfileScreenMode(
+												PROFILE_SCREEN_MODE.LOCK,
+											),
+										);
 									}
 
 									telemetry.track(
@@ -167,8 +209,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onChooseProfile,
 		onOpenProfile,
 		profilesManager,
-		screenName,
 		telemetry,
+		dispatch,
+		profileScreenMode,
+		isLoading,
 	]);
 
 	return (
