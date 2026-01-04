@@ -9,6 +9,7 @@ import {
 	ModalCloseButton,
 	ModalFooter,
 	ModalHeader,
+	Text,
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
@@ -98,30 +99,36 @@ export const TagEditor: FC<ITagEditorProps> = ({
 			<ModalHeader>{isEditingMode ? 'Edit tag' : 'Add tag'}</ModalHeader>
 
 			<ModalBody>
-				<VStack>
-					<SuggestedTagsList
-						placeholder="Parent tag"
-						tags={tags}
-						selectedTag={selectedParentTag ?? undefined}
-						onPick={(tag) => {
-							setParentTagId(tag.id);
-							setIsTagsListVisible(false);
-						}}
-					/>
+				<VStack align="start" gap="1rem">
+					<VStack w="100%" align="start" gap="0.5rem">
+						<Text>Parent tag</Text>
+						<SuggestedTagsList
+							placeholder="e.g., brainstorm"
+							tags={tags}
+							selectedTag={selectedParentTag ?? undefined}
+							onPick={(tag) => {
+								setParentTagId(tag.id);
+								setIsTagsListVisible(false);
+							}}
+						/>
+					</VStack>
 
 					<FormControl isInvalid={tagNameError !== null}>
-						<Input
-							placeholder="Tag name"
-							value={tagName}
-							onChange={(evt) => {
-								setTagName(evt.target.value);
-							}}
-							autoFocus={true}
-						/>
+						<VStack w="100%" align="start" gap="0.5rem">
+							<Text>Tag name</Text>
+							<Input
+								placeholder="e.g., work/idea"
+								value={tagName}
+								onChange={(evt) => {
+									setTagName(evt.target.value);
+								}}
+								autoFocus={true}
+							/>
 
-						{tagNameError && (
-							<FormErrorMessage>{tagNameError}</FormErrorMessage>
-						)}
+							{tagNameError && (
+								<FormErrorMessage>{tagNameError}</FormErrorMessage>
+							)}
+						</VStack>
 					</FormControl>
 				</VStack>
 			</ModalBody>

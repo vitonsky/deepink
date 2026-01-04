@@ -56,6 +56,8 @@ export const ImageButton: FC<
 														id: 'altText',
 														value: '',
 														label: 'Image alt text (optional)',
+														placeholder:
+															'Brief description of the image',
 													},
 												]}
 												onUpdate={({ url, altText }) => {
