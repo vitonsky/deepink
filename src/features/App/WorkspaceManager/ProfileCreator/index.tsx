@@ -202,7 +202,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Input
 						ref={profileNameInputRef}
 						size="lg"
-						placeholder="e.g. Notes"
+						placeholder="e.g., Notes"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
 						focusBorderColor={profileNameError ? 'red.500' : undefined}
@@ -217,7 +217,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						ref={passwordInputRef}
 						size="lg"
 						type="password"
-						placeholder="e.g. SecretPa$$word"
+						placeholder="e.g., SecretPa$$word"
 						value={password}
 						onChange={(evt) => setPassword(evt.target.value)}
 						focusBorderColor={passwordError ? 'red.500' : undefined}
