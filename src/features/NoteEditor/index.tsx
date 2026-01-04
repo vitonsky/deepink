@@ -33,6 +33,8 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -186,9 +188,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 	);
 
 	const [sidePanel, setSidePanel] = useState<NoteSidebarTabs | null>(null);
-	const onNoteMenuClick = useCallback((tabName: NoteSidebarTabs) => {
-		setSidePanel((state) => (state === tabName ? null : tabName));
-	}, []);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, () => {
+		setSidePanel((state) =>
+			state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
+		);
+	});
 
 	useEffect(() => {
 		if (sidePanel) {
@@ -220,7 +224,7 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 					/>
 
 					{/* TODO: add options that may be toggled */}
-					<NoteMenu note={note} onClick={onNoteMenuClick} />
+					<NoteMenu note={note} />
 				</HStack>
 			</HStack>
 

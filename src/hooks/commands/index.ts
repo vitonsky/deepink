@@ -28,6 +28,11 @@ export enum GLOBAL_COMMANDS {
 	 * Lock the currently active user profile
 	 */
 	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
+
+	/**
+	 * Open the history for the current note
+	 */
+	OPEN_NOTE_HISTORY = 'openNoteHistory',
 }
 
 // In the future, we can define a type for the payload like this:
