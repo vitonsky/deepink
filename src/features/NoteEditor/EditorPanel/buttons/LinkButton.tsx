@@ -52,6 +52,8 @@ export const LinkButton: FC<
 														id: 'url',
 														value: '',
 														label: 'Link url',
+														placeholder:
+															'https://example.com/',
 													},
 												]}
 												onUpdate={({ url }) => {
