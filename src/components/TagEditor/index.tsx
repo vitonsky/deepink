@@ -7,14 +7,11 @@ import {
 	Input,
 	ModalBody,
 	ModalCloseButton,
-	ModalContent,
 	ModalFooter,
 	ModalHeader,
-	ModalOverlay,
 	VStack,
 } from '@chakra-ui/react';
 import { IResolvedTag } from '@core/features/tags';
-import { WorkspaceModal } from '@features/WorkspaceModal';
 
 import { SuggestedTagsList } from '../SuggestedTagsList';
 
@@ -96,77 +93,76 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	}, [parentTagId, tags]);
 
 	return (
-		<WorkspaceModal isOpen onClose={onCancel} isCentered>
-			<ModalOverlay />
-			<ModalContent>
-				<ModalCloseButton />
-				<ModalHeader>{isEditingMode ? 'Edit tag' : 'Add tag'}</ModalHeader>
+		<>
+			<ModalCloseButton />
+			<ModalHeader>{isEditingMode ? 'Edit tag' : 'Add tag'}</ModalHeader>
 
-				<ModalBody>
-					<VStack>
-						<SuggestedTagsList
-							placeholder="Parent tag"
-							tags={tags}
-							selectedTag={selectedParentTag ?? undefined}
-							onPick={(tag) => {
-								setParentTagId(tag.id);
-								setIsTagsListVisible(false);
+			<ModalBody>
+				<VStack>
+					<SuggestedTagsList
+						placeholder="Parent tag"
+						tags={tags}
+						selectedTag={selectedParentTag ?? undefined}
+						onPick={(tag) => {
+							setParentTagId(tag.id);
+							setIsTagsListVisible(false);
+						}}
+					/>
+
+					<FormControl isInvalid={tagNameError !== null}>
+						<Input
+							placeholder="Tag name"
+							value={tagName}
+							onChange={(evt) => {
+								setTagName(evt.target.value);
 							}}
+							autoFocus={true}
 						/>
 
-						<FormControl isInvalid={tagNameError !== null}>
-							<Input
-								placeholder="Tag name"
-								value={tagName}
-								onChange={(evt) => {
-									setTagName(evt.target.value);
-								}}
-								autoFocus={true}
-							/>
+						{tagNameError && (
+							<FormErrorMessage>{tagNameError}</FormErrorMessage>
+						)}
+					</FormControl>
+				</VStack>
+			</ModalBody>
 
-							{tagNameError && (
-								<FormErrorMessage>{tagNameError}</FormErrorMessage>
-							)}
-						</FormControl>
-					</VStack>
-				</ModalBody>
+			<ModalFooter>
+				<HStack w="100%" justifyContent="end">
+					<Button
+						variant="primary"
+						onClick={async () => {
+							try {
+								const name = tagName.trim();
 
-				<ModalFooter>
-					<HStack w="100%" justifyContent="end">
-						<Button
-							variant="primary"
-							onClick={async () => {
-								try {
-									const name = tagName.trim();
+								const result = await onSave({
+									name,
+									parent: parentTagId,
+									...(isEditingMode && editedTag.id
+										? { id: editedTag.id }
+										: {}),
+								});
 
-									const result = await onSave({
-										name,
-										parent: parentTagId,
-										...(isEditingMode && editedTag.id
-											? { id: editedTag.id }
-											: {}),
-									});
-
-									if (!result.ok) {
-										setTagNameError(result.error);
-									}
-								} catch (error) {
-									console.error(error);
-
-									setTagNameError(
-										'Unable to save the tag. Please try again.',
-									);
+								if (!result.ok) {
+									setTagNameError(result.error);
+									return;
 								}
-							}}
-						>
-							{isEditingMode ? 'Save' : 'Add'}
-						</Button>
-						<Button variant="secondary" onClick={onCancel}>
-							Cancel
-						</Button>
-					</HStack>
-				</ModalFooter>
-			</ModalContent>
-		</WorkspaceModal>
+								onCancel();
+							} catch (error) {
+								console.error(error);
+
+								setTagNameError(
+									'Unable to save the tag. Please try again.',
+								);
+							}
+						}}
+					>
+						{isEditingMode ? 'Save' : 'Add'}
+					</Button>
+					<Button variant="secondary" onClick={onCancel}>
+						Cancel
+					</Button>
+				</HStack>
+			</ModalFooter>
+		</>
 	);
 };
