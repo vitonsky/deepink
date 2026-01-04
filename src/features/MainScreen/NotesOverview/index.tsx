@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC } from 'react';
 import {
 	FaBookmark,
 	FaBookOpen,
@@ -19,6 +19,7 @@ import {
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
+import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -48,17 +49,17 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 
 	const tagsRegistry = useTagsRegistry();
 
-	const parentTagForNewTagRef = useRef<IResolvedTag | null>(null);
-	const [isAddTagPopupOpened, setIsAddTagPopupOpened] = useState(false);
+	const modal = useWorkspaceModal();
 
-	useEffect(() => {
-		if (!isAddTagPopupOpened) {
-			parentTagForNewTagRef.current = null;
-		}
-	}, [isAddTagPopupOpened]);
-
-	const [editedTag, setEditedTag] = useState<TagEditorData | null>(null);
-	const tagEditor = useMemo(() => {
+	const getTagEditor = ({
+		onClose,
+		parentTag,
+		editedTag,
+	}: {
+		onClose: () => void;
+		parentTag?: IResolvedTag;
+		editedTag?: TagEditorData;
+	}) => {
 		if (editedTag) {
 			const parent = tags.find(({ id }) => id === editedTag.parent);
 			return (
@@ -74,7 +75,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								throw new Error('Tag ID is required but not found');
 
 							await tagsRegistry.update({ id: data.id, ...data });
-							setEditedTag(null);
 
 							telemetry.track(TELEMETRY_EVENT_NAME.TAG_EDITED, {
 								hasParent: data.parent === null ? 'no' : 'yes',
@@ -92,24 +92,19 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 							throw error;
 						}
 					}}
-					onCancel={() => {
-						setEditedTag(null);
-					}}
+					onCancel={onClose}
 				/>
 			);
 		}
 
-		if (!isAddTagPopupOpened) return null;
-
 		return (
 			<TagEditor
 				tags={tags}
-				parentTag={parentTagForNewTagRef.current ?? undefined}
+				parentTag={parentTag}
 				onSave={async (data) => {
 					try {
 						console.warn('Create tag', data);
 						await tagsRegistry.add(data.name, data.parent);
-						setIsAddTagPopupOpened(false);
 
 						telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
 							scope: 'side panel',
@@ -139,12 +134,10 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						throw error;
 					}
 				}}
-				onCancel={() => {
-					setIsAddTagPopupOpened(false);
-				}}
+				onCancel={onClose}
 			/>
 		);
-	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry, telemetry]);
+	};
 
 	// TODO: show spinner while loading tags
 	return (
@@ -242,7 +235,9 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 					<Button
 						variant="ghost"
 						onClick={() => {
-							setIsAddTagPopupOpened(true);
+							modal.show({
+								content: ({ onClose }) => getTagEditor({ onClose }),
+							});
 						}}
 						size="xs"
 						marginLeft="auto"
@@ -268,11 +263,14 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 						contextMenu={{
 							onAdd(id) {
 								const tag = tags.find((tag) => id === tag.id);
-								if (tag) {
-									parentTagForNewTagRef.current = tag;
-								}
 
-								setIsAddTagPopupOpened(true);
+								modal.show({
+									content: ({ onClose }) =>
+										getTagEditor({
+											onClose,
+											parentTag: tag,
+										}),
+								});
 							},
 							async onDelete(id) {
 								const tag = tags.find((tag) => id === tag.id);
@@ -293,14 +291,22 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 								if (!tag) return;
 
 								const { name, parent } = tag;
-								setEditedTag({ id, name, parent });
+								modal.show({
+									content: ({ onClose }) =>
+										getTagEditor({
+											onClose,
+											editedTag: {
+												id,
+												name,
+												parent,
+											},
+										}),
+								});
 							},
 						}}
 					/>
 				</Box>
 			</VStack>
-
-			{tagEditor}
 		</VStack>
 	);
 };
