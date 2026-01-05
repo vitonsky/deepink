@@ -13,8 +13,11 @@ import { ActivityBar } from './ActivityBar';
 import { NotesViewFilter } from './NotesViewFilter';
 import { StatusBar } from './StatusBar';
 import { TagsPanel } from './TagsPanel';
+import { useHandleDeleteCommand } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
 
 export const MainScreen: FC = () => {
+	useHandleDeleteCommand();
+
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
 
