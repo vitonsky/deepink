@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { formatNoteLink } from '@core/features/links';
 import { INote, NoteId } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
@@ -12,7 +11,6 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
-import { copyTextToClipboard } from '@utils/clipboard';
 
 import { NoteActions } from '.';
 
@@ -20,12 +18,6 @@ export type ContextMenuOptions = {
 	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
 };
-
-const mdCharsForEscape = ['\\', '[', ']'];
-const mdCharsForEscapeRegEx = new RegExp(
-	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
-	'g',
-);
 
 const buildNoteMenu = (note: INote): ContextMenu => {
 	return [
@@ -101,21 +93,7 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 				},
 
 				[NoteActions.COPY_MARKDOWN_LINK]: async (id: string) => {
-					const note = await notes.getById(id);
-					if (!note) {
-						console.error(`Can't get data of note #${id}`);
-						return;
-					}
-
-					const { title, text } = note.content;
-					const noteTitle = (title || text.slice(0, 30))
-						.trim()
-						.replace(mdCharsForEscapeRegEx, '\\$1');
-					const markdownLink = `[${noteTitle}](${formatNoteLink(id)})`;
-
-					console.log(`Copy markdown link ${markdownLink}`);
-
-					copyTextToClipboard(markdownLink);
+					runCommand(GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK, { id });
 				},
 
 				[NoteActions.EXPORT]: async (id: string) => {
