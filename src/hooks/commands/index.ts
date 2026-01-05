@@ -20,6 +20,11 @@ export enum GLOBAL_COMMANDS {
 	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
 
 	/**
+	 * Toggle bookmark state for current note
+	 */
+	TOGGLE_CURRENT_NOTE_BOOKMARK = 'toggleCurrentNoteBookmark',
+
+	/**
 	 * Switch focus to the next open note
 	 */
 	FOCUS_NEXT_NOTE = 'focusNextNote',
