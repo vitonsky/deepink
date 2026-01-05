@@ -8,11 +8,14 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
+import { useHandleDeleteCommand } from './NotesList/NoteContextMenu/useNoteContextMenu';
 import { NotesOverview } from './NotesOverview';
 import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
 export const MainScreen: FC = () => {
+	useHandleDeleteCommand();
+
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
 
