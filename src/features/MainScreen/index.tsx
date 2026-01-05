@@ -6,7 +6,11 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesListPanel } from '@features/MainScreen/NotesListPanel';
 import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
+import { noteContextShortcuts } from '@hooks/commands/shortcuts';
+import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveNoteId } from '@state/redux/profiles/profiles';
 
 import { NotificationsPopup } from '../NotificationsPopup';
 import { ActivityBar } from './ActivityBar';
@@ -17,6 +21,12 @@ import { useHandleDeleteCommand } from '@features/NotesContainer/NoteContextMenu
 
 export const MainScreen: FC = () => {
 	useHandleDeleteCommand();
+
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+	useShortcutsBinding(noteContextShortcuts, () => {
+		if (!activeNoteId) return;
+		return { id: activeNoteId };
+	});
 
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
