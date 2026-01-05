@@ -15,6 +15,21 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
 
 	/**
+	 * Move a note to the Bin
+	 */
+	DELETE_NOTE_TO_BIN = 'deleteNoteToBin',
+
+	/**
+	 * Permanently delete a note
+	 */
+	DELETE_NOTE_PERMANENTLY = 'deleteNotePermanently',
+
+	/**
+	 * Restore a note from the Bin
+	 */
+	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
+
+	/**
 	 * Toggle archive state for current note
 	 */
 	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
@@ -52,7 +67,17 @@ export enum GLOBAL_COMMANDS {
 
 // In the future, we can define a type for the payload like this:
 // type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
-export type CommandPayloadsMap = Record<GLOBAL_COMMANDS, void>;
+type CommandsWithPayload = {
+	[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: { id: string };
+	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { id: string };
+	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
+};
+
+export type CommandPayloadsMap = {
+	[K in GLOBAL_COMMANDS]: K extends keyof CommandsWithPayload
+		? CommandsWithPayload[K]
+		: void;
+};
 
 export const SHORTCUT_NAMES = {
 	[GLOBAL_COMMANDS.CREATE_NOTE]: 'Create note',

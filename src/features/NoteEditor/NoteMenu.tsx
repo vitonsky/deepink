@@ -113,10 +113,22 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 						</Text>
 					</HStack>
 				</MenuItem>
-				<MenuItem>
+				<MenuItem
+					onClick={() =>
+						note.isDeleted
+							? runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, {
+									id: note.id,
+							  })
+							: runCommand(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, {
+									id: note.id,
+							  })
+					}
+				>
 					<HStack>
 						<FaTrashCan />
-						<Text>Delete</Text>
+						<Text>
+							{note.isDeleted ? 'Restore from Bin' : 'Delete to Bin'}
+						</Text>
 					</HStack>
 				</MenuItem>
 			</MenuList>
