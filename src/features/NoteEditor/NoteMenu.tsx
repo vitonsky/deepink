@@ -36,7 +36,13 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				<FaEllipsis />
 			</MenuButton>
 			<MenuList>
-				<MenuItem>
+				<MenuItem
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK, {
+							id: note.id,
+						})
+					}
+				>
 					<HStack>
 						<FaCopy />
 						<Text>Copy reference on note</Text>
