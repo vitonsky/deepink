@@ -83,7 +83,11 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					</HStack>
 				</MenuItem>
 
-				<MenuItem>
+				<MenuItem
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { id: note.id })
+					}
+				>
 					<HStack>
 						<FaFileExport />
 						<Text>Export...</Text>

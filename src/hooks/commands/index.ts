@@ -30,6 +30,11 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
 
 	/**
+	 * Export note
+	 */
+	EXPORT_NOTE = 'exportNote',
+
+	/**
 	 * Toggle archive state for current note
 	 */
 	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
@@ -65,12 +70,11 @@ export enum GLOBAL_COMMANDS {
 	OPEN_NOTE_HISTORY = 'openNoteHistory',
 }
 
-// In the future, we can define a type for the payload like this:
-// type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
 type CommandsWithPayload = {
 	[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: { id: string };
 	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { id: string };
 	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
+	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
 };
 
 export type CommandPayloadsMap = {

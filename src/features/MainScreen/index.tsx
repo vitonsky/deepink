@@ -8,6 +8,7 @@ import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
 import { noteContextShortcuts } from '@hooks/commands/shortcuts';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
+import { useNoteManagementCommands } from '@hooks/notes/useNoteManagementCommands';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
@@ -17,10 +18,9 @@ import { ActivityBar } from './ActivityBar';
 import { NotesViewFilter } from './NotesViewFilter';
 import { StatusBar } from './StatusBar';
 import { TagsPanel } from './TagsPanel';
-import { useHandleDeleteCommand } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
 
 export const MainScreen: FC = () => {
-	useHandleDeleteCommand();
+	useNoteManagementCommands();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	useShortcutsBinding(noteContextShortcuts, () => {

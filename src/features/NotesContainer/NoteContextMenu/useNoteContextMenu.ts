@@ -4,17 +4,12 @@ import { INote, NoteId } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
-	useNotesContext,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
-import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
-import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
-import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
@@ -66,81 +61,11 @@ const buildNoteMenu = ({
 	];
 };
 
-export const useHandleDeleteCommand = () => {
-	const telemetry = useTelemetryTracker();
-	const notes = useNotesRegistry();
-	const tagsRegistry = useTagsRegistry();
-
-	const { noteUpdated } = useNotesContext();
-	const updateNotes = useUpdateNotes();
-	const noteActions = useNoteActions();
-
-	const deletionConfig = useVaultSelector(selectDeletionConfig);
-
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async ({ id }) => {
-		if (
-			deletionConfig.confirm &&
-			!confirm(`Do you want to move this note to the bin?`)
-		)
-			return;
-
-		noteActions.close(id);
-
-		await notes.updateMeta([id], { isDeleted: true });
-		const updatedNote = await notes.getById(id);
-		if (updatedNote) noteUpdated(updatedNote);
-
-		updateNotes();
-
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-			permanently: 'false',
-		});
-	});
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
-		async ({ id }) => {
-			if (
-				deletionConfig.confirm &&
-				!confirm(`Do you want to permanently delete this note?`)
-			)
-				return;
-
-			noteActions.close(id);
-
-			await notes.delete([id]);
-			await tagsRegistry.setAttachedTags(id, []);
-
-			updateNotes();
-
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-				permanently: 'true',
-			});
-		},
-	);
-
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async ({ id }) => {
-		await notes.updateMeta([id], { isDeleted: false });
-		const updatedNote = await notes.getById(id);
-		if (updatedNote) noteUpdated(updatedNote);
-
-		updateNotes();
-
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
-	});
-};
-
 export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 	const telemetry = useTelemetryTracker();
 
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
-
-	const notesExport = useNotesExport();
-	const currentWorkspace = useWorkspaceData();
-	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
-
-	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
 	const runCommand = useCommand();
 
@@ -204,15 +129,7 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 				},
 
 				[NoteActions.EXPORT]: async (id: string) => {
-					const note = await notes.getById(id);
-					await notesExport.exportNote(
-						id,
-						buildFileName(
-							workspaceData?.name,
-							note?.content.title.trim().slice(0, 50).trim() ||
-								`note_${id}`,
-						),
-					);
+					runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { id });
 				},
 			};
 
@@ -220,15 +137,7 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 				actionsMap[action](id);
 			}
 		},
-		[
-			notes,
-			tagsRegistry,
-			updateNotes,
-			notesExport,
-			workspaceData?.name,
-			telemetry,
-			runCommand,
-		],
+		[telemetry, runCommand, notes, tagsRegistry, updateNotes],
 	);
 
 	const showMenu = useShowNoteContextMenu(noteContextMenuCallback);
