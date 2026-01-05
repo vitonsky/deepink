@@ -2,14 +2,18 @@ import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
 
 import { useCommand } from '../useCommand';
-import { KeyboardShortcutMap, shortcuts } from '.';
+import { CommandPayloadsMap, GLOBAL_COMMANDS } from '..';
+import { KeyboardShortcutMap } from '.';
 
 /**
  * Registers keyboard shortcuts for commands
  *
  * Configures the processing of global keyboard shortcuts, associating each combination with a corresponding command
  */
-export const useShortcutsBinding = () => {
+export const useShortcutsBinding = <K extends GLOBAL_COMMANDS>(
+	shortcuts: KeyboardShortcutMap,
+	getContext?: (command: K) => CommandPayloadsMap[K],
+) => {
 	const runCommand = useCommand();
 
 	useEffect(() => {
@@ -39,7 +43,10 @@ export const useShortcutsBinding = () => {
 				{
 					capture: true,
 				},
-				() => runCommand(commandName),
+				() => {
+					const payload = getContext?.(commandName as K);
+					runCommand(commandName, payload);
+				},
 			);
 		});
 
@@ -48,5 +55,5 @@ export const useShortcutsBinding = () => {
 				hotkeys.unbind(shortcut),
 			);
 		};
-	}, [runCommand]);
+	}, [getContext, runCommand, shortcuts]);
 };
