@@ -56,6 +56,7 @@ export const useNoteManagementCommands = () => {
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
 		async ({ id }) => {
+			// Only notes with deleted status can be permanently deleted
 			const note = await notes.getById(id);
 			if (!note?.isDeleted) return;
 
