@@ -27,7 +27,6 @@ import { INote } from '@core/features/notes';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 
-// TODO: call commands by click items
 export const NoteMenu = memo(({ note }: { note: INote }) => {
 	const runCommand = useCommand();
 
@@ -49,7 +48,9 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 						<Text>Remind me</Text>
 					</HStack>
 				</MenuItem>
-				<MenuItem onClick={() => runCommand(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY)}>
+				<MenuItem
+					onClick={() => runCommand(GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY)}
+				>
 					<HStack>
 						<FaClock />
 						<Text>History</Text>
