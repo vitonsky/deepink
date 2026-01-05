@@ -17,9 +17,9 @@ export const shortcuts: KeyboardShortcutMap = {
 };
 
 /**
- * Shortcuts usable within a workspace context
+ * Shortcuts that are used in the workspace context
  */
-export const noteContextShortcuts: KeyboardShortcutMap = {
+export const workspaceShortcuts: KeyboardShortcutMap = {
 	delete: GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN,
 	'shift+delete': GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
 };

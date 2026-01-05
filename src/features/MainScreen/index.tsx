@@ -6,7 +6,7 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesListPanel } from '@features/MainScreen/NotesListPanel';
 import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
-import { noteContextShortcuts } from '@hooks/commands/shortcuts';
+import { workspaceShortcuts } from '@hooks/commands/shortcuts';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useNoteManagementCommands } from '@hooks/notes/useNoteManagementCommands';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -23,7 +23,7 @@ export const MainScreen: FC = () => {
 	useNoteManagementCommands();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	useShortcutsBinding(noteContextShortcuts, () => {
+	useShortcutsBinding(workspaceShortcuts, () => {
 		if (!activeNoteId) return;
 		return { id: activeNoteId };
 	});
