@@ -199,12 +199,11 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 		}
 	}, [sidePanel, telemetry]);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, () => {
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY, () => {
 		setSidePanel((state) =>
 			state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
 		);
 	});
-
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE, async () => {
 		const newArchivedState = !note.isArchived;
 		await notesRegistry.updateMeta([note.id], {

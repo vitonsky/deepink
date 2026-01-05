@@ -11,7 +11,7 @@ export const shortcuts: KeyboardShortcutMap = {
 
 	'ctrl+shift+a': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
 	'ctrl+shift+b': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
-	'ctrl+h': GLOBAL_COMMANDS.OPEN_NOTE_HISTORY,
+	'ctrl+h': GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY,
 
 	'ctrl+up': GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
 	'ctrl+down': GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
@@ -19,6 +19,9 @@ export const shortcuts: KeyboardShortcutMap = {
 	'ctrl+l': GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE,
 };
 
+/**
+ * Shortcuts usable within a workspace context
+ */
 export const noteContextShortcuts: KeyboardShortcutMap = {
 	delete: GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN,
 	'shift+delete': GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
