@@ -1,3 +1,4 @@
+import { formatNoteLink } from '@core/features/links';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
 	useNotesContext,
@@ -13,8 +14,15 @@ import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectConfirmMoveToBin } from '@state/redux/settings/selectors/preferences';
+import { copyTextToClipboard } from '@utils/clipboard';
 
 import { buildFileName, useNotesExport } from './useNotesExport';
+
+const mdCharsForEscape = ['\\', '[', ']'];
+const mdCharsForEscapeRegEx = new RegExp(
+	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
+	'g',
+);
 
 /**
  * Handles delete, restore, and export actions for a note
@@ -96,4 +104,25 @@ export const useNoteManagementCommands = () => {
 			),
 		);
 	});
+
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK,
+		async ({ id }) => {
+			const note = await notes.getById(id);
+			if (!note) {
+				console.error(`Can't get data of note #${id}`);
+				return;
+			}
+
+			const { title, text } = note.content;
+			const noteTitle = (title || text.slice(0, 30))
+				.trim()
+				.replace(mdCharsForEscapeRegEx, '\\$1');
+			const markdownLink = `[${noteTitle}](${formatNoteLink(id)})`;
+
+			console.log(`Copy markdown link ${markdownLink}`);
+
+			copyTextToClipboard(markdownLink);
+		},
+	);
 };

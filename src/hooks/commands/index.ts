@@ -68,6 +68,11 @@ export enum GLOBAL_COMMANDS {
 	 * Open the history for the current note
 	 */
 	OPEN_CURRENT_NOTE_HISTORY = 'openCurrentNoteHistory',
+
+	/**
+	 * Copy the Markdown link for the current note
+	 */
+	COPY_NOTE_MARKDOWN_LINK = 'copyNoteMarkdownLink',
 }
 
 type CommandsWithPayload = {
@@ -75,6 +80,7 @@ type CommandsWithPayload = {
 	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { id: string };
 	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
+	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };
 };
 
 export type CommandPayloadsMap = {
