@@ -101,10 +101,16 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 						<Text>Disable sync</Text>
 					</HStack>
 				</MenuItem>
-				<MenuItem>
+				<MenuItem
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE)
+					}
+				>
 					<HStack>
 						<FaBoxArchive />
-						<Text>Archive</Text>
+						<Text>
+							{note.isArchived ? 'Remove from archive' : 'Move to archive'}
+						</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>
