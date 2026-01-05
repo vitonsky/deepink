@@ -18,3 +18,8 @@ export const shortcuts: KeyboardShortcutMap = {
 
 	'ctrl+l': GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE,
 };
+
+export const noteContextShortcuts: KeyboardShortcutMap = {
+	delete: GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN,
+	'shift+delete': GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
+};
