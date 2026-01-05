@@ -30,17 +30,17 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
 
 	/**
-	 * Export note
+	 * Export a note
 	 */
 	EXPORT_NOTE = 'exportNote',
 
 	/**
-	 * Toggle archive state for current note
+	 * Toggle the archive status of the current note
 	 */
 	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
 
 	/**
-	 * Toggle bookmark state for current note
+	 * Toggle the bookmark status of the current note
 	 */
 	TOGGLE_CURRENT_NOTE_BOOKMARK = 'toggleCurrentNoteBookmark',
 
@@ -67,7 +67,7 @@ export enum GLOBAL_COMMANDS {
 	/**
 	 * Open the history for the current note
 	 */
-	OPEN_NOTE_HISTORY = 'openNoteHistory',
+	OPEN_CURRENT_NOTE_HISTORY = 'openCurrentNoteHistory',
 }
 
 type CommandsWithPayload = {
