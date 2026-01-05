@@ -229,6 +229,20 @@ export const Note: FC<NoteEditorProps> = memo(
 				});
 			},
 		);
+		useWorkspaceCommandCallback(
+			GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
+			async () => {
+				const newBookmarkedState = !note.isBookmarked;
+				await notesRegistry.updateMeta([note.id], {
+					isBookmarked: newBookmarkedState,
+				});
+				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
+					action: newBookmarkedState ? 'Added' : 'Removed',
+				});
+			},
+		);
 
 		const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
@@ -267,20 +281,9 @@ export const Note: FC<NoteEditorProps> = memo(
 									: 'Add to bookmarks'
 							}
 							size="xs"
-							onClick={async () => {
-								const newBookmarkedState = !note.isBookmarked;
-								await notesRegistry.updateMeta([note.id], {
-									isBookmarked: newBookmarkedState,
-								});
-								eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-								telemetry.track(
-									TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE,
-									{
-										action: newBookmarkedState ? 'Added' : 'Removed',
-									},
-								);
-							}}
+							onClick={() =>
+								runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK)
+							}
 							isActive={note.isBookmarked}
 						>
 							<FaBookmark />
