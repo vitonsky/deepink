@@ -15,6 +15,11 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
 
 	/**
+	 * Toggle archive state for current note
+	 */
+	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
+
+	/**
 	 * Switch focus to the next open note
 	 */
 	FOCUS_NEXT_NOTE = 'focusNextNote',
