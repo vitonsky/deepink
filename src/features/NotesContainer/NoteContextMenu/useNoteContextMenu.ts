@@ -4,17 +4,12 @@ import { INote, NoteId } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
-	useNotesContext,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
-import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
-import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
-import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
@@ -136,12 +131,6 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
-	const notesExport = useNotesExport();
-	const currentWorkspace = useWorkspaceData();
-	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
-
-	const deletionConfig = useVaultSelector(selectDeletionConfig);
-
 	const runCommand = useCommand();
 
 	const noteContextMenuCallback = useCallback<ContextMenuCallback<NoteActions>>(
@@ -220,15 +209,7 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 				actionsMap[action](id);
 			}
 		},
-		[
-			notes,
-			tagsRegistry,
-			updateNotes,
-			notesExport,
-			workspaceData?.name,
-			telemetry,
-			runCommand,
-		],
+		[telemetry, runCommand, notes, tagsRegistry, updateNotes],
 	);
 
 	const showMenu = useShowNoteContextMenu(noteContextMenuCallback);
