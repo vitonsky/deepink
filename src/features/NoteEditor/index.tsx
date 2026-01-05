@@ -34,6 +34,7 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -66,6 +67,8 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 
 	const eventBus = useEventBus();
 	const notesRegistry = useNotesRegistry();
+
+	const runCommand = useCommand();
 
 	const [title, setTitle] = useState(note.content.title);
 	const [text, setText] = useState(note.content.text);
@@ -188,12 +191,6 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 	);
 
 	const [sidePanel, setSidePanel] = useState<NoteSidebarTabs | null>(null);
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, () => {
-		setSidePanel((state) =>
-			state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
-		);
-	});
-
 	useEffect(() => {
 		if (sidePanel) {
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_SHOWN, {
@@ -201,6 +198,24 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			});
 		}
 	}, [sidePanel, telemetry]);
+
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, () => {
+		setSidePanel((state) =>
+			state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
+		);
+	});
+
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE, async () => {
+		const newArchivedState = !note.isArchived;
+		await notesRegistry.updateMeta([note.id], {
+			isArchived: newArchivedState,
+		});
+		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+			action: newArchivedState ? 'Added' : 'Removed',
+		});
+	});
 
 	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
@@ -259,17 +274,9 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 							note.isArchived ? 'Remove from archive' : 'Move to archive'
 						}
 						size="xs"
-						onClick={async () => {
-							const newArchivedState = !note.isArchived;
-							await notesRegistry.updateMeta([note.id], {
-								isArchived: newArchivedState,
-							});
-							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
-								action: newArchivedState ? 'Added' : 'Removed',
-							});
-						}}
+						onClick={() =>
+							runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE)
+						}
 						isActive={note.isArchived}
 					>
 						<FaBoxArchive />
