@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { INote, NoteId } from '@core/features/notes';
+import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
@@ -17,7 +17,6 @@ import { useVaultSelector } from '@state/redux/profiles/hooks';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 
 export type ContextMenuOptions = {
-	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
 };
 

@@ -41,5 +41,5 @@ export const useActiveNoteHistoryButton = () => {
 		return () => {
 			statusBarButtons.controls.unregister('noteTime');
 		};
-	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
+	}, [activeNoteId, statusBarButtons.controls, openedNotes, runCommand]);
 };
