@@ -49,7 +49,6 @@ export const useShortcutsBinding = (
 					if (commandPayloads[commandName]) {
 						const payload = commandPayloads[commandName]();
 						if (payload) runCommand(commandName, payload);
-
 						return;
 					}
 
