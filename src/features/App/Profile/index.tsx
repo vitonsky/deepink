@@ -4,6 +4,7 @@ import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { shortcuts } from '@hooks/commands/shortcuts';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
@@ -103,7 +104,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		};
 	}, [db, isDevMode]);
 
-	useShortcutsBinding();
+	useShortcutsBinding(shortcuts);
 
 	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
 

@@ -4,7 +4,13 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesPanel } from '@features/MainScreen/NotesPanel';
 import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { workspaceShortcuts } from '@hooks/commands/shortcuts';
+import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
+import { useNoteCommandHandlers } from '@hooks/notes/useNoteCommandHandlers';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
+import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveNoteId } from '@state/redux/profiles/profiles';
 
 import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
 import { NewNoteButton } from './NewNoteButton';
@@ -13,6 +19,18 @@ import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
 export const MainScreen: FC = () => {
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+
+	const getPayloadForCommand = () => (activeNoteId ? { id: activeNoteId } : undefined);
+	useShortcutsBinding(workspaceShortcuts, {
+		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE]: getPayloadForCommand,
+		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK]: getPayloadForCommand,
+		[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: getPayloadForCommand,
+		[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: getPayloadForCommand,
+	});
+
+	useNoteCommandHandlers();
+
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
 
