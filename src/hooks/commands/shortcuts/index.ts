@@ -6,8 +6,7 @@ export const shortcuts: KeyboardShortcutMap = {
 	'CmdOrCtrl+N': GLOBAL_COMMANDS.CREATE_NOTE,
 	'CmdOrCtrl+W': GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE,
 	'CmdOrCtrl+Shift+T': GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE,
-	'CmdOrCtrl+Shift+A': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
-	'CmdOrCtrl+Shift+B': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
+
 	'CmdOrCtrl+H': GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY,
 
 	'CmdOrCtrl+PageDown': GLOBAL_COMMANDS.FOCUS_NEXT_NOTE,
@@ -20,6 +19,9 @@ export const shortcuts: KeyboardShortcutMap = {
  * Shortcuts that are used in the workspace context
  */
 export const workspaceShortcuts: KeyboardShortcutMap = {
-	delete: GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN,
-	'shift+delete': GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
+	'CmdOrCtrl+Shift+A': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
+	'CmdOrCtrl+Shift+B': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
+
+	'CmdOrCtrl+delete': GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN,
+	'CmdOrCtrl+shift+delete': GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
 };

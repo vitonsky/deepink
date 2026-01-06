@@ -1,7 +1,8 @@
+import { WorkspaceEvents } from '@api/events/workspace';
 import { formatNoteLink } from '@core/features/links';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
-	useNotesContext,
+	useEventBus,
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
@@ -9,7 +10,6 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
@@ -32,8 +32,6 @@ export const useNoteCommandHandlers = () => {
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
-	const { noteUpdated } = useNotesContext();
-	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
 	const notesExport = useNotesExport();
@@ -41,6 +39,8 @@ export const useNoteCommandHandlers = () => {
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
 	const requiresConfirmMoveToBin = useAppSelector(selectConfirmMoveToBin);
+
+	const eventBus = useEventBus();
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async ({ id }) => {
 		if (requiresConfirmMoveToBin) {
@@ -51,10 +51,8 @@ export const useNoteCommandHandlers = () => {
 		noteActions.close(id);
 
 		await notes.updateMeta([id], { isDeleted: true });
-		const updatedNote = await notes.getById(id);
-		if (updatedNote) noteUpdated(updatedNote);
 
-		updateNotes();
+		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
 		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
 			permanently: 'false',
@@ -76,7 +74,7 @@ export const useNoteCommandHandlers = () => {
 			await notes.delete([id]);
 			await tagsRegistry.setAttachedTags(id, []);
 
-			updateNotes();
+			eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
 
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
 				permanently: 'true',
@@ -86,10 +84,8 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async ({ id }) => {
 		await notes.updateMeta([id], { isDeleted: false });
-		const updatedNote = await notes.getById(id);
-		if (updatedNote) noteUpdated(updatedNote);
 
-		updateNotes();
+		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
 		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
 	});
@@ -123,6 +119,42 @@ export const useNoteCommandHandlers = () => {
 			console.log(`Copy markdown link ${markdownLink}`);
 
 			copyTextToClipboard(markdownLink);
+		},
+	);
+
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
+		async ({ id }) => {
+			const note = await notes.getById(id);
+			if (!note) return;
+
+			const newArchivedState = !note.isArchived;
+			await notes.updateMeta([note.id], {
+				isArchived: newArchivedState,
+			});
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+				action: newArchivedState ? 'Added' : 'Removed',
+			});
+		},
+	);
+
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
+		async ({ id }) => {
+			const note = await notes.getById(id);
+			if (!note) return;
+
+			const newBookmarkedState = !note.isBookmarked;
+			await notes.updateMeta([note.id], {
+				isBookmarked: newBookmarkedState,
+			});
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
+				action: newBookmarkedState ? 'Added' : 'Removed',
+			});
 		},
 	);
 };
