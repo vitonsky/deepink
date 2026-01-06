@@ -6,6 +6,7 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesListPanel } from '@features/MainScreen/NotesListPanel';
 import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { workspaceShortcuts } from '@hooks/commands/shortcuts';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useNoteCommandHandlers } from '@hooks/notes/useNoteCommandHandlers';
@@ -21,9 +22,24 @@ import { TagsPanel } from './TagsPanel';
 
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	useShortcutsBinding(workspaceShortcuts, () => {
-		if (!activeNoteId) return;
-		return { id: activeNoteId };
+
+	useShortcutsBinding(workspaceShortcuts, {
+		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE]: () => {
+			if (!activeNoteId) return;
+			return { id: activeNoteId };
+		},
+		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK]: () => {
+			if (!activeNoteId) return;
+			return { id: activeNoteId };
+		},
+		[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: () => {
+			if (!activeNoteId) return;
+			return { id: activeNoteId };
+		},
+		[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: () => {
+			if (!activeNoteId) return;
+			return { id: activeNoteId };
+		},
 	});
 
 	useNoteCommandHandlers();
