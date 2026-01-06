@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { INote, NoteId } from '@core/features/notes';
+import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
 import {
@@ -15,7 +15,6 @@ import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 import { NoteActions } from '.';
 
 export type ContextMenuOptions = {
-	closeNote: (id: NoteId) => void;
 	updateNotes: () => void;
 };
 
