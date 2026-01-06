@@ -10,9 +10,11 @@ import { KeyboardShortcutMap } from '.';
  *
  * Configures the processing of global keyboard shortcuts, associating each combination with a corresponding command
  */
-export const useShortcutsBinding = <K extends GLOBAL_COMMANDS>(
+export const useShortcutsBinding = (
 	shortcuts: KeyboardShortcutMap,
-	getContext?: (command: K) => CommandPayloadsMap[K],
+	commandPayloads: {
+		[K in GLOBAL_COMMANDS]?: () => CommandPayloadsMap[K] | undefined;
+	} = {},
 ) => {
 	const runCommand = useCommand();
 
@@ -31,8 +33,14 @@ export const useShortcutsBinding = <K extends GLOBAL_COMMANDS>(
 					capture: true,
 				},
 				() => {
-					const payload = getContext?.(commandName as K);
-					runCommand(commandName, payload);
+					if (commandPayloads[commandName]) {
+						const payload = commandPayloads[commandName]();
+						if (payload) runCommand(commandName, payload);
+
+						return;
+					}
+
+					runCommand(commandName);
 				},
 			);
 		});
@@ -40,5 +48,5 @@ export const useShortcutsBinding = <K extends GLOBAL_COMMANDS>(
 		return () => {
 			Object.keys(shortcuts).forEach((shortcut) => hotkeys.unbind(shortcut));
 		};
-	}, [getContext, runCommand, shortcuts]);
+	}, [commandPayloads, runCommand, shortcuts]);
 };
