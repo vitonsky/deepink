@@ -6,7 +6,7 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { workspaceShortcuts } from '@hooks/commands/shortcuts';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
-import { useNoteManagementCommands } from '@hooks/notes/useNoteManagementCommands';
+import { useNoteCommandHandlers } from '@hooks/notes/useNoteManagementCommands';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
@@ -18,13 +18,13 @@ import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
 import { StatusBar } from './StatusBar';
 
 export const MainScreen: FC = () => {
-	useNoteManagementCommands();
-
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	useShortcutsBinding(workspaceShortcuts, () => {
 		if (!activeNoteId) return;
 		return { id: activeNoteId };
 	});
+
+	useNoteCommandHandlers();
 
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
