@@ -114,7 +114,9 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				</MenuItem>
 				<MenuItem
 					onClick={() =>
-						runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE)
+						runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE, {
+							id: note.id,
+						})
 					}
 				>
 					<HStack>
