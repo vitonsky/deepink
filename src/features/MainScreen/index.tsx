@@ -23,23 +23,12 @@ import { TagsPanel } from './TagsPanel';
 export const MainScreen: FC = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
+	const getPayloadForCommand = () => (activeNoteId ? { id: activeNoteId } : undefined);
 	useShortcutsBinding(workspaceShortcuts, {
-		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE]: () => {
-			if (!activeNoteId) return;
-			return { id: activeNoteId };
-		},
-		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK]: () => {
-			if (!activeNoteId) return;
-			return { id: activeNoteId };
-		},
-		[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: () => {
-			if (!activeNoteId) return;
-			return { id: activeNoteId };
-		},
-		[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: () => {
-			if (!activeNoteId) return;
-			return { id: activeNoteId };
-		},
+		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE]: getPayloadForCommand,
+		[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK]: getPayloadForCommand,
+		[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: getPayloadForCommand,
+		[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: getPayloadForCommand,
 	});
 
 	useNoteCommandHandlers();
