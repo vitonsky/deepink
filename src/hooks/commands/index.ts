@@ -81,6 +81,8 @@ type CommandsWithPayload = {
 	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
 	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };
+	[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE]: { id: string };
+	[GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK]: { id: string };
 };
 
 export type CommandPayloadsMap = {
