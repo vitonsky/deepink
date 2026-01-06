@@ -27,7 +27,7 @@ const mdCharsForEscapeRegEx = new RegExp(
 /**
  * Handles delete, restore, and export actions for a note
  */
-export const useNoteManagementCommands = () => {
+export const useNoteCommandHandlers = () => {
 	const telemetry = useTelemetryTracker();
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
