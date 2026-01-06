@@ -6,7 +6,7 @@ import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
 import { NotesContainer } from '@features/NotesContainer';
 import { workspaceShortcuts } from '@hooks/commands/shortcuts';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
-import { useNoteCommandHandlers } from '@hooks/notes/useNoteManagementCommands';
+import { useNoteCommandHandlers } from '@hooks/notes/useNoteCommandHandlers';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
