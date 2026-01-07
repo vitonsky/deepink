@@ -20,9 +20,13 @@ import {
 } from '@state/redux/profiles/profiles';
 import { selectNotesView } from '@state/redux/profiles/selectors/view';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
+<<<<<<< HEAD:src/features/MainScreen/NotesListPanel/NotesList.tsx
 import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
+=======
+// import { isElementInViewport } from '@utils/dom/isElementInViewport';
+import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
+>>>>>>> 9cc92efa (chore: simplify scroll):src/features/MainScreen/NotesList/index.tsx
 
 export type NotesListProps = {};
 
@@ -84,48 +88,36 @@ export const NotesList: FC<NotesListProps> = () => {
 		isLoadMoreNotesRef.current = 0;
 	}, [notesView]);
 
+	const shouldScrollRef = useRef(false);
+	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
-	const scrollTargetIdRef = useRef<string | null>(null);
-	const scrollToActiveNotes = () => {
-		if (!scrollTargetIdRef.current) return;
 
-		// Skip if active note is in viewport
-		if (
-			activeNoteRef.current !== null &&
-			isElementInViewport(activeNoteRef.current)
-		) {
-			scrollTargetIdRef.current = null;
+	// Update the flag when the view changes or the active note ID changes
+	useEffect(() => {
+		shouldScrollRef.current = true;
+	}, [notesView, activeNoteId]);
+
+	// Scroll to the active note
+	useEffect(() => {
+		if (!activeNoteId || !shouldScrollRef.current || isNotesLoading) return;
+
+		const noteIndex = notes.findIndex((n) => n.id === activeNoteId);
+		const isNoteInViewport = items.some((item) => item.index === noteIndex);
+
+		// Skip scrolling if the active note is in the viewport
+		if (noteIndex !== -1 && isNoteInViewport) {
+			shouldScrollRef.current = false;
 			return;
 		}
 
-		const noteIndex = notes.findIndex(
-			(note) => note.id === scrollTargetIdRef.current,
-		);
-		if (noteIndex === -1) return;
-
-		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-		scrollTargetIdRef.current = null;
-	};
-
-	// Scroll to active note
-	useEffect(() => {
-		if (activeNoteId) {
-			scrollTargetIdRef.current = activeNoteId;
-			scrollToActiveNotes();
-			return;
+		if (noteIndex === -1) {
+			virtualizer.scrollToOffset(0);
+		} else {
+			virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 		}
-		scrollTargetIdRef.current = null;
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [activeNoteId, notesView]);
-
-	// Update scroll when notes are updated
-	useEffect(() => {
-		if (!scrollTargetIdRef.current) return;
-		scrollToActiveNotes();
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [notes]);
+		shouldScrollRef.current = false;
+	}, [notes, isNotesLoading, virtualizer, activeNoteId]);
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
@@ -147,7 +139,6 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [notesView, notesOffset, dispatch, workspaceData]);
 
 	// Show the spinner for a minimum amount of time
-	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
 	const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
 	useEffect(() => {
 		if (isNotesLoading) {
