@@ -102,22 +102,22 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (!activeNoteId || !shouldScrollRef.current || isNotesLoading) return;
 
 		const noteIndex = notes.findIndex((n) => n.id === activeNoteId);
-		const isNoteInViewport = items.some((item) => item.index === noteIndex);
-
-		// Skip scrolling if the active note is in the viewport
-		if (noteIndex !== -1 && isNoteInViewport) {
+		if (noteIndex === -1) {
+			virtualizer.scrollToOffset(0);
 			shouldScrollRef.current = false;
 			return;
 		}
 
-		if (noteIndex === -1) {
-			virtualizer.scrollToOffset(0);
-		} else {
-			virtualizer.scrollToIndex(noteIndex, { align: 'start' });
+		// Skip scrolling if the active note is in the viewport
+		const isNoteInViewport = items.some((item) => item.index === noteIndex);
+		if (isNoteInViewport) {
+			shouldScrollRef.current = false;
+			return;
 		}
 
+		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 		shouldScrollRef.current = false;
-	}, [notes, isNotesLoading, virtualizer, activeNoteId]);
+	}, [notes, items, isNotesLoading, activeNoteId, virtualizer]);
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
