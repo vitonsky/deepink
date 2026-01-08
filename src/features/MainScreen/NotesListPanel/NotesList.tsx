@@ -88,36 +88,26 @@ export const NotesList: FC<NotesListProps> = () => {
 		isLoadMoreNotesRef.current = 0;
 	}, [notesView]);
 
-	const shouldScrollRef = useRef(false);
-	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
-	const activeNoteRef = useRef<HTMLDivElement | null>(null);
-
-	// Update the flag when the view changes or the active note ID changes
-	useEffect(() => {
-		shouldScrollRef.current = true;
-	}, [notesView, activeNoteId]);
-
 	// Scroll to the active note
+	const activeNoteRef = useRef<HTMLDivElement | null>(null);
+	const firstNoteId = notes[0]?.id;
 	useEffect(() => {
-		if (!activeNoteId || !shouldScrollRef.current || isNotesLoading) return;
-
 		const noteIndex = notes.findIndex((n) => n.id === activeNoteId);
 		if (noteIndex === -1) {
-			virtualizer.scrollToOffset(0);
-			shouldScrollRef.current = false;
+			virtualizer.scrollToIndex(0);
 			return;
 		}
 
 		// Skip scrolling if the active note is in the viewport
 		const isNoteInViewport = items.some((item) => item.index === noteIndex);
-		if (isNoteInViewport) {
-			shouldScrollRef.current = false;
-			return;
-		}
+		if (isNoteInViewport) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-		shouldScrollRef.current = false;
-	}, [notes, items, isNotesLoading, activeNoteId, virtualizer]);
+
+		// Scroll to active note once if it changes or notes are replaced after view change
+		// If firstNoteId changes, the notes list was replaced
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [firstNoteId, activeNoteId, notesView]);
 
 	// Saves the offset when switching views so we can scroll to a note with an index greater than the base page size
 	const notesOffset = useWorkspaceSelector(selectNotesOffset);
@@ -139,6 +129,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	}, [notesView, notesOffset, dispatch, workspaceData]);
 
 	// Show the spinner for a minimum amount of time
+	const isNotesLoading = useWorkspaceSelector(selectIsNotesLoading);
 	const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
 	useEffect(() => {
 		if (isNotesLoading) {
