@@ -93,15 +93,17 @@ export const NotesList: FC<NotesListProps> = () => {
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
 	const firstNoteId = notes[0]?.id;
 	useEffect(() => {
+		if (!activeNoteId) return;
+
+		// Skip if active note is in viewport
+		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
+			return;
+
 		const noteIndex = notes.findIndex((n) => n.id === activeNoteId);
 		if (noteIndex === -1) {
 			virtualizer.scrollToIndex(0);
 			return;
 		}
-
-		// Skip if active note is in viewport
-		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
-			return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
