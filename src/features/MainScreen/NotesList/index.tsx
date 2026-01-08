@@ -20,6 +20,7 @@ import {
 } from '@state/redux/profiles/profiles';
 import { selectNotesView } from '@state/redux/profiles/selectors/view';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 // import { isElementInViewport } from '@utils/dom/isElementInViewport';
 import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
@@ -94,9 +95,9 @@ export const NotesList: FC<NotesListProps> = () => {
 			return;
 		}
 
-		// Skip scrolling if the active note is in the viewport
-		const isNoteInViewport = items.some((item) => item.index === noteIndex);
-		if (isNoteInViewport) return;
+		// Skip if active note is in viewport
+		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
+			return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
