@@ -7,7 +7,14 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { FaArrowLeft, FaBookmark, FaFlag, FaHashtag, FaXmark } from 'react-icons/fa6';
+import {
+	FaArrowLeft,
+	FaBookmark,
+	FaBoxArchive,
+	FaFlag,
+	FaHashtag,
+	FaXmark,
+} from 'react-icons/fa6';
 import { Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { debounce } from 'lodash';
 import { WorkspaceEvents } from '@api/events/workspace';
