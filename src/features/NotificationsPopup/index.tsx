@@ -19,7 +19,7 @@ export const NotificationsPopup = () => {
 			},
 			{
 				placement: 'end',
-				priority: 100000,
+				priority: 100_000,
 			},
 		);
 

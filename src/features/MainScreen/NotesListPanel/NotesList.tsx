@@ -16,7 +16,7 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
+import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
 
 export type NotesListProps = {};
 

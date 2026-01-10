@@ -1,7 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { FaGear, FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
-import { Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
+import {
+	Button,
+	Divider,
+	HStack,
+	Select,
+	StackProps,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
+import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
@@ -12,7 +21,7 @@ import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles'
 
 import { WorkspaceCreatePopup } from './WorkspaceCreatePopup';
 
-export const WorkspaceBar = () => {
+export const WorkspacesPanel = (props: StackProps) => {
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();
@@ -41,18 +50,19 @@ export const WorkspaceBar = () => {
 	const modal = useWorkspaceModal();
 
 	return (
-		<VStack w="100%">
+		<VStack w="100%" {...props}>
 			<HStack w="100%">
 				<Text
 					as="h2"
-					fontWeight="bold"
-					fontSize="16px"
+					fontSize=".9rem"
+					fontWeight="600"
+					gap=".4rem"
 					color="typography.secondary"
 				>
 					Workspaces
 				</Text>
 
-				<Button
+				<IconButton
 					variant="ghost"
 					size="xs"
 					marginLeft="auto"
@@ -61,9 +71,9 @@ export const WorkspaceBar = () => {
 							content: () => <WorkspaceCreatePopup />,
 						});
 					}}
-				>
-					<FaPlus />
-				</Button>
+					icon={<FaPlus />}
+					title="Add workspace"
+				/>
 			</HStack>
 
 			<Divider />

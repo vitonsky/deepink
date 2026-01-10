@@ -3,7 +3,7 @@ import saveAs from 'file-saver';
 import { getAppResourceDataInUrl } from '@core/features/links';
 import { openLink } from '@electron/requests/interactions/renderer';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
-import { useNotesControl } from '@features/MainScreen/useNotesControl';
+import { useNotesControl } from '@hooks/notes/useNotesControl';
 
 /**
  * Returns callback to open any links, including links with application defined protocols

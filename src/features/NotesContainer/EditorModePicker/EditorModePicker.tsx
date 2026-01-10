@@ -52,14 +52,14 @@ export const EditorModePicker = () => {
 			},
 			{
 				placement: 'end',
-				priority: 100000,
+				priority: 99_000,
 			},
 		);
 	}, [controls, editorMode, isNotesOpened]);
 
 	useEffect(() => {
 		return () => {
-			controls.unregister('notifications');
+			controls.unregister('editor-mode');
 		};
 	}, [controls]);
 

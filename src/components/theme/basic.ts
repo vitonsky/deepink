@@ -4,12 +4,15 @@ import {
 	defineStyleConfig,
 	extendTheme,
 	StyleFunctionProps,
+	SystemStyleObject,
 } from '@chakra-ui/react';
 import { ModalScreenTheme } from '@components/ModalScreen/ModalScreen.theme';
 import { NestedListTheme } from '@components/NestedList/NestedList.theme';
 import { NotePreviewTheme } from '@components/NotePreview/NotePreview.theme';
 import { NotificationsTheme } from '@components/Notifications/Notifications.theme';
 import { RichEditorTheme } from '@features/NoteEditor/RichEditor/RichEditor.theme';
+
+import './resizable-panels.css';
 
 export const getScrollBarStyles = ({
 	trackColor = '#f1f1f1',
@@ -19,30 +22,44 @@ export const getScrollBarStyles = ({
 	trackColor?: string;
 	scrollColor?: string;
 	scrollHoverColor?: string;
-} = {}) => ({
-	'::-webkit-scrollbar': {
-		width: '10px',
-		// For horizontal scroll
-		height: '10px',
-	},
+} = {}) => {
+	const styles: SystemStyleObject = {
+		'.invisible-scroll::-webkit-scrollbar': {
+			display: 'none',
+		},
+	};
 
-	'::-webkit-scrollbar-track': {
-		background: trackColor,
-		borderRadius: '0px',
-		border: '1px solid transparent',
-	},
+	// Disable custom scrolls for some environments
+	if (navigator.userAgent.includes('Mac OS')) return styles;
 
-	'::-webkit-scrollbar-thumb': {
-		background: scrollColor,
-		borderRadius: '0px',
-		border: '0px solid transparent',
-		backgroundClip: 'padding-box',
-	},
+	// TODO: automatically hide scroll bar when not needed
+	return {
+		...styles,
 
-	'::-webkit-scrollbar-thumb:hover': {
-		background: scrollHoverColor,
-	},
-});
+		'::-webkit-scrollbar': {
+			width: '10px',
+			// For horizontal scroll
+			height: '10px',
+		},
+
+		'::-webkit-scrollbar-track': {
+			background: trackColor,
+			borderRadius: '0px',
+			border: '1px solid transparent',
+		},
+
+		'::-webkit-scrollbar-thumb': {
+			background: scrollColor,
+			borderRadius: '0px',
+			border: '0px solid transparent',
+			backgroundClip: 'padding-box',
+		},
+
+		'::-webkit-scrollbar-thumb:hover': {
+			background: scrollHoverColor,
+		},
+	} satisfies SystemStyleObject;
+};
 
 export const basicTheme = extendTheme({
 	styles: {
@@ -60,6 +77,10 @@ export const basicTheme = extendTheme({
 			body: {
 				background: 'surface.background',
 				margin: 0,
+			},
+
+			'[data-resize-handle]': {
+				'--resize-handle-active-color': 'var(--chakra-colors-accent-500)',
 			},
 
 			...getScrollBarStyles(),
@@ -87,12 +108,14 @@ export const basicTheme = extendTheme({
 		},
 		typography: {
 			primary: '#000',
+			inverted: '#fff',
 			secondary: '#727272',
 			additional: '#3e3d3d',
 			ghost: '#6e6e6e',
 		},
 		surface: {
 			background: '#ffffff',
+			invertedBackground: '#000',
 			panel: '#fdfdfd',
 			contrastPanel: '#f7f7f7',
 			border: '#e2e8f0',
@@ -136,6 +159,14 @@ export const basicTheme = extendTheme({
 		},
 	},
 	components: {
+		Tooltip: defineStyleConfig({
+			baseStyle: {
+				borderRadius: '4px',
+				color: 'typography.inverted',
+				backgroundColor: 'surface.invertedBackground',
+				'--popper-arrow-bg': 'var(--chakra-colors-surface-invertedBackground)',
+			},
+		}),
 		Link: defineStyleConfig({
 			baseStyle: {
 				color: 'link.base',
@@ -146,9 +177,11 @@ export const basicTheme = extendTheme({
 		}),
 		Button: defineStyleConfig({
 			baseStyle: {
-				transition: 'transform .20ms ease',
-				'&:not(:disabled):active': {
-					transform: 'scale(.95)',
+				'&:not([data-no-animation])': {
+					transition: 'transform .20ms ease',
+					'&:not(:disabled):active': {
+						transform: 'scale(.95)',
+					},
 				},
 			},
 			variants: {
@@ -184,6 +217,9 @@ export const basicTheme = extendTheme({
 					'&:not([disabled]):hover': {
 						backgroundColor: 'dim.400',
 					},
+					'&[data-active]': {
+						backgroundColor: 'primary.100',
+					},
 				},
 				ghost: {
 					color: 'variants.ghost.text',
@@ -192,6 +228,23 @@ export const basicTheme = extendTheme({
 					},
 					'&[data-active]': {
 						color: 'variants.ghost.active.text',
+					},
+				},
+				link: {
+					color: 'typography.accent',
+					backgroundColor: 'unset',
+					textDecoration: 'underline',
+					padding: 0,
+					fontWeight: 'normal',
+					fontSize: 'inherit',
+					alignItems: 'baseline',
+					'&:hover, &:active, &[data-active]': {
+						color: 'typography.accent',
+					},
+					textUnderlineOffset: '.2em',
+
+					'&:not(:disabled):active': {
+						transform: 'none',
 					},
 				},
 			},

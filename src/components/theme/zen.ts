@@ -27,6 +27,7 @@ export const zenTheme = extendTheme(basicTheme, {
 		},
 		primary: {
 			// Primary color for controls
+			100: '#ddccbd',
 			200: '#b78665',
 			300: '#ae7f5f',
 			500: '#fff',
@@ -35,6 +36,7 @@ export const zenTheme = extendTheme(basicTheme, {
 		typography: {
 			primary: '#000',
 			secondary: '#4e3a0c',
+			accent: '#493017',
 			additional: '#3e3d3d',
 			ghost: '#3a3a3a',
 		},

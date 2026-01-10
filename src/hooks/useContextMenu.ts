@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ContextMenu } from '@electron/requests/contextMenu';
-import { ElectronContextMenu } from '@features/MainScreen/NotesList/NoteContextMenu/ElectronContextMenu';
+import { ElectronContextMenu } from '@features/NotesContainer/NoteContextMenu/ElectronContextMenu';
 
 export type ContextMenuCallback<T extends string> = (event: {
 	id: string;
