@@ -5,7 +5,8 @@ import { IconButton } from '@components/IconButton';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import {
-	TAG_ERROR_CODE, TagControllerError
+	TAG_ERROR_CODE,
+	TagControllerError,
 } from '@core/features/tags/controller/TagsController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
