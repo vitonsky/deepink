@@ -48,9 +48,6 @@ export const NotesViewFilter: FC<NotesOverviewProps> = () => {
 						data-no-animation
 						isActive={id === notesViewMode}
 						onClick={() => {
-							if (id !== NOTES_VIEW.All_NOTES && id !== NOTES_VIEW.BIN)
-								return;
-
 							dispatch(
 								workspacesApi.setView({
 									...workspaceData,
