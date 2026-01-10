@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { FaBookmark, FaBoxArchive, FaRegCompass, FaTrashCan } from 'react-icons/fa6';
+import { FaBookmark, FaBoxArchive, FaCompass, FaTrash } from 'react-icons/fa6';
 import { ButtonGroup, HStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -12,7 +12,7 @@ export type NotesOverviewProps = {};
 const FilterOptions = [
 	{
 		id: NOTES_VIEW.All_NOTES,
-		icon: FaRegCompass,
+		icon: FaCompass,
 		label: 'All notes',
 	},
 	{
@@ -27,7 +27,7 @@ const FilterOptions = [
 	},
 	{
 		id: NOTES_VIEW.BIN,
-		icon: FaTrashCan,
+		icon: FaTrash,
 		label: 'Deleted notes',
 	},
 ];
