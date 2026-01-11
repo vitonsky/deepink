@@ -49,6 +49,7 @@
 				"lang": "en_US",
 				"skipWords": [
 					"Aes",
+					"cmd",
 					"embeddings",
 					"onnx",
 					"huggingface",
