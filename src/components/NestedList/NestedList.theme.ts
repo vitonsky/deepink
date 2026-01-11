@@ -22,11 +22,12 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 		},
 		item: {
 			w: '100%',
-			lineHeight: '1.5rem',
+			lineHeight: '1rem',
 			gap: '0',
 		},
 		content: {
 			w: '100%',
+			borderRadius: '4px',
 		},
 		group: {
 			w: '100%',

@@ -4,7 +4,7 @@ import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
 
-import { useNoteContextMenu } from '../NotesList/NoteContextMenu/useNoteContextMenu';
+import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
 export type TopBarProps = {
 	tabs: NoteId[];
@@ -18,7 +18,7 @@ export type TopBarProps = {
 };
 
 // TODO: improve tabs style
-export const TopBar: FC<TopBarProps> = ({
+export const OpenedNotesPanel: FC<TopBarProps> = ({
 	notes,
 	tabs,
 	activeTab,
@@ -54,6 +54,8 @@ export const TopBar: FC<TopBarProps> = ({
 			}}
 			w="100%"
 			maxH="100px"
+			paddingTop=".5rem"
+			paddingInline=".5rem"
 			overflow="auto"
 			bgColor="surface.panel"
 			flexShrink={0}

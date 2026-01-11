@@ -12,7 +12,7 @@
       true,
       {
         "browsers": [
-          "> 5% and not dead"
+          "last 5 Electron versions"
         ],
         "ignore": []
       }

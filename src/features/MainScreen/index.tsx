@@ -1,16 +1,18 @@
 import React, { FC, useEffect } from 'react';
-import { HStack, VStack } from '@chakra-ui/react';
+import { Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { Box, HStack, VStack } from '@chakra-ui/react';
+import { SyncedPanelGroup } from '@components/SyncedPanelGroup';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
-import { NotesPanel } from '@features/MainScreen/NotesPanel';
-import { WorkspaceBar } from '@features/MainScreen/WorkspaceBar';
+import { NotesListPanel } from '@features/MainScreen/NotesListPanel';
+import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
-import { ProfileSettings } from '../ProfileSettings/ProfileSettings';
-import { NewNoteButton } from './NewNoteButton';
-import { NotesOverview } from './NotesOverview';
-import { NotificationsPopup } from './NotificationsPopup/NotificationsPopup';
+import { NotificationsPopup } from '../NotificationsPopup';
+import { ActivityBar } from './ActivityBar';
+import { NotesViewFilter } from './NotesViewFilter';
 import { StatusBar } from './StatusBar';
+import { TagsPanel } from './TagsPanel';
 
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
@@ -70,58 +72,74 @@ export const MainScreen: FC = () => {
 					overflow: 'hidden',
 				}}
 			>
-				<VStack
+				<Box
+					className="invisible-scroll"
 					sx={{
+						flexShrink: 0,
+						height: '100%',
+						overflow: 'auto',
+						borderRight: '1px solid',
+						borderColor: 'surface.border',
 						bgColor: 'surface.panel',
-						alignItems: 'start',
-
-						width: '100%',
-						height: '100%',
-						minWidth: '250px',
-						maxWidth: '250px',
-						padding: '.5rem',
-						overflow: 'hidden',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '1rem',
-						borderRight: '1px solid',
-						borderColor: 'surface.border',
 					}}
 				>
-					<NewNoteButton />
+					<ActivityBar />
+				</Box>
 
-					<NotesOverview />
+				<SyncedPanelGroup direction="horizontal" autoSaveId="MainScreen.content">
+					<VStack
+						as={Panel}
+						defaultSize={20}
+						sx={{
+							alignItems: 'start',
 
-					<WorkspaceBar />
-				</VStack>
+							minWidth: 'min-content',
+							maxWidth: '350px',
+							padding: '.5rem',
+							overflow: 'hidden',
+							display: 'flex',
+							flexDirection: 'column',
+							gap: '1rem',
+						}}
+					>
+						<NotesViewFilter />
 
-				<VStack
-					sx={{
-						alignItems: 'start',
+						<TagsPanel />
 
-						width: '100%',
-						height: '100%',
-						minWidth: '250px',
-						maxWidth: '250px',
-						padding: '.5rem',
-						overflow: 'hidden',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '1rem',
-						borderRight: '1px solid',
-						borderColor: 'surface.border',
-					}}
-				>
-					<NotesPanel />
-				</VStack>
+						<WorkspacesPanel marginTop="auto" />
+					</VStack>
 
-				<NotesContainer />
+					<Box as={PanelResizeHandle} color="surface.border" />
+
+					<VStack
+						as={Panel}
+						defaultSize={20}
+						sx={{
+							alignItems: 'start',
+
+							minWidth: '200px',
+							maxWidth: '350px',
+							padding: '.5rem',
+							overflow: 'hidden',
+							display: 'flex',
+							flexDirection: 'column',
+							gap: '1rem',
+						}}
+					>
+						<NotesListPanel />
+					</VStack>
+
+					<Box as={PanelResizeHandle} color="surface.border" />
+
+					<Box as={Panel} minSize={50}>
+						<NotesContainer />
+					</Box>
+				</SyncedPanelGroup>
 			</HStack>
 
 			<StatusBar />
 
 			<NotificationsPopup />
-			<ProfileSettings />
 		</VStack>
 	);
 };

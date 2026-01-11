@@ -4,6 +4,8 @@ import { useStatusBar } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 export type StatusBarProps = StackProps;
 
+const isMacOS = navigator.userAgent.includes('Mac OS');
+
 // TODO: make status bar extensible
 export const StatusBar: FC<StatusBarProps> = (props) => {
 	const { start, end } = useStatusBar();
@@ -15,6 +17,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 			bgColor="surface.panel"
 			borderTop="1px solid"
 			borderColor="surface.border"
+			paddingInline={isMacOS ? '7px' : undefined}
 			{...props}
 		>
 			<HStack w="auto" gap="0">
@@ -29,6 +32,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 							fontWeight="normal"
 							title={item.title}
 							onClick={item.onClick}
+							color="typography.secondary"
 						>
 							<HStack>
 								{item.icon}
@@ -51,6 +55,7 @@ export const StatusBar: FC<StatusBarProps> = (props) => {
 							fontWeight="normal"
 							title={item.title}
 							onClick={item.onClick}
+							color="typography.secondary"
 						>
 							<HStack>
 								{item.icon}

@@ -1,15 +1,7 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
-import {
-	FaBookmark,
-	FaBookOpen,
-	FaBoxArchive,
-	FaFile,
-	FaInbox,
-	FaPlus,
-	FaTrash,
-} from 'react-icons/fa6';
-import { Box, Button, Divider, HStack, Text, VStack } from '@chakra-ui/react';
-import { NestedList } from '@components/NestedList';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { FaPlus } from 'react-icons/fa6';
+import { Box, Divider, HStack, Text, VStack } from '@chakra-ui/react';
+import { IconButton } from '@components/IconButton';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
 import { IResolvedTag } from '@core/features/tags';
 import {
@@ -22,19 +14,15 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
-	NOTES_VIEW,
 	selectActiveTag,
 	selectTags,
 	selectTagsTree,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectNotesView } from '@state/redux/profiles/selectors/view';
 
 import { TagsList } from './TagsList';
 
-export type NotesOverviewProps = {};
-
-export const NotesOverview: FC<NotesOverviewProps> = () => {
+export const TagsPanel = () => {
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();
@@ -43,8 +31,6 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 	const activeTag = useWorkspaceSelector(selectActiveTag);
 	const tags = useWorkspaceSelector(selectTags);
 	const tagsTree = useWorkspaceSelector(selectTagsTree);
-
-	const notesViewMode = useWorkspaceSelector(selectNotesView);
 
 	const tagsRegistry = useTagsRegistry();
 
@@ -146,161 +132,87 @@ export const NotesOverview: FC<NotesOverviewProps> = () => {
 		);
 	}, [editedTag, isAddTagPopupOpened, tags, tagsRegistry, telemetry]);
 
-	// TODO: show spinner while loading tags
 	return (
-		<VStack flex={1} w="100%" gap="2rem" minHeight="0">
-			<NestedList
-				overflow="auto"
-				minHeight="150px"
-				items={[
-					{
-						id: 'inbox',
-						content: (
-							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<FaInbox />
-								<Text>Inbox</Text>
-							</HStack>
-						),
-					},
-					{
-						id: NOTES_VIEW.All_NOTES,
-						content: (
-							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<FaBookOpen />
-								<Text>All notes</Text>
-							</HStack>
-						),
-					},
-					{
-						id: NOTES_VIEW.BOOKMARK,
-						content: (
-							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<FaBookmark />
-								<Text>Bookmarks</Text>
-							</HStack>
-						),
-					},
-					{
-						id: NOTES_VIEW.ARCHIVE,
-						content: (
-							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<FaBoxArchive />
-								<Text>Archive</Text>
-							</HStack>
-						),
-					},
-					{
-						id: 'files',
-						content: (
-							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<FaFile />
-								<Text>Files</Text>
-							</HStack>
-						),
-					},
-					{
-						id: NOTES_VIEW.BIN,
-						content: (
-							<HStack padding="0.5rem 1rem" gap="0.8rem">
-								<FaTrash />
-								<Text>Bin</Text>
-							</HStack>
-						),
-					},
-				]}
-				activeItem={notesViewMode}
-				onPick={(id) => {
-					if (!Object.values(NOTES_VIEW).includes(id as NOTES_VIEW)) return;
-
-					dispatch(
-						workspacesApi.setView({
-							...workspaceData,
-							view: id as NOTES_VIEW,
-						}),
-					);
-
-					dispatch(
-						workspacesApi.setSelectedTag({
-							...workspaceData,
-							tag: null,
-						}),
-					);
-				}}
-			/>
-
-			<VStack flex={1} minH="200px" w="100%" align="start">
+		<>
+			<VStack w="100%" align="start" minHeight="150px" gap=".4rem">
 				<HStack w="100%">
 					<Text
 						as="h2"
-						fontWeight="bold"
-						fontSize="16px"
+						fontSize=".9rem"
+						fontWeight="600"
 						color="typography.secondary"
 					>
 						Tags
 					</Text>
 
-					<Button
+					<IconButton
 						variant="ghost"
 						onClick={() => {
 							setIsAddTagPopupOpened(true);
 						}}
 						size="xs"
 						marginLeft="auto"
-					>
-						<FaPlus />
-					</Button>
+						icon={<FaPlus />}
+						title="Add tag"
+					/>
 				</HStack>
 
 				<Divider />
 
 				<Box w="100%" overflow="auto">
-					<TagsList
-						tags={tagsTree}
-						activeTag={activeTag ? activeTag.id : undefined}
-						onTagClick={(tagId) =>
-							dispatch(
-								workspacesApi.setSelectedTag({
-									...workspaceData,
-									tag: tagId,
-								}),
-							)
-						}
-						contextMenu={{
-							onAdd(id) {
-								const tag = tags.find((tag) => id === tag.id);
-								if (tag) {
-									parentTagForNewTagRef.current = tag;
-								}
+					{tagsTree.length > 0 ? (
+						<TagsList
+							tags={tagsTree}
+							activeTag={activeTag ? activeTag.id : undefined}
+							onTagClick={(tagId) =>
+								dispatch(
+									workspacesApi.setSelectedTag({
+										...workspaceData,
+										tag: tagId,
+									}),
+								)
+							}
+							contextMenu={{
+								onAdd(id) {
+									const tag = tags.find((tag) => id === tag.id);
+									if (tag) {
+										parentTagForNewTagRef.current = tag;
+									}
 
-								setIsAddTagPopupOpened(true);
-							},
-							async onDelete(id) {
-								const tag = tags.find((tag) => id === tag.id);
-								if (!tag) return;
+									setIsAddTagPopupOpened(true);
+								},
+								async onDelete(id) {
+									const tag = tags.find((tag) => id === tag.id);
+									if (!tag) return;
 
-								const isConfirmed = confirm(
-									`Really want to delete tag "${tag.resolvedName}" and all sub tags?`,
-								);
-								if (!isConfirmed) return;
+									const isConfirmed = confirm(
+										`Really want to delete tag "${tag.resolvedName}" and all sub tags?`,
+									);
+									if (!isConfirmed) return;
 
-								await tagsRegistry.delete(id);
+									await tagsRegistry.delete(id);
 
-								telemetry.track(TELEMETRY_EVENT_NAME.TAG_DELETED);
-							},
-							onEdit(id) {
-								const tag = tags.find((tag) => id === tag.id);
+									telemetry.track(TELEMETRY_EVENT_NAME.TAG_DELETED);
+								},
+								onEdit(id) {
+									const tag = tags.find((tag) => id === tag.id);
 
-								if (!tag) return;
+									if (!tag) return;
 
-								const { name, parent } = tag;
-								setEditedTag({ id, name, parent });
-							},
-						}}
-					/>
+									const { name, parent } = tag;
+									setEditedTag({ id, name, parent });
+								},
+							}}
+						/>
+					) : (
+						<Text color="typography.secondary" fontSize="sm">
+							Add tags in this workspace to organize notes
+						</Text>
+					)}
 				</Box>
 			</VStack>
 
 			{tagEditor}
-		</VStack>
+		</>
 	);
 };

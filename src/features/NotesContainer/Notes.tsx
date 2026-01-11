@@ -5,8 +5,8 @@ import { INote, INoteContent, NoteId } from '@core/features/notes';
 import { NoteMeta } from '@core/features/notes/controller';
 import { useAsRef } from '@hooks/useAsRef';
 
-import { useEditorLinks } from '../../MonakoEditor/features/useEditorLinks';
-import { Note } from '../../NoteEditor';
+import { useEditorLinks } from '../MonakoEditor/features/useEditorLinks';
+import { Note } from '../NoteEditor';
 
 export type NotesProps = {
 	tabs: NoteId[];
