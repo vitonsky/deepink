@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
 
 import { useCommand } from '../useCommand';
-import { shortcuts } from '.';
+import { KeyboardShortcutMap, shortcuts } from '.';
 
 /**
  * Registers keyboard shortcuts for commands
@@ -20,7 +20,20 @@ export const useShortcutsBinding = () => {
 		// We want to react only on events emitted by real user, not a synthetic
 		hotkeys.filter = (event) => event.isTrusted;
 
-		Object.entries(shortcuts).forEach(([shortcut, commandName]) => {
+		const isMacOS = navigator.userAgent.includes('Mac OS');
+		const normalizedShortcuts: KeyboardShortcutMap = Object.fromEntries(
+			Object.entries(shortcuts).map(
+				([shortcut, command]) =>
+					[
+						shortcut
+							.toLowerCase()
+							.replaceAll(/cmdorctrl/g, isMacOS ? 'cmd' : 'ctrl'),
+						command,
+					] as const,
+			),
+		);
+
+		Object.entries(normalizedShortcuts).forEach(([shortcut, commandName]) => {
 			hotkeys(
 				shortcut,
 				{
@@ -31,7 +44,9 @@ export const useShortcutsBinding = () => {
 		});
 
 		return () => {
-			Object.keys(shortcuts).forEach((shortcut) => hotkeys.unbind(shortcut));
+			Object.keys(normalizedShortcuts).forEach((shortcut) =>
+				hotkeys.unbind(shortcut),
+			);
 		};
 	}, [runCommand]);
 };
