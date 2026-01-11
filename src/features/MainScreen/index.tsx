@@ -93,8 +93,6 @@ export const MainScreen: FC = () => {
 						sx={{
 							alignItems: 'start',
 
-							// width: '100%',
-							// height: '100%',
 							minWidth: 'min-content',
 							maxWidth: '350px',
 							padding: '.5rem',
@@ -102,8 +100,6 @@ export const MainScreen: FC = () => {
 							display: 'flex',
 							flexDirection: 'column',
 							gap: '1rem',
-							// borderRight: '1px solid',
-							// borderColor: 'surface.border',
 						}}
 					>
 						<NotesViewFilter />
@@ -121,8 +117,6 @@ export const MainScreen: FC = () => {
 						sx={{
 							alignItems: 'start',
 
-							// width: '100%',
-							// height: '100%',
 							minWidth: '200px',
 							maxWidth: '350px',
 							padding: '.5rem',
@@ -130,8 +124,6 @@ export const MainScreen: FC = () => {
 							display: 'flex',
 							flexDirection: 'column',
 							gap: '1rem',
-							// borderRight: '1px solid',
-							// borderColor: 'surface.border',
 						}}
 					>
 						<NotesListPanel />
