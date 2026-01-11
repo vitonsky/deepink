@@ -46,6 +46,8 @@ export const zenTheme = extendTheme(basicTheme, {
 			contrastPanel: '#efe8de',
 			border: '#e0d6c7',
 			alternativeBorder: '#c0c4c9',
+			selection: '#ffca9b',
+			highlight: '#ffba7d',
 		},
 		dim: {
 			50: '#fdf4ea',

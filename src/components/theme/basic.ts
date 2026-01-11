@@ -79,6 +79,10 @@ export const basicTheme = extendTheme({
 				margin: 0,
 			},
 
+			'::selection': {
+				backgroundColor: 'surface.selection',
+			},
+
 			'[data-resize-handle]': {
 				'--resize-handle-active-color': 'var(--chakra-colors-accent-500)',
 			},
@@ -120,6 +124,8 @@ export const basicTheme = extendTheme({
 			contrastPanel: '#f7f7f7',
 			border: '#e2e8f0',
 			alternativeBorder: '#c0c4c9',
+			selection: '#d7e7ff',
+			highlight: '#b0d0ff',
 		},
 		dim: {
 			50: '#fbfbfb',

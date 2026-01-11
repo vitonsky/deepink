@@ -8,12 +8,16 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
+import { colord, extend } from 'colord';
+import mixPlugin from 'colord/plugins/mix';
 import { editor, languages } from 'monaco-editor-core';
 
 import { defaultExtensions } from './extensions';
 import { FileUploader, useDropFiles } from './features/useDropFiles';
 import * as markdown from './languages/markdown';
 import * as typescript from './languages/typescript';
+
+extend([mixPlugin]);
 
 // Configure monako
 languages.register({
@@ -45,6 +49,41 @@ languages.register({
 
 languages.setMonarchTokensProvider('markdown', markdown.language);
 languages.setLanguageConfiguration('markdown', markdown.conf);
+
+(globalThis as any).editor = editor;
+
+function updateScheme() {
+	const styles = getComputedStyle(document.documentElement);
+	const prop = (color: string) => colord(styles.getPropertyValue(color).trim()).toHex();
+
+	const colors = {
+		accent: prop('--chakra-colors-primary-300'),
+		background: prop('--chakra-colors-surface-background'),
+		text: prop('--chakra-colors-typography-primary'),
+		secondary: prop('--chakra-colors-typography-secondary'),
+		selection: prop('--chakra-colors-surface-selection'),
+		highlight: prop('--chakra-colors-surface-highlight'),
+	};
+
+	editor.defineTheme('zen', {
+		base: 'vs',
+		inherit: false,
+		rules: [],
+		colors: {
+			'editor.background': colors.background,
+			'editor.foreground': colors.text,
+			'editorCursor.foreground': colors.text,
+			'editorLineNumber.foreground': colors.secondary,
+			'editor.lineHighlightBackground': colord(colors.selection).alpha(0.2).toHex(),
+			'editor.selectionBackground': colors.selection,
+			'editor.selectionHighlightBackground': colors.highlight,
+			'editor.inactiveSelectionBackground': colors.highlight,
+		},
+	});
+}
+
+// TODO: call manually
+setInterval(updateScheme, 100);
 
 export type EditorObject = {
 	updateDimensions: () => void;
@@ -103,7 +142,10 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		const monacoEditor = editor.create(editorContainer, {
 			readOnly: isReadOnly,
 			value,
+			theme: 'zen',
 			language: 'markdown',
+			fontFamily: 'Arial',
+			fontSize: 18,
 			automaticLayout: true,
 			wordWrap: 'on',
 			quickSuggestions: false,
