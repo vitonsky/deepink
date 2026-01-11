@@ -17,8 +17,6 @@ import { FileUploader, useDropFiles } from './features/useDropFiles';
 import * as markdown from './languages/markdown';
 import * as typescript from './languages/typescript';
 
-extend([mixPlugin]);
-
 // Configure monako
 languages.register({
 	id: 'javascript',
@@ -50,9 +48,9 @@ languages.register({
 languages.setMonarchTokensProvider('markdown', markdown.language);
 languages.setLanguageConfiguration('markdown', markdown.conf);
 
-(globalThis as any).editor = editor;
+export function updateMonacoTheme() {
+	extend([mixPlugin]);
 
-function updateScheme() {
 	const styles = getComputedStyle(document.documentElement);
 	const prop = (color: string) => colord(styles.getPropertyValue(color).trim()).toHex();
 
@@ -65,7 +63,7 @@ function updateScheme() {
 		highlight: prop('--chakra-colors-surface-highlight'),
 	};
 
-	editor.defineTheme('zen', {
+	editor.defineTheme('native', {
 		base: 'vs',
 		inherit: false,
 		rules: [],
@@ -81,9 +79,6 @@ function updateScheme() {
 		},
 	});
 }
-
-// TODO: call manually
-setInterval(updateScheme, 100);
 
 export type EditorObject = {
 	updateDimensions: () => void;
@@ -142,7 +137,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		const monacoEditor = editor.create(editorContainer, {
 			readOnly: isReadOnly,
 			value,
-			theme: 'zen',
+			theme: 'native',
 			language: 'markdown',
 			fontFamily: 'Arial',
 			fontSize: 18,

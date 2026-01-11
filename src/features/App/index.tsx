@@ -1,7 +1,8 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useLayoutEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
+import { updateMonacoTheme } from '@features/MonakoEditor/MonacoEditor';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { Profiles } from './Profiles';
@@ -15,6 +16,7 @@ import { WorkspaceManager } from './WorkspaceManager';
 
 export const App: FC = () => {
 	useAppUpdater();
+	useLayoutEffect(updateMonacoTheme, []);
 
 	const [config] = useState(
 		() =>
