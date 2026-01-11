@@ -54,6 +54,8 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 			}}
 			w="100%"
 			maxH="100px"
+			paddingTop=".5rem"
+			paddingInline=".5rem"
 			overflow="auto"
 			bgColor="surface.panel"
 			flexShrink={0}
