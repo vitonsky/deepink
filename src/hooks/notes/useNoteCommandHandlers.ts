@@ -83,6 +83,10 @@ export const useNoteCommandHandlers = () => {
 	);
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async ({ id }) => {
+		// Only notes with deleted status can be restored
+		const note = await notes.getById(id);
+		if (!note?.isDeleted) return;
+
 		await notes.updateMeta([id], { isDeleted: false });
 
 		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
