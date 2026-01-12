@@ -32,7 +32,7 @@ export const settingsSlice = createSlice({
 				'-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Segoe UI Variable", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", Arial, system-ui, sans-serif',
 			fontSize: 18,
 			miniMap: false,
-			lineNumbers: true,
+			lineNumbers: false,
 		},
 		preferences: {
 			confirmBeforeMoveToBin: false,
