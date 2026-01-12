@@ -481,35 +481,24 @@ describe('manage attachments', () => {
 		});
 	});
 
-	test('does not throw when attach duplicate tags', async () => {
+	test('throw error when attach duplicate tags', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
 
-		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
-			expect(tags).toEqual([]);
-		});
+		await expect(tags.getAttachedTags(FAKE_NOTE_ID)).resolves.toEqual([]);
 
 		await expect(
 			tags.setAttachedTags(FAKE_NOTE_ID, [fooId, barId, fooId]),
-		).resolves.not.toThrow();
+		).rejects.toThrow(
+			expect.objectContaining({
+				code: TAG_ERROR_CODE.DUPLICATE,
+			}),
+		);
 
-		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
-			expect(tags).toEqual(
-				expect.arrayContaining([
-					expect.objectContaining({
-						name: 'foo',
-						resolvedName: 'foo',
-					}),
-					expect.objectContaining({
-						name: 'bar',
-						resolvedName: 'bar',
-					}),
-				]),
-			);
-		});
+		await expect(tags.getAttachedTags(FAKE_NOTE_ID)).resolves.toEqual([]);
 	});
 
 	test('deleted tag will not appears in tags list', async () => {

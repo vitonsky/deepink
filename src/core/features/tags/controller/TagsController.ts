@@ -305,6 +305,13 @@ export class TagsController {
 	}
 
 	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
+		// attach only unique tags
+		if (new Set(tags).size !== tags.length)
+			throw new TagControllerError(
+				"Can't attach duplicate tags",
+				TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST,
+			);
+
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
@@ -315,7 +322,7 @@ export class TagsController {
 			if (tags.length > 0) {
 				await db.query(
 					qb.sql`INSERT INTO attached_tags(workspace_id,source,target) VALUES ${qb.set(
-						Array.from(new Set(tags)).map((tagId) =>
+						tags.map((tagId) =>
 							qb.values([this.workspace, tagId, target]).withParenthesis(),
 						),
 					)}`,

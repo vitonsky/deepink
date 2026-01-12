@@ -449,8 +449,8 @@ describe('Import notes with different options', () => {
 		await expect(
 			importer.import(
 				createFileManagerMock({
-					'/foo/bar/note.md': createTextBuffer(
-						'---\ntags:\n - another tag\n - another tag\n - new tag\n---\nHello world!',
+					'/dev/ops/note.md': createTextBuffer(
+						'---\ntags:\n - dev\n - dev/ops\n - new tag\n---\nHello world!',
 					),
 				}),
 			),
@@ -458,8 +458,12 @@ describe('Import notes with different options', () => {
 
 		await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
 			expect.objectContaining({
-				name: 'another tag',
-				resolvedName: 'another tag',
+				name: 'dev',
+				resolvedName: 'dev',
+			}),
+			expect.objectContaining({
+				name: 'ops',
+				resolvedName: 'dev/ops',
 			}),
 			expect.objectContaining({
 				name: 'new tag',
