@@ -7,6 +7,12 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: 'zen' | 'light';
+	editor: {
+		fontFamily: string;
+		fontSize: number;
+		miniMap: boolean;
+		lineNumbers: boolean;
+	};
 	preferences: {
 		/**
 		 * Indicates if a confirmation is required before moving note to the bin
@@ -20,6 +26,14 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: 'zen',
+		editor: {
+			fontFamily:
+				// eslint-disable-next-line spellcheck/spell-checker
+				'-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Segoe UI Variable", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", Arial, system-ui, sans-serif',
+			fontSize: 18,
+			miniMap: false,
+			lineNumbers: true,
+		},
 		preferences: {
 			confirmBeforeMoveToBin: false,
 		},

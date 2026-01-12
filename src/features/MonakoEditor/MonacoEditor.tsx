@@ -11,6 +11,8 @@ import React, {
 import { colord, extend } from 'colord';
 import mixPlugin from 'colord/plugins/mix';
 import { editor, languages } from 'monaco-editor-core';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
 
 import { defaultExtensions } from './extensions';
 import { FileUploader, useDropFiles } from './features/useDropFiles';
@@ -104,6 +106,8 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 	isReadOnly,
 	...props
 }) => {
+	const editorConfig = useAppSelector(selectEditorConfig);
+
 	const setValueRef = useRef(setValue);
 	setValueRef.current = setValue;
 
@@ -139,8 +143,10 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			value,
 			theme: 'native',
 			language: 'markdown',
-			fontFamily: 'Arial',
-			fontSize: 18,
+			fontFamily: editorConfig.fontFamily,
+			fontSize: editorConfig.fontSize,
+			minimap: { enabled: editorConfig.miniMap },
+			lineNumbers: editorConfig.lineNumbers ? 'on' : 'off',
 			automaticLayout: true,
 			wordWrap: 'on',
 			quickSuggestions: false,
@@ -214,6 +220,24 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			editor.setValue(value);
 		}
 	});
+
+	// Update config
+	useEffect(() => {
+		const editor = editorRef.current;
+		if (!editor) return;
+
+		editor.updateOptions({
+			fontFamily: editorConfig.fontFamily,
+			fontSize: editorConfig.fontSize,
+			minimap: { enabled: editorConfig.miniMap },
+			lineNumbers: editorConfig.lineNumbers ? 'on' : 'off',
+		});
+	}, [
+		editorConfig.fontFamily,
+		editorConfig.fontSize,
+		editorConfig.lineNumbers,
+		editorConfig.miniMap,
+	]);
 
 	// Handle drop file
 	useDropFiles({ editor: editorObject, uploadFile });
