@@ -39,7 +39,7 @@ export const ImageButton: FC<
 									<Text>Add image</Text>
 								</ModalHeader>
 								<ModalBody paddingBottom="1rem">
-									<VStack w="100%" gap="1rem" align="start">
+									<VStack w="100%" gap="2rem" align="start">
 										<Text color="typography.secondary">
 											Image will be inserted at cursor position.
 										</Text>

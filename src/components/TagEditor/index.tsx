@@ -117,7 +117,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 						<VStack w="100%" align="start" gap="0.5rem">
 							<Text>Tag name</Text>
 							<Input
-								placeholder="e.g., work/idea"
+								placeholder="e.g., brainstorm/work"
 								value={tagName}
 								onChange={(evt) => {
 									setTagName(evt.target.value);
