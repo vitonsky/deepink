@@ -94,6 +94,9 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 								note.isDeleted ? 'line-through' : undefined
 							}
 							onMouseDown={(evt) => {
+								// Prevent focus capturing by click
+								evt.preventDefault();
+
 								const isLeftButton = evt.button === 0;
 								if (isLeftButton) return;
 

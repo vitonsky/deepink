@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { Ref, useEffect, useMemo } from 'react';
+import { $createRangeSelection, $getRoot, $getSelection, $setSelection } from 'lexical';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -12,6 +14,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
+import { setRef } from '@utils/react/setRef';
 
 import { CodeHighlightPlugin } from './plugins/CodeHighlightPlugin';
 import { GenericContextMenu } from './plugins/ContextMenu/components/GenericContextMenu';
@@ -30,11 +33,16 @@ import {
 import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
 import { ReadOnlyPlugin } from './plugins/ReadOnlyPlugin';
 
+export type RichEditorAPI = {
+	focus(): void;
+};
+
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
 		placeholder?: string;
 		isReadOnly?: boolean;
 		search?: string;
+		apiRef?: Ref<RichEditorAPI>;
 	};
 
 export const RichEditorContent = ({
@@ -43,10 +51,40 @@ export const RichEditorContent = ({
 	placeholder,
 	isReadOnly,
 	search,
+	apiRef,
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
 	const editorConfig = useAppSelector(selectEditorConfig);
+
+	// Expose API
+	const [editor] = useLexicalComposerContext();
+	const api = useMemo(() => {
+		return {
+			focus() {
+				editor.update(() => {
+					if ($getSelection()) return;
+
+					const root = $getRoot();
+					const firstChild = root.getAllTextNodes()[0];
+
+					if (!firstChild) {
+						return;
+					}
+
+					const selection = $createRangeSelection();
+					selection.anchor.set(firstChild.getKey(), 0, 'text');
+					selection.focus.set(firstChild.getKey(), 0, 'text');
+					$setSelection(selection);
+				});
+				editor.focus();
+			},
+		} satisfies RichEditorAPI;
+	}, [editor]);
+
+	useEffect(() => {
+		return setRef(apiRef ?? null, api);
+	}, [api, apiRef]);
 
 	return (
 		<Box

@@ -1,8 +1,7 @@
 /* eslint-disable spellcheck/spell-checker */
 import React, {
-	FC,
 	HTMLAttributes,
-	RefObject,
+	Ref,
 	useCallback,
 	useEffect,
 	useRef,
@@ -11,8 +10,10 @@ import React, {
 import { colord, extend } from 'colord';
 import mixPlugin from 'colord/plugins/mix';
 import { editor, languages } from 'monaco-editor-core';
+import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
+import { setRef } from '@utils/react/setRef';
 
 import { defaultExtensions } from './extensions';
 import { FileUploader, useDropFiles } from './features/useDropFiles';
@@ -82,14 +83,14 @@ export function updateMonacoTheme() {
 	});
 }
 
-export type EditorObject = {
-	updateDimensions: () => void;
-} | null;
+export type MonacoAPI = {
+	focus(): void;
+};
 
 export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	value: string;
 	setValue?: (value: string) => void;
-	editorObjectRef?: RefObject<EditorObject>;
+	apiRef?: Ref<MonacoAPI>;
 	uploadFile: FileUploader;
 	isReadOnly?: boolean;
 };
@@ -98,14 +99,14 @@ export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
  * Rich editor from VSCode
  * See docs: https://microsoft.github.io/monaco-editor/docs.html
  */
-export const MonacoEditor: FC<MonacoEditorProps> = ({
+export const MonacoEditor = ({
 	value,
 	setValue,
-	editorObjectRef,
+	apiRef,
 	uploadFile,
 	isReadOnly,
 	...props
-}) => {
+}: MonacoEditorProps) => {
 	const editorConfig = useAppSelector(selectEditorConfig);
 
 	const setValueRef = useRef(setValue);
@@ -151,7 +152,10 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			automaticLayout: true,
 			wordWrap: 'on',
 			quickSuggestions: false,
-			unicodeHighlight: { ambiguousCharacters: false, invisibleCharacters: true },
+			unicodeHighlight: {
+				ambiguousCharacters: false,
+				invisibleCharacters: true,
+			},
 			folding: false,
 		});
 
@@ -244,6 +248,32 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 
 	// Handle drop file
 	useDropFiles({ editor: editorObject, uploadFile });
+
+	// Expose API
+	const focusEditor = useImmutableCallback(async () => {
+		const startTime = Date.now();
+
+		// Wait some time for editor ref in case the method is called too early
+		while (true) {
+			const editor = editorRef.current;
+			if (editor) {
+				editor.focus();
+				break;
+			}
+
+			if (Date.now() - startTime >= 300) break;
+
+			await new Promise((res) => requestAnimationFrame(res));
+		}
+	}, []);
+
+	useEffect(() => {
+		return setRef(apiRef ?? null, {
+			focus() {
+				focusEditor();
+			},
+		} satisfies MonacoAPI);
+	}, [apiRef, focusEditor]);
 
 	return <div ref={editorContainerRef} {...props}></div>;
 };
