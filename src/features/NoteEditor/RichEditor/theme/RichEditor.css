@@ -540,6 +540,7 @@
 	border: none;
 	margin: 1em 0;
 	cursor: pointer;
+	border-top: 1px solid;
 }
 
 .RichEditor__hr::after {
