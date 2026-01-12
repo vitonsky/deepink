@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
 import { FaPlus } from 'react-icons/fa6';
 import { Box, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
@@ -170,11 +170,14 @@ export const TagsPanel = () => {
 							contextMenu={{
 								onAdd(id) {
 									const tag = tags.find((tag) => id === tag.id);
-									if (tag) {
-										parentTagForNewTagRef.current = tag;
-									}
 
-									setIsAddTagPopupOpened(true);
+									modal.show({
+										content: ({ onClose }) =>
+											getTagEditor({
+												onClose,
+												parentTag: tag,
+											}),
+									});
 								},
 								async onDelete(id) {
 									const tag = tags.find((tag) => id === tag.id);
@@ -195,7 +198,17 @@ export const TagsPanel = () => {
 									if (!tag) return;
 
 									const { name, parent } = tag;
-									setEditedTag({ id, name, parent });
+									modal.show({
+										content: ({ onClose }) =>
+											getTagEditor({
+												onClose,
+												editedTag: {
+													id,
+													name,
+													parent,
+												},
+											}),
+									});
 								},
 							}}
 						/>
@@ -206,8 +219,6 @@ export const TagsPanel = () => {
 					)}
 				</Box>
 			</VStack>
-
-			{tagEditor}
 		</>
 	);
 };
