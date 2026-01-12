@@ -30,11 +30,6 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
 
 	/**
-	 * Export a note
-	 */
-	EXPORT_NOTE = 'exportNote',
-
-	/**
 	 * Toggle the archive status of the current note
 	 */
 	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
@@ -43,6 +38,21 @@ export enum GLOBAL_COMMANDS {
 	 * Toggle the bookmark status of the current note
 	 */
 	TOGGLE_CURRENT_NOTE_BOOKMARK = 'toggleCurrentNoteBookmark',
+
+	/**
+	 * Open the history for the current note
+	 */
+	OPEN_CURRENT_NOTE_HISTORY = 'openCurrentNoteHistory',
+
+	/**
+	 * Export a note
+	 */
+	EXPORT_NOTE = 'exportNote',
+
+	/**
+	 * Copy the Markdown link for the current note
+	 */
+	COPY_NOTE_MARKDOWN_LINK = 'copyNoteMarkdownLink',
 
 	/**
 	 * Switch focus to the next open note
@@ -55,21 +65,6 @@ export enum GLOBAL_COMMANDS {
 	FOCUS_PREVIOUS_NOTE = 'focusPreviousNote',
 
 	/**
-	 * Lock the currently active user profile
-	 */
-	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
-
-	/**
-	 * Open the history for the current note
-	 */
-	OPEN_CURRENT_NOTE_HISTORY = 'openCurrentNoteHistory',
-
-	/**
-	 * Copy the Markdown link for the current note
-	 */
-	COPY_NOTE_MARKDOWN_LINK = 'copyNoteMarkdownLink',
-
-	/**
 	 * Open global settings window
 	 */
 	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
@@ -78,6 +73,11 @@ export enum GLOBAL_COMMANDS {
 	 * Synchronize the changes with the database
 	 */
 	SYNC_DATABASE = 'syncDataBase',
+
+	/**
+	 * Lock the currently active user profile
+	 */
+	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
 }
 
 type CommandsWithPayload = {
