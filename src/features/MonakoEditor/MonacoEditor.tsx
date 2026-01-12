@@ -67,7 +67,7 @@ export function updateMonacoTheme() {
 
 	editor.defineTheme('native', {
 		base: 'vs',
-		inherit: false,
+		inherit: true,
 		rules: [],
 		colors: {
 			'editor.background': colors.background,
