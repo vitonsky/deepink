@@ -51,6 +51,8 @@ export const ImageButton: FC<
 														id: 'url',
 														value: '',
 														label: 'Image url',
+														placeholder:
+															'e.g., https://example.com/image.png',
 													},
 													{
 														id: 'altText',
@@ -68,6 +70,8 @@ export const ImageButton: FC<
 													}
 												}}
 												submitButtonText="Add"
+												cancelButtonText="Cancel"
+												onCancel={onClose}
 											/>
 										</Box>
 									</VStack>

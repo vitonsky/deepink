@@ -53,7 +53,7 @@ export const LinkButton: FC<
 														value: '',
 														label: 'Link url',
 														placeholder:
-															'https://example.com/',
+															'e.g., https://example.com/',
 													},
 												]}
 												onUpdate={({ url }) => {
@@ -64,6 +64,8 @@ export const LinkButton: FC<
 													}
 												}}
 												submitButtonText="Add"
+												cancelButtonText="Cancel"
+												onCancel={onClose}
 											/>
 										</Box>
 									</VStack>
