@@ -515,44 +515,6 @@ describe('Import notes with different options', () => {
 				}),
 			]);
 		});
-
-		test('does not throw when importing note with duplicate tags when convertPathToTag is never', async () => {
-			const db = await dbPromise;
-			const appContext = createAppContext(db, fileManager);
-
-			const importer = new NotesImporter(appContext, {
-				noteExtensions: ['.md'],
-				convertPathToTag: 'never',
-			});
-
-			await expect(
-				importer.import(
-					createFileManagerMock({
-						'/dev/ops/note.md': createTextBuffer(
-							'---\ntags:\n - dev\n - dev/ops\n - new tag\n---\nHello world!',
-						),
-						'/foo/note.md': createTextBuffer(
-							'---\ntags:\n - dev\n - dev\n - dev\n - dev\n - new tag\n---\nHello world!',
-						),
-					}),
-				),
-			).resolves.not.toThrow();
-
-			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
-				expect.objectContaining({
-					name: 'dev',
-					resolvedName: 'dev',
-				}),
-				expect.objectContaining({
-					name: 'ops',
-					resolvedName: 'dev/ops',
-				}),
-				expect.objectContaining({
-					name: 'new tag',
-					resolvedName: 'new tag',
-				}),
-			]);
-		});
 	});
 });
 

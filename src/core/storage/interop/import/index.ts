@@ -300,10 +300,10 @@ export class NotesImporter {
 					const tagName = noteDirPath.split('/').filter(Boolean).join('/');
 					const [pathTagId] = await this.getTagIds([tagName]);
 
-					await tagsRegistry.setAttachedTags(
-						noteId,
-						Array.from(new Set([...attachedTagIds, pathTagId])),
-					);
+					await tagsRegistry.setAttachedTags(noteId, [
+						...attachedTagIds,
+						pathTagId,
+					]);
 				}
 			}
 
@@ -366,7 +366,7 @@ export class NotesImporter {
 			tagsToAttach.push(createdTagId);
 		}
 
-		return Array.from(new Set(tagsToAttach));
+		return tagsToAttach;
 	}
 
 	private readonly uploadedFiles: Record<string, Promise<string | null>> = {};
