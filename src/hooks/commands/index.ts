@@ -60,11 +60,6 @@ export enum GLOBAL_COMMANDS {
 	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
 
 	/**
-	 * Open global settings window
-	 */
-	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
-
-	/**
 	 * Open the history for the current note
 	 */
 	OPEN_CURRENT_NOTE_HISTORY = 'openCurrentNoteHistory',
@@ -73,6 +68,16 @@ export enum GLOBAL_COMMANDS {
 	 * Copy the Markdown link for the current note
 	 */
 	COPY_NOTE_MARKDOWN_LINK = 'copyNoteMarkdownLink',
+
+	/**
+	 * Open global settings window
+	 */
+	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
+
+	/**
+	 * Synchronize the changes with the database
+	 */
+	SYNC_DATABASE = 'syncDataBase',
 }
 
 type CommandsWithPayload = {
