@@ -142,7 +142,7 @@ export const TagsPanel = () => {
 						variant="ghost"
 						onClick={() => {
 							modal.show({
-								content: ({ onClose }) => getTagEditor({ onClose }),
+								content: getTagEditor,
 							});
 						}}
 						size="xs"
