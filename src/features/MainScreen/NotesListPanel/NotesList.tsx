@@ -3,6 +3,7 @@ import { Box, Spinner, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useNoteContextMenu } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -21,13 +22,6 @@ import {
 import { selectNotesView } from '@state/redux/profiles/selectors/view';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
-
-<<<<<<< HEAD:src/features/MainScreen/NotesListPanel/NotesList.tsx
-import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
-=======
-// import { isElementInViewport } from '@utils/dom/isElementInViewport';
-import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
->>>>>>> 9cc92efa (chore: simplify scroll):src/features/MainScreen/NotesList/index.tsx
 
 export type NotesListProps = {};
 
