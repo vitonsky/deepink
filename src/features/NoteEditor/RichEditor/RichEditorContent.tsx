@@ -60,6 +60,7 @@ export const RichEditorContent = ({
 				// TODO: move a styles to a top level container
 				fontSize: editorConfig.fontSize,
 				fontFamily: editorConfig.fontFamily,
+				lineHeight: editorConfig.lineHeight,
 			}}
 		>
 			<ContextMenuPlugin renderer={GenericContextMenu} />

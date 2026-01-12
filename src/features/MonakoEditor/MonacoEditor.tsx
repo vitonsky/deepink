@@ -145,6 +145,7 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			language: 'markdown',
 			fontFamily: editorConfig.fontFamily,
 			fontSize: editorConfig.fontSize,
+			lineHeight: editorConfig.lineHeight,
 			minimap: { enabled: editorConfig.miniMap },
 			lineNumbers: editorConfig.lineNumbers ? 'on' : 'off',
 			automaticLayout: true,
@@ -229,12 +230,14 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 		editor.updateOptions({
 			fontFamily: editorConfig.fontFamily,
 			fontSize: editorConfig.fontSize,
+			lineHeight: editorConfig.lineHeight,
 			minimap: { enabled: editorConfig.miniMap },
 			lineNumbers: editorConfig.lineNumbers ? 'on' : 'off',
 		});
 	}, [
 		editorConfig.fontFamily,
 		editorConfig.fontSize,
+		editorConfig.lineHeight,
 		editorConfig.lineNumbers,
 		editorConfig.miniMap,
 	]);

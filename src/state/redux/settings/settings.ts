@@ -10,6 +10,7 @@ export type GlobalSettings = {
 	editor: {
 		fontFamily: string;
 		fontSize: number;
+		lineHeight: number;
 		miniMap: boolean;
 		lineNumbers: boolean;
 	};
@@ -31,13 +32,14 @@ export const settingsSlice = createSlice({
 				// eslint-disable-next-line spellcheck/spell-checker
 				'-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Segoe UI Variable", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", Arial, system-ui, sans-serif',
 			fontSize: 18,
+			lineHeight: 1.5,
 			miniMap: false,
 			lineNumbers: false,
 		},
 		preferences: {
 			confirmBeforeMoveToBin: false,
 		},
-	} as GlobalSettings,
+	} satisfies GlobalSettings as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
 			return { ...state, ...payload } as GlobalSettings;
