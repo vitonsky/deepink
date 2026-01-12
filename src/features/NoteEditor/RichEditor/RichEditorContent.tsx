@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { Ref, useEffect } from 'react';
+import { LexicalEditor } from 'lexical';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -12,6 +14,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
+import { setRef } from '@utils/react/setRef';
 
 import { CodeHighlightPlugin } from './plugins/CodeHighlightPlugin';
 import { GenericContextMenu } from './plugins/ContextMenu/components/GenericContextMenu';
@@ -35,6 +38,7 @@ export type RichEditorContentProps = BoxProps &
 		placeholder?: string;
 		isReadOnly?: boolean;
 		search?: string;
+		lexicalRef?: Ref<LexicalEditor>;
 	};
 
 export const RichEditorContent = ({
@@ -43,10 +47,17 @@ export const RichEditorContent = ({
 	placeholder,
 	isReadOnly,
 	search,
+	lexicalRef,
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
 	const editorConfig = useAppSelector(selectEditorConfig);
+
+	const [editor] = useLexicalComposerContext();
+	useEffect(() => {
+		if (!lexicalRef || !editor) return;
+		return setRef(lexicalRef ?? null, editor);
+	}, [editor, lexicalRef]);
 
 	return (
 		<Box

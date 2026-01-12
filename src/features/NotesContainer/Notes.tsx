@@ -68,13 +68,13 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 				.filter((id) => notes.some((note) => note.id === id))
 				.map((id) => {
 					const note = notes.find((note) => note.id === id) as INote;
-					const isActiveTab = activeTab === note.id;
+					const isActive = activeTab === note.id;
 					const { updateContent, updateMeta } = updateHooks[note.id];
 
 					return (
 						<Box
 							key={note.id}
-							display={isActiveTab ? 'flex' : 'none'}
+							display={isActive ? 'flex' : 'none'}
 							w="100%"
 							h="100%"
 						>
@@ -83,6 +83,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 								note={note}
 								updateNote={updateContent}
 								updateMeta={updateMeta}
+								isActive={isActive}
 							/>
 						</Box>
 					);

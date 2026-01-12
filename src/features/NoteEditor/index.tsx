@@ -53,514 +53,540 @@ export type NoteEditorProps = {
 	note: INote;
 	updateNote: (note: INoteContent) => void;
 	updateMeta: (meta: Partial<NoteMeta>) => void;
+	isActive?: boolean;
 };
 
 /**
  * TODO: rename directory of component
  * TODO: create note context to interact with note from deep components
  */
-export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta }) => {
-	const telemetry = useTelemetryTracker();
-	const dispatch = useAppDispatch();
-	const workspaceData = useWorkspaceData();
+export const Note: FC<NoteEditorProps> = memo(
+	({ note, updateNote, updateMeta, isActive }) => {
+		const telemetry = useTelemetryTracker();
+		const dispatch = useAppDispatch();
+		const workspaceData = useWorkspaceData();
 
-	const eventBus = useEventBus();
-	const notesRegistry = useNotesRegistry();
+		const eventBus = useEventBus();
+		const notesRegistry = useNotesRegistry();
 
-	const [title, setTitle] = useState(note.content.title);
-	const [text, setText] = useState(note.content.text);
+		const [title, setTitle] = useState(note.content.title);
+		const [text, setText] = useState(note.content.text);
 
-	// Forced update for note data
-	const forceUpdateLocalStateRef = useRef(false);
-	useMemo(() => {
-		if (!forceUpdateLocalStateRef.current) return;
-		forceUpdateLocalStateRef.current = false;
+		// Forced update for note data
+		const forceUpdateLocalStateRef = useRef(false);
+		useMemo(() => {
+			if (!forceUpdateLocalStateRef.current) return;
+			forceUpdateLocalStateRef.current = false;
 
-		setTitle(note.content.title);
-		setText(note.content.text);
-	}, [note]);
+			setTitle(note.content.title);
+			setText(note.content.text);
+		}, [note]);
 
-	const tagsRegistry = useTagsRegistry();
+		const tagsRegistry = useTagsRegistry();
 
-	const tags = useWorkspaceSelector(selectTags);
+		const tags = useWorkspaceSelector(selectTags);
 
-	const [notAttachedTags, setNotAttachedTags] = useState<IResolvedTag[]>([]);
-	const [attachedTags, setAttachedTags] = useState<IResolvedTag[]>([]);
-	const updateTags = useCallback(async () => {
-		const attachedTags = await tagsRegistry.getAttachedTags(note.id);
-		setAttachedTags(attachedTags);
+		const [notAttachedTags, setNotAttachedTags] = useState<IResolvedTag[]>([]);
+		const [attachedTags, setAttachedTags] = useState<IResolvedTag[]>([]);
+		const updateTags = useCallback(async () => {
+			const attachedTags = await tagsRegistry.getAttachedTags(note.id);
+			setAttachedTags(attachedTags);
 
-		const filteredAttachedTags = tags.filter(
-			({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id),
-		);
-		setNotAttachedTags(filteredAttachedTags);
-	}, [note.id, tags, tagsRegistry]);
-	useEffect(() => {
-		updateTags();
-	}, [note.id, tagsRegistry, updateTags]);
-
-	const updateNoteRef = useRef(updateNote);
-	updateNoteRef.current = updateNote;
-
-	// Snapshot note once
-	const noteSnapshotPromiseRef = useRef<null | Promise<void>>(null);
-	const noteHistory = useNotesHistory();
-	useEffect(() => {
-		if (note.isSnapshotsDisabled) return;
-
-		noteSnapshotPromiseRef.current = new Promise<void>(async (res) => {
-			for (let attempt = 0; attempt < 3; attempt++) {
-				try {
-					await noteHistory.snapshot(note.id);
-					res();
-					return;
-				} catch (err) {
-					// Retry after delay
-					console.error(err);
-					await new Promise((res) => setTimeout(res, 200));
-				}
-			}
-		}).then(() => {
-			noteSnapshotPromiseRef.current = null;
-		});
-
-		// We need to run this effect once, at first render only
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const debouncedUpdateNote = useCallback(
-		debounce((data: { title: string; text: string }) => {
-			console.debug('Update note in DB');
-			updateNoteRef.current(data);
-		}, 800),
-		[],
-	);
-
-	const isFirstRenderRef = useRef(true);
-	useEffect(() => {
-		if (isFirstRenderRef.current) {
-			isFirstRenderRef.current = false;
-			return;
-		}
-
-		if (noteSnapshotPromiseRef.current === null) {
-			debouncedUpdateNote({ title, text });
-		} else {
-			// Wait note snapshotting before call
-			noteSnapshotPromiseRef.current.then(() => {
-				debouncedUpdateNote({ title, text });
-			});
-		}
-	}, [title, text, debouncedUpdateNote]);
-
-	const attachments = useAttachmentsController();
-
-	// TODO: throttle calls and run in IDLE
-	const noteId = note.id;
-	const updateAttachments = useCallback(
-		(text: string) => {
-			// Find ids
-			const filesIdRaw = findLinksInText(text).map((link) =>
-				getResourceIdInUrl(link.url),
+			const filteredAttachedTags = tags.filter(
+				({ id }) => !attachedTags.some((attachedTag) => attachedTag.id === id),
 			);
+			setNotAttachedTags(filteredAttachedTags);
+		}, [note.id, tags, tagsRegistry]);
+		useEffect(() => {
+			updateTags();
+		}, [note.id, tagsRegistry, updateTags]);
 
-			// Collect unique IDs
-			const filesId: string[] = [];
-			for (const fileId of filesIdRaw) {
-				if (fileId === null) continue;
-				if (filesId.includes(fileId)) continue;
-				filesId.push(fileId);
+		const updateNoteRef = useRef(updateNote);
+		updateNoteRef.current = updateNote;
+
+		// Snapshot note once
+		const noteSnapshotPromiseRef = useRef<null | Promise<void>>(null);
+		const noteHistory = useNotesHistory();
+		useEffect(() => {
+			if (note.isSnapshotsDisabled) return;
+
+			noteSnapshotPromiseRef.current = new Promise<void>(async (res) => {
+				for (let attempt = 0; attempt < 3; attempt++) {
+					try {
+						await noteHistory.snapshot(note.id);
+						res();
+						return;
+					} catch (err) {
+						// Retry after delay
+						console.error(err);
+						await new Promise((res) => setTimeout(res, 200));
+					}
+				}
+			}).then(() => {
+				noteSnapshotPromiseRef.current = null;
+			});
+
+			// We need to run this effect once, at first render only
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, []);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		const debouncedUpdateNote = useCallback(
+			debounce((data: { title: string; text: string }) => {
+				console.debug('Update note in DB');
+				updateNoteRef.current(data);
+			}, 800),
+			[],
+		);
+
+		const isFirstRenderRef = useRef(true);
+		useEffect(() => {
+			if (isFirstRenderRef.current) {
+				isFirstRenderRef.current = false;
+				return;
 			}
 
-			attachments.set(noteId, filesId);
-		},
-		[attachments, noteId],
-	);
+			if (noteSnapshotPromiseRef.current === null) {
+				debouncedUpdateNote({ title, text });
+			} else {
+				// Wait note snapshotting before call
+				noteSnapshotPromiseRef.current.then(() => {
+					debouncedUpdateNote({ title, text });
+				});
+			}
+		}, [title, text, debouncedUpdateNote]);
 
-	useEffect(() => {
-		updateAttachments(text);
-	}, [text, updateAttachments]);
+		const attachments = useAttachmentsController();
 
-	const [attachTagName, setAttachTagName] = useState<IResolvedTag | null>(null);
-	const [tagSearch, setTagSearch] = useState(
-		attachTagName ? attachTagName.resolvedName : '',
-	);
+		// TODO: throttle calls and run in IDLE
+		const noteId = note.id;
+		const updateAttachments = useCallback(
+			(text: string) => {
+				// Find ids
+				const filesIdRaw = findLinksInText(text).map((link) =>
+					getResourceIdInUrl(link.url),
+				);
 
-	const [sidePanel, setSidePanel] = useState<NoteSidebarTabs | null>(null);
-	const onNoteMenuClick = useCallback((tabName: NoteSidebarTabs) => {
-		setSidePanel((state) => (state === tabName ? null : tabName));
-	}, []);
+				// Collect unique IDs
+				const filesId: string[] = [];
+				for (const fileId of filesIdRaw) {
+					if (fileId === null) continue;
+					if (filesId.includes(fileId)) continue;
+					filesId.push(fileId);
+				}
 
-	useEffect(() => {
-		if (sidePanel) {
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_SHOWN, {
-				tab: sidePanel,
-			});
-		}
-	}, [sidePanel, telemetry]);
+				attachments.set(noteId, filesId);
+			},
+			[attachments, noteId],
+		);
 
-	const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
+		useEffect(() => {
+			updateAttachments(text);
+		}, [text, updateAttachments]);
 
-	const isReadOnly = note.isDeleted || Boolean(versionPreview);
+		const [attachTagName, setAttachTagName] = useState<IResolvedTag | null>(null);
+		const [tagSearch, setTagSearch] = useState(
+			attachTagName ? attachTagName.resolvedName : '',
+		);
 
-	return (
-		<VStack w="100%" align="start">
-			<HStack w="100%" align="start">
+		const [sidePanel, setSidePanel] = useState<NoteSidebarTabs | null>(null);
+		const onNoteMenuClick = useCallback((tabName: NoteSidebarTabs) => {
+			setSidePanel((state) => (state === tabName ? null : tabName));
+		}, []);
+
+		useEffect(() => {
+			if (sidePanel) {
+				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_SHOWN, {
+					tab: sidePanel,
+				});
+			}
+		}, [sidePanel, telemetry]);
+
+		const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
+
+		const isReadOnly = note.isDeleted || Boolean(versionPreview);
+
+		return (
+			<VStack w="100%" align="start">
 				<HStack w="100%" align="start">
-					<Input
-						placeholder="Note title"
-						size="sm"
-						borderRadius="6px"
-						value={versionPreview ? versionPreview.title : title}
-						onChange={
-							versionPreview
-								? undefined
-								: (evt) => setTitle(evt.target.value)
-						}
-						isDisabled={isReadOnly}
-					/>
-
-					{/* TODO: add options that may be toggled */}
-					<NoteMenu note={note} onClick={onNoteMenuClick} />
-				</HStack>
-			</HStack>
-
-			<HStack alignItems="center" w="100%" flexWrap="wrap">
-				<HStack>
-					<Button
-						variant="ghost"
-						title={
-							note.isBookmarked
-								? 'Remove from bookmarks'
-								: 'Add to bookmarks'
-						}
-						size="xs"
-						onClick={async () => {
-							const newBookmarkedState = !note.isBookmarked;
-							await notesRegistry.updateMeta([note.id], {
-								isBookmarked: newBookmarkedState,
-							});
-							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
-								action: newBookmarkedState ? 'Added' : 'Removed',
-							});
-						}}
-						isActive={note.isBookmarked}
-					>
-						<FaBookmark />
-					</Button>
-					<Button
-						variant="ghost"
-						title={
-							note.isArchived ? 'Remove from archive' : 'Move to archive'
-						}
-						size="xs"
-						onClick={async () => {
-							const newArchivedState = !note.isArchived;
-							await notesRegistry.updateMeta([note.id], {
-								isArchived: newArchivedState,
-							});
-							eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
-								action: newArchivedState ? 'Added' : 'Removed',
-							});
-						}}
-						isActive={note.isArchived}
-					>
-						<FaBoxArchive />
-					</Button>
-					<Button variant="ghost" size="xs">
-						<FaFlag />
-					</Button>
-				</HStack>
-
-				<Divider orientation="vertical" h="1em" />
-
-				{attachedTags.map((tag) => (
-					<Tag
-						as={HStack}
-						key={tag.id}
-						height="fit-content"
-						gap=".4rem"
-						onClick={() => {
-							dispatch(
-								workspacesApi.setSelectedTag({
-									...workspaceData,
-									tag: tag.id,
-								}),
-							);
-						}}
-						sx={{ cursor: 'pointer' }}
-					>
-						<HStack gap=".2rem">
-							<FaHashtag />
-							<Text>{tag.resolvedName}</Text>
-						</HStack>
-
-						<Box
-							sx={{
-								'&:not(:hover)': {
-									opacity: '.6',
-								},
-							}}
-						>
-							<FaXmark
-								onClick={async (evt) => {
-									evt.stopPropagation();
-									console.warn('Remove attached tag', tag.resolvedName);
-
-									const updatedTags = attachedTags
-										.filter(({ id }) => id !== tag.id)
-										.map(({ id }) => id);
-									await tagsRegistry.setAttachedTags(
-										noteId,
-										updatedTags,
-									);
-									await updateTags();
-
-									telemetry.track(
-										TELEMETRY_EVENT_NAME.NOTE_TAG_DETACHED,
-										{
-											count: Math.max(0, attachedTags.length - 1),
-										},
-									);
-								}}
-							/>
-						</Box>
-					</Tag>
-				))}
-
-				<SuggestedTagsList
-					tags={notAttachedTags}
-					selectedTag={attachTagName ?? undefined}
-					inputValue={tagSearch}
-					onInputChange={setTagSearch}
-					sx={{
-						display: 'inline',
-						w: 'auto',
-						maxW: '150px',
-					}}
-					inputProps={{
-						variant: 'ghost',
-						placeholder: 'Add some tags...',
-						// size: 'sm',
-						size: 'xs',
-					}}
-					hasTagName={(tagName) =>
-						tags.some(({ resolvedName }) => resolvedName === tagName)
-					}
-					onPick={async (tag) => {
-						setAttachTagName(tag);
-						await tagsRegistry.setAttachedTags(noteId, [
-							...attachedTags.map(({ id }) => id),
-							tag.id,
-						]);
-						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
-							tagsCount: attachedTags.length + 1,
-							context: 'tags suggest list',
-						});
-
-						setTagSearch('');
-
-						await updateTags();
-					}}
-					onCreateTag={async (tagName) => {
-						setAttachTagName(null);
-
-						let shortenedTagName = tagName;
-						let parentTagId: string | null = null;
-						const tagSegments = tagName.split('/');
-						for (
-							let lastSegmentIndex = tagSegments.length - 1;
-							lastSegmentIndex > 0;
-							lastSegmentIndex--
-						) {
-							const resolvedParentTag = tagSegments
-								.slice(0, lastSegmentIndex)
-								.join('/');
-							const foundTag = tags.find(
-								({ resolvedName }) => resolvedName === resolvedParentTag,
-							);
-							if (foundTag) {
-								parentTagId = foundTag.id;
-								shortenedTagName = tagSegments
-									.slice(lastSegmentIndex)
-									.join('/');
-								break;
+					<HStack w="100%" align="start">
+						<Input
+							placeholder="Note title"
+							size="sm"
+							borderRadius="6px"
+							value={versionPreview ? versionPreview.title : title}
+							onChange={
+								versionPreview
+									? undefined
+									: (evt) => setTitle(evt.target.value)
 							}
-						}
+							isDisabled={isReadOnly}
+						/>
 
-						const tagId = await tagsRegistry.add(
-							shortenedTagName,
-							parentTagId,
-						);
-						telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
-							scope: 'note editor',
-							hasParent: parentTagId === null ? 'no' : 'yes',
-						});
-
-						await tagsRegistry.setAttachedTags(noteId, [
-							...attachedTags.map(({ id }) => id),
-							tagId,
-						]);
-						telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
-							tagsCount: attachedTags.length + 1,
-							context: 'create tag option',
-						});
-
-						await updateTags();
-					}}
-				/>
-			</HStack>
-
-			{versionPreview && (
-				<HStack alignItems="center" w="100%" flexWrap="wrap">
-					<HStack gap=".3rem">
-						<Button
-							variant="ghost"
-							size="xs"
-							title="Go back to editing"
-							onClick={() => {
-								setVersionPreview(null);
-							}}
-						>
-							<FaArrowLeft />
-						</Button>
-
-						<Text color="typography.secondary">
-							Version at{' '}
-							{new Date(versionPreview.createdAt).toLocaleString()}
-						</Text>
+						{/* TODO: add options that may be toggled */}
+						<NoteMenu note={note} onClick={onNoteMenuClick} />
 					</HStack>
 				</HStack>
-			)}
 
-			<SyncedPanelGroup direction="vertical" autoSaveId="MainScreen.noteContent">
-				<Box
-					as={Panel}
-					defaultSize={80}
-					minH="min(200px, 100%)"
-					display="flex"
-					flexDirection="column"
-				>
-					<NoteEditor
-						text={versionPreview ? versionPreview.text : text}
-						setText={(noteText) => {
-							if (isReadOnly) return;
-							setText(noteText);
+				<HStack alignItems="center" w="100%" flexWrap="wrap">
+					<HStack>
+						<Button
+							variant="ghost"
+							title={
+								note.isBookmarked
+									? 'Remove from bookmarks'
+									: 'Add to bookmarks'
+							}
+							size="xs"
+							onClick={async () => {
+								const newBookmarkedState = !note.isBookmarked;
+								await notesRegistry.updateMeta([note.id], {
+									isBookmarked: newBookmarkedState,
+								});
+								eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+								telemetry.track(
+									TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE,
+									{
+										action: newBookmarkedState ? 'Added' : 'Removed',
+									},
+								);
+							}}
+							isActive={note.isBookmarked}
+						>
+							<FaBookmark />
+						</Button>
+						<Button
+							variant="ghost"
+							title={
+								note.isArchived
+									? 'Remove from archive'
+									: 'Move to archive'
+							}
+							size="xs"
+							onClick={async () => {
+								const newArchivedState = !note.isArchived;
+								await notesRegistry.updateMeta([note.id], {
+									isArchived: newArchivedState,
+								});
+								eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+								telemetry.track(
+									TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE,
+									{
+										action: newArchivedState ? 'Added' : 'Removed',
+									},
+								);
+							}}
+							isActive={note.isArchived}
+						>
+							<FaBoxArchive />
+						</Button>
+						<Button variant="ghost" size="xs">
+							<FaFlag />
+						</Button>
+					</HStack>
+
+					<Divider orientation="vertical" h="1em" />
+
+					{attachedTags.map((tag) => (
+						<Tag
+							as={HStack}
+							key={tag.id}
+							height="fit-content"
+							gap=".4rem"
+							onClick={() => {
+								dispatch(
+									workspacesApi.setSelectedTag({
+										...workspaceData,
+										tag: tag.id,
+									}),
+								);
+							}}
+							sx={{ cursor: 'pointer' }}
+						>
+							<HStack gap=".2rem">
+								<FaHashtag />
+								<Text>{tag.resolvedName}</Text>
+							</HStack>
+
+							<Box
+								sx={{
+									'&:not(:hover)': {
+										opacity: '.6',
+									},
+								}}
+							>
+								<FaXmark
+									onClick={async (evt) => {
+										evt.stopPropagation();
+										console.warn(
+											'Remove attached tag',
+											tag.resolvedName,
+										);
+
+										const updatedTags = attachedTags
+											.filter(({ id }) => id !== tag.id)
+											.map(({ id }) => id);
+										await tagsRegistry.setAttachedTags(
+											noteId,
+											updatedTags,
+										);
+										await updateTags();
+
+										telemetry.track(
+											TELEMETRY_EVENT_NAME.NOTE_TAG_DETACHED,
+											{
+												count: Math.max(
+													0,
+													attachedTags.length - 1,
+												),
+											},
+										);
+									}}
+								/>
+							</Box>
+						</Tag>
+					))}
+
+					<SuggestedTagsList
+						tags={notAttachedTags}
+						selectedTag={attachTagName ?? undefined}
+						inputValue={tagSearch}
+						onInputChange={setTagSearch}
+						sx={{
+							display: 'inline',
+							w: 'auto',
+							maxW: '150px',
 						}}
-						isReadOnly={isReadOnly}
-					/>
-				</Box>
+						inputProps={{
+							variant: 'ghost',
+							placeholder: 'Add some tags...',
+							// size: 'sm',
+							size: 'xs',
+						}}
+						hasTagName={(tagName) =>
+							tags.some(({ resolvedName }) => resolvedName === tagName)
+						}
+						onPick={async (tag) => {
+							setAttachTagName(tag);
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								tag.id,
+							]);
+							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+								tagsCount: attachedTags.length + 1,
+								context: 'tags suggest list',
+							});
 
-				{!sidePanel ? null : (
-					<>
-						<Box as={PanelResizeHandle} color="surface.border" />
-						<Box as={Panel} defaultSize={30} minH="200px">
-							<NoteSidebar
-								onClose={() => setSidePanel(null)}
-								activeTab={sidePanel as string}
-								onActiveTabChanged={(id) =>
-									setSidePanel(id as NoteSidebarTabs)
+							setTagSearch('');
+
+							await updateTags();
+						}}
+						onCreateTag={async (tagName) => {
+							setAttachTagName(null);
+
+							let shortenedTagName = tagName;
+							let parentTagId: string | null = null;
+							const tagSegments = tagName.split('/');
+							for (
+								let lastSegmentIndex = tagSegments.length - 1;
+								lastSegmentIndex > 0;
+								lastSegmentIndex--
+							) {
+								const resolvedParentTag = tagSegments
+									.slice(0, lastSegmentIndex)
+									.join('/');
+								const foundTag = tags.find(
+									({ resolvedName }) =>
+										resolvedName === resolvedParentTag,
+								);
+								if (foundTag) {
+									parentTagId = foundTag.id;
+									shortenedTagName = tagSegments
+										.slice(lastSegmentIndex)
+										.join('/');
+									break;
 								}
-								tabs={[
-									{
-										id: NoteSidebarTabs.HISTORY,
-										title: 'Note versions',
-										content() {
-											return (
-												<NoteVersions
-													isReadOnly={isReadOnly}
-													noteId={note.id}
-													recordControl={{
-														isDisabled: Boolean(
-															note.isSnapshotsDisabled,
-														),
-														onChange(isDisabled) {
-															updateMeta({
-																isSnapshotsDisabled:
-																	isDisabled,
-															});
-														},
-													}}
-													onShowVersion={(version) =>
-														setVersionPreview(version)
-													}
-													onVersionApply={async (version) => {
-														await noteHistory.snapshot(
-															note.id,
-														);
-														await notesRegistry.update(
-															note.id,
-															version,
-														);
-														await noteHistory.snapshot(
-															note.id,
-														);
+							}
 
-														eventBus.emit(
-															WorkspaceEvents.NOTE_HISTORY_UPDATED,
-															note.id,
-														);
-														eventBus.emit(
-															WorkspaceEvents.NOTE_UPDATED,
-															note.id,
-														);
-														forceUpdateLocalStateRef.current =
-															true;
-													}}
-													onSnapshot={async () => {
-														await noteHistory.snapshot(
-															note.id,
-															{
-																force: true,
-															},
-														);
-														eventBus.emit(
-															WorkspaceEvents.NOTE_HISTORY_UPDATED,
-															note.id,
-														);
-													}}
-													onDeleteAll={async () => {
-														await noteHistory.purge([
-															note.id,
-														]);
-														eventBus.emit(
-															WorkspaceEvents.NOTE_HISTORY_UPDATED,
-															note.id,
-														);
-													}}
-												/>
-											);
-										},
-									},
-									{
-										id: NoteSidebarTabs.BACKLINKS,
-										title: 'Back links',
-										content() {
-											return <div>TODO: Note back links</div>;
-										},
-									},
-									{
-										id: 'files',
-										title: 'Attached files',
-										content() {
-											return (
-												<div>TODO: Files attached to note</div>
-											);
-										},
-									},
-								]}
-							/>
-						</Box>
-					</>
+							const tagId = await tagsRegistry.add(
+								shortenedTagName,
+								parentTagId,
+							);
+							telemetry.track(TELEMETRY_EVENT_NAME.TAG_CREATED, {
+								scope: 'note editor',
+								hasParent: parentTagId === null ? 'no' : 'yes',
+							});
+
+							await tagsRegistry.setAttachedTags(noteId, [
+								...attachedTags.map(({ id }) => id),
+								tagId,
+							]);
+							telemetry.track(TELEMETRY_EVENT_NAME.NOTE_TAG_ATTACHED, {
+								tagsCount: attachedTags.length + 1,
+								context: 'create tag option',
+							});
+
+							await updateTags();
+						}}
+					/>
+				</HStack>
+
+				{versionPreview && (
+					<HStack alignItems="center" w="100%" flexWrap="wrap">
+						<HStack gap=".3rem">
+							<Button
+								variant="ghost"
+								size="xs"
+								title="Go back to editing"
+								onClick={() => {
+									setVersionPreview(null);
+								}}
+							>
+								<FaArrowLeft />
+							</Button>
+
+							<Text color="typography.secondary">
+								Version at{' '}
+								{new Date(versionPreview.createdAt).toLocaleString()}
+							</Text>
+						</HStack>
+					</HStack>
 				)}
-			</SyncedPanelGroup>
-		</VStack>
-	);
-});
+
+				<SyncedPanelGroup
+					direction="vertical"
+					autoSaveId="MainScreen.noteContent"
+				>
+					<Box
+						as={Panel}
+						defaultSize={80}
+						minH="min(200px, 100%)"
+						display="flex"
+						flexDirection="column"
+					>
+						<NoteEditor
+							text={versionPreview ? versionPreview.text : text}
+							setText={(noteText) => {
+								if (isReadOnly) return;
+								setText(noteText);
+							}}
+							isReadOnly={isReadOnly}
+							isActive={isActive}
+						/>
+					</Box>
+
+					{!sidePanel ? null : (
+						<>
+							<Box as={PanelResizeHandle} color="surface.border" />
+							<Box as={Panel} defaultSize={30} minH="200px">
+								<NoteSidebar
+									onClose={() => setSidePanel(null)}
+									activeTab={sidePanel as string}
+									onActiveTabChanged={(id) =>
+										setSidePanel(id as NoteSidebarTabs)
+									}
+									tabs={[
+										{
+											id: NoteSidebarTabs.HISTORY,
+											title: 'Note versions',
+											content() {
+												return (
+													<NoteVersions
+														isReadOnly={isReadOnly}
+														noteId={note.id}
+														recordControl={{
+															isDisabled: Boolean(
+																note.isSnapshotsDisabled,
+															),
+															onChange(isDisabled) {
+																updateMeta({
+																	isSnapshotsDisabled:
+																		isDisabled,
+																});
+															},
+														}}
+														onShowVersion={(version) =>
+															setVersionPreview(version)
+														}
+														onVersionApply={async (
+															version,
+														) => {
+															await noteHistory.snapshot(
+																note.id,
+															);
+															await notesRegistry.update(
+																note.id,
+																version,
+															);
+															await noteHistory.snapshot(
+																note.id,
+															);
+
+															eventBus.emit(
+																WorkspaceEvents.NOTE_HISTORY_UPDATED,
+																note.id,
+															);
+															eventBus.emit(
+																WorkspaceEvents.NOTE_UPDATED,
+																note.id,
+															);
+															forceUpdateLocalStateRef.current =
+																true;
+														}}
+														onSnapshot={async () => {
+															await noteHistory.snapshot(
+																note.id,
+																{
+																	force: true,
+																},
+															);
+															eventBus.emit(
+																WorkspaceEvents.NOTE_HISTORY_UPDATED,
+																note.id,
+															);
+														}}
+														onDeleteAll={async () => {
+															await noteHistory.purge([
+																note.id,
+															]);
+															eventBus.emit(
+																WorkspaceEvents.NOTE_HISTORY_UPDATED,
+																note.id,
+															);
+														}}
+													/>
+												);
+											},
+										},
+										{
+											id: NoteSidebarTabs.BACKLINKS,
+											title: 'Back links',
+											content() {
+												return <div>TODO: Note back links</div>;
+											},
+										},
+										{
+											id: 'files',
+											title: 'Attached files',
+											content() {
+												return (
+													<div>
+														TODO: Files attached to note
+													</div>
+												);
+											},
+										},
+									]}
+								/>
+							</Box>
+						</>
+					)}
+				</SyncedPanelGroup>
+			</VStack>
+		);
+	},
+);
 
 Note.displayName = 'Note';

@@ -1,8 +1,7 @@
 /* eslint-disable spellcheck/spell-checker */
 import React, {
-	FC,
 	HTMLAttributes,
-	RefObject,
+	Ref,
 	useCallback,
 	useEffect,
 	useRef,
@@ -13,6 +12,7 @@ import mixPlugin from 'colord/plugins/mix';
 import { editor, languages } from 'monaco-editor-core';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
+import { setRef } from '@utils/react/setRef';
 
 import { defaultExtensions } from './extensions';
 import { FileUploader, useDropFiles } from './features/useDropFiles';
@@ -82,14 +82,12 @@ export function updateMonacoTheme() {
 	});
 }
 
-export type EditorObject = {
-	updateDimensions: () => void;
-} | null;
+export type MonacoEditorInstance = editor.IStandaloneCodeEditor;
 
 export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	value: string;
 	setValue?: (value: string) => void;
-	editorObjectRef?: RefObject<EditorObject>;
+	editorObjectRef?: Ref<MonacoEditorInstance>;
 	uploadFile: FileUploader;
 	isReadOnly?: boolean;
 };
@@ -98,14 +96,14 @@ export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
  * Rich editor from VSCode
  * See docs: https://microsoft.github.io/monaco-editor/docs.html
  */
-export const MonacoEditor: FC<MonacoEditorProps> = ({
+export const MonacoEditor = ({
 	value,
 	setValue,
 	editorObjectRef,
 	uploadFile,
 	isReadOnly,
 	...props
-}) => {
+}: MonacoEditorProps) => {
 	const editorConfig = useAppSelector(selectEditorConfig);
 
 	const setValueRef = useRef(setValue);
@@ -151,7 +149,10 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 			automaticLayout: true,
 			wordWrap: 'on',
 			quickSuggestions: false,
-			unicodeHighlight: { ambiguousCharacters: false, invisibleCharacters: true },
+			unicodeHighlight: {
+				ambiguousCharacters: false,
+				invisibleCharacters: true,
+			},
 			folding: false,
 		});
 
@@ -244,6 +245,12 @@ export const MonacoEditor: FC<MonacoEditorProps> = ({
 
 	// Handle drop file
 	useDropFiles({ editor: editorObject, uploadFile });
+
+	// Serve ref
+	useEffect(() => {
+		if (!editorObjectRef || !editorObject) return;
+		return setRef(editorObjectRef ?? null, editorObject);
+	}, [editorObject, editorObjectRef]);
 
 	return <div ref={editorContainerRef} {...props}></div>;
 };
