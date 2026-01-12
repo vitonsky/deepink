@@ -61,7 +61,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (!notes.length) return;
 
 		const lazyLoadingThreshold = Math.ceil(NOTES_PAGE_SIZE * 0.2);
-		const lastVisibleIndex = items[items.length - 1].index;
+		const lastVisibleIndex = items[items.length - 1]?.index;
 
 		if (
 			lastVisibleIndex >= notes.length - lazyLoadingThreshold &&
@@ -132,7 +132,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (isNotesLoading) {
 			setIsShowSpinner(true);
 		} else {
-			setTimeout(() => setIsShowSpinner(false), 400);
+			setTimeout(() => setIsShowSpinner(false), 500);
 		}
 	}, [isNotesLoading]);
 
