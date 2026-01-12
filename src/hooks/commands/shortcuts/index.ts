@@ -13,6 +13,7 @@ export const shortcuts: KeyboardShortcutMap = {
 	'CmdOrCtrl+PageUp': GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE,
 
 	'CmdOrCtrl+L': GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE,
+	'CmdOrCtrl+S': GLOBAL_COMMANDS.SYNC_DATABASE,
 };
 
 /**

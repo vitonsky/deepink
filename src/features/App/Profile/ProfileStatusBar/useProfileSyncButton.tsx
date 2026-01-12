@@ -3,6 +3,8 @@ import { FaHardDrive } from 'react-icons/fa6';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 
 import { useProfileControls } from '..';
 
@@ -14,6 +16,8 @@ export const useProfileSyncButton = () => {
 	const {
 		profile: { db },
 	} = useProfileControls();
+
+	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, db.sync);
 
 	const [isPending, setIsPending] = useDebounce(false, 900);
 	useEffect(() => {
