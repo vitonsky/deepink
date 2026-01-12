@@ -309,7 +309,7 @@ export class TagsController {
 		if (new Set(tags).size !== tags.length)
 			throw new TagControllerError(
 				"Can't attach duplicate tags",
-				TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST,
+				TAG_ERROR_CODE.DUPLICATE,
 			);
 
 		await this.db.get().transaction(async (tx) => {
