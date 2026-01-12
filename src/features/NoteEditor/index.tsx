@@ -439,7 +439,13 @@ export const Note: FC<NoteEditorProps> = memo(({ note, updateNote, updateMeta })
 			)}
 
 			<SyncedPanelGroup direction="vertical" autoSaveId="MainScreen.noteContent">
-				<Box as={Panel} defaultSize={80} minH="min(200px, 100%)">
+				<Box
+					as={Panel}
+					defaultSize={80}
+					minH="min(200px, 100%)"
+					display="flex"
+					flexDirection="column"
+				>
 					<NoteEditor
 						text={versionPreview ? versionPreview.text : text}
 						setText={(noteText) => {
