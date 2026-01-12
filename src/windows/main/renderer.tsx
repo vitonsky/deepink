@@ -41,7 +41,7 @@ const globalEventBus = {
 	},
 } satisfies EventBus<GlobalEventsPayloadMap>;
 
-// Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
+// Patch confirm: original window.confirm causes focus loss
 window.confirm = (message?: string) => window.electronAPI.confirm(message);
 
 const reactRoot = createRoot(rootNode);
