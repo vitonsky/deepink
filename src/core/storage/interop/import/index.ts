@@ -300,10 +300,10 @@ export class NotesImporter {
 					const tagName = noteDirPath.split('/').filter(Boolean).join('/');
 					const [pathTagId] = await this.getTagIds([tagName]);
 
-					await tagsRegistry.setAttachedTags(noteId, [
-						...attachedTagIds,
-						pathTagId,
-					]);
+					await tagsRegistry.setAttachedTags(
+						noteId,
+						Array.from(new Set([...attachedTagIds, pathTagId])),
+					);
 				}
 			}
 

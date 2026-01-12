@@ -436,40 +436,123 @@ describe('Import notes with different options', () => {
 
 			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([]);
 		});
-	});
 
-	test('does not throw when importing note with duplicate tags', async () => {
-		const db = await dbPromise;
-		const appContext = createAppContext(db, fileManager);
+		test('does not throw when importing note with duplicate tags when convertPathToTag is always', async () => {
+			const db = await dbPromise;
+			const appContext = createAppContext(db, fileManager);
 
-		const importer = new NotesImporter(appContext, {
-			noteExtensions: ['.md'],
+			const importer = new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'always',
+			});
+			await expect(
+				importer.import(
+					createFileManagerMock({
+						'/dev/ops/note.md': createTextBuffer(
+							'---\ntags:\n - dev\n - dev/ops\n - new tag\n---\nHello world!',
+						),
+						'/foo/note.md': createTextBuffer(
+							'---\ntags:\n - dev\n - dev\n - dev\n - dev\n - new tag\n---\nHello world!',
+						),
+					}),
+				),
+			).resolves.not.toThrow();
+
+			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+				expect.objectContaining({
+					name: 'dev',
+					resolvedName: 'dev',
+				}),
+				expect.objectContaining({
+					name: 'ops',
+					resolvedName: 'dev/ops',
+				}),
+				expect.objectContaining({
+					name: 'new tag',
+					resolvedName: 'new tag',
+				}),
+				expect.objectContaining({
+					name: 'foo',
+					resolvedName: 'foo',
+				}),
+			]);
 		});
 
-		await expect(
-			importer.import(
-				createFileManagerMock({
-					'/dev/ops/note.md': createTextBuffer(
-						'---\ntags:\n - dev\n - dev/ops\n - new tag\n---\nHello world!',
-					),
-				}),
-			),
-		).resolves.not.toThrow();
+		test('does not throw when importing note with duplicate tags when convertPathToTag is fallback', async () => {
+			const db = await dbPromise;
+			const appContext = createAppContext(db, fileManager);
 
-		await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
-			expect.objectContaining({
-				name: 'dev',
-				resolvedName: 'dev',
-			}),
-			expect.objectContaining({
-				name: 'ops',
-				resolvedName: 'dev/ops',
-			}),
-			expect.objectContaining({
-				name: 'new tag',
-				resolvedName: 'new tag',
-			}),
-		]);
+			const importer = new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'fallback',
+			});
+
+			await expect(
+				importer.import(
+					createFileManagerMock({
+						'/dev/ops/note.md': createTextBuffer(
+							'---\ntags:\n - dev\n - dev/ops\n - new tag\n---\nHello world!',
+						),
+						'/foo/note.md': createTextBuffer(
+							'---\ntags:\n - dev\n - dev\n - dev\n - dev\n - new tag\n---\nHello world!',
+						),
+					}),
+				),
+			).resolves.not.toThrow();
+
+			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+				expect.objectContaining({
+					name: 'dev',
+					resolvedName: 'dev',
+				}),
+				expect.objectContaining({
+					name: 'ops',
+					resolvedName: 'dev/ops',
+				}),
+				expect.objectContaining({
+					name: 'new tag',
+					resolvedName: 'new tag',
+				}),
+			]);
+		});
+
+		test('does not throw when importing note with duplicate tags when convertPathToTag is never', async () => {
+			const db = await dbPromise;
+			const appContext = createAppContext(db, fileManager);
+
+			const importer = new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'never',
+			});
+
+			await expect(
+				importer.import(
+					createFileManagerMock({
+						'/dev/ops/note.md': createTextBuffer(
+							'---\ntags:\n - dev\n - dev/ops\n - new tag\n---\nHello world!',
+						),
+						'/foo/note.md': createTextBuffer(
+							'---\ntags:\n - dev\n - dev\n - dev\n - dev\n - new tag\n---\nHello world!',
+						),
+					}),
+				),
+			).resolves.not.toThrow();
+
+			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+				expect.objectContaining({
+					name: 'dev',
+					resolvedName: 'dev',
+				}),
+				expect.objectContaining({
+					name: 'ops',
+					resolvedName: 'dev/ops',
+				}),
+				expect.objectContaining({
+					name: 'new tag',
+					resolvedName: 'new tag',
+				}),
+			]);
+		});
 	});
 });
 
