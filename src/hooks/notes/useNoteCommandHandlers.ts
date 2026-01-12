@@ -51,7 +51,6 @@ export const useNoteCommandHandlers = () => {
 		noteActions.close(id);
 
 		await notes.updateMeta([id], { isDeleted: true });
-
 		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
 		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
@@ -73,7 +72,6 @@ export const useNoteCommandHandlers = () => {
 
 			await notes.delete([id]);
 			await tagsRegistry.setAttachedTags(id, []);
-
 			eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
 
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
@@ -88,7 +86,6 @@ export const useNoteCommandHandlers = () => {
 		if (!note?.isDeleted) return;
 
 		await notes.updateMeta([id], { isDeleted: false });
-
 		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
 		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
