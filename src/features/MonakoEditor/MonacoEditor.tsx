@@ -10,6 +10,7 @@ import React, {
 import { colord, extend } from 'colord';
 import mixPlugin from 'colord/plugins/mix';
 import { editor, languages } from 'monaco-editor-core';
+import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
 import { setRef } from '@utils/react/setRef';
@@ -82,12 +83,14 @@ export function updateMonacoTheme() {
 	});
 }
 
-export type MonacoEditorInstance = editor.IStandaloneCodeEditor;
+export type MonacoAPI = {
+	focus(): void;
+};
 
 export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 	value: string;
 	setValue?: (value: string) => void;
-	editorObjectRef?: Ref<MonacoEditorInstance>;
+	apiRef?: Ref<MonacoAPI>;
 	uploadFile: FileUploader;
 	isReadOnly?: boolean;
 };
@@ -99,7 +102,7 @@ export type MonacoEditorProps = HTMLAttributes<HTMLDivElement> & {
 export const MonacoEditor = ({
 	value,
 	setValue,
-	editorObjectRef,
+	apiRef,
 	uploadFile,
 	isReadOnly,
 	...props
@@ -246,11 +249,31 @@ export const MonacoEditor = ({
 	// Handle drop file
 	useDropFiles({ editor: editorObject, uploadFile });
 
-	// Serve ref
+	// Expose API
+	const focusEditor = useImmutableCallback(async () => {
+		const startTime = Date.now();
+
+		// Wait some time for editor ref in case the method is called too early
+		while (true) {
+			const editor = editorRef.current;
+			if (editor) {
+				editor.focus();
+				break;
+			}
+
+			if (Date.now() - startTime >= 300) break;
+
+			await new Promise((res) => requestAnimationFrame(res));
+		}
+	}, []);
+
 	useEffect(() => {
-		if (!editorObjectRef || !editorObject) return;
-		return setRef(editorObjectRef ?? null, editorObject);
-	}, [editorObject, editorObjectRef]);
+		return setRef(apiRef ?? null, {
+			focus() {
+				focusEditor();
+			},
+		} satisfies MonacoAPI);
+	}, [apiRef, focusEditor]);
 
 	return <div ref={editorContainerRef} {...props}></div>;
 };

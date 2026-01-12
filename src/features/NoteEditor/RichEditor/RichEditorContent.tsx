@@ -1,5 +1,5 @@
-import React, { Ref, useEffect } from 'react';
-import { LexicalEditor } from 'lexical';
+import React, { Ref, useEffect, useMemo } from 'react';
+import { $createRangeSelection, $getRoot, $getSelection, $setSelection } from 'lexical';
 import { Box, BoxProps, useMultiStyleConfig } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -33,12 +33,16 @@ import {
 import { MarkdownShortcutPlugin } from './plugins/Markdown/MarkdownShortcutPlugin';
 import { ReadOnlyPlugin } from './plugins/ReadOnlyPlugin';
 
+export type RichEditorAPI = {
+	focus(): void;
+};
+
 export type RichEditorContentProps = BoxProps &
 	MarkdownSerializePluginProps & {
 		placeholder?: string;
 		isReadOnly?: boolean;
 		search?: string;
-		lexicalRef?: Ref<LexicalEditor>;
+		apiRef?: Ref<RichEditorAPI>;
 	};
 
 export const RichEditorContent = ({
@@ -47,17 +51,40 @@ export const RichEditorContent = ({
 	placeholder,
 	isReadOnly,
 	search,
-	lexicalRef,
+	apiRef,
 	...props
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
 	const editorConfig = useAppSelector(selectEditorConfig);
 
+	// Expose API
 	const [editor] = useLexicalComposerContext();
+	const api = useMemo(() => {
+		return {
+			focus() {
+				editor.update(() => {
+					if ($getSelection()) return;
+
+					const root = $getRoot();
+					const firstChild = root.getAllTextNodes()[0];
+
+					if (!firstChild) {
+						return;
+					}
+
+					const selection = $createRangeSelection();
+					selection.anchor.set(firstChild.getKey(), 0, 'text');
+					selection.focus.set(firstChild.getKey(), 0, 'text');
+					$setSelection(selection);
+				});
+				editor.focus();
+			},
+		} satisfies RichEditorAPI;
+	}, [editor]);
+
 	useEffect(() => {
-		if (!lexicalRef || !editor) return;
-		return setRef(lexicalRef ?? null, editor);
-	}, [editor, lexicalRef]);
+		return setRef(apiRef ?? null, api);
+	}, [api, apiRef]);
 
 	return (
 		<Box
