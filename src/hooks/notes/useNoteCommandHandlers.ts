@@ -122,40 +122,4 @@ export const useNoteCommandHandlers = () => {
 			copyTextToClipboard(markdownLink);
 		},
 	);
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
-		async ({ id }) => {
-			const note = await notes.getById(id);
-			if (!note) return;
-
-			const newArchivedState = !note.isArchived;
-			await notes.updateMeta([note.id], {
-				isArchived: newArchivedState,
-			});
-			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
-				action: newArchivedState ? 'Added' : 'Removed',
-			});
-		},
-	);
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
-		async ({ id }) => {
-			const note = await notes.getById(id);
-			if (!note) return;
-
-			const newBookmarkedState = !note.isBookmarked;
-			await notes.updateMeta([note.id], {
-				isBookmarked: newBookmarkedState,
-			});
-			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
-				action: newBookmarkedState ? 'Added' : 'Removed',
-			});
-		},
-	);
 };

@@ -6,12 +6,8 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesListPanel } from '@features/MainScreen/NotesListPanel';
 import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
-import { workspaceShortcuts } from '@hooks/commands/shortcuts';
-import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useNoteCommandHandlers } from '@hooks/notes/useNoteCommandHandlers';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId } from '@state/redux/profiles/profiles';
 
 import { NotificationsPopup } from '../NotificationsPopup';
 import { ActivityBar } from './ActivityBar';
@@ -20,18 +16,6 @@ import { StatusBar } from './StatusBar';
 import { TagsPanel } from './TagsPanel';
 
 export const MainScreen: FC = () => {
-	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-
-	useShortcutsBinding(
-		workspaceShortcuts,
-		Object.fromEntries(
-			Object.values(workspaceShortcuts).map((command) => [
-				command,
-				() => (activeNoteId ? { id: activeNoteId } : undefined),
-			]),
-		),
-	);
-
 	useNoteCommandHandlers();
 
 	const tagsRegistry = useTagsRegistry();
