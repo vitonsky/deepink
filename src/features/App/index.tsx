@@ -95,7 +95,7 @@ export const App: FC = () => {
 				profilesManager={profilesList}
 				currentProfile={currentProfile}
 				onChooseProfile={setCurrentProfile}
-				screenMode={profileScreen}
+				screenName={profileScreen}
 			/>
 		);
 	}

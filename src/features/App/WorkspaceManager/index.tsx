@@ -31,7 +31,7 @@ export type IWorkspacePickerProps = {
 	profilesManager: ProfilesListApi;
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
-	screenMode: PROFILE_SCREEN | null;
+	screenName: PROFILE_SCREEN | null;
 };
 
 /**
@@ -42,7 +42,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	profiles,
 	currentProfile,
 	onChooseProfile,
-	screenMode,
+	screenName,
 }) => {
 	const telemetry = useTelemetryTracker();
 	const command = useCommand();
@@ -85,7 +85,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		if (isLoading === true) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
-		if (screenMode === PROFILE_SCREEN.CREATE || hasNoProfiles) {
+		if (screenName === PROFILE_SCREEN.CREATE || hasNoProfiles) {
 			return (
 				<ProfileCreator
 					onCreateProfile={async (profile) => {
@@ -110,7 +110,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			);
 		}
 
-		if (screenMode === PROFILE_SCREEN.LOCK && currentProfileObject) {
+		if (screenName === PROFILE_SCREEN.LOCK && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
@@ -195,9 +195,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onChooseProfile,
 		onOpenProfile,
 		profilesManager,
+		screenName,
 		telemetry,
 		isLoading,
-		screenMode,
+		command,
 	]);
 
 	return (
