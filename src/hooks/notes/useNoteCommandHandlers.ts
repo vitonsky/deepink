@@ -11,8 +11,8 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspace } from '@state/redux/profiles/profiles';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectActiveNoteId, selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectConfirmMoveToBin } from '@state/redux/settings/selectors/preferences';
 import { copyTextToClipboard } from '@utils/clipboard';
 
@@ -42,7 +42,12 @@ export const useNoteCommandHandlers = () => {
 
 	const eventBus = useEventBus();
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async ({ id }) => {
+	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async (noteId) => {
+		const id = noteId ? noteId.id : activeNoteId;
+		if (!id) return;
+
 		if (requiresConfirmMoveToBin) {
 			const isConfirmed = confirm(`Do you want to move this note to the bin?`);
 			if (!isConfirmed) return;
@@ -60,7 +65,10 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
-		async ({ id }) => {
+		async (noteId) => {
+			const id = noteId ? noteId.id : activeNoteId;
+			if (!id) return;
+
 			// Only notes with deleted status can be permanently deleted
 			const note = await notes.getById(id);
 			if (!note?.isDeleted) return;
@@ -80,7 +88,10 @@ export const useNoteCommandHandlers = () => {
 		},
 	);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async ({ id }) => {
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async (noteId) => {
+		const id = noteId ? noteId.id : activeNoteId;
+		if (!id) return;
+
 		// Only notes with deleted status can be restored
 		const note = await notes.getById(id);
 		if (!note?.isDeleted) return;
