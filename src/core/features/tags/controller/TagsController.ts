@@ -305,6 +305,9 @@ export class TagsController {
 	}
 
 	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
+		// attach only unique tags
+		const uniqueTags = Array.from(new Set(tags));
+
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
@@ -315,7 +318,7 @@ export class TagsController {
 			if (tags.length > 0) {
 				await db.query(
 					qb.sql`INSERT INTO attached_tags(workspace_id,source,target) VALUES ${qb.set(
-						tags.map((tagId) =>
+						uniqueTags.map((tagId) =>
 							qb.values([this.workspace, tagId, target]).withParenthesis(),
 						),
 					)}`,

@@ -39,7 +39,7 @@ export const LinkButton: FC<
 									<Text>Add link</Text>
 								</ModalHeader>
 								<ModalBody paddingBottom="1rem">
-									<VStack w="100%" gap="1rem" align="start">
+									<VStack w="100%" gap="2rem" align="start">
 										<Text color="typography.secondary">
 											Selected text become a link, or link will be
 											added at cursor position if nothing selected.
@@ -52,6 +52,8 @@ export const LinkButton: FC<
 														id: 'url',
 														value: '',
 														label: 'Link url',
+														placeholder:
+															'e.g., https://example.com',
 													},
 												]}
 												onUpdate={({ url }) => {
@@ -62,6 +64,8 @@ export const LinkButton: FC<
 													}
 												}}
 												submitButtonText="Add"
+												cancelButtonText="Cancel"
+												onCancel={onClose}
 											/>
 										</Box>
 									</VStack>
