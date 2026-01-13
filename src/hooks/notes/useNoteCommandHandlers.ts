@@ -44,8 +44,8 @@ export const useNoteCommandHandlers = () => {
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async (noteId) => {
-		const id = noteId ? noteId.id : activeNoteId;
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async (payload) => {
+		const id = payload?.id ?? activeNoteId;
 		if (!id) return;
 
 		if (requiresConfirmMoveToBin) {
@@ -65,8 +65,8 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
-		async (noteId) => {
-			const id = noteId ? noteId.id : activeNoteId;
+		async (payload) => {
+			const id = payload?.id ?? activeNoteId;
 			if (!id) return;
 
 			// Only notes with deleted status can be permanently deleted
@@ -88,19 +88,22 @@ export const useNoteCommandHandlers = () => {
 		},
 	);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async (noteId) => {
-		const id = noteId ? noteId.id : activeNoteId;
-		if (!id) return;
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN,
+		async (payload) => {
+			const id = payload?.id ?? activeNoteId;
+			if (!id) return;
 
-		// Only notes with deleted status can be restored
-		const note = await notes.getById(id);
-		if (!note?.isDeleted) return;
+			// Only notes with deleted status can be restored
+			const note = await notes.getById(id);
+			if (!note?.isDeleted) return;
 
-		await notes.updateMeta([id], { isDeleted: false });
-		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
+			await notes.updateMeta([id], { isDeleted: false });
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
-	});
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
+		},
+	);
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ id }) => {
 		const note = await notes.getById(id);
