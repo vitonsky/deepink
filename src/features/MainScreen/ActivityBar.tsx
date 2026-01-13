@@ -12,13 +12,10 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
-import { useAppDispatch } from '@state/redux/hooks';
-import { PROFILE_SCREEN_MODE, workspacesApi } from '@state/redux/profiles/profiles';
 
 export const ActivityBar = () => {
 	const telemetry = useTelemetryTracker();
 
-	const dispatch = useAppDispatch();
 	const profileControls = useProfileControls();
 
 	const command = useCommand();
@@ -105,14 +102,7 @@ export const ActivityBar = () => {
 						title="Lock profile"
 						tooltipPlacement="right"
 						data-no-animation
-						onClick={() => {
-							command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE);
-							dispatch(
-								workspacesApi.setProfileScreenMode(
-									PROFILE_SCREEN_MODE.LOCK,
-								),
-							);
-						}}
+						onClick={() => command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE)}
 					/>
 				)}
 				<IconButton

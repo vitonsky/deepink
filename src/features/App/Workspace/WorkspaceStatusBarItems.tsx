@@ -1,16 +1,17 @@
 import React from 'react';
 import { FaUserLarge } from 'react-icons/fa6';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
 import { useFirstRender } from '@hooks/useFirstRender';
-import { useAppDispatch } from '@state/redux/hooks';
-import { PROFILE_SCREEN_MODE, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useProfileControls } from '../Profile';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
+import { PROFILE_SCREEN } from '..';
 
 export const WorkspaceStatusBarItems = () => {
 	const statusBarButtons = useStatusBarManager();
-	const dispatch = useAppDispatch();
+	const command = useCommand();
 
 	// Profile controls on status bar
 	const profileControls = useProfileControls();
@@ -22,9 +23,9 @@ export const WorkspaceStatusBarItems = () => {
 				title: 'Change profile',
 				onClick: () => {
 					profileControls.close();
-					dispatch(
-						workspacesApi.setProfileScreenMode(PROFILE_SCREEN_MODE.CHANGE),
-					);
+					command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
+						screen: PROFILE_SCREEN.CHANGE,
+					});
 				},
 				icon: <FaUserLarge />,
 			},

@@ -1,3 +1,5 @@
+import { PROFILE_SCREEN } from '@features/App';
+
 export enum GLOBAL_COMMANDS {
 	/**
 	 * Create and open a new note
@@ -33,11 +35,23 @@ export enum GLOBAL_COMMANDS {
 	 * Open global settings window
 	 */
 	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
+
+	/**
+	 * Open screen for managing profiles: create, change profiles, etc.
+	 */
+	OPEN_PROFILE_SCREEN = 'OPEN_PROFILE_SCREEN',
 }
 
-// In the future, we can define a type for the payload like this:
-// type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
-export type CommandPayloadsMap = Record<GLOBAL_COMMANDS, void>;
+type CommandsWithPayload = {
+	[GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN]: {
+		screen: PROFILE_SCREEN;
+	};
+};
+
+export type CommandPayloadsMap = Record<
+	GLOBAL_COMMANDS,
+	K extends keyof CommandsWithPayload ? CommandsWithPayload[K] : void
+>;
 
 export const SHORTCUT_NAMES = {
 	[GLOBAL_COMMANDS.CREATE_NOTE]: 'Create note',
