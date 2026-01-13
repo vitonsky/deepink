@@ -39,9 +39,7 @@ export const useShortcutsBinding = () => {
 				{
 					capture: true,
 				},
-				() => {
-					runCommand(commandName);
-				},
+				() => runCommand(commandName),
 			);
 		});
 
