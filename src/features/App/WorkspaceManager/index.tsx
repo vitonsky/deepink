@@ -6,18 +6,15 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import {
-	PROFILE_SCREEN_MODE,
-	selectProfileScreenMode,
-	workspacesApi,
-} from '@state/redux/profiles/profiles';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 import { ProfilesForm } from './ProfilesForm';
+import { PROFILE_SCREEN } from '..';
 
 type PickProfileResponse = {
 	status: 'ok' | 'error';
@@ -34,6 +31,7 @@ export type IWorkspacePickerProps = {
 	profilesManager: ProfilesListApi;
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
+	screenMode: PROFILE_SCREEN | null;
 };
 
 /**
@@ -44,9 +42,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	profiles,
 	currentProfile,
 	onChooseProfile,
+	screenMode,
 }) => {
 	const telemetry = useTelemetryTracker();
-	const dispatch = useAppDispatch();
+	const command = useCommand();
 
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
@@ -79,8 +78,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const profileScreenMode = useAppSelector(selectProfileScreenMode);
-
 	const [isLoading, setIsLoading] = useState(false);
 
 	const content = useMemo(() => {
@@ -88,7 +85,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		if (isLoading === true) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
-		if (profileScreenMode === PROFILE_SCREEN_MODE.CREATE || hasNoProfiles) {
+		if (screenMode === PROFILE_SCREEN.CREATE || hasNoProfiles) {
 			return (
 				<ProfileCreator
 					onCreateProfile={async (profile) => {
@@ -104,28 +101,24 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 						setIsLoading(false);
 					}}
 					onCancel={() =>
-						dispatch(
-							workspacesApi.setProfileScreenMode(
-								PROFILE_SCREEN_MODE.CHANGE,
-							),
-						)
+						command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
+							screen: PROFILE_SCREEN.CHANGE,
+						})
 					}
 					isFirstProfile={hasNoProfiles}
 				/>
 			);
 		}
 
-		if (profileScreenMode === PROFILE_SCREEN_MODE.LOCK && currentProfileObject) {
+		if (screenMode === PROFILE_SCREEN.LOCK && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
 					onLogin={onOpenProfile}
 					onPickAnotherProfile={() => {
-						dispatch(
-							workspacesApi.setProfileScreenMode(
-								PROFILE_SCREEN_MODE.CHANGE,
-							),
-						);
+						command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
+							screen: PROFILE_SCREEN.CHANGE,
+						});
 						onChooseProfile(null);
 					}}
 				/>
@@ -142,11 +135,9 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							size="lg"
 							w="100%"
 							onClick={() =>
-								dispatch(
-									workspacesApi.setProfileScreenMode(
-										PROFILE_SCREEN_MODE.CREATE,
-									),
-								)
+								command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
+									screen: PROFILE_SCREEN.CREATE,
+								})
 							}
 						>
 							Create new profile
@@ -181,11 +172,9 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
 									} else {
-										dispatch(
-											workspacesApi.setProfileScreenMode(
-												PROFILE_SCREEN_MODE.LOCK,
-											),
-										);
+										command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
+											screen: PROFILE_SCREEN.LOCK,
+										});
 									}
 
 									telemetry.track(
@@ -207,9 +196,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onOpenProfile,
 		profilesManager,
 		telemetry,
-		dispatch,
-		profileScreenMode,
 		isLoading,
+		screenMode,
 	]);
 
 	return (
