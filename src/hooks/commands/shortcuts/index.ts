@@ -14,12 +14,7 @@ export const shortcuts: KeyboardShortcutMap = {
 
 	'CmdOrCtrl+L': GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE,
 	'CmdOrCtrl+S': GLOBAL_COMMANDS.SYNC_DATABASE,
-};
 
-/**
- * Shortcuts that are used in the workspace context
- */
-export const workspaceShortcuts: KeyboardShortcutMap = {
 	'CmdOrCtrl+Shift+A': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
 	'CmdOrCtrl+Shift+B': GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
 
