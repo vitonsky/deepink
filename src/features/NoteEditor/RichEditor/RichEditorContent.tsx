@@ -121,6 +121,7 @@ export const RichEditorContent = ({
 							bottom={0}
 							paddingInline="0.5rem"
 							pointerEvents="none"
+							color="typography.secondary"
 						>
 							{placeholder}
 						</Box>
