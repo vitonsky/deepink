@@ -112,7 +112,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		[notesView]: notesOffset,
 	});
 	useEffect(() => {
-		const previousOffset = offsetsByViewRef.current[notesView] ?? 0;
+		const previousOffset = offsetsByViewRef.current[notesView];
 		if (notesOffset < previousOffset) {
 			dispatch(
 				workspacesApi.updateNotesOffset({
@@ -224,7 +224,7 @@ export const NotesList: FC<NotesListProps> = () => {
 							})}
 						</VStack>
 					</Box>
-					{isShowSpinner && notes.length > 0 && (
+					{isShowSpinner && notes.length > NOTES_PAGE_SIZE && (
 						<Box
 							position="sticky"
 							display="flex"
