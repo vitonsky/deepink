@@ -208,6 +208,34 @@ export const Note: FC<NoteEditorProps> = memo(
 				state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
 			);
 		});
+		useWorkspaceCommandCallback(
+			GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
+			async () => {
+				const newArchivedState = !note.isArchived;
+				await notesRegistry.updateMeta([note.id], {
+					isArchived: newArchivedState,
+				});
+				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+					action: newArchivedState ? 'Added' : 'Removed',
+				});
+			},
+		);
+		useWorkspaceCommandCallback(
+			GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
+			async () => {
+				const newBookmarkedState = !note.isBookmarked;
+				await notesRegistry.updateMeta([note.id], {
+					isBookmarked: newBookmarkedState,
+				});
+				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
+
+				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
+					action: newBookmarkedState ? 'Added' : 'Removed',
+				});
+			},
+		);
 
 		const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
@@ -247,9 +275,7 @@ export const Note: FC<NoteEditorProps> = memo(
 							}
 							size="xs"
 							onClick={() =>
-								runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK, {
-									id: note.id,
-								})
+								runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK)
 							}
 							isActive={note.isBookmarked}
 						>
@@ -264,9 +290,7 @@ export const Note: FC<NoteEditorProps> = memo(
 							}
 							size="xs"
 							onClick={() =>
-								runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE, {
-									id: note.id,
-								})
+								runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE)
 							}
 							isActive={note.isArchived}
 						>
