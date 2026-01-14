@@ -63,20 +63,17 @@ export const RichEditorContent = ({
 		return {
 			focus() {
 				editor.update(() => {
+					// Do not change selection if exists
 					if ($getSelection()) return;
 
-					const root = $getRoot();
-					const firstChild = root.getAllTextNodes()[0];
-
-					if (!firstChild) {
-						return;
-					}
-
+					// Set cursor at content start
+					const rootKey = $getRoot().getKey();
 					const selection = $createRangeSelection();
-					selection.anchor.set(firstChild.getKey(), 0, 'text');
-					selection.focus.set(firstChild.getKey(), 0, 'text');
+					selection.anchor.set(rootKey, 0, 'element');
+					selection.focus.set(rootKey, 0, 'element');
 					$setSelection(selection);
 				});
+
 				editor.focus();
 			},
 		} satisfies RichEditorAPI;
@@ -124,6 +121,7 @@ export const RichEditorContent = ({
 							bottom={0}
 							paddingInline="0.5rem"
 							pointerEvents="none"
+							color="typography.secondary"
 						>
 							{placeholder}
 						</Box>
