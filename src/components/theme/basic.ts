@@ -152,16 +152,15 @@ export const basicTheme = extendTheme({
 			},
 		},
 		colors: {
-			variants: {
-				ghost: {
-					text: 'typography.primary',
-					hoverFill: 'dim.400',
-
-					active: {
-						text: 'accent.500',
-					},
-				},
-			},
+			// variants: {
+			// 	ghost: {
+			// 		text: 'typography.primary',
+			// 		hoverFill: '#f5e8dd',
+			// 		active: {
+			// 			text: 'accent.500',
+			// 		},
+			// 	},
+			// },
 		},
 	},
 	components: {
@@ -228,12 +227,16 @@ export const basicTheme = extendTheme({
 					},
 				},
 				ghost: {
-					color: 'variants.ghost.text',
-					'&:hover, &:active': {
-						backgroundColor: 'variants.ghost.hoverFill',
+					color: 'variants.ghost.foreground',
+					backgroundColor: 'transparent',
+
+					'&:not([data-active]):is(:hover,:active,:focus)': {
+						backgroundColor: 'variants.ghost.background',
 					},
+
 					'&[data-active]': {
-						color: 'variants.ghost.active.text',
+						color: 'variants.ghost.active.foreground',
+						background: 'variants.ghost.active.background',
 					},
 				},
 				link: {
@@ -322,10 +325,10 @@ export const basicTheme = extendTheme({
 						},
 					},
 				},
-				accent: {
+				static: {
 					container: {
-						backgroundColor: 'accent.100',
-						color: 'accent.500',
+						backgroundColor: 'dim.100',
+						color: 'typography.additional',
 					},
 				},
 			},
@@ -353,19 +356,30 @@ export const basicTheme = extendTheme({
 			variants: {
 				default: {
 					tab: {
-						color: 'typography.additional',
+						color: 'variants.ghost.foreground',
+						backgroundColor: 'transparent',
 
 						'&:hover': {
-							backgroundColor: 'dim.100',
+							backgroundColor: 'variants.ghost.background',
 						},
+
 						_selected: {
-							backgroundColor: 'accent.100',
-							color: 'accent.500',
-							'&:hover': {
-								color: 'accent.500',
-								backgroundColor: 'accent.100',
-							},
+							color: 'variants.ghost.active.foreground',
+							background: 'variants.ghost.active.background',
 						},
+
+						// color: 'typography.additional',
+						// '&:hover': {
+						// 	backgroundColor: 'dim.100',
+						// },
+						// _selected: {
+						// 	backgroundColor: 'accent.100',
+						// 	color: 'accent.500',
+						// 	'&:hover': {
+						// 		color: 'accent.500',
+						// 		backgroundColor: 'accent.100',
+						// 	},
+						// },
 					},
 				},
 			},
@@ -382,8 +396,12 @@ export const basicTheme = extendTheme({
 				field: {
 					color: 'typography.primary',
 					'&::placeholder': {
-						color: 'inherit',
-						opacity: '.6',
+						color: 'typography.secondary',
+						opacity: '.8',
+					},
+
+					'&:focus-visible': {
+						shadow: 'input',
 					},
 				},
 			},
@@ -399,10 +417,11 @@ export const basicTheme = extendTheme({
 				filled: {
 					field: {
 						borderColor: 'transparent',
+
 						'&:hover': {
 							borderColor: 'dim.400',
 						},
-						'&:focus-visible': {
+						'&:focus': {
 							borderColor: 'transparent',
 						},
 						'&:not(:focus)': {
@@ -413,6 +432,26 @@ export const basicTheme = extendTheme({
 				ghost: {
 					field: {
 						background: 'transparent',
+					},
+				},
+				thin: {
+					field: {
+						// font-size: 22px;
+						// /* height: 2.2rem; */
+
+						borderWidth: '0 0 1px',
+						padding: '.3rem',
+						boxShadow: 'none',
+						borderRadius: 0,
+						background: 'transparent',
+
+						borderColor: 'transparent',
+						'&:hover, &:focus': {
+							borderColor: 'dim.400',
+						},
+						'&:focus-visible': {
+							boxShadow: 'none',
+						},
 					},
 				},
 			},

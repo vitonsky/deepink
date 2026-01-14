@@ -1,8 +1,4 @@
-import {
-	createMultiStyleConfigHelpers,
-	defineStyleConfig,
-	extendTheme,
-} from '@chakra-ui/react';
+import { defineStyleConfig, extendTheme } from '@chakra-ui/react';
 
 import { basicTheme, getScrollBarStyles } from './basic';
 
@@ -17,7 +13,8 @@ export const zenTheme = extendTheme(basicTheme, {
 		},
 	},
 	shadows: {
-		outline: '0 0 0 3px #d3b97c8a',
+		input: '0 0 0 3px #bea56b',
+		outline: '0 0 0 3px #000000',
 	},
 	colors: {
 		accent: {
@@ -28,9 +25,9 @@ export const zenTheme = extendTheme(basicTheme, {
 		primary: {
 			// Primary color for controls
 			100: '#ddccbd',
-			200: '#b78665',
-			300: '#ae7f5f',
-			500: '#fff',
+			200: '#ffd5b2',
+			300: '#f9caa2',
+			500: '#94481c',
 			700: '#ae7f5f',
 		},
 		typography: {
@@ -51,8 +48,8 @@ export const zenTheme = extendTheme(basicTheme, {
 		},
 		dim: {
 			50: '#fdf4ea',
-			100: '#ece3da',
-			400: '#e0d4c8',
+			100: '#f7ece1',
+			400: '#f4e6d8',
 		},
 		link: {
 			base: '#0066ff',
@@ -66,38 +63,39 @@ export const zenTheme = extendTheme(basicTheme, {
 		colors: {
 			variants: {
 				ghost: {
-					text: 'accent.500',
-					hoverFill: 'dim.400',
+					foreground: '#57381b',
+					background: '#f5e8dd',
 
 					active: {
-						text: 'primary.700',
+						foreground: '#93561d',
+						background: '#f7e4d3',
 					},
 				},
 			},
 		},
 	},
 	components: {
-		Input: createMultiStyleConfigHelpers([
-			'field',
-			'addon',
-			'element',
-		]).defineMultiStyleConfig({
-			variants: {
-				filled: {
-					field: {
-						backgroundColor: 'dim.100',
-						borderColor: 'transparent',
-						color: 'typography.primary',
-						'&:hover, &:focus-visible': {
-							borderColor: 'dim.400',
-						},
-					},
-				},
-			},
-			defaultProps: {
-				variant: 'filled',
-			},
-		}),
+		// Input: createMultiStyleConfigHelpers([
+		// 	'field',
+		// 	'addon',
+		// 	'element',
+		// ]).defineMultiStyleConfig({
+		// 	variants: {
+		// 		filled: {
+		// 			field: {
+		// 				backgroundColor: 'dim.100',
+		// 				borderColor: 'transparent',
+		// 				color: 'typography.primary',
+		// 				'&:hover, &:focus-visible': {
+		// 					borderColor: 'dim.400',
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	defaultProps: {
+		// 		variant: 'filled',
+		// 	},
+		// }),
 		Spinner: defineStyleConfig({
 			variants: {
 				primary: {

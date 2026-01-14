@@ -211,9 +211,10 @@ export const Note: FC<NoteEditorProps> = memo(
 				<HStack w="100%" align="start">
 					<HStack w="100%" align="start">
 						<Input
-							placeholder="Note title"
+							placeholder="Untitled"
+							variant="thin"
 							size="sm"
-							borderRadius="6px"
+							fontSize="22px"
 							value={versionPreview ? versionPreview.title : title}
 							onChange={
 								versionPreview
@@ -229,7 +230,7 @@ export const Note: FC<NoteEditorProps> = memo(
 				</HStack>
 
 				<HStack alignItems="center" w="100%" flexWrap="wrap">
-					<HStack>
+					<HStack gap=".3rem">
 						<Button
 							variant="ghost"
 							title={

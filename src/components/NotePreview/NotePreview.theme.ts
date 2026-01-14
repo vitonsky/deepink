@@ -38,15 +38,27 @@ export const NotePreviewTheme = createMultiStyleConfigHelpers([
 	variants: {
 		default: {
 			root: {
-				color: 'typography.primary',
+				// color: 'typography.primary',
 
-				'&:not([aria-selected=true]):hover': {
-					backgroundColor: 'dim.100',
+				// '&:not([aria-selected=true]):hover': {
+				// 	backgroundColor: 'dim.100',
+				// },
+
+				// _selected: {
+				// 	backgroundColor: 'accent.100',
+				// 	color: 'accent.500',
+				// },
+
+				color: 'variants.ghost.foreground',
+				backgroundColor: 'transparent',
+
+				'&:hover': {
+					backgroundColor: 'variants.ghost.background',
 				},
 
 				_selected: {
-					backgroundColor: 'accent.100',
-					color: 'accent.500',
+					color: 'variants.ghost.active.foreground',
+					background: 'variants.ghost.active.background',
 				},
 			},
 			meta: {

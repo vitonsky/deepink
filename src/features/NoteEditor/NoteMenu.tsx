@@ -38,7 +38,7 @@ export const NoteMenu = memo(
 	}) => {
 		return (
 			<Menu>
-				<MenuButton as={Button} variant="primary" size="sm">
+				<MenuButton as={Button} variant="ghost" size="sm">
 					<FaEllipsis />
 				</MenuButton>
 				<MenuList>
