@@ -432,8 +432,8 @@ export const basicTheme = extendTheme({
 				},
 				container: {
 					'&[data-status="info"]': {
-						backgroundColor: 'panel.message.background',
-						color: 'panel.message.foreground',
+						backgroundColor: 'container.message.background',
+						color: 'container.message.foreground',
 					},
 				},
 			},

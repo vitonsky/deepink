@@ -21,8 +21,8 @@ export const NotificationsTheme = createMultiStyleConfigHelpers([
 		head: {
 			w: '100%',
 			padding: '.5rem 1rem',
-			backgroundColor: 'panel.head.background',
-			color: 'panel.head.foreground',
+			backgroundColor: 'container.head.background',
+			color: 'container.head.foreground',
 		},
 		body: {
 			w: '100%',

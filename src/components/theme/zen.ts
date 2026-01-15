@@ -115,8 +115,7 @@ export const zenTheme = extendTheme(basicTheme, {
 					},
 				},
 			},
-			// TODO: rename to `container`
-			panel: {
+			container: {
 				head: {
 					foreground: 'typography.primary',
 					background: 'surface.panel',
