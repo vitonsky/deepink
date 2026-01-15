@@ -1,12 +1,10 @@
 import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
-import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -17,14 +15,11 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
-import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
-
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
 	const telemetry = useTelemetryTracker();
 
-	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
@@ -32,10 +27,11 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const search = useWorkspaceSelector(selectSearch);
 
-	const openNoteContextMenu = useNoteContextMenu({
-		closeNote: noteActions.close,
-		updateNotes,
-	});
+	// const updateNotes = useUpdateNotes();
+	// const openNoteContextMenu = useNoteContextMenu({
+	// 	closeNote: noteActions.close,
+	// 	updateNotes,
+	// });
 
 	const parentRef = useRef<HTMLDivElement>(null);
 	const isActiveWorkspace = useIsActiveWorkspace();
@@ -44,7 +40,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 5,
+		overscan: 30,
 	});
 
 	const items = virtualizer.getVirtualItems();
@@ -58,7 +54,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
 			return;
 
-		const noteIndex = notes.findIndex((note) => note.id === activeNoteId);
+		const noteIndex = notes.findIndex((note) => note === activeNoteId);
 		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
@@ -106,21 +102,20 @@ export const NotesList: FC<NotesListProps> = () => {
 						{virtualizer.getVirtualItems().map((virtualRow) => {
 							const note = notes[virtualRow.index];
 
-							const date = note.createdTimestamp ?? note.updatedTimestamp;
-							const isActive = note.id === activeNoteId;
+							const isActive = note === activeNoteId;
 
 							// TODO: get preview text from DB as prepared value
 							// TODO: show attachments
 							return (
 								<NotePreview
-									key={note.id}
+									key={note}
 									ref={(node) => {
 										if (isActive) {
 											activeNoteRef.current = node;
 										}
-
 										virtualizer.measureElement(node);
 									}}
+									noteId={note}
 									data-index={virtualRow.index}
 									isSelected={isActive}
 									textToHighlight={search}
@@ -138,7 +133,7 @@ export const NotesList: FC<NotesListProps> = () => {
 										);
 									}}
 									onClick={() => {
-										noteActions.click(note.id);
+										noteActions.click(note);
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.NOTE_OPENED,
 											{
