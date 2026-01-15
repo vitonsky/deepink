@@ -6,6 +6,7 @@ import { updateMonacoTheme } from '@features/MonakoEditor/MonacoEditor';
 import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useShowForMinimumTime } from '@hooks/useShowForMinimumTime';
 
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
@@ -88,8 +89,9 @@ export const App: FC = () => {
 		setProfileScreen(screen);
 	});
 
-	const isLoadingState = Object.values(loadingState).some(Boolean);
-	if (isLoadingState) {
+	const isLoading = Object.values(loadingState).some(Boolean);
+	const isShow = useShowForMinimumTime(isLoading);
+	if (isShow) {
 		return <SplashScreen />;
 	}
 

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
@@ -8,6 +8,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
+import { useShowForMinimumTime } from '@hooks/useShowForMinimumTime';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -48,8 +49,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	const command = useCommand();
 
 	const [isProfileLoading, setIsProfileLoading] = useState(false);
-	const [isShowLoadingScreen, setIsShowLoadingScreen] = useState(false);
-
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
 			setIsProfileLoading(true);
@@ -85,28 +84,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const MIN_LOADING_TIME = 600;
-	const loadingStartRef = useRef<number | null>(null);
-	useEffect(() => {
-		if (isProfileLoading) {
-			loadingStartRef.current = Date.now();
-			setIsShowLoadingScreen(true);
-			return;
-		}
-
-		if (loadingStartRef.current === null) return;
-
-		const elapsed = Date.now() - loadingStartRef.current;
-		const delay = Math.max(0, MIN_LOADING_TIME - elapsed);
-
-		const timer = setTimeout(() => {
-			setIsShowLoadingScreen(false);
-			loadingStartRef.current = null;
-		}, delay);
-
-		return () => clearTimeout(timer);
-	}, [isProfileLoading]);
-
+	const isShowLoadingScreen = useShowForMinimumTime(isProfileLoading);
 	const content = useMemo(() => {
 		// show a loading screen while the profile is opening
 		if (isShowLoadingScreen === true) return <SplashScreen />;
