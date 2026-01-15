@@ -4,6 +4,7 @@ import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { updateMonacoTheme } from '@features/MonakoEditor/MonacoEditor';
 import { SplashScreen } from '@features/SplashScreen';
+import { useShowForMinimumTime } from '@hooks/useShowForMinimumTime';
 
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
@@ -75,8 +76,9 @@ export const App: FC = () => {
 		}
 	}, [profileContainers.profiles.length]);
 
-	const isLoadingState = Object.values(loadingState).some(Boolean);
-	if (isLoadingState) {
+	const isLoading = Object.values(loadingState).some(Boolean);
+	const isShowSplashScreen = useShowForMinimumTime(isLoading);
+	if (isShowSplashScreen) {
 		return <SplashScreen />;
 	}
 
