@@ -142,7 +142,7 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 							{...getInputProps()}
 							{...{ placeholder, ...inputProps }}
 							w="100%"
-							variant="thin"
+							variant="flushed"
 						/>
 					</Box>
 					{isOpen && (

@@ -164,14 +164,6 @@ export const basicTheme = extendTheme({
 		},
 	},
 	components: {
-		Tooltip: defineStyleConfig({
-			baseStyle: {
-				borderRadius: '4px',
-				color: 'typography.inverted',
-				backgroundColor: 'surface.invertedBackground',
-				'--popper-arrow-bg': 'var(--chakra-colors-surface-invertedBackground)',
-			},
-		}),
 		Link: defineStyleConfig({
 			baseStyle: {
 				color: 'link.base',
@@ -197,14 +189,15 @@ export const basicTheme = extendTheme({
 						base: string;
 						hover: string;
 					} = scheme || {
-						text: 'primary.500',
-						base: 'primary.200',
-						hover: 'primary.300',
+						text: 'control.action.foreground',
+						base: 'control.action.background',
+						hover: 'control.action.active.background',
 					};
 
 					return {
-						backgroundColor: colors.base,
 						color: colors.text,
+						backgroundColor: colors.base,
+
 						'&:hover': {
 							backgroundColor: colors.hover,
 						},
@@ -213,19 +206,19 @@ export const basicTheme = extendTheme({
 						},
 					};
 				},
+
 				secondary: {
-					backgroundColor: 'dim.100',
-					color: 'typography.primary',
+					color: 'control.base.foreground',
+					backgroundColor: 'control.base.background',
+
 					'&[disabled], &:hover, &[disabled]:hover': {
-						backgroundColor: 'dim.100',
+						backgroundColor: 'control.base.disabled.background',
 					},
-					'&:not([disabled]):hover': {
-						backgroundColor: 'dim.400',
-					},
-					'&[data-active]': {
-						backgroundColor: 'primary.100',
+					'&[data-active], &:not([disabled]):hover': {
+						backgroundColor: 'control.base.active.background',
 					},
 				},
+
 				ghost: {
 					color: 'variants.ghost.foreground',
 					backgroundColor: 'transparent',
@@ -239,19 +232,21 @@ export const basicTheme = extendTheme({
 						background: 'variants.ghost.active.background',
 					},
 				},
+
 				link: {
-					color: 'typography.accent',
+					color: 'link.base',
 					backgroundColor: 'unset',
+
 					textDecoration: 'underline',
+					textUnderlineOffset: '.2em',
 					padding: 0,
 					fontWeight: 'normal',
 					fontSize: 'inherit',
 					alignItems: 'baseline',
-					'&:hover, &:active, &[data-active]': {
-						color: 'typography.accent',
-					},
-					textUnderlineOffset: '.2em',
 
+					'&:hover, &:active, &[data-active]': {
+						color: 'link.base',
+					},
 					'&:not(:disabled):active': {
 						transform: 'none',
 					},
@@ -262,6 +257,99 @@ export const basicTheme = extendTheme({
 				colorScheme: 'primary',
 			},
 		}),
+		Input: createMultiStyleConfigHelpers([
+			'field',
+			'addon',
+			'element',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				field: {
+					color: 'typography.primary',
+					'&::placeholder': {
+						color: 'typography.secondary',
+						opacity: '.8',
+					},
+
+					'&:focus-visible, &[data-focus-visible]': {
+						shadow: 'input',
+					},
+				},
+			},
+			sizes: {
+				lg: {
+					field: {
+						borderWidth: '2px',
+					},
+				},
+			},
+			variants: {
+				subtle: {
+					field: {
+						borderColor: 'control.input.border',
+						borderWidth: '1px',
+
+						'&:hover': {
+							borderColor: 'control.input.active.border',
+						},
+						'&:focus': {
+							borderColor: 'control.input.border',
+							backgroundColor: 'transparent',
+						},
+						'&:not(:focus)': {
+							backgroundColor: 'control.input.background',
+						},
+					},
+				},
+				flushed: {
+					field: {
+						background: 'transparent',
+						boxShadow: 'none',
+						padding: '.3rem',
+
+						borderWidth: '0 0 1px',
+						borderColor: 'transparent',
+						borderRadius: 0,
+
+						'&:hover, &:focus, &:focus-visible': {
+							background: 'transparent',
+							borderColor: 'control.input.active.border',
+						},
+						'&:focus-visible': {
+							boxShadow: 'none',
+						},
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'subtle',
+			},
+		}),
+		Select: createMultiStyleConfigHelpers(['field', 'icon']).defineMultiStyleConfig({
+			baseStyle: {
+				field: {
+					color: 'typography.primary',
+					'&::placeholder': {
+						color: 'inherit',
+						opacity: '.8',
+					},
+				},
+			},
+			variants: {
+				subtle: {
+					field: {
+						backgroundColor: 'control.base.background',
+						color: 'control.base.foreground',
+
+						'&:hover': {
+							backgroundColor: 'control.base.active.background',
+						},
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'subtle',
+			},
+		}),
 		Switch: createMultiStyleConfigHelpers([
 			'container',
 			'thumb',
@@ -269,10 +357,10 @@ export const basicTheme = extendTheme({
 		]).defineMultiStyleConfig({
 			baseStyle: {
 				track: {
-					backgroundColor: 'primary.200',
+					backgroundColor: 'control.action.background',
 				},
 				thumb: {
-					backgroundColor: 'primary.500',
+					backgroundColor: 'control.action.foreground',
 				},
 			},
 		}),
@@ -287,12 +375,12 @@ export const basicTheme = extendTheme({
 					backgroundColor: 'surface.background',
 				},
 				item: {
-					color: 'typography.primary',
-					backgroundColor: 'surface.background',
+					color: 'variants.ghost.foreground',
+					backgroundColor: 'transparent',
 
 					transitionDuration: '0s',
 					'&:hover, &:focus': {
-						backgroundColor: 'dim.100',
+						backgroundColor: 'variants.ghost.background',
 					},
 				},
 			},
@@ -305,37 +393,49 @@ export const basicTheme = extendTheme({
 						backgroundColor: 'surface.background',
 					},
 					item: {
-						color: 'typography.primary',
+						color: 'variants.ghost.foreground',
+						backgroundColor: 'transparent',
 
 						'&[aria-selected=true]': {
-							backgroundColor: 'dim.100',
+							backgroundColor: 'variants.ghost.background',
 						},
 					},
 				},
 			},
 		),
+		Tooltip: defineStyleConfig({
+			baseStyle: {
+				borderRadius: '4px',
+				color: 'typography.inverted',
+				backgroundColor: 'surface.invertedBackground',
+				'--popper-arrow-bg': 'var(--chakra-colors-surface-invertedBackground)',
+			},
+		}),
 		Tag: createMultiStyleConfigHelpers(['container']).defineMultiStyleConfig({
 			variants: {
-				default: {
+				base: {
 					container: {
-						backgroundColor: 'dim.100',
-						color: 'typography.additional',
+						backgroundColor: 'control.base.background',
+						color: 'control.base.foreground',
+
 						'&:hover': {
-							backgroundColor: 'dim.400',
+							backgroundColor: 'control.base.active.background',
 						},
 					},
 				},
 				static: {
 					container: {
-						backgroundColor: 'dim.100',
-						color: 'typography.additional',
+						backgroundColor: 'control.base.background',
+						color: 'control.base.foreground',
 					},
 				},
 			},
 			defaultProps: {
-				variant: 'default',
+				variant: 'base',
 			},
 		}),
+
+		// TODO: review and improve
 		Alert: createMultiStyleConfigHelpers([
 			'icon',
 			'container',
@@ -367,145 +467,11 @@ export const basicTheme = extendTheme({
 							color: 'variants.ghost.active.foreground',
 							background: 'variants.ghost.active.background',
 						},
-
-						// color: 'typography.additional',
-						// '&:hover': {
-						// 	backgroundColor: 'dim.100',
-						// },
-						// _selected: {
-						// 	backgroundColor: 'accent.100',
-						// 	color: 'accent.500',
-						// 	'&:hover': {
-						// 		color: 'accent.500',
-						// 		backgroundColor: 'accent.100',
-						// 	},
-						// },
 					},
 				},
 			},
 			defaultProps: {
 				variant: 'default',
-			},
-		}),
-		Input: createMultiStyleConfigHelpers([
-			'field',
-			'addon',
-			'element',
-		]).defineMultiStyleConfig({
-			baseStyle: {
-				field: {
-					color: 'typography.primary',
-					'&::placeholder': {
-						color: 'typography.secondary',
-						opacity: '.8',
-					},
-
-					'&:focus-visible': {
-						shadow: 'input',
-					},
-				},
-			},
-			variants: {
-				outline: {
-					field: {
-						borderColor: 'surface.border',
-						'&:not(:focus):hover': {
-							borderColor: 'surface.alternativeBorder',
-						},
-					},
-				},
-				filled: {
-					field: {
-						borderColor: 'transparent',
-
-						'&:hover': {
-							borderColor: 'dim.400',
-						},
-						'&:focus': {
-							borderColor: 'transparent',
-						},
-						'&:not(:focus)': {
-							backgroundColor: 'dim.100',
-						},
-					},
-				},
-				ghost: {
-					field: {
-						background: 'transparent',
-					},
-				},
-				thin: {
-					field: {
-						// font-size: 22px;
-						// /* height: 2.2rem; */
-
-						borderWidth: '0 0 1px',
-						padding: '.3rem',
-						boxShadow: 'none',
-						borderRadius: 0,
-						background: 'transparent',
-
-						borderColor: 'transparent',
-						'&:hover, &:focus': {
-							borderColor: 'dim.400',
-						},
-						'&:focus-visible': {
-							boxShadow: 'none',
-						},
-					},
-				},
-			},
-			defaultProps: {
-				variant: 'filled',
-			},
-		}),
-		Select: createMultiStyleConfigHelpers(['field', 'icon']).defineMultiStyleConfig({
-			baseStyle: {
-				field: {
-					color: 'typography.primary',
-					'&::placeholder': {
-						color: 'inherit',
-						opacity: '.8',
-					},
-				},
-			},
-			variants: {
-				outline: {
-					field: {
-						'&, & >option': {
-							backgroundColor: 'surface.background',
-						},
-
-						borderColor: 'surface.border',
-						'&:not(:focus):hover': {
-							borderColor: 'surface.alternativeBorder',
-						},
-					},
-				},
-				primary: {
-					field: {
-						backgroundColor: 'primary.200',
-						color: 'primary.500',
-						'&:hover': {
-							backgroundColor: 'primary.300',
-						},
-					},
-					icon: {
-						color: 'primary.500',
-					},
-				},
-				secondary: {
-					field: {
-						backgroundColor: 'dim.100',
-						color: 'typography.primary',
-						'&:hover': {
-							backgroundColor: 'dim.400',
-						},
-					},
-				},
-			},
-			defaultProps: {
-				variant: 'outline',
 			},
 		}),
 		Spinner: defineStyleConfig({

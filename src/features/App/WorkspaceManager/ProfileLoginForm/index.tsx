@@ -94,7 +94,6 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 			<VStack as="form" w="100%" alignItems="start" onSubmit={onPressLogin}>
 				<Input
 					ref={firstInputRef}
-					variant="filled"
 					size="lg"
 					type="password"
 					placeholder="Enter password"

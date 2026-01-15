@@ -212,7 +212,7 @@ export const Note: FC<NoteEditorProps> = memo(
 					<HStack w="100%" align="start">
 						<Input
 							placeholder="Untitled"
-							variant="thin"
+							variant="flushed"
 							size="sm"
 							fontSize="22px"
 							value={versionPreview ? versionPreview.title : title}
@@ -361,7 +361,6 @@ export const Note: FC<NoteEditorProps> = memo(
 							maxW: '150px',
 						}}
 						inputProps={{
-							variant: 'ghost',
 							placeholder: 'Add some tags...',
 							// size: 'sm',
 							size: 'xs',

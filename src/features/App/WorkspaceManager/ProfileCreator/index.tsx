@@ -121,19 +121,13 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						Create profile
 					</Button>
 					<Button
-						variant="secondary"
 						w="100%"
 						onClick={noPasswordDialogState.onOpen}
 						disabled={isPending}
 					>
 						Continue with no password
 					</Button>
-					<Button
-						variant="secondary"
-						w="100%"
-						onClick={onCancel}
-						disabled={isPending}
-					>
+					<Button w="100%" onClick={onCancel} disabled={isPending}>
 						Cancel
 					</Button>
 
@@ -181,7 +175,6 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				<VStack w="100%" alignItems="start">
 					<Input
 						ref={profileNameInputRef}
-						variant="filled"
 						size="lg"
 						placeholder="Profile name"
 						value={profileName}
@@ -196,7 +189,6 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				<VStack w="100%" alignItems="start">
 					<Input
 						ref={passwordInputRef}
-						variant="filled"
 						size="lg"
 						type="password"
 						placeholder="Enter password"
@@ -214,7 +206,6 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						Encryption algorithm
 					</Text>
 					<Select
-						variant="secondary"
 						value={algorithm}
 						onChange={(evt) => setAlgorithm(evt.target.value)}
 						disabled={isPending}

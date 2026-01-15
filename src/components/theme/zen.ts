@@ -52,8 +52,10 @@ export const zenTheme = extendTheme(basicTheme, {
 			400: '#f4e6d8',
 		},
 		link: {
-			base: '#0066ff',
-			hover: '#0453c9',
+			base: 'typography.accent',
+			hover: 'typography.additional',
+			// base: '#0066ff',
+			// hover: '#0453c9',
 		},
 		overlay: {
 			500: '#00000075',
@@ -61,6 +63,41 @@ export const zenTheme = extendTheme(basicTheme, {
 	},
 	semanticTokens: {
 		colors: {
+			control: {
+				base: {
+					background: 'dim.100',
+					foreground: 'typography.primary',
+
+					active: {
+						background: 'dim.400',
+					},
+
+					disabled: {
+						background: 'dim.100',
+					},
+				},
+
+				action: {
+					foreground: 'primary.500',
+					background: 'primary.200',
+
+					active: {
+						background: 'primary.300',
+					},
+				},
+
+				input: {
+					background: 'dim.100',
+					border: 'transparent',
+
+					active: {
+						border: 'dim.400',
+					},
+				},
+			},
+			panel: {
+				base: {},
+			},
 			variants: {
 				ghost: {
 					foreground: '#57381b',

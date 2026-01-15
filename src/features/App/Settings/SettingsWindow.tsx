@@ -55,7 +55,7 @@ export const SettingsWindow = () => {
 								title="Encryption algorithm"
 								description="Choose best algorithm you trust"
 							>
-								<Select variant="secondary" defaultValue="aes">
+								<Select defaultValue="aes">
 									{[
 										{
 											value: 'none',
@@ -89,7 +89,7 @@ export const SettingsWindow = () => {
 								<Checkbox>Enable synchronization</Checkbox>
 							</FeaturesOption>
 							<FeaturesOption title="Synchronization method">
-								<Select variant="secondary" defaultValue="fs">
+								<Select defaultValue="fs">
 									{[
 										{
 											value: 'fs',

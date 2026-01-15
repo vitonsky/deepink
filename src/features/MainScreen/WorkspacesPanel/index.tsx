@@ -81,7 +81,6 @@ export const WorkspacesPanel = (props: StackProps) => {
 			<HStack w="100%" marginTop="auto">
 				<Select
 					size="sm"
-					variant="secondary"
 					borderRadius="6px"
 					value={workspaceId}
 					onChange={(evt) => {
