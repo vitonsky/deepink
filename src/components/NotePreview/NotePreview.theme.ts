@@ -51,7 +51,7 @@ export const NotePreviewTheme = createMultiStyleConfigHelpers([
 				},
 			},
 			meta: {
-				color: 'typography.ghost',
+				color: 'typography.secondary',
 			},
 		},
 	},

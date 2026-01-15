@@ -29,7 +29,7 @@ export const SettingsWindow = () => {
 		<Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size="4xl">
 			<ModalOverlay />
 			<ModalContent w="800">
-				<ModalHeader>Modal Title</ModalHeader>
+				<ModalHeader>Preferences</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>
 					<VStack w="100%" minH="100%" p="2rem" justifyContent="center">

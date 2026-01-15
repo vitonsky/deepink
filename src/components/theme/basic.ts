@@ -6,7 +6,6 @@ import {
 	StyleFunctionProps,
 	SystemStyleObject,
 } from '@chakra-ui/react';
-import { ModalScreenTheme } from '@components/ModalScreen/ModalScreen.theme';
 import { NestedListTheme } from '@components/NestedList/NestedList.theme';
 import { NotePreviewTheme } from '@components/NotePreview/NotePreview.theme';
 import { NotificationsTheme } from '@components/Notifications/Notifications.theme';
@@ -510,7 +509,6 @@ export const basicTheme = extendTheme({
 			},
 		}),
 		Notifications: NotificationsTheme,
-		ModalScreen: ModalScreenTheme,
 		NotePreview: NotePreviewTheme,
 		NestedList: NestedListTheme,
 		RichEditor: RichEditorTheme,

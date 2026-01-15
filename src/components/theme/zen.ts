@@ -115,8 +115,12 @@ export const zenTheme = extendTheme(basicTheme, {
 					},
 				},
 			},
+			// TODO: rename to `container`
 			panel: {
-				base: {},
+				head: {
+					foreground: 'typography.primary',
+					background: 'surface.panel',
+				},
 
 				message: {
 					foreground: 'accent.500',
