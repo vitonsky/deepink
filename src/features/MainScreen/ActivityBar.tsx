@@ -7,12 +7,13 @@ import { useDebouncedCallback } from 'use-debounce';
 import { ButtonGroup, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { PROFILE_SCREEN } from '@features/App';
 import { useProfileControls } from '@features/App/Profile';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
+import { useAppDispatch } from '@state/redux/hooks';
+import { PROFILE_SCREEN, workspacesApi } from '@state/redux/profiles/profiles';
 
 export const ActivityBar = () => {
 	const telemetry = useTelemetryTracker();
@@ -20,6 +21,7 @@ export const ActivityBar = () => {
 	const profileControls = useProfileControls();
 
 	const command = useCommand();
+	const dispatch = useAppDispatch();
 
 	const createNote = useCreateNote();
 	const debouncedCreateNote = useDebouncedCallback(async () => {
@@ -105,9 +107,7 @@ export const ActivityBar = () => {
 						data-no-animation
 						onClick={() => {
 							command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE);
-							command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-								screen: PROFILE_SCREEN.LOCK,
-							});
+							dispatch(workspacesApi.setProfileScreen(PROFILE_SCREEN.LOCK));
 						}}
 					/>
 				)}

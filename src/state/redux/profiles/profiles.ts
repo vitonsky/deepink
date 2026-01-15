@@ -53,6 +53,12 @@ export enum NOTES_VIEW {
 	ARCHIVE = 'Archive',
 }
 
+export enum PROFILE_SCREEN {
+	LOCK = 'lockProfileScreen',
+	CHANGE = 'changeProfileScreen',
+	CREATE = 'createProfileScreen',
+}
+
 export const createWorkspaceObject = (workspace: {
 	id: string;
 	name: string;
@@ -156,6 +162,7 @@ export type ProfileData = {
 export type ProfilesState = {
 	activeProfile: string | null;
 	profiles: Record<string, ProfileData | undefined>;
+	profileScreen: PROFILE_SCREEN | null;
 };
 
 export const profilesSlice = createSlice({
@@ -163,6 +170,7 @@ export const profilesSlice = createSlice({
 	initialState: {
 		activeProfile: null,
 		profiles: {},
+		profileScreen: null,
 	} as ProfilesState,
 	reducers: {
 		setProfiles: (state, { payload }: PayloadAction<Record<string, ProfileData>>) => {
@@ -187,6 +195,10 @@ export const profilesSlice = createSlice({
 
 		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
 			state.activeProfile = payload;
+		},
+
+		setProfileScreen: (state, { payload }: PayloadAction<PROFILE_SCREEN>) => {
+			state.profileScreen = payload;
 		},
 
 		setWorkspaces: (
@@ -518,6 +530,11 @@ export const selectActiveWorkspaceInfo = (scope: ProfileScoped) =>
 	createAppSelector(selectActiveWorkspace(scope), (workspace) =>
 		workspace ? getWorkspaceInfo(workspace) : null,
 	);
+
+export const selectProfileScreen = createAppSelector(
+	profilesSlice.selectSlice,
+	(state) => state.profileScreen,
+);
 
 export * from './selectors/notes';
 export * from './selectors/tags';

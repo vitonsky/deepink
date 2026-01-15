@@ -21,7 +21,7 @@ export const useCommandCallback = <K extends keyof CommandPayloadsMap>(
 		return commandEvent.watch((event) => {
 			if (event.name !== commandName) return;
 
-			callback(event.payload as CommandPayloadsMap[K]);
+			callback(event.payload);
 		});
 	}, [callback, commandName, commandEvent, enabled]);
 };
