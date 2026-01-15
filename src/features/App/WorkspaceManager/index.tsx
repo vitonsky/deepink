@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
@@ -47,8 +47,13 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	const telemetry = useTelemetryTracker();
 	const command = useCommand();
 
+	const [isProfileLoading, setIsProfileLoading] = useState(false);
+	const [isShowLoadingScreen, setIsShowLoadingScreen] = useState(false);
+
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
+			setIsProfileLoading(true);
+
 			// Profiles with no password
 			if (!profile.encryption) {
 				await profiles.openProfile({ profile }, true);
@@ -66,6 +71,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				console.error(err);
 
 				return { status: 'error', message: 'Invalid password' };
+			} finally {
+				setIsProfileLoading(false);
 			}
 		},
 		[profiles],
@@ -78,28 +85,43 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [isLoading, setIsLoading] = useState(false);
+	const MIN_LOADING_TIME = 600;
+	const loadingStartRef = useRef<number | null>(null);
+	useEffect(() => {
+		if (isProfileLoading) {
+			loadingStartRef.current = Date.now();
+			setIsShowLoadingScreen(true);
+			return;
+		}
+
+		if (loadingStartRef.current === null) return;
+
+		const elapsed = Date.now() - loadingStartRef.current;
+		const delay = Math.max(0, MIN_LOADING_TIME - elapsed);
+
+		const timer = setTimeout(() => {
+			setIsShowLoadingScreen(false);
+			loadingStartRef.current = null;
+		}, delay);
+
+		return () => clearTimeout(timer);
+	}, [isProfileLoading]);
 
 	const content = useMemo(() => {
-		// show a loading screen while the profile is being created
-		if (isLoading === true) return <SplashScreen />;
+		// show a loading screen while the profile is opening
+		if (isShowLoadingScreen === true) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
 		if (screenName === PROFILE_SCREEN.CREATE || hasNoProfiles) {
 			return (
 				<ProfileCreator
-					onCreateProfile={async (profile) => {
-						setIsLoading(true);
-
-						const newProfile = await profilesManager.createProfile(profile);
-						const response = await onOpenProfile(
-							newProfile,
-							profile.password ?? undefined,
-						);
-						console.warn(response);
-
-						setIsLoading(false);
-					}}
+					onCreateProfile={(profile) =>
+						profilesManager.createProfile(profile).then((newProfile) => {
+							onOpenProfile(newProfile, profile.password ?? undefined).then(
+								console.warn,
+							);
+						})
+					}
 					onCancel={() =>
 						command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
 							screen: PROFILE_SCREEN.CHANGE,
@@ -110,7 +132,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			);
 		}
 
-		if (screenName === PROFILE_SCREEN.LOCK && currentProfileObject) {
+		if (screenName !== PROFILE_SCREEN.CHANGE && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
@@ -197,8 +219,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		profilesManager,
 		screenName,
 		telemetry,
-		isLoading,
 		command,
+		isShowLoadingScreen,
 	]);
 
 	return (
