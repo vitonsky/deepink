@@ -5,6 +5,7 @@ import { ElectronFilesController, storageApi } from '@electron/requests/storage/
 import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useShowForMinimumTime } from '@hooks/useShowForMinimumTime';
 
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
@@ -83,8 +84,9 @@ export const App: FC = () => {
 		setProfileScreen(screen);
 	});
 
-	const isLoadingState = Object.values(loadingState).some(Boolean);
-	if (isLoadingState) {
+	const isLoading = Object.values(loadingState).some(Boolean);
+	const isShow = useShowForMinimumTime(isLoading);
+	if (isShow) {
 		return <SplashScreen />;
 	}
 
