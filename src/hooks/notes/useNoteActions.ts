@@ -12,7 +12,6 @@ import { useAppDispatch } from '@state/redux/hooks';
 import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
 import {
 	selectIsNoteOpened,
-	selectNotes,
 	selectWorkspace,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -27,27 +26,28 @@ export const useNoteActions = () => {
 
 	const store = useStore<RootState>();
 
+	const notesRegistry = useNotesRegistry();
+
 	const click = useCallback(
 		(id: NoteId) => {
 			const workspace = selectWorkspace(workspaceData)(store.getState());
-			const notes = selectNotes(workspace);
+			// const notes = selectOpenedNotes(workspace);
 			const isNoteOpened = selectIsNoteOpened(id)(workspace);
 
 			if (isNoteOpened) {
 				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: id }));
 			} else {
-				const note = notes.find((note) => note.id === id);
-				if (note) {
-					openNote(note);
-				}
+				notesRegistry.getById(id).then((note) => {
+					if (note) openNote(note);
+				});
 			}
 		},
-		[dispatch, openNote, store, workspaceData],
+		[dispatch, notesRegistry, openNote, store, workspaceData],
 	);
 
 	const eventBus = useEventBus();
 	const noteHistory = useNotesHistory();
-	const notesRegistry = useNotesRegistry();
+	// const notesRegistry = useNotesRegistry();
 	const { enabled: isSnapshotsEnabled } = useVaultSelector(selectSnapshotSettings);
 	const close = useCallback(
 		async (id: NoteId) => {

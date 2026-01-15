@@ -1,19 +1,41 @@
-import React, { forwardRef, ReactNode } from 'react';
-import { Box, StackProps, Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
+import React, { forwardRef, useEffect, useState } from 'react';
+import {
+	Box,
+	Skeleton,
+	StackProps,
+	Text,
+	useMultiStyleConfig,
+	VStack,
+} from '@chakra-ui/react';
+import { INote, NoteId } from '@core/features/notes';
+import { getNoteTitle } from '@core/features/notes/utils';
+import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 
 import { TextSample } from './TextSample';
 
 export const NotePreview = forwardRef<
 	HTMLDivElement,
 	{
-		title: string;
-		text: string;
-		meta?: ReactNode;
 		isSelected?: boolean;
 		textToHighlight?: string;
+		noteId: NoteId;
 	} & StackProps
->(({ title, text, textToHighlight, meta, isSelected, ...props }, ref) => {
+>(({ textToHighlight, noteId, isSelected, ...props }, ref) => {
 	const styles = useMultiStyleConfig('NotePreview');
+
+	const noteRegister = useNotesRegistry();
+
+	const [note, setNote] = useState<INote>();
+
+	useEffect(() => {
+		noteRegister.getById(noteId).then((n) => {
+			if (!n) return;
+			setNote(n);
+		});
+	}, [noteId]);
+
+	if (!note) return <Skeleton height="70px" w="100%" />;
+	const date = note.createdTimestamp ?? note.updatedTimestamp;
 
 	return (
 		<VStack
@@ -28,24 +50,25 @@ export const NotePreview = forwardRef<
 			<VStack sx={styles.body}>
 				<Text as="h3" sx={styles.title}>
 					<TextSample
-						text={title}
+						text={getNoteTitle(note.content)}
 						highlightText={textToHighlight}
 						lengthLimit={30}
 					/>
 				</Text>
 
-				{text.length > 0 ? (
+				{note.content.text.length > 0 ? (
 					<Text sx={styles.text}>
 						<TextSample
-							text={text}
+							text={'text'}
 							highlightText={textToHighlight}
 							lengthLimit={150}
 						/>
 					</Text>
 				) : undefined}
 			</VStack>
-
-			{meta && <Box sx={styles.meta}>{meta}</Box>}
+			{date && (
+				<Box sx={styles.meta}>{<Text>{new Date(date).toDateString()}</Text>}</Box>
+			)}
 		</VStack>
 	);
 });

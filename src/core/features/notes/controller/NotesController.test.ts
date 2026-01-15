@@ -356,6 +356,17 @@ describe('data fetching', () => {
 	});
 });
 
+test.only('get ids nor note', async () => {
+	const dbFile = createFileControllerMock();
+	const db = await openDatabase(dbFile);
+
+	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+	await registry.add({ title: 'Title', text: 'Text' });
+	await registry.add({ title: 'Title 1', text: 'Text 1' });
+
+	await expect(registry.query()).resolves.toEqual(expect.arrayContaining([]));
+});
+
 describe('multi instances', () => {
 	const dbFile = createFileControllerMock();
 
