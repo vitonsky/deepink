@@ -94,11 +94,6 @@ export const zenTheme = extendTheme(basicTheme, {
 						border: 'dim.400',
 					},
 				},
-			},
-			panel: {
-				base: {},
-			},
-			variants: {
 				ghost: {
 					foreground: '#57381b',
 					background: '#f5e8dd',
@@ -108,6 +103,9 @@ export const zenTheme = extendTheme(basicTheme, {
 						background: '#f7e4d3',
 					},
 				},
+			},
+			panel: {
+				base: {},
 			},
 		},
 	},

@@ -37,16 +37,16 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 	variants: {
 		default: {
 			content: {
-				color: 'variants.ghost.foreground',
+				color: 'control.ghost.foreground',
 				backgroundColor: 'transparent',
 
 				'&:hover': {
-					backgroundColor: 'variants.ghost.background',
+					backgroundColor: 'control.ghost.background',
 				},
 
 				_selected: {
-					color: 'variants.ghost.active.foreground',
-					background: 'variants.ghost.active.background',
+					color: 'control.ghost.active.foreground',
+					background: 'control.ghost.active.background',
 				},
 			},
 		},

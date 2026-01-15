@@ -144,23 +144,12 @@ export const basicTheme = extendTheme({
 		},
 	},
 	semanticTokens: {
-		schemes: {
+		scheme: {
 			alert: {
 				text: '#fff',
 				base: '#C53030',
 				hover: '#9B2C2C',
 			},
-		},
-		colors: {
-			// variants: {
-			// 	ghost: {
-			// 		text: 'typography.primary',
-			// 		hoverFill: '#f5e8dd',
-			// 		active: {
-			// 			text: 'accent.500',
-			// 		},
-			// 	},
-			// },
 		},
 	},
 	components: {
@@ -183,7 +172,7 @@ export const basicTheme = extendTheme({
 			},
 			variants: {
 				primary(props: StyleFunctionProps) {
-					const scheme = props.theme.semanticTokens.schemes[props.colorScheme];
+					const scheme = props.theme.semanticTokens.scheme[props.colorScheme];
 					const colors: {
 						text: string;
 						base: string;
@@ -220,16 +209,16 @@ export const basicTheme = extendTheme({
 				},
 
 				ghost: {
-					color: 'variants.ghost.foreground',
+					color: 'control.ghost.foreground',
 					backgroundColor: 'transparent',
 
 					'&:not([data-active]):is(:hover,:active,:focus)': {
-						backgroundColor: 'variants.ghost.background',
+						backgroundColor: 'control.ghost.background',
 					},
 
 					'&[data-active]': {
-						color: 'variants.ghost.active.foreground',
-						background: 'variants.ghost.active.background',
+						color: 'control.ghost.active.foreground',
+						background: 'control.ghost.active.background',
 					},
 				},
 
@@ -375,12 +364,12 @@ export const basicTheme = extendTheme({
 					backgroundColor: 'surface.background',
 				},
 				item: {
-					color: 'variants.ghost.foreground',
+					color: 'control.ghost.foreground',
 					backgroundColor: 'transparent',
 
 					transitionDuration: '0s',
 					'&:hover, &:focus': {
-						backgroundColor: 'variants.ghost.background',
+						backgroundColor: 'control.ghost.background',
 					},
 				},
 			},
@@ -393,11 +382,11 @@ export const basicTheme = extendTheme({
 						backgroundColor: 'surface.background',
 					},
 					item: {
-						color: 'variants.ghost.foreground',
+						color: 'control.ghost.foreground',
 						backgroundColor: 'transparent',
 
 						'&[aria-selected=true]': {
-							backgroundColor: 'variants.ghost.background',
+							backgroundColor: 'control.ghost.background',
 						},
 					},
 				},
@@ -456,16 +445,16 @@ export const basicTheme = extendTheme({
 			variants: {
 				default: {
 					tab: {
-						color: 'variants.ghost.foreground',
+						color: 'control.ghost.foreground',
 						backgroundColor: 'transparent',
 
 						'&:hover': {
-							backgroundColor: 'variants.ghost.background',
+							backgroundColor: 'control.ghost.background',
 						},
 
 						_selected: {
-							color: 'variants.ghost.active.foreground',
-							background: 'variants.ghost.active.background',
+							color: 'control.ghost.active.foreground',
+							background: 'control.ghost.active.background',
 						},
 					},
 				},
