@@ -1,4 +1,4 @@
-import { defineStyleConfig, extendTheme } from '@chakra-ui/react';
+import { extendTheme } from '@chakra-ui/react';
 
 import { basicTheme, getScrollBarStyles } from './basic';
 
@@ -103,43 +103,26 @@ export const zenTheme = extendTheme(basicTheme, {
 						background: '#f7e4d3',
 					},
 				},
+
+				checkbox: {
+					background: 'transparent',
+					border: 'surface.border',
+
+					active: {
+						background: 'primary.300',
+						foreground: 'primary.500',
+						border: 'primary.300',
+					},
+				},
 			},
 			panel: {
 				base: {},
-			},
-		},
-	},
-	components: {
-		// Input: createMultiStyleConfigHelpers([
-		// 	'field',
-		// 	'addon',
-		// 	'element',
-		// ]).defineMultiStyleConfig({
-		// 	variants: {
-		// 		filled: {
-		// 			field: {
-		// 				backgroundColor: 'dim.100',
-		// 				borderColor: 'transparent',
-		// 				color: 'typography.primary',
-		// 				'&:hover, &:focus-visible': {
-		// 					borderColor: 'dim.400',
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	defaultProps: {
-		// 		variant: 'filled',
-		// 	},
-		// }),
-		Spinner: defineStyleConfig({
-			variants: {
-				primary: {
-					color: 'primary.200',
+
+				message: {
+					foreground: 'accent.500',
+					background: 'accent.100',
 				},
 			},
-			defaultProps: {
-				variant: 'primary',
-			},
-		}),
+		},
 	},
 });

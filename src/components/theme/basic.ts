@@ -423,8 +423,6 @@ export const basicTheme = extendTheme({
 				variant: 'base',
 			},
 		}),
-
-		// TODO: review and improve
 		Alert: createMultiStyleConfigHelpers([
 			'icon',
 			'container',
@@ -435,15 +433,15 @@ export const basicTheme = extendTheme({
 				},
 				container: {
 					'&[data-status="info"]': {
-						backgroundColor: 'accent.100',
-						color: 'accent.500',
+						backgroundColor: 'panel.message.background',
+						color: 'panel.message.foreground',
 					},
 				},
 			},
 		}),
 		Tabs: createMultiStyleConfigHelpers(['tab']).defineMultiStyleConfig({
 			variants: {
-				default: {
+				subtle: {
 					tab: {
 						color: 'control.ghost.foreground',
 						backgroundColor: 'transparent',
@@ -460,17 +458,17 @@ export const basicTheme = extendTheme({
 				},
 			},
 			defaultProps: {
-				variant: 'default',
+				variant: 'subtle',
 			},
 		}),
 		Spinner: defineStyleConfig({
 			variants: {
-				primary: {
-					color: 'primary.500',
+				accent: {
+					color: 'control.action.foreground',
 				},
 			},
 			defaultProps: {
-				variant: 'primary',
+				variant: 'accent',
 			},
 		}),
 		Divider: defineStyleConfig({
@@ -484,11 +482,15 @@ export const basicTheme = extendTheme({
 		]).defineMultiStyleConfig({
 			baseStyle: {
 				control: {
-					borderColor: 'surface.border',
-					'&[aria-checked=true], &[data-checked]': {
-						color: 'primary.500',
-						borderColor: 'primary.300',
-						backgroundColor: 'primary.300',
+					backgroundColor: 'control.checkbox.background',
+					borderColor: 'control.checkbox.border',
+
+					_checked: {
+						'&, &:hover': {
+							color: 'control.checkbox.active.foreground',
+							borderColor: 'control.checkbox.active.border',
+							backgroundColor: 'control.checkbox.active.background',
+						},
 					},
 				},
 			},
