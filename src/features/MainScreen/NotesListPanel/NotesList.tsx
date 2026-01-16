@@ -39,8 +39,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		enabled: isActiveWorkspace,
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 70,
-		overscan: 30,
+		estimateSize: () => 90,
+		overscan: 50,
 	});
 
 	const items = virtualizer.getVirtualItems();
@@ -61,7 +61,7 @@ export const NotesList: FC<NotesListProps> = () => {
 
 		// We only need scroll to active note once by its change
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [activeNoteId]);
+	}, [activeNoteId, notes]);
 
 	// TODO: implement dragging and moving items
 	return (
@@ -99,7 +99,7 @@ export const NotesList: FC<NotesListProps> = () => {
 							gap: '4px',
 						}}
 					>
-						{virtualizer.getVirtualItems().map((virtualRow) => {
+						{items.map((virtualRow) => {
 							const note = notes[virtualRow.index];
 
 							const isActive = note === activeNoteId;
