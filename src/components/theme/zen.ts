@@ -107,6 +107,20 @@ export const zenTheme = extendTheme(basicTheme, {
 					},
 				},
 
+				option: {
+					foreground: 'typography.primary',
+					accentForeground: '#57381b',
+					additionalForeground: '#33435e',
+
+					hover: {
+						background: '#f5e8dd',
+					},
+					active: {
+						background: '#f7e4d3',
+						accentForeground: '#93561d',
+					},
+				},
+
 				checkbox: {
 					background: 'transparent',
 					border: 'surface.border',

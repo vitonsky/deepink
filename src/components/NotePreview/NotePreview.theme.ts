@@ -31,24 +31,29 @@ export const NotePreviewTheme = createMultiStyleConfigHelpers([
 			maxWidth: '100%',
 		},
 		meta: {
-			fontSize: '14px',
+			fontSize: '12px',
+			fontWeight: '500',
 			width: '100%',
 		},
 	},
 	variants: {
 		default: {
 			root: {
-				color: 'control.ghost.foreground',
+				color: 'control.option.foreground',
 				backgroundColor: 'transparent',
+				borderRadius: '4px',
 
 				'&:hover': {
-					backgroundColor: 'control.ghost.background',
+					backgroundColor: 'control.option.hover.background',
 				},
 
 				_selected: {
-					color: 'control.ghost.active.foreground',
-					background: 'control.ghost.active.background',
+					background: 'control.option.active.background',
+					color: 'control.option.active.accentForeground',
 				},
+			},
+			text: {
+				color: 'control.option.foreground',
 			},
 			meta: {
 				color: 'typography.secondary',

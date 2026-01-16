@@ -94,14 +94,14 @@ export const basicTheme = extendTheme({
 		},
 	},
 	shadows: {
-		outline: '0 0 0 3px #0066ffaa',
+		outline: '0 0 0 3px #0066ff',
 	},
 	colors: {
 		accent: {
 			// Accent color
-			100: '#e8e6ff',
-			200: '#f3e5ff',
-			500: '#6b00cb',
+			100: '#e6f0ff',
+			200: '#d7e7ff',
+			500: '#0066ff',
 		},
 		primary: {
 			// Primary color for controls
@@ -178,11 +178,24 @@ export const basicTheme = extendTheme({
 				},
 				ghost: {
 					foreground: 'typography.primary',
-					background: 'accent.200',
+					background: '#eff6ff',
 
 					active: {
-						foreground: 'accent.500',
-						background: 'accent.200',
+						foreground: '#0059df',
+						background: '#eff6ff',
+					},
+				},
+				option: {
+					foreground: 'typography.primary',
+					accentForeground: 'typography.primary',
+					additionalForeground: '#33435e',
+
+					hover: {
+						background: '#eff6ff',
+					},
+					active: {
+						background: '#eff6ff',
+						accentForeground: '#0059df',
 					},
 				},
 
