@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { WorkspaceEvents } from '@api/events/workspace';
 import {
 	Box,
@@ -52,7 +52,29 @@ export const NotePreview = forwardRef<
 		};
 	}, [noteId, eventBus, loadNote]);
 
-	if (!note) return <Skeleton height="70px" w="100%" />;
+	const [isShowSkeleton, setIsShowSkeleton] = useState(true);
+	const startTimeRef = useRef<number>(Date.now());
+	useEffect(() => {
+		const elapsed = Date.now() - startTimeRef.current;
+		const delay = Math.max(0, 600 - elapsed);
+
+		const timer = setTimeout(() => {
+			setIsShowSkeleton(false);
+		}, delay);
+
+		return () => clearTimeout(timer);
+	}, [note]);
+
+	if (isShowSkeleton)
+		return (
+			<Skeleton
+				startColor="primary.100"
+				endColor="dim.400"
+				height="70px"
+				w="100%"
+			/>
+		);
+	if (!note) return null;
 	const date = note.createdTimestamp ?? note.updatedTimestamp;
 
 	return (
