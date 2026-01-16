@@ -43,7 +43,7 @@ export const useUpdateNotes = () => {
 
 		const tags = activeTag !== null ? [activeTag.id] : [];
 
-		const notes = await notesRegistry.get({
+		const notes = await notesRegistry.query({
 			tags,
 			sort: { by: 'updatedAt', order: 'desc' },
 			search: searchText
@@ -64,8 +64,6 @@ export const useUpdateNotes = () => {
 
 		if (isRequestCanceled()) return;
 
-		dispatch(
-			workspacesApi.setNotes({ ...workspaceData, notes: notes.map((n) => n.id) }),
-		);
+		dispatch(workspacesApi.setNotes({ ...workspaceData, notes }));
 	}, [activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData]);
 };
