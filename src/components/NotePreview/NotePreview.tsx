@@ -1,4 +1,5 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import { WorkspaceEvents } from '@api/events/workspace';
 import {
 	Box,
 	Skeleton,
@@ -9,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useEventBus, useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 
 import { TextSample } from './TextSample';
 
@@ -24,15 +25,32 @@ export const NotePreview = forwardRef<
 	const styles = useMultiStyleConfig('NotePreview');
 
 	const noteRegister = useNotesRegistry();
+	const eventBus = useEventBus();
 
 	const [note, setNote] = useState<INote>();
 
+	const loadNote = useCallback(async () => {
+		const note = await noteRegister.getById(noteId);
+		if (note) setNote(note);
+	}, [noteId, noteRegister]);
+
 	useEffect(() => {
-		noteRegister.getById(noteId).then((n) => {
-			if (!n) return;
-			setNote(n);
-		});
-	}, [noteId]);
+		loadNote();
+	}, [loadNote]);
+
+	useEffect(() => {
+		const onUpdate = (updatedNoteId: NoteId) => {
+			if (updatedNoteId === noteId) loadNote();
+		};
+
+		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, onUpdate);
+		const cleanupEdited = eventBus.listen(WorkspaceEvents.NOTE_EDITED, onUpdate);
+
+		return () => {
+			cleanupUpdated();
+			cleanupEdited();
+		};
+	}, [noteId, eventBus, loadNote]);
 
 	if (!note) return <Skeleton height="70px" w="100%" />;
 	const date = note.createdTimestamp ?? note.updatedTimestamp;
