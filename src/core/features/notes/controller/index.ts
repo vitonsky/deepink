@@ -88,4 +88,6 @@ export interface INotesController {
 	 * Deletes all notes with specified ids
 	 */
 	delete(ids: NoteId[]): Promise<void>;
+
+	query(query?: NotesControllerFetchOptions): Promise<NoteId[]>;
 }
