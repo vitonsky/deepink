@@ -30,6 +30,7 @@ export const zenTheme = extendTheme(basicTheme, {
 			500: '#94481c',
 			700: '#ae7f5f',
 		},
+
 		typography: {
 			primary: '#000',
 			secondary: '#4e3a0c',
@@ -51,14 +52,16 @@ export const zenTheme = extendTheme(basicTheme, {
 			100: '#f7ece1',
 			400: '#f4e6d8',
 		},
+
 		link: {
 			base: 'typography.accent',
 			hover: 'typography.additional',
-			// base: '#0066ff',
-			// hover: '#0453c9',
 		},
 		overlay: {
 			500: '#00000075',
+		},
+		message: {
+			error: '#b30606',
 		},
 	},
 	semanticTokens: {

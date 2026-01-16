@@ -364,6 +364,7 @@ export const Note: FC<NoteEditorProps> = memo(
 							placeholder: 'Add some tags...',
 							// size: 'sm',
 							size: 'xs',
+							variant: 'flushed',
 						}}
 						hasTagName={(tagName) =>
 							tags.some(({ resolvedName }) => resolvedName === tagName)

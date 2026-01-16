@@ -100,6 +100,7 @@ export const basicTheme = extendTheme({
 		accent: {
 			// Accent color
 			100: '#e8e6ff',
+			200: '#f3e5ff',
 			500: '#6b00cb',
 		},
 		primary: {
@@ -112,7 +113,7 @@ export const basicTheme = extendTheme({
 		typography: {
 			primary: '#000',
 			inverted: '#fff',
-			secondary: '#727272',
+			secondary: '#5f5f5f',
 			additional: '#3e3d3d',
 			ghost: '#6e6e6e',
 		},
@@ -143,6 +144,71 @@ export const basicTheme = extendTheme({
 		},
 	},
 	semanticTokens: {
+		colors: {
+			control: {
+				base: {
+					background: 'dim.100',
+					foreground: 'typography.primary',
+
+					active: {
+						background: 'dim.400',
+					},
+
+					disabled: {
+						background: 'dim.100',
+					},
+				},
+
+				action: {
+					foreground: 'primary.500',
+					background: 'primary.200',
+
+					active: {
+						background: 'primary.300',
+					},
+				},
+
+				input: {
+					background: 'dim.100',
+					border: 'transparent',
+
+					active: {
+						border: 'dim.400',
+					},
+				},
+				ghost: {
+					foreground: 'typography.primary',
+					background: 'accent.200',
+
+					active: {
+						foreground: 'accent.500',
+						background: 'accent.200',
+					},
+				},
+
+				checkbox: {
+					background: 'transparent',
+					border: 'surface.border',
+
+					active: {
+						background: 'primary.300',
+						foreground: 'primary.500',
+						border: 'primary.300',
+					},
+				},
+			},
+			container: {
+				head: {
+					foreground: 'typography.primary',
+					background: 'surface.panel',
+				},
+
+				message: {
+					foreground: 'accent.500',
+					background: 'accent.100',
+				},
+			},
+		},
 		scheme: {
 			alert: {
 				text: '#fff',
