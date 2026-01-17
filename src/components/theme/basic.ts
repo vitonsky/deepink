@@ -95,6 +95,7 @@ export const basicTheme = extendTheme({
 	},
 	shadows: {
 		outline: '0 0 0 3px #0066ff',
+		input: '0 0 0 3px #0066ff',
 	},
 	colors: {
 		accent: {

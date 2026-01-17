@@ -5,57 +5,52 @@ import { basicTheme, getScrollBarStyles } from './basic';
 export default extendTheme(basicTheme, {
 	styles: {
 		global: {
-			...getScrollBarStyles({
-				trackColor: '#e7e0d9',
-				scrollColor: '#bbac9d',
-				scrollHoverColor: '#a99a8c',
-			}),
+			...getScrollBarStyles(),
 		},
 	},
 	shadows: {
-		input: '0 0 0 3px #bea56b',
-		outline: '0 0 0 3px #000000',
+		outline: '0 0 0 3px #0066ff',
+		input: '0 0 0 3px #0066ff',
 	},
 	colors: {
 		accent: {
 			// Accent color
-			100: '#e5d8cb',
-			500: '#493017',
+			100: '#e6f0ff',
+			200: '#d7e7ff',
+			500: '#0066ff',
 		},
 		primary: {
 			// Primary color for controls
-			100: '#ddccbd',
-			200: '#ffd5b2',
-			300: '#f9caa2',
-			500: '#94481c',
-			700: '#ae7f5f',
+			200: '#000',
+			300: '#313131ff',
+			500: '#f0f0f0',
+			700: '#000',
 		},
-
 		typography: {
 			primary: '#000',
-			secondary: '#4e3a0c',
-			accent: '#493017',
+			inverted: '#fff',
+			secondary: '#5f5f5f',
 			additional: '#3e3d3d',
-			ghost: '#3a3a3a',
+			ghost: '#6e6e6e',
 		},
 		surface: {
-			background: '#fffaf3',
-			panel: '#f8f2e9',
-			contrastPanel: '#efe8de',
-			border: '#e0d6c7',
+			background: '#ffffff',
+			invertedBackground: '#000',
+			panel: '#fdfdfd',
+			contrastPanel: '#f7f7f7',
+			border: '#e2e8f0',
 			alternativeBorder: '#c0c4c9',
-			selection: '#ffca9b',
-			highlight: '#ffba7d',
+			selection: '#d7e7ff',
+			highlight: '#b0d0ff',
 		},
 		dim: {
-			50: '#fdf4ea',
-			100: '#f7ece1',
-			400: '#f4e6d8',
+			50: '#fbfbfb',
+			100: '#f3f3f3',
+			400: '#e7e7e7',
 		},
-
 		link: {
-			base: 'typography.accent',
-			hover: 'typography.additional',
+			base: '#0066ff',
+			hover: '#0453c9',
 		},
 		overlay: {
 			500: '#00000075',
@@ -98,26 +93,25 @@ export default extendTheme(basicTheme, {
 					},
 				},
 				ghost: {
-					foreground: '#57381b',
-					background: '#f5e8dd',
+					foreground: 'typography.primary',
+					background: '#f0f0f0',
 
 					active: {
-						foreground: '#93561d',
-						background: '#f7e4d3',
+						foreground: '#000',
+						background: '#f0f0f0',
 					},
 				},
-
 				option: {
 					foreground: 'typography.primary',
-					accentForeground: '#57381b',
+					accentForeground: 'typography.primary',
 					additionalForeground: '#33435e',
 
 					hover: {
-						background: '#f5e8dd',
+						background: '#f0f0f0',
 					},
 					active: {
-						background: '#f7e4d3',
-						accentForeground: '#93561d',
+						background: '#f0f0f0',
+						accentForeground: 'typography.primary',
 					},
 				},
 
@@ -142,6 +136,13 @@ export default extendTheme(basicTheme, {
 					foreground: 'accent.500',
 					background: 'accent.100',
 				},
+			},
+		},
+		scheme: {
+			alert: {
+				text: '#fff',
+				base: '#C53030',
+				hover: '#9B2C2C',
 			},
 		},
 	},

@@ -1,10 +1,12 @@
 import { basicTheme } from './basic';
-import { zenTheme } from './zen';
+import monochromeTheme from './monochrome';
+import zenTheme from './zen';
 
 const themes: Record<string, Record<string, any>> = {
 	zen: zenTheme,
 	light: basicTheme,
+	monochrome: monochromeTheme,
 };
 
-const themeName = localStorage.getItem('theme') || 'zen';
+const themeName = localStorage.getItem('theme') || 'monochrome';
 export const theme = themes[themeName] || zenTheme;
