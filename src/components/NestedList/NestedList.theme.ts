@@ -22,7 +22,7 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 		},
 		item: {
 			w: '100%',
-			lineHeight: '1rem',
+			lineHeight: '1.1rem',
 			gap: '0',
 		},
 		content: {
@@ -41,7 +41,8 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 				backgroundColor: 'transparent',
 
 				'&:hover': {
-					backgroundColor: 'control.ghost.background',
+					color: 'control.ghost.hover.foreground',
+					backgroundColor: 'control.ghost.hover.background',
 				},
 
 				_selected: {
