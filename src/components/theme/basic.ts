@@ -11,6 +11,8 @@ import { NotePreviewTheme } from '@components/NotePreview/NotePreview.theme';
 import { NotificationsTheme } from '@components/Notifications/Notifications.theme';
 import { RichEditorTheme } from '@features/NoteEditor/RichEditor/RichEditor.theme';
 
+import { buildColorScheme } from './color';
+
 import './resizable-panels.css';
 
 export const getScrollBarStyles = ({
@@ -60,6 +62,13 @@ export const getScrollBarStyles = ({
 	} satisfies SystemStyleObject;
 };
 
+// TODO: leave only one
+// const accentColor = colord('#000000ff');
+// const accentColor = colord('#ffa600ff');
+// const accentColor = colord('#f400ff');
+// const accentColor = colord('#0066ff');
+const colors = buildColorScheme('#f400ff');
+
 export const basicTheme = extendTheme({
 	styles: {
 		global: {
@@ -83,7 +92,7 @@ export const basicTheme = extendTheme({
 			},
 
 			'[data-resize-handle]': {
-				'--resize-handle-active-color': 'var(--chakra-colors-accent-500)',
+				'--resize-handle-active-color': 'var(--chakra-colors-primary-300)',
 			},
 
 			...getScrollBarStyles(),
@@ -94,21 +103,14 @@ export const basicTheme = extendTheme({
 		},
 	},
 	shadows: {
-		outline: '0 0 0 3px #0066ff',
-		input: '0 0 0 3px #0066ff',
+		outline: `0 0 0 3px ${colors.accent}`,
+		input: `0 0 0 3px ${colors.accent}`,
 	},
 	colors: {
-		primary: {
-			// Primary color for controls
-			100: '#eff6ff',
-			200: '#e6f0ff',
-			300: '#d7e7ff',
-			500: '#0066ff',
-			700: '#3667b5',
-		},
+		primary: colors.primary,
 		typography: {
 			inverted: '#fff',
-			accent: '#0059df',
+			accent: colors.primary['600'],
 			primary: '#000',
 			secondary: '#5f5f5f',
 			additional: '#33435e',
@@ -120,8 +122,8 @@ export const basicTheme = extendTheme({
 			contrastPanel: '#f7f7f7',
 			border: '#e2e8f0',
 			alternativeBorder: '#c0c4c9',
-			selection: '#d7e7ff',
-			highlight: '#b0d0ff',
+			selection: colors.primary['200'],
+			highlight: colors.primary['300'],
 		},
 		dim: {
 			50: '#fbfbfb',
@@ -129,8 +131,8 @@ export const basicTheme = extendTheme({
 			400: '#e7e7e7',
 		},
 		link: {
-			base: '#0066ff',
-			hover: '#0453c9',
+			base: colors.primary['400'],
+			hover: colors.primary['600'],
 		},
 		overlay: {
 			500: '#00000075',
