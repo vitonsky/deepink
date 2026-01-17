@@ -30,15 +30,15 @@ export function tones(hex: string) {
 
 	return {
 		50: shiftBrightness(hex, brightnessBase * 0.95),
-		100: shiftBrightness(hex, brightnessBase * 0.9),
-		200: shiftBrightness(hex, brightnessBase * 0.8),
-		300: shiftBrightness(hex, brightnessBase * 0.7),
+		100: shiftBrightness(hex, brightnessBase * 0.8),
+		200: shiftBrightness(hex, brightnessBase * 0.6),
+		300: shiftBrightness(hex, brightnessBase * 0.4),
 		400: shiftBrightness(hex, brightnessBase * 0.2),
 		500: hex,
 		600: shiftBrightness(hex, darknessBase * 0.1),
-		700: shiftBrightness(hex, darknessBase * 0.3),
-		800: shiftBrightness(hex, darknessBase * 0.5),
-		900: shiftBrightness(hex, darknessBase * 0.8),
+		700: shiftBrightness(hex, darknessBase * 0.2),
+		800: shiftBrightness(hex, darknessBase * 0.4),
+		900: shiftBrightness(hex, darknessBase * 0.6),
 	};
 }
 

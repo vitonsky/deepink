@@ -39,24 +39,20 @@ export const NotePreviewTheme = createMultiStyleConfigHelpers([
 	variants: {
 		default: {
 			root: {
-				color: 'control.option.foreground',
-				backgroundColor: 'transparent',
 				borderRadius: '4px',
+
+				backgroundColor: 'control.option.background',
+				color: 'control.option.foreground',
 
 				'&:hover': {
 					backgroundColor: 'control.option.hover.background',
+					color: 'control.option.hover.foreground',
 				},
 
 				_selected: {
-					background: 'control.option.active.background',
-					color: 'control.option.active.accentForeground',
+					backgroundColor: 'control.option.active.background',
+					color: 'control.option.active.foreground',
 				},
-			},
-			text: {
-				color: 'control.option.foreground',
-			},
-			meta: {
-				color: 'typography.secondary',
 			},
 		},
 	},

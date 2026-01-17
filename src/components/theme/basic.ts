@@ -67,7 +67,7 @@ export const getScrollBarStyles = ({
 // const accentColor = colord('#ffa600ff');
 // const accentColor = colord('#f400ff');
 // const accentColor = colord('#0066ff');
-const colors = buildColorScheme('#f400ff');
+const colors = buildColorScheme('#ffb107ff');
 
 export const basicTheme = extendTheme({
 	styles: {
@@ -87,7 +87,8 @@ export const basicTheme = extendTheme({
 				margin: 0,
 			},
 
-			'::selection': {
+			'*::selection': {
+				color: 'typography.inverted',
 				backgroundColor: 'surface.selection',
 			},
 
@@ -109,33 +110,31 @@ export const basicTheme = extendTheme({
 	colors: {
 		primary: colors.primary,
 		typography: {
-			inverted: '#fff',
-			accent: colors.primary['600'],
-			primary: '#000',
-			secondary: '#5f5f5f',
-			additional: '#33435e',
+			inverted: '#000',
+			accent: colors.primary['700'],
+			primary: '#e2e2e2',
+			secondary: '#a7a59f',
 		},
 		surface: {
-			background: '#ffffff',
-			invertedBackground: '#000',
-			panel: '#fdfdfd',
-			contrastPanel: '#f7f7f7',
-			border: '#e2e8f0',
-			alternativeBorder: '#c0c4c9',
+			background: '#48433f',
+			invertedBackground: '#fff',
+			panel: '#524c46',
+			border: '#3a3633',
 			selection: colors.primary['200'],
 			highlight: colors.primary['300'],
 		},
 		dim: {
-			50: '#fbfbfb',
-			100: '#f3f3f3',
-			400: '#e7e7e7',
+			50: '#6c65659c',
+			100: '#6c6565b9',
+			200: '#6c6565c6',
+			400: '#6c65658a',
 		},
 		link: {
 			base: colors.primary['400'],
 			hover: colors.primary['600'],
 		},
 		overlay: {
-			500: '#00000075',
+			500: '#ffffff75',
 		},
 		message: {
 			error: '#b30606',
@@ -145,24 +144,24 @@ export const basicTheme = extendTheme({
 		colors: {
 			control: {
 				base: {
-					background: 'dim.100',
+					background: 'dim.50',
 					foreground: 'typography.primary',
 
 					active: {
-						background: 'dim.400',
+						background: 'dim.100',
 					},
 
 					disabled: {
-						background: 'dim.100',
+						background: 'dim.200',
 					},
 				},
 
 				action: {
-					foreground: 'primary.500',
-					background: 'primary.200',
+					foreground: 'primary.900',
+					background: 'primary.500',
 
 					active: {
-						background: 'primary.300',
+						background: 'primary.600',
 					},
 				},
 
@@ -176,24 +175,30 @@ export const basicTheme = extendTheme({
 				},
 				ghost: {
 					foreground: 'typography.primary',
-					background: 'primary.100',
+					background: 'transparent',
+
+					hover: {
+						foreground: 'typography.primary',
+						background: 'dim.200',
+					},
 
 					active: {
-						foreground: 'typography.accent',
-						background: 'primary.100',
+						foreground: 'typography.primary',
+						background: 'dim.200',
 					},
 				},
 				option: {
 					foreground: 'typography.primary',
-					accentForeground: 'typography.primary',
-					additionalForeground: 'typography.additional',
+					background: 'transparent',
 
 					hover: {
-						background: 'primary.100',
+						foreground: 'typography.primary',
+						background: 'dim.400',
 					},
+
 					active: {
-						background: 'primary.100',
-						accentForeground: 'typography.accent',
+						foreground: 'typography.primary',
+						background: 'dim.400',
 					},
 				},
 
@@ -215,8 +220,8 @@ export const basicTheme = extendTheme({
 				},
 
 				message: {
-					foreground: 'primary.500',
-					background: 'primary.200',
+					foreground: 'typography.primary',
+					background: 'dim.100',
 				},
 			},
 		},
@@ -229,6 +234,11 @@ export const basicTheme = extendTheme({
 		},
 	},
 	components: {
+		Text: defineStyleConfig({
+			baseStyle: {
+				color: 'typography.primary',
+			},
+		}),
 		Link: defineStyleConfig({
 			baseStyle: {
 				color: 'link.base',
@@ -286,10 +296,11 @@ export const basicTheme = extendTheme({
 
 				ghost: {
 					color: 'control.ghost.foreground',
-					backgroundColor: 'transparent',
+					backgroundColor: 'control.ghost.background',
 
 					'&:not([data-active]):is(:hover,:active,:focus)': {
-						backgroundColor: 'control.ghost.background',
+						color: 'control.ghost.hover.foreground',
+						backgroundColor: 'control.ghost.hover.background',
 					},
 
 					'&[data-active]': {
@@ -445,7 +456,8 @@ export const basicTheme = extendTheme({
 
 					transitionDuration: '0s',
 					'&:hover, &:focus': {
-						backgroundColor: 'control.ghost.background',
+						color: 'control.ghost.hover.foreground',
+						backgroundColor: 'control.ghost.hover.background',
 					},
 				},
 			},
@@ -462,7 +474,8 @@ export const basicTheme = extendTheme({
 						backgroundColor: 'transparent',
 
 						'&[aria-selected=true]': {
-							backgroundColor: 'control.ghost.background',
+							color: 'control.ghost.hover.foreground',
+							backgroundColor: 'control.ghost.hover.background',
 						},
 					},
 				},
@@ -523,7 +536,8 @@ export const basicTheme = extendTheme({
 						backgroundColor: 'transparent',
 
 						'&:hover': {
-							backgroundColor: 'control.ghost.background',
+							color: 'control.ghost.hover.foreground',
+							backgroundColor: 'control.ghost.hover.background',
 						},
 
 						_selected: {
