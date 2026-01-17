@@ -65,6 +65,11 @@ export interface INotesController {
 	getLength(query?: NotesControllerFetchOptions): Promise<number>;
 
 	/**
+	 * Get notes id filtered by parameters
+	 */
+	getIds(query?: NotesControllerFetchOptions): Promise<NoteId[]>;
+
+	/**
 	 * Primary method to get notes filtered by parameters
 	 */
 	get(options?: NotesControllerFetchOptions): Promise<INote[]>;
@@ -88,6 +93,4 @@ export interface INotesController {
 	 * Deletes all notes with specified ids
 	 */
 	delete(ids: NoteId[]): Promise<void>;
-
-	query(query?: NotesControllerFetchOptions): Promise<NoteId[]>;
 }
