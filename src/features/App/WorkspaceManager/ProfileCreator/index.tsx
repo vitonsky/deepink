@@ -202,7 +202,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				</VStack>
 
 				<VStack w="100%" gap="0.1rem">
-					<Text color="typography.additional" fontSize="18px" alignSelf="start">
+					<Text fontSize="18px" alignSelf="start">
 						Encryption algorithm
 					</Text>
 					<Select
