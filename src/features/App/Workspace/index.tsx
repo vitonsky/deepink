@@ -88,7 +88,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 				maxWidth: '100%',
 				maxHeight: '100%',
 				backgroundColor: 'surface.background',
-				color: 'typography.primary',
 			}}
 		>
 			{workspace ? (

@@ -211,9 +211,10 @@ export const Note: FC<NoteEditorProps> = memo(
 				<HStack w="100%" align="start">
 					<HStack w="100%" align="start">
 						<Input
-							placeholder="Note title"
+							placeholder="Untitled"
+							variant="flushed"
 							size="sm"
-							borderRadius="6px"
+							fontSize="22px"
 							value={versionPreview ? versionPreview.title : title}
 							onChange={
 								versionPreview
@@ -229,7 +230,7 @@ export const Note: FC<NoteEditorProps> = memo(
 				</HStack>
 
 				<HStack alignItems="center" w="100%" flexWrap="wrap">
-					<HStack>
+					<HStack gap=".3rem">
 						<Button
 							variant="ghost"
 							title={
@@ -360,10 +361,10 @@ export const Note: FC<NoteEditorProps> = memo(
 							maxW: '150px',
 						}}
 						inputProps={{
-							variant: 'ghost',
 							placeholder: 'Add some tags...',
 							// size: 'sm',
 							size: 'xs',
+							variant: 'flushed',
 						}}
 						hasTagName={(tagName) =>
 							tags.some(({ resolvedName }) => resolvedName === tagName)

@@ -59,14 +59,10 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 			overflow="auto"
 			bgColor="surface.panel"
 			flexShrink={0}
+			borderBottom="1px solid"
+			borderColor="surface.border"
 		>
-			<TabList
-				display="flex"
-				flexWrap="wrap"
-				overflow="hidden"
-				borderBottom="1px solid"
-				borderColor="surface.border"
-			>
+			<TabList display="flex" flexWrap="wrap" overflow="hidden">
 				{existsTabs.map((noteId, index) => {
 					const isActiveTab = index === tabIndex;
 

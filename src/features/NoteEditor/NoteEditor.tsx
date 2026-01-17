@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Box, HStack } from '@chakra-ui/react';
+import { Box, Divider, HStack } from '@chakra-ui/react';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -87,6 +87,7 @@ export const NoteEditor = ({
 						apiRef={monacoRef}
 					/>
 				)}
+				{editorMode === 'split-screen' && <Divider orientation="vertical" />}
 				{(editorMode === 'richtext' || editorMode === 'split-screen') && (
 					<RichEditor
 						placeholder="Write your thoughts here..."

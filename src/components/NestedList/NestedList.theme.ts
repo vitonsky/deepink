@@ -22,7 +22,7 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 		},
 		item: {
 			w: '100%',
-			lineHeight: '1rem',
+			lineHeight: '1.1rem',
 			gap: '0',
 		},
 		content: {
@@ -37,15 +37,17 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 	variants: {
 		default: {
 			content: {
-				color: 'typography.primary',
+				color: 'control.ghost.foreground',
+				backgroundColor: 'transparent',
 
-				'&:not([aria-selected=true]):hover': {
-					backgroundColor: 'dim.100',
+				'&:hover': {
+					color: 'control.ghost.hover.foreground',
+					backgroundColor: 'control.ghost.hover.background',
 				},
 
 				_selected: {
-					backgroundColor: 'accent.100',
-					color: 'accent.500',
+					color: 'control.ghost.active.foreground',
+					background: 'control.ghost.active.background',
 				},
 			},
 		},

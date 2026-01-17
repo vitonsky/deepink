@@ -29,7 +29,7 @@ export const SettingsWindow = () => {
 		<Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size="4xl">
 			<ModalOverlay />
 			<ModalContent w="800">
-				<ModalHeader>Modal Title</ModalHeader>
+				<ModalHeader>Preferences</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>
 					<VStack w="100%" minH="100%" p="2rem" justifyContent="center">
@@ -55,7 +55,7 @@ export const SettingsWindow = () => {
 								title="Encryption algorithm"
 								description="Choose best algorithm you trust"
 							>
-								<Select variant="secondary" defaultValue="aes">
+								<Select defaultValue="aes">
 									{[
 										{
 											value: 'none',
@@ -89,7 +89,7 @@ export const SettingsWindow = () => {
 								<Checkbox>Enable synchronization</Checkbox>
 							</FeaturesOption>
 							<FeaturesOption title="Synchronization method">
-								<Select variant="secondary" defaultValue="fs">
+								<Select defaultValue="fs">
 									{[
 										{
 											value: 'fs',

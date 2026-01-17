@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
+import { Text } from '@chakra-ui/react';
 
 // TODO: implement splash screen
 export const SplashScreen = () => {
 	return (
-		<Box
+		<Text
 			sx={{
 				display: 'flex',
 				height: '100vh',
@@ -17,6 +17,6 @@ export const SplashScreen = () => {
 			}}
 		>
 			Loading...
-		</Box>
+		</Text>
 	);
 };

@@ -81,7 +81,6 @@ export const WorkspacesPanel = (props: StackProps) => {
 			<HStack w="100%" marginTop="auto">
 				<Select
 					size="sm"
-					variant="secondary"
 					borderRadius="6px"
 					value={workspaceId}
 					onChange={(evt) => {
@@ -104,12 +103,7 @@ export const WorkspacesPanel = (props: StackProps) => {
 						</option>
 					))}
 				</Select>
-				<Button
-					size="sm"
-					variant="secondary"
-					title="Workspace settings"
-					onClick={editWorkspace}
-				>
+				<Button size="sm" title="Workspace settings" onClick={editWorkspace}>
 					<FaGear />
 				</Button>
 			</HStack>
