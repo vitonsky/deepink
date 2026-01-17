@@ -177,6 +177,27 @@ describe('data fetching', () => {
 		await db.close();
 	});
 
+	test('method getIds consider filters', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		await expect(registry.getIds()).resolves.toHaveLength(300);
+		await expect(registry.getIds({ limit: 100 })).resolves.toHaveLength(100);
+		await expect(
+			registry.getIds({ limit: 100, meta: { isDeleted: true } }),
+		).resolves.toHaveLength(0);
+
+		const tagsList = await tags.getTags();
+		await expect(
+			registry.getIds({
+				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
+			}),
+		).resolves.toHaveLength(1);
+
+		await db.close();
+	});
+
 	test('filter by tags and the deleted status', async () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
@@ -354,17 +375,6 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
-});
-
-test('get ids for note', async () => {
-	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
-
-	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-	await registry.add({ title: 'Title', text: 'Text' });
-	await registry.add({ title: 'Title 1', text: 'Text 1' });
-
-	await expect(registry.query()).resolves.toEqual(expect.arrayContaining([]));
 });
 
 describe('multi instances', () => {

@@ -273,7 +273,7 @@ export class NotesController implements INotesController {
 		return count;
 	}
 
-	public async query(query: NotesControllerFetchOptions = {}): Promise<NoteId[]> {
+	public async getIds(query: NotesControllerFetchOptions = {}): Promise<NoteId[]> {
 		const db = wrapDB(this.db.get());
 
 		const { rows } = await db.query(
