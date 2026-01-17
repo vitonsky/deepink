@@ -1,13 +1,6 @@
-import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { WorkspaceEvents } from '@api/events/workspace';
-import {
-	Box,
-	Skeleton,
-	StackProps,
-	Text,
-	useMultiStyleConfig,
-	VStack,
-} from '@chakra-ui/react';
+import { Box, StackProps, Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { useEventBus, useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
@@ -27,33 +20,23 @@ export const NotePreview = forwardRef<
 	const noteRegister = useNotesRegistry();
 	const eventBus = useEventBus();
 
-	const [isSkeletonVisible, setIsSkeletonVisible] = useState(true);
 	const [note, setNote] = useState<INote>();
 
-	const loadNote = useCallback(async () => {
-		const note = await noteRegister.getById(noteId);
-		if (note) setNote(note);
-	}, [noteId, noteRegister]);
-
 	useEffect(() => {
-		const startedAt = Date.now();
-
-		const load = async () => {
-			await loadNote();
-
-			const delta = Date.now() - startedAt;
-			const delay = Math.max(0, 400 - delta);
-
-			setTimeout(() => {
-				setIsSkeletonVisible(false);
-			}, delay);
-		};
-		load();
+		noteRegister.getById(noteId).then((note) => {
+			if (!note) return;
+			setNote(note);
+		});
 	}, [noteId, noteRegister]);
 
 	useEffect(() => {
 		const onUpdate = (updatedNoteId: NoteId) => {
-			if (updatedNoteId === noteId) loadNote();
+			if (updatedNoteId === noteId) {
+				noteRegister.getById(noteId).then((note) => {
+					if (!note) return;
+					setNote(note);
+				});
+			}
 		};
 
 		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, onUpdate);
@@ -63,17 +46,8 @@ export const NotePreview = forwardRef<
 			cleanupUpdated();
 			cleanupEdited();
 		};
-	}, [noteId, eventBus, loadNote]);
+	}, [noteId, eventBus, noteRegister]);
 
-	if (isSkeletonVisible)
-		return (
-			<Skeleton
-				startColor="primary.100"
-				endColor="dim.400"
-				height="90px"
-				w="100%"
-			/>
-		);
 	if (!note) return null;
 
 	const date = note.createdTimestamp ?? note.updatedTimestamp;
