@@ -100,7 +100,7 @@
 
 .RichEditor__textCode {
 	background-color: var(--chakra-colors-dim-100);
-	color: var(--chakra-colors-typography-primary);
+	color: var(--chakra-colors-typography-base);
 	padding: 1px 0.25rem;
 	font-family: Menlo, Consolas, Monaco, monospace;
 	font-size: 94%;
@@ -126,7 +126,7 @@
 	--block-padding: 0.8rem;
 
 	background-color: var(--chakra-colors-dim-100);
-	color: var(--chakra-colors-typography-primary);
+	color: var(--chakra-colors-typography-base);
 	font-family: Menlo, Consolas, Monaco, monospace;
 	display: block;
 	padding: var(--block-padding);

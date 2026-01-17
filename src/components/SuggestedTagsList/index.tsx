@@ -158,7 +158,6 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 							border="1px solid"
 							borderColor="surface.border"
 							backgroundColor="surface.background"
-							color="typography.primary"
 							borderRadius="6px"
 							paddingBlock=".3rem"
 						>

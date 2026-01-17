@@ -231,7 +231,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 										placeholder="e.g., Personal"
 										flex="100"
 									/>
-									<Button variant="primary" type="submit">
+									<Button variant="accent" type="submit">
 										Update
 									</Button>
 								</HStack>
@@ -357,7 +357,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 							<FeaturesOption description="Delete workspace and all related data, including notes, tags and files">
 								<Button
-									variant="primary"
+									variant="accent"
 									colorScheme="alert"
 									onClick={onDelete}
 									isDisabled={!isOtherWorkspacesExists}

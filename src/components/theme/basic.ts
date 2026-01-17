@@ -85,11 +85,12 @@ export const basicTheme = extendTheme({
 			body: {
 				background: 'surface.background',
 				margin: 0,
+				color: 'typography.base',
 			},
 
-			'*::selection': {
-				color: 'typography.inverted',
-				backgroundColor: 'surface.selection',
+			'::selection': {
+				color: 'selection.foreground',
+				backgroundColor: 'selection.base',
 			},
 
 			'[data-resize-handle]': {
@@ -108,19 +109,22 @@ export const basicTheme = extendTheme({
 		input: `0 0 0 3px ${colors.accent}`,
 	},
 	colors: {
-		primary: colors.primary,
+		accent: colors.accentVariants,
 		typography: {
-			primary: '#e2e2e2',
+			base: '#e2e2e2',
 			secondary: '#a7a59f',
 			inverted: '#000',
+		},
+		selection: {
+			foreground: '#000',
+			base: colors.accentVariants['200'],
+			highlight: colors.accentVariants['300'],
 		},
 		surface: {
 			background: '#48433f',
 			invertedBackground: '#fff',
 			panel: '#524c46',
 			border: '#3a3633',
-			selection: colors.primary['200'],
-			highlight: colors.primary['300'],
 		},
 		dim: {
 			50: '#6c65659c',
@@ -129,8 +133,8 @@ export const basicTheme = extendTheme({
 			400: '#6c65658a',
 		},
 		link: {
-			base: colors.primary['400'],
-			hover: colors.primary['600'],
+			base: colors.accentVariants['400'],
+			hover: colors.accentVariants['600'],
 		},
 		overlay: {
 			500: '#ffffff75',
@@ -144,7 +148,7 @@ export const basicTheme = extendTheme({
 			control: {
 				base: {
 					background: 'dim.50',
-					foreground: 'typography.primary',
+					foreground: 'typography.base',
 
 					active: {
 						background: 'dim.100',
@@ -156,11 +160,11 @@ export const basicTheme = extendTheme({
 				},
 
 				action: {
-					foreground: 'primary.900',
-					background: 'primary.500',
+					foreground: 'accent.900',
+					background: 'accent.500',
 
 					active: {
-						background: 'primary.600',
+						background: 'accent.600',
 					},
 				},
 
@@ -173,30 +177,30 @@ export const basicTheme = extendTheme({
 					},
 				},
 				ghost: {
-					foreground: 'typography.primary',
+					foreground: 'typography.base',
 					background: 'transparent',
 
 					hover: {
-						foreground: 'typography.primary',
+						foreground: 'typography.base',
 						background: 'dim.200',
 					},
 
 					active: {
-						foreground: 'typography.primary',
+						foreground: 'typography.base',
 						background: 'dim.200',
 					},
 				},
 				option: {
-					foreground: 'typography.primary',
+					foreground: 'typography.base',
 					background: 'transparent',
 
 					hover: {
-						foreground: 'typography.primary',
+						foreground: 'typography.base',
 						background: 'dim.400',
 					},
 
 					active: {
-						foreground: 'typography.primary',
+						foreground: 'typography.base',
 						background: 'dim.400',
 					},
 				},
@@ -206,20 +210,20 @@ export const basicTheme = extendTheme({
 					border: 'dim.50',
 
 					active: {
-						foreground: 'primary.900',
-						background: 'primary.300',
-						border: 'primary.300',
+						foreground: 'accent.900',
+						background: 'accent.300',
+						border: 'accent.300',
 					},
 				},
 			},
 			container: {
 				head: {
-					foreground: 'typography.primary',
+					foreground: 'typography.base',
 					background: 'surface.panel',
 				},
 
 				message: {
-					foreground: 'typography.primary',
+					foreground: 'typography.base',
 					background: 'dim.100',
 				},
 			},
@@ -235,7 +239,7 @@ export const basicTheme = extendTheme({
 	components: {
 		Text: defineStyleConfig({
 			baseStyle: {
-				color: 'typography.primary',
+				color: 'typography.base',
 			},
 		}),
 		Link: defineStyleConfig({
@@ -256,7 +260,7 @@ export const basicTheme = extendTheme({
 				},
 			},
 			variants: {
-				primary(props: StyleFunctionProps) {
+				accent(props: StyleFunctionProps) {
 					const scheme = props.theme.semanticTokens.scheme[props.colorScheme];
 					const colors: {
 						text: string;
@@ -281,7 +285,7 @@ export const basicTheme = extendTheme({
 					};
 				},
 
-				secondary: {
+				subtle: {
 					color: 'control.base.foreground',
 					backgroundColor: 'control.base.background',
 
@@ -328,8 +332,7 @@ export const basicTheme = extendTheme({
 				},
 			},
 			defaultProps: {
-				variant: 'secondary',
-				colorScheme: 'primary',
+				variant: 'subtle',
 			},
 		}),
 		Input: createMultiStyleConfigHelpers([
@@ -339,7 +342,7 @@ export const basicTheme = extendTheme({
 		]).defineMultiStyleConfig({
 			baseStyle: {
 				field: {
-					color: 'typography.primary',
+					color: 'typography.base',
 					'&::placeholder': {
 						color: 'typography.secondary',
 						opacity: '.8',
@@ -402,7 +405,7 @@ export const basicTheme = extendTheme({
 		Select: createMultiStyleConfigHelpers(['field', 'icon']).defineMultiStyleConfig({
 			baseStyle: {
 				field: {
-					color: 'typography.primary',
+					color: 'typography.base',
 					'&::placeholder': {
 						color: 'inherit',
 						opacity: '.8',
@@ -593,7 +596,7 @@ export const basicTheme = extendTheme({
 					backgroundColor: 'overlay.500',
 				},
 				dialog: {
-					color: 'typography.primary',
+					color: 'typography.base',
 					backgroundColor: 'surface.background',
 				},
 			},

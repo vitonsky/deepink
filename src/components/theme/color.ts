@@ -1,17 +1,29 @@
 import Color from 'colorjs.io';
 
-function getBrightness(color: string) {
+export function getBrightness(color: string) {
 	const base = new Color(color);
 	return base.oklch[0]!;
 }
 
-function shiftBrightness(color: string, delta: number) {
+export function shiftBrightness(color: string, delta: number) {
 	const base = new Color(color);
 	const [L, C, H] = base.oklch;
 
 	return new Color({
 		space: 'oklch',
 		coords: [Math.max(0, Math.min(1, L! + delta)), C, H],
+	})
+		.to('srgb')
+		.toString({ format: 'hex' });
+}
+
+export function setBrightness(color: string, brightness: number) {
+	const base = new Color(color);
+	const [_L, C, H] = base.oklch;
+
+	return new Color({
+		space: 'oklch',
+		coords: [Math.max(0, Math.min(1, brightness)), C, H],
 	})
 		.to('srgb')
 		.toString({ format: 'hex' });
@@ -43,10 +55,10 @@ export function tones(hex: string) {
 }
 
 export function buildColorScheme(accentColor: string) {
-	const primaryColorVariants = tones(accentColor);
+	const accentVariants = tones(accentColor);
 
 	return {
-		accent: primaryColorVariants['500'],
-		primary: primaryColorVariants,
+		accent: accentVariants['500'],
+		accentVariants,
 	};
 }

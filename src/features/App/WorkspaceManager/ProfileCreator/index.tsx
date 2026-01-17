@@ -113,7 +113,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			controls={
 				<>
 					<Button
-						variant="primary"
+						variant="accent"
 						w="100%"
 						onClick={() => onPressCreate(true)}
 						disabled={isPending}
@@ -153,7 +153,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 									as={AutoFocusInside}
 								>
 									<Button
-										variant="primary"
+										variant="accent"
 										onClick={() => {
 											onPressCreate(false);
 											noPasswordDialogState.onClose();
