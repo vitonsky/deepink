@@ -110,10 +110,9 @@ export const basicTheme = extendTheme({
 	colors: {
 		primary: colors.primary,
 		typography: {
-			inverted: '#000',
-			accent: colors.primary['700'],
 			primary: '#e2e2e2',
 			secondary: '#a7a59f',
+			inverted: '#000',
 		},
 		surface: {
 			background: '#48433f',
@@ -204,11 +203,11 @@ export const basicTheme = extendTheme({
 
 				checkbox: {
 					background: 'transparent',
-					border: 'surface.border',
+					border: 'dim.50',
 
 					active: {
+						foreground: 'primary.900',
 						background: 'primary.300',
-						foreground: 'primary.500',
 						border: 'primary.300',
 					},
 				},
