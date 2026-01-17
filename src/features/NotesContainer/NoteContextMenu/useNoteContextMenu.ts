@@ -204,12 +204,14 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 	const showMenu = useShowNoteContextMenu(noteContextMenuCallback);
 
 	return useCallback(
-		(note: INote, point: { x: number; y: number }) => {
-			showMenu(
-				note.id,
-				point,
-				buildNoteMenu({ note, useBin: !deletionConfig.permanentDeletion }),
-			);
+		(note: NoteId, point: { x: number; y: number }) => {
+			notes.getById(note).then((note) => {
+				showMenu(
+					note.id,
+					point,
+					buildNoteMenu({ note, useBin: !deletionConfig.permanentDeletion }),
+				);
+			});
 		},
 		[deletionConfig.permanentDeletion, showMenu],
 	);

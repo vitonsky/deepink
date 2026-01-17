@@ -110,10 +110,10 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 								// Prevent text selection on macOS
 								evt.preventDefault();
 
-								openNoteContextMenu(
-									note,
-									getContextMenuCoords(evt.nativeEvent),
-								);
+								openNoteContextMenu(note.id, {
+									x: evt.pageX,
+									y: evt.pageY,
+								});
 							}}
 						>
 							<HStack gap=".5rem" w="100%" justifyContent="space-between">

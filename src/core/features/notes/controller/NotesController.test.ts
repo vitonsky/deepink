@@ -356,7 +356,7 @@ describe('data fetching', () => {
 	});
 });
 
-test.only('get ids nor note', async () => {
+test('get ids for note', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openDatabase(dbFile);
 
