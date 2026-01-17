@@ -32,7 +32,6 @@ export const NotesList: FC<NotesListProps> = () => {
 	const search = useWorkspaceSelector(selectSearch);
 
 	const openNoteContextMenu = useNoteContextMenu({
-		closeNote: noteActions.close,
 		updateNotes,
 	});
 

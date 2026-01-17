@@ -15,6 +15,46 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
 
 	/**
+	 * Move a note to the Bin
+	 */
+	DELETE_NOTE_TO_BIN = 'deleteNoteToBin',
+
+	/**
+	 * Permanently delete a note
+	 */
+	DELETE_NOTE_PERMANENTLY = 'deleteNotePermanently',
+
+	/**
+	 * Restore a note from the Bin
+	 */
+	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
+
+	/**
+	 * Toggle the archive status of the current note
+	 */
+	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
+
+	/**
+	 * Toggle the bookmark status of the current note
+	 */
+	TOGGLE_CURRENT_NOTE_BOOKMARK = 'toggleCurrentNoteBookmark',
+
+	/**
+	 * Open the history for the current note
+	 */
+	OPEN_CURRENT_NOTE_HISTORY = 'openCurrentNoteHistory',
+
+	/**
+	 * Export a note
+	 */
+	EXPORT_NOTE = 'exportNote',
+
+	/**
+	 * Copy the Markdown link for the current note
+	 */
+	COPY_NOTE_MARKDOWN_LINK = 'copyNoteMarkdownLink',
+
+	/**
 	 * Switch focus to the next open note
 	 */
 	FOCUS_NEXT_NOTE = 'focusNextNote',
@@ -25,18 +65,32 @@ export enum GLOBAL_COMMANDS {
 	FOCUS_PREVIOUS_NOTE = 'focusPreviousNote',
 
 	/**
-	 * Lock the currently active user profile
-	 */
-	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
-
-	/**
 	 * Open global settings window
 	 */
 	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
+
+	/**
+	 * Synchronize the changes with the database
+	 */
+	SYNC_DATABASE = 'syncDataBase',
+
+	/**
+	 * Lock the currently active user profile
+	 */
+	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
 }
 
-// In the future, we can define a type for the payload like this:
-// type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
+type CommandsWithPayload = {
+	[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: { id: string } | null;
+	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { id: string } | null;
+	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string } | null;
+
+	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
+	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };
+};
+
 export type CommandPayloadsMap = {
-	[K in GLOBAL_COMMANDS]: void;
+	[K in GLOBAL_COMMANDS]: K extends keyof CommandsWithPayload
+		? CommandsWithPayload[K]
+		: void;
 };
