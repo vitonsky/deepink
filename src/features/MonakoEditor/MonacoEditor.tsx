@@ -10,6 +10,7 @@ import React, {
 import { colord, extend } from 'colord';
 import mixPlugin from 'colord/plugins/mix';
 import { editor, languages } from 'monaco-editor-core';
+import { getBrightness, setBrightness } from '@components/theme/color';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
@@ -58,13 +59,22 @@ export function updateMonacoTheme() {
 	const prop = (color: string) => colord(styles.getPropertyValue(color).trim()).toHex();
 
 	const colors = {
-		accent: prop('--chakra-colors-primary-300'),
+		accent: prop('--chakra-colors-accent-300'),
 		background: prop('--chakra-colors-surface-background'),
-		text: prop('--chakra-colors-typography-primary'),
+		text: prop('--chakra-colors-typography-base'),
 		secondary: prop('--chakra-colors-typography-secondary'),
-		selection: prop('--chakra-colors-surface-selection'),
-		highlight: prop('--chakra-colors-surface-highlight'),
+		selection: prop('--chakra-colors-selection-base'),
+		highlight: prop('--chakra-colors-selection-highlight'),
 	};
+
+	// We set custom styles for selection to ensure enough contrast between foreground and background
+	// This is necessary since option `editor.selectionForeground` does not work in Monaco editor
+	// See a bug report https://github.com/microsoft/monaco-editor/issues/5192
+	// TODO: customize foreground style with option `editor.selectionForeground` once bug will be fixed
+	const selectionColor = setBrightness(
+		colors.selection,
+		getBrightness(colors.text) > 0.5 ? 0.5 : 0.6,
+	);
 
 	editor.defineTheme('native', {
 		base: 'vs',
@@ -76,9 +86,9 @@ export function updateMonacoTheme() {
 			'editorCursor.foreground': colors.text,
 			'editorLineNumber.foreground': colors.secondary,
 			'editor.lineHighlightBackground': colord(colors.selection).alpha(0.2).toHex(),
-			'editor.selectionBackground': colors.selection,
-			'editor.selectionHighlightBackground': colors.highlight,
-			'editor.inactiveSelectionBackground': colors.highlight,
+			'editor.selectionBackground': selectionColor,
+			'editor.selectionHighlightBackground': selectionColor,
+			'editor.inactiveSelectionBackground': selectionColor,
 		},
 	});
 }
