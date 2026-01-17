@@ -68,7 +68,7 @@ export function updateMonacoTheme() {
 
 	editor.defineTheme('native', {
 		base: 'vs',
-		inherit: true,
+		inherit: false,
 		rules: [],
 		colors: {
 			'editor.background': colors.background,
@@ -149,6 +149,9 @@ export const MonacoEditor = ({
 			lineHeight: editorConfig.lineHeight,
 			minimap: { enabled: editorConfig.miniMap },
 			lineNumbers: editorConfig.lineNumbers ? 'on' : 'off',
+			// Disable hardcoded brackets colorization: https://github.com/microsoft/monaco-editor/issues/4535#issuecomment-2234042290
+			// @ts-ignore
+			'bracketPairColorization.enabled': false,
 			automaticLayout: true,
 			wordWrap: 'on',
 			quickSuggestions: false,
