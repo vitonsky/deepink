@@ -11,12 +11,13 @@ export const NotificationsTheme = createMultiStyleConfigHelpers([
 			bottom: '2rem',
 			right: '0.5rem',
 			backgroundColor: 'surface.background',
-			borderWidth: '2px',
+			borderWidth: '1px',
 			borderColor: 'surface.border',
 			borderRadius: '4px',
 			minWidth: '300px',
 			maxWidth: '500px',
 			maxHeight: '500px',
+			overflow: 'hidden',
 		},
 		head: {
 			w: '100%',
@@ -27,7 +28,7 @@ export const NotificationsTheme = createMultiStyleConfigHelpers([
 		body: {
 			w: '100%',
 			alignItems: 'start',
-			padding: '1rem',
+			padding: '.5rem',
 		},
 	},
 });
