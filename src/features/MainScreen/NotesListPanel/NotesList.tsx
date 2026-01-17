@@ -115,7 +115,7 @@ export const NotesList: FC<NotesListProps> = () => {
 										if (isActive) {
 											activeNoteRef.current = node;
 										}
-										// virtualizer.measureElement(node);
+										virtualizer.measureElement(node);
 									}}
 									noteId={noteId}
 									data-index={virtualRow.index}
