@@ -98,25 +98,20 @@ export const basicTheme = extendTheme({
 		input: '0 0 0 3px #0066ff',
 	},
 	colors: {
-		accent: {
-			// Accent color
-			100: '#e6f0ff',
-			200: '#d7e7ff',
-			500: '#0066ff',
-		},
 		primary: {
 			// Primary color for controls
+			100: '#eff6ff',
 			200: '#e6f0ff',
 			300: '#d7e7ff',
 			500: '#0066ff',
 			700: '#3667b5',
 		},
 		typography: {
-			primary: '#000',
 			inverted: '#fff',
+			accent: '#0059df',
+			primary: '#000',
 			secondary: '#5f5f5f',
-			additional: '#3e3d3d',
-			ghost: '#6e6e6e',
+			additional: '#33435e',
 		},
 		surface: {
 			background: '#ffffff',
@@ -179,24 +174,24 @@ export const basicTheme = extendTheme({
 				},
 				ghost: {
 					foreground: 'typography.primary',
-					background: '#eff6ff',
+					background: 'primary.100',
 
 					active: {
-						foreground: '#0059df',
-						background: '#eff6ff',
+						foreground: 'typography.accent',
+						background: 'primary.100',
 					},
 				},
 				option: {
 					foreground: 'typography.primary',
 					accentForeground: 'typography.primary',
-					additionalForeground: '#33435e',
+					additionalForeground: 'typography.additional',
 
 					hover: {
-						background: '#eff6ff',
+						background: 'primary.100',
 					},
 					active: {
-						background: '#eff6ff',
-						accentForeground: '#0059df',
+						background: 'primary.100',
+						accentForeground: 'typography.accent',
 					},
 				},
 
@@ -218,8 +213,8 @@ export const basicTheme = extendTheme({
 				},
 
 				message: {
-					foreground: 'accent.500',
-					background: 'accent.100',
+					foreground: 'primary.500',
+					background: 'primary.200',
 				},
 			},
 		},

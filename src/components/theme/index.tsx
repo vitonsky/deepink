@@ -8,5 +8,5 @@ const themes: Record<string, Record<string, any>> = {
 	monochrome: monochromeTheme,
 };
 
-const themeName = localStorage.getItem('theme') || 'monochrome';
+const themeName = localStorage.getItem('theme') || 'light';
 export const theme = themes[themeName] || zenTheme;
