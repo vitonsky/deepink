@@ -113,7 +113,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 								// Prevent text selection on macOS
 								evt.preventDefault();
 
-								openNoteContextMenu(note, {
+								openNoteContextMenu(note.id, {
 									x: evt.pageX,
 									y: evt.pageY,
 								});

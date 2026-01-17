@@ -198,9 +198,11 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 	const showMenu = useShowNoteContextMenu(noteContextMenuCallback);
 
 	return useCallback(
-		(note: INote, point: { x: number; y: number }) => {
-			showMenu(note.id, point, buildNoteMenu(note));
+		(note: NoteId, point: { x: number; y: number }) => {
+			notes.getById(note).then((note) => {
+				if (note) showMenu(note.id, point, buildNoteMenu(note));
+			});
 		},
-		[showMenu],
+		[notes, showMenu],
 	);
 };
