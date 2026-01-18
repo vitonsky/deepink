@@ -13,8 +13,8 @@ export default function (accentColor: string) {
 			},
 		},
 		shadows: {
-			outline: `0 0 0 3px ${colors.accent}`,
-			input: `0 0 0 3px ${colors.accent}`,
+			outline: `0 0 0 3px ${colors.accentVariants['500']}`,
+			input: `0 0 0 3px ${colors.accentVariants['500']}`,
 		},
 		colors: {
 			accent: colors.accentVariants,
@@ -68,7 +68,7 @@ export default function (accentColor: string) {
 					},
 
 					action: {
-						foreground: 'accent.500',
+						foreground: 'accent.600',
 						background: 'accent.100',
 
 						active: {

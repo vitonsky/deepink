@@ -30,32 +30,32 @@ export function setBrightness(color: string, brightness: number) {
 }
 
 /**
- * Generates tones around an accent color
+ * Generates palette based on an accent color
  * The accent color is available via key 500 (in the middle),
  * the lower keys represents a lighter colors, the greater keys are darken ones.
  * @param hex accent color
  */
-export function tones(hex: string) {
-	const brightness = getBrightness(hex);
-	const brightnessBase = 1 - brightness;
-	const darknessBase = brightness * -1;
+export function palette(hex: string) {
+	const range = [
+		...Color.steps('#fff', hex, { steps: 6, space: 'oklch' }),
+		...Color.steps(hex, '#000', {
+			steps: 5,
+			space: 'oklch',
+			maxDeltaE: 10,
+			deltaEMethod: '2000',
+		}).slice(1),
+	];
 
-	return {
-		50: shiftBrightness(hex, brightnessBase * 0.95),
-		100: shiftBrightness(hex, brightnessBase * 0.8),
-		200: shiftBrightness(hex, brightnessBase * 0.6),
-		300: shiftBrightness(hex, brightnessBase * 0.5),
-		400: shiftBrightness(hex, brightnessBase * 0.2),
-		500: hex,
-		600: shiftBrightness(hex, darknessBase * 0.1),
-		700: shiftBrightness(hex, darknessBase * 0.2),
-		800: shiftBrightness(hex, darknessBase * 0.4),
-		900: shiftBrightness(hex, darknessBase * 0.6),
-	};
+	return Object.fromEntries(
+		[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((key, index) => [
+			key,
+			range[index].toString({ format: 'hex' }),
+		]),
+	);
 }
 
 export function buildColorScheme(accentColor: string) {
-	const accentVariants = tones(accentColor);
+	const accentVariants = palette(accentColor);
 
 	return {
 		accent: accentVariants['500'],
