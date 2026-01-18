@@ -44,7 +44,7 @@ export function tones(hex: string) {
 		50: shiftBrightness(hex, brightnessBase * 0.95),
 		100: shiftBrightness(hex, brightnessBase * 0.8),
 		200: shiftBrightness(hex, brightnessBase * 0.6),
-		300: shiftBrightness(hex, brightnessBase * 0.4),
+		300: shiftBrightness(hex, brightnessBase * 0.5),
 		400: shiftBrightness(hex, brightnessBase * 0.2),
 		500: hex,
 		600: shiftBrightness(hex, darknessBase * 0.1),
