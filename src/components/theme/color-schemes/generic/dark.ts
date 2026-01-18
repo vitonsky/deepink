@@ -13,8 +13,8 @@ export default function (accentColor: string) {
 			},
 		},
 		shadows: {
-			outline: `0 0 0 3px ${colors.accent}`,
-			input: `0 0 0 3px ${colors.accent}`,
+			outline: `0 0 0 3px ${colors.accentVariants['400']}`,
+			input: `0 0 0 3px ${colors.accentVariants['400']}`,
 		},
 		colors: {
 			accent: colors.accentVariants,
@@ -29,10 +29,10 @@ export default function (accentColor: string) {
 				highlight: colors.accentVariants['300'],
 			},
 			surface: {
-				background: '#48433f',
+				background: '#2c272c',
 				invertedBackground: '#fff',
-				panel: '#524c46',
-				border: '#3a3633',
+				panel: '#363036',
+				border: '#3a353a',
 			},
 			dim: {
 				50: '#6c65659c',
@@ -68,7 +68,7 @@ export default function (accentColor: string) {
 					},
 
 					action: {
-						foreground: 'accent.900',
+						foreground: 'accent.50',
 						background: 'accent.500',
 
 						active: {
