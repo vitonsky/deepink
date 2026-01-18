@@ -7,7 +7,7 @@ import zenTheme from '@components/theme/color-schemes/zen';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectTheme } from '@state/redux/settings/settings';
 
-const colorsMap: Record<string, string> = {
+export const accentColorsMap: Record<string, string> = {
 	red: '#ff0707ff',
 	pink: '#ff07bdff',
 	purple: '#9807ffff',
@@ -26,9 +26,9 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
 		}
 
 		const accentColorCode =
-			accentColor && accentColor in colorsMap
-				? colorsMap[accentColor]
-				: colorsMap.blue;
+			accentColor && accentColor in accentColorsMap
+				? accentColorsMap[accentColor]
+				: accentColorsMap.blue;
 
 		return extendTheme(
 			baseTheme,

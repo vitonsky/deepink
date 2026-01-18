@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
+	Box,
 	Button,
 	Checkbox,
+	HStack,
 	Input,
 	Modal,
 	ModalBody,
@@ -15,10 +18,16 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { accentColorsMap } from '@features/ThemeProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectTheme, settingsApi } from '@state/redux/settings/settings';
 
 export const SettingsWindow = () => {
+	const theme = useAppSelector(selectTheme);
+	const dispatch = useDispatch();
+
 	const [isOpen, setIsOpen] = useState(false);
 
 	useCommandCallback(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS, () => {
@@ -37,6 +46,56 @@ export const SettingsWindow = () => {
 							<FeaturesHeader view="primary">
 								Database settings
 							</FeaturesHeader>
+
+							<FeaturesOption title="Theme">
+								<Select
+									value={theme.name}
+									onChange={(e) => {
+										dispatch(
+											settingsApi.setTheme({
+												name: e.target.value as any,
+											}),
+										);
+									}}
+								>
+									<option value="dark">Dark</option>
+									<option value="light">Light</option>
+								</Select>
+							</FeaturesOption>
+
+							<FeaturesOption title="Accent color">
+								<HStack>
+									{Object.entries(accentColorsMap).map(
+										([name, code]) => {
+											const isActive = name === theme.accentColor;
+											return (
+												<Box
+													key={name}
+													boxSize="1.3rem"
+													backgroundColor={code}
+													borderRadius="100%"
+													outlineOffset={1}
+													outline={
+														isActive ? '3px solid' : undefined
+													}
+													outlineColor={
+														isActive
+															? 'control.action.active.background'
+															: 'transparent'
+													}
+													onClick={() => {
+														dispatch(
+															settingsApi.setTheme({
+																accentColor: name,
+															}),
+														);
+													}}
+												></Box>
+											);
+										},
+									)}
+								</HStack>
+							</FeaturesOption>
 
 							<FeaturesOption title="Database name">
 								<Input

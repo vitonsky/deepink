@@ -56,8 +56,11 @@ export const settingsSlice = createSlice({
 		) => {
 			return { ...state, editorMode: payload } as GlobalSettings;
 		},
-		setTheme: (state, { payload }: PayloadAction<GlobalSettings['theme']>) => {
-			return { ...state, theme: payload } as GlobalSettings;
+		setTheme: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['theme']>>,
+		) => {
+			return { ...state, theme: { ...state.theme, ...payload } } as GlobalSettings;
 		},
 		setPreferences: (
 			state,
