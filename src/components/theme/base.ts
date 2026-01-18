@@ -85,7 +85,7 @@ export default extendTheme({
 			},
 
 			'[data-resize-handle]': {
-				'--resize-handle-active-color': 'var(--chakra-colors-primary-300)',
+				'--resize-handle-active-color': 'var(--chakra-colors-accent-300)',
 			},
 
 			...getScrollBarStyles(),
@@ -449,6 +449,7 @@ export default extendTheme({
 		Modal: createMultiStyleConfigHelpers([
 			'overlay',
 			'dialog',
+			'closeButton',
 		]).defineMultiStyleConfig({
 			baseStyle: {
 				overlay: {
@@ -457,6 +458,12 @@ export default extendTheme({
 				dialog: {
 					color: 'typography.base',
 					backgroundColor: 'surface.background',
+				},
+				closeButton: {
+					_hover: {
+						color: 'control.ghost.hover.foreground',
+						backgroundColor: 'control.ghost.hover.background',
+					},
 				},
 			},
 		}),
