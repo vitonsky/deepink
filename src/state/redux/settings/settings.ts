@@ -6,7 +6,10 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
 export type GlobalSettings = {
 	editorMode: EditorMode;
-	theme: 'zen' | 'light';
+	theme: {
+		name: 'zen' | 'light' | 'dark';
+		accentColor?: string;
+	};
 	editor: {
 		fontFamily: string;
 		fontSize: number;
@@ -26,7 +29,10 @@ export const settingsSlice = createSlice({
 	name: 'settings',
 	initialState: {
 		editorMode: 'plaintext',
-		theme: 'zen',
+		theme: {
+			name: 'light',
+			accentColor: 'blue',
+		},
 		editor: {
 			fontFamily:
 				// eslint-disable-next-line spellcheck/spell-checker

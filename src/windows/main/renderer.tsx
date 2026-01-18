@@ -2,18 +2,16 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
-import { z } from 'zod';
 import { EventBus } from '@api/events/EventBus';
 import { GlobalEventsPayloadMap } from '@api/events/global';
 // eslint-disable-next-line spellcheck/spell-checker
-import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from '@components/theme';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
 import { TelemetryContext } from '@features/telemetry';
+import { ThemeProvider } from '@features/ThemeProvider';
 import { CommandEventProvider } from '@hooks/commands/CommandEventProvider';
 import { GlobalEventBusContext } from '@hooks/events/useEventBus';
-import { selectSettings, settingsApi } from '@state/redux/settings/settings';
+import { loadStore, persistStore } from '@state/redux/persistence';
 import { store } from '@state/redux/store';
 
 const rootNode = document.getElementById('appRoot');
@@ -23,33 +21,8 @@ if (!rootNode) {
 
 document.body.style.overflow = 'hidden';
 
-const rawSettings = localStorage.getItem('settings');
-if (rawSettings) {
-	try {
-		const settings = z
-			.object({
-				editorMode: z.union([
-					z.literal('plaintext'),
-					z.literal('richtext'),
-					z.literal('split-screen'),
-				]),
-				theme: z.union([z.literal('zen'), z.literal('light')]),
-			})
-			.partial()
-			.safeParse(JSON.parse(rawSettings));
-
-		if (settings.data) {
-			store.dispatch(settingsApi.setSettings(settings.data));
-		}
-	} catch (error) {
-		console.error(error);
-	}
-}
-
-store.subscribe(() => {
-	const settings = selectSettings(store.getState());
-	localStorage.setItem('settings', JSON.stringify(settings));
-});
+loadStore(store);
+persistStore(store);
 
 const event = createEvent<{
 	name: string;
@@ -75,9 +48,9 @@ reactRoot.render(
 		<Provider store={store}>
 			<GlobalEventBusContext value={globalEventBus}>
 				<CommandEventProvider>
-					<ChakraProvider theme={theme}>
+					<ThemeProvider>
 						<App />
-					</ChakraProvider>
+					</ThemeProvider>
 				</CommandEventProvider>
 			</GlobalEventBusContext>
 		</Provider>
