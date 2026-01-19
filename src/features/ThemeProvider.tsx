@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useMemo } from 'react';
+import React, { PropsWithChildren, useLayoutEffect, useMemo } from 'react';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import baseTheme from '@components/theme/base';
 import darkTheme from '@components/theme/color-schemes/generic/dark';
@@ -6,6 +6,8 @@ import lightTheme from '@components/theme/color-schemes/generic/light';
 import zenTheme from '@components/theme/color-schemes/zen';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectTheme } from '@state/redux/settings/settings';
+
+import { updateMonacoTheme } from './MonakoEditor/MonacoEditor';
 
 export const accentColorsMap: Record<string, string> = {
 	red: '#ff0707ff',
@@ -18,6 +20,9 @@ export const accentColorsMap: Record<string, string> = {
 
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
 	const { name, accentColor } = useAppSelector(selectTheme);
+
+	useLayoutEffect(updateMonacoTheme, [name, accentColor]);
+
 	const theme = useMemo(() => {
 		switch (name) {
 			case 'zen': {
