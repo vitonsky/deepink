@@ -42,7 +42,7 @@ export default function (accentColor: string) {
 			},
 			link: {
 				base: colors.accentVariants['400'],
-				hover: colors.accentVariants['600'],
+				hover: colors.accentVariants['500'],
 			},
 			overlay: {
 				500: '#ffffff75',
@@ -118,9 +118,9 @@ export default function (accentColor: string) {
 						border: 'dim.50',
 
 						active: {
-							foreground: 'accent.900',
-							background: 'accent.300',
-							border: 'accent.300',
+							foreground: 'accent.50',
+							background: 'accent.500',
+							border: 'accent.500',
 						},
 					},
 				},

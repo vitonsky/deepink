@@ -16,12 +16,12 @@ import { selectTheme } from '@state/redux/settings/settings';
 import { updateMonacoTheme } from './MonakoEditor/MonacoEditor';
 
 export const accentColorsMap: Record<string, string> = {
-	red: '#ff0707ff',
-	pink: '#ff07bdff',
-	purple: '#9807ffff',
-	orange: '#ff6606ff',
-	yellow: '#ffff07ff',
-	blue: '#0655ffff',
+	red: '#e0383e',
+	pink: '#f74f9e',
+	purple: '#953d96',
+	orange: '#f7821b',
+	yellow: '#ffc726',
+	blue: '#0088ff',
 };
 
 const getSystemColorScheme = () => {

@@ -41,7 +41,7 @@ export default function (accentColor: string) {
 				400: '#e7e7e7',
 			},
 			link: {
-				base: colors.accentVariants['400'],
+				base: colors.accentVariants['500'],
 				hover: colors.accentVariants['600'],
 			},
 			overlay: {
@@ -68,11 +68,11 @@ export default function (accentColor: string) {
 					},
 
 					action: {
-						foreground: 'accent.600',
-						background: 'accent.100',
+						foreground: 'accent.50',
+						background: 'accent.500',
 
 						active: {
-							background: 'accent.200',
+							background: 'accent.600',
 						},
 					},
 
@@ -118,9 +118,9 @@ export default function (accentColor: string) {
 						border: 'surface.border',
 
 						active: {
-							foreground: 'accent.500',
-							background: 'accent.300',
-							border: 'accent.300',
+							foreground: 'accent.50',
+							background: 'accent.500',
+							border: 'accent.500',
 						},
 					},
 				},

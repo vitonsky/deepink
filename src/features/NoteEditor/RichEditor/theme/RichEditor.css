@@ -113,11 +113,12 @@
 
 .RichEditor__link {
 	display: inline-block;
-	color: rgb(33 111 219);
+	color: var(--chakra-colors-link-base);
 	text-decoration: inherit;
 }
 
 .RichEditor__link:hover {
+	color: var(--chakra-colors-link-hover);
 	text-decoration: underline;
 	cursor: pointer;
 }
