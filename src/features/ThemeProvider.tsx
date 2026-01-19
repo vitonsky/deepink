@@ -1,4 +1,10 @@
-import React, { PropsWithChildren, useLayoutEffect, useMemo } from 'react';
+import React, {
+	PropsWithChildren,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useState,
+} from 'react';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import baseTheme from '@components/theme/base';
 import darkTheme from '@components/theme/color-schemes/generic/dark';
@@ -18,10 +24,40 @@ export const accentColorsMap: Record<string, string> = {
 	blue: '#0655ffff',
 };
 
+const getSystemColorScheme = () => {
+	const query = window.matchMedia('(prefers-color-scheme: dark)');
+
+	return {
+		current: query.matches ? 'dark' : 'light',
+		subscribe(callback: (mode: 'dark' | 'light') => void) {
+			const onChange = (event: MediaQueryListEvent) => {
+				callback(event.matches ? 'dark' : 'light');
+			};
+
+			query.addEventListener('change', onChange);
+			return () => {
+				query.removeEventListener('change', onChange);
+			};
+		},
+	} as const;
+};
+
+const useSystemColorSchemeCallback = (callback: (mode: 'dark' | 'light') => void) => {
+	useEffect(() => {
+		return getSystemColorScheme().subscribe(callback);
+	}, [callback]);
+};
+
+const useSystemColorScheme = () => {
+	const [systemTheme, setSystemTheme] = useState(getSystemColorScheme().current);
+	useSystemColorSchemeCallback(setSystemTheme);
+
+	return systemTheme;
+};
+
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
 	const { name, accentColor } = useAppSelector(selectTheme);
-
-	useLayoutEffect(updateMonacoTheme, [name, accentColor]);
+	const systemTheme = useSystemColorScheme();
 
 	const theme = useMemo(() => {
 		switch (name) {
@@ -30,6 +66,7 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
 			}
 		}
 
+		const colorMode = name === 'auto' ? systemTheme : name;
 		const accentColorCode =
 			accentColor && accentColor in accentColorsMap
 				? accentColorsMap[accentColor]
@@ -37,9 +74,13 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
 
 		return extendTheme(
 			baseTheme,
-			name === 'dark' ? darkTheme(accentColorCode) : lightTheme(accentColorCode),
+			colorMode === 'dark'
+				? darkTheme(accentColorCode)
+				: lightTheme(accentColorCode),
 		);
-	}, [accentColor, name]);
+	}, [accentColor, name, systemTheme]);
+
+	useLayoutEffect(updateMonacoTheme, [theme]);
 
 	return <ChakraProvider theme={theme}>{children}</ChakraProvider>;
 };

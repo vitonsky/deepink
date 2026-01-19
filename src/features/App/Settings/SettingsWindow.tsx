@@ -58,6 +58,9 @@ export const SettingsWindow = () => {
 										);
 									}}
 								>
+									<option value="auto" title="Follow the system styles">
+										Auto
+									</option>
 									<option value="dark">Dark</option>
 									<option value="light">Light</option>
 								</Select>

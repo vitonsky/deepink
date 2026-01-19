@@ -15,9 +15,10 @@ export const loadStore = (store: AppStore) => {
 					]),
 					theme: z.object({
 						name: z.union([
-							z.literal('zen'),
+							z.literal('auto'),
 							z.literal('light'),
 							z.literal('dark'),
+							z.literal('zen'),
 						]),
 						accentColor: z.string().optional(),
 					}),

@@ -7,7 +7,7 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 export type GlobalSettings = {
 	editorMode: EditorMode;
 	theme: {
-		name: 'zen' | 'light' | 'dark';
+		name: 'auto' | 'light' | 'dark' | 'zen';
 		accentColor?: string;
 	};
 	editor: {
@@ -30,7 +30,7 @@ export const settingsSlice = createSlice({
 	initialState: {
 		editorMode: 'plaintext',
 		theme: {
-			name: 'light',
+			name: 'auto',
 			accentColor: 'blue',
 		},
 		editor: {
