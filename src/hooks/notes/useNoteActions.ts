@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useStore } from 'react-redux';
 import { WorkspaceEvents } from '@api/events/workspace';
-import { NoteId } from '@core/features/notes';
+import { INote, NoteId } from '@core/features/notes';
 import {
 	useEventBus,
 	useNotesContext,
@@ -29,15 +29,19 @@ export const useNoteActions = () => {
 	const notesRegistry = useNotesRegistry();
 
 	const click = useCallback(
-		(id: NoteId) => {
+		(note: NoteId | INote) => {
+			if (typeof note !== 'string') {
+				openNote(note);
+				return;
+			}
+
 			const workspace = selectWorkspace(workspaceData)(store.getState());
-			// const notes = selectOpenedNotes(workspace);
-			const isNoteOpened = selectIsNoteOpened(id)(workspace);
+			const isNoteOpened = selectIsNoteOpened(note)(workspace);
 
 			if (isNoteOpened) {
-				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: id }));
+				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: note }));
 			} else {
-				notesRegistry.getById(id).then((note) => {
+				notesRegistry.getById(note).then((note) => {
 					if (note) openNote(note);
 				});
 			}
