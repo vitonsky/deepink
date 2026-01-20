@@ -116,17 +116,6 @@ export default function (accentColor: string) {
 							background: 'dim.200',
 						},
 					},
-
-					checkbox: {
-						background: 'transparent',
-						border: 'dim.400',
-
-						active: {
-							foreground: 'typography.invertedAccent',
-							background: 'accent.500',
-							border: 'accent.500',
-						},
-					},
 				},
 				container: {
 					head: {

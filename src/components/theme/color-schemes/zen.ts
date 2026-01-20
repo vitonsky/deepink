@@ -119,17 +119,6 @@ export default {
 						background: 'dim.400',
 					},
 				},
-
-				checkbox: {
-					background: 'transparent',
-					border: 'surface.border',
-
-					active: {
-						foreground: 'accent.500',
-						background: 'accent.300',
-						border: 'accent.300',
-					},
-				},
 			},
 			container: {
 				head: {
