@@ -45,8 +45,8 @@ export const NotePreview = forwardRef<
 			if (cancelled) return;
 			if (note) setNote(note);
 
-			clearTimeout(timer);
 			setIsSkeletonVisible(false);
+			clearTimeout(timer);
 		});
 
 		return () => {
@@ -55,8 +55,9 @@ export const NotePreview = forwardRef<
 		};
 	}, [noteId, noteRegister]);
 
+	// Update preview when note content changes
 	useEffect(() => {
-		const onUpdate = (updatedNoteId: NoteId) => {
+		const update = (updatedNoteId: NoteId) => {
 			if (updatedNoteId !== noteId) return;
 
 			noteRegister.getById(noteId).then((note) => {
@@ -65,8 +66,8 @@ export const NotePreview = forwardRef<
 			});
 		};
 
-		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, onUpdate);
-		const cleanupEdited = eventBus.listen(WorkspaceEvents.NOTE_EDITED, onUpdate);
+		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, update);
+		const cleanupEdited = eventBus.listen(WorkspaceEvents.NOTE_EDITED, update);
 
 		return () => {
 			cleanupUpdated();
