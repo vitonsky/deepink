@@ -39,11 +39,11 @@ export default {
 			border: '#e0d6c7',
 		},
 		dim: {
-			50: '#fdf4ea',
-			100: '#f7ece1',
-			200: '#d6ab7d4f',
-			400: '#f4e6d8',
-			500: '#d6ab7d72',
+			50: '#d6ab7d10',
+			100: '#d6ab7d17',
+			200: '#d6ab7d25',
+			400: '#d6ab7d3c',
+			500: '#d6ab7d3c',
 		},
 		overlay: {
 			500: '#00000075',
@@ -61,7 +61,7 @@ export default {
 
 			control: {
 				base: {
-					background: 'dim.100',
+					background: 'dim.200',
 					foreground: 'typography.base',
 
 					active: {
@@ -83,11 +83,11 @@ export default {
 				},
 
 				input: {
-					background: 'dim.100',
+					background: 'dim.200',
 					border: 'transparent',
 
 					active: {
-						border: 'dim.400',
+						border: 'dim.500',
 					},
 				},
 				ghost: {
@@ -96,12 +96,12 @@ export default {
 
 					hover: {
 						foreground: 'typography.base',
-						background: 'dim.200',
+						background: 'dim.400',
 					},
 
 					active: {
 						foreground: 'typography.base',
-						background: 'dim.200',
+						background: 'dim.400',
 					},
 				},
 
@@ -111,12 +111,12 @@ export default {
 
 					hover: {
 						foreground: 'typography.base',
-						background: 'dim.200',
+						background: 'dim.400',
 					},
 
 					active: {
 						foreground: 'typography.base',
-						background: 'dim.200',
+						background: 'dim.400',
 					},
 				},
 
