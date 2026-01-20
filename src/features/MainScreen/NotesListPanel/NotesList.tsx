@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useLayoutEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -41,15 +41,15 @@ export const NotesList: FC<NotesListProps> = () => {
 		enabled: isActiveWorkspace,
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 90,
-		overscan: 30,
+		estimateSize: () => 70,
+		overscan: 40,
 	});
 
 	const items = virtualizer.getVirtualItems();
 
 	// Scroll to active note
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (!activeNoteId) return;
 
 		// Skip if active note is in viewport
@@ -61,9 +61,35 @@ export const NotesList: FC<NotesListProps> = () => {
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
-		// We only need scroll to active note once by its change
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [activeNoteId, notes]);
+		let cancelled = false;
+		const waitForRender = () => {
+			if (cancelled) return;
+
+			const item = virtualizer.getVirtualItems().find((i) => i.index === noteIndex);
+
+			if (item) {
+				const domNode =
+					activeNoteRef.current ??
+					parentRef.current?.querySelector<HTMLElement>(
+						`[data-index="${noteIndex}"]`,
+					);
+
+				if (domNode) {
+					domNode.scrollIntoView({ block: 'center', behavior: 'auto' });
+				} else {
+					virtualizer.scrollToOffset(item.start);
+				}
+			} else {
+				requestAnimationFrame(waitForRender);
+			}
+		};
+
+		const requestAnimationId = requestAnimationFrame(waitForRender);
+		return () => {
+			cancelled = true;
+			cancelAnimationFrame(requestAnimationId);
+		};
+	}, [activeNoteId, notes, virtualizer]);
 
 	// TODO: implement dragging and moving items
 	return (
