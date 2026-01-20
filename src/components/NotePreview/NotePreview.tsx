@@ -1,6 +1,13 @@
 import React, { forwardRef, useEffect, useState } from 'react';
 import { WorkspaceEvents } from '@api/events/workspace';
-import { Box, StackProps, Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Skeleton,
+	StackProps,
+	Text,
+	useMultiStyleConfig,
+	VStack,
+} from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -27,22 +34,35 @@ export const NotePreview = forwardRef<
 	const eventBus = useEventBus();
 
 	const [note, setNote] = useState<INote>();
-
+	const [isSkeletonVisible, setIsSkeletonVisible] = useState(false);
 	useEffect(() => {
+		let cancelled = false;
+		const timer = setTimeout(() => {
+			if (!cancelled) setIsSkeletonVisible(true);
+		}, 300);
+
 		noteRegister.getById(noteId).then((note) => {
-			if (!note) return;
-			setNote(note);
+			if (cancelled) return;
+			if (note) setNote(note);
+
+			clearTimeout(timer);
+			setIsSkeletonVisible(false);
 		});
+
+		return () => {
+			cancelled = true;
+			clearTimeout(timer);
+		};
 	}, [noteId, noteRegister]);
 
 	useEffect(() => {
 		const onUpdate = (updatedNoteId: NoteId) => {
-			if (updatedNoteId === noteId) {
-				noteRegister.getById(noteId).then((note) => {
-					if (!note) return;
-					setNote(note);
-				});
-			}
+			if (updatedNoteId !== noteId) return;
+
+			noteRegister.getById(noteId).then((note) => {
+				if (!note) return;
+				setNote(note);
+			});
 		};
 
 		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, onUpdate);
@@ -53,6 +73,16 @@ export const NotePreview = forwardRef<
 			cleanupEdited();
 		};
 	}, [noteId, eventBus, noteRegister]);
+
+	if (isSkeletonVisible)
+		return (
+			<Skeleton
+				startColor="primary.100"
+				endColor="dim.400"
+				height="90px"
+				w="100%"
+			/>
+		);
 
 	if (!note) return null;
 
