@@ -12,48 +12,37 @@ export default {
 	},
 	shadows: {
 		input: '0 0 0 3px #bea56b',
-		outline: '0 0 0 3px #000000',
+		outline: '0 0 0 3px #bea56b',
 	},
 	colors: {
 		accent: {
-			// Accent color
-			100: '#e5d8cb',
-			500: '#493017',
-		},
-		primary: {
-			// Primary color for controls
 			100: '#ddccbd',
 			200: '#ffd5b2',
 			300: '#f9caa2',
 			500: '#94481c',
 			700: '#ae7f5f',
 		},
-
 		typography: {
-			primary: '#000',
+			base: '#000',
 			secondary: '#4e3a0c',
-			accent: '#493017',
-			additional: '#3e3d3d',
-			ghost: '#3a3a3a',
+			inverted: '#fff',
+		},
+		selection: {
+			foreground: '#000',
+			base: '#ffca9b',
+			highlight: '#ffba7d',
 		},
 		surface: {
 			background: '#fffaf3',
+			invertedBackground: '#000',
 			panel: '#f8f2e9',
-			contrastPanel: '#efe8de',
 			border: '#e0d6c7',
-			alternativeBorder: '#c0c4c9',
-			selection: '#ffca9b',
-			highlight: '#ffba7d',
 		},
 		dim: {
 			50: '#fdf4ea',
 			100: '#f7ece1',
+			200: '#d6ab7d4f',
 			400: '#f4e6d8',
-		},
-
-		link: {
-			base: 'typography.accent',
-			hover: 'typography.additional',
 		},
 		overlay: {
 			500: '#00000075',
@@ -64,10 +53,15 @@ export default {
 	},
 	semanticTokens: {
 		colors: {
+			link: {
+				base: 'accent.500',
+				hover: 'accent.700',
+			},
+
 			control: {
 				base: {
 					background: 'dim.100',
-					foreground: 'typography.primary',
+					foreground: 'typography.base',
 
 					active: {
 						background: 'dim.400',
@@ -79,11 +73,11 @@ export default {
 				},
 
 				action: {
-					foreground: 'primary.500',
-					background: 'primary.200',
+					foreground: 'accent.500',
+					background: 'accent.200',
 
 					active: {
-						background: 'primary.300',
+						background: 'accent.300',
 					},
 				},
 
@@ -96,26 +90,32 @@ export default {
 					},
 				},
 				ghost: {
-					foreground: '#57381b',
-					background: '#f5e8dd',
+					foreground: 'typography.base',
+					background: 'transparent',
+
+					hover: {
+						foreground: 'typography.base',
+						background: 'dim.200',
+					},
 
 					active: {
-						foreground: '#93561d',
-						background: '#f7e4d3',
+						foreground: 'typography.base',
+						background: 'dim.200',
 					},
 				},
 
 				option: {
-					foreground: 'typography.primary',
-					accentForeground: '#57381b',
-					additionalForeground: '#33435e',
+					foreground: 'typography.base',
+					background: 'transparent',
 
 					hover: {
-						background: '#f5e8dd',
+						foreground: 'typography.base',
+						background: 'dim.200',
 					},
+
 					active: {
-						background: '#f7e4d3',
-						accentForeground: '#93561d',
+						foreground: 'typography.base',
+						background: 'dim.200',
 					},
 				},
 
@@ -124,22 +124,41 @@ export default {
 					border: 'surface.border',
 
 					active: {
-						background: 'primary.300',
-						foreground: 'primary.500',
-						border: 'primary.300',
+						foreground: 'accent.500',
+						background: 'accent.300',
+						border: 'accent.300',
 					},
 				},
 			},
 			container: {
 				head: {
-					foreground: 'typography.primary',
+					foreground: 'typography.base',
 					background: 'surface.panel',
 				},
 
 				message: {
-					foreground: 'accent.500',
-					background: 'accent.100',
+					foreground: 'typography.base',
+					background: 'dim.100',
 				},
+			},
+			code: {
+				token: {
+					comment: '#a5674e',
+					punctuation: '#9c5f1c',
+					property: '#ac4e04',
+					selector: '#ac4e04',
+					operator: '#e14e12',
+					attr: '#bf3903',
+					variable: '#d46f0f',
+					function: '#d46f0f',
+				},
+			},
+		},
+		scheme: {
+			alert: {
+				text: '#fff',
+				base: '#C53030',
+				hover: '#9B2C2C',
 			},
 		},
 	},
