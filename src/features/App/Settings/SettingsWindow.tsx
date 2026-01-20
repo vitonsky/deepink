@@ -63,6 +63,7 @@ export const SettingsWindow = () => {
 									</option>
 									<option value="dark">Dark</option>
 									<option value="light">Light</option>
+									<option value="zen">Zen</option>
 								</Select>
 							</FeaturesOption>
 
