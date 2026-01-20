@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
 	Button,
-	Checkbox,
 	Input,
 	Modal,
 	ModalBody,
@@ -11,6 +10,7 @@ import {
 	ModalHeader,
 	ModalOverlay,
 	Select,
+	Switch,
 	VStack,
 } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
@@ -93,7 +93,9 @@ export const SettingsWindow = () => {
 								</FeaturesOption>
 
 								<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password">
-									<Checkbox>Remember workspaces passwords</Checkbox>
+									<Switch size="sm">
+										Remember workspaces passwords
+									</Switch>
 								</FeaturesOption>
 							</FeaturesGroup>
 
@@ -131,7 +133,7 @@ export const SettingsWindow = () => {
 
 							<FeaturesGroup title="Synchronization">
 								<FeaturesOption description="Sync all data in database between your devices, to not loose it. All data are encrypted.">
-									<Checkbox>Enable synchronization</Checkbox>
+									<Switch size="sm">Enable synchronization</Switch>
 								</FeaturesOption>
 								<FeaturesOption title="Synchronization method">
 									<Select defaultValue="fs" size="sm">
