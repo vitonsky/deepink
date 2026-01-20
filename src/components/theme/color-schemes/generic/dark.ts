@@ -27,7 +27,7 @@ export default function (accentColor: string) {
 				),
 			},
 			selection: {
-				foreground: '#000',
+				foreground: colors.getContrastForeground(colors.accentVariants['200']),
 				base: colors.accentVariants['200'],
 				highlight: colors.accentVariants['300'],
 			},
