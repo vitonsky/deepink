@@ -37,7 +37,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 30,
+		overscan: 40,
 	});
 
 	const items = virtualizer.getVirtualItems();
@@ -56,12 +56,13 @@ export const NotesList: FC<NotesListProps> = () => {
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
+		// Because list items have dynamic heights, scrollToIndex may not always position the item correctly
+		// For fix it we wait for the DOM element to render and then scroll to it manually
 		let cancelled = false;
 		const waitForRender = () => {
 			if (cancelled) return;
 
 			const item = virtualizer.getVirtualItems().find((i) => i.index === noteIndex);
-
 			if (item) {
 				const activeNode =
 					activeNoteRef.current ??
