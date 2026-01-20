@@ -3,7 +3,7 @@ import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import {
 	Button,
-	Checkbox,
+	Divider,
 	HStack,
 	Input,
 	Link,
@@ -18,12 +18,13 @@ import {
 	ModalHeader,
 	ModalOverlay,
 	Spinner,
+	Switch,
 	Text,
 	VStack,
 } from '@chakra-ui/react';
 import { CalmButton } from '@components/CalmButton';
 import { Features } from '@components/Features/Features';
-import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
+import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -202,189 +203,209 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 			size="4xl"
 		>
 			<ModalOverlay />
-			<ModalContent w="800">
+			<ModalContent w="780px">
 				<ModalHeader>Workspace settings</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>
-					<VStack w="100%" minH="100%" p="2rem" justifyContent="center">
+					<VStack
+						w="100%"
+						minH="100%"
+						paddingBottom="2rem"
+						justifyContent="center"
+					>
 						<Features>
-							<FeaturesOption title="Workspace name">
-								<HStack
-									as="form"
-									onSubmit={workspaceNameForm.handleSubmit(
-										async ({ name }) => {
-											if (!workspaceData) return;
+							<FeaturesGroup>
+								<FeaturesOption title="Workspace name">
+									<HStack
+										as="form"
+										onSubmit={workspaceNameForm.handleSubmit(
+											async ({ name }) => {
+												if (!workspaceData) return;
 
-											await workspacesManager.update(
-												workspaceData.id,
-												{
-													name,
-												},
-											);
+												await workspacesManager.update(
+													workspaceData.id,
+													{
+														name,
+													},
+												);
 
-											await workspaces.update();
-										},
-									)}
-								>
-									<Input
-										{...workspaceNameForm.register('name')}
-										placeholder="e.g., Personal"
-										flex="100"
-									/>
-									<Button variant="accent" type="submit">
-										Update
-									</Button>
-								</HStack>
-								{workspaceNameForm.formState.errors.name && (
-									<Text color="message.error">
-										{workspaceNameForm.formState.errors.name.message}
-									</Text>
-								)}
-							</FeaturesOption>
-
-							<FeaturesHeader view="section">
-								Notes management
-							</FeaturesHeader>
-
-							<FeaturesOption description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app">
-								<HStack>
-									<Menu>
-										<MenuButton
-											as={CalmButton}
-											isDisabled={importProgress !== null}
-										>
-											Import notes
-										</MenuButton>
-										<MenuList>
-											{importOptions.map((option) => (
-												<MenuItem
-													key={option.type}
-													onClick={() =>
-														onClickImport(option.type)
-													}
-												>
-													<Text>{option.text}</Text>
-												</MenuItem>
-											))}
-										</MenuList>
-									</Menu>
-
-									<Button
-										isDisabled={notesExport.progress !== null}
-										onClick={async () => {
-											await notesExport.exportNotes(
-												buildFileName(
-													workspaceData?.name,
-													'backup',
-												),
-											);
-										}}
+												await workspaces.update();
+											},
+										)}
 									>
-										Export notes
-									</Button>
-								</HStack>
-							</FeaturesOption>
-
-							<FeaturesOption>
-								<Dropzone
-									onDrop={async (files) => {
-										if (files.length === 0) return;
-
-										// Import zip file
-										if (
-											files.length === 1 &&
-											files[0].name.endsWith('.zip')
-										) {
-											await importFiles('zip', files);
-											return;
-										}
-
-										// Import markdown files
-										await importFiles('directory', files);
-									}}
-									disabled={importProgress !== null}
-								>
-									{({ getRootProps, getInputProps, isDragActive }) => (
-										<VStack
-											{...getRootProps()}
-											gap="1rem"
-											as="section"
-											border="1px dashed"
-											backgroundColor="dim.50"
-											borderColor={
-												isDragActive ? 'dim.400' : 'dim.100'
-											}
-											borderWidth="2px"
-											borderRadius="2px"
-											padding="1rem"
-											opacity={importProgress === null ? 1 : 0.6}
-										>
-											<input {...getInputProps()} />
-											<Text>
-												Drop Markdown files or .zip archive to
-												import
-											</Text>
-											<Text color="typography.secondary">
-												Drag & Drop some files here, or click to
-												select files
-											</Text>
-										</VStack>
-									)}
-								</Dropzone>
-
-								{importProgress && (
-									<HStack w="100%" align="start">
-										<Spinner size="sm" />
-										<Text>
-											Notes import is in progress. Stage:{' '}
-											{importProgress.stage}{' '}
-											{importProgress.processed}/
-											{importProgress.total}
-										</Text>
+										<Input
+											{...workspaceNameForm.register('name')}
+											placeholder="e.g., Personal"
+											flex="100"
+											size="sm"
+										/>
+										<Button variant="accent" type="submit" size="sm">
+											Update
+										</Button>
 									</HStack>
-								)}
-							</FeaturesOption>
+									{workspaceNameForm.formState.errors.name && (
+										<Text color="message.error">
+											{
+												workspaceNameForm.formState.errors.name
+													.message
+											}
+										</Text>
+									)}
+								</FeaturesOption>
 
-							<FeaturesOption description="Keep full changes log for notes. You may disable history for single notes">
-								<Checkbox>Enable history for notes</Checkbox>
-							</FeaturesOption>
+								<Divider />
 
-							<FeaturesOption description="Move notes to recycle bin, instead of instant deletion">
-								<Checkbox>Use recycle bin</Checkbox>
-							</FeaturesOption>
+								<FeaturesOption description="Keep full changes log for notes. You may disable history for single notes">
+									<Switch size="sm">Enable history for notes</Switch>
+								</FeaturesOption>
 
-							<FeaturesHeader view="section">Dangerous zone</FeaturesHeader>
+								<FeaturesOption description="Move notes to recycle bin, instead of instant deletion">
+									<Switch size="sm">Use recycle bin</Switch>
+								</FeaturesOption>
+							</FeaturesGroup>
 
-							<FeaturesOption description="Delete workspace and all related data, including notes, tags and files">
-								<Button
-									variant="accent"
-									colorScheme="alert"
-									onClick={onDelete}
-									isDisabled={!isOtherWorkspacesExists}
-								>
-									Delete workspace
-								</Button>
+							<FeaturesGroup title="Data migration">
+								<FeaturesOption description="You may export and import notes as markdown files with attachments. Try it if you migrate from another note taking app">
+									<HStack>
+										<Menu size="sm">
+											<MenuButton
+												size="sm"
+												as={CalmButton}
+												isDisabled={importProgress !== null}
+											>
+												Import notes
+											</MenuButton>
+											<MenuList>
+												{importOptions.map((option) => (
+													<MenuItem
+														key={option.type}
+														onClick={() =>
+															onClickImport(option.type)
+														}
+													>
+														<Text>{option.text}</Text>
+													</MenuItem>
+												))}
+											</MenuList>
+										</Menu>
 
-								{!isOtherWorkspacesExists && (
-									<Text>
-										It is not possible to delete last workspace in
-										profile.{' '}
-										<Link
-											href="#"
-											onClick={() => {
-												modal.show({
-													content: () => (
-														<WorkspaceCreatePopup />
+										<Button
+											size="sm"
+											isDisabled={notesExport.progress !== null}
+											onClick={async () => {
+												await notesExport.exportNotes(
+													buildFileName(
+														workspaceData?.name,
+														'backup',
 													),
-												});
+												);
 											}}
 										>
-											Create
-										</Link>{' '}
-										another workspace first.
-									</Text>
-								)}
-							</FeaturesOption>
+											Export notes
+										</Button>
+									</HStack>
+								</FeaturesOption>
+
+								<FeaturesOption>
+									<Dropzone
+										onDrop={async (files) => {
+											if (files.length === 0) return;
+
+											// Import zip file
+											if (
+												files.length === 1 &&
+												files[0].name.endsWith('.zip')
+											) {
+												await importFiles('zip', files);
+												return;
+											}
+
+											// Import markdown files
+											await importFiles('directory', files);
+										}}
+										disabled={importProgress !== null}
+									>
+										{({
+											getRootProps,
+											getInputProps,
+											isDragActive,
+										}) => (
+											<VStack
+												{...getRootProps()}
+												gap="1rem"
+												as="section"
+												border="1px dashed"
+												backgroundColor="dim.50"
+												borderColor={
+													isDragActive ? 'dim.400' : 'dim.200'
+												}
+												borderWidth="2px"
+												borderRadius="2px"
+												padding="1rem"
+												opacity={
+													importProgress === null ? 1 : 0.6
+												}
+											>
+												<input {...getInputProps()} />
+												<Text>
+													Drop Markdown files or .zip archive to
+													import
+												</Text>
+												<Text color="typography.secondary">
+													Drag & Drop some files here, or click
+													to select files
+												</Text>
+											</VStack>
+										)}
+									</Dropzone>
+
+									{importProgress && (
+										<HStack w="100%" align="start">
+											<Spinner size="sm" />
+											<Text>
+												Notes import is in progress. Stage:{' '}
+												{importProgress.stage}{' '}
+												{importProgress.processed}/
+												{importProgress.total}
+											</Text>
+										</HStack>
+									)}
+								</FeaturesOption>
+							</FeaturesGroup>
+
+							<FeaturesGroup title="Dangerous zone">
+								<FeaturesOption description="Delete workspace and all related data, including notes, tags and files">
+									<Button
+										size="sm"
+										variant="accent"
+										colorScheme="alert"
+										onClick={onDelete}
+										isDisabled={!isOtherWorkspacesExists}
+									>
+										Delete workspace
+									</Button>
+
+									{!isOtherWorkspacesExists && (
+										<Text>
+											It is not possible to delete last workspace in
+											profile.{' '}
+											<Link
+												href="#"
+												onClick={() => {
+													modal.show({
+														content: () => (
+															<WorkspaceCreatePopup />
+														),
+													});
+												}}
+											>
+												Create
+											</Link>{' '}
+											another workspace first.
+										</Text>
+									)}
+								</FeaturesOption>
+							</FeaturesGroup>
 						</Features>
 					</VStack>
 				</ModalBody>
