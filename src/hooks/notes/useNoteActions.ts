@@ -30,20 +30,24 @@ export const useNoteActions = () => {
 
 	const click = useCallback(
 		(note: NoteId | INote) => {
-			if (typeof note !== 'string') {
-				openNote(note);
+			const noteId = typeof note === 'string' ? note : note.id;
+
+			const workspace = selectWorkspace(workspaceData)(store.getState());
+			const isNoteOpened = selectIsNoteOpened(noteId)(workspace);
+
+			if (isNoteOpened) {
+				dispatch(
+					workspacesApi.setActiveNote({ ...workspaceData, noteId: noteId }),
+				);
 				return;
 			}
 
-			const workspace = selectWorkspace(workspaceData)(store.getState());
-			const isNoteOpened = selectIsNoteOpened(note)(workspace);
-
-			if (isNoteOpened) {
-				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: note }));
-			} else {
-				notesRegistry.getById(note).then((note) => {
+			if (typeof note === 'string') {
+				notesRegistry.getById(noteId).then((note) => {
 					if (note) openNote(note);
 				});
+			} else {
+				openNote(note);
 			}
 		},
 		[dispatch, notesRegistry, openNote, store, workspaceData],
