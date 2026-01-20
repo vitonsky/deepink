@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useStore } from 'react-redux';
 import { WorkspaceEvents } from '@api/events/workspace';
-import { NoteId } from '@core/features/notes';
+import { INote, NoteId } from '@core/features/notes';
 import {
 	useEventBus,
 	useNotesContext,
@@ -22,7 +22,7 @@ export const useNoteActions = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
-	const { openNote, noteClosed } = useNotesContext();
+	const { openNote: open, noteClosed } = useNotesContext();
 
 	const store = useStore<RootState>();
 
@@ -37,16 +37,31 @@ export const useNoteActions = () => {
 				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: id }));
 			} else {
 				notesRegistry.getById(id).then((note) => {
-					if (note) openNote(note);
+					if (note) open(note);
 				});
 			}
 		},
-		[dispatch, notesRegistry, openNote, store, workspaceData],
+		[dispatch, notesRegistry, open, store, workspaceData],
+	);
+
+	const openNote = useCallback(
+		(note: INote) => {
+			const workspace = selectWorkspace(workspaceData)(store.getState());
+			const isNoteOpened = selectIsNoteOpened(note.id)(workspace);
+
+			if (isNoteOpened) {
+				dispatch(
+					workspacesApi.setActiveNote({ ...workspaceData, noteId: note.id }),
+				);
+			} else {
+				open(note);
+			}
+		},
+		[dispatch, open, store, workspaceData],
 	);
 
 	const eventBus = useEventBus();
 	const noteHistory = useNotesHistory();
-	// const notesRegistry = useNotesRegistry();
 	const { enabled: isSnapshotsEnabled } = useVaultSelector(selectSnapshotSettings);
 	const close = useCallback(
 		async (id: NoteId) => {
@@ -65,5 +80,5 @@ export const useNoteActions = () => {
 		[eventBus, isSnapshotsEnabled, noteClosed, noteHistory, notesRegistry],
 	);
 
-	return { click, close };
+	return { click, close, openNote };
 };
