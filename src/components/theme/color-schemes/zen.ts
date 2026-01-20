@@ -11,8 +11,8 @@ export default {
 		},
 	},
 	shadows: {
-		input: '0 0 0 3px #bea56b',
-		outline: '0 0 0 3px #bea56b',
+		input: '0 0 0 3px #ffd5b2',
+		outline: '0 0 0 3px #ffd5b2',
 	},
 	colors: {
 		accent: {
