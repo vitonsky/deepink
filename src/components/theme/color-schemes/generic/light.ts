@@ -38,10 +38,11 @@ export default function (accentColor: string) {
 				border: '#e2e8f0',
 			},
 			dim: {
-				50: '#00000006',
+				50: '#00000005',
 				100: '#0000000a',
 				200: '#00000010',
 				400: '#00000017',
+				500: '#00000030',
 			},
 			link: {
 				base: colors.accentVariants['500'],
@@ -118,7 +119,7 @@ export default function (accentColor: string) {
 
 					checkbox: {
 						background: 'transparent',
-						border: 'surface.border',
+						border: 'dim.400',
 
 						active: {
 							foreground: 'typography.invertedAccent',

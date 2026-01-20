@@ -43,6 +43,7 @@ export default {
 			100: '#f7ece1',
 			200: '#d6ab7d4f',
 			400: '#f4e6d8',
+			500: '#d6ab7d72',
 		},
 		overlay: {
 			500: '#00000075',

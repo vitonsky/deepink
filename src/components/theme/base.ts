@@ -296,7 +296,10 @@ export default extendTheme({
 		]).defineMultiStyleConfig({
 			baseStyle: {
 				track: {
-					backgroundColor: 'control.action.background',
+					backgroundColor: 'dim.500',
+					_checked: {
+						backgroundColor: 'control.action.background',
+					},
 				},
 				thumb: {
 					backgroundColor: 'control.action.foreground',

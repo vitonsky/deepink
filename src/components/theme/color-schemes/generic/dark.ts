@@ -42,6 +42,7 @@ export default function (accentColor: string) {
 				100: '#6c6565b9',
 				200: '#6c6565c6',
 				400: '#6c65658a',
+				500: '#d5d5d530',
 			},
 			link: {
 				base: colors.accentVariants['400'],
