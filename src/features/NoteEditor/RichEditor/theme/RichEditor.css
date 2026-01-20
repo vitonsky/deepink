@@ -414,7 +414,7 @@
 
 .RichEditor__listItemUnchecked:focus::before,
 .RichEditor__listItemChecked:focus::before {
-	box-shadow: 0 0 0 2px #a6cdfe;
+	box-shadow: var(--chakra-shadows-outline);
 	border-radius: 2px;
 }
 
@@ -424,16 +424,16 @@
 }
 
 .RichEditor__listItemChecked::before {
-	border: 1px solid rgb(61 135 245);
+	border: 1px solid var(--chakra-colors-control-action-active-background);
 	border-radius: 2px;
-	background-color: #3d87f5;
+	background-color: var(--chakra-colors-control-action-active-background);
 	background-repeat: no-repeat;
 }
 
 .RichEditor__listItemChecked::after {
 	content: '';
 	cursor: pointer;
-	border-color: #fff;
+	border-color: var(--chakra-colors-control-action-foreground);
 	border-style: solid;
 	position: absolute;
 	display: block;
