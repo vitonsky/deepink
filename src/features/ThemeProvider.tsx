@@ -80,7 +80,12 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
 		);
 	}, [accentColor, name, systemTheme]);
 
-	useLayoutEffect(updateMonacoTheme, [theme]);
+	useLayoutEffect(() => {
+		updateMonacoTheme();
+
+		// Forward update function to debug a theme
+		(globalThis as any)[Symbol.for('updateMonacoTheme')] = updateMonacoTheme;
+	}, [theme]);
 
 	return <ChakraProvider theme={theme}>{children}</ChakraProvider>;
 };

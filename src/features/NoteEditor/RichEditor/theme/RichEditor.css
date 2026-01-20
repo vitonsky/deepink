@@ -461,35 +461,35 @@
 * Source: https://github.com/PrismJS/prism-themes/blob/447479fc7b2be2051fe27e561aceed7cc87a589f/themes/prism-gruvbox-light.css
 */
 .RichEditor__tokenComment {
-	color: #7c6f64;
+	color: var(--chakra-colors-code-token-comment);
 }
 
 .RichEditor__tokenPunctuation {
-	color: #b57614;
+	color: var(--chakra-colors-code-token-punctuation);
 }
 
 .RichEditor__tokenProperty {
-	color: #9d0006;
+	color: var(--chakra-colors-code-token-property);
 }
 
 .RichEditor__tokenSelector {
-	color: #797403;
+	color: var(--chakra-colors-code-token-selector);
 }
 
 .RichEditor__tokenOperator {
-	color: #9a6e3a;
+	color: var(--chakra-colors-code-token-operator);
 }
 
 .RichEditor__tokenAttr {
-	color: #9d0006;
+	color: var(--chakra-colors-code-token-attr);
 }
 
 .RichEditor__tokenVariable {
-	color: #e90;
+	color: var(--chakra-colors-code-token-variable);
 }
 
 .RichEditor__tokenFunction {
-	color: #b57614;
+	color: var(--chakra-colors-code-token-function);
 }
 
 .RichEditor__mark {

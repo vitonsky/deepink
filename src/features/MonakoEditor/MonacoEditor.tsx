@@ -56,15 +56,32 @@ export function updateMonacoTheme() {
 	extend([mixPlugin]);
 
 	const styles = getComputedStyle(document.documentElement);
-	const prop = (color: string) => colord(styles.getPropertyValue(color).trim()).toHex();
+	const getColor = (name: string) => {
+		const color = styles.getPropertyValue(name).trim();
+		if (color.length === 0) {
+			throw new Error(`Cannot resolve a color in property ${name}`);
+		}
+
+		return colord(color).toHex();
+	};
+
+	const getColorWithFallback = <T extends unknown>(name: string, fallback: T) => {
+		try {
+			return getColor(name);
+		} catch (error) {
+			console.warn("Can't resolve a color in CSS property", name);
+			console.error(error);
+			return fallback;
+		}
+	};
 
 	const colors = {
-		accent: prop('--chakra-colors-accent-300'),
-		background: prop('--chakra-colors-surface-background'),
-		text: prop('--chakra-colors-typography-base'),
-		secondary: prop('--chakra-colors-typography-secondary'),
-		selection: prop('--chakra-colors-selection-base'),
-		highlight: prop('--chakra-colors-selection-highlight'),
+		accent: getColor('--chakra-colors-accent-300'),
+		background: getColor('--chakra-colors-surface-background'),
+		text: getColor('--chakra-colors-typography-base'),
+		secondary: getColor('--chakra-colors-typography-secondary'),
+		selection: getColor('--chakra-colors-selection-base'),
+		highlight: getColor('--chakra-colors-selection-highlight'),
 	};
 
 	// We set custom styles for selection to ensure enough contrast between foreground and background
@@ -76,10 +93,28 @@ export function updateMonacoTheme() {
 		getBrightness(colors.text) > 0.5 ? 0.5 : 0.6,
 	);
 
+	// Build rules
+	const rulesMap = {
+		keyword: '--chakra-colors-code-token-function',
+		comment: '--chakra-colors-code-token-comment',
+		variable: '--chakra-colors-code-token-selector',
+		number: '--chakra-colors-code-token-selector',
+		regexp: '--chakra-colors-code-token-selector',
+		string: '--chakra-colors-code-token-selector',
+	};
+
+	const rules: editor.ITokenThemeRule[] = [];
+	for (const [token, cssProp] of Object.entries(rulesMap)) {
+		const color = getColorWithFallback(cssProp, null);
+		if (!color) continue;
+
+		rules.push({ token, foreground: color });
+	}
+
 	editor.defineTheme('native', {
 		base: 'vs',
 		inherit: false,
-		rules: [],
+		rules: rules,
 		colors: {
 			'editor.background': colors.background,
 			'editor.foreground': colors.text,

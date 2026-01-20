@@ -135,6 +135,18 @@ export default function (accentColor: string) {
 						background: 'dim.100',
 					},
 				},
+				code: {
+					token: {
+						comment: '#a5674e',
+						punctuation: '#9c5f1c',
+						property: '#ac4e04',
+						selector: '#ac4e04',
+						operator: '#e14e12',
+						attr: '#df4c11',
+						variable: '#e90',
+						function: '#ff8300',
+					},
+				},
 			},
 			scheme: {
 				alert: {
