@@ -306,6 +306,25 @@ export default extendTheme({
 				},
 			},
 		}),
+		Checkbox: createMultiStyleConfigHelpers([
+			'control',
+			'icon',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				control: {
+					backgroundColor: 'control.checkbox.background',
+					borderColor: 'control.checkbox.border',
+
+					_checked: {
+						'&, &:hover': {
+							color: 'control.checkbox.active.foreground',
+							borderColor: 'control.checkbox.active.border',
+							backgroundColor: 'control.checkbox.active.background',
+						},
+					},
+				},
+			},
+		}),
 		Menu: createMultiStyleConfigHelpers([
 			'button',
 			'list',
@@ -430,25 +449,6 @@ export default extendTheme({
 		Divider: defineStyleConfig({
 			baseStyle: {
 				borderColor: 'surface.border',
-			},
-		}),
-		Checkbox: createMultiStyleConfigHelpers([
-			'control',
-			'icon',
-		]).defineMultiStyleConfig({
-			baseStyle: {
-				control: {
-					backgroundColor: 'control.checkbox.background',
-					borderColor: 'control.checkbox.border',
-
-					_checked: {
-						'&, &:hover': {
-							color: 'control.checkbox.active.foreground',
-							borderColor: 'control.checkbox.active.border',
-							backgroundColor: 'control.checkbox.active.background',
-						},
-					},
-				},
 			},
 		}),
 		Modal: createMultiStyleConfigHelpers([
