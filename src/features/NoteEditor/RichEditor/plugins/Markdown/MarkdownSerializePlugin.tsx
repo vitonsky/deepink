@@ -26,14 +26,14 @@ export const MarkdownSerializePlugin = ({
 }: MarkdownSerializePluginProps) => {
 	const [editor] = useLexicalComposerContext();
 
-	const isProgrammaticUpdate = useRef(false);
+	const isShouldSync = useRef(false);
 
 	const serializedValueRef = useRef<string | null>(null);
 	useEffect(() => {
 		// Skip updates sent from this component, based on value equality
 		if (serializedValueRef.current === value) return;
 
-		isProgrammaticUpdate.current = true;
+		isShouldSync.current = true;
 
 		// Cleanup for new values, since it will be updated
 		// Otherwise we may have bug when value is updated via `editor.update`, an `OnChangePlugin` will not trigger callback (because synthetic update) and if next value update will have previous value - update will be ignored.
@@ -45,9 +45,10 @@ export const MarkdownSerializePlugin = ({
 		});
 	}, [editor, value]);
 
+	// Prevents reacting to programmatic editor.update changes, e.g., when opening a note
 	useEffect(() => {
 		editor.read(() => {
-			isProgrammaticUpdate.current = false;
+			isShouldSync.current = false;
 		});
 	}, [editor]);
 
@@ -72,8 +73,8 @@ export const MarkdownSerializePlugin = ({
 		<OnChangePlugin
 			ignoreSelectionChange
 			onChange={(_, editor) => {
-				// If true, sync should not run, this prevents reacting to programmatic editor.update changes, e.g., when opening a note.
-				if (isProgrammaticUpdate.current) return;
+				if (isShouldSync.current) return;
+
 				const isActive = isFocusedElement(editor.getRootElement());
 				if (!isActive) return;
 
