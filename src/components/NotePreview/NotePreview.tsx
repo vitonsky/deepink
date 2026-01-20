@@ -3,7 +3,10 @@ import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, StackProps, Text, useMultiStyleConfig, VStack } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useEventBus, useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useTelemetryTracker } from '@features/telemetry';
+import { useNoteActions } from '@hooks/notes/useNoteActions';
 
 import { TextSample } from './TextSample';
 
@@ -16,6 +19,9 @@ export const NotePreview = forwardRef<
 	} & StackProps
 >(({ textToHighlight, noteId, isSelected, ...props }, ref) => {
 	const styles = useMultiStyleConfig('NotePreview');
+
+	const telemetry = useTelemetryTracker();
+	const noteActions = useNoteActions();
 
 	const noteRegister = useNotesRegistry();
 	const eventBus = useEventBus();
@@ -59,6 +65,12 @@ export const NotePreview = forwardRef<
 			sx={{
 				...styles.root,
 				...props.sx,
+			}}
+			onClick={() => {
+				noteActions.click(note);
+				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_OPENED, {
+					context: 'notes list',
+				});
 			}}
 		>
 			<VStack sx={styles.body}>
