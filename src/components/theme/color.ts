@@ -58,7 +58,16 @@ export function buildColorScheme(accentColor: string) {
 	const accentVariants = palette(accentColor);
 
 	return {
-		accent: accentVariants['500'],
 		accentVariants,
+		getContrastForeground(background: string) {
+			const backgroundColor = new Color(background);
+			const options = ['#ffffff', '#000000'].sort((a, b) =>
+				Math.abs(backgroundColor.contrastAPCA(a)) >
+				Math.abs(backgroundColor.contrastAPCA(b))
+					? -1
+					: 1,
+			);
+			return options[0];
+		},
 	};
 }

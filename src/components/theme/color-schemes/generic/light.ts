@@ -22,6 +22,9 @@ export default function (accentColor: string) {
 				base: '#000',
 				secondary: '#5f5f5f',
 				inverted: '#fff',
+				invertedAccent: colors.getContrastForeground(
+					colors.accentVariants['500'],
+				),
 			},
 			selection: {
 				foreground: '#fff',
@@ -68,7 +71,7 @@ export default function (accentColor: string) {
 					},
 
 					action: {
-						foreground: 'accent.50',
+						foreground: 'typography.invertedAccent',
 						background: 'accent.500',
 
 						active: {
@@ -118,7 +121,7 @@ export default function (accentColor: string) {
 						border: 'surface.border',
 
 						active: {
-							foreground: 'accent.50',
+							foreground: 'typography.invertedAccent',
 							background: 'accent.500',
 							border: 'accent.500',
 						},
