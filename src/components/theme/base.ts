@@ -202,6 +202,7 @@ export default extendTheme({
 			baseStyle: {
 				field: {
 					color: 'typography.base',
+					borderRadius: '6px',
 					'&::placeholder': {
 						color: 'typography.secondary',
 						opacity: '.8',
@@ -265,6 +266,7 @@ export default extendTheme({
 			baseStyle: {
 				field: {
 					color: 'typography.base',
+					borderRadius: '6px',
 					'&::placeholder': {
 						color: 'inherit',
 						opacity: '.8',
