@@ -90,7 +90,7 @@ export function updateMonacoTheme() {
 	// TODO: customize foreground style with option `editor.selectionForeground` once bug will be fixed
 	const selectionColor = setBrightness(
 		colors.selection,
-		getBrightness(colors.text) > 0.5 ? 0.5 : 0.6,
+		getBrightness(colors.text) > 0.5 ? 0.5 : 0.9,
 	);
 
 	// Build rules
