@@ -29,8 +29,11 @@ export default {
 		},
 		selection: {
 			foreground: '#000',
-			base: '#ffca9b',
-			highlight: '#ffba7d',
+			background: '#ffca9b',
+		},
+		highlight: {
+			foreground: '#000',
+			background: '#ffba7d',
 		},
 		surface: {
 			background: '#fffaf3',

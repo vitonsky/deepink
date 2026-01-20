@@ -80,8 +80,8 @@ export function updateMonacoTheme() {
 		background: getColor('--chakra-colors-surface-background'),
 		text: getColor('--chakra-colors-typography-base'),
 		secondary: getColor('--chakra-colors-typography-secondary'),
-		selection: getColor('--chakra-colors-selection-base'),
-		highlight: getColor('--chakra-colors-selection-highlight'),
+		selection: getColor('--chakra-colors-selection-background'),
+		highlight: getColor('--chakra-colors-highlight-background'),
 	};
 
 	// We set custom styles for selection to ensure enough contrast between foreground and background

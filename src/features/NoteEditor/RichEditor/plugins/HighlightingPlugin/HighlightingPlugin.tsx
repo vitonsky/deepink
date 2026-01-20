@@ -174,7 +174,8 @@ export const HighlightingPlugin = ({ search }: { search?: string }) => {
 								pointerEvents="none"
 								opacity=".4"
 								transform="scale(1.1)"
-								backgroundColor="yellow"
+								backgroundColor="highlight.background"
+								color="highlight.foreground"
 								blendMode="multiply"
 								style={{
 									left: `${x - rootRect.x}px`,
