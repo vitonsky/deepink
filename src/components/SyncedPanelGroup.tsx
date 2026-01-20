@@ -9,8 +9,6 @@ import { isEqual } from 'lodash';
 import { GlobalEvents } from '@api/events/global';
 import { useEventBus } from '@hooks/events/useEventBus';
 
-import './SyncedPanelGroup.css';
-
 disableGlobalCursorStyles();
 
 /**
