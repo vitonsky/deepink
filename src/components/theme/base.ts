@@ -160,7 +160,7 @@ export default extendTheme({
 					color: 'control.ghost.foreground',
 					backgroundColor: 'control.ghost.background',
 
-					'&:not([data-active]):is(:hover,:active,:focus)': {
+					'&:not([data-active]):is(:hover,:active)': {
 						color: 'control.ghost.hover.foreground',
 						backgroundColor: 'control.ghost.hover.background',
 					},
