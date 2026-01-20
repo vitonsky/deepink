@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
-	Box,
 	Button,
 	Checkbox,
-	HStack,
 	Input,
 	Modal,
 	ModalBody,
@@ -18,11 +16,12 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
-import { accentColorsMap } from '@features/ThemeProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectTheme, settingsApi } from '@state/redux/settings/settings';
+
+import { ColorPicker } from './ColorPicker';
 
 export const SettingsWindow = () => {
 	const theme = useAppSelector(selectTheme);
@@ -43,9 +42,7 @@ export const SettingsWindow = () => {
 				<ModalBody>
 					<VStack w="100%" minH="100%" p="2rem" justifyContent="center">
 						<Features>
-							<FeaturesHeader view="primary">
-								Database settings
-							</FeaturesHeader>
+							<FeaturesHeader view="primary">Appearance</FeaturesHeader>
 
 							<FeaturesOption title="Theme">
 								<Select
@@ -68,38 +65,22 @@ export const SettingsWindow = () => {
 							</FeaturesOption>
 
 							<FeaturesOption title="Accent color">
-								<HStack>
-									{Object.entries(accentColorsMap).map(
-										([name, code]) => {
-											const isActive = name === theme.accentColor;
-											return (
-												<Box
-													key={name}
-													boxSize="1.3rem"
-													backgroundColor={code}
-													borderRadius="100%"
-													outlineOffset={1}
-													outline={
-														isActive ? '3px solid' : undefined
-													}
-													outlineColor={
-														isActive
-															? 'control.action.active.background'
-															: 'transparent'
-													}
-													onClick={() => {
-														dispatch(
-															settingsApi.setTheme({
-																accentColor: name,
-															}),
-														);
-													}}
-												></Box>
-											);
-										},
-									)}
-								</HStack>
+								<ColorPicker
+									isDisabled={theme.name === 'zen'}
+									color={theme.accentColor}
+									onChange={(color) => {
+										dispatch(
+											settingsApi.setTheme({
+												accentColor: color,
+											}),
+										);
+									}}
+								/>
 							</FeaturesOption>
+
+							<FeaturesHeader view="primary">
+								Database settings
+							</FeaturesHeader>
 
 							<FeaturesOption title="Database name">
 								<Input

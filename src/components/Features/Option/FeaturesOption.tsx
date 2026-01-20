@@ -31,7 +31,7 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 			>
 				{title}
 			</Text>
-			<VStack alignItems="baseline">
+			<VStack alignItems="baseline" justifyContent="end">
 				{children}
 				{description && (
 					<Text

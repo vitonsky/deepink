@@ -1,3 +1,4 @@
+import { accentColorsMap } from '@features/ThemeProvider';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
@@ -31,7 +32,7 @@ export const settingsSlice = createSlice({
 		editorMode: 'plaintext',
 		theme: {
 			name: 'auto',
-			accentColor: 'blue',
+			accentColor: 'auto',
 		},
 		editor: {
 			fontFamily:
@@ -60,7 +61,12 @@ export const settingsSlice = createSlice({
 			state,
 			{ payload }: PayloadAction<Partial<GlobalSettings['theme']>>,
 		) => {
-			return { ...state, theme: { ...state.theme, ...payload } } as GlobalSettings;
+			const theme = { ...state.theme, ...payload };
+			if (!theme.accentColor || !(theme.accentColor in accentColorsMap)) {
+				theme.accentColor = 'auto';
+			}
+
+			return { ...state, theme } as GlobalSettings;
 		},
 		setPreferences: (
 			state,
