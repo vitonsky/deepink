@@ -38,10 +38,10 @@ export default function (accentColor: string) {
 				border: '#e2e8f0',
 			},
 			dim: {
-				50: '#fbfbfb',
-				100: '#f3f3f3',
-				200: '#edededff',
-				400: '#e7e7e7',
+				50: '#00000006',
+				100: '#0000000a',
+				200: '#00000010',
+				400: '#00000017',
 			},
 			link: {
 				base: colors.accentVariants['500'],
@@ -58,7 +58,7 @@ export default function (accentColor: string) {
 			colors: {
 				control: {
 					base: {
-						background: 'dim.100',
+						background: 'dim.200',
 						foreground: 'typography.base',
 
 						active: {
@@ -66,7 +66,7 @@ export default function (accentColor: string) {
 						},
 
 						disabled: {
-							background: 'dim.100',
+							background: 'dim.200',
 						},
 					},
 

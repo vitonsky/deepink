@@ -25,13 +25,13 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 					display: 'flex',
 					justifyContent: 'end',
 					lineHeight: '120%',
-					paddingTop: '.8rem',
+					paddingTop: '.5rem',
 					paddingInlineEnd: '1rem',
 				}}
 			>
 				{title}
 			</Text>
-			<VStack alignItems="baseline" justifyContent="end">
+			<VStack alignItems="baseline" justifyContent="center">
 				{children}
 				{description && (
 					<Text
