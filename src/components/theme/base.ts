@@ -81,7 +81,7 @@ export default extendTheme({
 
 			'::selection': {
 				color: 'selection.foreground',
-				backgroundColor: 'selection.base',
+				backgroundColor: 'selection.background',
 			},
 
 			'[data-resize-handle]': {
