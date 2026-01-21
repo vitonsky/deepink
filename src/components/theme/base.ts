@@ -271,6 +271,10 @@ export default extendTheme({
 						color: 'inherit',
 						opacity: '.8',
 					},
+
+					'& option': {
+						backgroundColor: 'surface.background',
+					},
 				},
 			},
 			variants: {
