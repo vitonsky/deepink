@@ -71,7 +71,14 @@ export const SettingsWindow = () => {
 									</Select>
 								</FeaturesOption>
 
-								<FeaturesOption title="Accent color">
+								<FeaturesOption
+									title="Accent color"
+									description={
+										theme.name === 'zen'
+											? 'Accent color is not applicable to selected theme.'
+											: undefined
+									}
+								>
 									<ColorPicker
 										isDisabled={theme.name === 'zen'}
 										color={theme.accentColor}
