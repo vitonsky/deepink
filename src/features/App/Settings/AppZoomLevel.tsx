@@ -19,11 +19,17 @@ const zoomLimits = {
 };
 
 const zoomScheme = z.object({
-	zoom: z.coerce
-		.number({ message: 'Enter a zoom in percents' })
-		.min(zoomLimits.min, `Zoom cannot be less than ${zoomLimits.min}%`)
-		.max(zoomLimits.max, `Zoom cannot be more than ${zoomLimits.max}%`)
-		.transform((v) => Number((v / 100).toFixed(3))),
+	zoom: z
+		.string()
+		.trim()
+		.min(1, { message: 'Enter a number to set zoom' })
+		.pipe(
+			z.coerce
+				.number()
+				.min(zoomLimits.min, `Zoom cannot be less than ${zoomLimits.min}%`)
+				.max(zoomLimits.max, `Zoom cannot be more than ${zoomLimits.max}%`)
+				.transform((v) => Number((v / 100).toFixed(3))),
+		),
 });
 
 const zoomFactorToPercents = (factor: number) => Math.round(factor * 100);
@@ -42,6 +48,7 @@ export const AppZoomLevel = () => {
 	return (
 		<VStack
 			as="form"
+			noValidate
 			onSubmit={form.handleSubmit(async ({ zoom }) => {
 				setZoomFactor(zoom);
 			})}
@@ -50,10 +57,10 @@ export const AppZoomLevel = () => {
 			<HStack align="start">
 				<InputGroup size="sm" width="auto">
 					<Input
-						placeholder="e.g. 100"
 						width="6rem"
 						textAlign="right"
 						type="number"
+						step={10}
 						min={zoomLimits.min}
 						max={zoomLimits.max}
 						{...form.register('zoom')}
