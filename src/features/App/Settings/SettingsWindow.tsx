@@ -89,7 +89,7 @@ export const SettingsWindow = () => {
 
 								<FeaturesOption
 									title="Zoom level"
-									description={`Adjust the default zoom level for all windows.\nDetected display pixel ratio is ${getDevicePixelRatio()}`}
+									description={`Adjust the default zoom level for all windows.\nIn case your system does not scale an apps automatically, you may change a zoom to make it fit an actual display pixel ratio (DPR). Detected DPR is ${getDevicePixelRatio()}.`}
 								>
 									<AppZoomLevel />
 								</FeaturesOption>
@@ -104,7 +104,7 @@ export const SettingsWindow = () => {
 									/>
 								</FeaturesOption>
 
-								<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password">
+								<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password.">
 									<Switch size="sm">
 										Remember workspaces passwords
 									</Switch>
@@ -112,10 +112,7 @@ export const SettingsWindow = () => {
 							</FeaturesGroup>
 
 							<FeaturesGroup title="Encryption">
-								<FeaturesOption
-									title="Encryption algorithm"
-									description="Choose best algorithm you trust"
-								>
+								<FeaturesOption title="Encryption algorithm">
 									<Select defaultValue="aes" size="sm">
 										{[
 											{
