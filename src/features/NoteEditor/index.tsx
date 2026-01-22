@@ -246,7 +246,6 @@ export const Note: FC<NoteEditorProps> = memo(
 			runCommand(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, { id: note.id });
 		});
 		useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_CURRENT_NOTE_FROM_BIN, () => {
-			// Only notes with deleted status can be restored
 			if (!note.isDeleted) return;
 			runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { id: note.id });
 		});
