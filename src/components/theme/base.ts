@@ -100,6 +100,14 @@ export default extendTheme({
 			baseStyle: {
 				color: 'typography.base',
 			},
+			variants: {
+				secondary: {
+					color: 'typography.secondary',
+				},
+				error: {
+					color: 'message.error',
+				},
+			},
 		}),
 		Link: defineStyleConfig({
 			baseStyle: {

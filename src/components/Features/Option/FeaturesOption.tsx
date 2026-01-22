@@ -39,6 +39,7 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 							fontSize: '0.9rem',
 							color: 'typography.secondary',
 							lineHeight: '140%',
+							whiteSpace: 'pre-line',
 						}}
 					>
 						{description}

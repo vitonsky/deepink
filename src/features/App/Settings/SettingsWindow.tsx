@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
 	Button,
+	Divider,
 	Input,
 	Modal,
 	ModalBody,
@@ -20,7 +21,9 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectTheme, settingsApi } from '@state/redux/settings/settings';
+import { getDevicePixelRatio } from '@utils/os/zoom';
 
+import { AppZoomLevel } from './AppZoomLevel';
 import { ColorPicker } from './ColorPicker';
 
 export const SettingsWindow = () => {
@@ -80,6 +83,15 @@ export const SettingsWindow = () => {
 											);
 										}}
 									/>
+								</FeaturesOption>
+
+								<Divider />
+
+								<FeaturesOption
+									title="Zoom level"
+									description={`Adjust the default zoom level for all windows.\nDetected display pixel ratio is ${getDevicePixelRatio()}`}
+								>
+									<AppZoomLevel />
 								</FeaturesOption>
 							</FeaturesGroup>
 

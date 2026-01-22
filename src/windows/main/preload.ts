@@ -1,14 +1,15 @@
 import { contextBridge, ipcRenderer, webFrame } from 'electron';
+import { initZoomFactor } from '@utils/os/zoom';
 
-webFrame.setZoomFactor(1);
-
-const dpr = window.devicePixelRatio;
-
-console.log('Device pixel ratio', dpr);
-webFrame.setZoomFactor(dpr);
+initZoomFactor();
 
 contextBridge.exposeInMainWorld('electron', {
 	ipcRenderer: {
 		invoke: ipcRenderer.invoke,
+	},
+
+	webFrame: {
+		getZoomFactor: () => webFrame.getZoomFactor(),
+		setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),
 	},
 });
