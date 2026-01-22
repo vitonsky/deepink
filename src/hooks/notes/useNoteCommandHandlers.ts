@@ -11,8 +11,8 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId, selectWorkspace } from '@state/redux/profiles/profiles';
+import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectConfirmMoveToBin } from '@state/redux/settings/selectors/preferences';
 import { copyTextToClipboard } from '@utils/clipboard';
 
@@ -42,12 +42,7 @@ export const useNoteCommandHandlers = () => {
 
 	const eventBus = useEventBus();
 
-	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async (payload) => {
-		const id = payload?.id ?? activeNoteId;
-		if (!id) return;
-
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async ({ id }) => {
 		if (requiresConfirmMoveToBin) {
 			const isConfirmed = confirm(`Do you want to move this note to the bin?`);
 			if (!isConfirmed) return;
@@ -65,14 +60,7 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
-		async (payload) => {
-			const id = payload?.id ?? activeNoteId;
-			if (!id) return;
-
-			// Only notes with deleted status can be permanently deleted
-			const note = await notes.getById(id);
-			if (!note?.isDeleted) return;
-
+		async ({ id }) => {
 			const isConfirmed = confirm(`Do you want to permanently delete this note?`);
 			if (!isConfirmed) return;
 
@@ -88,22 +76,12 @@ export const useNoteCommandHandlers = () => {
 		},
 	);
 
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN,
-		async (payload) => {
-			const id = payload?.id ?? activeNoteId;
-			if (!id) return;
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async ({ id }) => {
+		await notes.updateMeta([id], { isDeleted: false });
+		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
 
-			// Only notes with deleted status can be restored
-			const note = await notes.getById(id);
-			if (!note?.isDeleted) return;
-
-			await notes.updateMeta([id], { isDeleted: false });
-			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
-
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
-		},
-	);
+		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
+	});
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ id }) => {
 		const note = await notes.getById(id);

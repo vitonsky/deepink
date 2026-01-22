@@ -20,14 +20,29 @@ export enum GLOBAL_COMMANDS {
 	DELETE_NOTE_TO_BIN = 'deleteNoteToBin',
 
 	/**
+	 * Restore a note from the Bin
+	 */
+	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
+
+	/**
 	 * Permanently delete a note
 	 */
 	DELETE_NOTE_PERMANENTLY = 'deleteNotePermanently',
 
 	/**
-	 * Restore a note from the Bin
+	 * Move a current note to the Bin
 	 */
-	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
+	DELETE_CURRENT_NOTE_TO_BIN = 'DELETE_CURRENT_NOTE_TO_BIN',
+
+	/**
+	 * Restore a current note from the Bin
+	 */
+	RESTORE_CURRENT_NOTE_FROM_BIN = 'RESTORE_CURRENT_NOTE_FROM_BIN',
+
+	/**
+	 * Permanently delete a current note
+	 */
+	DELETE_CURRENT_NOTE_PERMANENTLY = 'DELETE_CURRENT_NOTE_PERMANENTLY',
 
 	/**
 	 * Toggle the archive status of the current note
@@ -81,9 +96,9 @@ export enum GLOBAL_COMMANDS {
 }
 
 type CommandsWithPayload = {
-	[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: { id: string } | null;
-	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { id: string } | null;
-	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string } | null;
+	[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: { id: string };
+	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { id: string };
+	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
 
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
 	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };
