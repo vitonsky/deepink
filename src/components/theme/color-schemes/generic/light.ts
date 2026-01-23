@@ -31,8 +31,8 @@ export default function (accentColor: string) {
 				background: colors.accentVariants['200'],
 			},
 			highlight: {
-				foreground: colors.getContrastForeground(colors.accentVariants['400']),
-				background: colors.accentVariants['400'],
+				foreground: colors.getContrastForeground(colors.accentVariants['200']),
+				background: colors.accentVariants['200'],
 			},
 			surface: {
 				background: '#ffffff',
