@@ -104,6 +104,10 @@ export default extendTheme({
 				secondary: {
 					color: 'typography.secondary',
 				},
+				highlight: {
+					backgroundColor: 'highlight.background',
+					color: 'highlight.foreground',
+				},
 				error: {
 					color: 'message.error',
 				},

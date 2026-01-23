@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Text } from '@chakra-ui/react';
 import { findTextSegments } from '@utils/text/findTextSegments';
 import { getHighlightedText } from '@utils/text/getHighlightedText';
 
@@ -34,14 +34,9 @@ export const TextSample = ({
 				const content = text.slice(segment.start, segment.end);
 
 				return segment.highlight ? (
-					<Box
-						as="mark"
-						key={index}
-						backgroundColor="highlight.background"
-						color="highlight.foreground"
-					>
+					<Text key={index} as="mark" variant="highlight">
 						{content}
-					</Box>
+					</Text>
 				) : (
 					content
 				);
