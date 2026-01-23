@@ -25,7 +25,7 @@ export const useShowForMinimumTime = (isLoading: boolean, minTime = 500) => {
 		}, delay);
 
 		return () => clearTimeout(timer);
-	}, [isLoading]);
+	}, [isLoading, minTime]);
 
 	return isShow;
 };
