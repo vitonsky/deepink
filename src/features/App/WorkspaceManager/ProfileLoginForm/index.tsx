@@ -78,14 +78,14 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 			controls={
 				<>
 					<Button
-						variant="primary"
+						variant="accent"
 						w="100%"
 						onClick={onPressLogin}
 						disabled={isPending}
 					>
 						Unlock
 					</Button>
-					<Button variant="secondary" w="100%" onClick={onPickAnotherProfile}>
+					<Button w="100%" onClick={onPickAnotherProfile}>
 						Change profile
 					</Button>
 				</>
@@ -94,7 +94,6 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 			<VStack as="form" w="100%" alignItems="start" onSubmit={onPressLogin}>
 				<Input
 					ref={firstInputRef}
-					variant="filled"
 					size="lg"
 					type="password"
 					placeholder="Enter password"

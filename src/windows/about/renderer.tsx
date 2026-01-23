@@ -1,9 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 // eslint-disable-next-line spellcheck/spell-checker
-import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from '@components/theme';
+import { ThemeProvider } from '@features/ThemeProvider';
+import { loadStore } from '@state/redux/persistence';
+import { store } from '@state/redux/store';
 
+// eslint-disable-next-line spellcheck/spell-checker
 import { About } from './About';
 
 const rootNode = document.getElementById('appRoot');
@@ -13,9 +16,13 @@ if (!rootNode) {
 
 document.body.style.overflow = 'hidden';
 
+loadStore(store);
+
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
-	<ChakraProvider theme={theme}>
-		<About />
-	</ChakraProvider>,
+	<Provider store={store}>
+		<ThemeProvider>
+			<About />
+		</ThemeProvider>
+	</Provider>,
 );

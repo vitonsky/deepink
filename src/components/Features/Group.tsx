@@ -1,0 +1,32 @@
+import React from 'react';
+import { StackProps, VStack } from '@chakra-ui/react';
+import { FeaturesHeader } from '@components/Features/Header/FeaturesHeader';
+
+export const FeaturesPanel = ({ children, ...props }: StackProps) => {
+	return (
+		<VStack
+			align="start"
+			backgroundColor="dim.50"
+			padding=".7rem .5rem"
+			borderRadius="6px"
+			width="100%"
+			gap="1rem"
+			{...props}
+		>
+			{children}
+		</VStack>
+	);
+};
+
+export const FeaturesGroup = ({
+	title,
+	children,
+	...props
+}: StackProps & { title?: string }) => {
+	return (
+		<VStack align="start" width="100%" {...props}>
+			{title && <FeaturesHeader view="primary">{title}</FeaturesHeader>}
+			<FeaturesPanel>{children}</FeaturesPanel>
+		</VStack>
+	);
+};

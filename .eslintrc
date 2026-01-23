@@ -52,6 +52,7 @@
 					"cmd",
 					"embeddings",
 					"onnx",
+					"Chakra",
 					"huggingface",
 					"pg_trgm",
 					"Checkbox",

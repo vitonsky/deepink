@@ -29,20 +29,22 @@
 [data-panel-group-direction='horizontal'] {
 	width: 1px;
 
-	::after {
+	&::after {
 		width: var(--resize-handle-size);
 		height: 100%;
 		left: calc(var(--resize-handle-size) / -2);
+		cursor: col-resize;
 	}
 }
 
 [data-panel-group-direction='vertical'] {
 	height: 1px;
 
-	::after {
+	&::after {
 		width: 100%;
 		height: var(--resize-handle-size);
 		left: calc(var(--resize-handle-size) / -2);
+		cursor: row-resize;
 	}
 }
 

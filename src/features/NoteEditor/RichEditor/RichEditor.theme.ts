@@ -24,7 +24,7 @@ export const RichEditorTheme = createMultiStyleConfigHelpers([
 				borderColor: 'surface.border',
 			},
 			[`& .${theme.code}, & .${theme.text.code}`]: {
-				color: 'typography.primary',
+				color: 'typography.base',
 				backgroundColor: 'dim.100',
 			},
 			[`& .${theme.code}`]: {

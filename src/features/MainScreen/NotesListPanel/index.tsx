@@ -111,7 +111,7 @@ export const NotesListPanel = () => {
 						</Text>
 						<HStack maxW="100%" align="start" overflow="hidden">
 							<Tag
-								variant="accent"
+								variant="static"
 								as={HStack}
 								gap=".5rem"
 								align="start"

@@ -1,9 +1,9 @@
-import React, { FC, PropsWithChildren } from 'react';
+import React, { FC, PropsWithChildren, ReactNode } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 
 export type FeaturesOptionProps = PropsWithChildren<{
 	title?: string;
-	description?: string;
+	description?: ReactNode;
 }>;
 
 export const FeaturesOption: FC<FeaturesOptionProps> = ({
@@ -25,22 +25,16 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 					display: 'flex',
 					justifyContent: 'end',
 					lineHeight: '120%',
-					paddingTop: '.8rem',
+					paddingTop: '.5rem',
 					paddingInlineEnd: '1rem',
 				}}
 			>
 				{title}
 			</Text>
-			<VStack alignItems="baseline">
+			<VStack alignItems="baseline" justifyContent="center">
 				{children}
 				{description && (
-					<Text
-						sx={{
-							fontSize: '0.9rem',
-							color: 'typography.secondary',
-							lineHeight: '140%',
-						}}
-					>
+					<Text variant="secondary" fontSize=".8rem" whiteSpace="pre-line">
 						{description}
 					</Text>
 				)}

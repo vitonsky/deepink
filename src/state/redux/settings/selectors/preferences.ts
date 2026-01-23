@@ -11,3 +11,8 @@ export const selectEditorConfig = createAppSelector(
 	selectSettings,
 	(settings) => settings.editor,
 );
+
+export const selectTheme = createAppSelector(
+	selectSettings,
+	(settings) => settings.theme,
+);
