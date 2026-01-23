@@ -199,6 +199,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		screenName,
 		telemetry,
 		isShowLoadingScreen,
+		dispatch,
 	]);
 
 	return (
