@@ -209,52 +209,14 @@ export const Note: FC<NoteEditorProps> = memo(
 			}
 		}, [sidePanel, telemetry]);
 
-		useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY, () => {
-			setSidePanel((state) =>
-				state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
-			);
-		});
 		useWorkspaceCommandCallback(
-			GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE,
-			async () => {
-				const newArchivedState = !note.isArchived;
-				await notesRegistry.updateMeta([note.id], {
-					isArchived: newArchivedState,
-				});
-				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
-					action: newArchivedState ? 'Added' : 'Removed',
-				});
-			},
-		);
-		useWorkspaceCommandCallback(
-			GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
-			async () => {
-				const newBookmarkedState = !note.isBookmarked;
-				await notesRegistry.updateMeta([note.id], {
-					isBookmarked: newBookmarkedState,
-				});
-				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
-					action: newBookmarkedState ? 'Added' : 'Removed',
-				});
-			},
-		);
-		useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_CURRENT_NOTE_TO_BIN, () => {
-			runCommand(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, { id: note.id });
-		});
-		useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_CURRENT_NOTE_FROM_BIN, () => {
-			if (!note.isDeleted) return;
-			runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { id: note.id });
-		});
-		useWorkspaceCommandCallback(
-			GLOBAL_COMMANDS.DELETE_CURRENT_NOTE_PERMANENTLY,
+			GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY,
 			() => {
-				if (!note.isDeleted) return;
-				runCommand(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, { id: note.id });
+				setSidePanel((state) =>
+					state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
+				);
 			},
+			{ enabled: isActive },
 		);
 
 		const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);

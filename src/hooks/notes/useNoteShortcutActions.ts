@@ -1,6 +1,9 @@
+import { WorkspaceEvents } from '@api/events/workspace';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useEventBus, useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
@@ -13,13 +16,16 @@ import {
 import { getItemByOffset } from '@utils/collections/getItemByOffset';
 
 /**
- * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
+ * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore, switch focus and etc.,
  */
 export const useNoteShortcutActions = () => {
 	const telemetry = useTelemetryTracker();
 
 	const noteActions = useNoteActions();
 	const createNote = useCreateNote();
+	const notesRegistry = useNotesRegistry();
+	const runCommand = useCommand();
+	const eventBus = useEventBus();
 
 	const recentlyClosedNotes = useWorkspaceSelector(selectRecentlyClosedNotes);
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
@@ -66,5 +72,66 @@ export const useNoteShortcutActions = () => {
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE, () =>
 		focusNoteInDirection('next'),
+	);
+
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE, async () => {
+		if (!activeNoteId) return;
+		const note = await notesRegistry.getById(activeNoteId);
+		if (!note) return;
+
+		const newArchivedState = !note.isArchived;
+		await notesRegistry.updateMeta([activeNoteId], {
+			isArchived: newArchivedState,
+		});
+		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, activeNoteId);
+
+		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+			action: newArchivedState ? 'Added' : 'Removed',
+		});
+	});
+
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
+		async () => {
+			if (!activeNoteId) return;
+			const note = await notesRegistry.getById(activeNoteId);
+			if (!note) return;
+
+			const newBookmarkedState = !note.isBookmarked;
+			await notesRegistry.updateMeta([activeNoteId], {
+				isBookmarked: newBookmarkedState,
+			});
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, activeNoteId);
+
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
+				action: newBookmarkedState ? 'Added' : 'Removed',
+			});
+		},
+	);
+
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_CURRENT_NOTE_TO_BIN, () => {
+		if (!activeNoteId) return;
+		runCommand(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, { id: activeNoteId });
+	});
+
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.RESTORE_CURRENT_NOTE_FROM_BIN,
+		async () => {
+			if (!activeNoteId) return;
+			const note = await notesRegistry.getById(activeNoteId);
+			if (note && !note.isDeleted) return;
+
+			runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { id: activeNoteId });
+		},
+	);
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.DELETE_CURRENT_NOTE_PERMANENTLY,
+		async () => {
+			if (!activeNoteId) return;
+			const note = await notesRegistry.getById(activeNoteId);
+			if (note && !note.isDeleted) return;
+
+			runCommand(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, { id: activeNoteId });
+		},
 	);
 };
