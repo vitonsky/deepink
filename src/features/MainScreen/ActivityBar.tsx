@@ -47,7 +47,7 @@ export const ActivityBar = () => {
 					icon={<FaFeather />}
 					tooltipPlacement="right"
 					title="New note"
-					variant="primary"
+					variant="accent"
 					onClick={debouncedCreateNote}
 				/>
 

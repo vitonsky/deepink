@@ -136,7 +136,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 			<ModalFooter>
 				<HStack w="100%" justifyContent="end">
 					<Button
-						variant="primary"
+						variant="accent"
 						onClick={async () => {
 							try {
 								const name = tagName.trim();
@@ -165,9 +165,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 					>
 						{isEditingMode ? 'Save' : 'Add'}
 					</Button>
-					<Button variant="secondary" onClick={onCancel}>
-						Cancel
-					</Button>
+					<Button onClick={onCancel}>Cancel</Button>
 				</HStack>
 			</ModalFooter>
 		</>

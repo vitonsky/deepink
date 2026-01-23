@@ -1,3 +1,4 @@
+import { accentColorsMap } from '@features/ThemeProvider';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
@@ -6,7 +7,10 @@ export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
 export type GlobalSettings = {
 	editorMode: EditorMode;
-	theme: 'zen' | 'light';
+	theme: {
+		name: 'auto' | 'light' | 'dark' | 'zen';
+		accentColor?: string;
+	};
 	editor: {
 		fontFamily: string;
 		fontSize: number;
@@ -26,7 +30,10 @@ export const settingsSlice = createSlice({
 	name: 'settings',
 	initialState: {
 		editorMode: 'plaintext',
-		theme: 'zen',
+		theme: {
+			name: 'auto',
+			accentColor: 'auto',
+		},
 		editor: {
 			fontFamily:
 				// eslint-disable-next-line spellcheck/spell-checker
@@ -50,8 +57,16 @@ export const settingsSlice = createSlice({
 		) => {
 			return { ...state, editorMode: payload } as GlobalSettings;
 		},
-		setTheme: (state, { payload }: PayloadAction<GlobalSettings['theme']>) => {
-			return { ...state, theme: payload } as GlobalSettings;
+		setTheme: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['theme']>>,
+		) => {
+			const theme = { ...state.theme, ...payload };
+			if (!theme.accentColor || !(theme.accentColor in accentColorsMap)) {
+				theme.accentColor = 'auto';
+			}
+
+			return { ...state, theme } as GlobalSettings;
 		},
 		setPreferences: (
 			state,

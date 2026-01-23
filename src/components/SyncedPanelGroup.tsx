@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import {
+	disableGlobalCursorStyles,
 	ImperativePanelGroupHandle,
 	PanelGroup,
 	PanelGroupProps,
@@ -7,6 +8,8 @@ import {
 import { isEqual } from 'lodash';
 import { GlobalEvents } from '@api/events/global';
 import { useEventBus } from '@hooks/events/useEventBus';
+
+disableGlobalCursorStyles();
 
 /**
  * The same as `PanelGroup`, but automatically sync panels size across workspaces.

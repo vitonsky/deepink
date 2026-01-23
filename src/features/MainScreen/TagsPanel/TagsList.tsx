@@ -1,6 +1,6 @@
 import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronUp, FaHashtag } from 'react-icons/fa6';
-import { Box, HStack, Text } from '@chakra-ui/react';
+import { Button, HStack, Text } from '@chakra-ui/react';
 import { ListItem, NestedList } from '@components/NestedList';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
@@ -70,14 +70,15 @@ export const TagsList: FC<ITagsListProps> = ({
 						</Text>
 
 						{isHaveChilds ? (
-							<Box
+							<Button
 								marginLeft="auto"
 								padding="2px"
+								variant="ghost"
+								boxSize="1rem"
+								minWidth={0}
+								tabIndex={-1}
 								sx={{
 									borderRadius: '4px',
-									'&:hover': {
-										backdropFilter: 'contrast(0.7)',
-									},
 								}}
 								onClick={(evt) => {
 									evt.stopPropagation();
@@ -92,7 +93,7 @@ export const TagsList: FC<ITagsListProps> = ({
 								) : (
 									<FaChevronDown size={14} />
 								)}
-							</Box>
+							</Button>
 						) : undefined}
 					</HStack>
 				),

@@ -94,7 +94,7 @@ export const NoteVersions = ({
 								action: (
 									<>
 										<Button
-											variant="primary"
+											variant="accent"
 											onClick={() => {
 												onDeleteAll();
 												onClose();
@@ -209,7 +209,7 @@ export const NoteVersions = ({
 												action: (
 													<>
 														<Button
-															variant="primary"
+															variant="accent"
 															onClick={() => {
 																applyVersion();
 																onClose();
@@ -218,7 +218,7 @@ export const NoteVersions = ({
 															Apply
 														</Button>
 														<Button
-															variant="primary"
+															variant="accent"
 															onClick={() => {
 																onShowVersion(version);
 																onClose();
@@ -311,7 +311,7 @@ export const NoteVersions = ({
 												action: (
 													<>
 														<Button
-															variant="primary"
+															variant="accent"
 															onClick={() => {
 																deleteVersion();
 																onClose();
@@ -320,7 +320,7 @@ export const NoteVersions = ({
 															Delete
 														</Button>
 														<Button
-															variant="primary"
+															variant="accent"
 															onClick={() => {
 																onShowVersion(version);
 																onClose();

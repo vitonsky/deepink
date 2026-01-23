@@ -100,7 +100,7 @@
 
 .RichEditor__textCode {
 	background-color: var(--chakra-colors-dim-100);
-	color: var(--chakra-colors-typography-primary);
+	color: var(--chakra-colors-typography-base);
 	padding: 1px 0.25rem;
 	font-family: Menlo, Consolas, Monaco, monospace;
 	font-size: 94%;
@@ -113,11 +113,12 @@
 
 .RichEditor__link {
 	display: inline-block;
-	color: rgb(33 111 219);
+	color: var(--chakra-colors-link-base);
 	text-decoration: inherit;
 }
 
 .RichEditor__link:hover {
+	color: var(--chakra-colors-link-hover);
 	text-decoration: underline;
 	cursor: pointer;
 }
@@ -126,7 +127,7 @@
 	--block-padding: 0.8rem;
 
 	background-color: var(--chakra-colors-dim-100);
-	color: var(--chakra-colors-typography-primary);
+	color: var(--chakra-colors-typography-base);
 	font-family: Menlo, Consolas, Monaco, monospace;
 	display: block;
 	padding: var(--block-padding);
@@ -413,7 +414,7 @@
 
 .RichEditor__listItemUnchecked:focus::before,
 .RichEditor__listItemChecked:focus::before {
-	box-shadow: 0 0 0 2px #a6cdfe;
+	box-shadow: var(--chakra-shadows-outline);
 	border-radius: 2px;
 }
 
@@ -423,16 +424,16 @@
 }
 
 .RichEditor__listItemChecked::before {
-	border: 1px solid rgb(61 135 245);
+	border: 1px solid var(--chakra-colors-control-action-active-background);
 	border-radius: 2px;
-	background-color: #3d87f5;
+	background-color: var(--chakra-colors-control-action-active-background);
 	background-repeat: no-repeat;
 }
 
 .RichEditor__listItemChecked::after {
 	content: '';
 	cursor: pointer;
-	border-color: #fff;
+	border-color: var(--chakra-colors-control-action-foreground);
 	border-style: solid;
 	position: absolute;
 	display: block;
@@ -460,35 +461,35 @@
 * Source: https://github.com/PrismJS/prism-themes/blob/447479fc7b2be2051fe27e561aceed7cc87a589f/themes/prism-gruvbox-light.css
 */
 .RichEditor__tokenComment {
-	color: #7c6f64;
+	color: var(--chakra-colors-code-token-comment);
 }
 
 .RichEditor__tokenPunctuation {
-	color: #b57614;
+	color: var(--chakra-colors-code-token-punctuation);
 }
 
 .RichEditor__tokenProperty {
-	color: #9d0006;
+	color: var(--chakra-colors-code-token-property);
 }
 
 .RichEditor__tokenSelector {
-	color: #797403;
+	color: var(--chakra-colors-code-token-selector);
 }
 
 .RichEditor__tokenOperator {
-	color: #9a6e3a;
+	color: var(--chakra-colors-code-token-operator);
 }
 
 .RichEditor__tokenAttr {
-	color: #9d0006;
+	color: var(--chakra-colors-code-token-attr);
 }
 
 .RichEditor__tokenVariable {
-	color: #e90;
+	color: var(--chakra-colors-code-token-variable);
 }
 
 .RichEditor__tokenFunction {
-	color: #b57614;
+	color: var(--chakra-colors-code-token-function);
 }
 
 .RichEditor__mark {

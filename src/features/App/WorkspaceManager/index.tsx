@@ -108,7 +108,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				controls={
 					<>
 						<Button
-							variant="primary"
+							variant="accent"
 							size="lg"
 							w="100%"
 							onClick={() => setScreenName('createProfile')}
@@ -119,9 +119,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				}
 			>
 				<NestedList
-					divider={
-						<Divider borderColor="primary.700" margin="0px !important" />
-					}
+					divider={<Divider margin="0px !important" />}
 					sx={{
 						w: '100%',
 						borderRadius: '4px',
@@ -129,7 +127,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 						overflow: 'auto',
 
 						border: '1px solid',
-						borderColor: 'primary.700',
 					}}
 					items={(profilesManager.profiles ?? []).map((profile) => ({
 						id: profile.id,
