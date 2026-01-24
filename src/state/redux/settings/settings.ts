@@ -1,4 +1,4 @@
-import { accentColorsMap } from '@features/ThemeProvider';
+import { accentColorsMap } from '@features/accentColorsMap';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
