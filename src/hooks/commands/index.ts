@@ -93,6 +93,11 @@ export enum GLOBAL_COMMANDS {
 	 * Lock the currently active user profile
 	 */
 	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
+
+	/**
+	 * Focus the search input field
+	 */
+	FOCUS_SEARCH = 'FOCUS_SEARCH',
 }
 
 type CommandsWithPayload = {
