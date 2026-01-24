@@ -13,18 +13,8 @@ import zenTheme from '@components/theme/color-schemes/zen';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectTheme } from '@state/redux/settings/settings';
 
+import { accentColorsMap } from './accentColorsMap';
 import { updateMonacoTheme } from './MonakoEditor/MonacoEditor';
-
-export const accentColorsMap: Record<string, string> = {
-	red: '#e0383e',
-	pink: '#f74f9e',
-	purple: '#953d96',
-	orange: '#f7821b',
-	yellow: '#ffc726',
-	blue: '#0088ff',
-	green: '#62ba46',
-	graphite: '#969696',
-};
 
 const getSystemColorScheme = () => {
 	const query = window.matchMedia('(prefers-color-scheme: dark)');

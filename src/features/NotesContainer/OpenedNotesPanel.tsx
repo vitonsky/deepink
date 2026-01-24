@@ -27,7 +27,6 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 	updateNotes,
 }) => {
 	const openNoteContextMenu = useNoteContextMenu({
-		closeNote: onClose,
 		updateNotes,
 	});
 
