@@ -37,7 +37,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 40,
+		overscan: 30,
 	});
 
 	const items = virtualizer.getVirtualItems();
