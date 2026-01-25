@@ -34,25 +34,11 @@ export const NotePreview = forwardRef<
 	const eventBus = useEventBus();
 
 	const [note, setNote] = useState<INote>();
-	const [isSkeletonVisible, setIsSkeletonVisible] = useState(false);
 	useEffect(() => {
-		let cancelled = false;
-		const timer = setTimeout(() => {
-			if (!cancelled) setIsSkeletonVisible(true);
-		}, 300);
-
 		noteRegister.getById(noteId).then((note) => {
-			if (cancelled) return;
-			if (note) setNote(note);
-
-			setIsSkeletonVisible(false);
-			clearTimeout(timer);
+			if (!note) return;
+			setNote(note);
 		});
-
-		return () => {
-			cancelled = true;
-			clearTimeout(timer);
-		};
 	}, [noteId, noteRegister]);
 
 	// Update preview when note content changes
@@ -75,17 +61,15 @@ export const NotePreview = forwardRef<
 		};
 	}, [noteId, eventBus, noteRegister]);
 
-	if (isSkeletonVisible)
+	if (!note)
 		return (
 			<Skeleton
 				startColor="primary.100"
 				endColor="dim.400"
-				height="90px"
+				height="70px"
 				w="100%"
 			/>
 		);
-
-	if (!note) return null;
 
 	const date = note.createdTimestamp ?? note.updatedTimestamp;
 	return (
