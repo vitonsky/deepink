@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
@@ -44,8 +44,10 @@ export const NotesList: FC<NotesListProps> = () => {
 	const items = virtualizer.getVirtualItems();
 
 	// Scroll to active note
+	// Preliminary scroll to render the active note in the DOM; may be inaccurate, corrected afterwards
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
-	useLayoutEffect(() => {
+	const correctiveScrollIndexRef = useRef<number | null>(null);
+	useEffect(() => {
 		if (!activeNoteId) return;
 
 		// Skip if active note is in viewport
@@ -57,37 +59,10 @@ export const NotesList: FC<NotesListProps> = () => {
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
-		// Because list items have dynamic heights, scrollToIndex may not always position the item correctly
-		// For fix it we wait for the DOM element to render and then scroll to it manually
-		let cancelled = false;
-		const waitForRender = () => {
-			if (cancelled) return;
-
-			const item = virtualizer.getVirtualItems().find((i) => i.index === noteIndex);
-			if (item) {
-				const activeNode =
-					activeNoteRef.current ??
-					parentRef.current?.querySelector<HTMLElement>(
-						`[data-index="${noteIndex}"]`,
-					);
-
-				if (activeNode) {
-					activeNode.scrollIntoView({ block: 'center', behavior: 'auto' });
-				} else {
-					virtualizer.scrollToOffset(item.start);
-				}
-			} else {
-				requestAnimationFrame(waitForRender);
-			}
-		};
-
-		const requestAnimationId = requestAnimationFrame(waitForRender);
-		return () => {
-			cancelled = true;
-			cancelAnimationFrame(requestAnimationId);
-		};
+		correctiveScrollIndexRef.current = noteIndex;
 	}, [activeNoteId, notes, virtualizer]);
 
+	// Reset scroll bar after view change
 	const notesView = useWorkspaceSelector(selectNotesView);
 	useEffect(() => {
 		if (!activeNoteId) {
@@ -148,10 +123,35 @@ export const NotesList: FC<NotesListProps> = () => {
 								<NotePreview
 									key={noteId}
 									ref={(node) => {
-										if (isActive) {
-											activeNoteRef.current = node;
-										}
+										if (!node) return;
 										virtualizer.measureElement(node);
+
+										if (!isActive) return;
+										activeNoteRef.current = node;
+
+										if (!parentRef.current) return;
+										const parentRect =
+											parentRef.current.getBoundingClientRect();
+										const activeNoteRect =
+											node.getBoundingClientRect();
+
+										// Corrective scroll to active node
+										if (
+											correctiveScrollIndexRef.current ===
+											virtualRow.index
+										) {
+											correctiveScrollIndexRef.current = null;
+
+											const offset =
+												parentRef.current.scrollTop +
+												(activeNoteRect.top - parentRect.top) -
+												parentRef.current.clientHeight / 2 +
+												activeNoteRect.height / 2;
+
+											parentRef.current.scrollTo({
+												top: offset,
+											});
+										}
 									}}
 									noteId={noteId}
 									data-index={virtualRow.index}
