@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, memo, useEffect, useState } from 'react';
 import { WorkspaceEvents } from '@api/events/workspace';
 import {
 	Box,
@@ -17,101 +17,105 @@ import { useNoteActions } from '@hooks/notes/useNoteActions';
 
 import { TextSample } from './TextSample';
 
-export const NotePreview = forwardRef<
-	HTMLDivElement,
-	{
-		isSelected?: boolean;
-		textToHighlight?: string;
-		noteId: NoteId;
-	} & StackProps
->(({ textToHighlight, noteId, isSelected, ...props }, ref) => {
-	const telemetry = useTelemetryTracker();
-	const noteActions = useNoteActions();
+export const NotePreview = memo(
+	forwardRef<
+		HTMLDivElement,
+		{
+			isSelected?: boolean;
+			textToHighlight?: string;
+			noteId: NoteId;
+		} & StackProps
+	>(({ textToHighlight, noteId, isSelected, ...props }, ref) => {
+		const telemetry = useTelemetryTracker();
+		const noteActions = useNoteActions();
 
-	const styles = useMultiStyleConfig('NotePreview');
+		const styles = useMultiStyleConfig('NotePreview');
 
-	const noteRegister = useNotesRegistry();
-	const eventBus = useEventBus();
+		const noteRegister = useNotesRegistry();
+		const eventBus = useEventBus();
 
-	const [note, setNote] = useState<INote>();
-	useEffect(() => {
-		noteRegister.getById(noteId).then((note) => {
-			if (!note) return;
-			setNote(note);
-		});
-	}, [noteId, noteRegister]);
-
-	// Update preview when note content changes
-	useEffect(() => {
-		const update = (updatedNoteId: NoteId) => {
-			if (updatedNoteId !== noteId) return;
-
+		const [note, setNote] = useState<INote>();
+		useEffect(() => {
 			noteRegister.getById(noteId).then((note) => {
 				if (!note) return;
 				setNote(note);
 			});
-		};
+		}, [noteId, noteRegister]);
 
-		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, update);
-		const cleanupEdited = eventBus.listen(WorkspaceEvents.NOTE_EDITED, update);
+		// Update preview when note content changes
+		useEffect(() => {
+			const update = (updatedNoteId: NoteId) => {
+				if (updatedNoteId !== noteId) return;
 
-		return () => {
-			cleanupUpdated();
-			cleanupEdited();
-		};
-	}, [noteId, eventBus, noteRegister]);
-
-	if (!note)
-		return (
-			<Skeleton
-				startColor="primary.100"
-				endColor="dim.400"
-				height="70px"
-				w="100%"
-			/>
-		);
-
-	const date = note.createdTimestamp ?? note.updatedTimestamp;
-	return (
-		<VStack
-			ref={ref}
-			aria-selected={isSelected}
-			{...props}
-			sx={{
-				...styles.root,
-				...props.sx,
-			}}
-			onClick={() => {
-				noteActions.openNote(note);
-				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_OPENED, {
-					context: 'notes list',
+				noteRegister.getById(noteId).then((note) => {
+					if (!note) return;
+					setNote(note);
 				});
-			}}
-		>
-			<VStack sx={styles.body}>
-				<Text as="h3" sx={styles.title}>
-					<TextSample
-						text={getNoteTitle(note.content)}
-						highlightText={textToHighlight}
-						lengthLimit={30}
-					/>
-				</Text>
+			};
 
-				{note.content.text.length > 0 ? (
-					<Text sx={styles.text}>
+			const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, update);
+			const cleanupEdited = eventBus.listen(WorkspaceEvents.NOTE_EDITED, update);
+
+			return () => {
+				cleanupUpdated();
+				cleanupEdited();
+			};
+		}, [noteId, eventBus, noteRegister]);
+
+		if (!note)
+			return (
+				<Skeleton
+					startColor="primary.100"
+					endColor="dim.400"
+					height="70px"
+					w="100%"
+				/>
+			);
+
+		const date = note.createdTimestamp ?? note.updatedTimestamp;
+		return (
+			<VStack
+				ref={ref}
+				aria-selected={isSelected}
+				{...props}
+				sx={{
+					...styles.root,
+					...props.sx,
+				}}
+				onClick={() => {
+					noteActions.openNote(note);
+					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_OPENED, {
+						context: 'notes list',
+					});
+				}}
+			>
+				<VStack sx={styles.body}>
+					<Text as="h3" sx={styles.title}>
 						<TextSample
-							text={note.content.text}
+							text={getNoteTitle(note.content)}
 							highlightText={textToHighlight}
-							lengthLimit={150}
+							lengthLimit={30}
 						/>
 					</Text>
-				) : undefined}
+
+					{note.content.text.length > 0 ? (
+						<Text sx={styles.text}>
+							<TextSample
+								text={note.content.text}
+								highlightText={textToHighlight}
+								lengthLimit={150}
+							/>
+						</Text>
+					) : undefined}
+				</VStack>
+				{date && (
+					<Box sx={styles.meta}>
+						{<Text>{new Date(date).toDateString()}</Text>}
+					</Box>
+				)}
 			</VStack>
-			{date && (
-				<Box sx={styles.meta}>{<Text>{new Date(date).toDateString()}</Text>}</Box>
-			)}
-		</VStack>
-	);
-});
+		);
+	}),
+);
 
 NotePreview.displayName = 'NotePreview';
