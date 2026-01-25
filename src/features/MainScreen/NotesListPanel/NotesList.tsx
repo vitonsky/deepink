@@ -50,13 +50,21 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (!activeNoteId) return;
 
 		// Skip if active note is in viewport
-		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
+		if (
+			activeNoteRef.current !== null &&
+			isElementInViewport(activeNoteRef.current)
+		) {
 			return;
+		}
 
 		const noteIndex = notes.findIndex((id) => id === activeNoteId);
-		if (noteIndex === -1) return;
+		if (noteIndex === -1) {
+			console.log('not scroll');
+			return;
+		}
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
+		console.log('scroll');
 
 		correctiveScrollIndexRef.current = noteIndex;
 	}, [activeNoteId, notes, virtualizer]);
@@ -122,13 +130,12 @@ export const NotesList: FC<NotesListProps> = () => {
 								<NotePreview
 									key={noteId}
 									ref={(node) => {
-										if (!node) return;
 										virtualizer.measureElement(node);
 
 										if (!isActive) return;
 										activeNoteRef.current = node;
 
-										if (!parentRef.current) return;
+										if (!node || !parentRef.current) return;
 										const parentRect =
 											parentRef.current.getBoundingClientRect();
 										const activeNoteRect =
