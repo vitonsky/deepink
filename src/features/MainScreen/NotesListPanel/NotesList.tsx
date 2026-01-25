@@ -57,13 +57,9 @@ export const NotesList: FC<NotesListProps> = () => {
 		}
 
 		const noteIndex = notes.findIndex((id) => id === activeNoteId);
-		if (noteIndex === -1) {
-			console.log('not scroll');
-			return;
-		}
+		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-		console.log('scroll');
 
 		correctiveScrollIndexRef.current = noteIndex;
 	}, [activeNoteId, notes, virtualizer]);
