@@ -1,4 +1,4 @@
-import React, { FC, useLayoutEffect, useRef } from 'react';
+import React, { FC, useEffect, useLayoutEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
@@ -12,6 +12,7 @@ import {
 	selectNotes,
 	selectSearch,
 } from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
@@ -51,7 +52,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
 			return;
 
-		const noteIndex = notes.findIndex((note) => note === activeNoteId);
+		const noteIndex = notes.findIndex((id) => id === activeNoteId);
 		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
@@ -86,6 +87,19 @@ export const NotesList: FC<NotesListProps> = () => {
 			cancelAnimationFrame(requestAnimationId);
 		};
 	}, [activeNoteId, notes, virtualizer]);
+
+	const notesView = useWorkspaceSelector(selectNotesView);
+	useEffect(() => {
+		if (!activeNoteId) {
+			virtualizer.scrollToOffset(0);
+			return;
+		}
+
+		const noteIndex = notes.findIndex((id) => id === activeNoteId);
+		if (noteIndex === -1) {
+			virtualizer.scrollToOffset(0);
+		}
+	}, [notesView, notes, activeNoteId, virtualizer]);
 
 	// TODO: implement dragging and moving items
 	return (
