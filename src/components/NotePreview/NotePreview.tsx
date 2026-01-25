@@ -24,6 +24,7 @@ export const NotePreview = memo(
 			isSelected?: boolean;
 			textToHighlight?: string;
 			noteId: NoteId;
+			isScrolling?: boolean;
 		} & StackProps
 	>(({ textToHighlight, noteId, isSelected, ...props }, ref) => {
 		const telemetry = useTelemetryTracker();
@@ -36,10 +37,18 @@ export const NotePreview = memo(
 
 		const [note, setNote] = useState<INote>();
 		useEffect(() => {
-			noteRegister.getById(noteId).then((note) => {
-				if (!note) return;
-				setNote(note);
-			});
+			let isMounted = true;
+			const timer = setTimeout(async () => {
+				const fetchedNote = await noteRegister.getById(noteId);
+				if (isMounted && fetchedNote) {
+					setNote(fetchedNote);
+				}
+			}, 100);
+
+			return () => {
+				isMounted = false;
+				clearTimeout(timer);
+			};
 		}, [noteId, noteRegister]);
 
 		// Update preview when note content changes
