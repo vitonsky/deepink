@@ -37,10 +37,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 30,
+		overscan: 25,
 	});
-
-	const items = virtualizer.getVirtualItems();
 
 	// Scroll to active note
 	// Preliminary scroll to render the active note in the DOM; may be inaccurate, corrected afterwards
@@ -82,6 +80,8 @@ export const NotesList: FC<NotesListProps> = () => {
 			virtualizer.scrollToOffset(0);
 		}
 	}, [notesView, notes, activeNoteId, virtualizer]);
+
+	const items = virtualizer.getVirtualItems();
 
 	// TODO: implement dragging and moving items
 	return (
