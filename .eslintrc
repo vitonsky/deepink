@@ -163,7 +163,8 @@
 					"whitespace",
 					"Tsconfig",
 					"readdir",
-					"workspaces"
+					"workspaces",
+					"Rect"
 				],
 				// Check if word contains numbers
 				"skipIfMatch": [

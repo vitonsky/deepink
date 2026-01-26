@@ -36,7 +36,7 @@ export const selectNote = (noteId: string | null) =>
 
 		const { notes } = workspace;
 
-		return notes.find((note) => note.id === noteId) ?? null;
+		return notes.find((id) => id === noteId) ?? null;
 	});
 
 export const selectActiveNoteId = createWorkspaceSelector(
@@ -65,9 +65,9 @@ export const selectActiveNote = createWorkspaceSelector(
 		const { activeNote } = workspace;
 		if (!activeNote) return null;
 
-		const { notes } = workspace;
+		const { openedNotes } = workspace;
 
-		return notes.find((note) => note.id === activeNote) ?? null;
+		return openedNotes.find((note) => note.id === activeNote) ?? null;
 	},
 );
 

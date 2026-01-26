@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
-import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useNoteContextMenu } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -13,10 +13,9 @@ import {
 	selectNotes,
 	selectSearch,
 } from '@state/redux/profiles/profiles';
+import { selectNotesView } from '@state/redux/profiles/selectors/view';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
-
-import { useNoteContextMenu } from '../../NotesContainer/NoteContextMenu/useNoteContextMenu';
 
 export type NotesListProps = {};
 
@@ -43,13 +42,13 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 5,
+		overscan: 20,
 	});
 
-	const items = virtualizer.getVirtualItems();
-
 	// Scroll to active note
+	// Preliminary scroll to render the active note in the DOM; may be inaccurate, corrected afterwards
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
+	const correctiveScrollIndexRef = useRef<number | null>(null);
 	useEffect(() => {
 		if (!activeNoteId) return;
 
@@ -57,14 +56,59 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
 			return;
 
-		const noteIndex = notes.findIndex((note) => note.id === activeNoteId);
+		const noteIndex = notes.findIndex((id) => id === activeNoteId);
 		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
-		// We only need scroll to active note once by its change
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [activeNoteId]);
+		correctiveScrollIndexRef.current = noteIndex;
+	}, [activeNoteId, notes, virtualizer]);
+
+	// Reset scroll bar after view change
+	const notesView = useWorkspaceSelector(selectNotesView);
+	useEffect(() => {
+		if (!activeNoteId) {
+			virtualizer.scrollToOffset(0);
+			return;
+		}
+
+		const noteIndex = notes.findIndex((id) => id === activeNoteId);
+		if (noteIndex === -1) {
+			virtualizer.scrollToOffset(0);
+		}
+	}, [notesView, notes, activeNoteId, virtualizer]);
+
+	// Measure a virtualized item and scrolls to the active note when needed
+	const handleActiveNoteRef = useCallback(
+		(virtualIndex: number, isActive: boolean) => (node: HTMLDivElement | null) => {
+			virtualizer.measureElement(node);
+
+			if (!isActive) return;
+			activeNoteRef.current = node;
+
+			if (!node || !parentRef.current) return;
+			const parentRect = parentRef.current.getBoundingClientRect();
+			const activeNoteRect = node.getBoundingClientRect();
+
+			// Corrective scroll to active node
+			if (correctiveScrollIndexRef.current === virtualIndex) {
+				correctiveScrollIndexRef.current = null;
+
+				const offset =
+					parentRef.current.scrollTop +
+					(activeNoteRect.top - parentRect.top) -
+					parentRef.current.clientHeight / 2 +
+					activeNoteRect.height / 2;
+
+				parentRef.current.scrollTo({
+					top: offset,
+				});
+			}
+		},
+		[virtualizer],
+	);
+
+	const items = virtualizer.getVirtualItems();
 
 	// TODO: implement dragging and moving items
 	return (
@@ -102,42 +146,29 @@ export const NotesList: FC<NotesListProps> = () => {
 							gap: '4px',
 						}}
 					>
-						{virtualizer.getVirtualItems().map((virtualRow) => {
-							const note = notes[virtualRow.index];
+						{items.map((virtualRow) => {
+							const noteId = notes[virtualRow.index];
 
-							const date = note.createdTimestamp ?? note.updatedTimestamp;
-							const isActive = note.id === activeNoteId;
+							const isActive = noteId === activeNoteId;
 
 							// TODO: get preview text from DB as prepared value
 							// TODO: show attachments
 							return (
 								<NotePreview
-									key={note.id}
-									ref={(node) => {
-										if (isActive) {
-											activeNoteRef.current = node;
-										}
-
-										virtualizer.measureElement(node);
-									}}
+									key={noteId}
+									ref={handleActiveNoteRef(virtualRow.index, isActive)}
+									noteId={noteId}
 									data-index={virtualRow.index}
 									isSelected={isActive}
 									textToHighlight={search}
-									title={getNoteTitle(note.content)}
-									text={note.content.text}
-									meta={
-										date && (
-											<Text>{new Date(date).toDateString()}</Text>
-										)
-									}
 									onContextMenu={(evt) => {
-										openNoteContextMenu(note, {
+										openNoteContextMenu(noteId, {
 											x: evt.pageX,
 											y: evt.pageY,
 										});
 									}}
 									onClick={() => {
-										noteActions.click(note.id);
+										noteActions.click(noteId);
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.NOTE_OPENED,
 											{
