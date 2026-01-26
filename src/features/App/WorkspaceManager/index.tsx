@@ -1,5 +1,6 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
+import { useDebouncedCallback } from 'use-debounce';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -8,7 +9,6 @@ import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
-import { useShowForMinimumTime } from '@hooks/useShowForMinimumTime';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -84,10 +84,23 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const isShowLoadingScreen = useShowForMinimumTime(isProfileLoading);
+	const [showLoadingScreen, setShowLoadingScreen] = useState(false);
+	const hideLoadingScreen = useDebouncedCallback(
+		() => setShowLoadingScreen(false),
+		500,
+	);
+	useEffect(() => {
+		if (isProfileLoading) {
+			hideLoadingScreen.cancel();
+			setShowLoadingScreen(true);
+		} else {
+			hideLoadingScreen();
+		}
+	}, [isProfileLoading, hideLoadingScreen]);
+
 	const content = useMemo(() => {
 		// show a loading screen while the profile is opening
-		if (isShowLoadingScreen === true) return <SplashScreen />;
+		if (showLoadingScreen) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
 		if (screenName === PROFILE_SCREEN.CREATE || hasNoProfiles) {
@@ -198,7 +211,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		screenName,
 		telemetry,
 		command,
-		isShowLoadingScreen,
+		showLoadingScreen,
 	]);
 
 	return (

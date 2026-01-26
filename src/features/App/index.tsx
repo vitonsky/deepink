@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
-import { useShowForMinimumTime } from '@hooks/useShowForMinimumTime';
 
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
@@ -85,8 +85,19 @@ export const App: FC = () => {
 	});
 
 	const isLoading = Object.values(loadingState).some(Boolean);
-	const isShow = useShowForMinimumTime(isLoading);
-	if (isShow) {
+
+	const [showSplashScreen, setShowSplashScreen] = useState(false);
+	const hideSplashScreen = useDebouncedCallback(() => setShowSplashScreen(false), 500);
+	useEffect(() => {
+		if (isLoading) {
+			hideSplashScreen.cancel();
+			setShowSplashScreen(true);
+		} else {
+			hideSplashScreen();
+		}
+	}, [isLoading, hideSplashScreen]);
+
+	if (showSplashScreen) {
 		return <SplashScreen />;
 	}
 
