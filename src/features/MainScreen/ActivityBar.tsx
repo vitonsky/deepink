@@ -106,7 +106,7 @@ export const ActivityBar = () => {
 						onClick={() => {
 							command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE);
 							command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-								screen: PROFILE_SCREEN.LOCK,
+								screen: PROFILE_SCREEN.LOGIN,
 							});
 						}}
 					/>
