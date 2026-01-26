@@ -35,7 +35,7 @@ export const selectNote = (noteId: string | null) =>
 
 		const { notes } = workspace;
 
-		return notes.find((note) => note === noteId) ?? null;
+		return notes.find((id) => id === noteId) ?? null;
 	});
 
 export const selectActiveNoteId = createWorkspaceSelector(
