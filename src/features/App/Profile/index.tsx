@@ -5,6 +5,7 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
+import { useCommand } from '@hooks/commands/useCommand';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -17,6 +18,7 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
+import { PROFILE_SCREEN } from '../WorkspaceManager';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { SQLConsole } from './SQLConsole/SQLConsole';
 import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
@@ -105,9 +107,19 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	useShortcutsBinding();
 
-	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close, {
-		enabled: controls.profile.profile.isEncrypted,
-	});
+	const command = useCommand();
+	useCommandCallback(
+		GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE,
+		() => {
+			command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
+				screen: PROFILE_SCREEN.LOGIN,
+			});
+			controls.close();
+		},
+		{
+			enabled: controls.profile.profile.isEncrypted,
+		},
+	);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
