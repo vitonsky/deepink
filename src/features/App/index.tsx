@@ -14,13 +14,7 @@ import { useAppUpdater } from './useAppUpdater';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { WorkspaceManager } from './WorkspaceManager';
-
-export enum PROFILE_SCREEN {
-	LOGIN = 'profileLoginScreen',
-	PROFILES_LIST = 'profilesListScreen',
-	CREATION = 'profileCreationScreen',
-}
+import { PROFILE_SCREEN, WorkspaceManager } from './WorkspaceManager';
 
 export const App: FC = () => {
 	useAppUpdater();

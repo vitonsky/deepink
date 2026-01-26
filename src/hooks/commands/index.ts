@@ -1,4 +1,4 @@
-import { PROFILE_SCREEN } from '@features/App';
+import { PROFILE_SCREEN } from '@features/App/WorkspaceManager';
 
 export enum GLOBAL_COMMANDS {
 	/**

@@ -15,7 +15,12 @@ import { ProfilesListApi } from '../useProfilesList';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 import { ProfilesForm } from './ProfilesForm';
-import { PROFILE_SCREEN } from '..';
+
+export enum PROFILE_SCREEN {
+	LOGIN = 'profileLoginScreen',
+	PROFILES_LIST = 'profilesListScreen',
+	CREATION = 'profileCreationScreen',
+}
 
 type PickProfileResponse = {
 	status: 'ok' | 'error';
@@ -123,7 +128,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			);
 		}
 
-		if (screenName !== PROFILE_SCREEN.PROFILES_LIST && currentProfileObject) {
+		if (currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
