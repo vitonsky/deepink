@@ -3,6 +3,8 @@ import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { SplashScreen } from '@features/SplashScreen';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShowForMinimumTime } from '@hooks/useShowForMinimumTime';
 
 import { AppServices } from './AppServices';
@@ -12,6 +14,12 @@ import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
+
+export enum PROFILE_SCREEN {
+	LOCK = 'lockProfileScreen',
+	CHANGE = 'changeProfileScreen',
+	CREATE = 'createProfileScreen',
+}
 
 export const App: FC = () => {
 	const [config] = useState(
@@ -71,11 +79,14 @@ export const App: FC = () => {
 		}
 	}, [profileContainers.profiles.length]);
 
-	const isLoadingState = Object.values(loadingState).some(Boolean);
+	const [profileScreen, setProfileScreen] = useState<PROFILE_SCREEN | null>(null);
+	useCommandCallback(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, ({ screen }) => {
+		setProfileScreen(screen);
+	});
 
-	// Prevent SplashScreen flickering if profiles load quickly
-	const isShowSplashScreen = useShowForMinimumTime({ isLoading: isLoadingState });
-	if (isShowSplashScreen) {
+	const isLoading = Object.values(loadingState).some(Boolean);
+	const isShow = useShowForMinimumTime(isLoading);
+	if (isShow) {
 		return <SplashScreen />;
 	}
 
@@ -86,6 +97,7 @@ export const App: FC = () => {
 				profilesManager={profilesList}
 				currentProfile={currentProfile}
 				onChooseProfile={setCurrentProfile}
+				screenName={profileScreen}
 			/>
 		);
 	}

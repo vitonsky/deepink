@@ -1,3 +1,5 @@
+import { PROFILE_SCREEN } from '@features/App';
+
 export enum GLOBAL_COMMANDS {
 	/**
 	 * Create and open a new note
