@@ -10,10 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
-import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useEventBus, useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
-import { useTelemetryTracker } from '@features/telemetry';
-import { useNoteActions } from '@hooks/notes/useNoteActions';
 
 import { TextSample } from './TextSample';
 
@@ -29,15 +26,14 @@ export const NotePreview = memo(
 	>(({ textToHighlight, noteId, isSelected, ...props }, ref) => {
 		const styles = useMultiStyleConfig('NotePreview');
 
-		const telemetry = useTelemetryTracker();
-		const noteActions = useNoteActions();
 		const noteRegister = useNotesRegistry();
 		const eventBus = useEventBus();
 
 		const [note, setNote] = useState<INote>();
 		useEffect(() => {
 			noteRegister.getById(noteId).then((note) => {
-				if (note) setNote(note);
+				if (!note) return;
+				setNote(note);
 			});
 		}, [noteId, noteRegister]);
 
@@ -80,12 +76,6 @@ export const NotePreview = memo(
 				sx={{
 					...styles.root,
 					...props.sx,
-				}}
-				onClick={() => {
-					noteActions.openNote(note);
-					telemetry.track(TELEMETRY_EVENT_NAME.NOTE_OPENED, {
-						context: 'notes list',
-					});
 				}}
 			>
 				<VStack sx={styles.body}>

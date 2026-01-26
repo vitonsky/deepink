@@ -1,7 +1,9 @@
 import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useNoteContextMenu } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
@@ -18,13 +20,16 @@ import { isElementInViewport } from '@utils/dom/isElementInViewport';
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
+	const telemetry = useTelemetryTracker();
+
+	const updateNotes = useUpdateNotes();
+	const noteActions = useNoteActions();
+
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
 
 	const search = useWorkspaceSelector(selectSearch);
 
-	const noteActions = useNoteActions();
-	const updateNotes = useUpdateNotes();
 	const openNoteContextMenu = useNoteContextMenu({
 		closeNote: noteActions.close,
 		updateNotes,
@@ -161,6 +166,15 @@ export const NotesList: FC<NotesListProps> = () => {
 											x: evt.pageX,
 											y: evt.pageY,
 										});
+									}}
+									onClick={() => {
+										noteActions.click(noteId);
+										telemetry.track(
+											TELEMETRY_EVENT_NAME.NOTE_OPENED,
+											{
+												context: 'notes list',
+											},
+										);
 									}}
 								/>
 							);
