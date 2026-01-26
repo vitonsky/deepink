@@ -103,7 +103,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		if (showLoadingScreen) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
-		if (screenName === PROFILE_SCREEN.CREATE || hasNoProfiles) {
+		if (screenName === PROFILE_SCREEN.CREATION || hasNoProfiles) {
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
@@ -115,7 +115,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 					}
 					onCancel={() =>
 						command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-							screen: PROFILE_SCREEN.CHANGE,
+							screen: PROFILE_SCREEN.PROFILES_LIST,
 						})
 					}
 					isFirstProfile={hasNoProfiles}
@@ -123,14 +123,14 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 			);
 		}
 
-		if (screenName !== PROFILE_SCREEN.CHANGE && currentProfileObject) {
+		if (screenName !== PROFILE_SCREEN.PROFILES_LIST && currentProfileObject) {
 			return (
 				<ProfileLoginForm
 					profile={currentProfileObject}
 					onLogin={onOpenProfile}
 					onPickAnotherProfile={() => {
 						command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-							screen: PROFILE_SCREEN.CHANGE,
+							screen: PROFILE_SCREEN.PROFILES_LIST,
 						});
 						onChooseProfile(null);
 					}}
@@ -149,7 +149,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							w="100%"
 							onClick={() =>
 								command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-									screen: PROFILE_SCREEN.CREATE,
+									screen: PROFILE_SCREEN.CREATION,
 								})
 							}
 						>
@@ -186,7 +186,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 										onOpenProfile(profile);
 									} else {
 										command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-											screen: PROFILE_SCREEN.LOCK,
+											screen: PROFILE_SCREEN.LOGIN,
 										});
 									}
 
