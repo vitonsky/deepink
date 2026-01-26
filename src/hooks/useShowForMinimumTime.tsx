@@ -1,37 +1,32 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Ensures a minimum visible time for loading states
+ * Guarantees a minimum visible duration for any loading state
  */
-export const useShowForMinimumTime = ({
-	isLoading,
-	minTime = 500,
-}: {
-	isLoading: boolean;
-	minTime?: number;
-}) => {
-	const startTimeRef = useRef<number | null>(null);
-	const [isVisible, setIsVisible] = useState<boolean>(false);
+export const useShowForMinimumTime = (isLoading: boolean, minTime = 500) => {
+	const loadingStartRef = useRef<number | null>(null);
+
+	const [isShow, setIsShow] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (isLoading) {
-			startTimeRef.current = Date.now();
-			setIsVisible(true);
+			loadingStartRef.current = Date.now();
+			setIsShow(true);
 			return;
 		}
 
-		if (!startTimeRef.current) return;
+		if (loadingStartRef.current === null) return;
 
-		const delta = Date.now() - startTimeRef.current;
-		const delay = Math.max(0, minTime - delta);
+		const elapsed = Date.now() - loadingStartRef.current;
+		const delay = Math.max(0, minTime - elapsed);
 
 		const timer = setTimeout(() => {
-			setIsVisible(false);
-			startTimeRef.current = null;
+			setIsShow(false);
+			loadingStartRef.current = null;
 		}, delay);
 
 		return () => clearTimeout(timer);
-	}, [isLoading, minTime]);
+	}, [isLoading]);
 
-	return isVisible;
+	return isShow;
 };
