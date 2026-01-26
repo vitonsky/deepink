@@ -87,10 +87,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 
 	const screenName = useAppSelector(selectProfileScreen);
 
-	const isShowLoadingScreen = useShowForMinimumTime(isProfileLoading);
+	const isShowLoadingScreen = useShowForMinimumTime({ isLoading: isProfileLoading });
 	const content = useMemo(() => {
 		// show a loading screen while the profile is opening
-		if (isShowLoadingScreen === true) return <SplashScreen />;
+		if (isShowLoadingScreen) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
 		if (screenName === PROFILE_SCREEN.CREATE || hasNoProfiles) {

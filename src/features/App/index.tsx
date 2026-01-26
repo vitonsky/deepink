@@ -71,8 +71,10 @@ export const App: FC = () => {
 		}
 	}, [profileContainers.profiles.length]);
 
-	const isLoading = Object.values(loadingState).some(Boolean);
-	const isShowSplashScreen = useShowForMinimumTime(isLoading);
+	const isLoadingState = Object.values(loadingState).some(Boolean);
+
+	// Prevent SplashScreen flickering if profiles load quickly
+	const isShowSplashScreen = useShowForMinimumTime({ isLoading: isLoadingState });
 	if (isShowSplashScreen) {
 		return <SplashScreen />;
 	}
