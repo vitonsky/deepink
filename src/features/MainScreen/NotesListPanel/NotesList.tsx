@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
@@ -38,7 +38,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 25,
+		overscan: 20,
 	});
 
 	// Scroll to active note
@@ -49,12 +49,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (!activeNoteId) return;
 
 		// Skip if active note is in viewport
-		if (
-			activeNoteRef.current !== null &&
-			isElementInViewport(activeNoteRef.current)
-		) {
+		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
 			return;
-		}
 
 		const noteIndex = notes.findIndex((id) => id === activeNoteId);
 		if (noteIndex === -1) return;
@@ -78,7 +74,46 @@ export const NotesList: FC<NotesListProps> = () => {
 		}
 	}, [notesView, notes, activeNoteId, virtualizer]);
 
-	const items = virtualizer.getVirtualItems();
+	// Measure a virtualized item and scrolls to the active note when needed
+	const handleActiveNoteRef = useCallback(
+		(virtualIndex: number, isActive: boolean) => (node: HTMLDivElement | null) => {
+			virtualizer.measureElement(node);
+
+			if (!isActive) return;
+			activeNoteRef.current = node;
+
+			if (!node || !parentRef.current) return;
+			const parentRect = parentRef.current.getBoundingClientRect();
+			const activeNoteRect = node.getBoundingClientRect();
+
+			// Corrective scroll to active node
+			if (correctiveScrollIndexRef.current === virtualIndex) {
+				correctiveScrollIndexRef.current = null;
+
+				const offset =
+					parentRef.current.scrollTop +
+					(activeNoteRect.top - parentRect.top) -
+					parentRef.current.clientHeight / 2 +
+					activeNoteRect.height / 2;
+
+				parentRef.current.scrollTo({
+					top: offset,
+				});
+			}
+		},
+		[virtualizer],
+	);
+
+	// The items array updates too often, which triggers many rerenders, to prevent this we memoize based on item index
+	const items = useMemo(
+		() => virtualizer.getVirtualItems(),
+		[
+			virtualizer
+				.getVirtualItems()
+				.map((i) => i.index)
+				.join(','),
+		],
+	);
 
 	// TODO: implement dragging and moving items
 	return (
@@ -126,36 +161,7 @@ export const NotesList: FC<NotesListProps> = () => {
 							return (
 								<NotePreview
 									key={noteId}
-									ref={(node) => {
-										virtualizer.measureElement(node);
-
-										if (!isActive) return;
-										activeNoteRef.current = node;
-
-										if (!node || !parentRef.current) return;
-										const parentRect =
-											parentRef.current.getBoundingClientRect();
-										const activeNoteRect =
-											node.getBoundingClientRect();
-
-										// Corrective scroll to active node
-										if (
-											correctiveScrollIndexRef.current ===
-											virtualRow.index
-										) {
-											correctiveScrollIndexRef.current = null;
-
-											const offset =
-												parentRef.current.scrollTop +
-												(activeNoteRect.top - parentRect.top) -
-												parentRef.current.clientHeight / 2 +
-												activeNoteRect.height / 2;
-
-											parentRef.current.scrollTo({
-												top: offset,
-											});
-										}
-									}}
+									ref={handleActiveNoteRef(virtualRow.index, isActive)}
 									noteId={noteId}
 									data-index={virtualRow.index}
 									isSelected={isActive}

@@ -27,28 +27,18 @@ export const NotePreview = memo(
 			isScrolling?: boolean;
 		} & StackProps
 	>(({ textToHighlight, noteId, isSelected, ...props }, ref) => {
-		const telemetry = useTelemetryTracker();
-		const noteActions = useNoteActions();
-
 		const styles = useMultiStyleConfig('NotePreview');
 
+		const telemetry = useTelemetryTracker();
+		const noteActions = useNoteActions();
 		const noteRegister = useNotesRegistry();
 		const eventBus = useEventBus();
 
 		const [note, setNote] = useState<INote>();
 		useEffect(() => {
-			let isMounted = true;
-			const timer = setTimeout(async () => {
-				const fetchedNote = await noteRegister.getById(noteId);
-				if (isMounted && fetchedNote) {
-					setNote(fetchedNote);
-				}
-			}, 100);
-
-			return () => {
-				isMounted = false;
-				clearTimeout(timer);
-			};
+			noteRegister.getById(noteId).then((note) => {
+				if (note) setNote(note);
+			});
 		}, [noteId, noteRegister]);
 
 		// Update preview when note content changes
