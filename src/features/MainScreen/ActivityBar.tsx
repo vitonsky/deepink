@@ -7,7 +7,6 @@ import { useDebouncedCallback } from 'use-debounce';
 import { ButtonGroup, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { PROFILE_SCREEN } from '@features/App';
 import { useProfileControls } from '@features/App/Profile';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
@@ -105,9 +104,6 @@ export const ActivityBar = () => {
 						data-no-animation
 						onClick={() => {
 							command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE);
-							command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-								screen: PROFILE_SCREEN.LOGIN,
-							});
 						}}
 					/>
 				)}
