@@ -24,7 +24,7 @@ export const WorkspaceStatusBarItems = () => {
 				onClick: () => {
 					profileControls.close();
 					command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-						screen: PROFILE_SCREEN.CHANGE,
+						screen: PROFILE_SCREEN.PROFILES_LIST,
 					});
 				},
 				icon: <FaUserLarge />,

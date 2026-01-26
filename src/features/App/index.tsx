@@ -16,9 +16,9 @@ import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
 
 export enum PROFILE_SCREEN {
-	LOCK = 'lockProfileScreen',
-	CHANGE = 'changeProfileScreen',
-	CREATE = 'createProfileScreen',
+	LOGIN = 'profileLoginScreen',
+	PROFILES_LIST = 'profilesListScreen',
+	CREATION = 'profileCreationScreen',
 }
 
 export const App: FC = () => {
