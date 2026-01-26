@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
@@ -104,16 +104,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		[virtualizer],
 	);
 
-	// The items array updates too often, which triggers many rerenders, to prevent this we memoize based on item index
-	const items = useMemo(
-		() => virtualizer.getVirtualItems(),
-		[
-			virtualizer
-				.getVirtualItems()
-				.map((i) => i.index)
-				.join(','),
-		],
-	);
+	const items = virtualizer.getVirtualItems();
 
 	// TODO: implement dragging and moving items
 	return (
