@@ -79,10 +79,6 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const items = virtualizer.getVirtualItems();
 
-	useEffect(() => {
-		// console.log(items.length);
-	}, [items]);
-
 	// TODO: implement dragging and moving items
 	return (
 		<VStack
@@ -107,7 +103,6 @@ export const NotesList: FC<NotesListProps> = () => {
 						width: '100%',
 						height: virtualizer.getTotalSize(),
 						flexShrink: 0,
-						minHeight: '100%',
 					}}
 				>
 					<VStack
