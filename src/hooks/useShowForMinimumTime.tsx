@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Guarantees a minimum visible duration for any loading state
+ * Ensures a minimum visible time for loading states
  */
 export const useShowForMinimumTime = ({
 	isLoading,
