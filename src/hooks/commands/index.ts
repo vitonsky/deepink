@@ -37,7 +37,7 @@ export enum GLOBAL_COMMANDS {
 	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
 
 	/**
-	 * Open screen for managing profiles: create, change profiles, etc.
+	 * Opens the screen for profile management: creating, switching, and logging into profiles
 	 */
 	OPEN_PROFILE_SCREEN = 'OPEN_PROFILE_SCREEN',
 }
