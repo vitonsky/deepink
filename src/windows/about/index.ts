@@ -1,10 +1,10 @@
 import { BaseWindow, BrowserWindow } from 'electron';
 import path from 'path';
 import url from 'url';
-import { enableConfirm } from '@electron/requests/electronPatches/main';
+import { enableElectronPatches } from '@electron/requests/electronPatches/main';
 
 export const openAboutWindow = async (parent?: BaseWindow) => {
-	enableConfirm();
+	enableElectronPatches();
 
 	const win = new BrowserWindow({
 		width: 600,
