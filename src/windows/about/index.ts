@@ -1,8 +1,11 @@
 import { BaseWindow, BrowserWindow } from 'electron';
 import path from 'path';
 import url from 'url';
+import { enableConfirm } from '@electron/requests/electronPatches/main';
 
 export const openAboutWindow = async (parent?: BaseWindow) => {
+	enableConfirm();
+
 	const win = new BrowserWindow({
 		width: 600,
 		height: 700,
