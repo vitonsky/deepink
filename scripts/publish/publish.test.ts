@@ -28,8 +28,7 @@ beforeEach(async () => {
 
 	// doMock is not hoisted, so it can capture the spies above
 	vi.doMock('@octokit/rest', () => {
-		Octokit = vi.fn().mockImplementation((opts: Record<string, unknown>) => {
-			(Octokit as any).__lastOptions = opts;
+		Octokit = vi.fn(function () {
 			return {
 				repos: {
 					createRelease,

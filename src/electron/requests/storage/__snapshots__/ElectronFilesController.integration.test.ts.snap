@@ -26,7 +26,7 @@ exports[`Write files > FS structure after writing 1`] = `
   "/home/userData/appDir/profileDir/foo/bar",
   "/home/userData/appDir/profileDir/foo/bar/baz",
   "/home/userData/appDir/profileDir/foo",
-  "home",
+  "/home",
   "/home/userData/appDir/profileDir",
   "/home/userData/appDir/profileDir/test.txt",
   "/home/userData/appDir/profileDir/foo/bar/baz/test.txt",
