@@ -3,6 +3,7 @@ import { Box, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -131,10 +132,10 @@ export const NotesList: FC<NotesListProps> = () => {
 										)
 									}
 									onContextMenu={(evt) => {
-										openNoteContextMenu(note, {
-											x: evt.screenX,
-											y: evt.screenY,
-										});
+										openNoteContextMenu(
+											note,
+											getContextMenuCoords(evt.nativeEvent),
+										);
 									}}
 									onClick={() => {
 										noteActions.click(note.id);

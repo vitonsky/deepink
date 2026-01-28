@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronUp, FaHashtag } from 'react-icons/fa6';
 import { Button, HStack, Text } from '@chakra-ui/react';
 import { ListItem, NestedList } from '@components/NestedList';
+import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
 
@@ -60,7 +61,7 @@ export const TagsList: FC<ITagsListProps> = ({
 						padding="0.4rem"
 						alignItems="center"
 						onContextMenu={(evt) => {
-							onTagMenu(id, { x: evt.screenX, y: evt.screenY });
+							onTagMenu(id, getContextMenuCoords(evt.nativeEvent));
 						}}
 					>
 						<FaHashtag size={14} />
