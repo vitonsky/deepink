@@ -7,7 +7,6 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
-import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
@@ -37,7 +36,6 @@ export type IWorkspacePickerProps = {
 	profilesManager: ProfilesListApi;
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
-	screenName: PROFILE_SCREEN | null;
 };
 
 /**
@@ -48,7 +46,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	profiles,
 	currentProfile,
 	onChooseProfile,
-	screenName,
 }) => {
 	const telemetry = useTelemetryTracker();
 	const command = useCommand();
@@ -103,6 +100,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		}
 	}, [isProfileLoading, hideLoadingScreen]);
 
+	const [screenName, setScreenName] = useState<PROFILE_SCREEN | null>(null);
+
 	const content = useMemo(() => {
 		// show a loading screen while the profile is opening
 		if (showLoadingScreen) return <SplashScreen />;
@@ -118,11 +117,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							);
 						})
 					}
-					onCancel={() =>
-						command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-							screen: PROFILE_SCREEN.PROFILES_LIST,
-						})
-					}
+					onCancel={() => setScreenName(PROFILE_SCREEN.PROFILES_LIST)}
 					isFirstProfile={hasNoProfiles}
 				/>
 			);
@@ -134,9 +129,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 					profile={currentProfileObject}
 					onLogin={onOpenProfile}
 					onPickAnotherProfile={() => {
-						command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-							screen: PROFILE_SCREEN.PROFILES_LIST,
-						});
+						setScreenName(PROFILE_SCREEN.PROFILES_LIST);
 						onChooseProfile(null);
 					}}
 				/>
@@ -152,11 +145,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							variant="accent"
 							size="lg"
 							w="100%"
-							onClick={() =>
-								command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-									screen: PROFILE_SCREEN.CREATION,
-								})
-							}
+							onClick={() => setScreenName(PROFILE_SCREEN.CREATION)}
 						>
 							Create new profile
 						</Button>
@@ -190,9 +179,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
 									} else {
-										command(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, {
-											screen: PROFILE_SCREEN.LOGIN,
-										});
+										setScreenName(PROFILE_SCREEN.LOGIN);
 									}
 
 									telemetry.track(
