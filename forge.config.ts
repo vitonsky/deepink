@@ -1,7 +1,6 @@
 /* eslint-disable @cspell/spellchecker */
 import type { MakerDebConfig } from '@electron-forge/maker-deb';
 import type { MakerDMGConfig } from '@electron-forge/maker-dmg';
-import type { MakerRpmConfig } from '@electron-forge/maker-rpm';
 import type { MakerWixConfig } from '@electron-forge/maker-wix';
 import type { MakerZIPConfig } from '@electron-forge/maker-zip';
 import type { ForgeConfig } from '@electron-forge/shared-types';
@@ -92,20 +91,6 @@ export default {
 					categories: ['Office', 'Science', 'Education'],
 				},
 			} satisfies MakerDebConfig,
-		},
-		{
-			name: '@electron-forge/maker-rpm',
-			config: {
-				options: {
-					productName: about.displayName,
-					productDescription: about.description,
-					genericName: about.description,
-					license: about.license,
-					homepage: about.homepage,
-					icon: 'assets/icons/app.png',
-					categories: ['Office', 'Science', 'Education'],
-				},
-			} satisfies MakerRpmConfig,
 		},
 	],
 	plugins: [
