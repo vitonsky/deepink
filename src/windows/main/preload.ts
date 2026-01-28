@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer, webFrame } from 'electron';
+import { confirm } from '@electron/requests/confirm/preload';
 import { initZoomFactor } from '@utils/os/zoom';
 
 initZoomFactor();
@@ -12,8 +13,6 @@ contextBridge.exposeInMainWorld('electron', {
 		getZoomFactor: () => webFrame.getZoomFactor(),
 		setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),
 	},
-});
 
-contextBridge.exposeInMainWorld('electronAPI', {
-	confirm: (message?: string) => ipcRenderer.sendSync('show-confirm', message),
+	confirm,
 });
