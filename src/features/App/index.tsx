@@ -4,8 +4,6 @@ import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { SplashScreen } from '@features/SplashScreen';
-import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
@@ -14,7 +12,7 @@ import { useAppUpdater } from './useAppUpdater';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { PROFILE_SCREEN, WorkspaceManager } from './WorkspaceManager';
+import { WorkspaceManager } from './WorkspaceManager';
 
 export const App: FC = () => {
 	useAppUpdater();
@@ -76,11 +74,6 @@ export const App: FC = () => {
 		}
 	}, [profileContainers.profiles.length]);
 
-	const [profileScreen, setProfileScreen] = useState<PROFILE_SCREEN | null>(null);
-	useCommandCallback(GLOBAL_COMMANDS.OPEN_PROFILE_SCREEN, ({ screen }) => {
-		setProfileScreen(screen);
-	});
-
 	const isLoading = Object.values(loadingState).some(Boolean);
 
 	const [showSplashScreen, setShowSplashScreen] = useState(false);
@@ -105,7 +98,6 @@ export const App: FC = () => {
 				profilesManager={profilesList}
 				currentProfile={currentProfile}
 				onChooseProfile={setCurrentProfile}
-				screenName={profileScreen}
 			/>
 		);
 	}

@@ -102,9 +102,7 @@ export const ActivityBar = () => {
 						title="Lock profile"
 						tooltipPlacement="right"
 						data-no-animation
-						onClick={() => {
-							command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE);
-						}}
+						onClick={profileControls.close}
 					/>
 				)}
 				<IconButton
