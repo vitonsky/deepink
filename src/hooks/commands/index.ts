@@ -1,5 +1,3 @@
-import { PROFILE_SCREEN } from '@features/App/WorkspaceManager';
-
 export enum GLOBAL_COMMANDS {
 	/**
 	 * Create and open a new note
