@@ -3,6 +3,7 @@ import { FaXmark } from 'react-icons/fa6';
 import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
+import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
 
 import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
@@ -109,10 +110,10 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 								// Prevent text selection on macOS
 								evt.preventDefault();
 
-								openNoteContextMenu(note, {
-									x: evt.pageX,
-									y: evt.pageY,
-								});
+								openNoteContextMenu(
+									note,
+									getContextMenuCoords(evt.nativeEvent),
+								);
 							}}
 						>
 							<HStack gap=".5rem" w="100%" justifyContent="space-between">

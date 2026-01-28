@@ -9,3 +9,8 @@ export type ContextMenuRequestProps = {
 };
 
 export const { open: openContextMenu } = contextMenuChannel.client(ipcRendererFetcher);
+
+export const getContextMenuCoords = (event: MouseEvent) => ({
+	x: event.screenX,
+	y: event.screenY,
+});
