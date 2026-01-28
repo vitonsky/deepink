@@ -2,6 +2,7 @@
 import { globalIgnores } from 'eslint/config';
 import prettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
+import paths from 'eslint-plugin-paths';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
@@ -12,7 +13,8 @@ import tseslint from 'typescript-eslint';
 import cspellPlugin from '@cspell/eslint-plugin';
 import eslint from '@eslint/js';
 
-const readLinesInFile = (file) => readFileSync(file, { encoding: 'utf8' }).split('\n');
+const readLinesInFile = (file: string) =>
+	readFileSync(file, { encoding: 'utf8' }).split('\n');
 
 export default tseslint.config(
 	eslint.configs.recommended,
@@ -46,6 +48,7 @@ export default tseslint.config(
 			'unused-imports': unusedImports,
 			'simple-import-sort': simpleImportSort,
 			'@cspell': cspellPlugin,
+			paths,
 		},
 		settings: {
 			'import/resolver': {
@@ -56,6 +59,8 @@ export default tseslint.config(
 			},
 		},
 		rules: {
+			'paths/alias': 'error',
+
 			// Typos
 			'@cspell/spellchecker': [
 				'warn',
@@ -181,11 +186,7 @@ export default tseslint.config(
 			camelcase: [
 				'error',
 				{
-					allow: [
-						"^pg_",
-						"^UNSAFE_",
-						"^UNSTABLE_"
-					],
+					allow: ['^pg_', '^UNSAFE_', '^UNSTABLE_'],
 				},
 			],
 
@@ -220,8 +221,8 @@ export default tseslint.config(
 		],
 		settings: {
 			react: {
-				version: 'detect'
-			}
+				version: 'detect',
+			},
 		},
 		languageOptions: {
 			parserOptions: {
