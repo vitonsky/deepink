@@ -1,4 +1,4 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';

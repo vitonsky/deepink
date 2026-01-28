@@ -83,7 +83,7 @@ export const useInsertFiles = () => {
 							const paragraph = $createParagraphNode();
 							paragraph.append(node);
 							return paragraph;
-					  })
+						})
 					: fileNodes;
 
 				$insertAfter(selectedNode, nodes);

@@ -36,7 +36,7 @@ export const NoteVersions = ({
 		isDisabled: boolean;
 		onChange: (isDisabled: boolean) => void;
 	};
-	isReadOnly?: Boolean;
+	isReadOnly?: boolean;
 }) => {
 	const telemetry = useTelemetryTracker();
 	const noteHistory = useNotesHistory();

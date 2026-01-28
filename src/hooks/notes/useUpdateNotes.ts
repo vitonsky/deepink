@@ -50,7 +50,7 @@ export const useUpdateNotes = () => {
 			search: searchText
 				? {
 						text: searchText,
-				  }
+					}
 				: undefined,
 			meta: {
 				isDeleted: notesView === NOTES_VIEW.BIN,

@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import React, { memo } from 'react';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { AutoLinkNode, LinkNode } from '@lexical/link';

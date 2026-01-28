@@ -18,7 +18,8 @@ export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 
 		// Parse data in state file
 		const rawJson = await this.file.get();
-		if (!rawJson) return defaultValue;
+		if (!rawJson)
+			return defaultValue as void extends D ? z.TypeOf<T> | null : z.TypeOf<T>;
 
 		try {
 			const parseResult = this.scheme.safeParse(
@@ -29,7 +30,7 @@ export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 			if (options.onError) options.onError(error);
 		}
 
-		return defaultValue;
+		return defaultValue as void extends D ? z.TypeOf<T> | null : z.TypeOf<T>;
 	}
 
 	async set(value: z.TypeOf<T>): Promise<void> {

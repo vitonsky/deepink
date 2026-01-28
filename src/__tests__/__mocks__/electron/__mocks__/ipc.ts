@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { EventEmitter } from 'events';
 
 class MockIpcMain extends EventEmitter implements Electron.IpcMain {
-	private handlers = new Map<string, Function>();
+	private readonly handlers = new Map<string, Function>();
 
 	handle(channel: string, fn: Function) {
 		this.handlers.set(channel, fn);
@@ -46,12 +47,12 @@ class MockIpcMain extends EventEmitter implements Electron.IpcMain {
 // Define a type that checks if `sendTo` exists on `IpcRenderer`
 type SendToType = 'sendTo' extends keyof Electron.IpcRenderer
 	? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	  // @ts-ignore
-	  Electron.IpcRenderer['sendTo']
+		// @ts-ignore
+		Electron.IpcRenderer['sendTo']
 	: never;
 
 class MockIpcRenderer extends EventEmitter implements Electron.IpcRenderer {
-	constructor(private main: MockIpcMain) {
+	constructor(private readonly main: MockIpcMain) {
 		super();
 	}
 

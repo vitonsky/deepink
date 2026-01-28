@@ -23,8 +23,9 @@ const zoomScheme = z.object({
 		.string()
 		.trim()
 		.min(1, { message: 'Enter a number to set zoom' })
+		.transform((v) => Number(v))
 		.pipe(
-			z.coerce
+			z
 				.number()
 				.min(zoomLimits.min, `Zoom cannot be less than ${zoomLimits.min}%`)
 				.max(zoomLimits.max, `Zoom cannot be more than ${zoomLimits.max}%`)

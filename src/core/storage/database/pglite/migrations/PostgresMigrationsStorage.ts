@@ -5,9 +5,9 @@ import { PGliteWorker } from '@electric-sql/pglite/worker';
 /**
  * Custom storage that persists migration names
  */
-export class PostgresMigrationsStorage<C extends MigrationContext<any, any>>
-	implements MigrationStorage<C>
-{
+export class PostgresMigrationsStorage<
+	C extends MigrationContext<any, any>,
+> implements MigrationStorage<C> {
 	constructor(
 		private readonly db: PGliteWorker,
 		private readonly tableName = 'schema_migrations',

@@ -9,7 +9,7 @@ const workspaceType = z.object({
 });
 
 export class WorkspacesController {
-	private db;
+	private readonly db;
 	constructor(db: PGLiteDatabase) {
 		this.db = db;
 	}

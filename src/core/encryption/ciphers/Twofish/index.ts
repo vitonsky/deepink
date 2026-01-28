@@ -84,7 +84,7 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 		this.ctrCipher = new CTRCipherMode(this.encryptBuffer);
 	}
 
-	private encryptBuffer = async (buffer: ArrayBuffer) => {
+	private readonly encryptBuffer = async (buffer: ArrayBuffer) => {
 		return transformBuffer(new Uint8Array(buffer), (offset, input, output) => {
 			encrypt(input, offset, output, offset, this.key);
 		}).buffer;

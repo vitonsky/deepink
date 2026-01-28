@@ -21,9 +21,9 @@ export const $transformTextToCheckbox = (textNode: TextNode) => {
 	if (!textNode.isSimpleText()) return;
 
 	// Checkbox signature in list item
-	const checkboxSegmentInsideListMatch = textNode
-		.getTextContent()
-		.match(/^\[(x|\s)\]\s*/i);
+	const checkboxSegmentInsideListMatch = /^\[(x|\s)\]\s*/i.exec(
+		textNode.getTextContent(),
+	);
 	if (checkboxSegmentInsideListMatch) {
 		const listItemNode = textNode.getParent();
 
@@ -55,7 +55,7 @@ export const $transformTextToCheckbox = (textNode: TextNode) => {
 	}
 
 	// Checkbox at any place in text
-	const checkboxMatch = textNode.getTextContent().match(/^([\*\-])\s\[(x|\s)\]\s*/i);
+	const checkboxMatch = /^([*-])\s\[(x|\s)\]\s*/i.exec(textNode.getTextContent());
 	if (checkboxMatch) {
 		const parent = textNode.getParent();
 		if (!parent) return;
@@ -79,7 +79,7 @@ export const $transformTextToCheckbox = (textNode: TextNode) => {
 };
 
 export const $transformTextToHorizontalRule = (node: TextNode) => {
-	if (!/^(\*|\-|\_){3,}$/.test(node.getTextContent())) return;
+	if (!/^(\*|-|_){3,}$/.test(node.getTextContent())) return;
 
 	const parent = node.getParent();
 	if (!$isParagraphNode(parent)) return;

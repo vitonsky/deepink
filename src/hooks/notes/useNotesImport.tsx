@@ -54,7 +54,7 @@ export const useNotesImport = () => {
 				},
 				{
 					ignorePaths: ['/_resources'],
-					// eslint-disable-next-line spellcheck/spell-checker
+
 					noteExtensions: ['.md', '.mdx'],
 					convertPathToTag: 'always',
 					throttle: requestAnimationFrame,

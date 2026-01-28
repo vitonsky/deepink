@@ -2,9 +2,9 @@
 node_modules
 
 # artifacts
-/out
-/dist
-/build
+out
+dist
+build
 
 # files
 *.d.ts

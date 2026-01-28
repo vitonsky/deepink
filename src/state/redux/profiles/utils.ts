@@ -13,7 +13,7 @@ export const selectWorkspaceRoot = (workspace: WorkspaceData | null) => workspac
 export const findNearNote = (notes: INote[], noteId: NoteId) => {
 	const currentNoteIndex = notes.findIndex((note) => note.id === noteId);
 	if (currentNoteIndex === -1) {
-		return notes.length === 0 ? null : notes.at(-1) ?? null;
+		return notes.length === 0 ? null : (notes.at(-1) ?? null);
 	}
 
 	if (notes.length === 1) return null;

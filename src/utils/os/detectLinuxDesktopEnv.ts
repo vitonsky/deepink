@@ -1,4 +1,4 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 import { spawnSync } from 'child_process';
 
 export type DesktopEnv =
@@ -38,7 +38,9 @@ export function detectLinuxDesktopEnv(): DesktopEnv {
 		if (out.includes('cinnamon')) return 'cinnamon';
 		if (out.includes('mate-session')) return 'mate';
 		if (out.includes('lxqt-session')) return 'lxqt';
-	} catch {}
+	} catch (err) {
+		console.error(err);
+	}
 
 	return 'unknown';
 }

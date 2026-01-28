@@ -12,8 +12,8 @@ import { IFilesStorage } from '.';
  * Files manager for local database
  */
 export class FilesController {
-	private db;
-	private fileController;
+	private readonly db;
+	private readonly fileController;
 	private readonly workspace;
 	constructor(db: PGLiteDatabase, fileController: IFilesStorage, workspace: string) {
 		this.db = db;

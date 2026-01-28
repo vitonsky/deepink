@@ -20,7 +20,10 @@ export type VersionsSummary = {
 
 export class AppVersions {
 	private readonly stateFile;
-	constructor(private readonly currentVersion: string, file: IFileController) {
+	constructor(
+		private readonly currentVersion: string,
+		file: IFileController,
+	) {
 		this.stateFile = new StateFile(file, AppVersionScheme.array(), {
 			defaultValue: [],
 		});

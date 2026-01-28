@@ -15,10 +15,10 @@ export const formatNoteLink = (noteId: string) => `${AppUrlProtocols.note}://${n
 
 export const findLinksInText = (
 	text: string,
-): Array<{
+): {
 	index: number;
 	url: string;
-}> => {
+}[] => {
 	return Array.from(
 		text.matchAll(
 			new RegExp(
@@ -43,9 +43,10 @@ export const getAppResourceDataInUrl = (
 	type: keyof URLProtocolsMap;
 	id: string;
 } => {
-	const urlProtocols = Object.entries(AppUrlProtocols) as Array<
-		[keyof URLProtocolsMap, URLProtocolsMap[keyof URLProtocolsMap]]
-	>;
+	const urlProtocols = Object.entries(AppUrlProtocols) as [
+		keyof URLProtocolsMap,
+		URLProtocolsMap[keyof URLProtocolsMap],
+	][];
 
 	if (typeof url === 'string') {
 		const protocol = urlProtocols.find(([_, protocol]) =>

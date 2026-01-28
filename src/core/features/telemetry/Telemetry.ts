@@ -81,7 +81,7 @@ export class Telemetry implements TelemetryTracker {
 					name: event.name,
 					payload: event.props ?? {},
 				});
-			} catch (error) {
+			} catch (_error) {
 				newQueue.push(event);
 			}
 		}

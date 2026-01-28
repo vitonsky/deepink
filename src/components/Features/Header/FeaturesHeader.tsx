@@ -7,6 +7,7 @@ export interface FeaturesHeaderProps extends TextProps {
 
 export const FeaturesHeader: FC<FeaturesHeaderProps> = ({
 	children,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	view = 'section',
 	...rest
 }) => {

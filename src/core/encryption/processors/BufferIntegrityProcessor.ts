@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import crc32 from 'crc/calculators/crc32';
 
 import { joinBuffers } from '../utils/buffers';

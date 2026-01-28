@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { createEvent } from 'effector';
-import { Query } from 'nano-queries/core/Query';
+import { Query } from 'nano-queries';
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { DBTypes, qb } from '@utils/db/query-builder';
@@ -18,7 +18,10 @@ export enum TAG_ERROR_CODE {
 }
 
 export class TagControllerError extends Error {
-	constructor(message: string, public readonly code: TAG_ERROR_CODE) {
+	constructor(
+		message: string,
+		public readonly code: TAG_ERROR_CODE,
+	) {
 		super(message);
 		this.name = 'TagControllerError';
 	}

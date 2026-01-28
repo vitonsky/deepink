@@ -1,5 +1,5 @@
 import { createEvent, EventCallable } from 'effector';
-import { PGlite, PGliteOptions } from '@electric-sql/pglite';
+import { PGlite } from '@electric-sql/pglite';
 
 export type EventsMap = {
 	sync: void;
@@ -11,10 +11,6 @@ export class ExtendedPGLite extends PGlite {
 	} = {
 		sync: createEvent(),
 	};
-
-	constructor(options?: PGliteOptions) {
-		super(options);
-	}
 
 	syncToFs(): Promise<void> {
 		this.events.sync();

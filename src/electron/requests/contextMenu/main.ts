@@ -10,7 +10,7 @@ export const enableContextMenu = () =>
 			const targetWindow = BrowserWindow.fromWebContents(event.sender);
 			if (!targetWindow) return;
 
-			const { menu: menuTemplate, x = 0, y = 0 } = props ?? {};
+			const { menu: menuTemplate, x, y } = props ?? {};
 
 			// Handle click on menu
 			let onClick: (itemId: string | null) => void;
@@ -29,10 +29,10 @@ export const enableContextMenu = () =>
 										menuItem: Electron.MenuItem,
 										browserWindow: Electron.BaseWindow | undefined,
 										event: Electron.KeyboardEvent,
-								  ) => {
+									) => {
 										if (click) click(menuItem, browserWindow, event);
 										onClick(id);
-								  };
+									};
 
 						return { id, click: clickHandler, ...props };
 					},

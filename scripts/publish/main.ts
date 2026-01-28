@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-/* eslint-disable spellcheck/spell-checker */
+
 import 'dotenv/config';
 
 import fg from 'fast-glob';
@@ -158,7 +158,7 @@ export default async function (args: Args) {
 	console.log(`Found ${artifacts.length} artifact(s):`);
 	artifacts.forEach((a) => console.log(' -', a));
 
-	const release = await ensureRelease(octokit, owner!, repo!, args.tag);
+	const release = await ensureRelease(octokit, owner, repo, args.tag);
 	const releaseId = release.id;
 	console.log(`Using release: id=${releaseId} tag=${args.tag}`);
 

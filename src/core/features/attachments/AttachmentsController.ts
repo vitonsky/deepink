@@ -7,7 +7,7 @@ import { wrapDB } from '@utils/db/wrapDB';
  * attachments manager, to track attachments usage and to keep consistency
  */
 export class AttachmentsController {
-	private db;
+	private readonly db;
 	private readonly workspace;
 	constructor(db: PGLiteDatabase, workspace: string) {
 		this.db = db;

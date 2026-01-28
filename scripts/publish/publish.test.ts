@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 import { vol } from 'memfs';
 import path from 'path';
 
@@ -28,8 +28,7 @@ beforeEach(async () => {
 
 	// doMock is not hoisted, so it can capture the spies above
 	vi.doMock('@octokit/rest', () => {
-		Octokit = vi.fn().mockImplementation((opts: Record<string, unknown>) => {
-			(Octokit as any).__lastOptions = opts;
+		Octokit = vi.fn(function () {
 			return {
 				repos: {
 					createRelease,

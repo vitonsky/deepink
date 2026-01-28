@@ -230,7 +230,7 @@ export const profilesSlice = createSlice({
 			workspace.activeNote =
 				activeNote !== noteId
 					? activeNote
-					: findNearNote(openedNotes, activeNote)?.id ?? null;
+					: (findNearNote(openedNotes, activeNote)?.id ?? null);
 			workspace.openedNotes =
 				filteredNotes.length !== openedNotes.length ? filteredNotes : openedNotes;
 

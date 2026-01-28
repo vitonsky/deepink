@@ -1,3 +1,4 @@
+/* eslint-disable @cspell/spellchecker */
 import { IntegrityError } from '../../processors/BufferIntegrityProcessor';
 import { joinBuffers } from '../../utils/buffers';
 

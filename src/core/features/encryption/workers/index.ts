@@ -2,7 +2,7 @@
  * Worker created by a bundler
  */
 export type ManagedWorker = {
-	new (options?: WorkerOptions | undefined): Worker;
+	new (options?: WorkerOptions): Worker;
 	prototype: Worker;
 };
 

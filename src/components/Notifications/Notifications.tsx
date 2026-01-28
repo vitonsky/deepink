@@ -12,7 +12,7 @@ import {
 
 export const Notifications = forwardRef<
 	HTMLDivElement,
-	{ isVisible?: boolean; onClose?: () => void; title?: string; items: Array<string> }
+	{ isVisible?: boolean; onClose?: () => void; title?: string; items: string[] }
 >(({ isVisible, onClose, title, items }, ref) => {
 	const styles = useMultiStyleConfig('Notifications');
 

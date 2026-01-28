@@ -18,9 +18,10 @@ export type ApiToHandlers<T extends ApiSchema, Context = never> = {
 	}) => ReturnType<T[K]> extends Promise<infer R> ? Promise<R | undefined> : never;
 };
 
-export type ClientFetcher<T extends ApiSchema = {}> = {
-	(endpoint: string, args: Parameters<T[keyof T]>): ReturnType<T[keyof T]>;
-};
+export type ClientFetcher<T extends ApiSchema = {}> = (
+	endpoint: string,
+	args: Parameters<T[keyof T]>,
+) => ReturnType<T[keyof T]>;
 
 export type ServerRequestHandler<Context = never> = (
 	endpoint: string,

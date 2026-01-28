@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import React, { FC } from 'react';
 import { $isLinkNode } from '@lexical/link';
 import { $findMatchingParent } from '@lexical/utils';

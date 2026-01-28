@@ -22,7 +22,7 @@ export const TextSample = ({
 				? findTextSegments(text, highlightText, {
 						similarity: 0.7,
 						joinDistance: 20,
-				  })
+					})
 				: [],
 			{ limit: lengthLimit },
 		);

@@ -19,7 +19,7 @@ export const getConfig = () => {
 				.string()
 				.optional()
 				.default('1h')
-				.transform((time) => ms(time))
+				.transform((time) => ms(time as ms.StringValue))
 				.parse(process.env.TELEMETRY_SYNC_INTERVAL),
 			api: {
 				baseURL: z

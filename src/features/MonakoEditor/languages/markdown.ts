@@ -1,4 +1,5 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable no-useless-escape */
+/* eslint-disable @cspell/spellchecker */
 // File copied from https://github.com/microsoft/monaco-editor/blob/34f6c100735faff8a42e39fb6005ed029176025c/src/basic-languages/markdown/markdown.ts
 
 /*---------------------------------------------------------------------------------------------
@@ -38,7 +39,7 @@ export const conf: languages.LanguageConfiguration = {
 };
 
 /* eslint-disable camelcase */
-export const language = <languages.IMonarchLanguage>{
+export const language = {
 	defaultToken: '',
 	tokenPostfix: '.md',
 
@@ -267,4 +268,4 @@ export const language = <languages.IMonarchLanguage>{
 			[/</, ''],
 		],
 	},
-};
+} as languages.IMonarchLanguage;

@@ -1,4 +1,4 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 import { execFileSync } from 'child_process';
 import { mkdirSync, rmSync } from 'fs';
 import path from 'path';

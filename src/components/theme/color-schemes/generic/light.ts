@@ -1,5 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
-
 import { getScrollBarStyles } from '../../base';
 import { buildColorScheme } from '../../color';
 

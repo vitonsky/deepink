@@ -29,9 +29,7 @@ export type OptionObject = {
 export type PropertiesFormProps<T extends OptionObject[]> = StackProps & {
 	options: T;
 	validatorScheme?: z.ZodType;
-	onUpdate: (values: {
-		[K in T[number]['value']]: string;
-	}) => void;
+	onUpdate: (values: Record<T[number]['value'], string>) => void;
 	onCancel?: () => void;
 	submitButtonText?: string;
 	cancelButtonText?: string;

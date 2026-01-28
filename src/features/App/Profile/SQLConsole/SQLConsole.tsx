@@ -36,7 +36,6 @@ export const SQLConsole = ({
 					height: 'auto',
 					overflow: 'hidden',
 
-					// eslint-disable-next-line spellcheck/spell-checker
 					'& thead': {
 						position: 'sticky',
 						top: '-1px',
@@ -82,7 +81,7 @@ export const SQLConsole = ({
 						input.click();
 
 						await wait(100);
-						// eslint-disable-next-line spellcheck/spell-checker
+						// eslint-disable-next-line @cspell/spellchecker
 						input.innerHTML = `SELECT * FROM pg_tables WHERE schemaname = 'public'`;
 
 						await wait(100);

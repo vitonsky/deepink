@@ -42,7 +42,7 @@ export class AppTray {
 		const tray = new Tray(trayIcon);
 		tray.setToolTip(getAbout().displayName);
 
-		const cleanups: Array<() => void> = [];
+		const cleanups: (() => void)[] = [];
 		if (process.platform === 'win32' || process.platform === 'darwin') {
 			// Show app by click
 			tray.addListener('click', () => {

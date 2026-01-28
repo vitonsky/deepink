@@ -1,5 +1,4 @@
 export function isElementInViewport(node: HTMLElement) {
-	// eslint-disable-next-line spellcheck/spell-checker
 	const rect = node.getBoundingClientRect();
 
 	return (

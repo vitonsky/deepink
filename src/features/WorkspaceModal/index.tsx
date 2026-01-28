@@ -12,7 +12,7 @@ export const WorkspaceModal = (props: ModalProps) => {
 	const isActiveWorkspace = useIsActiveWorkspace();
 
 	return (
-		<Modal {...props} isOpen={Boolean(isActiveWorkspace && props.isOpen)}>
+		<Modal {...props} isOpen={isActiveWorkspace && props.isOpen}>
 			{props.children}
 		</Modal>
 	);

@@ -116,7 +116,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ onClose }) => {
 
 	const workspaceNameForm = useForm({
 		defaultValues: {
-			name: workspaceData?.name,
+			name: workspaceData?.name ?? '',
 		},
 		resolver: zodResolver(workspacePropsValidator),
 	});

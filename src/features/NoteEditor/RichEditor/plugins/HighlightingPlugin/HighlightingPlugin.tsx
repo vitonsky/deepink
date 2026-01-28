@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import React, { useEffect, useState } from 'react';
 import {
 	$getEditor,

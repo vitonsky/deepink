@@ -72,7 +72,7 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 						resolvedName.toLowerCase().includes(inputValue.toLowerCase()),
 				)
 				.map(
-					({ id, resolvedName }) => ({ id, content: resolvedName } as ListItem),
+					({ id, resolvedName }) => ({ id, content: resolvedName }) as ListItem,
 				);
 
 			// Add button to create new tag
@@ -164,6 +164,8 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 							{getListItems(inputValue).map((item, index) => {
 								return (
 									<ListItem
+										// @ts-expect-error ensure key
+										key={item.id}
 										listStyleType="none"
 										sx={{
 											padding: '.3rem',
@@ -171,7 +173,7 @@ export const SuggestedTagsList: FC<ISuggestedTagsListProps> = ({
 											fontSize: '1rem',
 										}}
 										{...getItemProps({
-											key: item.content,
+											key: item.id,
 											index,
 											item,
 										})}

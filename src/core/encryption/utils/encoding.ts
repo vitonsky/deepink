@@ -43,10 +43,8 @@ export const extendedBase64 = {
 
 		const buffers = binStrings.map(
 			(binString) =>
-				Uint8Array.from(
-					binString as any as string[],
-					(m) => m.codePointAt(0) as number,
-				).buffer,
+				Uint8Array.from(binString as any as string[], (m) => m.codePointAt(0)!)
+					.buffer,
 		);
 		return joinBuffers(buffers);
 	},

@@ -1,3 +1,4 @@
+/* eslint-disable @cspell/spellchecker */
 import Color from 'colorjs.io';
 
 export function getBrightness(color: string) {
