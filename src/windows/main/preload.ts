@@ -1,9 +1,9 @@
 import { contextBridge, ipcRenderer, webFrame } from 'electron';
-import { exposeConfirm } from '@electron/requests/confirm/preload';
+import { exposeElectronPatches } from '@electron/requests/electronPatches/preload';
 import { initZoomFactor } from '@utils/os/zoom';
 
 initZoomFactor();
-exposeConfirm();
+exposeElectronPatches();
 
 contextBridge.exposeInMainWorld('electron', {
 	ipcRenderer: {
