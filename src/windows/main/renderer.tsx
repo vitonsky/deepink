@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
 import { EventBus } from '@api/events/EventBus';
 import { GlobalEventsPayloadMap } from '@api/events/global';
+import { patchConfirm } from '@electron/requests/confirm/renderer';
 // eslint-disable-next-line spellcheck/spell-checker
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
@@ -42,8 +43,7 @@ const globalEventBus = {
 	},
 } satisfies EventBus<GlobalEventsPayloadMap>;
 
-// Patch confirm: original window.confirm causes focus loss
-window.confirm = (message?: string) => window.electronAPI.confirm(message);
+patchConfirm();
 
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
