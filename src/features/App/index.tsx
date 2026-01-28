@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
+import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
@@ -71,20 +71,9 @@ export const App: FC = () => {
 		}
 	}, [profileContainers.profiles.length]);
 
-	const isLoading = Object.values(loadingState).some(Boolean);
-
-	const [showSplashScreen, setShowSplashScreen] = useState(false);
-	const hideSplashScreen = useDebouncedCallback(() => setShowSplashScreen(false), 500);
-	useEffect(() => {
-		if (isLoading) {
-			hideSplashScreen.cancel();
-			setShowSplashScreen(true);
-		} else {
-			hideSplashScreen();
-		}
-	}, [isLoading, hideSplashScreen]);
-
-	if (showSplashScreen) {
+	const isLoadingState = Object.values(loadingState).some(Boolean);
+	const [isShowSplash] = useDebounce(isLoadingState, 500);
+	if (isShowSplash) {
 		return <SplashScreen />;
 	}
 

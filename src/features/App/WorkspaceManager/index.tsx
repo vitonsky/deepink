@@ -1,13 +1,12 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
-import { useDebouncedCallback } from 'use-debounce';
+import { useDebounce } from 'use-debounce';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useCommand } from '@hooks/commands/useCommand';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -48,7 +47,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 	onChooseProfile,
 }) => {
 	const telemetry = useTelemetryTracker();
-	const command = useCommand();
 
 	const [isProfileLoading, setIsProfileLoading] = useState(false);
 	const onOpenProfile: OnPickProfile = useCallback(
@@ -86,25 +84,12 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [showLoadingScreen, setShowLoadingScreen] = useState(false);
-	const hideLoadingScreen = useDebouncedCallback(
-		() => setShowLoadingScreen(false),
-		500,
-	);
-	useEffect(() => {
-		if (isProfileLoading) {
-			hideLoadingScreen.cancel();
-			setShowLoadingScreen(true);
-		} else {
-			hideLoadingScreen();
-		}
-	}, [isProfileLoading, hideLoadingScreen]);
-
 	const [screenName, setScreenName] = useState<PROFILE_SCREEN | null>(null);
 
+	const [isShowSplash] = useDebounce(isProfileLoading, 500);
 	const content = useMemo(() => {
 		// show a loading screen while the profile is opening
-		if (showLoadingScreen) return <SplashScreen />;
+		if (isProfileLoading || isShowSplash) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
 		if (screenName === PROFILE_SCREEN.CREATION || hasNoProfiles) {
@@ -202,8 +187,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		profilesManager,
 		screenName,
 		telemetry,
-		command,
-		showLoadingScreen,
+		isShowSplash,
+		isProfileLoading,
 	]);
 
 	return (
