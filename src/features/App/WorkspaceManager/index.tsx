@@ -78,7 +78,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [isCreationScreen, setIsCreationScreen] = useState(false);
+	const [isProfileCreationScreen, setIsProfileCreationScreen] = useState(false);
 
 	const [isShowSplash] = useDebounce(isProfileLoading, 500);
 	const content = useMemo(() => {
@@ -86,18 +86,18 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		if (isProfileLoading || isShowSplash) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
-		if (isCreationScreen || hasNoProfiles) {
+		if (isProfileCreationScreen || hasNoProfiles) {
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
 						profilesManager.createProfile(profile).then((newProfile) => {
-							setIsCreationScreen(false);
+							setIsProfileCreationScreen(false);
 							onOpenProfile(newProfile, profile.password ?? undefined).then(
 								console.warn,
 							);
 						})
 					}
-					onCancel={() => setIsCreationScreen(false)}
+					onCancel={() => setIsProfileCreationScreen(false)}
 					isFirstProfile={hasNoProfiles}
 				/>
 			);
@@ -124,7 +124,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							variant="accent"
 							size="lg"
 							w="100%"
-							onClick={() => setIsCreationScreen(true)}
+							onClick={() => setIsProfileCreationScreen(true)}
 						>
 							Create new profile
 						</Button>
@@ -180,7 +180,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		telemetry,
 		isShowSplash,
 		isProfileLoading,
-		isCreationScreen,
+		isProfileCreationScreen,
 	]);
 
 	return (
