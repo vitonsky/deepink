@@ -14,12 +14,6 @@ import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 import { ProfilesForm } from './ProfilesForm';
 
-export enum PROFILE_SCREEN {
-	LOGIN = 'profileLoginScreen',
-	PROFILES_LIST = 'profilesListScreen',
-	CREATION = 'profileCreationScreen',
-}
-
 type PickProfileResponse = {
 	status: 'ok' | 'error';
 	message?: string;
@@ -84,7 +78,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [screenName, setScreenName] = useState<PROFILE_SCREEN | null>(null);
+	const [isCreationScreen, setIsCreationScreen] = useState(false);
 
 	const [isShowSplash] = useDebounce(isProfileLoading, 500);
 	const content = useMemo(() => {
@@ -92,7 +86,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		if (isProfileLoading || isShowSplash) return <SplashScreen />;
 
 		const hasNoProfiles = profilesManager.profiles.length === 0;
-		if (screenName === PROFILE_SCREEN.CREATION || hasNoProfiles) {
+		if (isCreationScreen || hasNoProfiles) {
 			return (
 				<ProfileCreator
 					onCreateProfile={(profile) =>
@@ -102,7 +96,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							);
 						})
 					}
-					onCancel={() => setScreenName(PROFILE_SCREEN.PROFILES_LIST)}
+					onCancel={() => setIsCreationScreen(false)}
 					isFirstProfile={hasNoProfiles}
 				/>
 			);
@@ -114,7 +108,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 					profile={currentProfileObject}
 					onLogin={onOpenProfile}
 					onPickAnotherProfile={() => {
-						setScreenName(PROFILE_SCREEN.PROFILES_LIST);
 						onChooseProfile(null);
 					}}
 				/>
@@ -130,7 +123,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							variant="accent"
 							size="lg"
 							w="100%"
-							onClick={() => setScreenName(PROFILE_SCREEN.CREATION)}
+							onClick={() => setIsCreationScreen(true)}
 						>
 							Create new profile
 						</Button>
@@ -163,8 +156,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 									onChooseProfile(profile.id);
 									if (profile.encryption === null) {
 										onOpenProfile(profile);
-									} else {
-										setScreenName(PROFILE_SCREEN.LOGIN);
 									}
 
 									telemetry.track(
@@ -185,10 +176,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onChooseProfile,
 		onOpenProfile,
 		profilesManager,
-		screenName,
 		telemetry,
 		isShowSplash,
 		isProfileLoading,
+		isCreationScreen,
 	]);
 
 	return (
