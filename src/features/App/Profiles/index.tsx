@@ -26,9 +26,9 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 					api: {
 						lexemes: new LexemesRegistry(profile.db),
 					},
-					close: (
-						options: { reason: 'lock' | 'change' } = { reason: 'lock' },
-					) => {
+					close: ({
+						resetActiveProfile = false,
+					}: { resetActiveProfile?: boolean } = {}) => {
 						profilesApi.events.profileClosed(profileContainer);
 
 						dispatch(
@@ -37,7 +37,7 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 							}),
 						);
 
-						if (options.reason === 'change') {
+						if (resetActiveProfile) {
 							dispatch(workspacesApi.setActiveProfile(null));
 						}
 					},

@@ -34,7 +34,7 @@ export type ProfileControls = {
 	api: {
 		lexemes: LexemesRegistry;
 	};
-	close: (options?: { reason: 'lock' | 'change' }) => void;
+	close: (options?: { resetActiveProfile: boolean }) => void;
 };
 
 export const ProfileControlsContext = createContext<ProfileControls | null>(null);
