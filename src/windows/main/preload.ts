@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer, webFrame } from 'electron';
-import { confirm } from '@electron/requests/confirm/preload';
+import { exposeConfirm } from '@electron/requests/confirm/preload';
 import { initZoomFactor } from '@utils/os/zoom';
 
 initZoomFactor();
+exposeConfirm();
 
 contextBridge.exposeInMainWorld('electron', {
 	ipcRenderer: {
@@ -13,7 +14,4 @@ contextBridge.exposeInMainWorld('electron', {
 		getZoomFactor: () => webFrame.getZoomFactor(),
 		setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),
 	},
-
-	// Synchronous IPC channel for showing a confirm dialog
-	confirm,
 });

@@ -1,8 +1,10 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
 
+import { CONFIRM_CHANNEL } from './shared';
+
 // Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
 export const enableConfirm = () => {
-	ipcMain.on('showConfirm', (event, message?: string) => {
+	ipcMain.on(CONFIRM_CHANNEL, (event, message?: string) => {
 		const targetWindow = BrowserWindow.fromWebContents(event.sender);
 		if (!targetWindow) return;
 
