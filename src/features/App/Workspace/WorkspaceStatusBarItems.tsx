@@ -17,7 +17,7 @@ export const WorkspaceStatusBarItems = () => {
 			{
 				visible: true,
 				title: 'Change profile',
-				onClick: () => profileControls.close(),
+				onClick: () => profileControls.close({ resetActiveProfile: true }),
 				icon: <FaUserLarge />,
 			},
 			{

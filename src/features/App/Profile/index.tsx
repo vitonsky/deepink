@@ -26,7 +26,7 @@ export type ProfileControls = {
 	api: {
 		lexemes: LexemesRegistry;
 	};
-	close: () => void;
+	close: (options?: { resetActiveProfile: boolean }) => void;
 };
 
 export const ProfileControlsContext = createContext<ProfileControls | null>(null);
@@ -105,7 +105,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	useShortcutsBinding();
 
-	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
+	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, () => controls.close(), {
+		enabled: controls.profile.profile.isEncrypted,
+	});
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

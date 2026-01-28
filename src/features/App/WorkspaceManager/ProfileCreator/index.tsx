@@ -32,11 +32,13 @@ export type NewProfile = {
 export type ProfileCreatorProps = {
 	onCreateProfile: (profile: NewProfile) => Promise<void | string>;
 	onCancel: () => void;
+	isFirstProfile: boolean;
 };
 
 export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	onCreateProfile,
 	onCancel,
+	isFirstProfile,
 }) => {
 	const telemetry = useTelemetryTracker();
 
@@ -45,7 +47,19 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [isPending, setIsPending] = useState(false);
 
-	const [profileName, setProfileName] = useState('');
+	const defaultProfileNames = [
+		'Creative drafts',
+		'Second brain',
+		'Digital garden',
+		'Creative space',
+		'Mind space',
+		'Idea lab',
+	];
+	const [profileName, setProfileName] = useState(
+		isFirstProfile
+			? defaultProfileNames[Math.floor(Math.random() * defaultProfileNames.length)]
+			: '',
+	);
 	const [profileNameError, setProfileNameError] = useState<null | string>(null);
 	useEffect(() => {
 		setProfileNameError(null);
@@ -104,6 +118,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			telemetry,
 		],
 	);
+
+	// Focus password input (name has a default value)
+	useEffect(() => {
+		if (isFirstProfile) passwordInputRef.current?.focus();
+	}, [isFirstProfile, passwordInputRef]);
 
 	const noPasswordDialogState = useDisclosure();
 
@@ -171,12 +190,19 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				</>
 			}
 		>
-			<VStack w="100%" alignItems="start">
+			<VStack
+				w="100%"
+				alignItems="start"
+				gap={'0.8rem'}
+				fontSize="18px"
+				color="typography.additional"
+			>
 				<VStack w="100%" alignItems="start">
+					<Text>Profile name</Text>
 					<Input
 						ref={profileNameInputRef}
 						size="lg"
-						placeholder="Profile name"
+						placeholder="e.g., Notes"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
 						focusBorderColor={profileNameError ? 'red.500' : undefined}
@@ -185,13 +211,13 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
 				</VStack>
-
 				<VStack w="100%" alignItems="start">
+					<Text>Encryption password (recommended)</Text>
 					<Input
 						ref={passwordInputRef}
 						size="lg"
 						type="password"
-						placeholder="Enter password"
+						placeholder="e.g., SecretPa$$word"
 						value={password}
 						onChange={(evt) => setPassword(evt.target.value)}
 						focusBorderColor={passwordError ? 'red.500' : undefined}
