@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { createEvent } from 'effector';
-import { Query } from 'nano-queries/core/Query';
+import { Query } from 'nano-queries';
 import { z } from 'zod';
 import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { DBTypes, qb } from '@utils/db/query-builder';
