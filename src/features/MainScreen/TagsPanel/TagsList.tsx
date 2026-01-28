@@ -60,7 +60,7 @@ export const TagsList: FC<ITagsListProps> = ({
 						padding="0.4rem"
 						alignItems="center"
 						onContextMenu={(evt) => {
-							onTagMenu(id, { x: evt.clientX, y: evt.clientY });
+							onTagMenu(id, { x: evt.screenX, y: evt.screenY });
 						}}
 					>
 						<FaHashtag size={14} />

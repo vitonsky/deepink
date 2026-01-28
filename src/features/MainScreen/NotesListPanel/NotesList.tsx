@@ -132,8 +132,8 @@ export const NotesList: FC<NotesListProps> = () => {
 									}
 									onContextMenu={(evt) => {
 										openNoteContextMenu(note, {
-											x: evt.pageX,
-											y: evt.pageY,
+											x: evt.screenX,
+											y: evt.screenY,
 										});
 									}}
 									onClick={() => {

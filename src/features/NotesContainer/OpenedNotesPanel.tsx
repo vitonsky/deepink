@@ -110,8 +110,8 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 								evt.preventDefault();
 
 								openNoteContextMenu(note, {
-									x: evt.pageX,
-									y: evt.pageY,
+									x: evt.screenX,
+									y: evt.screenY,
 								});
 							}}
 						>
