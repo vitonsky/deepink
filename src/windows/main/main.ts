@@ -5,7 +5,7 @@ import url from 'url';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { AppContext } from '@electron/main/main';
 import { enableContextMenu } from '@electron/requests/contextMenu/main';
-import { enableConfirm } from '@electron/requests/electronPatches/main';
+import { enableElectronPatches } from '@electron/requests/electronPatches/main';
 import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { enableStorage } from '@electron/requests/storage/main';
@@ -33,7 +33,7 @@ export const openMainWindow = async ({
 	enableStorage();
 	enableContextMenu();
 	enableInteractions();
-	enableConfirm();
+	enableElectronPatches();
 
 	// State
 	const $windowState = createStore<WindowState>({
