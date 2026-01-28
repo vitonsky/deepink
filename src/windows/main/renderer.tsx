@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
 import { EventBus } from '@api/events/EventBus';
 import { GlobalEventsPayloadMap } from '@api/events/global';
-import { patchWindowConfirm } from '@electron/requests/confirm/renderer';
+import { patchWindowConfirm } from '@electron/requests/electronPatches/renderer';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
 import { TelemetryContext } from '@features/telemetry';
