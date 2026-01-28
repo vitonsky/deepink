@@ -19,6 +19,7 @@ worker({
 				type: 'worker.event',
 				event: {
 					name: 'sync',
+					data: {},
 				},
 			} satisfies z.TypeOf<typeof WorkerEventMessageScheme>);
 		});

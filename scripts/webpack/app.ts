@@ -80,6 +80,7 @@ export default merge(commonConfig, {
 						loader: 'css-loader',
 						options: {
 							modules: {
+								namedExport: false,
 								mode: (resourcePath: string) => {
 									const isModule = resourcePath.endsWith('.module.css');
 									return isModule ? 'local' : 'global';
