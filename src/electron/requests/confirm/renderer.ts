@@ -9,6 +9,6 @@ declare global {
 }
 
 // Patch confirm: original window.confirm causes focus loss
-export const patchConfirm = () => {
+export const patchWindowConfirm = () => {
 	window.confirm = (message?: string) => window.electron.confirm(message);
 };

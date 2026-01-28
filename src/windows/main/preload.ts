@@ -14,5 +14,6 @@ contextBridge.exposeInMainWorld('electron', {
 		setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),
 	},
 
+	// Synchronous IPC channel for showing a confirm dialog
 	confirm,
 });
