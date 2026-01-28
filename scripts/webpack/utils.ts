@@ -12,11 +12,11 @@ export const isPreloadChunk = (chunk: Exclude<PathData['chunk'], void>) =>
 	Boolean(chunk.name && chunk.name.endsWith('-preload'));
 
 export const getAppWindows = () => {
-	const windowObjects: Array<{
+	const windowObjects: {
 		name: string;
 		renderer: string;
 		preloadScript?: string;
-	}> = [];
+	}[] = [];
 
 	readdirSync(path.join(projectRoot, 'src/windows'), {
 		withFileTypes: true,

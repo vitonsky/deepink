@@ -21,7 +21,7 @@ const NoteVersionMapScheme = NoteVersionRowScheme.omit({ note_id: true }).transf
 export type NoteVersion = z.TypeOf<typeof NoteVersionMapScheme>;
 
 export class NoteVersions {
-	private db;
+	private readonly db;
 	private readonly workspace;
 	constructor(db: PGLiteDatabase, workspace: string) {
 		this.db = db;

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable spellcheck/spell-checker */
 
 import {
 	$applyNodeReplacement,
@@ -33,10 +32,6 @@ export class RawNode extends ElementNode {
 	exportDOM(): DOMExportOutput {
 		const element = document.createElement('span');
 		return { element };
-	}
-
-	constructor(key?: NodeKey) {
-		super(key);
 	}
 
 	exportJSON(): SerializedRawNode {

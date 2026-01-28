@@ -92,7 +92,7 @@ export const dumpMarkdownNode = (node: Content) => {
 		}) satisfies Root,
 	);
 
-	if (content.slice(-1) === '\n') {
+	if (content.endsWith('\n')) {
 		return content.slice(0, -1);
 	}
 

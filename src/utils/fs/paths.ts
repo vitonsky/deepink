@@ -1,7 +1,7 @@
 export function escapeFileName(name: string, replacement = '_'): string {
 	// Replace control chars and reserved filename chars
 	return name
-		.replace(/[^\p{L}\d.\-]+/gu, replacement) // anything not a letter
+		.replace(/[^\p{L}\d.-]+/gu, replacement) // anything not a letter
 		.replace(new RegExp(`${replacement}{2,}`, 'g'), replacement) // collapse repeats
 		.replace(new RegExp(`^${replacement}|${replacement}$`, 'g'), ''); // trim edges
 }

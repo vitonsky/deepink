@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 import { vol } from 'memfs';
 import path from 'path';
 

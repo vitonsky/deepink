@@ -227,7 +227,7 @@ export const EditorPanelPlugin = () => {
 			const command = commands[evt.type];
 			if (command) {
 				// Data depends on type, so it always will match
-				// @ts-ignore
+				// @ts-expect-error TODO: review this exception
 				command(evt.data);
 			}
 		});

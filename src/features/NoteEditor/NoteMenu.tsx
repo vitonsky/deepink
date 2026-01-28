@@ -63,7 +63,7 @@ export const NoteMenu = memo(
 							)}
 						</HStack>
 					</MenuItem>
-					<MenuItem onClick={() => onClick?.(NoteSidebarTabs.BACKLINKS)}>
+					<MenuItem onClick={() => onClick?.(NoteSidebarTabs.BACK_LINKS)}>
 						<HStack>
 							<FaLink />
 							<Text>Back links</Text>

@@ -1,4 +1,4 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 import React, {
 	HTMLAttributes,
 	Ref,
@@ -194,8 +194,7 @@ export const MonacoEditor = ({
 			lineHeight: editorConfig.lineHeight,
 			minimap: { enabled: editorConfig.miniMap },
 			lineNumbers: editorConfig.lineNumbers ? 'on' : 'off',
-			// Disable hardcoded brackets colorization: https://github.com/microsoft/monaco-editor/issues/4535#issuecomment-2234042290
-			// @ts-ignore
+			// @ts-expect-error Disable hardcoded brackets colorization: https://github.com/microsoft/monaco-editor/issues/4535#issuecomment-2234042290
 			'bracketPairColorization.enabled': false,
 			automaticLayout: true,
 			wordWrap: 'on',

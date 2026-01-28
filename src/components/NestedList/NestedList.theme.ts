@@ -11,7 +11,7 @@ export const NestedListTheme = createMultiStyleConfigHelpers([
 			margin: '0',
 			paddingLeft: '0',
 			listStyle: 'none',
-			// eslint-disable-next-line spellcheck/spell-checker
+
 			fontFamily: 'Arial, Helvetica, sans-serif',
 			userSelect: 'none',
 			'& &': {

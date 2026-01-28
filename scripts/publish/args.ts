@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import 'dotenv/config';
 
 import packageInfo from '../../package.json';

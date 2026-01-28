@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable spellcheck/spell-checker */
+
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *

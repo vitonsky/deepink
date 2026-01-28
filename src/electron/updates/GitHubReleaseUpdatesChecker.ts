@@ -39,7 +39,7 @@ export class GitHubReleaseUpdatesChecker {
 				? {
 						version: latestVersion,
 						url: latestRelease.html_url,
-				  }
+					}
 				: null;
 		} catch (error) {
 			console.error(error);

@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
 import { EventBus } from '@api/events/EventBus';
 import { GlobalEventsPayloadMap } from '@api/events/global';
-// eslint-disable-next-line spellcheck/spell-checker
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
 import { TelemetryContext } from '@features/telemetry';

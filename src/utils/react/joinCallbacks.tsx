@@ -1,5 +1,5 @@
 export const joinCallbacks =
-	(...callbacks: Array<() => void>) =>
+	(...callbacks: (() => void)[]) =>
 	() => {
 		callbacks.forEach((cb) => cb());
 	};

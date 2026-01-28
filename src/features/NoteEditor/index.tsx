@@ -46,7 +46,7 @@ import { NoteVersions } from './NoteVersions';
 
 export enum NoteSidebarTabs {
 	HISTORY = 'HISTORY',
-	BACKLINKS = 'BACKLINKS',
+	BACK_LINKS = 'BACK_LINKS',
 }
 
 export type NoteEditorProps = {
@@ -533,8 +533,7 @@ export const Note: FC<NoteEditorProps> = memo(
 																WorkspaceEvents.NOTE_UPDATED,
 																note.id,
 															);
-															forceUpdateLocalStateRef.current =
-																true;
+															forceUpdateLocalStateRef.current = true;
 														}}
 														onSnapshot={async () => {
 															await noteHistory.snapshot(
@@ -562,7 +561,7 @@ export const Note: FC<NoteEditorProps> = memo(
 											},
 										},
 										{
-											id: NoteSidebarTabs.BACKLINKS,
+											id: NoteSidebarTabs.BACK_LINKS,
 											title: 'Back links',
 											content() {
 												return <div>TODO: Note back links</div>;

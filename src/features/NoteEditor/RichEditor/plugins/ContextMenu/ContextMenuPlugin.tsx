@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { $getNearestNodeFromDOMNode, LexicalEditor, LexicalNode } from 'lexical';
 import { BoxProps, Portal } from '@chakra-ui/react';

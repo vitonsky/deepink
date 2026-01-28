@@ -18,7 +18,10 @@ export enum TAG_ERROR_CODE {
 }
 
 export class TagControllerError extends Error {
-	constructor(message: string, public readonly code: TAG_ERROR_CODE) {
+	constructor(
+		message: string,
+		public readonly code: TAG_ERROR_CODE,
+	) {
 		super(message);
 		this.name = 'TagControllerError';
 	}

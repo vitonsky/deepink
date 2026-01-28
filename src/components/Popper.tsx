@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import React from 'react';
 import { Box, BoxProps, Portal } from '@chakra-ui/react';
 import {

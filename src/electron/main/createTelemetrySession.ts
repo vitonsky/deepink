@@ -10,6 +10,7 @@ import { getUserDataPath } from '@electron/utils/files';
 import { getAbout } from '../../about';
 
 function convertBooleanValue(value?: boolean) {
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion
 	return typeof value === 'boolean' ? String(Boolean(value)) : value;
 }
 
@@ -85,7 +86,7 @@ export const createTelemetrySession = (versionsInfo: VersionsSummary) => {
 				firstVersion: versionsInfo.versions[0]?.installedAt ?? Date.now(),
 				currentVersion: versionsInfo.isVersionUpdated
 					? Date.now()
-					: versionsInfo.versions.slice(-1)[0]?.installedAt ?? Date.now(),
+					: (versionsInfo.versions.slice(-1)[0]?.installedAt ?? Date.now()),
 			};
 		}
 

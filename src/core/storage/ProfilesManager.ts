@@ -13,8 +13,8 @@ export type ProfileObject = {
 // TODO: implement delete method
 // TODO: implement update method
 export class ProfilesManager {
-	private filesController: IFilesStorage;
-	private getProfileFilesController;
+	private readonly filesController: IFilesStorage;
+	private readonly getProfileFilesController;
 	constructor(
 		filesController: IFilesStorage,
 		getProfileFilesController: (profileName: string) => IFilesStorage,

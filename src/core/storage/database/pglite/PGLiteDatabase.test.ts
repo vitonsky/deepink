@@ -1,4 +1,4 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 import { getLongText } from 'src/__tests__/samples';
 import { PGlite } from '@electric-sql/pglite';
 import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';

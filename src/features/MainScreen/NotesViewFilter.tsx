@@ -51,7 +51,7 @@ export const NotesViewFilter: FC<NotesOverviewProps> = () => {
 							dispatch(
 								workspacesApi.setView({
 									...workspaceData,
-									view: id as NOTES_VIEW,
+									view: id,
 								}),
 							);
 

@@ -1,3 +1,4 @@
+/* eslint-disable @cspell/spellchecker */
 import type { MakerDebConfig } from '@electron-forge/maker-deb';
 import type { MakerDMGConfig } from '@electron-forge/maker-dmg';
 import type { MakerRpmConfig } from '@electron-forge/maker-rpm';

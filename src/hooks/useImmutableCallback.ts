@@ -20,7 +20,7 @@ export const useImmutableCallback = <T extends (...args: any[]) => any>(
 	callbackRef.current = actualCallback;
 
 	// Return same wrapper
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+
 	const staticCallback = useCallback(
 		((...args) => callbackRef.current(...args)) as T,
 		[],

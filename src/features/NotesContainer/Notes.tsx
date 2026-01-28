@@ -32,7 +32,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 								updateContent: (content: INoteContent) => {
 									const note = notesRef.current.find(
 										(note) => note.id === id,
-									) as INote;
+									)!;
 
 									// Skip updates with not changed data
 									if (isEqual(note.content, content)) {
@@ -44,7 +44,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 								updateMeta: (meta: Partial<NoteMeta>) => {
 									const note = notesRef.current.find(
 										(note) => note.id === id,
-									) as INote;
+									)!;
 
 									updateNote({ ...note, ...meta });
 								},
@@ -67,7 +67,7 @@ export const Notes: FC<NotesProps> = ({ notes, tabs, activeTab, updateNote }) =>
 			{tabs
 				.filter((id) => notes.some((note) => note.id === id))
 				.map((id) => {
-					const note = notes.find((note) => note.id === id) as INote;
+					const note = notes.find((note) => note.id === id)!;
 					const isActive = activeTab === note.id;
 					const { updateContent, updateMeta } = updateHooks[note.id];
 

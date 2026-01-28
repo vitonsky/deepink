@@ -1,8 +1,6 @@
 import { GLOBAL_COMMANDS } from '..';
 
-export type KeyboardShortcutMap = {
-	[key: string]: GLOBAL_COMMANDS;
-};
+export type KeyboardShortcutMap = Record<string, GLOBAL_COMMANDS>;
 
 export const shortcuts: KeyboardShortcutMap = {
 	'CmdOrCtrl+N': GLOBAL_COMMANDS.CREATE_NOTE,

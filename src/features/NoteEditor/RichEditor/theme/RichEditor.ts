@@ -1,4 +1,4 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @cspell/spellchecker */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *

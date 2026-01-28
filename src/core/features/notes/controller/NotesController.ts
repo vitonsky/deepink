@@ -1,4 +1,5 @@
-/* eslint-disable spellcheck/spell-checker */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-conversion */
+/* eslint-disable @cspell/spellchecker */
 /* eslint-disable camelcase */
 import { Query } from 'nano-queries/core/Query';
 import { z } from 'zod';
@@ -95,7 +96,7 @@ function getFetchQuery(
 		}),
 	);
 
-	const sortFieldMap: { [K in NoteSortField]: string } = {
+	const sortFieldMap: Record<NoteSortField, string> = {
 		id: 'id',
 		createdAt: 'created_at',
 		updatedAt: 'updated_at',
@@ -184,7 +185,7 @@ function getFetchQuery(
 							({ name, query }) => qb.sql`${qb.raw(name)} AS (${query})`,
 						),
 					),
-			  )
+				)
 			: undefined,
 		qb.sql`SELECT ${qb.set([select, ...selectAddonsQuery])} FROM notes`,
 		(joinQuery.length > 0 || undefined) && qb.line(...joinQuery),
@@ -207,7 +208,7 @@ function getFetchQuery(
  * Synced notes registry
  */
 export class NotesController implements INotesController {
-	private db;
+	private readonly db;
 	private readonly workspace;
 	constructor(db: PGLiteDatabase, workspace: string) {
 		this.db = db;
