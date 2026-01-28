@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
 import { EventBus } from '@api/events/EventBus';
 import { GlobalEventsPayloadMap } from '@api/events/global';
-import { patchConfirm } from '@electron/requests/confirm/renderer';
+import { patchWindowConfirm } from '@electron/requests/confirm/renderer';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
 import { TelemetryContext } from '@features/telemetry';
@@ -42,7 +42,7 @@ const globalEventBus = {
 	},
 } satisfies EventBus<GlobalEventsPayloadMap>;
 
-patchConfirm();
+patchWindowConfirm();
 
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
