@@ -91,6 +91,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				<ProfileCreator
 					onCreateProfile={(profile) =>
 						profilesManager.createProfile(profile).then((newProfile) => {
+							setIsCreationScreen(false);
 							onOpenProfile(newProfile, profile.password ?? undefined).then(
 								console.warn,
 							);
