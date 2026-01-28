@@ -1,3 +1,9 @@
-import { ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 
-export const confirm = (message?: string) => ipcRenderer.sendSync('showConfirm', message);
+import { CONFIRM_CHANNEL, CONFIRM_CHANNEL_API } from './shared';
+
+export const exposeConfirm = () => {
+	contextBridge.exposeInMainWorld(CONFIRM_CHANNEL_API, (message?: string) =>
+		ipcRenderer.sendSync(CONFIRM_CHANNEL, message),
+	);
+};
