@@ -12,7 +12,12 @@ export type ContextMenuRequestProps = {
 
 export const { open: openContextMenu } = contextMenuChannel.client(ipcRendererFetcher);
 
-export const getContextMenuCoords = (event: MouseEvent) => ({
-	x: Math.ceil(event.pageX * getZoomFactor()),
-	y: Math.ceil(event.pageY * getZoomFactor()),
-});
+export const getContextMenuCoords = (event: MouseEvent) => {
+	// Consider zoom factor to draw context menu on proper coordinates for scaled windows
+	// With no zoom factor, context menu will be rendered under pointer, and click random option
+	const zoomFactor = getZoomFactor();
+	return {
+		x: Math.ceil(event.pageX * zoomFactor),
+		y: Math.ceil(event.pageY * zoomFactor),
+	};
+};
