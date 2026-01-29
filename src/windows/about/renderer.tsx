@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { patchWindow } from '@electron/requests/electronPatches/renderer';
 import { ThemeProvider } from '@features/ThemeProvider';
 import { loadStore } from '@state/redux/persistence';
 import { store } from '@state/redux/store';
@@ -15,6 +16,8 @@ if (!rootNode) {
 document.body.style.overflow = 'hidden';
 
 loadStore(store);
+
+patchWindow();
 
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
