@@ -208,7 +208,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				<VStack w="100%" alignItems="start">
 					<HStack>
 						<Text>Encryption password</Text>
-						<Text color="typography.secondary">(recommended)</Text>
+						<Text variant="secondary">(recommended)</Text>
 					</HStack>
 					<Input
 						ref={passwordInputRef}
