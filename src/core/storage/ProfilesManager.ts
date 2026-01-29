@@ -13,15 +13,12 @@ export type ProfileObject = {
 // TODO: implement delete method
 // TODO: implement update method
 export class ProfilesManager {
-	private filesController: IFilesStorage;
-	private getProfileFilesController;
 	constructor(
-		filesController: IFilesStorage,
-		getProfileFilesController: (profileName: string) => IFilesStorage,
-	) {
-		this.filesController = filesController;
-		this.getProfileFilesController = getProfileFilesController;
-	}
+		private readonly filesController: IFilesStorage,
+		private readonly getProfileFilesController: (
+			profileName: string,
+		) => IFilesStorage,
+	) {}
 
 	public async getProfiles(): Promise<ProfileObject[]> {
 		const buffer = await this.filesController.get('profiles.json');

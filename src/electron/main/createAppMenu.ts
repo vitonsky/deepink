@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import { app, Menu, MenuItem, MenuItemConstructorOptions } from 'electron';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 

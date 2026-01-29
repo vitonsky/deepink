@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { StackProps, VStack } from '@chakra-ui/react';
 
-export interface FeaturesProps extends StackProps {}
+export type FeaturesProps = StackProps;
 
 export const Features: FC<FeaturesProps> = ({ children, ...rest }) => {
 	return (

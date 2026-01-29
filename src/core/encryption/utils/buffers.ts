@@ -40,11 +40,11 @@ export class BufferView {
 		this.buffer = buffer;
 	}
 
-	public getBytes(offset: number = 0, end?: number) {
+	public getBytes(offset = 0, end?: number) {
 		return this.buffer.slice(offset, end);
 	}
 
-	public setBytes(buffer: ArrayBuffer, offset: number = 0) {
+	public setBytes(buffer: ArrayBuffer, offset = 0) {
 		if (offset > this.buffer.byteLength)
 			throw new RangeError('Offset out of buffer size');
 		if (offset + buffer.byteLength > this.buffer.byteLength)

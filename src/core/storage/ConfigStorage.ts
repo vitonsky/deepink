@@ -3,12 +3,10 @@ import { IFilesStorage } from '../features/files';
 type Config = Record<string, any>;
 
 export class ConfigStorage<T extends Record<string, any> = Config> {
-	private filename: string;
-	private filesController: IFilesStorage;
-	constructor(filename: string, filesController: IFilesStorage) {
-		this.filename = filename;
-		this.filesController = filesController;
-	}
+	constructor(
+		private readonly filename: string,
+		private readonly filesController: IFilesStorage,
+	) {}
 
 	public async set(key: keyof T, value: T[keyof T]) {
 		let json = {} as T;

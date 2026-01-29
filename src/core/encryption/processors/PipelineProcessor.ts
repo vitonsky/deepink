@@ -4,7 +4,7 @@ import { IEncryptionProcessor } from '..';
  * Compose and execute a pipeline with provided processors
  */
 export class PipelineProcessor implements IEncryptionProcessor {
-	private ciphers;
+	private readonly ciphers;
 	constructor(ciphers: IEncryptionProcessor[]) {
 		this.ciphers = ciphers;
 	}

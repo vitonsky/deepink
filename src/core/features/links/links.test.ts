@@ -7,7 +7,7 @@ import {
 
 test('formatters and parsers behavior are consistent', () => {
 	const link = formatNoteLink('foo-bar');
-	// eslint-disable-next-line spellcheck/spell-checker
+	// eslint-disable-next-line @cspell/spellchecker
 	const link2 = formatResourceLink('baz-qux');
 
 	const exampleText = `Example text with links. See a link ${link} on note and link ${link2} on resource`;
@@ -22,7 +22,7 @@ test('formatters and parsers behavior are consistent', () => {
 			type: 'note',
 		},
 		{
-			// eslint-disable-next-line spellcheck/spell-checker
+			// eslint-disable-next-line @cspell/spellchecker
 			id: 'baz-qux',
 			type: 'resource',
 		},

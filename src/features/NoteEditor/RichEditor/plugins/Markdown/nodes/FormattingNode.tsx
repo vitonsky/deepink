@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable spellcheck/spell-checker */
 
 import {
 	$applyNodeReplacement,

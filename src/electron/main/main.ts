@@ -123,10 +123,7 @@ export class MainProcess {
 			console.log('Install dev tools');
 
 			const { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } =
-				await import(
-					// eslint-disable-next-line spellcheck/spell-checker
-					'electron-devtools-installer'
-				);
+				await import('electron-devtools-installer');
 
 			await Promise.all(
 				[REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS].map((extension) =>

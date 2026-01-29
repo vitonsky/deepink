@@ -9,9 +9,7 @@ import {
 } from '../../Markdown/nodes/FormattingNode';
 
 export const $getFormatNodes = (node: LexicalNode): FormattingNode[] => {
-	return node
-		.getParents()
-		.filter((node) => $isFormattingNode(node)) as FormattingNode[];
+	return node.getParents().filter((node) => $isFormattingNode(node));
 };
 
 const formatMap = {

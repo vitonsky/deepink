@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import path from 'path';
 import { SwcMinifyWebpackPlugin } from 'swc-minify-webpack-plugin';

@@ -60,7 +60,7 @@ export const useProfileContainers = () => {
 			{ profile, password }: { profile: ProfileObject; password?: string },
 			changeActiveProfile = false,
 		) => {
-			const cleanups: Array<() => void> = [];
+			const cleanups: (() => void)[] = [];
 
 			const profileFilesController = new ElectronFilesController(
 				storageApi,

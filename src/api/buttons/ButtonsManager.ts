@@ -32,7 +32,7 @@ export type ButtonOptions = {
 };
 
 export class ButtonsManager {
-	private updateCallback: (state: ManagedButtons) => void;
+	private readonly updateCallback: (state: ManagedButtons) => void;
 	constructor(updateCallback: (state: ManagedButtons) => void) {
 		this.updateCallback = updateCallback;
 	}

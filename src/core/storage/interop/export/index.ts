@@ -74,7 +74,7 @@ export class NotesExporter {
 
 		const mdTree = markdownProcessor.parse(note.content.text);
 
-		// TODO: insert frontmater optionally
+		// TODO: insert frontmatter optionally
 		mdTree.children.unshift({
 			type: 'yaml',
 			value: stringifyYaml({
@@ -127,6 +127,7 @@ export class NotesExporter {
 
 		let progress = 0;
 		const context = this.createContext(files);
+		// eslint-disable-next-line no-constant-condition
 		for (let page = 1; true; page++) {
 			const totalNotes = await notesRegistry.getLength();
 			const notes = await notesRegistry.get({

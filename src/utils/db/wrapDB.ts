@@ -1,4 +1,4 @@
-import { Query } from 'nano-queries/core/Query';
+import { Query } from 'nano-queries';
 import { z } from 'zod';
 import { DatabaseObject } from '@core/storage/database/pglite/PGLiteDatabase';
 import { Results, Transaction } from '@electric-sql/pglite';

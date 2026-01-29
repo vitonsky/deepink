@@ -2,8 +2,8 @@ export type DistanceFn = (a: string, b: string) => number;
 
 export class BKTree {
 	private word: string;
-	private children: Map<number, BKTree>;
-	private distance: DistanceFn;
+	private readonly children: Map<number, BKTree>;
+	private readonly distance: DistanceFn;
 
 	constructor(wordOrFn: string | DistanceFn, distanceFn?: DistanceFn) {
 		if (typeof wordOrFn === 'string') {
@@ -32,8 +32,8 @@ export class BKTree {
 	}
 
 	// Search words within maxDist
-	search(query: string, maxDist: number, limit?: number): Array<[number, string]> {
-		const results: Array<[number, string]> = [];
+	search(query: string, maxDist: number, limit?: number): [number, string][] {
+		const results: [number, string][] = [];
 		const d = this.distance(query, this.word);
 		if (d <= maxDist) {
 			results.push([d, this.word]);

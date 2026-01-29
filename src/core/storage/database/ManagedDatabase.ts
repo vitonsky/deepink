@@ -51,7 +51,7 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 	public readonly dbContainer;
 	private readonly dbFile: IFileController;
 	private readonly debouncedSync;
-	private readonly cleanups: Array<() => void> = [];
+	private readonly cleanups: (() => void)[] = [];
 	constructor(
 		dbContainer: IDatabaseContainer<T>,
 		dbFile: IFileController,
@@ -108,7 +108,7 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 	private readonly onSyncStateUpdated = createEvent<SyncStatus>();
 	private isSyncWorkerRun = false;
 	private syncRequests: SyncRequest[] = [];
-	private syncWorker = async () => {
+	private readonly syncWorker = async () => {
 		if (this.isSyncWorkerRun) return;
 
 		this.isSyncWorkerRun = true;

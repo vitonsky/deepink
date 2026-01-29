@@ -1,4 +1,3 @@
-/* eslint-disable spellcheck/spell-checker */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -42,6 +41,7 @@ function useSuspenseImage(src: string) {
 	const filesRegistry = useFilesRegistry();
 
 	if (!imageCache.has(src)) {
+		// eslint-disable-next-line @typescript-eslint/only-throw-error
 		throw new Promise(async (resolve, reject) => {
 			let actualSrc = src;
 
@@ -228,10 +228,7 @@ export default function ImageComponent({
 			draggable={false}
 			onContextMenu={(event) => {
 				editor.getEditorState().read(() => {
-					editor.dispatchCommand(
-						RIGHT_CLICK_IMAGE_COMMAND,
-						event.nativeEvent as MouseEvent,
-					);
+					editor.dispatchCommand(RIGHT_CLICK_IMAGE_COMMAND, event.nativeEvent);
 				});
 			}}
 			onClick={(event) => {
@@ -239,10 +236,7 @@ export default function ImageComponent({
 				if (event.button !== 0) return;
 
 				editor.getEditorState().read(() => {
-					editor.dispatchCommand(
-						LEFT_CLICK_IMAGE_COMMAND,
-						event.nativeEvent as MouseEvent,
-					);
+					editor.dispatchCommand(LEFT_CLICK_IMAGE_COMMAND, event.nativeEvent);
 				});
 			}}
 		>

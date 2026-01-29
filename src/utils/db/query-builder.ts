@@ -1,5 +1,4 @@
-import { SQLCompiler } from 'nano-queries/compilers/SQLCompiler';
-import { ConfigurableSQLBuilder } from 'nano-queries/sql/ConfigurableSQLBuilder';
+import { ConfigurableSQLBuilder, SQLCompiler } from 'nano-queries';
 
 export type DBPrimitiveTypes = string | number | null | boolean;
 export type DBTypes = DBPrimitiveTypes | DBPrimitiveTypes[];

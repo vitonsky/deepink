@@ -6,9 +6,9 @@ type VoidCallback = () => void;
 
 // TODO: implement handle `onClick` events for menu items
 export class ElectronContextMenu<T extends string> {
-	private menu: ContextMenu;
-	private onClosed;
-	private onClicked;
+	private readonly menu: ContextMenu;
+	private readonly onClosed;
+	private readonly onClicked;
 	constructor(menu: ContextMenu) {
 		this.menu = menu;
 		this.onClosed = createEvent();

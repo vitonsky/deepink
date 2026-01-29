@@ -15,10 +15,7 @@ export function findSafeBreakPoint(input: string): number {
 // with bad performance on large strings https://issues.chromium.org/issues/326176949
 // That is an alternative to https://github.com/jonschlinkert/intl-segmenter
 // We use own implementation due to bug in `intl-segmenter` - they do not add an offset to indexes in chunk
-export function* getLexemesList(
-	input: string,
-	limit: number = 100,
-): Generator<Intl.SegmentData> {
+export function* getLexemesList(input: string, limit = 100): Generator<Intl.SegmentData> {
 	let offset = 0;
 	while (offset < input.length) {
 		const remainingText = input.slice(offset);
