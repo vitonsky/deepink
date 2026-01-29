@@ -31,14 +31,14 @@ export type NewProfile = {
 
 export type ProfileCreatorProps = {
 	onCreateProfile: (profile: NewProfile) => Promise<void | string>;
-	onCancel: () => void;
-	isFirstProfile: boolean;
+	onCancel?: () => void;
+	defaultProfileName?: string;
 };
 
 export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	onCreateProfile,
 	onCancel,
-	isFirstProfile,
+	defaultProfileName,
 }) => {
 	const telemetry = useTelemetryTracker();
 
@@ -47,19 +47,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const [isPending, setIsPending] = useState(false);
 
-	const defaultProfileNames = [
-		'Creative drafts',
-		'Second brain',
-		'Digital garden',
-		'Creative space',
-		'Mind space',
-		'Idea lab',
-	];
-	const [profileName, setProfileName] = useState(
-		isFirstProfile
-			? defaultProfileNames[Math.floor(Math.random() * defaultProfileNames.length)]
-			: '',
-	);
+	const [profileName, setProfileName] = useState(defaultProfileName ?? '');
 	const [profileNameError, setProfileNameError] = useState<null | string>(null);
 	useEffect(() => {
 		setProfileNameError(null);
@@ -119,10 +107,14 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		],
 	);
 
-	// Focus password input (name has a default value)
+	// Focus input
 	useEffect(() => {
-		if (isFirstProfile) passwordInputRef.current?.focus();
-	}, [isFirstProfile, passwordInputRef]);
+		if (profileNameInputRef.current?.value) {
+			passwordInputRef.current?.focus();
+		} else {
+			profileNameInputRef.current?.focus();
+		}
+	}, []);
 
 	const noPasswordDialogState = useDisclosure();
 
@@ -146,9 +138,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Continue with no password
 					</Button>
-					<Button w="100%" onClick={onCancel} disabled={isPending}>
-						Cancel
-					</Button>
+					{onCancel && (
+						<Button w="100%" onClick={onCancel} disabled={isPending}>
+							Cancel
+						</Button>
+					)}
 
 					<Modal
 						isOpen={noPasswordDialogState.isOpen}

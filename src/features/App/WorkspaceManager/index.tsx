@@ -7,6 +7,7 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
+import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -30,6 +31,15 @@ export type IWorkspacePickerProps = {
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
 };
+
+const defaultProfileNames = [
+	'Creative drafts',
+	'Second brain',
+	'Digital garden',
+	'Creative space',
+	'Mind space',
+	'Idea lab',
+];
 
 /**
  * Manages a workspace profiles
@@ -97,8 +107,14 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							);
 						})
 					}
-					onCancel={() => setIsProfileCreationScreen(false)}
-					isFirstProfile={hasNoProfiles}
+					onCancel={
+						hasNoProfiles
+							? undefined
+							: () => setIsProfileCreationScreen(false)
+					}
+					defaultProfileName={
+						hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
+					}
 				/>
 			);
 		}
