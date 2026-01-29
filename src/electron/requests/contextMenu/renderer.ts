@@ -1,3 +1,5 @@
+import { getZoomFactor } from '@utils/os/zoom';
+
 import { ipcRendererFetcher } from '../../utils/ipc/ipcRendererFetcher';
 
 import { ContextMenu, contextMenuChannel } from '.';
@@ -11,6 +13,6 @@ export type ContextMenuRequestProps = {
 export const { open: openContextMenu } = contextMenuChannel.client(ipcRendererFetcher);
 
 export const getContextMenuCoords = (event: MouseEvent) => ({
-	x: event.screenX,
-	y: event.screenY,
+	x: Math.ceil(event.pageX * getZoomFactor()),
+	y: Math.ceil(event.pageY * getZoomFactor()),
 });
