@@ -1,16 +1,9 @@
 import React, { FC } from 'react';
 import { Text, TextProps } from '@chakra-ui/react';
 
-export interface FeaturesHeaderProps extends TextProps {
-	view?: 'section' | 'group' | 'primary';
-}
+export type FeaturesHeaderProps = TextProps;
 
-export const FeaturesHeader: FC<FeaturesHeaderProps> = ({
-	children,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	view = 'section',
-	...rest
-}) => {
+export const FeaturesHeader: FC<FeaturesHeaderProps> = ({ children, ...rest }) => {
 	return (
 		<Text
 			as="h2"

@@ -25,7 +25,7 @@ export const FeaturesGroup = ({
 }: StackProps & { title?: string }) => {
 	return (
 		<VStack align="start" width="100%" {...props}>
-			{title && <FeaturesHeader view="primary">{title}</FeaturesHeader>}
+			{title && <FeaturesHeader>{title}</FeaturesHeader>}
 			<FeaturesPanel>{children}</FeaturesPanel>
 		</VStack>
 	);
