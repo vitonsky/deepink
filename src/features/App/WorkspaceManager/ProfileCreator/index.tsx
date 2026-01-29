@@ -206,12 +206,15 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
 				</VStack>
 				<VStack w="100%" alignItems="start">
-					<Text>Encryption password (recommended)</Text>
+					<HStack>
+						<Text>Encryption password</Text>
+						<Text color="typography.secondary">(recommended)</Text>
+					</HStack>
 					<Input
 						ref={passwordInputRef}
 						size="lg"
 						type="password"
-						placeholder="e.g., SecretPa$$word"
+						placeholder="Enter a strong password here"
 						value={password}
 						onChange={(evt) => setPassword(evt.target.value)}
 						focusBorderColor={passwordError ? 'red.500' : undefined}
