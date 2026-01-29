@@ -92,6 +92,18 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 
 	const [isShowSplash] = useDebounce(isProfileLoading, 500);
 	const content = useMemo(() => {
+		if (currentProfileObject) {
+			return (
+				<ProfileLoginForm
+					profile={currentProfileObject}
+					onLogin={onOpenProfile}
+					onPickAnotherProfile={() => {
+						onChooseProfile(null);
+					}}
+				/>
+			);
+		}
+
 		// show a loading screen while the profile is opening
 		if (isProfileLoading || isShowSplash) return <SplashScreen />;
 
@@ -115,18 +127,6 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 					defaultProfileName={
 						hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
 					}
-				/>
-			);
-		}
-
-		if (currentProfileObject) {
-			return (
-				<ProfileLoginForm
-					profile={currentProfileObject}
-					onLogin={onOpenProfile}
-					onPickAnotherProfile={() => {
-						onChooseProfile(null);
-					}}
 				/>
 			);
 		}
