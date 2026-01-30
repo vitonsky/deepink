@@ -21,6 +21,9 @@ import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { SQLConsole } from './SQLConsole/SQLConsole';
 import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
 
+/**
+ * Manages a profile and its resources
+ */
 export type ProfileControls = {
 	profile: ProfileContainer;
 	api: {
