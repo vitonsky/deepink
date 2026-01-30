@@ -21,15 +21,12 @@ import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { SQLConsole } from './SQLConsole/SQLConsole';
 import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
 
-/**
- * Manages a profile and its resources
- */
 export type ProfileControls = {
 	profile: ProfileContainer;
 	api: {
 		lexemes: LexemesRegistry;
 	};
-	close: (options?: { resetActiveProfile: boolean }) => void;
+	close: () => void;
 };
 
 export const ProfileControlsContext = createContext<ProfileControls | null>(null);
