@@ -114,6 +114,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		} else {
 			profileNameInputRef.current?.focus();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const noPasswordDialogState = useDisclosure();
