@@ -29,6 +29,9 @@ import { SQLConsole } from './SQLConsole/SQLConsole';
 import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
 import { useVaultState } from './useVaultState';
 
+/**
+ * Manages a profile and its resources
+ */
 export type ProfileControls = {
 	profile: ProfileContainer;
 	api: {
