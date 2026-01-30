@@ -1,9 +1,5 @@
 import { getRandomItem } from './getRandomItem';
 
-beforeEach(() => {
-	vi.resetAllMocks();
-});
-
 const collection = ['Apple', 'Banana', 'Watermelon', 'Carrot', 'Eggplant'];
 
 test('Returns undefined for empty collection', () => {
