@@ -1,5 +1,9 @@
 import { getRandomItem } from './getRandomItem';
 
+beforeEach(() => {
+	vi.resetAllMocks();
+});
+
 const collection = ['Apple', 'Banana', 'Watermelon', 'Carrot', 'Eggplant'];
 
 test('Returns undefined for empty collection', () => {
@@ -7,19 +11,22 @@ test('Returns undefined for empty collection', () => {
 });
 
 test('Returns random value', () => {
-	expect(getRandomItem(collection)).toBeTypeOf('string');
+	for (let i = 0; i < 5; i++) {
+		expect(getRandomItem(collection)).toBeTypeOf('string');
+	}
 });
 
 test('Returns the value for collection with one item', () => {
-	expect(getRandomItem(collection.slice(0, 1))).toBe(collection[0]);
+	const smallCollection = ['Apple'];
+	expect(getRandomItem(smallCollection)).toBe(smallCollection[0]);
 });
 
-test('Can return the first item', () => {
-	vi.spyOn(Math, 'random').mockReturnValue(0);
+test('Returns the first and last items from the collection', () => {
+	vi.spyOn(Math, 'random')
+		.mockImplementationOnce(() => 0)
+		.mockImplementationOnce(() => 0.9);
+
 	expect(getRandomItem(collection)).toBe(collection[0]);
-});
 
-test('Can return the last item', () => {
-	vi.spyOn(Math, 'random').mockReturnValue(0.9);
 	expect(getRandomItem(collection)).toBe(collection[collection.length - 1]);
 });
