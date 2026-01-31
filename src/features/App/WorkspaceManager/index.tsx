@@ -1,10 +1,13 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
+import { useDebounce } from 'use-debounce';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
+import { SplashScreen } from '@features/SplashScreen';
 import { useTelemetryTracker } from '@features/telemetry';
+import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { ProfilesApi } from '../Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from '../useProfilesList';
@@ -29,6 +32,15 @@ export type IWorkspacePickerProps = {
 	onChooseProfile: (id: string | null) => void;
 };
 
+const defaultProfileNames = [
+	'Creative drafts',
+	'Second brain',
+	'Digital garden',
+	'Creative space',
+	'Mind space',
+	'Idea lab',
+];
+
 /**
  * Manages a workspace profiles
  */
@@ -40,8 +52,11 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 }) => {
 	const telemetry = useTelemetryTracker();
 
+	const [isProfileLoading, setIsProfileLoading] = useState(false);
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
+			setIsProfileLoading(true);
+
 			// Profiles with no password
 			if (!profile.encryption) {
 				await profiles.openProfile({ profile }, true);
@@ -59,6 +74,8 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 				console.error(err);
 
 				return { status: 'error', message: 'Invalid password' };
+			} finally {
+				setIsProfileLoading(false);
 			}
 		},
 		[profiles],
@@ -71,25 +88,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		[currentProfile, profilesManager.profiles],
 	);
 
-	const [screenName, setScreenName] = useState<'main' | 'createProfile'>('main');
+	const [isProfileCreationScreen, setIsProfileCreationScreen] = useState(false);
 
+	const [isShowSplash] = useDebounce(isProfileLoading, 500);
 	const content = useMemo(() => {
-		if (screenName === 'createProfile') {
-			return (
-				<ProfileCreator
-					onCreateProfile={(profile) =>
-						profilesManager.createProfile(profile).then((newProfile) => {
-							setScreenName('main');
-							onOpenProfile(newProfile, profile.password ?? undefined).then(
-								console.warn,
-							);
-						})
-					}
-					onCancel={() => setScreenName('main')}
-				/>
-			);
-		}
-
 		if (currentProfileObject) {
 			return (
 				<ProfileLoginForm
@@ -98,6 +100,33 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 					onPickAnotherProfile={() => {
 						onChooseProfile(null);
 					}}
+				/>
+			);
+		}
+
+		// show a loading screen while the profile is opening
+		if (isProfileLoading || isShowSplash) return <SplashScreen />;
+
+		const hasNoProfiles = profilesManager.profiles.length === 0;
+		if (isProfileCreationScreen || hasNoProfiles) {
+			return (
+				<ProfileCreator
+					onCreateProfile={(profile) =>
+						profilesManager.createProfile(profile).then((newProfile) => {
+							setIsProfileCreationScreen(false);
+							onOpenProfile(newProfile, profile.password ?? undefined).then(
+								console.warn,
+							);
+						})
+					}
+					onCancel={
+						hasNoProfiles
+							? undefined
+							: () => setIsProfileCreationScreen(false)
+					}
+					defaultProfileName={
+						hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
+					}
 				/>
 			);
 		}
@@ -111,7 +140,7 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 							variant="accent"
 							size="lg"
 							w="100%"
-							onClick={() => setScreenName('createProfile')}
+							onClick={() => setIsProfileCreationScreen(true)}
 						>
 							Create new profile
 						</Button>
@@ -164,8 +193,10 @@ export const WorkspaceManager: FC<IWorkspacePickerProps> = ({
 		onChooseProfile,
 		onOpenProfile,
 		profilesManager,
-		screenName,
 		telemetry,
+		isShowSplash,
+		isProfileLoading,
+		isProfileCreationScreen,
 	]);
 
 	return (
