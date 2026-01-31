@@ -1,7 +1,7 @@
 import { getRandomItem } from './getRandomItem';
 
 beforeEach(() => {
-	vi.clearAllMocks();
+	vi.restoreAllMocks();
 });
 
 const collection = ['Apple', 'Banana', 'Watermelon', 'Carrot', 'Eggplant'];
