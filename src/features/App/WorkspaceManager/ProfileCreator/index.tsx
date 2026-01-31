@@ -1,4 +1,4 @@
-import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import {
 	Button,
@@ -19,7 +19,6 @@ import {
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
 
@@ -42,8 +41,8 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 }) => {
 	const telemetry = useTelemetryTracker();
 
-	const profileNameInputRef = useFocusableRef<HTMLInputElement>();
-	const passwordInputRef = createRef<HTMLInputElement>();
+	const profileNameInputRef = useRef<HTMLInputElement | null>(null);
+	const passwordInputRef = useRef<HTMLInputElement | null>(null);
 
 	const [isPending, setIsPending] = useState(false);
 
@@ -109,13 +108,14 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	// Focus input
 	useEffect(() => {
-		if (profileNameInputRef.current?.value) {
+		const hasName = profileNameInputRef.current?.value;
+		if (hasName) {
 			passwordInputRef.current?.focus();
-		} else {
-			profileNameInputRef.current?.focus();
+			return;
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+
+		profileNameInputRef.current?.focus();
+	}, [passwordInputRef, profileNameInputRef]);
 
 	const noPasswordDialogState = useDisclosure();
 
