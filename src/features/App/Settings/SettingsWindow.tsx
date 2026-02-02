@@ -26,7 +26,7 @@ import { TextWithIcon } from '@components/TextWithIcon';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 
-import { AppearanceSettings } from './AppearanceSettings';
+import { AppearanceSettings } from './sections/appearance';
 import { GeneralSettings } from './sections/GeneralSettings';
 import { HotKeysSettings } from './sections/HotKeysSettings';
 import { ImportAndExport } from './sections/ImportAndExport';
