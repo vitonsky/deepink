@@ -25,43 +25,54 @@ import { VaultSettings } from './sections/VaultSettings';
 import { WorkspaceSettings } from './sections/WorkspaceSettings';
 
 // TODO: add icons
-const tabs = [
+type SettingsSection = {
+	id: string;
+	title: string;
+	component: React.ComponentType;
+};
+
+const tabs: SettingsSection[] = [
 	{
-		id: 'Hotkeys',
-		content: <Text>Hotkeys</Text>,
-	},
-	{
-		id: 'General',
-		content: <Text>General</Text>,
+		id: 'general',
+		title: 'General',
+		component: GeneralSettings,
 	},
 	{
 		id: 'appearance',
-		content: <Text>Appearance</Text>,
+		title: 'Appearance',
+		component: AppearanceSettings,
 	},
 	{
 		id: 'vault',
-		content: <Text>Vault</Text>,
+		title: 'Vault',
+		component: VaultSettings,
 	},
 	{
-		id: 'Notes',
-		content: <Text>Notes</Text>,
+		id: 'notes',
+		title: 'Notes',
+		component: NoteSettings,
+	},
+	{
+		id: 'hotkeys',
+		title: 'Hotkeys',
+		component: HotKeysSettings,
 	},
 ];
 
-const workspaceTabs = [
+const workspaceTabs: SettingsSection[] = [
 	{
-		id: 'Workspace Settings',
-		content: <Text>Workspace Settings</Text>,
+		id: 'workspace-settings',
+		title: 'Workspace Settings',
+		component: WorkspaceSettings,
 	},
 	{
-		id: 'Import & Export',
-		content: <Text>Import & Export</Text>,
+		id: 'import-and-export',
+		title: 'Import & Export',
+		component: ImportAndExport,
 	},
 ];
 
 // TODO: add help section with links
-// TODO: add section with workspace settings
-// TODO: move panels to separate components
 // TODO: connect controls to a data and make changes
 // TODO: use range selectors instead of numbers for options with limited range of values
 // TODO: suggest available fonts
@@ -101,7 +112,7 @@ export const SettingsWindow = () => {
 										borderRadius="4px"
 										padding=".3rem .5rem"
 									>
-										{tab.content}
+										{tab.title}
 									</Tab>
 								);
 							})}
@@ -117,38 +128,28 @@ export const SettingsWindow = () => {
 										borderRadius="4px"
 										padding=".3rem .5rem"
 									>
-										{tab.content}
+										{tab.title}
 									</Tab>
 								);
 							})}
 						</TabList>
 
 						<TabPanels maxWidth="600px" minWidth="400px" width="100%">
-							<TabPanel padding={0}>
-								<HotKeysSettings />
-							</TabPanel>
+							{tabs.map((tab) => {
+								return (
+									<TabPanel key={tab.id} padding={0}>
+										<tab.component />
+									</TabPanel>
+								);
+							})}
 
-							<TabPanel padding={0}>
-								<GeneralSettings />
-							</TabPanel>
-
-							<TabPanel padding={0}>
-								<AppearanceSettings />
-							</TabPanel>
-
-							<TabPanel padding={0}>
-								<VaultSettings />
-							</TabPanel>
-							<TabPanel padding={0}>
-								<NoteSettings />
-							</TabPanel>
-
-							<TabPanel padding={0}>
-								<WorkspaceSettings />
-							</TabPanel>
-							<TabPanel padding={0}>
-								<ImportAndExport />
-							</TabPanel>
+							{workspaceTabs.map((tab) => {
+								return (
+									<TabPanel key={tab.id} padding={0}>
+										<tab.component />
+									</TabPanel>
+								);
+							})}
 						</TabPanels>
 					</Tabs>
 				</ModalBody>
