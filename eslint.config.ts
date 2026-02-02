@@ -257,6 +257,14 @@ export default tseslint.config(
 						'(useEqualMemo|useImmutableCallback|useIsomorphicLayoutEffect)',
 				},
 			],
+
+			'react/jsx-curly-brace-presence': [
+				'error',
+				{
+					props: 'never',
+					children: 'never',
+				},
+			],
 		},
 	},
 );

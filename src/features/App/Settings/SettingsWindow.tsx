@@ -101,12 +101,12 @@ export const KeyboardShortcut = ({ shortcut }: { shortcut?: string }) => {
 	// TODO: use icons for some buttons
 	return (
 		<Box
-			padding={'.2rem .5rem'}
-			fontSize={'.8rem'}
-			backgroundColor={'dim.200'}
-			borderRadius={'6px'}
-			cursor={'default'}
-			userSelect={'none'}
+			padding=".2rem .5rem"
+			fontSize=".8rem"
+			backgroundColor="dim.200"
+			borderRadius="6px"
+			cursor="default"
+			userSelect="none"
 		>
 			{keys.length > 0 ? keys.join(' + ') : 'Blank'}
 		</Box>
@@ -303,15 +303,15 @@ export const SettingsWindow = () => {
 			closeOnEsc={false}
 		>
 			<ModalOverlay />
-			<ModalContent maxWidth={'800px'}>
-				<ModalHeader paddingInline={'1rem'}>Preferences</ModalHeader>
+			<ModalContent maxWidth="800px">
+				<ModalHeader paddingInline="1rem">Preferences</ModalHeader>
 				<ModalCloseButton />
-				<ModalBody paddingInline={'1rem'} paddingBlockEnd={'2rem'}>
+				<ModalBody paddingInline="1rem" paddingBlockEnd="2rem">
 					<Tabs orientation="vertical" gap="1rem">
 						<TabList
 							display="flex"
 							flexWrap="wrap"
-							width={'200px'}
+							width="200px"
 							gap="1px"
 							flexShrink={0}
 						>
@@ -319,8 +319,8 @@ export const SettingsWindow = () => {
 								return (
 									<Tab
 										key={tab.id}
-										justifyContent={'start'}
-										borderRadius={'4px'}
+										justifyContent="start"
+										borderRadius="4px"
 										padding=".3rem .5rem"
 									>
 										{tab.content}
@@ -328,15 +328,15 @@ export const SettingsWindow = () => {
 								);
 							})}
 
-							<Text fontWeight={'bold'} marginTop={'2rem'}>
+							<Text fontWeight="bold" marginTop="2rem">
 								Workspace
 							</Text>
 							{workspaceTabs.map((tab) => {
 								return (
 									<Tab
 										key={tab.id}
-										justifyContent={'start'}
-										borderRadius={'4px'}
+										justifyContent="start"
+										borderRadius="4px"
 										padding=".3rem .5rem"
 									>
 										{tab.content}
@@ -348,7 +348,7 @@ export const SettingsWindow = () => {
 						<TabPanels maxWidth="600px" minWidth="400px" width="100%">
 							<TabPanel padding={0}>
 								<Features>
-									<FeaturesPanel padding={'1rem'}>
+									<FeaturesPanel padding="1rem">
 										{Object.entries(shortcuts).map(
 											([shortcuts, command], index) => {
 												return (
@@ -358,9 +358,7 @@ export const SettingsWindow = () => {
 															<Text>
 																{SHORTCUT_NAMES[command]}
 															</Text>
-															<Box
-																marginInlineStart={'auto'}
-															>
+															<Box marginInlineStart="auto">
 																<KeyboardShortcut
 																	shortcut={shortcuts}
 																/>
@@ -419,7 +417,7 @@ export const SettingsWindow = () => {
 											<Select
 												defaultValue="fs"
 												size="sm"
-												width={'auto'}
+												width="auto"
 											>
 												<option>Do not lock</option>
 												<option>for 5 minutes</option>
@@ -546,7 +544,7 @@ export const SettingsWindow = () => {
 										</FeaturesOption>
 
 										<FeaturesOption title="Plain text features">
-											<VStack align={'start'} paddingTop={'.5rem'}>
+											<VStack align="start" paddingTop=".5rem">
 												<Switch
 													size="sm"
 													defaultChecked={
@@ -670,7 +668,7 @@ export const SettingsWindow = () => {
 										<FeaturesOption title="New note title">
 											<Input
 												size="sm"
-												defaultValue={'Note $date$ $time$'}
+												defaultValue="Note $date$ $time$"
 											/>
 										</FeaturesOption>
 										<FeaturesOption title="Tags for new note">
@@ -707,7 +705,7 @@ export const SettingsWindow = () => {
 												/>
 												<InputRightElement
 													w="3rem"
-													pointerEvents={'none'}
+													pointerEvents="none"
 												>
 													<Text variant="secondary">sec</Text>
 												</InputRightElement>
@@ -754,7 +752,7 @@ export const SettingsWindow = () => {
 												/>
 												<InputRightElement
 													w="3rem"
-													pointerEvents={'none'}
+													pointerEvents="none"
 												>
 													<Text variant="secondary">days</Text>
 												</InputRightElement>
@@ -860,7 +858,7 @@ export const SettingsWindow = () => {
 								</Features>
 							</TabPanel>
 							<TabPanel padding={0}>
-								<VStack width={'100%'} align={'start'}>
+								<VStack width="100%" align="start">
 									<HStack>
 										<Menu size="sm">
 											<MenuButton
@@ -925,7 +923,7 @@ export const SettingsWindow = () => {
 										}) => (
 											<VStack
 												{...getRootProps()}
-												width={'100%'}
+												width="100%"
 												gap="1rem"
 												as="section"
 												border="1px dashed"
