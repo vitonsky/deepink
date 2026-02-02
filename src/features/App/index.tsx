@@ -6,7 +6,6 @@ import { SplashScreen } from '@features/SplashScreen';
 
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
-import { SettingsWindow } from './Settings/SettingsWindow';
 import { useAppUpdater } from './useAppUpdater';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
@@ -98,7 +97,6 @@ export const App: FC = () => {
 			}}
 		>
 			<Profiles profilesApi={profileContainers} />
-			<SettingsWindow />
 		</Box>
 	);
 };
