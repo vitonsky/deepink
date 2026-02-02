@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
 import {
+	FaFileImport,
+	FaGear,
+	FaInbox,
+	FaKeyboard,
+	FaNoteSticky,
+	FaPalette,
+	FaVault,
+} from 'react-icons/fa6';
+import {
 	Modal,
 	ModalBody,
 	ModalCloseButton,
@@ -13,6 +22,7 @@ import {
 	Tabs,
 	Text,
 } from '@chakra-ui/react';
+import { TextWithIcon } from '@components/TextWithIcon';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 
@@ -29,6 +39,7 @@ type SettingsSection = {
 	id: string;
 	title: string;
 	component: React.ComponentType;
+	icon?: React.ComponentType;
 };
 
 const tabs: SettingsSection[] = [
@@ -36,26 +47,31 @@ const tabs: SettingsSection[] = [
 		id: 'general',
 		title: 'General',
 		component: GeneralSettings,
+		icon: FaGear,
 	},
 	{
 		id: 'appearance',
 		title: 'Appearance',
 		component: AppearanceSettings,
+		icon: FaPalette,
 	},
 	{
 		id: 'vault',
 		title: 'Vault',
 		component: VaultSettings,
+		icon: FaVault,
 	},
 	{
 		id: 'notes',
 		title: 'Notes',
 		component: NoteSettings,
+		icon: FaNoteSticky,
 	},
 	{
 		id: 'hotkeys',
 		title: 'Hotkeys',
 		component: HotKeysSettings,
+		icon: FaKeyboard,
 	},
 ];
 
@@ -64,11 +80,13 @@ const workspaceTabs: SettingsSection[] = [
 		id: 'workspace-settings',
 		title: 'Workspace Settings',
 		component: WorkspaceSettings,
+		icon: FaInbox,
 	},
 	{
 		id: 'import-and-export',
 		title: 'Import & Export',
 		component: ImportAndExport,
+		icon: FaFileImport,
 	},
 ];
 
@@ -112,7 +130,9 @@ export const SettingsWindow = () => {
 										borderRadius="4px"
 										padding=".3rem .5rem"
 									>
-										{tab.title}
+										<TextWithIcon icon={tab.icon && <tab.icon />}>
+											{tab.title}
+										</TextWithIcon>
 									</Tab>
 								);
 							})}
@@ -128,7 +148,9 @@ export const SettingsWindow = () => {
 										borderRadius="4px"
 										padding=".3rem .5rem"
 									>
-										{tab.title}
+										<TextWithIcon icon={tab.icon && <tab.icon />}>
+											{tab.title}
+										</TextWithIcon>
 									</Tab>
 								);
 							})}
