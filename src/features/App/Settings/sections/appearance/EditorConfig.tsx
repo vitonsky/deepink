@@ -68,10 +68,30 @@ export const EditorConfig = () => {
 
 			<FeaturesOption title="Plain text features">
 				<VStack align="start" paddingTop=".5rem">
-					<Switch size="sm" defaultChecked={editorConfig.lineNumbers}>
+					<Switch
+						size="sm"
+						isChecked={editorConfig.lineNumbers}
+						onChange={(evt) => {
+							dispatch(
+								settingsApi.setEditorConfig({
+									lineNumbers: evt.target.checked,
+								}),
+							);
+						}}
+					>
 						Show line numbers
 					</Switch>
-					<Switch size="sm" defaultChecked={editorConfig.miniMap}>
+					<Switch
+						size="sm"
+						isChecked={editorConfig.miniMap}
+						onChange={(evt) => {
+							dispatch(
+								settingsApi.setEditorConfig({
+									miniMap: evt.target.checked,
+								}),
+							);
+						}}
+					>
 						Enable mini map
 					</Switch>
 				</VStack>
