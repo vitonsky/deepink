@@ -11,6 +11,8 @@ import {
 	settingsApi,
 } from '@state/redux/settings/settings';
 
+import { SimpleSlider } from './SimpleSlider';
+
 export const EditorConfig = () => {
 	const editorMode = useAppSelector(selectEditorMode);
 
@@ -42,11 +44,26 @@ export const EditorConfig = () => {
 			</FeaturesOption>
 
 			<FeaturesOption title="Font size">
-				<Input size="sm" defaultValue={editorConfig.fontSize} />
+				<SimpleSlider
+					min={8}
+					max={32}
+					value={editorConfig.fontSize}
+					onChange={(value) => {
+						dispatch(settingsApi.setEditorConfig({ fontSize: value }));
+					}}
+				/>
 			</FeaturesOption>
 
 			<FeaturesOption title="Line height">
-				<Input size="sm" defaultValue={editorConfig.lineHeight} />
+				<SimpleSlider
+					min={0.3}
+					max={5}
+					step={0.1}
+					value={editorConfig.lineHeight}
+					onChange={(value) => {
+						dispatch(settingsApi.setEditorConfig({ lineHeight: value }));
+					}}
+				/>
 			</FeaturesOption>
 
 			<FeaturesOption title="Plain text features">

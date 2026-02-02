@@ -51,12 +51,20 @@ export const settingsSlice = createSlice({
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
 			return { ...state, ...payload } as GlobalSettings;
 		},
+
 		setEditorMode: (
 			state,
 			{ payload }: PayloadAction<GlobalSettings['editorMode']>,
 		) => {
 			return { ...state, editorMode: payload } as GlobalSettings;
 		},
+		setEditorConfig: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['editor']>>,
+		) => {
+			state.editor = { ...state.editor, ...payload };
+		},
+
 		setTheme: (
 			state,
 			{ payload }: PayloadAction<Partial<GlobalSettings['theme']>>,
