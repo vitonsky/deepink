@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Select, Switch, VStack } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { editorModes } from '@features/NotesContainer/EditorModePicker/EditorModePicker';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
+import {
+	selectEditorConfig,
+	selectEditorFontFamily,
+} from '@state/redux/settings/selectors/preferences';
 import {
 	EditorMode,
 	selectEditorMode,
@@ -18,8 +21,7 @@ export const EditorConfig = () => {
 	const dispatch = useAppDispatch();
 	const editorMode = useAppSelector(selectEditorMode);
 	const editorConfig = useAppSelector(selectEditorConfig);
-
-	const [font, setFont] = useState(editorConfig.fontFamily);
+	const editorFontFamily = useAppSelector(selectEditorFontFamily);
 
 	return (
 		<FeaturesGroup title="Editor">
@@ -42,10 +44,16 @@ export const EditorConfig = () => {
 
 			<FeaturesOption title="Font family">
 				<FontFamilyInput
-					inputProps={{ size: 'sm' }}
-					inputValue={font}
-					onInputChange={setFont}
+					inputProps={{
+						size: 'sm',
+						placeholder: 'Enter font family name',
+						fontFamily: editorFontFamily,
+					}}
 					fontSize={editorConfig.fontSize}
+					value={editorConfig.fontFamily}
+					onChange={(fontFamily) => {
+						dispatch(settingsApi.setEditorConfig({ fontFamily }));
+					}}
 				/>
 			</FeaturesOption>
 

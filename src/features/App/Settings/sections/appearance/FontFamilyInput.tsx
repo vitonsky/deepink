@@ -42,46 +42,58 @@ export const VirtualList = ({
 	return children(virtualizer);
 };
 
-export const FontFamilyInput = ({
+// TODO: open list when user click input
+export const SimpleComboBox = <T extends unknown>({
+	autoFocusItem,
+
+	items,
+	itemToString,
+	renderItem,
+
 	placeholder,
 	inputProps,
 	inputValue,
 	onInputChange,
-	fontSize,
 	...props
-}: BoxProps & {
+}: {
 	placeholder?: string;
 	inputProps?: InputProps;
 
 	inputValue?: string;
 	onInputChange?: (inputValue: string) => void;
-}) => {
+
+	autoFocusItem?: boolean;
+
+	items: T[];
+	itemToString: (item: T | null) => string;
+	renderItem: (item: T) => ReactNode;
+} & BoxProps) => {
 	const listRootRef = useRef<HTMLDivElement>(null);
 	const [inputRef, setInputRef] = useState<HTMLDivElement>();
 
-	const [fonts, setFonts] = useState<IFontInfo[]>([]);
-	useEffect(() => {
-		getFontsList().then(setFonts);
-	}, []);
-
-	const fontSuggests = useMemo(() => {
-		if (!inputValue) return fonts;
-
-		return fonts.filter(
-			(info) => inputValue === null || info.name.includes(inputValue),
-		);
-	}, [fonts, inputValue]);
-
 	return (
 		<Downshift
-			onStateChange={({ inputValue }) => {
-				if (inputValue !== undefined) {
-					onInputChange?.(inputValue ?? '');
-				}
-			}}
 			inputValue={inputValue}
-			itemToString={(item: IFontInfo | null) => (item ? item.name : '')}
-			itemCount={fontSuggests.length}
+			onInputValueChange={(value) => {
+				onInputChange?.(value ?? '');
+			}}
+			itemCount={items.length}
+			itemToString={itemToString}
+			defaultHighlightedIndex={autoFocusItem ? 0 : undefined}
+			stateReducer={(state, changes) => {
+				// Clear input only by second escape press
+				if (
+					changes.type === Downshift.stateChangeTypes.keyDownEscape &&
+					(items.length === 0 || !state.isOpen)
+				) {
+					return changes;
+				}
+
+				return {
+					...changes,
+					inputValue: state.inputValue,
+				};
+			}}
 		>
 			{({
 				getInputProps,
@@ -106,7 +118,7 @@ export const FontFamilyInput = ({
 							/>
 						</Box>
 
-						{isOpen && fontSuggests.length > 0 && (
+						{isOpen && items.length > 0 && renderItem && (
 							<Popper
 								referenceRef={inputRef ?? undefined}
 								allowedPlacements={['top', 'bottom']}
@@ -114,11 +126,11 @@ export const FontFamilyInput = ({
 								zIndex={999999}
 							>
 								<VirtualList
-									count={fontSuggests.length}
+									count={items.length}
 									activeIndex={highlightedIndex ?? undefined}
 									getScrollElement={() => listRootRef.current}
 									estimateSize={() => 40}
-									overscan={10}
+									overscan={6}
 								>
 									{(virtualizer) => {
 										return (
@@ -147,14 +159,14 @@ export const FontFamilyInput = ({
 																virtualItemPosition,
 															) => {
 																const item =
-																	fontSuggests[
+																	items[
 																		virtualRow.index
 																	];
 
 																return (
 																	<ListItem
 																		{...getItemProps({
-																			key: item.familyName,
+																			key: virtualRow.index,
 																			index: virtualRow.index,
 																			item,
 																		})}
@@ -162,7 +174,7 @@ export const FontFamilyInput = ({
 																			virtualizer.measureElement
 																		}
 																		key={
-																			item.familyName
+																			virtualRow.index
 																		}
 																		data-index={
 																			virtualRow.index
@@ -178,22 +190,7 @@ export const FontFamilyInput = ({
 																				: undefined
 																		}
 																	>
-																		<Text
-																			maxWidth="100%"
-																			padding=".3rem 1rem"
-																			fontSize={
-																				fontSize
-																			}
-																			whiteSpace="nowrap"
-																			wordBreak="break-word"
-																			textOverflow="ellipsis"
-																			overflow="hidden"
-																			fontFamily={
-																				item.familyName
-																			}
-																		>
-																			{item.name}
-																		</Text>
+																		{renderItem(item)}
 																	</ListItem>
 																);
 															},
@@ -209,5 +206,60 @@ export const FontFamilyInput = ({
 				);
 			}}
 		</Downshift>
+	);
+};
+
+export const FontFamilyInput = ({
+	placeholder,
+	value,
+	onChange,
+	fontSize,
+	...props
+}: Omit<BoxProps, 'onChange'> & {
+	placeholder?: string;
+	inputProps?: InputProps;
+
+	value?: string;
+	onChange?: (fontFamily: string) => void;
+}) => {
+	// Suggests list
+	const [fonts, setFonts] = useState<IFontInfo[]>([]);
+	useEffect(() => {
+		getFontsList().then(setFonts);
+	}, []);
+
+	const fontSuggests = useMemo(() => {
+		if (!value) return fonts;
+
+		return fonts.filter(
+			(info) =>
+				value === null || info.name.toLowerCase().includes(value.toLowerCase()),
+		);
+	}, [fonts, value]);
+
+	return (
+		<SimpleComboBox
+			{...props}
+			inputValue={value}
+			onInputChange={onChange}
+			itemToString={(item) => item?.name ?? ''}
+			items={fontSuggests}
+			renderItem={(item) => (
+				<Text
+					fontSize={fontSize}
+					fontFamily={item.familyName}
+					maxWidth="100%"
+					padding=".3rem 1rem"
+					overflow="hidden"
+					textOverflow="ellipsis"
+					whiteSpace="nowrap"
+					wordBreak="break-word"
+					cursor="default"
+					userSelect="none"
+				>
+					{item.name}
+				</Text>
+			)}
+		/>
 	);
 };
