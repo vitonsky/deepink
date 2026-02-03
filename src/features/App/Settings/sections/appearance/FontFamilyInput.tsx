@@ -35,7 +35,6 @@ export const VirtualList = ({
 	useEffect(() => {
 		if (activeIndex === undefined) return;
 
-		console.log('activeIndex', activeIndex);
 		virtualizer.scrollToIndex(activeIndex);
 	}, [activeIndex, virtualizer]);
 
@@ -102,6 +101,7 @@ export const SimpleComboBox = <T extends unknown>({
 				isOpen,
 				getRootProps,
 				highlightedIndex,
+				openMenu,
 			}) => {
 				return (
 					<Box w="100%" position="relative" {...props}>
@@ -111,7 +111,11 @@ export const SimpleComboBox = <T extends unknown>({
 							{...getRootProps({}, { suppressRefError: true })}
 						>
 							<Input
-								{...getInputProps()}
+								{...getInputProps({
+									onClick() {
+										openMenu();
+									},
+								})}
 								{...{ placeholder, ...inputProps }}
 								w="100%"
 								ref={setInputRef}
@@ -124,6 +128,10 @@ export const SimpleComboBox = <T extends unknown>({
 								allowedPlacements={['top', 'bottom']}
 								offset={{ mainAxis: 5 }}
 								zIndex={999999}
+								onMouseDownCapture={(evt) => {
+									// Prevent focus by click scroll bar
+									evt.preventDefault();
+								}}
 							>
 								<VirtualList
 									count={items.length}
