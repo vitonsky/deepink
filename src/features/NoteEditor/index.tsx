@@ -259,7 +259,7 @@ export const Note: FC<NoteEditorProps> = memo(
 							size="xs"
 							onClick={() =>
 								runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK, {
-									id: note.id,
+									noteId: note.id,
 								})
 							}
 							isActive={note.isBookmarked}
@@ -279,7 +279,7 @@ export const Note: FC<NoteEditorProps> = memo(
 							size="xs"
 							onClick={() =>
 								runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, {
-									id: note.id,
+									noteId: note.id,
 								})
 							}
 							isActive={note.isArchived}
