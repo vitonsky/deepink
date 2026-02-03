@@ -2,10 +2,6 @@ import { useCallback } from 'react';
 import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
-import {
-	useNotesRegistry,
-	useTagsRegistry,
-} from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
@@ -13,10 +9,6 @@ import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 
 import { NoteActions } from '.';
-
-export type ContextMenuOptions = {
-	updateNotes: () => void;
-};
 
 const buildNoteMenu = (note: INote): ContextMenu => {
 	return [
@@ -42,11 +34,8 @@ const buildNoteMenu = (note: INote): ContextMenu => {
 	];
 };
 
-export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
+export const useNoteContextMenu = () => {
 	const telemetry = useTelemetryTracker();
-
-	const notes = useNotesRegistry();
-	const tagsRegistry = useTagsRegistry();
 
 	const runCommand = useCommand();
 
@@ -75,26 +64,8 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 					runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { noteId });
 				},
 
-				[NoteActions.DUPLICATE]: async (id: string) => {
-					const sourceNote = await notes.getById(id);
-
-					if (!sourceNote) {
-						console.warn(`Not found note with id ${sourceNote}`);
-						return;
-					}
-
-					const { title, text } = sourceNote.content;
-					const newNoteId = await notes.add({
-						title: 'DUPLICATE: ' + title,
-						text,
-					});
-
-					const attachedTags = await tagsRegistry.getAttachedTags(id);
-					const attachedTagsIds = attachedTags.map(({ id }) => id);
-
-					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
-
-					updateNotes();
+				[NoteActions.DUPLICATE]: async (noteId: string) => {
+					runCommand(GLOBAL_COMMANDS.DUPLICATE_NOTE, { noteId });
 				},
 
 				[NoteActions.COPY_MARKDOWN_LINK]: async (noteId: string) => {
@@ -110,7 +81,7 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 				actionsMap[action](id);
 			}
 		},
-		[telemetry, runCommand, notes, tagsRegistry, updateNotes],
+		[telemetry, runCommand],
 	);
 
 	const showMenu = useShowNoteContextMenu(noteContextMenuCallback);
