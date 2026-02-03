@@ -17,7 +17,8 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
 
 	/**
-	 * Move a note to the Bin
+	 * Deletes a note.
+	 * Behavior depends on the permanent flag: true move the note to the bin, false removes it permanently
 	 */
 	DELETE_NOTE = 'DELETE_NOTE',
 
@@ -27,19 +28,19 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
 
 	/**
-	 * Toggle the archive status of the current note
+	 * Toggle the archive status of the note
 	 */
-	TOGGLE_CURRENT_NOTE_ARCHIVE = 'toggleCurrentNoteArchive',
+	TOGGLE_NOTE_ARCHIVE = 'TOGGLE_NOTE_ARCHIVE',
 
 	/**
-	 * Toggle the bookmark status of the current note
+	 * Toggle the bookmark status of the note
 	 */
-	TOGGLE_CURRENT_NOTE_BOOKMARK = 'toggleCurrentNoteBookmark',
+	TOGGLE_NOTE_BOOKMARK = 'TOGGLE_NOTE_BOOKMARK',
 
 	/**
-	 * Open the history for the current note
+	 * Open the history for the note
 	 */
-	OPEN_CURRENT_NOTE_HISTORY = 'openCurrentNoteHistory',
+	OPEN_NOTE_HISTORY = 'OPEN_NOTE_HISTORY',
 
 	/**
 	 * Export a note
@@ -81,12 +82,19 @@ export enum GLOBAL_COMMANDS {
 	 */
 	FOCUS_SEARCH = 'FOCUS_SEARCH',
 
+	/**
+	 * Triggered when a keyboard shortcut is pressed
+	 */
 	SHORTCUTS_PRESSED = 'SHORTCUTS_PRESSED',
 }
 
 type CommandsWithPayload = {
 	[GLOBAL_COMMANDS.DELETE_NOTE]: { id: string; permanent: boolean };
 	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
+
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { id: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK]: { id: string };
+	[GLOBAL_COMMANDS.OPEN_NOTE_HISTORY]: { id: string };
 
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
 	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };

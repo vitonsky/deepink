@@ -55,7 +55,9 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					</HStack>
 				</MenuItem>
 				<MenuItem
-					onClick={() => runCommand(GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY)}
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, { id: note.id })
+					}
 				>
 					<HStack>
 						<FaClock />
@@ -114,7 +116,7 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				</MenuItem>
 				<MenuItem
 					onClick={() =>
-						runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE)
+						runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, { id: note.id })
 					}
 				>
 					<HStack>

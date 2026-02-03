@@ -210,7 +210,7 @@ export const Note: FC<NoteEditorProps> = memo(
 		}, [sidePanel, telemetry]);
 
 		useWorkspaceCommandCallback(
-			GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY,
+			GLOBAL_COMMANDS.OPEN_NOTE_HISTORY,
 			() => {
 				setSidePanel((state) =>
 					state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
@@ -257,7 +257,9 @@ export const Note: FC<NoteEditorProps> = memo(
 							}
 							size="xs"
 							onClick={() =>
-								runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK)
+								runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK, {
+									id: note.id,
+								})
 							}
 							isActive={note.isBookmarked}
 						>
@@ -272,7 +274,9 @@ export const Note: FC<NoteEditorProps> = memo(
 							}
 							size="xs"
 							onClick={() =>
-								runCommand(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE)
+								runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, {
+									id: note.id,
+								})
 							}
 							isActive={note.isArchived}
 						>

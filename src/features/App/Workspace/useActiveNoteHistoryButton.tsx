@@ -30,7 +30,8 @@ export const useActiveNoteHistoryButton = () => {
 				title: 'History',
 				icon: <FaClockRotateLeft />,
 				text: noteDate ?? '',
-				onClick: () => runCommand(GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY),
+				onClick: () =>
+					runCommand(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, { id: activeNoteId }),
 			},
 			{
 				placement: 'end',

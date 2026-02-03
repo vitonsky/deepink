@@ -17,7 +17,7 @@ import {
 } from '@state/redux/profiles/profiles';
 import { getItemByOffset } from '@utils/collections/getItemByOffset';
 
-export const useCallShortcut = () => {
+export const useHandleShortcut = () => {
 	const notesRegistry = useNotesRegistry();
 	const command = useCommand();
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
@@ -30,9 +30,6 @@ export const useCallShortcut = () => {
 		[Shortcuts.RESTORE_CLOSED_NOTE]: () =>
 			command(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE),
 
-		[Shortcuts.OPEN_CURRENT_NOTE_HISTORY]: () =>
-			command(GLOBAL_COMMANDS.OPEN_CURRENT_NOTE_HISTORY),
-
 		[Shortcuts.FOCUS_NEXT_NOTE]: () => command(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE),
 
 		[Shortcuts.FOCUS_PREVIOUS_NOTE]: () =>
@@ -44,12 +41,6 @@ export const useCallShortcut = () => {
 		[Shortcuts.SYNC_DATABASE]: () => command(GLOBAL_COMMANDS.SYNC_DATABASE),
 
 		[Shortcuts.FOCUS_SEARCH]: () => command(GLOBAL_COMMANDS.FOCUS_SEARCH),
-
-		[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: () =>
-			command(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE),
-
-		[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]: () =>
-			command(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK),
 	};
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.SHORTCUTS_PRESSED, (payload) => {
@@ -78,12 +69,27 @@ export const useCallShortcut = () => {
 
 		command(GLOBAL_COMMANDS.DELETE_NOTE, { id: activeNoteId, permanent: true });
 	});
+
+	useShortcutCallback(Shortcuts.OPEN_CURRENT_NOTE_HISTORY, () => {
+		if (!activeNoteId) return;
+		command(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, { id: activeNoteId });
+	});
+
+	useShortcutCallback(Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE, () => {
+		if (!activeNoteId) return;
+		command(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, { id: activeNoteId });
+	});
+
+	useShortcutCallback(Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK, () => {
+		if (!activeNoteId) return;
+		command(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK, { id: activeNoteId });
+	});
 };
 
 /**
  * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore, switch focus and etc.,
  */
-export const useNoteShortcutActions = () => {
+export const useNotesShortcutActions = () => {
 	const telemetry = useTelemetryTracker();
 
 	const noteActions = useNoteActions();
@@ -95,7 +101,7 @@ export const useNoteShortcutActions = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 
-	useCallShortcut();
+	useHandleShortcut();
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.CREATE_NOTE, () => {
 		createNote();
@@ -140,34 +146,35 @@ export const useNoteShortcutActions = () => {
 		focusNoteInDirection('next'),
 	);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_ARCHIVE, async () => {
-		if (!activeNoteId) return;
-		const note = await notesRegistry.getById(activeNoteId);
-		if (!note) return;
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE,
+		async ({ id: noteId }) => {
+			const note = await notesRegistry.getById(noteId);
+			if (!note) return;
 
-		const newArchivedState = !note.isArchived;
-		await notesRegistry.updateMeta([activeNoteId], {
-			isArchived: newArchivedState,
-		});
-		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, activeNoteId);
+			const newArchivedState = !note.isArchived;
+			await notesRegistry.updateMeta([noteId], {
+				isArchived: newArchivedState,
+			});
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
-			action: newArchivedState ? 'Added' : 'Removed',
-		});
-	});
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+				action: newArchivedState ? 'Added' : 'Removed',
+			});
+		},
+	);
 
 	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.TOGGLE_CURRENT_NOTE_BOOKMARK,
-		async () => {
-			if (!activeNoteId) return;
-			const note = await notesRegistry.getById(activeNoteId);
+		GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK,
+		async ({ id: noteId }) => {
+			const note = await notesRegistry.getById(noteId);
 			if (!note) return;
 
 			const newBookmarkedState = !note.isBookmarked;
-			await notesRegistry.updateMeta([activeNoteId], {
+			await notesRegistry.updateMeta([noteId], {
 				isBookmarked: newBookmarkedState,
 			});
-			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, activeNoteId);
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
 				action: newBookmarkedState ? 'Added' : 'Removed',
