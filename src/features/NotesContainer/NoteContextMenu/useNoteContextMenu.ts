@@ -2,23 +2,15 @@ import { useCallback } from 'react';
 import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ContextMenu } from '@electron/requests/contextMenu';
-import {
-	useNotesRegistry,
-	useTagsRegistry,
-} from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
-
-import { NoteActions } from '.';
 import { useVaultSelector } from '@state/redux/profiles/hooks';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 
-export type ContextMenuOptions = {
-	updateNotes: () => void;
-};
+import { NoteActions } from '.';
 
 const buildNoteMenu = ({
 	note,
@@ -50,75 +42,8 @@ const buildNoteMenu = ({
 	];
 };
 
-export const useHandleDeleteCommand = () => {
+export const useNoteContextMenu = () => {
 	const telemetry = useTelemetryTracker();
-	const notes = useNotesRegistry();
-	const tagsRegistry = useTagsRegistry();
-
-	const { noteUpdated } = useNotesContext();
-	const updateNotes = useUpdateNotes();
-	const noteActions = useNoteActions();
-
-	const deletionConfig = useVaultSelector(selectDeletionConfig);
-
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async ({ id }) => {
-		if (
-			deletionConfig.confirm &&
-			!confirm(`Do you want to move this note to the bin?`)
-		)
-			return;
-
-		noteActions.close(id);
-
-					await notes.updateMeta([id], { isDeleted: true });
-					const [updatedNote] = await notes.getById([id]);
-					if (updatedNote) noteUpdated(updatedNote);
-
-		updateNotes();
-
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-			permanently: 'false',
-		});
-	});
-
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
-		async ({ id }) => {
-			if (
-				deletionConfig.confirm &&
-				!confirm(`Do you want to permanently delete this note?`)
-			)
-				return;
-
-			noteActions.close(id);
-
-			await notes.delete([id]);
-			await tagsRegistry.setAttachedTags(id, []);
-
-			updateNotes();
-
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-				permanently: 'true',
-			});
-		},
-	);
-
-				[NoteActions.RESTORE_FROM_BIN]: async (id: string) => {
-					await notes.updateMeta([id], { isDeleted: false });
-					const [updatedNote] = await notes.getById([id]);
-					if (updatedNote) noteUpdated(updatedNote);
-
-		updateNotes();
-
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
-	});
-};
-
-export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
-	const telemetry = useTelemetryTracker();
-
-	const notes = useNotesRegistry();
-	const tagsRegistry = useTagsRegistry();
 
 	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
@@ -149,26 +74,8 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 					runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { noteId });
 				},
 
-				[NoteActions.DUPLICATE]: async (id: string) => {
-					const [sourceNote] = await notes.getById([id]);
-
-					if (!sourceNote) {
-						console.warn(`Not found note with id ${sourceNote}`);
-						return;
-					}
-
-					const { title, text } = sourceNote.content;
-					const newNoteId = await notes.add({
-						title: 'DUPLICATE: ' + title,
-						text,
-					});
-
-					const attachedTags = await tagsRegistry.getAttachedTags(id);
-					const attachedTagsIds = attachedTags.map(({ id }) => id);
-
-					await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
-
-					updateNotes();
+				[NoteActions.DUPLICATE]: async (noteId: string) => {
+					runCommand(GLOBAL_COMMANDS.DUPLICATE_NOTE, { noteId });
 				},
 
 				[NoteActions.COPY_MARKDOWN_LINK]: async (noteId: string) => {
@@ -184,7 +91,7 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 				actionsMap[action](id);
 			}
 		},
-		[telemetry, runCommand, notes, tagsRegistry, updateNotes],
+		[telemetry, runCommand],
 	);
 
 	const showMenu = useShowNoteContextMenu(noteContextMenuCallback);
