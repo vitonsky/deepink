@@ -35,9 +35,7 @@ export const settingsSlice = createSlice({
 			accentColor: 'auto',
 		},
 		editor: {
-			fontFamily:
-				// eslint-disable-next-line @cspell/spellchecker
-				'-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Segoe UI Variable", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", Arial, system-ui, sans-serif',
+			fontFamily: '',
 			fontSize: 18,
 			lineHeight: 1.5,
 			miniMap: false,
