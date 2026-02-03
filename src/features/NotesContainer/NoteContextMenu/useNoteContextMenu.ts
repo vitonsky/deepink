@@ -67,16 +67,22 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 			});
 
 			const actionsMap = {
-				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
-					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, { id, permanent: false });
+				[NoteActions.DELETE_TO_BIN]: async (noteId: string) => {
+					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
+						noteId,
+						permanent: false,
+					});
 				},
 
-				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
-					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, { id, permanent: true });
+				[NoteActions.DELETE_PERMANENTLY]: async (noteId: string) => {
+					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
+						noteId,
+						permanent: true,
+					});
 				},
 
-				[NoteActions.RESTORE_FROM_BIN]: async (id: string) => {
-					runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { id });
+				[NoteActions.RESTORE_FROM_BIN]: async (noteId: string) => {
+					runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { noteId });
 				},
 
 				[NoteActions.DUPLICATE]: async (id: string) => {
@@ -101,12 +107,12 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 					updateNotes();
 				},
 
-				[NoteActions.COPY_MARKDOWN_LINK]: async (id: string) => {
-					runCommand(GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK, { id });
+				[NoteActions.COPY_MARKDOWN_LINK]: async (noteId: string) => {
+					runCommand(GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK, { noteId });
 				},
 
-				[NoteActions.EXPORT]: async (id: string) => {
-					runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { id });
+				[NoteActions.EXPORT]: async (noteId: string) => {
+					runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { noteId });
 				},
 			};
 

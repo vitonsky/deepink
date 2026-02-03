@@ -39,7 +39,7 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				<MenuItem
 					onClick={() =>
 						runCommand(GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK, {
-							id: note.id,
+							noteId: note.id,
 						})
 					}
 				>
@@ -56,7 +56,9 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				</MenuItem>
 				<MenuItem
 					onClick={() =>
-						runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY, { id: note.id })
+						runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY, {
+							noteId: note.id,
+						})
 					}
 				>
 					<HStack>
@@ -94,7 +96,7 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 
 				<MenuItem
 					onClick={() =>
-						runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { id: note.id })
+						runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { noteId: note.id })
 					}
 				>
 					<HStack>
@@ -116,7 +118,9 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				</MenuItem>
 				<MenuItem
 					onClick={() =>
-						runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, { id: note.id })
+						runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, {
+							noteId: note.id,
+						})
 					}
 				>
 					<HStack>
@@ -130,10 +134,10 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					onClick={() =>
 						note.isDeleted
 							? runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, {
-									id: note.id,
+									noteId: note.id,
 								})
 							: runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
-									id: note.id,
+									noteId: note.id,
 									permanent: false,
 								})
 					}

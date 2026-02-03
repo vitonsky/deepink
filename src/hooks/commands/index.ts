@@ -89,15 +89,15 @@ export enum GLOBAL_COMMANDS {
 }
 
 type CommandsWithPayload = {
-	[GLOBAL_COMMANDS.DELETE_NOTE]: { id: string; permanent: boolean };
-	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
+	[GLOBAL_COMMANDS.DELETE_NOTE]: { noteId: string; permanent: boolean };
+	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { noteId: string };
 
-	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { id: string };
-	[GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK]: { id: string };
-	[GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY]: { id: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { noteId: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK]: { noteId: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY]: { noteId: string };
 
-	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
-	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };
+	[GLOBAL_COMMANDS.EXPORT_NOTE]: { noteId: string };
+	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { noteId: string };
 
 	[GLOBAL_COMMANDS.SHORTCUTS_PRESSED]: Shortcuts;
 };

@@ -44,7 +44,7 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE,
-		async ({ id: noteId, permanent }) => {
+		async ({ noteId, permanent }) => {
 			if (permanent) {
 				const isConfirmed = confirm(
 					`Do you want to permanently delete this note?`,
@@ -55,32 +55,31 @@ export const useNoteCommandHandlers = () => {
 
 				await notes.delete([noteId]);
 				await tagsRegistry.setAttachedTags(noteId, []);
+
 				eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+			} else {
+				if (requiresConfirmMoveToBin) {
+					const isConfirmed = confirm(
+						`Do you want to move this note to the bin?`,
+					);
+					if (!isConfirmed) return;
+				}
 
-				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-					permanently: 'true',
-				});
+				noteActions.close(noteId);
+
+				await notes.updateMeta([noteId], { isDeleted: true });
+				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 			}
-
-			if (requiresConfirmMoveToBin) {
-				const isConfirmed = confirm(`Do you want to move this note to the bin?`);
-				if (!isConfirmed) return;
-			}
-
-			noteActions.close(noteId);
-
-			await notes.updateMeta([noteId], { isDeleted: true });
-			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-				permanently: 'false',
+				permanently: permanent,
 			});
 		},
 	);
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN,
-		async ({ id: noteId }) => {
+		async ({ noteId }) => {
 			await notes.updateMeta([noteId], { isDeleted: false });
 			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 
@@ -88,7 +87,7 @@ export const useNoteCommandHandlers = () => {
 		},
 	);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ id: noteId }) => {
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ noteId }) => {
 		const note = await notes.getById(noteId);
 		await notesExport.exportNote(
 			noteId,
@@ -101,7 +100,7 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK,
-		async ({ id: noteId }) => {
+		async ({ noteId }) => {
 			const note = await notes.getById(noteId);
 			if (!note) {
 				console.error(`Can't get data of note #${noteId}`);
