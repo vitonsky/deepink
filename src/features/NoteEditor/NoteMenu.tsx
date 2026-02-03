@@ -129,10 +129,11 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 						note.isDeleted
 							? runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, {
 									id: note.id,
-							  })
-							: runCommand(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, {
+								})
+							: runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
 									id: note.id,
-							  })
+									permanent: false,
+								})
 					}
 				>
 					<HStack>
