@@ -1,0 +1,18 @@
+import { useCommandCallback } from '../useCommandCallback';
+import { GLOBAL_COMMANDS } from '..';
+import { Shortcuts } from '.';
+
+export const useShortcutCallback = (
+	shortcut: Shortcuts,
+	callback: () => void,
+	{ enabled = true }: { enabled?: boolean } = {},
+) => {
+	useCommandCallback(
+		GLOBAL_COMMANDS.SHORTCUTS_PRESSED,
+		(pressedShortcut) => {
+			if (pressedShortcut !== shortcut) return;
+			callback();
+		},
+		{ enabled },
+	);
+};
