@@ -68,11 +68,11 @@ export const useNoteContextMenu = ({ updateNotes }: ContextMenuOptions) => {
 
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
-					runCommand(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, { id });
+					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, { id, permanent: false });
 				},
 
 				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
-					runCommand(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, { id });
+					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, { id, permanent: true });
 				},
 
 				[NoteActions.RESTORE_FROM_BIN]: async (id: string) => {

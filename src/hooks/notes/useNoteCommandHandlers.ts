@@ -42,64 +42,69 @@ export const useNoteCommandHandlers = () => {
 
 	const eventBus = useEventBus();
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, async ({ id }) => {
-		if (requiresConfirmMoveToBin) {
-			const isConfirmed = confirm(`Do you want to move this note to the bin?`);
-			if (!isConfirmed) return;
-		}
-
-		noteActions.close(id);
-
-		await notes.updateMeta([id], { isDeleted: true });
-		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
-
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-			permanently: 'false',
-		});
-	});
-
 	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
-		async ({ id }) => {
-			const isConfirmed = confirm(`Do you want to permanently delete this note?`);
-			if (!isConfirmed) return;
+		GLOBAL_COMMANDS.DELETE_NOTE,
+		async ({ id: noteId, permanent }) => {
+			if (permanent) {
+				const isConfirmed = confirm(
+					`Do you want to permanently delete this note?`,
+				);
+				if (!isConfirmed) return;
 
-			noteActions.close(id);
+				noteActions.close(noteId);
 
-			await notes.delete([id]);
-			await tagsRegistry.setAttachedTags(id, []);
-			eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+				await notes.delete([noteId]);
+				await tagsRegistry.setAttachedTags(noteId, []);
+				eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+
+				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
+					permanently: 'true',
+				});
+			}
+
+			if (requiresConfirmMoveToBin) {
+				const isConfirmed = confirm(`Do you want to move this note to the bin?`);
+				if (!isConfirmed) return;
+			}
+
+			noteActions.close(noteId);
+
+			await notes.updateMeta([noteId], { isDeleted: true });
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-				permanently: 'true',
+				permanently: 'false',
 			});
 		},
 	);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, async ({ id }) => {
-		await notes.updateMeta([id], { isDeleted: false });
-		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, id);
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN,
+		async ({ id: noteId }) => {
+			await notes.updateMeta([noteId], { isDeleted: false });
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 
-		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
-	});
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_RESTORED_FROM_BIN);
+		},
+	);
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ id }) => {
-		const note = await notes.getById(id);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ id: noteId }) => {
+		const note = await notes.getById(noteId);
 		await notesExport.exportNote(
-			id,
+			noteId,
 			buildFileName(
 				workspaceData?.name,
-				note?.content.title.trim().slice(0, 50).trim() || `note_${id}`,
+				note?.content.title.trim().slice(0, 50).trim() || `note_${noteId}`,
 			),
 		);
 	});
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK,
-		async ({ id }) => {
-			const note = await notes.getById(id);
+		async ({ id: noteId }) => {
+			const note = await notes.getById(noteId);
 			if (!note) {
-				console.error(`Can't get data of note #${id}`);
+				console.error(`Can't get data of note #${noteId}`);
 				return;
 			}
 
@@ -107,7 +112,7 @@ export const useNoteCommandHandlers = () => {
 			const noteTitle = (title || text.slice(0, 30))
 				.trim()
 				.replace(mdCharsForEscapeRegEx, '\\$1');
-			const markdownLink = `[${noteTitle}](${formatNoteLink(id)})`;
+			const markdownLink = `[${noteTitle}](${formatNoteLink(noteId)})`;
 
 			console.log(`Copy markdown link ${markdownLink}`);
 

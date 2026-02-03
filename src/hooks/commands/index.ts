@@ -19,17 +19,12 @@ export enum GLOBAL_COMMANDS {
 	/**
 	 * Move a note to the Bin
 	 */
-	DELETE_NOTE_TO_BIN = 'deleteNoteToBin',
+	DELETE_NOTE = 'DELETE_NOTE',
 
 	/**
 	 * Restore a note from the Bin
 	 */
 	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
-
-	/**
-	 * Permanently delete a note
-	 */
-	DELETE_NOTE_PERMANENTLY = 'deleteNotePermanently',
 
 	/**
 	 * Toggle the archive status of the current note
@@ -90,8 +85,7 @@ export enum GLOBAL_COMMANDS {
 }
 
 type CommandsWithPayload = {
-	[GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN]: { id: string };
-	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { id: string };
+	[GLOBAL_COMMANDS.DELETE_NOTE]: { id: string; permanent: boolean };
 	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { id: string };
 
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };

@@ -60,7 +60,7 @@ export const useCallShortcut = () => {
 
 	useShortcutCallback(Shortcuts.DELETE_NOTE_TO_BIN, () => {
 		if (!activeNoteId) return;
-		command(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, { id: activeNoteId });
+		command(GLOBAL_COMMANDS.DELETE_NOTE, { id: activeNoteId, permanent: false });
 	});
 
 	useShortcutCallback(Shortcuts.RESTORE_NOTE_FROM_BIN, async () => {
@@ -76,7 +76,7 @@ export const useCallShortcut = () => {
 		const note = await notesRegistry.getById(activeNoteId);
 		if (note && !note.isDeleted) return;
 
-		command(GLOBAL_COMMANDS.DELETE_NOTE_TO_BIN, { id: activeNoteId });
+		command(GLOBAL_COMMANDS.DELETE_NOTE, { id: activeNoteId, permanent: true });
 	});
 };
 
