@@ -155,6 +155,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	useShortcutsBinding();
 
 	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
+	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, db.sync);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
