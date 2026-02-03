@@ -51,7 +51,7 @@ export const useHandleShortcut = () => {
 
 	useShortcutCallback(Shortcuts.DELETE_NOTE_TO_BIN, () => {
 		if (!activeNoteId) return;
-		command(GLOBAL_COMMANDS.DELETE_NOTE, { id: activeNoteId, permanent: false });
+		command(GLOBAL_COMMANDS.DELETE_NOTE, { noteId: activeNoteId, permanent: false });
 	});
 
 	useShortcutCallback(Shortcuts.RESTORE_NOTE_FROM_BIN, async () => {
@@ -59,7 +59,7 @@ export const useHandleShortcut = () => {
 		const note = await notesRegistry.getById(activeNoteId);
 		if (note && !note.isDeleted) return;
 
-		command(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { id: activeNoteId });
+		command(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { noteId: activeNoteId });
 	});
 
 	useShortcutCallback(Shortcuts.DELETE_NOTE_PERMANENTLY, async () => {
@@ -67,22 +67,22 @@ export const useHandleShortcut = () => {
 		const note = await notesRegistry.getById(activeNoteId);
 		if (note && !note.isDeleted) return;
 
-		command(GLOBAL_COMMANDS.DELETE_NOTE, { id: activeNoteId, permanent: true });
+		command(GLOBAL_COMMANDS.DELETE_NOTE, { noteId: activeNoteId, permanent: true });
 	});
 
 	useShortcutCallback(Shortcuts.OPEN_CURRENT_NOTE_HISTORY, () => {
 		if (!activeNoteId) return;
-		command(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY, { id: activeNoteId });
+		command(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY, { noteId: activeNoteId });
 	});
 
 	useShortcutCallback(Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE, () => {
 		if (!activeNoteId) return;
-		command(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, { id: activeNoteId });
+		command(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, { noteId: activeNoteId });
 	});
 
 	useShortcutCallback(Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK, () => {
 		if (!activeNoteId) return;
-		command(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK, { id: activeNoteId });
+		command(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK, { noteId: activeNoteId });
 	});
 };
 
@@ -148,7 +148,7 @@ export const useNotesShortcutActions = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE,
-		async ({ id: noteId }) => {
+		async ({ noteId }) => {
 			const note = await notesRegistry.getById(noteId);
 			if (!note) return;
 
@@ -166,7 +166,7 @@ export const useNotesShortcutActions = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK,
-		async ({ id: noteId }) => {
+		async ({ noteId }) => {
 			const note = await notesRegistry.getById(noteId);
 			if (!note) return;
 
