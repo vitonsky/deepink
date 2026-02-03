@@ -72,7 +72,7 @@ export const useHandleShortcut = () => {
 
 	useShortcutCallback(Shortcuts.OPEN_CURRENT_NOTE_HISTORY, () => {
 		if (!activeNoteId) return;
-		command(GLOBAL_COMMANDS.OPEN_NOTE_HISTORY, { id: activeNoteId });
+		command(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY, { id: activeNoteId });
 	});
 
 	useShortcutCallback(Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE, () => {
