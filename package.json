@@ -125,6 +125,7 @@
 		"file-saver": "^2.0.5",
 		"font-list": "^2.0.2",
 		"framer-motion": "^12.29.2",
+		"fuzzysort": "^3.1.0",
 		"hotkeys-js": "^4.0.0",
 		"lexical": "^0.39.0",
 		"lodash": "^4.17.23",

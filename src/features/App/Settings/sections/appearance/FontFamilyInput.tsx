@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import Downshift from 'downshift';
 import { IFontInfo } from 'font-list';
+import fuzzysort from 'fuzzysort';
 import {
 	Box,
 	BoxProps,
@@ -239,15 +240,20 @@ export const FontFamilyInput = ({
 	const fontSuggests = useMemo(() => {
 		if (!value) return fonts;
 
-		return fonts.filter(
-			(info) =>
-				value === null || info.name.toLowerCase().includes(value.toLowerCase()),
-		);
+		return fuzzysort
+			.go(value, fonts, {
+				key(obj) {
+					return obj.name;
+				},
+				threshold: 0.2,
+			})
+			.map((result) => result.obj);
 	}, [fonts, value]);
 
 	return (
 		<SimpleComboBox
 			{...props}
+			autoFocusItem
 			inputValue={value}
 			onInputChange={onChange}
 			itemToString={(item) => item?.name ?? ''}
