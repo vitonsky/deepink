@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
 
 import { useCommand } from '../useCommand';
-import { KeyboardShortcutMap, shortcuts } from '.';
+import { GLOBAL_COMMANDS } from '..';
+import { SHORTCUTS_MAP } from '.';
 
 /**
  * Registers keyboard shortcuts for commands
@@ -21,8 +22,8 @@ export const useShortcutsBinding = () => {
 		hotkeys.filter = (event) => event.isTrusted;
 
 		const isMacOS = navigator.userAgent.includes('Mac OS');
-		const normalizedShortcuts: KeyboardShortcutMap = Object.fromEntries(
-			Object.entries(shortcuts).map(
+		const normalizedShortcuts = Object.fromEntries(
+			Object.entries(SHORTCUTS_MAP).map(
 				([shortcut, command]) =>
 					[
 						shortcut
@@ -39,7 +40,7 @@ export const useShortcutsBinding = () => {
 				{
 					capture: true,
 				},
-				() => runCommand(commandName),
+				() => runCommand(GLOBAL_COMMANDS.SHORTCUTS_PRESSED, commandName),
 			);
 		});
 
