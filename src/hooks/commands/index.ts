@@ -1,3 +1,5 @@
+import { Shortcuts } from './shortcuts';
+
 export enum GLOBAL_COMMANDS {
 	/**
 	 * Create and open a new note
@@ -28,21 +30,6 @@ export enum GLOBAL_COMMANDS {
 	 * Permanently delete a note
 	 */
 	DELETE_NOTE_PERMANENTLY = 'deleteNotePermanently',
-
-	/**
-	 * Move a current note to the Bin
-	 */
-	DELETE_CURRENT_NOTE_TO_BIN = 'DELETE_CURRENT_NOTE_TO_BIN',
-
-	/**
-	 * Restore a current note from the Bin
-	 */
-	RESTORE_CURRENT_NOTE_FROM_BIN = 'RESTORE_CURRENT_NOTE_FROM_BIN',
-
-	/**
-	 * Permanently delete a current note
-	 */
-	DELETE_CURRENT_NOTE_PERMANENTLY = 'DELETE_CURRENT_NOTE_PERMANENTLY',
 
 	/**
 	 * Toggle the archive status of the current note
@@ -98,6 +85,8 @@ export enum GLOBAL_COMMANDS {
 	 * Focus the search input field
 	 */
 	FOCUS_SEARCH = 'FOCUS_SEARCH',
+
+	SHORTCUTS_PRESSED = 'SHORTCUTS_PRESSED',
 }
 
 type CommandsWithPayload = {
@@ -107,6 +96,8 @@ type CommandsWithPayload = {
 
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
 	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };
+
+	[GLOBAL_COMMANDS.SHORTCUTS_PRESSED]: Shortcuts;
 };
 
 export type CommandPayloadsMap = {
