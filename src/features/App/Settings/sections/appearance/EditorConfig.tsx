@@ -1,5 +1,5 @@
-import React from 'react';
-import { Input, Select, Switch, VStack } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Select, Switch, VStack } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { editorModes } from '@features/NotesContainer/EditorModePicker/EditorModePicker';
@@ -11,14 +11,15 @@ import {
 	settingsApi,
 } from '@state/redux/settings/settings';
 
+import { FontFamilyInput } from './FontFamilyInput';
 import { SimpleSlider } from './SimpleSlider';
 
 export const EditorConfig = () => {
+	const dispatch = useAppDispatch();
 	const editorMode = useAppSelector(selectEditorMode);
-
 	const editorConfig = useAppSelector(selectEditorConfig);
 
-	const dispatch = useAppDispatch();
+	const [font, setFont] = useState(editorConfig.fontFamily);
 
 	return (
 		<FeaturesGroup title="Editor">
@@ -40,7 +41,12 @@ export const EditorConfig = () => {
 			</FeaturesOption>
 
 			<FeaturesOption title="Font family">
-				<Input size="sm" defaultValue={editorConfig.fontFamily} />
+				<FontFamilyInput
+					inputProps={{ size: 'sm' }}
+					inputValue={font}
+					onInputChange={setFont}
+					fontSize={editorConfig.fontSize}
+				/>
 			</FeaturesOption>
 
 			<FeaturesOption title="Font size">
