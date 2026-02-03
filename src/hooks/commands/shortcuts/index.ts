@@ -5,7 +5,7 @@ export enum Shortcuts {
 	FOCUS_NEXT_NOTE,
 	FOCUS_PREVIOUS_NOTE,
 
-	OPEN_CURRENT_NOTE_HISTORY,
+	TOGGLE_CURRENT_NOTE_HISTORY,
 
 	LOCK_CURRENT_PROFILE,
 	SYNC_DATABASE,
@@ -27,7 +27,7 @@ export const SHORTCUTS_MAP = {
 	'CmdOrCtrl+PageDown': Shortcuts.FOCUS_NEXT_NOTE,
 	'CmdOrCtrl+PageUp': Shortcuts.FOCUS_PREVIOUS_NOTE,
 
-	'CmdOrCtrl+H': Shortcuts.OPEN_CURRENT_NOTE_HISTORY,
+	'CmdOrCtrl+H': Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY,
 
 	'CmdOrCtrl+L': Shortcuts.LOCK_CURRENT_PROFILE,
 	'CmdOrCtrl+S': Shortcuts.SYNC_DATABASE,
