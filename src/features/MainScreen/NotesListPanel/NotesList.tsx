@@ -6,7 +6,6 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -24,7 +23,6 @@ export type NotesListProps = {};
 export const NotesList: FC<NotesListProps> = () => {
 	const telemetry = useTelemetryTracker();
 
-	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
@@ -32,9 +30,7 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const search = useWorkspaceSelector(selectSearch);
 
-	const openNoteContextMenu = useNoteContextMenu({
-		updateNotes,
-	});
+	const openNoteContextMenu = useNoteContextMenu();
 
 	const parentRef = useRef<HTMLDivElement>(null);
 	const isActiveWorkspace = useIsActiveWorkspace();

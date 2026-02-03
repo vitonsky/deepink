@@ -120,6 +120,28 @@ export const useNoteCommandHandlers = () => {
 		},
 	);
 
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DUPLICATE_NOTE, async ({ noteId }) => {
+		const sourceNote = await notes.getById(noteId);
+
+		if (!sourceNote) {
+			console.warn(`Not found note with id ${sourceNote}`);
+			return;
+		}
+
+		const { title, text } = sourceNote.content;
+		const newNoteId = await notes.add({
+			title: 'DUPLICATE: ' + title,
+			text,
+		});
+
+		const attachedTags = await tagsRegistry.getAttachedTags(noteId);
+		const attachedTagsIds = attachedTags.map(({ id }) => id);
+
+		await tagsRegistry.setAttachedTags(newNoteId, attachedTagsIds);
+
+		eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
+	});
+
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE,
 		async ({ noteId }) => {
