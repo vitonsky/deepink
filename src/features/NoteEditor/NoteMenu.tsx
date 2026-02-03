@@ -138,7 +138,7 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 								})
 							: runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
 									noteId: note.id,
-									permanent: false,
+									permanently: false,
 								})
 					}
 				>

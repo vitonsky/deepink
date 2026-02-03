@@ -25,7 +25,7 @@ const mdCharsForEscapeRegEx = new RegExp(
 );
 
 /**
- * Handles delete, restore, and export actions for a note
+ * Registers handlers for commands that operate on a specific note
  */
 export const useNoteCommandHandlers = () => {
 	const telemetry = useTelemetryTracker();
@@ -33,6 +33,7 @@ export const useNoteCommandHandlers = () => {
 	const tagsRegistry = useTagsRegistry();
 
 	const noteActions = useNoteActions();
+	const notesRegistry = useNotesRegistry();
 
 	const notesExport = useNotesExport();
 	const currentWorkspace = useWorkspaceData();
@@ -44,8 +45,8 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE,
-		async ({ noteId, permanent }) => {
-			if (permanent) {
+		async ({ noteId, permanently }) => {
+			if (permanently) {
 				const isConfirmed = confirm(
 					`Do you want to permanently delete this note?`,
 				);
@@ -72,7 +73,7 @@ export const useNoteCommandHandlers = () => {
 			}
 
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-				permanently: permanent,
+				permanently,
 			});
 		},
 	);
@@ -116,6 +117,42 @@ export const useNoteCommandHandlers = () => {
 			console.log(`Copy markdown link ${markdownLink}`);
 
 			copyTextToClipboard(markdownLink);
+		},
+	);
+
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE,
+		async ({ noteId }) => {
+			const note = await notesRegistry.getById(noteId);
+			if (!note) return;
+
+			const newArchivedState = !note.isArchived;
+			await notesRegistry.updateMeta([noteId], {
+				isArchived: newArchivedState,
+			});
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
+
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE, {
+				action: newArchivedState ? 'Added' : 'Removed',
+			});
+		},
+	);
+
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK,
+		async ({ noteId }) => {
+			const note = await notesRegistry.getById(noteId);
+			if (!note) return;
+
+			const newBookmarkedState = !note.isBookmarked;
+			await notesRegistry.updateMeta([noteId], {
+				isBookmarked: newBookmarkedState,
+			});
+			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
+
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE, {
+				action: newBookmarkedState ? 'Added' : 'Removed',
+			});
 		},
 	);
 };
