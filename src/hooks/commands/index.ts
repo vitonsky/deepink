@@ -38,9 +38,9 @@ export enum GLOBAL_COMMANDS {
 	TOGGLE_NOTE_BOOKMARK = 'TOGGLE_NOTE_BOOKMARK',
 
 	/**
-	 * Open the history for the note
+	 * Toggle the history view for the note
 	 */
-	OPEN_NOTE_HISTORY = 'OPEN_NOTE_HISTORY',
+	TOGGLE_NOTE_HISTORY = 'TOGGLE_NOTE_HISTORY',
 
 	/**
 	 * Export a note
@@ -94,7 +94,7 @@ type CommandsWithPayload = {
 
 	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { id: string };
 	[GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK]: { id: string };
-	[GLOBAL_COMMANDS.OPEN_NOTE_HISTORY]: { id: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY]: { id: string };
 
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { id: string };
 	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { id: string };
