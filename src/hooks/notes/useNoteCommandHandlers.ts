@@ -146,7 +146,10 @@ export const useNoteCommandHandlers = () => {
 		GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE,
 		async ({ noteId }) => {
 			const note = await notesRegistry.getById(noteId);
-			if (!note) return;
+			if (!note) {
+				console.warn(`Not found note with id ${noteId}`);
+				return;
+			}
 
 			const newArchivedState = !note.isArchived;
 			await notesRegistry.updateMeta([noteId], {
@@ -164,7 +167,10 @@ export const useNoteCommandHandlers = () => {
 		GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK,
 		async ({ noteId }) => {
 			const note = await notesRegistry.getById(noteId);
-			if (!note) return;
+			if (!note) {
+				console.warn(`Not found note with id ${noteId}`);
+				return;
+			}
 
 			const newBookmarkedState = !note.isBookmarked;
 			await notesRegistry.updateMeta([noteId], {
