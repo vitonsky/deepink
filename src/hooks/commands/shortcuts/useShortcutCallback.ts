@@ -2,6 +2,9 @@ import { useCommandCallback } from '../useCommandCallback';
 import { GLOBAL_COMMANDS } from '..';
 import { Shortcuts } from '.';
 
+/**
+ * Runs the callback when the given shortcut is pressed
+ */
 export const useShortcutCallback = (
 	shortcut: Shortcuts,
 	callback: () => void,
