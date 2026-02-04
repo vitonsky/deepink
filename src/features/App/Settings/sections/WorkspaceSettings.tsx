@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Divider, HStack, Input, Link, Switch, Text } from '@chakra-ui/react';
+import { Button, Divider, HStack, Input, Link, Select, Text } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
@@ -164,12 +164,15 @@ export const WorkspaceSettings = () => {
 
 				<Divider />
 
-				<FeaturesOption description="Keep full changes log for notes. You may disable history for single notes">
-					<Switch size="sm">Enable history for notes</Switch>
+				<FeaturesOption title="New note title">
+					<Input size="sm" defaultValue="Note $date$ $time$" />
 				</FeaturesOption>
-
-				<FeaturesOption description="Move notes to recycle bin, instead of instant deletion">
-					<Switch size="sm">Use recycle bin</Switch>
+				<FeaturesOption title="Tags for new note">
+					<Select size="sm" width="auto">
+						<option>Do not set any tags</option>
+						<option>Same as selected tag</option>
+						<option>Assign tags below</option>
+					</Select>
 				</FeaturesOption>
 			</FeaturesGroup>
 

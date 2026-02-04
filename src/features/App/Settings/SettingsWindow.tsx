@@ -4,7 +4,6 @@ import {
 	FaGear,
 	FaInbox,
 	FaKeyboard,
-	FaNoteSticky,
 	FaPalette,
 	FaVault,
 } from 'react-icons/fa6';
@@ -30,7 +29,6 @@ import { AppearanceSettings } from './sections/appearance';
 import { GeneralSettings } from './sections/GeneralSettings';
 import { HotKeysSettings } from './sections/HotKeysSettings';
 import { ImportAndExport } from './sections/ImportAndExport';
-import { NoteSettings } from './sections/NoteSettings';
 import { VaultSettings } from './sections/VaultSettings';
 import { WorkspaceSettings } from './sections/WorkspaceSettings';
 
@@ -60,12 +58,6 @@ const tabs: SettingsSection[] = [
 		title: 'Vault',
 		component: VaultSettings,
 		icon: FaVault,
-	},
-	{
-		id: 'notes',
-		title: 'Notes',
-		component: NoteSettings,
-		icon: FaNoteSticky,
 	},
 	{
 		id: 'hotkeys',
