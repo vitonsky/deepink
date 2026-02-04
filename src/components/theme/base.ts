@@ -496,6 +496,7 @@ export default extendTheme({
 				solid: {
 					track: {
 						backgroundColor: 'control.base.background',
+						borderRadius: '6px',
 					},
 					filledTrack: {
 						backgroundColor: 'control.action.background',
