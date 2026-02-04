@@ -1,12 +1,16 @@
 import React, { useEffect } from 'react';
 import { FaClockRotateLeft } from 'react-icons/fa6';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
 
 export const useActiveNoteHistoryButton = () => {
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
+
+	const runCommand = useCommand();
 
 	// Note items on status bar
 	const statusBarButtons = useStatusBarManager();
@@ -26,7 +30,10 @@ export const useActiveNoteHistoryButton = () => {
 				title: 'History',
 				icon: <FaClockRotateLeft />,
 				text: noteDate ?? '',
-				onClick: () => console.log('TODO: show note history'),
+				onClick: () =>
+					runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL, {
+						noteId: activeNoteId,
+					}),
 			},
 			{
 				placement: 'end',
@@ -37,5 +44,5 @@ export const useActiveNoteHistoryButton = () => {
 		return () => {
 			statusBarButtons.controls.unregister('noteTime');
 		};
-	}, [activeNoteId, statusBarButtons.controls, openedNotes]);
+	}, [activeNoteId, statusBarButtons.controls, openedNotes, runCommand]);
 };

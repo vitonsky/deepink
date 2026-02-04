@@ -35,6 +35,9 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
+import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
@@ -68,6 +71,8 @@ export const Note: FC<NoteEditorProps> = memo(
 
 		const eventBus = useEventBus();
 		const notesRegistry = useNotesRegistry();
+
+		const runCommand = useCommand();
 
 		const [title, setTitle] = useState(note.content.title);
 		const [text, setText] = useState(note.content.text);
@@ -190,10 +195,6 @@ export const Note: FC<NoteEditorProps> = memo(
 		);
 
 		const [sidePanel, setSidePanel] = useState<NoteSidebarTabs | null>(null);
-		const onNoteMenuClick = useCallback((tabName: NoteSidebarTabs) => {
-			setSidePanel((state) => (state === tabName ? null : tabName));
-		}, []);
-
 		useEffect(() => {
 			if (sidePanel) {
 				telemetry.track(TELEMETRY_EVENT_NAME.NOTE_SIDE_PANEL_SHOWN, {
@@ -201,6 +202,16 @@ export const Note: FC<NoteEditorProps> = memo(
 				});
 			}
 		}, [sidePanel, telemetry]);
+
+		useWorkspaceCommandCallback(
+			GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL,
+			() => {
+				setSidePanel((state) =>
+					state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
+				);
+			},
+			{ enabled: isActive },
+		);
 
 		const [versionPreview, setVersionPreview] = useState<NoteVersion | null>(null);
 
@@ -225,7 +236,7 @@ export const Note: FC<NoteEditorProps> = memo(
 						/>
 
 						{/* TODO: add options that may be toggled */}
-						<NoteMenu note={note} onClick={onNoteMenuClick} />
+						<NoteMenu note={note} />
 					</HStack>
 				</HStack>
 
@@ -239,20 +250,11 @@ export const Note: FC<NoteEditorProps> = memo(
 									: 'Add to bookmarks'
 							}
 							size="xs"
-							onClick={async () => {
-								const newBookmarkedState = !note.isBookmarked;
-								await notesRegistry.updateMeta([note.id], {
-									isBookmarked: newBookmarkedState,
-								});
-								eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-								telemetry.track(
-									TELEMETRY_EVENT_NAME.NOTE_BOOKMARK_TOGGLE,
-									{
-										action: newBookmarkedState ? 'Added' : 'Removed',
-									},
-								);
-							}}
+							onClick={() =>
+								runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK, {
+									noteId: note.id,
+								})
+							}
 							isActive={note.isBookmarked}
 						>
 							<FaBookmark />
@@ -265,20 +267,11 @@ export const Note: FC<NoteEditorProps> = memo(
 									: 'Move to archive'
 							}
 							size="xs"
-							onClick={async () => {
-								const newArchivedState = !note.isArchived;
-								await notesRegistry.updateMeta([note.id], {
-									isArchived: newArchivedState,
-								});
-								eventBus.emit(WorkspaceEvents.NOTE_UPDATED, note.id);
-
-								telemetry.track(
-									TELEMETRY_EVENT_NAME.NOTE_ARCHIVE_TOGGLE,
-									{
-										action: newArchivedState ? 'Added' : 'Removed',
-									},
-								);
-							}}
+							onClick={() =>
+								runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, {
+									noteId: note.id,
+								})
+							}
 							isActive={note.isArchived}
 						>
 							<FaBoxArchive />
