@@ -69,7 +69,7 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 						)}
 					</HStack>
 				</MenuItem>
-				<MenuItem onClick={() => console.log('TODO: show note backlinks')}>
+				<MenuItem>
 					<HStack>
 						<FaLink />
 						<Text>Back links</Text>
