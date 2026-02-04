@@ -1,6 +1,15 @@
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Divider, HStack, Input, Link, Select, Text } from '@chakra-ui/react';
+import {
+	Button,
+	Divider,
+	HStack,
+	Input,
+	Link,
+	Select,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
@@ -15,6 +24,7 @@ import {
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { TemplateProcessor } from '@hooks/notes/TemplateProcessor';
 import { useImportNotesPreset } from '@hooks/notes/useImportNotesPreset';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -167,9 +177,25 @@ export const WorkspaceSettings = () => {
 
 				<Divider />
 
-				<FeaturesOption title="New note title">
+				<FeaturesOption
+					title="New note title"
+					description={
+						<>
+							{
+								'Set title for a new notes. You may use date via syntax {date} or {date:FORMAT} like that {date:DD/MM/YYYY HH:mm}.'
+							}
+							<br />
+							For more syntax, refer to{' '}
+							<Link href="https://day.js.org/docs/en/display/format">
+								format reference
+							</Link>
+							.
+						</>
+					}
+				>
 					<Input
 						size="sm"
+						placeholder="e.g., Note {date:DD/MM/YYYY HH:mm}"
 						value={newNoteConfig.title}
 						onChange={(evt) => {
 							dispatch(
@@ -180,6 +206,17 @@ export const WorkspaceSettings = () => {
 							);
 						}}
 					/>
+
+					{newNoteConfig.title.trim().length > 0 && (
+						<VStack align="start" gap={0}>
+							<Text fontSize=".8rem">Example</Text>
+							<Text fontWeight="bold">
+								{new TemplateProcessor({
+									ignoreParsingErrors: true,
+								}).compile(newNoteConfig.title)}
+							</Text>
+						</VStack>
+					)}
 				</FeaturesOption>
 				<FeaturesOption title="Tags for new note">
 					<Select
