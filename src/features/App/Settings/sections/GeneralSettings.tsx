@@ -1,14 +1,37 @@
 import React from 'react';
 import { getAbout } from 'src/about';
-import { Button, Divider, HStack, Select, Switch, Text } from '@chakra-ui/react';
+import Logo from '@assets/icons/app.svg';
+import {
+	Box,
+	Button,
+	Divider,
+	HStack,
+	Select,
+	Switch,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
-import { FeaturesGroup } from '@components/Features/Group';
+import { FeaturesGroup, FeaturesPanel } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 
 export const GeneralSettings = () => {
 	return (
 		<Features>
-			<FeaturesGroup>
+			<FeaturesPanel align="center" paddingBlock="2rem">
+				<Box as={Logo} boxSize="100px" />
+
+				<VStack gap=".3rem">
+					<Text fontSize="1.5rem" lineHeight="1">
+						General settings
+					</Text>
+					<Text variant="secondary">
+						Manage your overall preferences in app.
+					</Text>
+				</VStack>
+
+				<Divider />
+
 				<FeaturesOption title="Version">
 					<HStack gap="1rem" align="center">
 						<Text>{getAbout().version}</Text>
@@ -18,14 +41,14 @@ export const GeneralSettings = () => {
 					</HStack>
 				</FeaturesOption>
 
-				<FeaturesOption>
+				<FeaturesOption description="App will periodically check for updates and notify if new version is available">
 					<Switch size="sm" defaultChecked>
 						Automatic check for updates
 					</Switch>
 				</FeaturesOption>
+			</FeaturesPanel>
 
-				<Divider />
-
+			<FeaturesGroup>
 				<FeaturesOption
 					title="Language"
 					description="Change the display language."
@@ -35,6 +58,15 @@ export const GeneralSettings = () => {
 						<option>Japanese</option>
 						<option>Portuguese</option>
 					</Select>
+				</FeaturesOption>
+
+				<FeaturesOption
+					title="Notifications"
+					description="System notifications will be used only for reminders. When disabled, a reminders will appear only in app notifications list."
+				>
+					<Switch size="sm" defaultChecked>
+						Use system notifications for reminders
+					</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>
 
@@ -54,14 +86,6 @@ export const GeneralSettings = () => {
 						<option>for 30 minutes</option>
 						<option>for 1 hour</option>
 					</Select>
-				</FeaturesOption>
-			</FeaturesGroup>
-
-			<FeaturesGroup title="Notifications">
-				<FeaturesOption>
-					<Switch size="sm" defaultChecked>
-						Use system notifications for reminders
-					</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>
 		</Features>

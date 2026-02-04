@@ -14,7 +14,7 @@ export const Appearance = () => {
 	const theme = useAppSelector(selectTheme);
 
 	return (
-		<FeaturesGroup title="Appearance">
+		<FeaturesGroup>
 			<FeaturesOption title="Theme">
 				<Select
 					value={theme.name}

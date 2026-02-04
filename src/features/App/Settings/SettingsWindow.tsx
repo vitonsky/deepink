@@ -152,6 +152,15 @@ export const SettingsWindow = () => {
 							{tabs.map((tab) => {
 								return (
 									<TabPanel key={tab.id} padding={0}>
+										{tab.id !== 'general' && (
+											<Text
+												fontSize="1.5rem"
+												lineHeight="1"
+												marginBottom="1rem"
+											>
+												{tab.title}
+											</Text>
+										)}
 										<tab.component />
 									</TabPanel>
 								);
@@ -160,6 +169,13 @@ export const SettingsWindow = () => {
 							{workspaceTabs.map((tab) => {
 								return (
 									<TabPanel key={tab.id} padding={0}>
+										<Text
+											fontSize="1.5rem"
+											lineHeight="1"
+											marginBottom="1rem"
+										>
+											{tab.title}
+										</Text>
 										<tab.component />
 									</TabPanel>
 								);

@@ -16,7 +16,7 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 export const VaultSettings = () => {
 	return (
 		<Features>
-			<FeaturesGroup title="Vault settings">
+			<FeaturesGroup>
 				<FeaturesOption title="Vault name">
 					<Input defaultValue="Personal notes" size="sm" />
 				</FeaturesOption>

@@ -33,6 +33,7 @@
 		"baseUrl": ".",
 		"types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
 		"paths": {
+			"@assets/*": ["assets/*"],
 			"@core/*": ["src/core/*"],
 			"@electron/*": ["src/electron/*"],
 			"@components/*": ["src/components/*"],
