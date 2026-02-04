@@ -44,15 +44,23 @@ export const useWorkspaceShortcutHandlers = () => {
 		[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]: async () =>
 			commandWithActiveNote(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK),
 
-		[Shortcuts.DELETE_NOTE_TO_BIN]: () =>
-			commandWithActiveNote(GLOBAL_COMMANDS.DELETE_NOTE, { permanent: false }),
+		[Shortcuts.DELETE_NOTE_TO_BIN]: async () => {
+			if (!activeNoteId) return;
+			const note = await notesRegistry.getById(activeNoteId);
+			if (note && note.isDeleted) {
+				console.warn(`Note with id ${activeNoteId} is already in the bin`);
+				return;
+			}
+
+			commandWithActiveNote(GLOBAL_COMMANDS.DELETE_NOTE, { permanently: false });
+		},
 
 		[Shortcuts.DELETE_NOTE_PERMANENTLY]: async () => {
 			if (!activeNoteId) return;
 			const note = await notesRegistry.getById(activeNoteId);
 			if (note && !note.isDeleted) return;
 
-			commandWithActiveNote(GLOBAL_COMMANDS.DELETE_NOTE, { permanent: true });
+			commandWithActiveNote(GLOBAL_COMMANDS.DELETE_NOTE, { permanently: true });
 		},
 
 		[Shortcuts.RESTORE_NOTE_FROM_BIN]: async () => {
