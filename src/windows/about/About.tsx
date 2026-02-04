@@ -1,8 +1,7 @@
 import React from 'react';
 import { getAbout } from 'src/about';
+import Logo from '@assets/icons/app.svg';
 import { Box, Link, Text, VStack } from '@chakra-ui/react';
-
-import Logo from '../../../assets/icons/app.svg';
 
 export const About = () => {
 	const { displayName, description, version, bugs } = getAbout();
