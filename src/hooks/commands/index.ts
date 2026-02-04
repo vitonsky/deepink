@@ -17,15 +17,25 @@ export enum GLOBAL_COMMANDS {
 	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
 
 	/**
+	 * Switch focus to the next open note
+	 */
+	FOCUS_NEXT_NOTE = 'focusNextNote',
+
+	/**
+	 * Switch focus to the previous open note
+	 */
+	FOCUS_PREVIOUS_NOTE = 'focusPreviousNote',
+
+	/**
 	 * Deletes a note.
-	 * Behavior depends on the permanent flag: true move the note to the bin, false removes it permanently
+	 * Behavior depends on the 'permanently' flag: false move the note to the bin, true removes it permanently
 	 */
 	DELETE_NOTE = 'DELETE_NOTE',
 
 	/**
 	 * Restore a note from the Bin
 	 */
-	RESTORE_NOTE_FROM_BIN = 'restoreNoteFromBin',
+	RESTORE_NOTE_FROM_BIN = 'RESTORE_NOTE_FROM_BIN',
 
 	/**
 	 * Toggle the archive status of the note
@@ -38,19 +48,19 @@ export enum GLOBAL_COMMANDS {
 	TOGGLE_NOTE_BOOKMARK = 'TOGGLE_NOTE_BOOKMARK',
 
 	/**
-	 * Toggle the history view for the note
+	 * Open and close the history for a note
 	 */
-	TOGGLE_NOTE_HISTORY = 'TOGGLE_NOTE_HISTORY',
+	TOGGLE_NOTE_HISTORY_PANEL = 'TOGGLE_NOTE_HISTORY_PANEL',
 
 	/**
 	 * Export a note
 	 */
-	EXPORT_NOTE = 'exportNote',
+	EXPORT_NOTE = 'EXPORT_NOTE',
 
 	/**
-	 * Copy the Markdown link for the current note
+	 * Copy the Markdown link for the note
 	 */
-	COPY_NOTE_MARKDOWN_LINK = 'copyNoteMarkdownLink',
+	COPY_NOTE_MARKDOWN_LINK = 'COPY_NOTE_MARKDOWN_LINK',
 
 	/**
 	 * Creates a copy of an existing note
@@ -58,24 +68,14 @@ export enum GLOBAL_COMMANDS {
 	DUPLICATE_NOTE = 'DUPLICATE_NOTE',
 
 	/**
-	 * Switch focus to the next open note
-	 */
-	FOCUS_NEXT_NOTE = 'focusNextNote',
-
-	/**
-	 * Switch focus to the previous open note
-	 */
-	FOCUS_PREVIOUS_NOTE = 'focusPreviousNote',
-
-	/**
 	 * Open global settings window
 	 */
 	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
 
 	/**
-	 * Synchronize the changes with the database
+	 * Synchronize the database
 	 */
-	SYNC_DATABASE = 'syncDataBase',
+	SYNC_DATABASE = 'SYNC_DATABASE',
 
 	/**
 	 * Lock the currently active user profile
@@ -88,7 +88,7 @@ export enum GLOBAL_COMMANDS {
 	FOCUS_SEARCH = 'FOCUS_SEARCH',
 
 	/**
-	 * Triggered when a keyboard shortcut is pressed
+	 * Indicates a keyboard shortcut was pressed
 	 */
 	SHORTCUTS_PRESSED = 'SHORTCUTS_PRESSED',
 }
@@ -99,7 +99,7 @@ type CommandsWithPayload = {
 
 	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { noteId: string };
 	[GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK]: { noteId: string };
-	[GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY]: { noteId: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL]: { noteId: string };
 
 	[GLOBAL_COMMANDS.EXPORT_NOTE]: { noteId: string };
 	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { noteId: string };
