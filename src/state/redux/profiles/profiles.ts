@@ -347,6 +347,20 @@ export const profilesSlice = createSlice({
 
 			workspace.view = view;
 		},
+
+		setWorkspaceNoteTemplateConfig: (
+			state,
+			{
+				payload: { profileId, workspaceId, ...props },
+			}: PayloadAction<
+				WorkspaceScoped<Partial<WorkspaceData['config']['newNote']>>
+			>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.config.newNote = { ...workspace.config.newNote, ...props };
+		},
 	},
 });
 

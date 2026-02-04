@@ -19,6 +19,7 @@ import { useImportNotesPreset } from '@hooks/notes/useImportNotesPreset';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
+	selectNewNoteTemplate,
 	selectWorkspace,
 	selectWorkspaceName,
 	workspacesApi,
@@ -34,6 +35,8 @@ import {
 } from '../../Workspace/WorkspaceProvider';
 
 export const WorkspaceSettings = () => {
+	const newNoteConfig = useWorkspaceSelector(selectNewNoteTemplate);
+
 	const telemetry = useTelemetryTracker();
 
 	const {
@@ -165,13 +168,32 @@ export const WorkspaceSettings = () => {
 				<Divider />
 
 				<FeaturesOption title="New note title">
-					<Input size="sm" defaultValue="Note $date$ $time$" />
+					<Input
+						size="sm"
+						value={newNoteConfig.title}
+						onChange={(evt) => {
+							dispatch(
+								workspacesApi.setWorkspaceNoteTemplateConfig({
+									...currentWorkspace,
+									title: evt.target.value,
+								}),
+							);
+						}}
+					/>
 				</FeaturesOption>
 				<FeaturesOption title="Tags for new note">
-					<Select size="sm" width="auto">
-						<option>Do not set any tags</option>
-						<option>Same as selected tag</option>
-						<option>Assign tags below</option>
+					<Select
+						size="sm"
+						width="auto"
+						value={
+							Array.isArray(newNoteConfig.tags)
+								? 'custom'
+								: newNoteConfig.tags
+						}
+					>
+						<option value="none">Do not set any tags</option>
+						<option value="selected">Same as selected tag</option>
+						<option value="custom">Assign tags below</option>
 					</Select>
 				</FeaturesOption>
 			</FeaturesGroup>
