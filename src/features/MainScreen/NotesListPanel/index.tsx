@@ -70,9 +70,9 @@ export const NotesListPanel = () => {
 	};
 
 	const searchInputRef = useRef<HTMLInputElement | null>(null);
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_SEARCH, () => {
-		searchInputRef.current?.focus();
-	});
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_SEARCH, () =>
+		searchInputRef.current?.focus(),
+	);
 
 	return (
 		<VStack
