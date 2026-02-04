@@ -31,7 +31,7 @@ export const useActiveNoteHistoryButton = () => {
 				icon: <FaClockRotateLeft />,
 				text: noteDate ?? '',
 				onClick: () =>
-					runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY, {
+					runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL, {
 						noteId: activeNoteId,
 					}),
 			},

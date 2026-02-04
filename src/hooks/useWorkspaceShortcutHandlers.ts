@@ -35,8 +35,8 @@ export const useWorkspaceShortcutHandlers = () => {
 
 		[Shortcuts.FOCUS_SEARCH]: () => command(GLOBAL_COMMANDS.FOCUS_SEARCH),
 
-		[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY]: async () =>
-			commandWithActiveNote(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY),
+		[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: async () =>
+			commandWithActiveNote(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL),
 
 		[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: async () =>
 			commandWithActiveNote(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE),

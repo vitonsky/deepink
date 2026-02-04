@@ -210,7 +210,7 @@ export const Note: FC<NoteEditorProps> = memo(
 		}, [sidePanel, telemetry]);
 
 		useWorkspaceCommandCallback(
-			GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY,
+			GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL,
 			() => {
 				setSidePanel((state) =>
 					state === NoteSidebarTabs.HISTORY ? null : NoteSidebarTabs.HISTORY,
