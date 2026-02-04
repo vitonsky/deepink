@@ -5,8 +5,9 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveTag } from '@state/redux/profiles/profiles';
+import { selectActiveTag, selectNewNoteTemplate } from '@state/redux/profiles/profiles';
 
+import { TemplateProcessor } from './TemplateProcessor';
 import { useUpdateNotes } from './useUpdateNotes';
 
 export const useCreateNote = () => {
@@ -14,16 +15,25 @@ export const useCreateNote = () => {
 	const tagsRegistry = useTagsRegistry();
 
 	const activeTag = useWorkspaceSelector(selectActiveTag);
+	const newNoteConfig = useWorkspaceSelector(selectNewNoteTemplate);
 
 	const updateNotes = useUpdateNotes();
 
 	const { openNote } = useNotesContext();
 
 	return useCallback(async () => {
-		const noteId = await notesRegistry.add({ title: '', text: '' });
+		const templates = new TemplateProcessor({ ignoreParsingErrors: true });
 
-		if (activeTag) {
-			await tagsRegistry.setAttachedTags(noteId, [activeTag.id]);
+		const noteId = await notesRegistry.add({
+			title: templates.compile(newNoteConfig.title),
+			text: '',
+		});
+
+		// TODO: attach listed tags if they do exist
+		if (newNoteConfig.tags === 'selected') {
+			if (activeTag) {
+				await tagsRegistry.setAttachedTags(noteId, [activeTag.id]);
+			}
 		}
 
 		await updateNotes();
@@ -32,5 +42,5 @@ export const useCreateNote = () => {
 		if (note) {
 			openNote(note);
 		}
-	}, [activeTag, notesRegistry, openNote, tagsRegistry, updateNotes]);
+	}, [activeTag, newNoteConfig, notesRegistry, openNote, tagsRegistry, updateNotes]);
 };

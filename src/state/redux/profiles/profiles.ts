@@ -42,6 +42,13 @@ export const createWorkspaceObject = (workspace: {
 		selected: null,
 		list: [],
 	},
+
+	config: {
+		newNote: {
+			title: 'New note {date:DD/MM/YYYY} at {date:HH:mm:ss}',
+			tags: 'selected',
+		},
+	},
 });
 
 export type ProfileScoped<T extends {} = {}> = T & {
@@ -76,6 +83,13 @@ export type WorkspaceData = {
 	tags: {
 		selected: string | null;
 		list: IResolvedTag[];
+	};
+
+	config: {
+		newNote: {
+			title: string;
+			tags: 'none' | 'selected' | string[];
+		};
 	};
 };
 

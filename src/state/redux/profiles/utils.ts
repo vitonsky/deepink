@@ -7,6 +7,11 @@ export const createWorkspaceSelector = createSelector.withTypes<WorkspaceData>()
 
 export const selectWorkspaceRoot = (workspace: WorkspaceData | null) => workspace;
 
+export const selectWorkspaceRootSafe = (workspace: WorkspaceData | null) => {
+	if (!workspace) throw new Error('Workspace selector used out of workspace scope');
+	return workspace;
+};
+
 /**
  * Find a note near current, but except current note in edge cases
  */
