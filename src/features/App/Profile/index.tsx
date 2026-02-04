@@ -6,9 +6,9 @@ import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useGlobalShortcutHandlers } from '@hooks/commands/shortcuts/useGlobalShortcutHandlers';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useGlobalShortcutHandlers } from '@hooks/useGlobalShortcutHandlers';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
