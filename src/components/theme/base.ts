@@ -470,12 +470,34 @@ export default extendTheme({
 			},
 		}),
 		Slider: createMultiStyleConfigHelpers([
+			'container',
 			'track',
 			'filledTrack',
 			'thumb',
+			'mark',
 		]).defineMultiStyleConfig({
+			baseStyle: {
+				container: {
+					height: '2rem',
+				},
+				track: {
+					height: '.5rem',
+					top: '20% !important',
+				},
+				thumb: {
+					boxSize: '.8rem',
+					top: '20% !important',
+				},
+				mark: {
+					width: 'max-content',
+					top: '35%',
+				},
+			},
 			sizes: {
 				sm: {
+					container: {
+						height: '2rem',
+					},
 					track: {
 						height: '.3rem',
 					},
@@ -484,6 +506,9 @@ export default extendTheme({
 					},
 				},
 				md: {
+					container: {
+						height: '2.5rem',
+					},
 					track: {
 						height: '.5rem',
 					},
