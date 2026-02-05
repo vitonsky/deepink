@@ -106,7 +106,12 @@ export const SettingsWindow = () => {
 				<ModalHeader paddingInline="1rem">Preferences</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody paddingInline="1rem" paddingBlockEnd="2rem">
-					<Tabs orientation="vertical" gap="1rem">
+					<Tabs
+						orientation="vertical"
+						gap="1rem"
+						isLazy
+						lazyBehavior="keepMounted"
+					>
 						<TabList
 							display="flex"
 							flexWrap="wrap"
