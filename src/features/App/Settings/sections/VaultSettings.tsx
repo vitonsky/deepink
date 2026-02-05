@@ -14,11 +14,10 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
 import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
-
-import { SimpleSlider } from './appearance/SimpleSlider';
 
 export const VaultSettings = () => {
 	const dispatch = useAppDispatch();
@@ -133,7 +132,7 @@ export const VaultSettings = () => {
 					title="Delay for snapshot"
 					description="Time in seconds to wait since recent note changes, before create a new snapshot. The lower time the more snapshots will be created, the large a vault size."
 				>
-					<SimpleSlider
+					<RelaxedSlider
 						min={ms('10s')}
 						max={ms('5m')}
 						step={ms('10s')}

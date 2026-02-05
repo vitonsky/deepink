@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { Divider, Input, Link, Select, Switch, Text, VStack } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { editorModes } from '@features/NotesContainer/EditorModePicker/EditorModePicker';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
@@ -16,7 +17,6 @@ import {
 } from '@state/redux/settings/settings';
 
 import { FontFamilyInput } from './FontFamilyInput';
-import { SimpleSlider } from './SimpleSlider';
 
 export const EditorConfig = () => {
 	const dispatch = useAppDispatch();
@@ -65,7 +65,7 @@ export const EditorConfig = () => {
 				</FeaturesOption>
 
 				<FeaturesOption title="Font size">
-					<SimpleSlider
+					<RelaxedSlider
 						min={8}
 						max={32}
 						value={editorConfig.fontSize}
@@ -76,7 +76,7 @@ export const EditorConfig = () => {
 				</FeaturesOption>
 
 				<FeaturesOption title="Line height">
-					<SimpleSlider
+					<RelaxedSlider
 						min={0.3}
 						max={5}
 						step={0.1}

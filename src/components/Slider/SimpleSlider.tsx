@@ -9,19 +9,17 @@ import {
 	Tooltip,
 } from '@chakra-ui/react';
 
-// TODO: use accent color
+export type SimpleSliderProps = Omit<SliderProps, 'defaultValue'> &
+	Required<Pick<SliderProps, 'value' | 'min' | 'max'>> & {
+		transformValue?: (value: number) => string;
+	};
+
 /**
  * Simple to use slider control
  * Under the hood is a https://v2.chakra-ui.com/docs/components/slider with sensible defaults
  */
 
-export const SimpleSlider = ({
-	transformValue,
-	...props
-}: Omit<SliderProps, 'defaultValue'> &
-	Required<Pick<SliderProps, 'value' | 'min' | 'max'>> & {
-		transformValue?: (value: number) => string;
-	}) => {
+export const SimpleSlider = ({ transformValue, ...props }: SimpleSliderProps) => {
 	const { value, min, max } = props;
 	return (
 		<Slider {...props}>
