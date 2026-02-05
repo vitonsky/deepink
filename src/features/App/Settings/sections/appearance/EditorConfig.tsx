@@ -25,64 +25,111 @@ export const EditorConfig = () => {
 	const editorFontFamily = useAppSelector(selectEditorFontFamily);
 
 	return (
-		<FeaturesGroup title="Editor">
-			<FeaturesOption title="Editor mode">
-				<Select
-					value={editorMode}
-					size="sm"
-					width="auto"
-					onChange={(e) => {
-						dispatch(settingsApi.setEditorMode(e.target.value as EditorMode));
-					}}
+		<>
+			<FeaturesGroup title="Editor">
+				<FeaturesOption title="Editor mode">
+					<Select
+						value={editorMode}
+						size="sm"
+						width="auto"
+						onChange={(e) => {
+							dispatch(
+								settingsApi.setEditorMode(e.target.value as EditorMode),
+							);
+						}}
+					>
+						{Object.entries(editorModes).map(([id, title]) => (
+							<option key={id} value={id}>
+								{title}
+							</option>
+						))}
+					</Select>
+				</FeaturesOption>
+
+				<FeaturesOption
+					title="Font family"
+					description="Set a font family to use in all editors, or leave empty to use defaults."
 				>
-					{Object.entries(editorModes).map(([id, title]) => (
-						<option key={id} value={id}>
-							{title}
-						</option>
-					))}
-				</Select>
-			</FeaturesOption>
+					<FontFamilyInput
+						inputProps={{
+							size: 'sm',
+							placeholder: 'Enter font family name',
+							fontFamily: editorFontFamily,
+						}}
+						fontSize={editorConfig.fontSize}
+						value={editorConfig.fontFamily}
+						onChange={(fontFamily) => {
+							dispatch(settingsApi.setEditorConfig({ fontFamily }));
+						}}
+					/>
+				</FeaturesOption>
 
-			<FeaturesOption title="Font family">
-				<FontFamilyInput
-					inputProps={{
-						size: 'sm',
-						placeholder: 'Enter font family name',
-						fontFamily: editorFontFamily,
-					}}
-					fontSize={editorConfig.fontSize}
-					value={editorConfig.fontFamily}
-					onChange={(fontFamily) => {
-						dispatch(settingsApi.setEditorConfig({ fontFamily }));
-					}}
-				/>
-			</FeaturesOption>
+				<FeaturesOption title="Font size">
+					<SimpleSlider
+						min={8}
+						max={32}
+						value={editorConfig.fontSize}
+						onChange={(value) => {
+							dispatch(settingsApi.setEditorConfig({ fontSize: value }));
+						}}
+					/>
+				</FeaturesOption>
 
-			<FeaturesOption title="Font size">
-				<SimpleSlider
-					min={8}
-					max={32}
-					value={editorConfig.fontSize}
-					onChange={(value) => {
-						dispatch(settingsApi.setEditorConfig({ fontSize: value }));
-					}}
-				/>
-			</FeaturesOption>
+				<FeaturesOption title="Line height">
+					<SimpleSlider
+						min={0.3}
+						max={5}
+						step={0.1}
+						value={editorConfig.lineHeight}
+						onChange={(value) => {
+							dispatch(settingsApi.setEditorConfig({ lineHeight: value }));
+						}}
+					/>
+				</FeaturesOption>
 
-			<FeaturesOption title="Line height">
-				<SimpleSlider
-					min={0.3}
-					max={5}
-					step={0.1}
-					value={editorConfig.lineHeight}
-					onChange={(value) => {
-						dispatch(settingsApi.setEditorConfig({ lineHeight: value }));
-					}}
-				/>
-			</FeaturesOption>
+				<Divider />
 
-			<FeaturesOption title="Plain text features">
-				<VStack align="start" paddingTop=".5rem">
+				<FeaturesOption
+					title="Date format"
+					description={
+						<>
+							Configure a format of date to insert. You may use standard
+							syntax DD/MM/YYYY HH:mm:ss.
+							<br />
+							For more syntax, refer to{' '}
+							<Link href="https://day.js.org/docs/en/display/format">
+								date format reference
+							</Link>
+							.
+						</>
+					}
+				>
+					<Input
+						size="sm"
+						placeholder="e.g., DD/MM/YYYY HH:mm"
+						value={editorConfig.dateFormat}
+						onChange={(evt) => {
+							dispatch(
+								settingsApi.setEditorConfig({
+									dateFormat: evt.target.value,
+								}),
+							);
+						}}
+					/>
+
+					{editorConfig.dateFormat.trim().length > 0 && (
+						<VStack align="start" gap={0}>
+							<Text fontSize=".8rem">Example</Text>
+							<Text fontWeight="bold">
+								{dayjs().format(editorConfig.dateFormat)}
+							</Text>
+						</VStack>
+					)}
+				</FeaturesOption>
+			</FeaturesGroup>
+
+			<FeaturesGroup title="Plain text editor">
+				<FeaturesOption>
 					<Switch
 						size="sm"
 						isChecked={editorConfig.lineNumbers}
@@ -96,6 +143,9 @@ export const EditorConfig = () => {
 					>
 						Show line numbers
 					</Switch>
+				</FeaturesOption>
+
+				<FeaturesOption>
 					<Switch
 						size="sm"
 						isChecked={editorConfig.miniMap}
@@ -109,48 +159,8 @@ export const EditorConfig = () => {
 					>
 						Enable mini map
 					</Switch>
-				</VStack>
-			</FeaturesOption>
-
-			<Divider />
-
-			<FeaturesOption
-				title="Date format"
-				description={
-					<>
-						Configure a format of date to insert. You may use standard syntax
-						DD/MM/YYYY HH:mm:ss.
-						<br />
-						For more syntax, refer to{' '}
-						<Link href="https://day.js.org/docs/en/display/format">
-							date format reference
-						</Link>
-						.
-					</>
-				}
-			>
-				<Input
-					size="sm"
-					placeholder="e.g., DD/MM/YYYY HH:mm"
-					value={editorConfig.dateFormat}
-					onChange={(evt) => {
-						dispatch(
-							settingsApi.setEditorConfig({
-								dateFormat: evt.target.value,
-							}),
-						);
-					}}
-				/>
-
-				{editorConfig.dateFormat.trim().length > 0 && (
-					<VStack align="start" gap={0}>
-						<Text fontSize=".8rem">Example</Text>
-						<Text fontWeight="bold">
-							{dayjs().format(editorConfig.dateFormat)}
-						</Text>
-					</VStack>
-				)}
-			</FeaturesOption>
-		</FeaturesGroup>
+				</FeaturesOption>
+			</FeaturesGroup>
+		</>
 	);
 };
