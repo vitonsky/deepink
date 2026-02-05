@@ -30,10 +30,8 @@ export const useCreateNote = () => {
 		});
 
 		// TODO: attach listed tags if they do exist
-		if (newNoteConfig.tags === 'selected') {
-			if (activeTag) {
-				await tagsRegistry.setAttachedTags(noteId, [activeTag.id]);
-			}
+		if (newNoteConfig.tags === 'selected' && activeTag) {
+			await tagsRegistry.setAttachedTags(noteId, [activeTag.id]);
 		}
 
 		await updateNotes();

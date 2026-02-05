@@ -88,7 +88,7 @@ export type WorkspaceData = {
 	config: {
 		newNote: {
 			title: string;
-			tags: 'none' | 'selected' | string[];
+			tags: 'none' | 'selected';
 		};
 	};
 };

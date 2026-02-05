@@ -222,15 +222,21 @@ export const WorkspaceSettings = () => {
 					<Select
 						size="sm"
 						width="auto"
-						value={
-							Array.isArray(newNoteConfig.tags)
-								? 'custom'
-								: newNoteConfig.tags
-						}
+						value={newNoteConfig.tags}
+						onChange={(evt) => {
+							const { value } = evt.target;
+							if (value === 'none' || value === 'selected') {
+								dispatch(
+									workspacesApi.setWorkspaceNoteTemplateConfig({
+										...currentWorkspace,
+										tags: value,
+									}),
+								);
+							}
+						}}
 					>
 						<option value="none">Do not set any tags</option>
 						<option value="selected">Same as selected tag</option>
-						<option value="custom">Assign tags below</option>
 					</Select>
 				</FeaturesOption>
 			</FeaturesGroup>
