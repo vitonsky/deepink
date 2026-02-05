@@ -5,6 +5,8 @@ import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { ZipFS } from '@core/features/files/ZipFS';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
+import { useVaultSelector } from '@state/redux/profiles/hooks';
+import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
 import { joinPathSegments } from '@utils/fs/paths';
 
 import { useNotesImport } from './useNotesImport';
@@ -19,7 +21,8 @@ export type ImportTypes = (typeof importOptions)[number]['type'];
 export const useImportNotesPreset = () => {
 	const telemetry = useTelemetryTracker();
 
-	const notesImport = useNotesImport();
+	const snapshotsConfig = useVaultSelector(selectSnapshotSettings);
+	const notesImport = useNotesImport({ snapshots: snapshotsConfig.enabled });
 
 	const importFiles = useCallback(
 		async (type: ImportTypes, files: File[]) => {
