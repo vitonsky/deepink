@@ -1,10 +1,17 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { useWorkspaceContext } from '@features/App/Workspace';
-import { Selector } from '@reduxjs/toolkit';
+import { ActionCreatorWithPayload, Selector } from '@reduxjs/toolkit';
 
 import { useAppSelector } from '../hooks';
-import { selectWorkspace, WorkspaceData } from './profiles';
+import { RootState } from '../store';
+import {
+	ProfileData,
+	selectProfile,
+	selectWorkspace,
+	WorkspaceData,
+	workspacesApi,
+} from './profiles';
 
 export const useWorkspaceData = () => {
 	const { profileId, workspaceId } = useWorkspaceContext();
@@ -26,4 +33,49 @@ export const useWorkspaceSelector = <T>(
 ): T => {
 	const selectWorkspace = useWorkspaceRootSelector();
 	return useAppSelector((state) => selector(selectWorkspace(state)), isEqual);
+};
+
+export const useVaultSelector = <T>(selector: Selector<ProfileData | null, T>): T => {
+	const { profileId } = useWorkspaceData();
+
+	const composedSelector = useCallback(
+		(state: RootState) => {
+			const selectConfiguredProfile = selectProfile({ profileId });
+			const profile = selectConfiguredProfile(state);
+			return selector(profile);
+		},
+		[profileId, selector],
+	);
+
+	return useAppSelector(composedSelector, isEqual);
+};
+
+type StripPropsInActionCreator<T, StripPropsSignature extends {}> = {
+	[K in keyof T as T[K] extends ActionCreatorWithPayload<
+		StripPropsSignature & infer _P,
+		infer _
+	>
+		? K
+		: never]: T[K] extends ActionCreatorWithPayload<
+		StripPropsSignature & infer P,
+		infer N
+	>
+		? ActionCreatorWithPayload<Omit<P, keyof StripPropsSignature>, N>
+		: never;
+};
+
+export const useVaultActions = () => {
+	const { profileId } = useWorkspaceData();
+
+	return useMemo(() => {
+		return Object.fromEntries(
+			Object.entries(workspacesApi).map(([key, action]) => [
+				key,
+				(props: Record<any, any>) => action({ profileId, ...props } as any),
+			]),
+		) as unknown as StripPropsInActionCreator<
+			typeof workspacesApi,
+			{ profileId: string }
+		>;
+	}, [profileId]);
 };

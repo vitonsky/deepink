@@ -5,6 +5,18 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createAppSelector } from '../utils';
 import { findNearNote } from './utils';
 
+type ProfileMutator<T extends {}> = (profile: ProfileData, payload: T) => void;
+
+export function createProfileReducer<T extends {} = {}>(mutator: ProfileMutator<T>) {
+	return (state: ProfilesState, { payload }: PayloadAction<ProfileScoped<T>>) => {
+		const { profileId, ...rest } = payload;
+		const profile = state.profiles[profileId];
+		if (profile) {
+			mutator(profile, rest as unknown as T);
+		}
+	};
+}
+
 const selectWorkspaceObject = (
 	state: ProfilesState,
 	{ profileId, workspaceId }: WorkspaceScoped,
@@ -96,6 +108,13 @@ export type WorkspaceData = {
 export type ProfileData = {
 	activeWorkspace: string | null;
 	workspaces: Record<string, WorkspaceData | undefined>;
+
+	config: {
+		snapshots: {
+			enabled: boolean;
+			interval: number;
+		};
+	};
 };
 
 export type ProfilesState = {
@@ -361,6 +380,15 @@ export const profilesSlice = createSlice({
 
 			workspace.config.newNote = { ...workspace.config.newNote, ...props };
 		},
+
+		setSnapshotsConfig: createProfileReducer(
+			(profile, payload: Partial<ProfileData['config']['snapshots']>) => {
+				profile.config.snapshots = {
+					...profile.config.snapshots,
+					...payload,
+				};
+			},
+		),
 	},
 });
 

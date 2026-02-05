@@ -1,4 +1,5 @@
 import React from 'react';
+import z from 'zod';
 import {
 	Button,
 	Divider,
@@ -12,8 +13,15 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
+import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
 
 export const VaultSettings = () => {
+	const dispatch = useAppDispatch();
+	const snapshotsConfig = useVaultSelector(selectSnapshotSettings);
+	const vaultActions = useVaultActions();
+
 	return (
 		<Features>
 			<FeaturesGroup>
@@ -103,7 +111,17 @@ export const VaultSettings = () => {
 
 			<FeaturesGroup title="Snapshots">
 				<FeaturesOption description="When enabled, a snapshots of note content will be created when note is changed. You may control snapshots recording per note level in note history panel.">
-					<Switch size="sm" defaultChecked>
+					<Switch
+						size="sm"
+						isChecked={snapshotsConfig.enabled}
+						onChange={(evt) => {
+							dispatch(
+								vaultActions.setSnapshotsConfig({
+									enabled: evt.target.checked,
+								}),
+							);
+						}}
+					>
 						Record note snapshots
 					</Switch>
 				</FeaturesOption>
@@ -119,7 +137,22 @@ export const VaultSettings = () => {
 							type="number"
 							min={1}
 							max={1000}
-							defaultValue={30}
+							value={Math.round(snapshotsConfig.interval / 1000)}
+							onChange={(evt) => {
+								const result = z.coerce
+									.number()
+									.min(1)
+									.safeParse(evt.target.value);
+
+								const value = result.success
+									? result.data * 1000
+									: 30_000;
+								dispatch(
+									vaultActions.setSnapshotsConfig({
+										interval: value,
+									}),
+								);
+							}}
 							sx={{
 								paddingInlineEnd: '3rem',
 							}}

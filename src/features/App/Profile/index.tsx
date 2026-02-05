@@ -68,6 +68,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 								createWorkspaceObject(workspace),
 							]),
 						),
+						config: {
+							snapshots: {
+								enabled: true,
+								interval: 30_000,
+							},
+						},
 					},
 				}),
 			);
