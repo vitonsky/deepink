@@ -45,7 +45,7 @@ export const createWorkspaceObject = (workspace: {
 
 	config: {
 		newNote: {
-			title: 'New note {date:DD/MM/YYYY} at {date:HH:mm:ss}',
+			title: 'Untitled - {date:D MMM YYYY, HH:mm}',
 			tags: 'selected',
 		},
 	},
