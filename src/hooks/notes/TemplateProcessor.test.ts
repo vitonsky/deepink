@@ -3,7 +3,10 @@ import { TemplateProcessor } from './TemplateProcessor';
 test('Compile template with time', () => {
 	vi.setSystemTime(100_000);
 
-	const templates = new TemplateProcessor({ ignoreParsingErrors: true });
+	const templates = new TemplateProcessor({
+		ignoreParsingErrors: true,
+		timezone: 'Europe/Berlin',
+	});
 
 	expect(templates.compile(`New note {date}`)).toBe('New note 01/01/1970');
 	expect(templates.compile(`New note {  date  }`)).toBe('New note 01/01/1970');

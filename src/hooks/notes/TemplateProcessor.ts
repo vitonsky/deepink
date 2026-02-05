@@ -1,4 +1,9 @@
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type Token = { type: 'text'; value: string } | { type: 'directive'; value: string };
 
@@ -6,6 +11,7 @@ export class TemplateProcessor {
 	constructor(
 		private readonly config: {
 			ignoreParsingErrors?: boolean;
+			timezone?: string;
 		} = {},
 	) {}
 
@@ -19,7 +25,7 @@ export class TemplateProcessor {
 					const format = directive.startsWith('date:')
 						? directive.slice('date:'.length)
 						: 'DD/MM/YYYY';
-					return dayjs().format(format);
+					return dayjs().tz(this.config.timezone).format(format);
 				}
 
 				return `{${token.value}}`;
