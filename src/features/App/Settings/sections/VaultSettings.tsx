@@ -1,5 +1,6 @@
 import React from 'react';
-import z from 'zod';
+import humanizeDuration from 'humanize-duration';
+import ms from 'ms';
 import {
 	Button,
 	Divider,
@@ -16,6 +17,8 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
 import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
+
+import { SimpleSlider } from './appearance/SimpleSlider';
 
 export const VaultSettings = () => {
 	const dispatch = useAppDispatch();
@@ -130,37 +133,22 @@ export const VaultSettings = () => {
 					title="Delay for snapshot"
 					description="Time in seconds to wait since recent note changes, before create a new snapshot. The lower time the more snapshots will be created, the large a vault size."
 				>
-					<InputGroup size="sm" width="auto">
-						<Input
-							width="8rem"
-							textAlign="right"
-							type="number"
-							min={1}
-							max={1000}
-							value={Math.round(snapshotsConfig.interval / 1000)}
-							onChange={(evt) => {
-								const result = z.coerce
-									.number()
-									.min(1)
-									.safeParse(evt.target.value);
-
-								const value = result.success
-									? result.data * 1000
-									: 30_000;
-								dispatch(
-									vaultActions.setSnapshotsConfig({
-										interval: value,
-									}),
-								);
-							}}
-							sx={{
-								paddingInlineEnd: '3rem',
-							}}
-						/>
-						<InputRightElement w="3rem" pointerEvents="none">
-							<Text variant="secondary">sec</Text>
-						</InputRightElement>
-					</InputGroup>
+					<SimpleSlider
+						min={ms('10s')}
+						max={ms('5m')}
+						step={ms('10s')}
+						transformValue={(value) =>
+							humanizeDuration(value, { units: ['m', 's'] })
+						}
+						value={snapshotsConfig.interval}
+						onChange={(value) => {
+							dispatch(
+								vaultActions.setSnapshotsConfig({
+									interval: value,
+								}),
+							);
+						}}
+					/>
 				</FeaturesOption>
 			</FeaturesGroup>
 
