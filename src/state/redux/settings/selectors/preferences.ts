@@ -16,7 +16,6 @@ export const selectEditorConfig = createAppSelector(
 export const selectEditorFontFamily = createAppSelector(
 	selectEditorConfig,
 	({ fontFamily }) => {
-		 
 		const fallback =
 			'-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Segoe UI Variable", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", Arial, system-ui, sans-serif';
 
@@ -25,6 +24,11 @@ export const selectEditorFontFamily = createAppSelector(
 		if (!normalizedFontFamily) return fallback;
 		return `${normalizedFontFamily}, ${fallback}`;
 	},
+);
+
+export const selectEditorDateFormat = createAppSelector(
+	selectEditorConfig,
+	({ dateFormat }) => dateFormat,
 );
 
 export const selectTheme = createAppSelector(

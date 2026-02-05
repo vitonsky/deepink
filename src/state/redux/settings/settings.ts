@@ -17,6 +17,7 @@ export type GlobalSettings = {
 		lineHeight: number;
 		miniMap: boolean;
 		lineNumbers: boolean;
+		dateFormat: string;
 	};
 	preferences: {
 		/**
@@ -40,6 +41,7 @@ export const settingsSlice = createSlice({
 			lineHeight: 1.5,
 			miniMap: false,
 			lineNumbers: false,
+			dateFormat: 'D MMM YYYY, HH:mm',
 		},
 		preferences: {
 			confirmBeforeMoveToBin: false,

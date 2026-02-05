@@ -1,5 +1,6 @@
 import React from 'react';
-import { Select, Switch, VStack } from '@chakra-ui/react';
+import dayjs from 'dayjs';
+import { Divider, Input, Link, Select, Switch, Text, VStack } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { editorModes } from '@features/NotesContainer/EditorModePicker/EditorModePicker';
@@ -109,6 +110,46 @@ export const EditorConfig = () => {
 						Enable mini map
 					</Switch>
 				</VStack>
+			</FeaturesOption>
+
+			<Divider />
+
+			<FeaturesOption
+				title="Date format"
+				description={
+					<>
+						Configure a format of date to insert. You may use standard syntax
+						DD/MM/YYYY HH:mm:ss.
+						<br />
+						For more syntax, refer to{' '}
+						<Link href="https://day.js.org/docs/en/display/format">
+							date format reference
+						</Link>
+						.
+					</>
+				}
+			>
+				<Input
+					size="sm"
+					placeholder="e.g., DD/MM/YYYY HH:mm"
+					value={editorConfig.dateFormat}
+					onChange={(evt) => {
+						dispatch(
+							settingsApi.setEditorConfig({
+								dateFormat: evt.target.value,
+							}),
+						);
+					}}
+				/>
+
+				{editorConfig.dateFormat.trim().length > 0 && (
+					<VStack align="start" gap={0}>
+						<Text fontSize=".8rem">Example</Text>
+						<Text fontWeight="bold">
+							{dayjs().format(editorConfig.dateFormat)}
+						</Text>
+					</VStack>
+				)}
 			</FeaturesOption>
 		</FeaturesGroup>
 	);
