@@ -244,6 +244,17 @@ export class NotesController implements INotesController {
 		return count;
 	}
 
+	public async getIds(query: NotesControllerFetchOptions = {}): Promise<NoteId[]> {
+		const db = wrapDB(this.db.get());
+
+		const { rows } = await db.query(
+			getFetchQuery({ select: qb.sql`id`, workspace: this.workspace }, query),
+			z.object({ id: z.string() }).transform((row) => row.id),
+		);
+
+		return rows;
+	}
+
 	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
 		const db = wrapDB(this.db.get());
 
