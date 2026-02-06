@@ -36,8 +36,13 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	useVaultSelector,
+	useWorkspaceData,
+	useWorkspaceSelector,
+} from '@state/redux/profiles/hooks';
 import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
+import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
 
 import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
@@ -107,8 +112,9 @@ export const Note: FC<NoteEditorProps> = memo(
 		// Snapshot note once
 		const noteSnapshotPromiseRef = useRef<null | Promise<void>>(null);
 		const noteHistory = useNotesHistory();
+		const { enabled: isSnapshotsEnabled } = useVaultSelector(selectSnapshotSettings);
 		useEffect(() => {
-			if (note.isSnapshotsDisabled) return;
+			if (!isSnapshotsEnabled || note.isSnapshotsDisabled) return;
 
 			noteSnapshotPromiseRef.current = new Promise<void>(async (res) => {
 				for (let attempt = 0; attempt < 3; attempt++) {

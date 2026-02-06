@@ -13,7 +13,10 @@ import { editor, languages } from 'monaco-editor-core';
 import { getBrightness, setBrightness } from '@components/theme/color';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useAppSelector } from '@state/redux/hooks';
-import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
+import {
+	selectEditorConfig,
+	selectEditorFontFamily,
+} from '@state/redux/settings/selectors/preferences';
 import { setRef } from '@utils/react/setRef';
 
 import { defaultExtensions } from './extensions';
@@ -153,6 +156,7 @@ export const MonacoEditor = ({
 	...props
 }: MonacoEditorProps) => {
 	const editorConfig = useAppSelector(selectEditorConfig);
+	const fontFamily = useAppSelector(selectEditorFontFamily);
 
 	const setValueRef = useRef(setValue);
 	setValueRef.current = setValue;
@@ -189,7 +193,7 @@ export const MonacoEditor = ({
 			value,
 			theme: 'native',
 			language: 'markdown',
-			fontFamily: editorConfig.fontFamily,
+			fontFamily: fontFamily,
 			fontSize: editorConfig.fontSize,
 			lineHeight: editorConfig.lineHeight,
 			minimap: { enabled: editorConfig.miniMap },

@@ -82,7 +82,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 					const error = errors[id];
 					return (
 						<VStack key={id} as="label" align="start" w="100%" gap="0.3rem">
-							{<Text paddingBottom=".2rem">{label}</Text>}
+							<Text paddingBottom=".2rem">{label}</Text>
 							<Input {...register(id)} placeholder={placeholder} />
 							{error && <Text color="message.error">{error.message}</Text>}
 						</VStack>

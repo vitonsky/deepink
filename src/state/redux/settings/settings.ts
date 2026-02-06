@@ -1,4 +1,4 @@
-import { accentColorsMap } from '@features/ThemeProvider';
+import { accentColorsMap } from '@features/accentColorsMap';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
@@ -17,12 +17,7 @@ export type GlobalSettings = {
 		lineHeight: number;
 		miniMap: boolean;
 		lineNumbers: boolean;
-	};
-	preferences: {
-		/**
-		 * Indicates if a confirmation is required before moving note to the bin
-		 */
-		confirmBeforeMoveToBin: boolean;
+		dateFormat: string;
 	};
 };
 
@@ -35,28 +30,32 @@ export const settingsSlice = createSlice({
 			accentColor: 'auto',
 		},
 		editor: {
-			fontFamily:
-				// eslint-disable-next-line @cspell/spellchecker
-				'-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Segoe UI Variable", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", Arial, system-ui, sans-serif',
+			fontFamily: '',
 			fontSize: 18,
 			lineHeight: 1.5,
 			miniMap: false,
 			lineNumbers: false,
-		},
-		preferences: {
-			confirmBeforeMoveToBin: false,
+			dateFormat: 'D MMM YYYY, HH:mm',
 		},
 	} satisfies GlobalSettings as GlobalSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
 			return { ...state, ...payload } as GlobalSettings;
 		},
+
 		setEditorMode: (
 			state,
 			{ payload }: PayloadAction<GlobalSettings['editorMode']>,
 		) => {
 			return { ...state, editorMode: payload } as GlobalSettings;
 		},
+		setEditorConfig: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['editor']>>,
+		) => {
+			state.editor = { ...state.editor, ...payload };
+		},
+
 		setTheme: (
 			state,
 			{ payload }: PayloadAction<Partial<GlobalSettings['theme']>>,
@@ -67,12 +66,6 @@ export const settingsSlice = createSlice({
 			}
 
 			return { ...state, theme } as GlobalSettings;
-		},
-		setPreferences: (
-			state,
-			{ payload }: PayloadAction<GlobalSettings['preferences']>,
-		) => {
-			return { ...state, preferences: payload } as GlobalSettings;
 		},
 	},
 });

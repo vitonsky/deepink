@@ -5,6 +5,18 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createAppSelector } from '../utils';
 import { findNearNote } from './utils';
 
+type ProfileMutator<T extends {}> = (profile: ProfileData, payload: T) => void;
+
+export function createProfileReducer<T extends {} = {}>(mutator: ProfileMutator<T>) {
+	return (state: ProfilesState, { payload }: PayloadAction<ProfileScoped<T>>) => {
+		const { profileId, ...rest } = payload;
+		const profile = state.profiles[profileId];
+		if (profile) {
+			mutator(profile, rest as unknown as T);
+		}
+	};
+}
+
 const selectWorkspaceObject = (
 	state: ProfilesState,
 	{ profileId, workspaceId }: WorkspaceScoped,
@@ -42,6 +54,13 @@ export const createWorkspaceObject = (workspace: {
 		selected: null,
 		list: [],
 	},
+
+	config: {
+		newNote: {
+			title: 'Untitled - {date:D MMM YYYY, HH:mm}',
+			tags: 'selected',
+		},
+	},
 });
 
 export type ProfileScoped<T extends {} = {}> = T & {
@@ -77,11 +96,33 @@ export type WorkspaceData = {
 		selected: string | null;
 		list: IResolvedTag[];
 	};
+
+	config: {
+		newNote: {
+			title: string;
+			tags: 'none' | 'selected';
+		};
+	};
 };
 
 export type ProfileData = {
 	activeWorkspace: string | null;
 	workspaces: Record<string, WorkspaceData | undefined>;
+
+	config: {
+		snapshots: {
+			enabled: boolean;
+			interval: number;
+		};
+		deletion: {
+			confirm: boolean;
+			permanentDeletion: boolean;
+			bin: {
+				autoClean: boolean;
+				cleanInterval: number;
+			};
+		};
+	};
 };
 
 export type ProfilesState = {
@@ -333,6 +374,46 @@ export const profilesSlice = createSlice({
 
 			workspace.view = view;
 		},
+
+		setWorkspaceNoteTemplateConfig: (
+			state,
+			{
+				payload: { profileId, workspaceId, ...props },
+			}: PayloadAction<
+				WorkspaceScoped<Partial<WorkspaceData['config']['newNote']>>
+			>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.config.newNote = { ...workspace.config.newNote, ...props };
+		},
+
+		setSnapshotsConfig: createProfileReducer(
+			(profile, payload: Partial<ProfileData['config']['snapshots']>) => {
+				profile.config.snapshots = {
+					...profile.config.snapshots,
+					...payload,
+				};
+			},
+		),
+
+		setNoteDeletionConfig: createProfileReducer(
+			(
+				profile,
+				payload: Partial<
+					Pick<
+						ProfileData['config']['deletion'],
+						'permanentDeletion' | 'confirm'
+					>
+				>,
+			) => {
+				profile.config.deletion = {
+					...profile.config.deletion,
+					...payload,
+				};
+			},
+		),
 	},
 });
 

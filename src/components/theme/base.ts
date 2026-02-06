@@ -469,6 +469,73 @@ export default extendTheme({
 				},
 			},
 		}),
+		Slider: createMultiStyleConfigHelpers([
+			'container',
+			'track',
+			'filledTrack',
+			'thumb',
+			'mark',
+		]).defineMultiStyleConfig({
+			baseStyle: {
+				container: {
+					height: '2rem',
+				},
+				track: {
+					height: '.5rem',
+					top: '20% !important',
+				},
+				thumb: {
+					boxSize: '.8rem',
+					top: '20% !important',
+				},
+				mark: {
+					width: 'max-content',
+					top: '35%',
+				},
+			},
+			sizes: {
+				sm: {
+					container: {
+						height: '2rem',
+					},
+					track: {
+						height: '.3rem',
+					},
+					thumb: {
+						boxSize: '.5rem',
+					},
+				},
+				md: {
+					container: {
+						height: '2.5rem',
+					},
+					track: {
+						height: '.5rem',
+					},
+					thumb: {
+						boxSize: '.8rem',
+					},
+				},
+			},
+			variants: {
+				solid: {
+					track: {
+						backgroundColor: 'control.base.background',
+						borderRadius: '6px',
+					},
+					filledTrack: {
+						backgroundColor: 'control.action.background',
+					},
+					thumb: {
+						backgroundColor: 'control.action.foreground',
+					},
+				},
+			},
+			defaultProps: {
+				variant: 'solid',
+				size: 'md',
+			},
+		}),
 		Notifications: NotificationsTheme,
 		NotePreview: NotePreviewTheme,
 		NestedList: NestedListTheme,

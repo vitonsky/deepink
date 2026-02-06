@@ -12,7 +12,10 @@ import {
 	FaQuoteLeft,
 	FaStrikethrough,
 } from 'react-icons/fa6';
+import dayjs from 'dayjs';
 import { Button, HStack } from '@chakra-ui/react';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectEditorDateFormat } from '@state/redux/settings/selectors/preferences';
 
 import { HeaderPicker } from './buttons/HeaderPicker';
 import { ImageButton } from './buttons/ImageButton';
@@ -23,6 +26,7 @@ import { useEditorPanelContext } from '.';
 // TODO: implement notifications from editor to panel, to render current state for formatting buttons
 export const EditorPanel = memo(() => {
 	const { onInserting, onFormatting } = useEditorPanelContext();
+	const dateFormat = useAppSelector(selectEditorDateFormat);
 
 	return (
 		<HStack
@@ -150,7 +154,7 @@ export const EditorPanel = memo(() => {
 					onClick={() => {
 						onInserting({
 							type: 'date',
-							data: { date: new Date().toDateString() },
+							data: { date: dayjs().format(dateFormat) },
 						});
 					}}
 				>

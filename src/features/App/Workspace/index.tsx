@@ -15,6 +15,7 @@ import {
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
+import { SettingsWindow } from '../Settings/SettingsWindow';
 import { WorkspaceServices } from './services/WorkspaceServices';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -128,6 +129,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
 						<MainScreen />
 						<WorkspaceStatusBarItems />
+						<SettingsWindow />
 					</WorkspaceModalProvider>
 				</WorkspaceProvider>
 			) : (

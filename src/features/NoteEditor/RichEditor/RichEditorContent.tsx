@@ -13,7 +13,10 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useAppSelector } from '@state/redux/hooks';
-import { selectEditorConfig } from '@state/redux/settings/selectors/preferences';
+import {
+	selectEditorConfig,
+	selectEditorFontFamily,
+} from '@state/redux/settings/selectors/preferences';
 import { setRef } from '@utils/react/setRef';
 
 import { CodeHighlightPlugin } from './plugins/CodeHighlightPlugin';
@@ -56,6 +59,7 @@ export const RichEditorContent = ({
 }: RichEditorContentProps) => {
 	const styles = useMultiStyleConfig('RichEditor');
 	const editorConfig = useAppSelector(selectEditorConfig);
+	const fontFamily = useAppSelector(selectEditorFontFamily);
 
 	// Expose API
 	const [editor] = useLexicalComposerContext();
@@ -94,7 +98,7 @@ export const RichEditorContent = ({
 				...styles.root,
 				// TODO: move a styles to a top level container
 				fontSize: editorConfig.fontSize,
-				fontFamily: editorConfig.fontFamily,
+				fontFamily: fontFamily,
 				lineHeight: editorConfig.lineHeight,
 			}}
 		>

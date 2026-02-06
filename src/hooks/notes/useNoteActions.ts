@@ -9,13 +9,14 @@ import {
 	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
 import {
 	selectIsNoteOpened,
 	selectNotes,
 	selectWorkspace,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
 import { RootState } from '@state/redux/store';
 
 export const useNoteActions = () => {
@@ -47,9 +48,12 @@ export const useNoteActions = () => {
 	const eventBus = useEventBus();
 	const noteHistory = useNotesHistory();
 	const notesRegistry = useNotesRegistry();
+	const { enabled: isSnapshotsEnabled } = useVaultSelector(selectSnapshotSettings);
 	const close = useCallback(
 		async (id: NoteId) => {
 			noteClosed(id);
+
+			if (!isSnapshotsEnabled) return;
 
 			// Take note content snapshot (if not disabled)
 			const note = await notesRegistry.getById(id);
@@ -59,7 +63,7 @@ export const useNoteActions = () => {
 				});
 			}
 		},
-		[eventBus, noteClosed, noteHistory, notesRegistry],
+		[eventBus, isSnapshotsEnabled, noteClosed, noteHistory, notesRegistry],
 	);
 
 	return { click, close };

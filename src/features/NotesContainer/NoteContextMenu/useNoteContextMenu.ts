@@ -13,9 +13,9 @@ import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
 import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
-import { selectConfirmMoveToBin } from '@state/redux/settings/selectors/preferences';
+import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { NoteActions } from '.';
@@ -31,7 +31,13 @@ const mdCharsForEscapeRegEx = new RegExp(
 	'g',
 );
 
-const buildNoteMenu = (note: INote): ContextMenu => {
+const buildNoteMenu = ({
+	note,
+	useBin,
+}: {
+	note: INote;
+	useBin: boolean;
+}): ContextMenu => {
 	return [
 		...(note.isDeleted
 			? [{ id: NoteActions.RESTORE_FROM_BIN, label: 'Restore' }]
@@ -49,7 +55,7 @@ const buildNoteMenu = (note: INote): ContextMenu => {
 		},
 		{ type: 'separator' },
 
-		note.isDeleted
+		!useBin || note.isDeleted
 			? { id: NoteActions.DELETE_PERMANENTLY, label: 'Delete permanently' }
 			: { id: NoteActions.DELETE_TO_BIN, label: 'Delete to bin' },
 	];
@@ -65,7 +71,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
-	const requiresConfirmMoveToBin = useAppSelector(selectConfirmMoveToBin);
+	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
 	const { noteUpdated } = useNotesContext();
 
@@ -77,12 +83,11 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: async (id: string) => {
-					if (requiresConfirmMoveToBin) {
-						const isConfirmed = confirm(
-							`Do you want to move this note to the bin?`,
-						);
-						if (!isConfirmed) return;
-					}
+					if (
+						deletionConfig.confirm &&
+						!confirm(`Do you want to move this note to the bin?`)
+					)
+						return;
 
 					closeNote(id);
 
@@ -98,10 +103,11 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				},
 
 				[NoteActions.DELETE_PERMANENTLY]: async (id: string) => {
-					const isConfirmed = confirm(
-						`Do you want to permanently delete this note?`,
-					);
-					if (!isConfirmed) return;
+					if (
+						deletionConfig.confirm &&
+						!confirm(`Do you want to permanently delete this note?`)
+					)
+						return;
 
 					closeNote(id);
 
@@ -183,7 +189,6 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 			}
 		},
 		[
-			requiresConfirmMoveToBin,
 			closeNote,
 			notes,
 			noteUpdated,
@@ -192,6 +197,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 			telemetry,
 			notesExport,
 			workspaceData?.name,
+			deletionConfig,
 		],
 	);
 
@@ -199,8 +205,12 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 	return useCallback(
 		(note: INote, point: { x: number; y: number }) => {
-			showMenu(note.id, point, buildNoteMenu(note));
+			showMenu(
+				note.id,
+				point,
+				buildNoteMenu({ note, useBin: !deletionConfig.permanentDeletion }),
+			);
 		},
-		[showMenu],
+		[deletionConfig.permanentDeletion, showMenu],
 	);
 };

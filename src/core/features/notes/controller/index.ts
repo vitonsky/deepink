@@ -8,7 +8,19 @@ export type NoteMeta = {
 	isBookmarked: boolean;
 };
 
-export type NoteSortField = 'id' | 'createdAt' | 'updatedAt';
+export type NoteSortField = 'id' | 'createdAt' | 'updatedAt' | 'deletedAt';
+
+type DateRange = {
+	/**
+	 * inclusive
+	 */
+	from: Date;
+
+	/**
+	 * exclusive
+	 */
+	to: Date;
+};
 
 export type NotesControllerFetchOptions = {
 	/**
@@ -40,6 +52,11 @@ export type NotesControllerFetchOptions = {
 	search?: {
 		text: string;
 	};
+
+	/**
+	 * Filter by deletion date
+	 */
+	deletedAt?: Partial<DateRange>;
 
 	/**
 	 * Sorting options

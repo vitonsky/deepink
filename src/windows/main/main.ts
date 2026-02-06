@@ -8,6 +8,7 @@ import { enableContextMenu } from '@electron/requests/contextMenu/main';
 import { enableElectronPatches } from '@electron/requests/electronPatches/main';
 import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
+import { serveInterop } from '@electron/requests/interop/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
 import { debounce } from '@utils/debounce/debounce';
@@ -30,6 +31,7 @@ export const openMainWindow = async ({
 }: AppContext): Promise<MainWindowAPI> => {
 	// Requests handlers
 	serveFiles();
+	serveInterop();
 	enableStorage();
 	enableContextMenu();
 	enableInteractions();

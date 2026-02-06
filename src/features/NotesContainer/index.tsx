@@ -18,8 +18,9 @@ import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useNoteShortcutActions } from '@hooks/notes/useNoteShortcutActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useVaultSelector, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
+import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
 import { createWorkspaceSelector } from '@state/redux/profiles/utils';
 import { joinCallbacks } from '@utils/react/joinCallbacks';
 
@@ -62,6 +63,8 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	}, [eventBus, noteUpdated, notesRegistry, updateNotes]);
 
 	// Simulate note update
+	const { enabled: isSnapshotsEnabled, interval: snapshotsInterval } =
+		useVaultSelector(selectSnapshotSettings);
 	const syncJobsRef = useRef<Record<string, NodeJS.Timeout>>({});
 	const updateNote = useImmutableCallback(
 		async (note: INote) => {
@@ -82,16 +85,24 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 			}
 
 			// Sync by timeout
-			if (!note.isSnapshotsDisabled) {
+			if (isSnapshotsEnabled && !note.isSnapshotsDisabled) {
 				syncJobsRef.current[note.id] = setTimeout(async () => {
 					delete syncJobsRef.current[note.id];
 
 					await noteHistory.snapshot(note.id);
 					eventBus.emit(WorkspaceEvents.NOTE_HISTORY_UPDATED, note.id);
-				}, 10 * 1000);
+				}, snapshotsInterval);
 			}
 		},
-		[eventBus, noteHistory, noteUpdated, notesRegistry, updateNotes],
+		[
+			noteUpdated,
+			notesRegistry,
+			eventBus,
+			updateNotes,
+			isSnapshotsEnabled,
+			snapshotsInterval,
+			noteHistory,
+		],
 	);
 
 	useNoteShortcutActions();
