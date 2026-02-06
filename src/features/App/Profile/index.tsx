@@ -1,5 +1,6 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
+import ms from 'ms';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -72,6 +73,14 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 							snapshots: {
 								enabled: true,
 								interval: 30_000,
+							},
+							deletion: {
+								confirm: false,
+								permanentDeletion: false,
+								bin: {
+									autoClean: false,
+									cleanInterval: ms('30d'),
+								},
 							},
 						},
 					},

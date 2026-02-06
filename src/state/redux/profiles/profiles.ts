@@ -114,6 +114,14 @@ export type ProfileData = {
 			enabled: boolean;
 			interval: number;
 		};
+		deletion: {
+			confirm: boolean;
+			permanentDeletion: boolean;
+			bin: {
+				autoClean: boolean;
+				cleanInterval: number;
+			};
+		};
 	};
 };
 
@@ -385,6 +393,23 @@ export const profilesSlice = createSlice({
 			(profile, payload: Partial<ProfileData['config']['snapshots']>) => {
 				profile.config.snapshots = {
 					...profile.config.snapshots,
+					...payload,
+				};
+			},
+		),
+
+		setNoteDeletionConfig: createProfileReducer(
+			(
+				profile,
+				payload: Partial<
+					Pick<
+						ProfileData['config']['deletion'],
+						'permanentDeletion' | 'confirm'
+					>
+				>,
+			) => {
+				profile.config.deletion = {
+					...profile.config.deletion,
 					...payload,
 				};
 			},

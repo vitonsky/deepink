@@ -15,3 +15,8 @@ export const selectSnapshotSettings = createVaultSelector(
 	[selectVaultConfig],
 	(config) => config.snapshots,
 );
+
+export const selectDeletionConfig = createVaultSelector(
+	[selectVaultConfig],
+	(config) => config.deletion,
+);

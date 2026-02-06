@@ -17,12 +17,17 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
-import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
+import {
+	selectDeletionConfig,
+	selectSnapshotSettings,
+} from '@state/redux/profiles/selectors/vault';
 
 export const VaultSettings = () => {
 	const dispatch = useAppDispatch();
-	const snapshotsConfig = useVaultSelector(selectSnapshotSettings);
 	const vaultActions = useVaultActions();
+
+	const snapshotsConfig = useVaultSelector(selectSnapshotSettings);
+	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
 	return (
 		<Features>
@@ -153,13 +158,33 @@ export const VaultSettings = () => {
 
 			<FeaturesGroup title="Trash bin">
 				<FeaturesOption description="Ask before deleting a note.">
-					<Switch size="sm" defaultChecked>
+					<Switch
+						size="sm"
+						isChecked={deletionConfig.confirm}
+						onChange={(evt) => {
+							dispatch(
+								vaultActions.setNoteDeletionConfig({
+									confirm: evt.target.checked,
+								}),
+							);
+						}}
+					>
 						Confirm deletion
 					</Switch>
 				</FeaturesOption>
 
 				<FeaturesOption description="Move notes to a trash bin instead of permanent deletion so you can restore it later.">
-					<Switch size="sm" defaultChecked>
+					<Switch
+						size="sm"
+						isChecked={!deletionConfig.permanentDeletion}
+						onChange={(evt) => {
+							dispatch(
+								vaultActions.setNoteDeletionConfig({
+									permanentDeletion: !evt.target.checked,
+								}),
+							);
+						}}
+					>
 						Move notes to bin
 					</Switch>
 				</FeaturesOption>

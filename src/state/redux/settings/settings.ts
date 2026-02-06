@@ -1,4 +1,4 @@
-import { accentColorsMap } from '@features/ThemeProvider';
+import { accentColorsMap } from '@features/accentColorsMap';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
@@ -19,12 +19,6 @@ export type GlobalSettings = {
 		lineNumbers: boolean;
 		dateFormat: string;
 	};
-	preferences: {
-		/**
-		 * Indicates if a confirmation is required before moving note to the bin
-		 */
-		confirmBeforeMoveToBin: boolean;
-	};
 };
 
 export const settingsSlice = createSlice({
@@ -42,9 +36,6 @@ export const settingsSlice = createSlice({
 			miniMap: false,
 			lineNumbers: false,
 			dateFormat: 'D MMM YYYY, HH:mm',
-		},
-		preferences: {
-			confirmBeforeMoveToBin: false,
 		},
 	} satisfies GlobalSettings as GlobalSettings,
 	reducers: {
@@ -75,12 +66,6 @@ export const settingsSlice = createSlice({
 			}
 
 			return { ...state, theme } as GlobalSettings;
-		},
-		setPreferences: (
-			state,
-			{ payload }: PayloadAction<GlobalSettings['preferences']>,
-		) => {
-			return { ...state, preferences: payload } as GlobalSettings;
 		},
 	},
 });

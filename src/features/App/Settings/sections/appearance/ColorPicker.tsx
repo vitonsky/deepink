@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Box, HStack } from '@chakra-ui/react';
-import { accentColorsMap } from '@features/ThemeProvider';
+import { accentColorsMap } from '@features/accentColorsMap';
 
 export const ColorPicker = ({
 	color,
