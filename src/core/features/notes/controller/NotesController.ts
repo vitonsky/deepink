@@ -317,15 +317,13 @@ export class NotesController implements INotesController {
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
-			const updateTime = new Date();
 			const result = await db.query(
 				qb.line(
 					'UPDATE notes SET',
 					qb.values({
 						title: updatedNote.title,
 						text: updatedNote.text,
-						// TODO: should we really update note by update meta?
-						updated_at: updateTime,
+						updated_at: new Date(),
 					}),
 					qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
 				),

@@ -1,5 +1,8 @@
 import { NotesController } from '../notes/controller/NotesController';
 
+/**
+ * Permanently deletes a notes moved to bin out of retention time policy
+ */
 export class TrashCleaner {
 	constructor(
 		private readonly controllers: {
@@ -14,6 +17,7 @@ export class TrashCleaner {
 		const { notes } = this.controllers;
 		const { retentionTime } = this.config;
 
+		// TODO: use `query` method to fetch only ids
 		const noteIds = await notes
 			.get({
 				deletedAt: {
