@@ -1,6 +1,6 @@
 import { ConfigurableSQLBuilder, SQLCompiler } from 'nano-queries';
 
-export type DBPrimitiveTypes = string | number | null | boolean;
+export type DBPrimitiveTypes = string | number | null | boolean | Date;
 export type DBTypes = DBPrimitiveTypes | DBPrimitiveTypes[];
 
 export const qb = new ConfigurableSQLBuilder(

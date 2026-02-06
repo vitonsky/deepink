@@ -69,7 +69,7 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 				fields['visible'] = Boolean(value);
 				break;
 			case 'isDeleted':
-				fields['deleted_at'] = value ? Date.now() : null;
+				fields['deleted_at'] = value ? new Date() : null;
 				break;
 			case 'isArchived':
 				fields['archived'] = Boolean(value);
@@ -191,10 +191,10 @@ function getFetchQuery(
 	}
 
 	if (deletedAt.from) {
-		filterQuery.push(qb.sql`deleted_at >= ${deletedAt.from.getTime()}`);
+		filterQuery.push(qb.sql`deleted_at >= ${deletedAt.from}`);
 	}
 	if (deletedAt.to) {
-		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to.getTime()}`);
+		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to}`);
 	}
 
 	// Sort
@@ -284,7 +284,7 @@ export class NotesController implements INotesController {
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
-		const creationTime = new Date().getTime();
+		const creationTime = new Date();
 
 		// Insert data
 		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
@@ -317,7 +317,7 @@ export class NotesController implements INotesController {
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
-			const updateTime = new Date().getTime();
+			const updateTime = new Date();
 			const result = await db.query(
 				qb.line(
 					'UPDATE notes SET',
