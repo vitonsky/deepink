@@ -1,8 +1,8 @@
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-import { NotesController } from '../notes/controller/NotesController';
-import { TrashCleaner } from './TrashCleaner';
+import { NotesController } from '../controller/NotesController';
+import { DeletedNotesController } from './DeletedNotesController';
 import ms from 'ms';
 
 const FAKE_WORKSPACE_ID = getUUID();
@@ -23,7 +23,7 @@ describe('Purge expired notes', () => {
 	test('Purge notes in bin that is deleted longer than retention time', async () => {
 		const db = await openDatabase(dbFile);
 		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
-		const bin = new TrashCleaner(
+		const bin = new DeletedNotesController(
 			{ notes: notesController },
 			{ retentionTime: ms('10d') },
 		);
@@ -76,7 +76,7 @@ describe('Purge expired notes', () => {
 	test('Modification time is considered when required', async () => {
 		const db = await openDatabase(dbFile);
 		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
-		const bin = new TrashCleaner(
+		const bin = new DeletedNotesController(
 			{ notes: notesController },
 			{ retentionTime: ms('10d'), considerModificationTime: true },
 		);
@@ -124,7 +124,7 @@ describe('Purge expired notes', () => {
 test('Empty bin', async () => {
 	const db = await openDatabase(dbFile);
 	const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
-	const bin = new TrashCleaner(
+	const bin = new DeletedNotesController(
 		{ notes: notesController },
 		{ retentionTime: ms('10d'), considerModificationTime: true },
 	);

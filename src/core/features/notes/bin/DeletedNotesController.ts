@@ -1,10 +1,8 @@
-import { NotesController } from '../notes/controller/NotesController';
+import { NotesController } from '../controller/NotesController';
 
 // TODO: add tests with restore from bin and different time zones
-/**
- * Permanently deletes a notes moved to bin out of retention time policy
- */
-export class TrashCleaner {
+
+export class DeletedNotesController {
 	constructor(
 		private readonly controllers: {
 			notes: NotesController;
@@ -15,6 +13,9 @@ export class TrashCleaner {
 		},
 	) {}
 
+	/**
+	 * Permanently deletes all notes marked as deleted
+	 */
 	public async empty() {
 		const { notes } = this.controllers;
 
@@ -28,6 +29,9 @@ export class TrashCleaner {
 		return noteIds.length;
 	}
 
+	/**
+	 * Permanently deletes a notes marked as deleted longer than allow a retention policy
+	 */
 	public async purgeExpired() {
 		const { notes } = this.controllers;
 		const { retentionTime, considerModificationTime } = this.config;
