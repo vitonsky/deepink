@@ -20,6 +20,7 @@ import { useAppDispatch } from '@state/redux/hooks';
 import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
 import {
 	selectDeletionConfig,
+	selectIntegrityServiceConfig,
 	selectSnapshotSettings,
 } from '@state/redux/profiles/selectors/vault';
 
@@ -29,6 +30,7 @@ export const VaultSettings = () => {
 
 	const snapshotsConfig = useVaultSelector(selectSnapshotSettings);
 	const deletionConfig = useVaultSelector(selectDeletionConfig);
+	const filesIntegrityConfig = useVaultSelector(selectIntegrityServiceConfig);
 
 	return (
 		<Features>
@@ -52,7 +54,19 @@ export const VaultSettings = () => {
 				</FeaturesOption>
 
 				<FeaturesOption description="Delete files that is not used anymore.">
-					<Switch size="sm">Delete orphaned files</Switch>
+					<Switch
+						size="sm"
+						isChecked={filesIntegrityConfig.enabled}
+						onChange={(evt) => {
+							dispatch(
+								vaultActions.setFilesIntegrityConfig({
+									enabled: evt.target.checked,
+								}),
+							);
+						}}
+					>
+						Delete orphaned files
+					</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>
 

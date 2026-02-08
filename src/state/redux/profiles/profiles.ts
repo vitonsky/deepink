@@ -425,6 +425,14 @@ export const profilesSlice = createSlice({
 				};
 			},
 		),
+		setFilesIntegrityConfig: createProfileReducer(
+			(profile, payload: Partial<ProfileData['config']['filesIntegrity']>) => {
+				profile.config.filesIntegrity = {
+					...profile.config.filesIntegrity,
+					...payload,
+				};
+			},
+		),
 	},
 });
 
