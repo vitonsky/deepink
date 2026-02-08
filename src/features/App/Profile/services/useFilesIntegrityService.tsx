@@ -33,7 +33,7 @@ export const useFilesIntegrityService = () => {
 		return runService(async () => {
 			console.debug('Start files integrity service...');
 			console.warn(
-				'Files integrity service will delete a files that is not mentioned in any note. Note snapshots is not considered as reference sources, so you may lost files that mentioned only in history.',
+				"Files integrity service will delete a files that is not mentioned in any note. Note snapshots is not considered as a reference source, so you may lost files that only mentioned in history. If that's undesirable - disable this service in next 5 minutes to prevent data loss.",
 			);
 
 			const controls = await Promise.all(
@@ -59,18 +59,20 @@ export const useFilesIntegrityService = () => {
 					abortSignal.addEventListener('abort', () => res(), { once: true }),
 				);
 
+				console.debug('A files integrity service wait 5 minutes before start...');
+				await Promise.race([wait(ms('5m')), abortPromise]);
+				if (abortSignal.aborted) {
+					res();
+					return;
+				}
+
 				while (true) {
 					if (abortSignal.aborted) {
 						res();
 						return;
 					}
 
-					await Promise.race([wait(ms('5m')), abortPromise]);
-					if (abortSignal.aborted) {
-						res();
-						return;
-					}
-
+					console.debug('Scan vault files by files integrity service...');
 					Promise.all(controls.map((control) => control.fixAll()));
 					if (abortSignal.aborted) {
 						res();
