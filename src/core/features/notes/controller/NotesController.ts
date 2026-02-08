@@ -244,20 +244,7 @@ export class NotesController implements INotesController {
 		this.workspace = workspace;
 	}
 
-	public async getById(id: NoteId): Promise<INote | null> {
-		const db = wrapDB(this.db.get());
-
-		const {
-			rows: [note],
-		} = await db.query(
-			qb.sql`SELECT * FROM notes WHERE workspace_id=${this.workspace} AND id=${id}`,
-			RowScheme,
-		);
-
-		return note ?? null;
-	}
-
-	public async getByIds(ids: NoteId[]): Promise<INote[] | null> {
+	public async getById(ids: NoteId[]): Promise<INote[]> {
 		const db = wrapDB(this.db.get());
 
 		const { rows } = await db.query(
@@ -267,11 +254,11 @@ export class NotesController implements INotesController {
 
 		if (rows.length !== ids.length) {
 			console.warn(
-				`Not match deleted entries length. Expected: ${ids.length}; Received: ${rows.length}`,
+				`Found notes count does not match the requested count. Expected: ${ids.length}; Found: ${rows.length}`,
 			);
 		}
 
-		return rows ?? null;
+		return rows;
 	}
 
 	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {

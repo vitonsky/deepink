@@ -72,14 +72,9 @@ export type NotesControllerFetchOptions = {
  */
 export interface INotesController {
 	/**
-	 * Get note by ID
-	 */
-	getById(id: NoteId): Promise<INote | null>;
-
-	/**
 	 * Get notes by IDs
 	 */
-	getByIds(id: NoteId[]): Promise<INote[] | null>;
+	getById(id: NoteId[]): Promise<INote[]>;
 
 	/**
 	 * Get number of notes
@@ -87,7 +82,7 @@ export interface INotesController {
 	getLength(query?: NotesControllerFetchOptions): Promise<number>;
 
 	/**
-	 * Get notes id filtered by parameters
+	 * Get note IDs filtered by parameters
 	 */
 	query(query?: NotesControllerFetchOptions): Promise<NoteId[]>;
 

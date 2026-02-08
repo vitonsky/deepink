@@ -36,7 +36,7 @@ export const useNoteActions = () => {
 			if (isNoteOpened) {
 				dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: id }));
 			} else {
-				notesRegistry.getById(id).then((note) => {
+				notesRegistry.getById([id]).then(([note]) => {
 					if (note) openNote(note);
 				});
 			}
@@ -54,7 +54,7 @@ export const useNoteActions = () => {
 			if (!isSnapshotsEnabled) return;
 
 			// Take note content snapshot (if not disabled)
-			const note = await notesRegistry.getById(id);
+			const [note] = await notesRegistry.getById([id]);
 			if (note && !note.isSnapshotsDisabled) {
 				noteHistory.snapshot(id).then(() => {
 					eventBus.emit(WorkspaceEvents.NOTE_HISTORY_UPDATED, id);

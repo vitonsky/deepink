@@ -36,7 +36,7 @@ export const useCreateNote = () => {
 
 		await updateNotes();
 
-		const note = await notesRegistry.getById(noteId);
+		const [note] = await notesRegistry.getById([noteId]);
 		if (note) {
 			openNote(note);
 		}

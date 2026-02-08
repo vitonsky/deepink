@@ -95,8 +95,8 @@ export const NotesList: FC<NotesListProps> = () => {
 	const [notesInViewport, setNotesInViewport] = useState<Map<NoteId, INote>>(new Map());
 	const loadViewportNotes = useDebouncedCallback(
 		(noteIds: NoteId[]) => {
-			noteRegister.getByIds(noteIds).then((loadedNotes) => {
-				if (!loadedNotes || loadedNotes.length === 0) return;
+			noteRegister.getById(noteIds).then((loadedNotes) => {
+				if (loadedNotes.length === 0) return;
 
 				setNotesInViewport(new Map(loadedNotes.map((note) => [note.id, note])));
 			});
@@ -116,7 +116,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		const update = (updatedNoteId: NoteId) => {
 			if (!notesInViewport.has(updatedNoteId)) return;
 
-			noteRegister.getById(updatedNoteId).then((note) => {
+			noteRegister.getById([updatedNoteId]).then(([note]) => {
 				if (!note) return;
 				setNotesInViewport((prev) => new Map(prev).set(note.id, note));
 			});
