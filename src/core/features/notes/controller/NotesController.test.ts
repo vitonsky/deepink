@@ -375,6 +375,20 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
+
+	test('method getById returns notes in the requested order', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		const reversedIds = notesId.reverse();
+
+		const notes = await registry.getById(reversedIds);
+		expect(notes.map((note) => note.id)).toEqual(reversedIds);
+	});
 });
 
 describe('multi instances', () => {
