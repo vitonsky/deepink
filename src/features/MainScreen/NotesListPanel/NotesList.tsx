@@ -52,7 +52,6 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	// Scroll to active note
 	// Active note scroll may be off due to dynamic element sizes; corrected after measurements
-
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
 	const correctiveScrollIndexRef = useRef<number | null>(null);
 	useEffect(() => {
@@ -81,7 +80,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		[virtualizer],
 	);
 
-	// Reset scroll bar after view change
+	// Reset the scroll bar after a view change
 	const notesView = useWorkspaceSelector(selectNotesView);
 	useEffect(() => {
 		if (!activeNoteId || !notes.includes(activeNoteId)) {
@@ -92,17 +91,13 @@ export const NotesList: FC<NotesListProps> = () => {
 	const virtualNotes = virtualizer.getVirtualItems();
 
 	// Load notes
-	const [notesInViewport, setNotesInViewport] = useState<Map<string, INote>>(new Map());
+	const [notesInViewport, setNotesInViewport] = useState<Map<NoteId, INote>>(new Map());
 	const loadViewportNotes = useDebouncedCallback(
 		(noteIds: NoteId[]) => {
 			noteRegister.getByIds(noteIds).then((loadedNotes) => {
 				if (!loadedNotes || loadedNotes.length === 0) return;
 
-				const newNotes = new Map<NoteId, INote>();
-				for (const note of loadedNotes) {
-					newNotes.set(note.id, note);
-				}
-				setNotesInViewport(newNotes);
+				setNotesInViewport(new Map(loadedNotes.map((note) => [note.id, note])));
 			});
 		},
 		{ wait: 10 },
@@ -150,13 +145,13 @@ export const NotesList: FC<NotesListProps> = () => {
 						}}
 					>
 						{virtualNotes.map((virtualRow) => {
-							const noteId = notes[virtualRow.index];
-							const note = notesInViewport.get(noteId);
+							const id = notes[virtualRow.index];
+							const note = notesInViewport.get(id);
 
 							if (!note)
 								return (
 									<Skeleton
-										key={noteId}
+										key={id}
 										ref={virtualizer.measureElement}
 										data-index={virtualRow.index}
 										startColor="primary.100"
@@ -167,13 +162,13 @@ export const NotesList: FC<NotesListProps> = () => {
 								);
 
 							const date = note.createdTimestamp ?? note.updatedTimestamp;
-							const isActive = noteId === activeNoteId;
+							const isActive = note.id === activeNoteId;
 
 							// TODO: get preview text from DB as prepared value
 							// TODO: show attachments
 							return (
 								<NotePreview
-									key={noteId}
+									key={note.id}
 									ref={(node) => {
 										virtualizer.measureElement(node);
 
@@ -186,7 +181,7 @@ export const NotesList: FC<NotesListProps> = () => {
 									isSelected={isActive}
 									textToHighlight={search}
 									title={getNoteTitle(note.content)}
-									text={note?.content.text}
+									text={note.content.text}
 									meta={
 										date && (
 											<Text>{new Date(date).toDateString()}</Text>
@@ -194,12 +189,12 @@ export const NotesList: FC<NotesListProps> = () => {
 									}
 									onContextMenu={(evt) => {
 										openNoteContextMenu(
-											noteId,
+											note.id,
 											getContextMenuCoords(evt.nativeEvent),
 										);
 									}}
 									onClick={() => {
-										noteActions.click(noteId);
+										noteActions.click(note.id);
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.NOTE_OPENED,
 											{
