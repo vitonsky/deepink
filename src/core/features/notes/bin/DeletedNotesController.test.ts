@@ -4,6 +4,7 @@ import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { NotesController } from '../controller/NotesController';
 import { DeletedNotesController } from './DeletedNotesController';
 import ms from 'ms';
+import { Mock } from 'vitest';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -168,6 +169,15 @@ test('Empty bin', async () => {
 });
 
 describe('Service must delete expired notes', () => {
+	/**
+	 * First we skip a time, then run timers once
+	 * This way to change time is needed for large time spans, to not iterate too much timers
+	 */
+	const advanceTimersFast = async (time: number) => {
+		vi.advanceTimersByTime(time);
+		await vi.advanceTimersByTimeAsync(0);
+	};
+
 	test('Service deletes only expired notes just in time', async () => {
 		vi.setSystemTime('2020-01-01T00:00:00.000Z');
 
@@ -250,5 +260,115 @@ describe('Service must delete expired notes', () => {
 			expect(notes).toEqual(noteIds.slice(50));
 			expect(notes).toHaveLength(50);
 		});
+	});
+
+	test('Service works fine with large time spans', async () => {
+		vi.setSystemTime('2020-01-01T00:00:00.000Z');
+
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
+		const bin = new DeletedNotesController(
+			{ notes: notesController },
+			{ retentionTime: ms('5y'), considerModificationTime: true },
+		);
+
+		const onClean = vi.fn();
+		const stopService = await bin.startService({ onClean });
+		expect(onClean).toBeCalledTimes(0);
+
+		// Create notes
+		const noteIds = await createNotes(notesController, 100);
+		expect(noteIds).toHaveLength(100);
+
+		// Move to bin
+		await notesController.updateMeta(noteIds, { isDeleted: true });
+		expect(onClean).toBeCalledTimes(0);
+
+		// Nothing is deleted
+		await advanceTimersFast(ms('1y'));
+		expect(onClean).toBeCalledTimes(0);
+		await advanceTimersFast(ms('1y'));
+		expect(onClean).toBeCalledTimes(0);
+		await advanceTimersFast(ms('1y'));
+		expect(onClean).toBeCalledTimes(0);
+		await advanceTimersFast(ms('1y'));
+		expect(onClean).toBeCalledTimes(0);
+
+		await advanceTimersFast(ms('1y'));
+
+		// Yep, due to a time shifts that's not 2025 year yet
+		// But 5 years have passed
+		expect(new Date().toISOString()).toBe('2024-12-31T06:00:00.000Z');
+
+		// All expired notes must be deleted
+		expect(onClean).toHaveBeenLastCalledWith(100);
+		expect(onClean).toBeCalledTimes(1);
+
+		await expect(stopService()).resolves.not.toThrow();
+		await expect(getNoteIds(notesController)).resolves.toHaveLength(0);
+	});
+
+	test('Service may be restarted', async () => {
+		vi.setSystemTime('2020-01-01T00:00:00.000Z');
+
+		const dbFile = createFileControllerMock();
+		const db = await openDatabase(dbFile);
+		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
+		const bin = new DeletedNotesController(
+			{ notes: notesController },
+			{ retentionTime: ms('1d'), considerModificationTime: true },
+		);
+
+		// Create notes
+		const noteIds = await createNotes(notesController, 100);
+		expect(noteIds).toHaveLength(100);
+
+		// Move to bin
+		await notesController.updateMeta(noteIds, { isDeleted: true });
+
+		// Restart service every hour
+		const serviceRuns: {
+			onClean: Mock;
+			stopPromise: Promise<any>;
+		}[] = [];
+		for (let i = 0; i < 20; i++) {
+			// Run new service
+			const onClean = vi.fn();
+			const stopService = await bin.startService({ onClean: onClean });
+
+			await vi.advanceTimersByTimeAsync(ms('20m'));
+			expect(onClean).toBeCalledTimes(0);
+			await vi.advanceTimersByTimeAsync(ms('20m'));
+			expect(onClean).toBeCalledTimes(0);
+			await vi.advanceTimersByTimeAsync(ms('20m'));
+			expect(onClean).toBeCalledTimes(0);
+
+			const stopPromise = stopService();
+			await expect(stopPromise).resolves.not.toThrow();
+
+			serviceRuns.push({ onClean, stopPromise });
+		}
+
+		// Run new service. Nothing is deleted
+		const onClean = vi.fn();
+		const stopService = await bin.startService({ onClean: onClean });
+
+		await vi.advanceTimersByTimeAsync(ms('4h'));
+		expect(onClean).toHaveBeenLastCalledWith(100);
+		expect(onClean).toBeCalledTimes(1);
+
+		await expect(stopService()).resolves.not.toThrow();
+
+		await vi.advanceTimersByTimeAsync(ms('100h'));
+		expect(onClean).toBeCalledTimes(1);
+
+		// Previous runs have no deletions after service was stopped
+		Promise.all(
+			serviceRuns.map(async ({ onClean, stopPromise }) => {
+				expect(onClean).toBeCalledTimes(0);
+				await expect(stopPromise).resolves.not.toThrow();
+			}),
+		);
 	});
 });
