@@ -182,15 +182,15 @@ describe('data fetching', () => {
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
-		await expect(registry.getIds()).resolves.toHaveLength(300);
-		await expect(registry.getIds({ limit: 100 })).resolves.toHaveLength(100);
+		await expect(registry.query()).resolves.toHaveLength(300);
+		await expect(registry.query({ limit: 100 })).resolves.toHaveLength(100);
 		await expect(
-			registry.getIds({ limit: 100, meta: { isDeleted: true } }),
+			registry.query({ limit: 100, meta: { isDeleted: true } }),
 		).resolves.toHaveLength(0);
 
 		const tagsList = await tags.getTags();
 		await expect(
-			registry.getIds({
+			registry.query({
 				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
 			}),
 		).resolves.toHaveLength(1);

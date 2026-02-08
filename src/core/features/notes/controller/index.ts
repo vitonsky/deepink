@@ -89,7 +89,7 @@ export interface INotesController {
 	/**
 	 * Get notes id filtered by parameters
 	 */
-	getIds(query?: NotesControllerFetchOptions): Promise<NoteId[]>;
+	query(query?: NotesControllerFetchOptions): Promise<NoteId[]>;
 
 	/**
 	 * Primary method to get notes filtered by parameters

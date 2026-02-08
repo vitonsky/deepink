@@ -43,7 +43,7 @@ export const useUpdateNotes = () => {
 
 		const tags = activeTag !== null ? [activeTag.id] : [];
 
-		const notes = await notesRegistry.getIds({
+		const notes = await notesRegistry.query({
 			tags,
 			sort: { by: 'updatedAt', order: 'desc' },
 			search: searchText
