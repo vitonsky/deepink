@@ -54,10 +54,10 @@ describe('CRUD operations', () => {
 		const modifiedData = { title: 'Modified title', text: 'Modified text' };
 		await registry.update(entryV1.id, modifiedData);
 
-		const entryV2 = await registry.getById([entryV1.id]);
-		expect(entryV2[0]?.content).toMatchObject(modifiedData);
-		expect(entryV2[0]?.createdTimestamp).toBe(entryV1.createdTimestamp);
-		expect(entryV2[0]?.updatedTimestamp).not.toBe(entryV1.updatedTimestamp);
+		const [entryV2] = await registry.getById([entryV1.id]);
+		expect(entryV2?.content).toMatchObject(modifiedData);
+		expect(entryV2?.createdTimestamp).toBe(entryV1.createdTimestamp);
+		expect(entryV2?.updatedTimestamp).not.toBe(entryV1.updatedTimestamp);
 	});
 
 	test('delete entries', async () => {
