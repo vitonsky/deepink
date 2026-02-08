@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
@@ -54,7 +54,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	// Scroll to active note
 	// Active note scroll may be off due to dynamic element sizes; corrected after measurements
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
-	const correctiveScrollIndexRef = useRef<number | null>(null);
+	const scrollCorrectionIndexRef = useRef<number | null>(null);
 	useEffect(() => {
 		if (!activeNoteId) return;
 
@@ -67,19 +67,8 @@ export const NotesList: FC<NotesListProps> = () => {
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
-		correctiveScrollIndexRef.current = noteIndex;
+		scrollCorrectionIndexRef.current = noteIndex;
 	}, [activeNoteId, notes, virtualizer]);
-
-	// Corrective scroll to the active note if needed
-	const correctiveScroll = useCallback(
-		(noteIndex: number) => {
-			if (correctiveScrollIndexRef.current === noteIndex) {
-				virtualizer.scrollToIndex(noteIndex, { align: 'start' });
-				correctiveScrollIndexRef.current = null;
-			}
-		},
-		[virtualizer],
-	);
 
 	// Reset the scroll bar after a view change
 	const notesView = useWorkspaceSelector(selectNotesView);
@@ -194,10 +183,20 @@ export const NotesList: FC<NotesListProps> = () => {
 									ref={(node) => {
 										virtualizer.measureElement(node);
 
-										if (isActive) {
-											activeNoteRef.current = node;
-											correctiveScroll(virtualRow.index);
-										}
+										if (!isActive) return;
+										activeNoteRef.current = node;
+
+										// Corrective scroll to the active note if needed
+										if (
+											scrollCorrectionIndexRef.current !==
+											virtualRow.index
+										)
+											return;
+
+										virtualizer.scrollToIndex(virtualRow.index, {
+											align: 'start',
+										});
+										scrollCorrectionIndexRef.current = null;
 									}}
 									data-index={virtualRow.index}
 									isSelected={isActive}
