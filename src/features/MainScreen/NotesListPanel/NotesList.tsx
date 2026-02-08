@@ -1,7 +1,12 @@
-import React, { FC, useCallback, useEffect, useRef } from 'react';
-import { Box, Text, VStack } from '@chakra-ui/react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { Box, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
+import { INote, NoteId } from '@core/features/notes';
+import { getNoteTitle } from '@core/features/notes/utils';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
+import { telemetry } from '@electron/requests/telemetry/renderer';
+import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteContextMenu } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -14,6 +19,7 @@ import {
 } from '@state/redux/profiles/profiles';
 import { selectNotesView } from '@state/redux/profiles/selectors/view';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { useDebouncedCallback } from '@utils/debounce/useDebouncedCallback';
 import { isElementInViewport } from '@utils/dom/isElementInViewport';
 
 export type NotesListProps = {};
@@ -21,6 +27,8 @@ export type NotesListProps = {};
 export const NotesList: FC<NotesListProps> = () => {
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
+
+	const noteRegister = useNotesRegistry();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
@@ -39,7 +47,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 20,
+		overscan: 10,
 	});
 
 	// Scroll to active note
@@ -75,14 +83,9 @@ export const NotesList: FC<NotesListProps> = () => {
 		}
 	}, [notesView, notes, activeNoteId, virtualizer]);
 
-	// Measure a virtualized item and scrolls to the active note when needed
-	const handleActiveNoteRef = useCallback(
-		(virtualIndex: number, isActive: boolean) => (node: HTMLDivElement | null) => {
-			virtualizer.measureElement(node);
-
-			if (!isActive) return;
-			activeNoteRef.current = node;
-
+	// Corrective scroll to the active note if needed
+	const correctActiveNoteScroll = useCallback(
+		(virtualIndex: number) => (node: HTMLDivElement | null) => {
 			if (!node || !parentRef.current) return;
 			const parentRect = parentRef.current.getBoundingClientRect();
 			const activeNoteRect = node.getBoundingClientRect();
@@ -102,10 +105,32 @@ export const NotesList: FC<NotesListProps> = () => {
 				});
 			}
 		},
-		[virtualizer],
+		[],
 	);
 
-	const items = virtualizer.getVirtualItems();
+	const virtualNotes = virtualizer.getVirtualItems();
+	const [notesInViewport, setNotesInViewport] = useState<Map<string, INote>>(new Map());
+	const loadViewportNotes = useDebouncedCallback(
+		(noteIds: NoteId[]) => {
+			noteRegister.getByIds(noteIds).then((loadedNotes) => {
+				if (!loadedNotes || !loadedNotes.length) return;
+
+				const newNotes = new Map<NoteId, INote>();
+				for (const note of loadedNotes) {
+					newNotes.set(note.id, note);
+				}
+				setNotesInViewport(newNotes);
+			});
+		},
+		{ wait: 10 },
+	);
+
+	useEffect(() => {
+		const noteIds = virtualNotes.map((i) => notes[i.index]);
+		if (noteIds.length === 0) return;
+
+		loadViewportNotes(noteIds);
+	}, [notes, noteRegister, virtualNotes, loadViewportNotes]);
 
 	// TODO: implement dragging and moving items
 	return (
@@ -135,17 +160,31 @@ export const NotesList: FC<NotesListProps> = () => {
 				>
 					<VStack
 						sx={{
-							position: 'absolute',
 							width: '100%',
 							top: 0,
 							left: 0,
-							transform: `translateY(${items[0]?.start ?? 0}px)`,
+							marginTop: `${virtualNotes[0]?.start ?? 0}px`,
 							gap: '4px',
 						}}
 					>
-						{items.map((virtualRow) => {
+						{virtualNotes.map((virtualRow) => {
 							const noteId = notes[virtualRow.index];
+							const note = notesInViewport.get(noteId);
 
+							if (!note)
+								return (
+									<Skeleton
+										key={noteId}
+										ref={virtualizer.measureElement}
+										data-index={virtualRow.index}
+										startColor="primary.100"
+										endColor="dim.400"
+										height="70px"
+										w="100%"
+									/>
+								);
+
+							const date = note.createdTimestamp ?? note.updatedTimestamp;
 							const isActive = noteId === activeNoteId;
 
 							// TODO: get preview text from DB as prepared value
@@ -153,15 +192,38 @@ export const NotesList: FC<NotesListProps> = () => {
 							return (
 								<NotePreview
 									key={noteId}
-									ref={handleActiveNoteRef(virtualRow.index, isActive)}
-									noteId={noteId}
+									ref={(node) => {
+										if (isActive) {
+											activeNoteRef.current = node;
+										}
+
+										virtualizer.measureElement(node);
+
+										correctActiveNoteScroll(virtualRow.index);
+									}}
 									data-index={virtualRow.index}
 									isSelected={isActive}
 									textToHighlight={search}
+									title={getNoteTitle(note.content)}
+									text={note?.content.text}
+									meta={
+										date && (
+											<Text>{new Date(date).toDateString()}</Text>
+										)
+									}
 									onContextMenu={(evt) => {
 										openNoteContextMenu(
 											noteId,
 											getContextMenuCoords(evt.nativeEvent),
+										);
+									}}
+									onClick={() => {
+										noteActions.click(noteId);
+										telemetry.track(
+											TELEMETRY_EVENT_NAME.NOTE_OPENED,
+											{
+												context: 'notes list',
+											},
 										);
 									}}
 								/>

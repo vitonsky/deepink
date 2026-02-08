@@ -77,6 +77,11 @@ export interface INotesController {
 	getById(id: NoteId): Promise<INote | null>;
 
 	/**
+	 * Get notes by IDs
+	 */
+	getByIds(id: NoteId[]): Promise<INote[] | null>;
+
+	/**
 	 * Get number of notes
 	 */
 	getLength(query?: NotesControllerFetchOptions): Promise<number>;
