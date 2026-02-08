@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { INote, NoteId } from '@core/features/notes';
@@ -6,7 +7,7 @@ import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
 import { telemetry } from '@electron/requests/telemetry/renderer';
-import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import { useEventBus, useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteContextMenu } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
@@ -108,6 +109,27 @@ export const NotesList: FC<NotesListProps> = () => {
 
 		loadViewportNotes(noteIds);
 	}, [notes, noteRegister, virtualNotes, loadViewportNotes]);
+
+	// Update preview when note content changes
+	const eventBus = useEventBus();
+	useEffect(() => {
+		const update = (updatedNoteId: NoteId) => {
+			if (!notesInViewport.has(updatedNoteId)) return;
+
+			noteRegister.getById(updatedNoteId).then((note) => {
+				if (!note) return;
+				setNotesInViewport((prev) => new Map(prev).set(note.id, note));
+			});
+		};
+
+		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, update);
+		const cleanupEdited = eventBus.listen(WorkspaceEvents.NOTE_EDITED, update);
+
+		return () => {
+			cleanupUpdated();
+			cleanupEdited();
+		};
+	}, [eventBus, noteRegister, notesInViewport]);
 
 	// TODO: implement dragging and moving items
 	return (
