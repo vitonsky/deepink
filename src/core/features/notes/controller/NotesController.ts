@@ -248,7 +248,9 @@ export class NotesController implements INotesController {
 		const db = wrapDB(this.db.get());
 
 		const { rows } = await db.query(
-			qb.sql`SELECT * FROM notes WHERE workspace_id=${this.workspace} AND id IN(${qb.values(ids)})`,
+			qb.sql`SELECT * FROM notes
+				JOIN unnest(ARRAY[${qb.values(ids)}]::uuid[]) WITH ORDINALITY AS ordering(id, position) ON notes.id = ordering.id
+				WHERE workspace_id = ${this.workspace} ORDER BY ordering.position`,
 			RowScheme,
 		);
 
