@@ -2,13 +2,13 @@ import { useEffect } from 'react';
 import ms from 'ms';
 import { DeletedNotesController } from '@core/features/notes/bin/DeletedNotesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
+import { useService } from '@hooks/useService';
 import { useVaultSelector } from '@state/redux/profiles/hooks';
 import {
 	selectBinRetentionPolicy,
 	selectWorkspacesSummary,
 } from '@state/redux/profiles/selectors/vault';
 
-import { useService } from './useService';
 import { useProfileControls } from '..';
 
 export const useBinService = () => {
