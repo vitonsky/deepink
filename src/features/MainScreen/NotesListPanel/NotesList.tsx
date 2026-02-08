@@ -47,11 +47,12 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 10,
+		overscan: 5,
 	});
 
 	// Scroll to active note
-	// Preliminary scroll to render the active note in the DOM; may be inaccurate, corrected afterwards
+	// Active note scroll may be off due to dynamic element sizes; corrected after measurements
+
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
 	const correctiveScrollIndexRef = useRef<number | null>(null);
 	useEffect(() => {
@@ -61,7 +62,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
 			return;
 
-		const noteIndex = notes.findIndex((id) => id === activeNoteId);
+		const noteIndex = notes.findIndex((noteId) => noteId === activeNoteId);
 		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
@@ -69,51 +70,33 @@ export const NotesList: FC<NotesListProps> = () => {
 		correctiveScrollIndexRef.current = noteIndex;
 	}, [activeNoteId, notes, virtualizer]);
 
+	// Corrective scroll to the active note if needed
+	const correctiveScroll = useCallback(
+		(noteIndex: number) => {
+			if (correctiveScrollIndexRef.current === noteIndex) {
+				virtualizer.scrollToIndex(noteIndex, { align: 'start' });
+				correctiveScrollIndexRef.current = null;
+			}
+		},
+		[virtualizer],
+	);
+
 	// Reset scroll bar after view change
 	const notesView = useWorkspaceSelector(selectNotesView);
 	useEffect(() => {
-		if (!activeNoteId) {
-			virtualizer.scrollToOffset(0);
-			return;
-		}
-
-		const noteIndex = notes.findIndex((id) => id === activeNoteId);
-		if (noteIndex === -1) {
+		if (!activeNoteId || !notes.includes(activeNoteId)) {
 			virtualizer.scrollToOffset(0);
 		}
 	}, [notesView, notes, activeNoteId, virtualizer]);
 
-	// Corrective scroll to the active note if needed
-	const correctActiveNoteScroll = useCallback(
-		(virtualIndex: number) => (node: HTMLDivElement | null) => {
-			if (!node || !parentRef.current) return;
-			const parentRect = parentRef.current.getBoundingClientRect();
-			const activeNoteRect = node.getBoundingClientRect();
-
-			// Corrective scroll to active node
-			if (correctiveScrollIndexRef.current === virtualIndex) {
-				correctiveScrollIndexRef.current = null;
-
-				const offset =
-					parentRef.current.scrollTop +
-					(activeNoteRect.top - parentRect.top) -
-					parentRef.current.clientHeight / 2 +
-					activeNoteRect.height / 2;
-
-				parentRef.current.scrollTo({
-					top: offset,
-				});
-			}
-		},
-		[],
-	);
-
 	const virtualNotes = virtualizer.getVirtualItems();
+
+	// Load notes
 	const [notesInViewport, setNotesInViewport] = useState<Map<string, INote>>(new Map());
 	const loadViewportNotes = useDebouncedCallback(
 		(noteIds: NoteId[]) => {
 			noteRegister.getByIds(noteIds).then((loadedNotes) => {
-				if (!loadedNotes || !loadedNotes.length) return;
+				if (!loadedNotes || loadedNotes.length === 0) return;
 
 				const newNotes = new Map<NoteId, INote>();
 				for (const note of loadedNotes) {
@@ -124,7 +107,6 @@ export const NotesList: FC<NotesListProps> = () => {
 		},
 		{ wait: 10 },
 	);
-
 	useEffect(() => {
 		const noteIds = virtualNotes.map((i) => notes[i.index]);
 		if (noteIds.length === 0) return;
@@ -193,13 +175,12 @@ export const NotesList: FC<NotesListProps> = () => {
 								<NotePreview
 									key={noteId}
 									ref={(node) => {
-										if (isActive) {
-											activeNoteRef.current = node;
-										}
-
 										virtualizer.measureElement(node);
 
-										correctActiveNoteScroll(virtualRow.index);
+										if (isActive) {
+											activeNoteRef.current = node;
+											correctiveScroll(virtualRow.index);
+										}
 									}}
 									data-index={virtualRow.index}
 									isSelected={isActive}
