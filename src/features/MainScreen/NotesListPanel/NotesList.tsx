@@ -6,9 +6,9 @@ import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useEventBus, useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useNoteContextMenu } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
+import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
@@ -26,6 +26,8 @@ import { isElementInViewport } from '@utils/dom/isElementInViewport';
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
+	const telemetry = useTelemetryTracker();
+
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
@@ -50,6 +52,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		estimateSize: () => 70,
 		overscan: 5,
 	});
+
+	const virtualNoteItems = virtualizer.getVirtualItems();
 
 	// Scroll to active note
 	// Active note scroll may be off due to dynamic element sizes; corrected after measurements
@@ -78,8 +82,6 @@ export const NotesList: FC<NotesListProps> = () => {
 		}
 	}, [notesView, notes, activeNoteId, virtualizer]);
 
-	const virtualNotes = virtualizer.getVirtualItems();
-
 	// Load notes
 	const [notesInViewport, setNotesInViewport] = useState<Map<NoteId, INote>>(new Map());
 	const loadViewportNotes = useDebouncedCallback(
@@ -93,11 +95,11 @@ export const NotesList: FC<NotesListProps> = () => {
 		{ wait: 10 },
 	);
 	useEffect(() => {
-		const noteIds = virtualNotes.map((i) => notes[i.index]);
+		const noteIds = virtualNoteItems.map((i) => notes[i.index]);
 		if (noteIds.length === 0) return;
 
 		loadViewportNotes(noteIds);
-	}, [notes, noteRegister, virtualNotes, loadViewportNotes]);
+	}, [notes, noteRegister, virtualNoteItems, loadViewportNotes]);
 
 	// Update preview when note content changes
 	const eventBus = useEventBus();
@@ -151,11 +153,11 @@ export const NotesList: FC<NotesListProps> = () => {
 							width: '100%',
 							top: 0,
 							left: 0,
-							marginTop: `${virtualNotes[0]?.start ?? 0}px`,
+							marginTop: `${virtualNoteItems[0]?.start ?? 0}px`,
 							gap: '4px',
 						}}
 					>
-						{virtualNotes.map((virtualRow) => {
+						{virtualNoteItems.map((virtualRow) => {
 							const id = notes[virtualRow.index];
 							const note = notesInViewport.get(id);
 
