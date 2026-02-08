@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import ms from 'ms';
 import { DeletedNotesController } from '@core/features/notes/bin/DeletedNotesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
@@ -8,6 +8,7 @@ import {
 	selectWorkspacesSummary,
 } from '@state/redux/profiles/selectors/vault';
 
+import { useService } from './useService';
 import { useProfileControls } from '..';
 
 export const useBinService = () => {
@@ -17,34 +18,15 @@ export const useBinService = () => {
 	const workspaces = useVaultSelector(selectWorkspacesSummary);
 	const { autoClean, cleanIntervalInMs } = useVaultSelector(selectBinRetentionPolicy);
 
-	const stateRef = useRef<{
-		context: symbol;
-		service: null | Promise<any>;
-	}>({
-		context: Symbol(),
-		service: null,
-	});
+	const runService = useService();
+
 	useEffect(() => {
 		if (!autoClean) return;
 
-		const instanceContext = Symbol();
-
-		// Take context
-		stateRef.current.context = instanceContext;
-		async function startService() {
-			// Wait a previous service will complete
-			if (stateRef.current.service) await stateRef.current.service;
-
-			// Check if context has not been changed after wait
-			// Changed context means that another instance have been started
-			// In that case we should exit and let another instance to run
-			if (stateRef.current.context !== instanceContext) {
-				return;
-			}
-
+		return runService(async () => {
 			console.debug('Start a new bin auto deletion service...');
 
-			const servicePromise = Promise.all(
+			const controls = await Promise.all(
 				workspaces.map((workspace) => {
 					const notes = new NotesController(db, workspace.id);
 					const bin = new DeletedNotesController(
@@ -62,28 +44,14 @@ export const useBinService = () => {
 						},
 					});
 				}),
-			).then((controls) => {
-				return async function cleanup() {
-					console.debug('Stop a bin auto deletion service...');
+			);
 
-					// Stop services
-					await Promise.all(controls.map((stop) => stop()));
+			return async () => {
+				console.debug('Stop a bin auto deletion service...');
 
-					// Reset service promise
-					if (stateRef.current.service === servicePromise) {
-						stateRef.current.service = null;
-					}
-				};
-			});
-
-			stateRef.current.service = servicePromise;
-
-			return servicePromise;
-		}
-
-		const serviceControls = startService();
-		return () => {
-			serviceControls.then((stopAll) => stopAll?.());
-		};
-	}, [db, autoClean, cleanIntervalInMs, workspaces]);
+				// Stop services
+				await Promise.all(controls.map((stop) => stop()));
+			};
+		});
+	}, [db, autoClean, cleanIntervalInMs, workspaces, runService]);
 };
