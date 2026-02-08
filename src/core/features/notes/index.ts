@@ -17,5 +17,6 @@ export type INote = {
 	id: NoteId;
 	createdTimestamp?: number;
 	updatedTimestamp?: number;
+	deletedAt?: number;
 	content: INoteContent;
 } & Partial<NoteMeta>;

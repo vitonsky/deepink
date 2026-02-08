@@ -47,6 +47,7 @@ const RowScheme = z
 			isSnapshotsDisabled: history_disabled,
 			isVisible: visible,
 			isDeleted: deleted_at !== null,
+			deletedAt: deleted_at?.getTime(),
 			isArchived: archived,
 			isBookmarked: bookmarked,
 			content: { title, text },
