@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { isEqual } from 'lodash';
+import { useProfileControls } from '@features/App/Profile';
 import { useWorkspaceContext } from '@features/App/Workspace';
 import { ActionCreatorWithPayload, Selector } from '@reduxjs/toolkit';
 
@@ -36,7 +37,11 @@ export const useWorkspaceSelector = <T>(
 };
 
 export const useVaultSelector = <T>(selector: Selector<ProfileData | null, T>): T => {
-	const { profileId } = useWorkspaceData();
+	const {
+		profile: {
+			profile: { id: profileId },
+		},
+	} = useProfileControls();
 
 	const composedSelector = useCallback(
 		(state: RootState) => {
@@ -65,7 +70,11 @@ type StripPropsInActionCreator<T, StripPropsSignature extends {}> = {
 };
 
 export const useVaultActions = () => {
-	const { profileId } = useWorkspaceData();
+	const {
+		profile: {
+			profile: { id: profileId },
+		},
+	} = useProfileControls();
 
 	return useMemo(() => {
 		return Object.fromEntries(
