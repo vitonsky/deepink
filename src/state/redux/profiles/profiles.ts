@@ -110,6 +110,9 @@ export type ProfileData = {
 	workspaces: Record<string, WorkspaceData | undefined>;
 
 	config: {
+		filesIntegrity: {
+			enabled: boolean;
+		};
 		snapshots: {
 			enabled: boolean;
 			interval: number;

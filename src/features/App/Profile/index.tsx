@@ -70,6 +70,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 							]),
 						),
 						config: {
+							filesIntegrity: {
+								enabled: false,
+							},
 							snapshots: {
 								enabled: true,
 								interval: 30_000,

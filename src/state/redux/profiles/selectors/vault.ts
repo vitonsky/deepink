@@ -37,3 +37,8 @@ export const selectWorkspacesSummary = createVaultSelector([selectVault], (vault
 		.map(({ id, name }) => ({ id, name }))
 		.toArray(),
 );
+
+export const selectIntegrityServiceConfig = createVaultSelector(
+	[selectVaultConfig],
+	(config) => config.filesIntegrity,
+);
