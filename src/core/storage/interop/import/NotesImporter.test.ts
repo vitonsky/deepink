@@ -12,7 +12,7 @@ import {
 	PGLiteDatabase,
 } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-import { wait } from '@utils/tests';
+import { wait } from '@utils/time';
 
 import { NotesImporter, OnProcessedPayload } from '.';
 

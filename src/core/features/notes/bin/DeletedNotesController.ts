@@ -1,5 +1,5 @@
 import ms from 'ms';
-import { wait } from '@utils/tests';
+import { wait } from '@utils/time';
 
 import { NotesController } from '../controller/NotesController';
 

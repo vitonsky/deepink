@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { FaTerminal, FaXmark } from 'react-icons/fa6';
 import { Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { Repl } from '@electric-sql/pglite-repl';
-import { wait } from '@utils/tests';
+import { wait } from '@utils/time';
 
 import { useProfileControls } from '..';
 
