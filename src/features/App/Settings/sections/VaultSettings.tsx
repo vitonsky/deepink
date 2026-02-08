@@ -1,6 +1,7 @@
 import React from 'react';
 import humanizeDuration from 'humanize-duration';
 import ms from 'ms';
+import z from 'zod';
 import {
 	Button,
 	Divider,
@@ -192,7 +193,19 @@ export const VaultSettings = () => {
 				<Divider />
 
 				<FeaturesOption description="Note moved to bin will be permanently deleted after some time.">
-					<Switch size="sm">Permanently delete old notes in bin</Switch>
+					<Switch
+						size="sm"
+						isChecked={deletionConfig.bin.autoClean}
+						onChange={(evt) => {
+							dispatch(
+								vaultActions.setBinAutoDeletionConfig({
+									autoClean: evt.target.checked,
+								}),
+							);
+						}}
+					>
+						Permanently delete old notes in bin
+					</Switch>
 				</FeaturesOption>
 
 				<FeaturesOption
@@ -206,9 +219,22 @@ export const VaultSettings = () => {
 							type="number"
 							min={1}
 							max={1000}
-							defaultValue={30}
 							sx={{
 								paddingInlineEnd: '3rem',
+							}}
+							value={deletionConfig.bin.cleanInterval}
+							onChange={(evt) => {
+								const result = z.coerce
+									.number()
+									.min(1)
+									.safeParse(evt.target.value);
+								const days = result.data ?? 30;
+
+								dispatch(
+									vaultActions.setBinAutoDeletionConfig({
+										cleanInterval: days,
+									}),
+								);
 							}}
 						/>
 						<InputRightElement w="3rem" pointerEvents="none">

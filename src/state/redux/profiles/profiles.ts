@@ -414,6 +414,14 @@ export const profilesSlice = createSlice({
 				};
 			},
 		),
+		setBinAutoDeletionConfig: createProfileReducer(
+			(profile, payload: Partial<ProfileData['config']['deletion']['bin']>) => {
+				profile.config.deletion.bin = {
+					...profile.config.deletion.bin,
+					...payload,
+				};
+			},
+		),
 	},
 });
 

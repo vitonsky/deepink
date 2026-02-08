@@ -1,3 +1,5 @@
+import ms from 'ms';
+
 import { ProfileData } from '../profiles';
 import { createVaultSelector } from '../utils';
 
@@ -19,4 +21,19 @@ export const selectSnapshotSettings = createVaultSelector(
 export const selectDeletionConfig = createVaultSelector(
 	[selectVaultConfig],
 	(config) => config.deletion,
+);
+export const selectBinRetentionPolicy = createVaultSelector(
+	[selectDeletionConfig],
+	(config) => ({
+		...config.bin,
+		cleanIntervalInMs: ms(`${config.bin.cleanInterval}d`),
+	}),
+);
+
+export const selectWorkspacesSummary = createVaultSelector([selectVault], (vault) =>
+	Object.values(vault.workspaces)
+		.values()
+		.filter((i) => i !== undefined)
+		.map(({ id, name }) => ({ id, name }))
+		.toArray(),
 );

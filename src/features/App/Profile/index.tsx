@@ -1,6 +1,5 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
-import ms from 'ms';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -19,6 +18,7 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
+import { ProfileServices } from './services';
 import { SQLConsole } from './SQLConsole/SQLConsole';
 import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
 
@@ -79,7 +79,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 								permanentDeletion: false,
 								bin: {
 									autoClean: false,
-									cleanInterval: ms('30d'),
+									cleanInterval: 30,
 								},
 							},
 						},
@@ -124,6 +124,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
+			{workspaces.length > 0 && <ProfileServices />}
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
 					<WorkspaceContext.Provider
