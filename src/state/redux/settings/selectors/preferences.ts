@@ -30,3 +30,8 @@ export const selectTheme = createAppSelector(
 	selectSettings,
 	(settings) => settings.theme,
 );
+
+export const selectVaultLockConfig = createAppSelector(
+	selectSettings,
+	(settings) => settings.vaultLock,
+);

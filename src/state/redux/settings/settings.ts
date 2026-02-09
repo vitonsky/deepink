@@ -19,6 +19,10 @@ export type GlobalSettings = {
 		lineNumbers: boolean;
 		dateFormat: string;
 	};
+	vaultLock: {
+		lockAfterIdle: number | null;
+		lockOnSystemLock: boolean;
+	};
 };
 
 export const settingsSlice = createSlice({
@@ -36,6 +40,10 @@ export const settingsSlice = createSlice({
 			miniMap: false,
 			lineNumbers: false,
 			dateFormat: 'D MMM YYYY, HH:mm',
+		},
+		vaultLock: {
+			lockAfterIdle: null,
+			lockOnSystemLock: false,
 		},
 	} satisfies GlobalSettings as GlobalSettings,
 	reducers: {
@@ -66,6 +74,16 @@ export const settingsSlice = createSlice({
 			}
 
 			return { ...state, theme } as GlobalSettings;
+		},
+
+		setVaultLockConfig: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['vaultLock']>>,
+		) => {
+			state.vaultLock = {
+				...state.vaultLock,
+				...payload,
+			};
 		},
 	},
 });

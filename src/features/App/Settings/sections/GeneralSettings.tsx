@@ -1,5 +1,7 @@
 import React from 'react';
+import ms from 'ms';
 import { getAbout } from 'src/about';
+import z from 'zod';
 import Logo from '@assets/icons/app.svg';
 import {
 	Box,
@@ -14,8 +16,14 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup, FeaturesPanel } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { selectVaultLockConfig } from '@state/redux/settings/selectors/preferences';
+import { settingsApi } from '@state/redux/settings/settings';
 
 export const GeneralSettings = () => {
+	const vaultLockConfig = useAppSelector(selectVaultLockConfig);
+	const dispatch = useAppDispatch();
+
 	return (
 		<Features>
 			<FeaturesPanel align="center" paddingBlock="2rem">
@@ -78,13 +86,33 @@ export const GeneralSettings = () => {
 					title="Lock Vault after idle"
 					description="Vault will be locked after selected idle time."
 				>
-					<Select defaultValue="fs" size="sm" width="auto">
-						<option>Do not lock</option>
-						<option>for 5 minutes</option>
-						<option>for 10 minutes</option>
-						<option>for 15 minutes</option>
-						<option>for 30 minutes</option>
-						<option>for 1 hour</option>
+					<Select
+						size="sm"
+						width="auto"
+						value={vaultLockConfig.lockAfterIdle ?? 'never'}
+						onChange={(evt) => {
+							const result = z.coerce
+								.number()
+								.or(z.literal('never'))
+								.transform((value) => (value === 'never' ? null : value))
+								.safeParse(evt.target.value);
+
+							dispatch(
+								settingsApi.setVaultLockConfig({
+									lockAfterIdle: result.success ? result.data : null,
+								}),
+							);
+						}}
+					>
+						<option value="never">Do not lock</option>
+						<option value={ms('5m')}>for 5 minutes</option>
+						<option value={ms('10m')}>for 10 minutes</option>
+						<option value={ms('15m')}>for 15 minutes</option>
+						<option value={ms('30m')}>for 30 minutes</option>
+						<option value={ms('1h')}>for 1 hour</option>
+						<option value={ms('2h')}>for 2 hours</option>
+						<option value={ms('3h')}>for 3 hours</option>
+						<option value={ms('5h')}>for 5 hours</option>
 					</Select>
 				</FeaturesOption>
 			</FeaturesGroup>
