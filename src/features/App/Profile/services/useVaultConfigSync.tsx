@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { isEqual } from 'lodash';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
@@ -41,7 +42,7 @@ export const useVaultConfigSync = () => {
 		});
 	}, [files, profileId, watchSelector]);
 
-	const workspaces = useAppSelector(selectWorkspacesInfo({ profileId }));
+	const workspaces = useAppSelector(selectWorkspacesInfo({ profileId }), isEqual);
 	useEffect(() => {
 		const cleanups = workspaces
 			.filter((workspace) => workspace.touched)
