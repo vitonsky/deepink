@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import ms from 'ms';
+import { onLockScreenChanged } from '@electron/requests/screenLock/renderer';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectVaultLockConfig } from '@state/redux/settings/selectors/preferences';
 
@@ -12,7 +13,20 @@ export const useAutoLock = () => {
 			profile: { isEncrypted },
 		},
 	} = useProfileControls();
-	const { lockAfterIdle } = useAppSelector(selectVaultLockConfig);
+	const { lockAfterIdle, lockOnSystemLock } = useAppSelector(selectVaultLockConfig);
+
+	// Lock when device is locked
+	useEffect(() => {
+		if (!isEncrypted || !lockOnSystemLock) return;
+
+		console.debug('Auto lock for vault by screen lock is enabled');
+		return onLockScreenChanged((status) => {
+			if (status !== 'locked') return;
+
+			console.debug('Device is locked. Lock vault...');
+			closeVault();
+		});
+	}, [closeVault, isEncrypted, lockOnSystemLock]);
 
 	// Lock after idle
 	useEffect(() => {
@@ -27,7 +41,7 @@ export const useAutoLock = () => {
 		}
 
 		console.debug(
-			`Auto lock is enabled. Vault will be locked after ${ms(lockAfterIdle)} inactivity`,
+			`Auto lock by idle time is enabled. Vault will be locked after ${ms(lockAfterIdle)} inactivity`,
 		);
 
 		let lockTimer: number | null = null;

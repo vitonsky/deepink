@@ -7,8 +7,16 @@ exposeElectronPatches();
 
 contextBridge.exposeInMainWorld('electron', {
 	ipcRenderer: {
-		invoke: ipcRenderer.invoke,
-	},
+		invoke(channel: string, ...args: any[]) {
+			return ipcRenderer.invoke(channel, ...args);
+		},
+		on(channel, listener) {
+			return ipcRenderer.on(channel, listener);
+		},
+		off(channel, listener) {
+			return ipcRenderer.off(channel, listener);
+		},
+	} satisfies Partial<Electron.IpcRenderer>,
 
 	webFrame: {
 		getZoomFactor: () => webFrame.getZoomFactor(),

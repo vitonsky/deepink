@@ -79,8 +79,20 @@ export const GeneralSettings = () => {
 			</FeaturesGroup>
 
 			<FeaturesGroup title="Vault lock">
-				<FeaturesOption>
-					<Switch size="sm">Lock vault when screen saver starts</Switch>
+				<FeaturesOption description="Vault will be locked when a screen saver will start, or a device will sleep">
+					<Switch
+						size="sm"
+						isChecked={vaultLockConfig.lockOnSystemLock}
+						onChange={(evt) => {
+							dispatch(
+								settingsApi.setVaultLockConfig({
+									lockOnSystemLock: evt.target.checked,
+								}),
+							);
+						}}
+					>
+						Lock vault when system locks
+					</Switch>
 				</FeaturesOption>
 				<FeaturesOption
 					title="Lock Vault after idle"

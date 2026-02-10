@@ -117,6 +117,7 @@
 		"colorjs.io": "^0.6.1",
 		"crc": "^4.3.2",
 		"dayjs": "^1.11.19",
+		"dbus-next": "^0.10.2",
 		"dotenv": "^17.2.3",
 		"downshift": "^9.0.13",
 		"effector": "^23.4.4",

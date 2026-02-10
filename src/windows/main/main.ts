@@ -9,6 +9,7 @@ import { enableElectronPatches } from '@electron/requests/electronPatches/main';
 import { serveFiles } from '@electron/requests/files/main';
 import { enableInteractions } from '@electron/requests/interactions/main';
 import { serveInterop } from '@electron/requests/interop/main';
+import { enableScreenLockNotifications } from '@electron/requests/screenLock/main';
 import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
 import { debounce } from '@utils/debounce/debounce';
@@ -36,6 +37,9 @@ export const openMainWindow = async ({
 	enableContextMenu();
 	enableInteractions();
 	enableElectronPatches();
+
+	// Notifications
+	enableScreenLockNotifications();
 
 	// State
 	const $windowState = createStore<WindowState>({
