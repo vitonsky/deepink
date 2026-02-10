@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import ms from 'ms';
 import { getAbout } from 'src/about';
 import z from 'zod';
@@ -8,6 +8,7 @@ import {
 	Button,
 	Divider,
 	HStack,
+	Link,
 	Select,
 	Switch,
 	Text,
@@ -16,18 +17,32 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup, FeaturesPanel } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { AppVersionInfo } from '@electron/updates/GitHubReleaseUpdatesChecker';
+import { useGetAppUpdates } from '@features/App/useGetAppUpdates';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	selectIsCheckForUpdatesEnabled,
 	selectVaultLockConfig,
 } from '@state/redux/settings/selectors/preferences';
 import { settingsApi } from '@state/redux/settings/settings';
+import { wait } from '@utils/time';
+
+type UpdateState = {
+	state: 'pending' | 'result' | null;
+	newVersion: AppVersionInfo | null;
+};
 
 export const GeneralSettings = () => {
 	const dispatch = useAppDispatch();
 
 	const vaultLockConfig = useAppSelector(selectVaultLockConfig);
 	const isCheckForUpdatesEnabled = useAppSelector(selectIsCheckForUpdatesEnabled);
+
+	const getAppUpdates = useGetAppUpdates();
+	const [appUpdatesState, updateAppUpdatesState] = useReducer<
+		UpdateState,
+		[Partial<UpdateState>]
+	>((state, args) => ({ ...state, ...args }), { state: null, newVersion: null });
 
 	return (
 		<Features>
@@ -46,12 +61,55 @@ export const GeneralSettings = () => {
 				<Divider />
 
 				<FeaturesOption title="Version">
-					<HStack gap="1rem" align="center">
-						<Text>{getAbout().version}</Text>
-						<Button size="sm" type="submit">
-							Check for updates
-						</Button>
-					</HStack>
+					<VStack gap=".3rem" align="start" width="100%">
+						<HStack gap="1rem" align="center">
+							<Text fontWeight="bold">{getAbout().version}</Text>
+							<Button
+								size="sm"
+								type="submit"
+								isLoading={appUpdatesState.state === 'pending'}
+								onClick={() => {
+									updateAppUpdatesState({
+										state: 'pending',
+										newVersion: null,
+									});
+
+									// Ensure minimal time to prevent blinking
+									Promise.all([getAppUpdates(true), wait(ms('1s'))])
+										.then(([newVersion]) => {
+											updateAppUpdatesState({ newVersion });
+										})
+										.finally(() =>
+											updateAppUpdatesState({ state: 'result' }),
+										);
+								}}
+							>
+								Check for updates
+							</Button>
+						</HStack>
+
+						{appUpdatesState.state === 'result' && (
+							<>
+								{appUpdatesState.newVersion === null ? (
+									<Text variant="secondary">
+										You use latest version
+									</Text>
+								) : (
+									<Text variant="secondary">
+										New version{' '}
+										<b>{appUpdatesState.newVersion.version}</b> is
+										available.
+										<br />
+										<Link href={appUpdatesState.newVersion.url}>
+											Download
+										</Link>{' '}
+										latest version to get new features and
+										improvements.
+									</Text>
+								)}
+							</>
+						)}
+					</VStack>
 				</FeaturesOption>
 
 				<FeaturesOption description="App will periodically check for updates and notify if new version is available">

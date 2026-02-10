@@ -12,7 +12,7 @@ export const AppToast = ({
 }) => {
 	return (
 		<VStack
-			padding=".8rem"
+			padding="1rem 1.5rem"
 			gap="1rem"
 			align="start"
 			backgroundColor="surface.panel"
