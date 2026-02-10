@@ -14,6 +14,8 @@ import { GlobalEventBusContext } from '@hooks/events/useEventBus';
 import { loadStore, persistStore } from '@state/redux/persistence';
 import { store } from '@state/redux/store';
 
+patchWindow();
+
 const rootNode = document.getElementById('appRoot');
 if (!rootNode) {
 	throw new Error('Root node not found!');
@@ -41,8 +43,6 @@ const globalEventBus = {
 		});
 	},
 } satisfies EventBus<GlobalEventsPayloadMap>;
-
-patchWindow();
 
 const reactRoot = createRoot(rootNode);
 reactRoot.render(

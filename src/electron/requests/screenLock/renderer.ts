@@ -1,16 +1,12 @@
-import { ipcRenderer } from 'electron';
-
+import { subscribeIpcRendererEvent } from '../electronPatches/renderer';
 import { LockState } from './ScreenLockWatcher';
 import { SCREEN_LOCK_CHANNEL } from '.';
 
 export const onLockScreenChanged = (callback: (state: LockState) => void) => {
-	const onMessage = (_event: Electron.IpcRendererEvent, state: LockState) => {
-		callback(state);
-	};
-
-	ipcRenderer.on(SCREEN_LOCK_CHANNEL, onMessage);
-
-	return () => {
-		ipcRenderer.off(SCREEN_LOCK_CHANNEL, onMessage);
-	};
+	return subscribeIpcRendererEvent(
+		SCREEN_LOCK_CHANNEL,
+		(_event: Electron.IpcRendererEvent, state: LockState) => {
+			callback(state);
+		},
+	);
 };
