@@ -6,6 +6,7 @@ import { ProfileConfigScheme, selectProfile } from '@state/redux/profiles/profil
 import { selectVaultConfig } from '@state/redux/profiles/selectors/vault';
 import { createAppSelector } from '@state/redux/utils';
 
+import { DebouncedPromises } from './DebouncedPromises';
 import { useProfileControls } from '..';
 
 export const useVaultConfigSync = () => {
@@ -19,6 +20,7 @@ export const useVaultConfigSync = () => {
 	const watchSelector = useWatchSelector();
 
 	useEffect(() => {
+		const promisesQueue = new DebouncedPromises();
 		const vaultConfig = new StateFile(
 			new FileController('config.json', files),
 			ProfileConfigScheme,
@@ -27,8 +29,10 @@ export const useVaultConfigSync = () => {
 		return watchSelector({
 			selector: createAppSelector(selectProfile({ profileId }), selectVaultConfig),
 			onChange(config) {
-				console.debug('Update vault config');
-				vaultConfig.set(config);
+				promisesQueue.add(async () => {
+					console.debug('Update vault config');
+					await vaultConfig.set(config);
+				});
 			},
 		});
 	}, [files, profileId, watchSelector]);
