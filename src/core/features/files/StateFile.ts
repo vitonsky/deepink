@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { DebouncedPromises } from '@utils/debounce/DebouncedPromises';
 
-import { IFileController } from '../files';
+import { IFileController } from '.';
 
 export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 	constructor(
@@ -33,12 +34,15 @@ export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 		return defaultValue as void extends D ? z.TypeOf<T> | null : z.TypeOf<T>;
 	}
 
+	private readonly queue = new DebouncedPromises();
 	async set(value: z.TypeOf<T>): Promise<void> {
 		const validValue = this.scheme.parse(value);
 
-		await this.file.write(
-			new TextEncoder().encode(JSON.stringify(validValue)).buffer,
-		);
+		await this.queue.add(async () => {
+			await this.file.write(
+				new TextEncoder().encode(JSON.stringify(validValue)).buffer,
+			);
+		});
 	}
 
 	async clean(): Promise<void> {

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { IFileController } from '../files';
-import { StateFile } from './StateFile';
+import { StateFile } from '../files/StateFile';
 
 const AppVersionScheme = z.object({
 	version: z.string(),

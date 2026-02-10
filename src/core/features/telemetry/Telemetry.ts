@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { z } from 'zod';
 
 import { IFileController } from '../files';
-import { StateFile } from './StateFile';
+import { StateFile } from '../files/StateFile';
 import { EventPayload, EventTracker } from '.';
 
 const StateScheme = z.object({
