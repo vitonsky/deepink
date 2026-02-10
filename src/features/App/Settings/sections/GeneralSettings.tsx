@@ -17,12 +17,17 @@ import { Features } from '@components/Features/Features';
 import { FeaturesGroup, FeaturesPanel } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectVaultLockConfig } from '@state/redux/settings/selectors/preferences';
+import {
+	selectIsCheckForUpdatesEnabled,
+	selectVaultLockConfig,
+} from '@state/redux/settings/selectors/preferences';
 import { settingsApi } from '@state/redux/settings/settings';
 
 export const GeneralSettings = () => {
-	const vaultLockConfig = useAppSelector(selectVaultLockConfig);
 	const dispatch = useAppDispatch();
+
+	const vaultLockConfig = useAppSelector(selectVaultLockConfig);
+	const isCheckForUpdatesEnabled = useAppSelector(selectIsCheckForUpdatesEnabled);
 
 	return (
 		<Features>
@@ -50,7 +55,13 @@ export const GeneralSettings = () => {
 				</FeaturesOption>
 
 				<FeaturesOption description="App will periodically check for updates and notify if new version is available">
-					<Switch size="sm" defaultChecked>
+					<Switch
+						size="sm"
+						isChecked={isCheckForUpdatesEnabled}
+						onChange={(evt) => {
+							dispatch(settingsApi.setCheckForUpdates(evt.target.checked));
+						}}
+					>
 						Automatic check for updates
 					</Switch>
 				</FeaturesOption>

@@ -35,3 +35,8 @@ export const selectVaultLockConfig = createAppSelector(
 	selectSettings,
 	(settings) => settings.vaultLock,
 );
+
+export const selectIsCheckForUpdatesEnabled = createAppSelector(
+	selectSettings,
+	(settings) => settings.checkForUpdates,
+);

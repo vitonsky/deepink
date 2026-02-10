@@ -4,8 +4,12 @@ import { getAbout } from 'src/about';
 import { Button, useToast } from '@chakra-ui/react';
 import { AppToast } from '@components/AppToast';
 import { GitHubReleaseUpdatesChecker } from '@electron/updates/GitHubReleaseUpdatesChecker';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectIsCheckForUpdatesEnabled } from '@state/redux/settings/selectors/preferences';
 
 export const useAppUpdater = () => {
+	const isCheckForUpdatesEnabled = useAppSelector(selectIsCheckForUpdatesEnabled);
+
 	const ignoreFlagKey = 'ignoreUpdate';
 
 	const toast = useToast();
@@ -29,6 +33,8 @@ export const useAppUpdater = () => {
 	}, [toast]);
 
 	useEffect(() => {
+		if (!isCheckForUpdatesEnabled) return;
+
 		// Ignore update if user decline
 		const ignoreTime = localStorage.getItem(ignoreFlagKey);
 		if (ignoreTime) {
@@ -96,5 +102,5 @@ export const useAppUpdater = () => {
 					},
 				});
 			});
-	}, [ignoreUpdate, toast]);
+	}, [ignoreUpdate, isCheckForUpdatesEnabled, toast]);
 };

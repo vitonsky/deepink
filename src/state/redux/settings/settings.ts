@@ -6,6 +6,7 @@ import { createAppSelector } from '../utils';
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
 export type GlobalSettings = {
+	checkForUpdates: boolean;
 	editorMode: EditorMode;
 	theme: {
 		name: 'auto' | 'light' | 'dark' | 'zen';
@@ -28,6 +29,7 @@ export type GlobalSettings = {
 export const settingsSlice = createSlice({
 	name: 'settings',
 	initialState: {
+		checkForUpdates: true,
 		editorMode: 'plaintext',
 		theme: {
 			name: 'auto',
@@ -84,6 +86,13 @@ export const settingsSlice = createSlice({
 				...state.vaultLock,
 				...payload,
 			};
+		},
+
+		setCheckForUpdates: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['checkForUpdates']>>,
+		) => {
+			state.checkForUpdates = payload;
 		},
 	},
 });
