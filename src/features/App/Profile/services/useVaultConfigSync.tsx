@@ -2,7 +2,15 @@ import { useEffect } from 'react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
-import { ProfileConfigScheme, selectProfile } from '@state/redux/profiles/profiles';
+import { useAppSelector } from '@state/redux/hooks';
+import {
+	ProfileConfigScheme,
+	selectProfile,
+	selectWorkspace,
+	selectWorkspaceConfig,
+	selectWorkspacesInfo,
+	WorkspaceConfigScheme,
+} from '@state/redux/profiles/profiles';
 import { selectVaultConfig } from '@state/redux/profiles/selectors/vault';
 import { createAppSelector } from '@state/redux/utils';
 
@@ -17,7 +25,6 @@ export const useVaultConfigSync = () => {
 	} = useProfileControls();
 
 	const watchSelector = useWatchSelector();
-
 	useEffect(() => {
 		const vaultConfig = new StateFile(
 			new FileController('config.json', files),
@@ -33,4 +40,30 @@ export const useVaultConfigSync = () => {
 			},
 		});
 	}, [files, profileId, watchSelector]);
+
+	const workspaces = useAppSelector(selectWorkspacesInfo({ profileId }));
+	useEffect(() => {
+		const cleanups = workspaces
+			.filter((workspace) => workspace.touched)
+			.map((workspace) => {
+				const workspaceConfig = new StateFile(
+					new FileController(`configs/${workspace.id}.json`, files),
+					WorkspaceConfigScheme,
+				);
+
+				return watchSelector({
+					selector: createAppSelector(
+						selectWorkspace({ profileId, workspaceId: workspace.id }),
+						selectWorkspaceConfig,
+					),
+					onChange(config) {
+						workspaceConfig.set(config).then(() => {
+							console.debug('Workspace config is saved');
+						});
+					},
+				});
+			});
+
+		return () => cleanups.forEach((cleanup) => cleanup());
+	}, [files, profileId, watchSelector, workspaces]);
 };

@@ -72,6 +72,13 @@ export type WorkspaceScoped<T extends {} = {}> = T &
 		workspaceId: string;
 	}>;
 
+export const WorkspaceConfigScheme = z.object({
+	newNote: z.object({
+		title: z.string(),
+		tags: z.union([z.literal('none'), z.literal('selected')]),
+	}),
+});
+
 export type WorkspaceData = {
 	id: string;
 	name: string;
@@ -98,12 +105,7 @@ export type WorkspaceData = {
 		list: IResolvedTag[];
 	};
 
-	config: {
-		newNote: {
-			title: string;
-			tags: 'none' | 'selected';
-		};
-	};
+	config: z.output<typeof WorkspaceConfigScheme>;
 };
 
 export const ProfileConfigScheme = z.object({

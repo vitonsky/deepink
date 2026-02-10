@@ -14,6 +14,8 @@ import {
 	createWorkspaceObject,
 	ProfileConfigScheme,
 	selectWorkspacesInfo,
+	WorkspaceConfigScheme,
+	WorkspaceData,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
@@ -62,8 +64,22 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		);
 
 		Promise.all([workspacesManager.getList(), vaultConfig.get()]).then(
-			([workspaces, config]) => {
+			async ([workspaces, config]) => {
 				const [defaultWorkspace] = workspaces;
+
+				const workspaceConfigs = await Promise.all(
+					workspaces.map(async (workspace) => {
+						const config = await new StateFile(
+							new FileController(
+								`configs/${workspace.id}.json`,
+								controls.profile.files,
+							),
+							WorkspaceConfigScheme,
+						).get();
+
+						return [workspace.id, config] as const;
+					}),
+				).then((entries) => Object.fromEntries(entries));
 
 				if (!defaultWorkspace) return;
 
@@ -73,10 +89,20 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						profile: {
 							activeWorkspace: null,
 							workspaces: Object.fromEntries(
-								workspaces.map((workspace) => [
-									workspace.id,
-									createWorkspaceObject(workspace),
-								]),
+								workspaces.map((workspace) => {
+									const workspaceObject =
+										createWorkspaceObject(workspace);
+									return [
+										workspace.id,
+										{
+											...workspaceObject,
+											config: {
+												...workspaceObject.config,
+												...workspaceConfigs[workspace.id],
+											},
+										} satisfies WorkspaceData,
+									];
+								}),
 							),
 							config: {
 								filesIntegrity: {

@@ -78,9 +78,15 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 	},
 );
 
-export const selectNewNoteTemplate = createWorkspaceSelector(
+export const selectWorkspaceConfig = createWorkspaceSelector(
 	[selectWorkspaceRootSafe],
 	(workspace) => {
-		return workspace.config.newNote;
+		return workspace.config;
+	},
+);
+export const selectNewNoteTemplate = createWorkspaceSelector(
+	[selectWorkspaceConfig],
+	(config) => {
+		return config.newNote;
 	},
 );
