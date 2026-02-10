@@ -1,6 +1,8 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
+import { FileController } from '@core/features/files/FileController';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
+import { StateFile } from '@core/features/telemetry/StateFile';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
@@ -10,6 +12,7 @@ import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
+	ProfileConfigScheme,
 	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -53,50 +56,59 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		[currentProfile.db],
 	);
 	useEffect(() => {
-		workspacesManager.getList().then((workspaces) => {
-			const [defaultWorkspace] = workspaces;
+		const vaultConfig = new StateFile(
+			new FileController('config.json', controls.profile.files),
+			ProfileConfigScheme,
+		);
 
-			if (!defaultWorkspace) return;
+		Promise.all([workspacesManager.getList(), vaultConfig.get()]).then(
+			([workspaces, config]) => {
+				const [defaultWorkspace] = workspaces;
 
-			dispatch(
-				workspacesApi.addProfile({
-					profileId,
-					profile: {
-						activeWorkspace: null,
-						workspaces: Object.fromEntries(
-							workspaces.map((workspace) => [
-								workspace.id,
-								createWorkspaceObject(workspace),
-							]),
-						),
-						config: {
-							filesIntegrity: {
-								enabled: false,
-							},
-							snapshots: {
-								enabled: true,
-								interval: 30_000,
-							},
-							deletion: {
-								confirm: false,
-								permanentDeletion: false,
-								bin: {
-									autoClean: false,
-									cleanInterval: 30,
+				if (!defaultWorkspace) return;
+
+				dispatch(
+					workspacesApi.addProfile({
+						profileId,
+						profile: {
+							activeWorkspace: null,
+							workspaces: Object.fromEntries(
+								workspaces.map((workspace) => [
+									workspace.id,
+									createWorkspaceObject(workspace),
+								]),
+							),
+							config: {
+								filesIntegrity: {
+									enabled: false,
 								},
+								snapshots: {
+									enabled: true,
+									interval: 30_000,
+								},
+								deletion: {
+									confirm: false,
+									permanentDeletion: false,
+									bin: {
+										autoClean: false,
+										cleanInterval: 30,
+									},
+								},
+
+								...config,
 							},
 						},
-					},
-				}),
-			);
-			dispatch(workspacesApi.setActiveProfile(profileId));
-			dispatch(
-				workspacesApi.setActiveWorkspace({
-					profileId,
-					workspaceId: defaultWorkspace.id,
-				}),
-			);
-		});
+					}),
+				);
+				dispatch(workspacesApi.setActiveProfile(profileId));
+				dispatch(
+					workspacesApi.setActiveWorkspace({
+						profileId,
+						workspaceId: defaultWorkspace.id,
+					}),
+				);
+			},
+		);
 
 		return () => {
 			dispatch(
@@ -105,7 +117,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				}),
 			);
 		};
-	}, [dispatch, profileId, workspacesManager]);
+	}, [controls.profile.files, dispatch, profileId, workspacesManager]);
 
 	const [isDBConsoleVisible, setIsDBConsoleVisible] = useState(false);
 	const isDevMode = useIsDeveloper();

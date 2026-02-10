@@ -1,3 +1,4 @@
+import z from 'zod';
 import { INote, NoteId } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -105,27 +106,29 @@ export type WorkspaceData = {
 	};
 };
 
+export const ProfileConfigScheme = z.object({
+	filesIntegrity: z.object({
+		enabled: z.boolean(),
+	}),
+	snapshots: z.object({
+		enabled: z.boolean(),
+		interval: z.number(),
+	}),
+	deletion: z.object({
+		confirm: z.boolean(),
+		permanentDeletion: z.boolean(),
+		bin: z.object({
+			autoClean: z.boolean(),
+			cleanInterval: z.number(),
+		}),
+	}),
+});
+
 export type ProfileData = {
 	activeWorkspace: string | null;
 	workspaces: Record<string, WorkspaceData | undefined>;
 
-	config: {
-		filesIntegrity: {
-			enabled: boolean;
-		};
-		snapshots: {
-			enabled: boolean;
-			interval: number;
-		};
-		deletion: {
-			confirm: boolean;
-			permanentDeletion: boolean;
-			bin: {
-				autoClean: boolean;
-				cleanInterval: number;
-			};
-		};
-	};
+	config: z.output<typeof ProfileConfigScheme>;
 };
 
 export type ProfilesState = {
