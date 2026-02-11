@@ -18,12 +18,12 @@ export const settingsScheme = z.object({
 		accentColor: z.string().optional(),
 	}),
 
-	editorMode: z.union([
-		z.literal('plaintext'),
-		z.literal('richtext'),
-		z.literal('split-screen'),
-	]),
 	editor: z.object({
+		mode: z.union([
+			z.literal('plaintext'),
+			z.literal('richtext'),
+			z.literal('split-screen'),
+		]),
 		fontFamily: z.string(),
 		fontSize: z.number(),
 		lineHeight: z.number(),
@@ -44,12 +44,12 @@ export const settingsSlice = createSlice({
 	name: 'settings',
 	initialState: {
 		checkForUpdates: true,
-		editorMode: 'plaintext',
 		theme: {
 			name: 'auto',
 			accentColor: 'auto',
 		},
 		editor: {
+			mode: 'plaintext',
 			fontFamily: '',
 			fontSize: 18,
 			lineHeight: 1.5,
@@ -69,9 +69,9 @@ export const settingsSlice = createSlice({
 
 		setEditorMode: (
 			state,
-			{ payload }: PayloadAction<GlobalSettings['editorMode']>,
+			{ payload }: PayloadAction<GlobalSettings['editor']['mode']>,
 		) => {
-			return { ...state, editorMode: payload } as GlobalSettings;
+			state.editor.mode = payload;
 		},
 		setEditorConfig: (
 			state,
@@ -117,7 +117,7 @@ export const selectSettings = settingsSlice.selectSlice;
 
 export const selectEditorMode = createAppSelector(
 	selectSettings,
-	(settings) => settings.editorMode,
+	(settings) => settings.editor.mode,
 );
 
 export const selectTheme = createAppSelector(
