@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import z from 'zod';
 import { FileController } from '@core/features/files/FileController';
+import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { selectProfile } from '@state/redux/profiles/profiles';
@@ -18,6 +19,7 @@ export const useVaultState = ({
 	controls: {
 		profile: {
 			files,
+			encryptionController,
 			profile: { id: profileId },
 		},
 	},
@@ -28,7 +30,10 @@ export const useVaultState = ({
 	const [vaultState] = useState(
 		() =>
 			new StateFile(
-				new FileController('state.json', files),
+				new FileControllerWithEncryption(
+					new FileController('state.json', files),
+					encryptionController,
+				),
 				vaultStateScheme.partial(),
 			),
 	);
