@@ -83,12 +83,8 @@ const workspaceTabs: SettingsSection[] = [
 ];
 
 // TODO: add help section with links
-// TODO: connect controls to a data and make changes
-// TODO: use range selectors instead of numbers for options with limited range of values
-// TODO: suggest available fonts
-// TODO: add sync targets list
 export const SettingsWindow = () => {
-	const [isOpen, setIsOpen] = useState(true);
+	const [isOpen, setIsOpen] = useState(false);
 
 	useCommandCallback(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS, () => {
 		setIsOpen(true);
