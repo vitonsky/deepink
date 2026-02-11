@@ -3,7 +3,7 @@ import ms from 'ms';
 import { ProfileData } from '../profiles';
 import { createVaultSelector } from '../utils';
 
-const selectVault = (state: ProfileData | null) => {
+export const selectVault = (state: ProfileData | null) => {
 	if (!state) throw new Error('Vault selector is used out of vault context');
 	return state;
 };

@@ -26,6 +26,7 @@ import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { SQLConsole } from './SQLConsole/SQLConsole';
 import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
+import { useVaultState } from './useVaultState';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
@@ -53,6 +54,11 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
+	const getVaultState = useVaultState({
+		sync: Object.keys(workspaces).length > 0,
+		controls,
+	});
+
 	const workspacesManager = useMemo(
 		() => new WorkspacesController(currentProfile.db),
 		[currentProfile.db],
@@ -63,78 +69,79 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			ProfileConfigScheme,
 		);
 
-		Promise.all([workspacesManager.getList(), vaultConfig.get()]).then(
-			async ([workspaces, config]) => {
-				const [defaultWorkspace] = workspaces;
+		Promise.all([
+			workspacesManager.getList(),
+			vaultConfig.get(),
+			getVaultState(),
+		]).then(async ([workspaces, config, state]) => {
+			const [defaultWorkspace] = workspaces;
 
-				const workspaceConfigs = await Promise.all(
-					workspaces.map(async (workspace) => {
-						const config = await new StateFile(
-							new FileController(
-								`configs/${workspace.id}.json`,
-								controls.profile.files,
-							),
-							WorkspaceConfigScheme,
-						).get();
+			const workspaceConfigs = await Promise.all(
+				workspaces.map(async (workspace) => {
+					const config = await new StateFile(
+						new FileController(
+							`configs/${workspace.id}.json`,
+							controls.profile.files,
+						),
+						WorkspaceConfigScheme,
+					).get();
 
-						return [workspace.id, config] as const;
-					}),
-				).then((entries) => Object.fromEntries(entries));
+					return [workspace.id, config] as const;
+				}),
+			).then((entries) => Object.fromEntries(entries));
 
-				if (!defaultWorkspace) return;
+			if (!defaultWorkspace) return;
 
-				dispatch(
-					workspacesApi.addProfile({
-						profileId,
-						profile: {
-							activeWorkspace: null,
-							workspaces: Object.fromEntries(
-								workspaces.map((workspace) => {
-									const workspaceObject =
-										createWorkspaceObject(workspace);
-									return [
-										workspace.id,
-										{
-											...workspaceObject,
-											config: {
-												...workspaceObject.config,
-												...workspaceConfigs[workspace.id],
-											},
-										} satisfies WorkspaceData,
-									];
-								}),
-							),
-							config: {
-								filesIntegrity: {
-									enabled: false,
-								},
-								snapshots: {
-									enabled: true,
-									interval: 30_000,
-								},
-								deletion: {
-									confirm: false,
-									permanentDeletion: false,
-									bin: {
-										autoClean: false,
-										cleanInterval: 30,
-									},
-								},
-
-								...config,
+			dispatch(
+				workspacesApi.addProfile({
+					profileId,
+					profile: {
+						activeWorkspace: null,
+						workspaces: Object.fromEntries(
+							workspaces.map((workspace) => {
+								const workspaceObject = createWorkspaceObject(workspace);
+								return [
+									workspace.id,
+									{
+										...workspaceObject,
+										config: {
+											...workspaceObject.config,
+											...workspaceConfigs[workspace.id],
+										},
+									} satisfies WorkspaceData,
+								];
+							}),
+						),
+						config: {
+							filesIntegrity: {
+								enabled: false,
 							},
+							snapshots: {
+								enabled: true,
+								interval: 30_000,
+							},
+							deletion: {
+								confirm: false,
+								permanentDeletion: false,
+								bin: {
+									autoClean: false,
+									cleanInterval: 30,
+								},
+							},
+
+							...config,
 						},
-					}),
-				);
-				dispatch(workspacesApi.setActiveProfile(profileId));
-				dispatch(
-					workspacesApi.setActiveWorkspace({
-						profileId,
-						workspaceId: defaultWorkspace.id,
-					}),
-				);
-			},
-		);
+					},
+				}),
+			);
+			dispatch(workspacesApi.setActiveProfile(profileId));
+			dispatch(
+				workspacesApi.setActiveWorkspace({
+					profileId,
+					workspaceId: state?.activeWorkspace ?? defaultWorkspace.id,
+				}),
+			);
+		});
 
 		return () => {
 			dispatch(
@@ -143,7 +150,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				}),
 			);
 		};
-	}, [controls.profile.files, dispatch, profileId, workspacesManager]);
+	}, [controls.profile.files, dispatch, getVaultState, profileId, workspacesManager]);
 
 	const [isDBConsoleVisible, setIsDBConsoleVisible] = useState(false);
 	const isDevMode = useIsDeveloper();
