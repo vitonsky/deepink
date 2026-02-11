@@ -1,17 +1,25 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useMemo, useMemo, useState } from 'react';
+import { FaUser } from 'react-icons/fa6';
 import { useDebounce } from 'use-debounce';
-import { Box } from '@chakra-ui/react';
+import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
+import { NestedList } from '@components/NestedList';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
+import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { useAutoOpenProfile } from './useAutoOpenProfile';
+import { useOpenProfile } from './useOpenProfile';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { WorkspaceManager } from './WorkspaceManager';
+import { ProfileCreator } from './WorkspaceManager/ProfileCreator';
+import { ProfileLoginForm } from './WorkspaceManager/ProfileLoginForm';
+import { ProfilesForm } from './WorkspaceManager/ProfilesForm';
 
 export const App: FC = () => {
 	const files = useFilesStorage();
@@ -20,79 +28,154 @@ export const App: FC = () => {
 	const profilesList = useProfilesList();
 	const profileContainers = useProfileContainers();
 
-	const [loadingState, setLoadingState] = useState<{
-		isProfilesLoading: boolean;
-		isProfileLoading: boolean;
-	}>({
-		isProfilesLoading: true,
-		isProfileLoading: false,
-	});
-	const [currentProfile, setCurrentProfile] = useProfileSelector(config);
+	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
+	const currentProfileObject = useMemo(
+		() =>
+			profilesList.profiles?.find((profile) => profile.id === currentProfileId) ??
+			null,
+		[currentProfileId, profilesList.profiles],
+	);
 
 	// Open recent profile
 	const recentProfile = useRecentProfile(config);
-	useEffect(
-		() => {
-			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
+	const isProfileOpening = useAutoOpenProfile({
+		profilesList,
+		recentProfile,
+		setCurrentProfileId: setCurrentProfileId,
+		profiles: profileContainers,
+	});
 
-			// Restore profile id
-			setCurrentProfile(recentProfile.profileId);
+	const onOpenProfile = useOpenProfile(profileContainers);
 
-			const profile = profilesList.profiles.find(
-				(profile) => profile.id === recentProfile.profileId,
-			);
-			if (!profile || profile.encryption) {
-				setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
-				return;
-			}
+	const [authScreen, setAuthScreen] = useState<'choose' | 'create' | 'login'>('choose');
 
-			// Automatically open profile with no encryption
-			profileContainers.openProfile({ profile }, true);
-			setLoadingState({
-				isProfilesLoading: false,
-				isProfileLoading: true,
-			});
-		},
-
-		// Depends only of loading status and run only once
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
-	);
-
-	// Handle case with auto open profile. Wait the end of loading
-	useEffect(() => {
-		if (profileContainers.profiles.length > 0) {
-			setLoadingState((state) => ({ ...state, isProfileLoading: false }));
+	const screenName: 'loading' | 'main' | 'auth' = useMemo(() => {
+		if (
+			!profilesList.isProfilesLoaded ||
+			!recentProfile.isLoaded ||
+			isProfileOpening
+		) {
+			return 'loading';
 		}
-	}, [profileContainers.profiles.length]);
 
-	const isLoadingState = Object.values(loadingState).some(Boolean);
-	const [isShowSplash] = useDebounce(isLoadingState, 500);
+		if (profileContainers.profiles.length > 0) {
+			return 'main';
+		}
+
+		return 'auth';
+	}, [
+		profilesList.isProfilesLoaded,
+		recentProfile.isLoaded,
+		isProfileOpening,
+		profileContainers.profiles.length,
+	]);
+
+	const [isShowSplash] = useDebounce(screenName === 'loading', 500);
 	if (isShowSplash) {
 		return <SplashScreen />;
 	}
 
-	if (profileContainers.profiles.length === 0) {
+	if (screenName == 'main') {
 		return (
-			<WorkspaceManager
-				profiles={profileContainers}
-				profilesManager={profilesList}
-				currentProfile={currentProfile}
-				onChooseProfile={setCurrentProfile}
-			/>
+			<Box
+				sx={{
+					display: 'flex',
+					width: '100%',
+					height: '100vh',
+				}}
+			>
+				<Profiles profilesApi={profileContainers} />
+				<AppServices />
+			</Box>
 		);
 	}
 
 	return (
-		<Box
-			sx={{
-				display: 'flex',
-				width: '100%',
-				height: '100vh',
-			}}
-		>
-			<Profiles profilesApi={profileContainers} />
-			<AppServices />
+		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
+			<Box maxW="500px" minW="350px" padding="1rem">
+				{authScreen === 'create' && (
+					<ProfileCreator
+						onCreateProfile={(profile) =>
+							profilesList.createProfile(profile).then((newProfile) => {
+								// setScreenName('main');
+								onOpenProfile(
+									newProfile,
+									profile.password ?? undefined,
+								).then(console.warn);
+							})
+						}
+						onCancel={() => setAuthScreen('choose')}
+					/>
+				)}
+
+				{currentProfileObject && (
+					<ProfileLoginForm
+						profile={currentProfileObject}
+						onLogin={onOpenProfile}
+						onPickAnotherProfile={() => {
+							setCurrentProfileId(null);
+						}}
+					/>
+				)}
+
+				{authScreen !== 'create' && !currentProfileId && (
+					<ProfilesForm
+						title="Choose the profile"
+						controls={
+							<>
+								<Button
+									variant="accent"
+									size="lg"
+									w="100%"
+									onClick={() => setAuthScreen('create')}
+								>
+									Create new profile
+								</Button>
+							</>
+						}
+					>
+						<NestedList
+							divider={<Divider margin="0px !important" />}
+							sx={{
+								w: '100%',
+								borderRadius: '4px',
+								maxHeight: '230px',
+								overflow: 'auto',
+
+								border: '1px solid',
+							}}
+							items={(profilesList.profiles ?? []).map((profile) => ({
+								id: profile.id,
+								content: (
+									<HStack
+										as="button"
+										sx={{
+											padding: '.8rem 1rem',
+											w: '100%',
+											cursor: 'pointer',
+											gap: '.8rem',
+										}}
+										key={profile.id}
+										onClick={() => {
+											setCurrentProfileId(profile.id);
+											if (profile.encryption === null) {
+												onOpenProfile(profile);
+											}
+
+											telemetry.track(
+												TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
+											);
+										}}
+									>
+										<FaUser />
+										<Text>{profile.name}</Text>
+									</HStack>
+								),
+							}))}
+						/>
+					</ProfilesForm>
+				)}
+			</Box>
 		</Box>
 	);
 };
