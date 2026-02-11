@@ -54,7 +54,10 @@ export const useVaultConfigSync = () => {
 			.map((workspace) => {
 				const workspaceConfig = new StateFile(
 					new FileControllerWithEncryption(
-						new FileController(`configs/${workspace.id}.json`, files),
+						new FileController(
+							`workspaces/${workspace.id}/config.json`,
+							files,
+						),
 						encryptionController,
 					),
 					WorkspaceConfigScheme,
