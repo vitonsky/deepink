@@ -1,5 +1,33 @@
-import dbus from 'dbus-next';
+import { sessionBus } from 'dbus-ts';
 import { powerMonitor } from 'electron';
+
+const subscribeBusEvents = async (
+	busName: string,
+	objectPath: string,
+	ifaceName: string,
+	events: Record<string, (...args: any[]) => void>,
+) => {
+	const eventsList = Object.entries(events);
+
+	try {
+		// Hint when creating object which dbus type definitions should be used
+		const bus = await sessionBus();
+		const iface = await bus.getInterface(busName, objectPath, ifaceName);
+
+		await Promise.all(eventsList.map(([name, callback]) => iface.on(name, callback)));
+
+		return () => {
+			Promise.all(
+				eventsList.map(([name, callback]) => iface.off(name, callback)),
+			).finally(() => bus.connection.end());
+		};
+	} catch (err) {
+		// ignore missing services
+		console.error(err);
+	}
+
+	return () => {};
+};
 
 export type LockState = 'locked' | 'unlocked';
 
@@ -11,8 +39,8 @@ export class ScreenLockWatcher {
 
 		this.cleanupsPromise = Promise.all([
 			this.watchPowerManagementEvents(),
-			this.watchPrepareForSleep(),
-			this.watchDesktopEnvironmentEvents(),
+			// TODO: run conditionally only for those who have dbus
+			this.watchDBusEvents(),
 		]);
 
 		await this.cleanupsPromise;
@@ -33,64 +61,42 @@ export class ScreenLockWatcher {
 		this.onChange?.(status);
 	}
 
-	private async watchPrepareForSleep() {
-		const systemBus = dbus.systemBus();
-
-		const login1 = await systemBus.getProxyObject(
-			'org.freedesktop.login1',
-			'/org/freedesktop/login1',
-		);
-
-		const manager = login1.getInterface('org.freedesktop.login1.Manager');
-
-		manager.on('PrepareForSleep', (sleeping: boolean) => {
-			this.notify(sleeping ? 'locked' : 'unlocked');
-		});
-
-		return () => {
-			manager.removeAllListeners();
-		};
-	}
-
-	private async watchDesktopEnvironmentEvents() {
-		const sessionBus = dbus.sessionBus();
-
-		const listenScreenSaver = async (
-			busName: string,
-			objectPath: string,
-			ifaceName: string,
-		) => {
-			try {
-				const obj = await sessionBus.getProxyObject(busName, objectPath);
-				const iface = obj.getInterface(ifaceName);
-
-				iface.on('ActiveChanged', (active: boolean) => {
-					this.notify(active ? 'locked' : 'unlocked');
-				});
-
-				return () => {
-					iface.removeAllListeners();
-				};
-			} catch {
-				// silently ignore missing services
-			}
-
-			return () => {};
-		};
-
+	private async watchDBusEvents() {
 		const cleanups = await Promise.all([
+			// Login service & prepare for sleep events
+			await subscribeBusEvents(
+				'org.freedesktop.login1',
+				'/org/freedesktop/login1',
+				'org.freedesktop.login1.Manager',
+				{
+					PrepareForSleep: (sleeping: boolean) => {
+						this.notify(sleeping ? 'locked' : 'unlocked');
+					},
+				},
+			),
+
 			// GNOME
-			await listenScreenSaver(
+			await subscribeBusEvents(
 				'org.gnome.ScreenSaver',
 				'/org/gnome/ScreenSaver',
 				'org.gnome.ScreenSaver',
+				{
+					ActiveChanged: (active: boolean) => {
+						this.notify(active ? 'locked' : 'unlocked');
+					},
+				},
 			),
 
 			// KDE + generic
-			await listenScreenSaver(
+			await subscribeBusEvents(
 				'org.freedesktop.ScreenSaver',
 				'/ScreenSaver',
 				'org.freedesktop.ScreenSaver',
+				{
+					ActiveChanged: (active: boolean) => {
+						this.notify(active ? 'locked' : 'unlocked');
+					},
+				},
 			),
 		]);
 
