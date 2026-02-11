@@ -1,3 +1,4 @@
+import z from 'zod';
 import { accentColorsMap } from '@features/accentColorsMap';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -5,26 +6,39 @@ import { createAppSelector } from '../utils';
 
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
-export type GlobalSettings = {
-	checkForUpdates: boolean;
-	editorMode: EditorMode;
-	theme: {
-		name: 'auto' | 'light' | 'dark' | 'zen';
-		accentColor?: string;
-	};
-	editor: {
-		fontFamily: string;
-		fontSize: number;
-		lineHeight: number;
-		miniMap: boolean;
-		lineNumbers: boolean;
-		dateFormat: string;
-	};
-	vaultLock: {
-		lockAfterIdle: number | null;
-		lockOnSystemLock: boolean;
-	};
-};
+export const settingsScheme = z.object({
+	checkForUpdates: z.boolean(),
+	theme: z.object({
+		name: z.union([
+			z.literal('auto'),
+			z.literal('light'),
+			z.literal('dark'),
+			z.literal('zen'),
+		]),
+		accentColor: z.string().optional(),
+	}),
+
+	editorMode: z.union([
+		z.literal('plaintext'),
+		z.literal('richtext'),
+		z.literal('split-screen'),
+	]),
+	editor: z.object({
+		fontFamily: z.string(),
+		fontSize: z.number(),
+		lineHeight: z.number(),
+		miniMap: z.boolean(),
+		lineNumbers: z.boolean(),
+		dateFormat: z.string(),
+	}),
+
+	vaultLock: z.object({
+		lockAfterIdle: z.number().nullable(),
+		lockOnSystemLock: z.boolean(),
+	}),
+});
+
+export type GlobalSettings = z.output<typeof settingsScheme>;
 
 export const settingsSlice = createSlice({
 	name: 'settings',
