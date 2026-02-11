@@ -5,7 +5,6 @@ import { FileControllerWithEncryption } from '@core/features/files/FileControlle
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { selectProfile } from '@state/redux/profiles/profiles';
-import { selectVault } from '@state/redux/profiles/selectors/vault';
 import { createAppSelector } from '@state/redux/utils';
 
 import { ProfileControls } from '.';
@@ -44,12 +43,15 @@ export const useVaultState = ({
 
 		return watchSelector({
 			selector: createAppSelector(selectProfile({ profileId }), (state) => {
-				const vault = selectVault(state);
-				const { activeWorkspace } = vault;
+				if (!state) return null;
+
+				const { activeWorkspace } = state;
 
 				return { activeWorkspace };
 			}),
 			onChange(state) {
+				if (!state) return;
+
 				vaultState.set(state);
 			},
 		});

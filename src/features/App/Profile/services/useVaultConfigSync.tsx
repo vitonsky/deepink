@@ -9,11 +9,9 @@ import {
 	ProfileConfigScheme,
 	selectProfile,
 	selectWorkspace,
-	selectWorkspaceConfig,
 	selectWorkspacesInfo,
 	WorkspaceConfigScheme,
 } from '@state/redux/profiles/profiles';
-import { selectVaultConfig } from '@state/redux/profiles/selectors/vault';
 import { createAppSelector } from '@state/redux/utils';
 
 import { useProfileControls } from '..';
@@ -38,8 +36,13 @@ export const useVaultConfigSync = () => {
 		);
 
 		return watchSelector({
-			selector: createAppSelector(selectProfile({ profileId }), selectVaultConfig),
+			selector: createAppSelector(
+				selectProfile({ profileId }),
+				(profile) => profile?.config,
+			),
 			onChange(config) {
+				if (!config) return;
+
 				vaultConfig.set(config).then(() => {
 					console.debug('Vault config is saved');
 				});
@@ -66,9 +69,11 @@ export const useVaultConfigSync = () => {
 				return watchSelector({
 					selector: createAppSelector(
 						selectWorkspace({ profileId, workspaceId: workspace.id }),
-						selectWorkspaceConfig,
+						(workspace) => workspace?.config,
 					),
 					onChange(config) {
+						if (!config) return;
+
 						workspaceConfig.set(config).then(() => {
 							console.debug('Workspace config is saved');
 						});
