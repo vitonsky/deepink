@@ -17,7 +17,7 @@ import { FakeWorkerObject } from '.';
 
 export default FakeWorkerObject;
 
-console.log('Hello world from worker');
+console.debug('Encryption worker is started');
 
 let encryptionController: EncryptionController | null = null;
 const messenger = new WorkerMessenger(self);
@@ -25,7 +25,7 @@ const requests = new WorkerRPC(messenger);
 
 const workerId = performance.now();
 requests.addHandler('init', async ({ key, salt, algorithm }) => {
-	self.setInterval(() => console.log('Worker pulse', workerId), 1000);
+	self.setInterval(() => console.debug('Worker pulse', workerId), 1000);
 
 	// Convert `ArrayBuffer`
 	if (salt instanceof ArrayBuffer) {
