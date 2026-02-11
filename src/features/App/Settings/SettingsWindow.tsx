@@ -23,7 +23,7 @@ import {
 } from '@chakra-ui/react';
 import { TextWithIcon } from '@components/TextWithIcon';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 
 import { AppearanceSettings } from './sections/appearance';
 import { GeneralSettings } from './sections/GeneralSettings';
@@ -86,7 +86,7 @@ const workspaceTabs: SettingsSection[] = [
 export const SettingsWindow = () => {
 	const [isOpen, setIsOpen] = useState(false);
 
-	useCommandCallback(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS, () => {
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS, () => {
 		setIsOpen(true);
 	});
 
