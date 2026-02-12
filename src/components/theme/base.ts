@@ -309,8 +309,19 @@ export default extendTheme({
 			'container',
 			'thumb',
 			'track',
+			'label',
 		]).defineMultiStyleConfig({
 			baseStyle: {
+				container: {
+					display: 'inline-flex',
+					maxWidth: '100%',
+					lineHeight: '1',
+				},
+				label: {
+					overflow: 'hidden',
+					whiteSpace: 'nowrap',
+					textOverflow: 'ellipsis',
+				},
 				track: {
 					backgroundColor: 'dim.500',
 					_checked: {
