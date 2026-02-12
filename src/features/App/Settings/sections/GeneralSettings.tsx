@@ -142,7 +142,7 @@ export const GeneralSettings = () => {
 					description="System notifications will be used only for reminders. When disabled, a reminders will appear only in app notifications list."
 				>
 					<Switch size="sm" defaultChecked>
-						Use system notifications for reminders
+						Use system notifications
 					</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>
