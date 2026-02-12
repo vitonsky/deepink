@@ -54,12 +54,6 @@ const tabs: SettingsSection[] = [
 		icon: FaPalette,
 	},
 	{
-		id: 'vault',
-		title: 'Vault',
-		component: VaultSettings,
-		icon: FaVault,
-	},
-	{
 		id: 'hotkeys',
 		title: 'Hotkeys',
 		component: HotKeysSettings,
@@ -67,10 +61,16 @@ const tabs: SettingsSection[] = [
 	},
 ];
 
-const workspaceTabs: SettingsSection[] = [
+const vaultTabs: SettingsSection[] = [
 	{
-		id: 'workspace-settings',
-		title: 'Workspace Settings',
+		id: 'vault',
+		title: 'Vault',
+		component: VaultSettings,
+		icon: FaVault,
+	},
+	{
+		id: 'workspace',
+		title: 'Workspace',
 		component: WorkspaceSettings,
 		icon: FaInbox,
 	},
@@ -131,9 +131,9 @@ export const SettingsWindow = () => {
 							})}
 
 							<Text fontWeight="bold" marginTop="2rem">
-								Workspace
+								Vault Settings
 							</Text>
-							{workspaceTabs.map((tab) => {
+							{vaultTabs.map((tab) => {
 								return (
 									<Tab
 										key={tab.id}
@@ -167,7 +167,7 @@ export const SettingsWindow = () => {
 								);
 							})}
 
-							{workspaceTabs.map((tab) => {
+							{vaultTabs.map((tab) => {
 								return (
 									<TabPanel key={tab.id} padding={0}>
 										<Text
