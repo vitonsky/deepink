@@ -356,6 +356,8 @@ export class NotesController implements INotesController {
 	}
 
 	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
+		if (ids.length === 0) return;
+
 		const db = wrapDB(this.db.get());
 
 		const { affectedRows = 0 } = await db.query(
