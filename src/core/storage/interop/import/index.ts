@@ -314,10 +314,10 @@ export class NotesImporter {
 			updatingProgress.notify();
 		}
 
-		await notesRegistry.updateMeta(
-			Object.values(createdNotes).map((note) => note.id),
-			{ isVisible: true },
-		);
+		const createdNoteIds = Object.values(createdNotes).map((note) => note.id);
+		if (createdNoteIds.length > 0) {
+			await notesRegistry.updateMeta(createdNoteIds, { isVisible: true });
+		}
 	}
 
 	private isNotePath(filePath: string) {
