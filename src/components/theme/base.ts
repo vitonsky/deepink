@@ -454,7 +454,7 @@ export default extendTheme({
 		Spinner: defineStyleConfig({
 			variants: {
 				accent: {
-					color: 'control.action.foreground',
+					color: 'control.action.background',
 				},
 			},
 			defaultProps: {

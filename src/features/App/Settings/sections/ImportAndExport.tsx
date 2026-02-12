@@ -24,11 +24,7 @@ import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 
-import { useProfileControls } from '../../Profile';
-
 export const ImportAndExport = () => {
-	const {} = useProfileControls();
-
 	const { importFiles, progress: importProgress } = useImportNotesPreset();
 	const notesExport = useNotesExport();
 
@@ -122,9 +118,9 @@ export const ImportAndExport = () => {
 						as="section"
 						border="1px dashed"
 						backgroundColor="dim.50"
-						borderColor={isDragActive ? 'dim.400' : 'dim.200'}
+						borderColor={isDragActive ? 'accent.500' : 'dim.200'}
 						borderWidth="2px"
-						borderRadius="2px"
+						borderRadius="6px"
 						padding="1rem"
 						opacity={importProgress === null ? 1 : 0.6}
 					>
@@ -138,7 +134,7 @@ export const ImportAndExport = () => {
 			</Dropzone>
 
 			{importProgress && (
-				<HStack w="100%" align="start">
+				<HStack w="100%" align="center">
 					<Spinner size="sm" />
 					<Text>
 						Notes import is in progress. Stage: {importProgress.stage}{' '}
