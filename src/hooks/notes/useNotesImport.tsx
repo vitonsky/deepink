@@ -60,13 +60,22 @@ export const useNotesImport = ({ snapshots }: { snapshots?: boolean } = {}) => {
 					throttle: requestAnimationFrame,
 					...options,
 				},
-			).import(files, {
-				abortSignal: abortController.signal,
-				onProcessed(info) {
-					console.log('Import progress', info);
-					onProgress((value) => (value ? { ...value, progress: info } : value));
-				},
-			});
+			)
+				.import(files, {
+					abortSignal: abortController.signal,
+					onProcessed(info) {
+						console.log('Import progress', info);
+						onProgress((value) =>
+							value ? { ...value, progress: info } : value,
+						);
+					},
+				})
+				.catch((error) => {
+					onProgress.flush();
+					setImportSession(null);
+
+					throw error;
+				});
 
 			onProgress.flush();
 			setImportSession(null);
