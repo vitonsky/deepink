@@ -14,7 +14,7 @@ import { useDebouncedCallback } from '@utils/debounce/useDebouncedCallback';
 export const useRelaxedValue = <T extends unknown>({
 	value,
 	onChange,
-	wait = 50,
+	wait = 150,
 	deadline,
 }: {
 	value: T;

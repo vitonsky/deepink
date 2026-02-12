@@ -1,8 +1,9 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { Divider, Input, Link, Select, Switch, Text, VStack } from '@chakra-ui/react';
+import { Divider, Link, Select, Switch, Text, VStack } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { RelaxedInput } from '@components/RelaxedInput';
 import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { editorModes } from '@features/NotesContainer/EditorModePicker/EditorModePicker';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
@@ -104,23 +105,23 @@ export const EditorConfig = () => {
 						</>
 					}
 				>
-					<Input
+					<RelaxedInput
 						size="sm"
 						placeholder="e.g., DD/MM/YYYY HH:mm"
 						value={editorConfig.dateFormat}
-						onChange={(evt) => {
+						onValueChange={(value) => {
 							dispatch(
 								settingsApi.setEditorConfig({
-									dateFormat: evt.target.value,
+									dateFormat: value,
 								}),
 							);
 						}}
 					/>
 
 					{editorConfig.dateFormat.trim().length > 0 && (
-						<VStack align="start" gap={0}>
+						<VStack align="start" gap={0} maxWidth="100%">
 							<Text fontSize=".8rem">Example</Text>
-							<Text fontWeight="bold">
+							<Text fontWeight="bold" maxWidth="100%">
 								{dayjs().format(editorConfig.dateFormat)}
 							</Text>
 						</VStack>

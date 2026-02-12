@@ -13,6 +13,7 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { RelaxedInput } from '@components/RelaxedInput';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
@@ -193,24 +194,24 @@ export const WorkspaceSettings = () => {
 						</>
 					}
 				>
-					<Input
+					<RelaxedInput
 						size="sm"
 						placeholder="e.g., Note {date:DD/MM/YYYY HH:mm}"
 						value={newNoteConfig.title}
-						onChange={(evt) => {
+						onValueChange={(value) => {
 							dispatch(
 								workspacesApi.setWorkspaceNoteTemplateConfig({
 									...currentWorkspace,
-									title: evt.target.value,
+									title: value,
 								}),
 							);
 						}}
 					/>
 
 					{newNoteConfig.title.trim().length > 0 && (
-						<VStack align="start" gap={0}>
+						<VStack align="start" gap={0} maxWidth="100%">
 							<Text fontSize=".8rem">Example</Text>
-							<Text fontWeight="bold">
+							<Text fontWeight="bold" maxWidth="100%">
 								{new TemplateProcessor({
 									ignoreParsingErrors: true,
 								}).compile(newNoteConfig.title)}

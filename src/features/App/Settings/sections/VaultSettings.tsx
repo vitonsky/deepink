@@ -15,6 +15,7 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { RelaxedInput } from '@components/RelaxedInput';
 import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
@@ -227,7 +228,7 @@ export const VaultSettings = () => {
 					description="Time interval in days to delete note from bin. Time counts from a moment you move note to bin."
 				>
 					<InputGroup size="sm" width="auto">
-						<Input
+						<RelaxedInput
 							width="8rem"
 							textAlign="right"
 							type="number"
@@ -237,11 +238,8 @@ export const VaultSettings = () => {
 								paddingInlineEnd: '3rem',
 							}}
 							value={deletionConfig.bin.cleanInterval}
-							onChange={(evt) => {
-								const result = z.coerce
-									.number()
-									.min(1)
-									.safeParse(evt.target.value);
+							onValueChange={(value) => {
+								const result = z.coerce.number().min(1).safeParse(value);
 								const days = result.data ?? 30;
 
 								dispatch(
