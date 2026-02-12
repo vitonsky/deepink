@@ -9,16 +9,30 @@ export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 		private readonly scheme: T,
 		private readonly config: {
 			defaultValue?: D;
+			ignoreFileReadErrors?: boolean;
+			ignoreParsingErrors?: boolean;
 		} = {},
 	) {}
 
 	async get(
 		options: { onError?: (error: unknown) => void } = {},
 	): Promise<void extends D ? z.TypeOf<T> | null : z.TypeOf<T>> {
-		const { defaultValue = null } = this.config;
+		const {
+			defaultValue = null,
+			ignoreParsingErrors = true,
+			ignoreFileReadErrors,
+		} = this.config;
 
 		// Parse data in state file
-		const rawJson = await this.file.get();
+		const rawJson = await this.file.get().catch((error) => {
+			if (ignoreFileReadErrors) {
+				console.error(error);
+				if (options.onError) options.onError(error);
+				return null;
+			}
+
+			throw error;
+		});
 		if (!rawJson)
 			return defaultValue as void extends D ? z.TypeOf<T> | null : z.TypeOf<T>;
 
@@ -27,7 +41,9 @@ export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 				JSON.parse(new TextDecoder().decode(rawJson)),
 			);
 			if (parseResult.success) return parseResult.data;
+			else if (!ignoreParsingErrors) throw parseResult.error;
 		} catch (error) {
+			if (!ignoreParsingErrors) throw error;
 			if (options.onError) options.onError(error);
 		}
 
