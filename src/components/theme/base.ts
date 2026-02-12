@@ -223,6 +223,13 @@ export default extendTheme({
 					'&:focus-visible, &[data-focus-visible]': {
 						shadow: 'input',
 					},
+
+					// Make chars in password input larger
+					'&[type=password]:not(:placeholder-shown)': {
+						fontFamily: 'Verdana',
+						fontWeight: 'bold',
+						letterSpacing: '0.05em',
+					},
 				},
 			},
 			sizes: {
