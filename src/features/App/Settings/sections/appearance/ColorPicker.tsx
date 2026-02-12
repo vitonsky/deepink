@@ -1,16 +1,23 @@
 import React, { useMemo } from 'react';
 import { Box, HStack } from '@chakra-ui/react';
 import { accentColorsMap } from '@features/accentColorsMap';
+import { useRelaxedValue } from '@hooks/useRelaxedValue';
 
 export const ColorPicker = ({
-	color,
-	onChange,
 	isDisabled,
+	...props
 }: {
 	color?: string;
 	onChange?: (color: string) => void;
 	isDisabled?: boolean;
 }) => {
+	const [color, setColor] = useRelaxedValue({
+		value: props.color,
+		onChange(value) {
+			if (!value) return;
+			props.onChange?.(value);
+		},
+	});
 	const colors = useMemo(
 		() => [
 			{
@@ -40,7 +47,7 @@ export const ColorPicker = ({
 						onClick={() => {
 							if (isDisabled) return;
 
-							onChange?.(id);
+							setColor(id);
 						}}
 					/>
 				);
