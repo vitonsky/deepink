@@ -98,7 +98,7 @@ export const SettingsWindow = () => {
 			closeOnEsc={false}
 		>
 			<ModalOverlay />
-			<ModalContent maxWidth="800px">
+			<ModalContent maxWidth="800px" minHeight="500px">
 				<ModalHeader paddingInline="1rem">Preferences</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody paddingInline="1rem" paddingBlockEnd="2rem">
