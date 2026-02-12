@@ -6,7 +6,7 @@ export const RelaxedInput = ({
 	value,
 	onValueChange,
 	onChange,
-	wait,
+	wait = 500,
 	...props
 }: InputProps & { wait?: number; onValueChange?: (value: string) => void }) => {
 	const [state, setState] = useRelaxedValue<string>({
