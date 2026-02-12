@@ -80,7 +80,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				workspaces.map(async (workspace) => {
 					const config = await new StateFile(
 						new FileController(
-							`configs/${workspace.id}.json`,
+							`workspaces/${workspace.id}/config.json`,
 							controls.profile.files,
 						),
 						WorkspaceConfigScheme,

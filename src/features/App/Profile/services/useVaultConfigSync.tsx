@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { isEqual } from 'lodash';
 import { FileController } from '@core/features/files/FileController';
-import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { useAppSelector } from '@state/redux/hooks';
@@ -20,7 +19,6 @@ export const useVaultConfigSync = () => {
 	const {
 		profile: {
 			files,
-			encryptionController,
 			profile: { id: profileId },
 		},
 	} = useProfileControls();
@@ -28,10 +26,7 @@ export const useVaultConfigSync = () => {
 	const watchSelector = useWatchSelector();
 	useEffect(() => {
 		const vaultConfig = new StateFile(
-			new FileControllerWithEncryption(
-				new FileController('config.json', files),
-				encryptionController,
-			),
+			new FileController('config.json', files),
 			ProfileConfigScheme,
 		);
 
@@ -48,7 +43,7 @@ export const useVaultConfigSync = () => {
 				});
 			},
 		});
-	}, [encryptionController, files, profileId, watchSelector]);
+	}, [files, profileId, watchSelector]);
 
 	const workspaces = useAppSelector(selectWorkspacesInfo({ profileId }), isEqual);
 	useEffect(() => {
@@ -56,13 +51,7 @@ export const useVaultConfigSync = () => {
 			.filter((workspace) => workspace.touched)
 			.map((workspace) => {
 				const workspaceConfig = new StateFile(
-					new FileControllerWithEncryption(
-						new FileController(
-							`workspaces/${workspace.id}/config.json`,
-							files,
-						),
-						encryptionController,
-					),
+					new FileController(`workspaces/${workspace.id}/config.json`, files),
 					WorkspaceConfigScheme,
 				);
 
@@ -82,5 +71,5 @@ export const useVaultConfigSync = () => {
 			});
 
 		return () => cleanups.forEach((cleanup) => cleanup());
-	}, [encryptionController, files, profileId, watchSelector, workspaces]);
+	}, [files, profileId, watchSelector, workspaces]);
 };
