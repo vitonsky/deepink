@@ -122,7 +122,13 @@ export const ImportAndExport = () => {
 						borderWidth="2px"
 						borderRadius="6px"
 						padding="1rem"
-						opacity={importProgress === null ? 1 : 0.6}
+						{...(importProgress === null
+							? undefined
+							: {
+									filter: 'contrast(.3)',
+									cursor: 'progress',
+									userSelect: 'none',
+								})}
 					>
 						<input {...getInputProps()} />
 						<Text>Drop Markdown files or .zip archive to import</Text>
