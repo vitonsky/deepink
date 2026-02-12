@@ -37,11 +37,12 @@ export class ScreenLockWatcher {
 	public async start() {
 		if (this.cleanupsPromise !== null) throw new Error('Service is already in run');
 
-		this.cleanupsPromise = Promise.all([
-			this.watchPowerManagementEvents(),
-			// TODO: run conditionally only for those who have dbus
-			this.watchDBusEvents(),
-		]);
+		this.cleanupsPromise = Promise.all(
+			[
+				this.watchPowerManagementEvents(),
+				process.platform === 'linux' ? this.watchDBusEvents() : undefined,
+			].filter((promise) => promise !== undefined),
+		);
 
 		await this.cleanupsPromise;
 	}
