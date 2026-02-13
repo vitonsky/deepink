@@ -49,8 +49,8 @@ export const defaultSettings = {
 	editor: {
 		mode: 'plaintext',
 		fontFamily: '',
-		fontSize: 18,
-		lineHeight: 1.5,
+		fontSize: 16,
+		lineHeight: 1.6,
 		miniMap: false,
 		lineNumbers: false,
 		dateFormat: 'D MMM YYYY, HH:mm',

@@ -68,8 +68,8 @@ export const EditorConfig = () => {
 
 				<FeaturesOption title="Font size">
 					<RelaxedSlider
-						min={8}
-						max={32}
+						min={10}
+						max={30}
 						resetValue={defaultSettings.editor.fontSize}
 						value={editorConfig.fontSize}
 						onChange={(value) => {
@@ -80,8 +80,8 @@ export const EditorConfig = () => {
 
 				<FeaturesOption title="Line height">
 					<RelaxedSlider
-						min={1}
-						max={5}
+						min={1.2}
+						max={2}
 						step={0.1}
 						resetValue={defaultSettings.editor.lineHeight}
 						value={editorConfig.lineHeight}
