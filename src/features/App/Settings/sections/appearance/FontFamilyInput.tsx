@@ -31,6 +31,8 @@ export const VirtualList = ({
 		children: (virtualizer: Virtualizer<HTMLDivElement, HTMLLIElement>) => ReactNode;
 		activeIndex?: number;
 	}) => {
+	// FIXME: https://github.com/TanStack/virtual/issues/1119
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const virtualizer = useVirtualizer(props);
 
 	useEffect(() => {
