@@ -19,6 +19,7 @@ import { RelaxedInput } from '@components/RelaxedInput';
 import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
+import { defaultVaultConfig } from '@state/redux/profiles/profiles';
 import {
 	selectDeletionConfig,
 	selectIntegrityServiceConfig,
@@ -157,6 +158,7 @@ export const VaultSettings = () => {
 						min={ms('10s')}
 						max={ms('5m')}
 						step={ms('10s')}
+						resetValue={defaultVaultConfig.snapshots.interval}
 						transformValue={(value) =>
 							humanizeDuration(value, { units: ['m', 's'] })
 						}

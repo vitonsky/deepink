@@ -12,6 +12,7 @@ import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
+	defaultVaultConfig,
 	ProfileConfigScheme,
 	selectWorkspacesInfo,
 	WorkspaceConfigScheme,
@@ -113,22 +114,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 							}),
 						),
 						config: {
-							filesIntegrity: {
-								enabled: false,
-							},
-							snapshots: {
-								enabled: true,
-								interval: 30_000,
-							},
-							deletion: {
-								confirm: false,
-								permanentDeletion: false,
-								bin: {
-									autoClean: false,
-									cleanInterval: 30,
-								},
-							},
-
+							...defaultVaultConfig,
 							...config,
 						},
 					},

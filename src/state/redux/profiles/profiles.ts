@@ -8,6 +8,24 @@ import { findNearNote } from './utils';
 
 type ProfileMutator<T extends {}> = (profile: ProfileData, payload: T) => void;
 
+export const defaultVaultConfig = {
+	filesIntegrity: {
+		enabled: false,
+	},
+	snapshots: {
+		enabled: true,
+		interval: 30_000,
+	},
+	deletion: {
+		confirm: false,
+		permanentDeletion: false,
+		bin: {
+			autoClean: false,
+			cleanInterval: 30,
+		},
+	},
+} satisfies ProfileConfig;
+
 export function createProfileReducer<T extends {} = {}>(mutator: ProfileMutator<T>) {
 	return (state: ProfilesState, { payload }: PayloadAction<ProfileScoped<T>>) => {
 		const { profileId, ...rest } = payload;
@@ -126,11 +144,13 @@ export const ProfileConfigScheme = z.object({
 	}),
 });
 
+export type ProfileConfig = z.output<typeof ProfileConfigScheme>;
+
 export type ProfileData = {
 	activeWorkspace: string | null;
 	workspaces: Record<string, WorkspaceData | undefined>;
 
-	config: z.output<typeof ProfileConfigScheme>;
+	config: ProfileConfig;
 };
 
 export type ProfilesState = {

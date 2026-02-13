@@ -40,28 +40,30 @@ export const settingsScheme = z.object({
 
 export type GlobalSettings = z.output<typeof settingsScheme>;
 
+export const defaultSettings = {
+	checkForUpdates: true,
+	theme: {
+		name: 'auto',
+		accentColor: 'auto',
+	},
+	editor: {
+		mode: 'plaintext',
+		fontFamily: '',
+		fontSize: 18,
+		lineHeight: 1.5,
+		miniMap: false,
+		lineNumbers: false,
+		dateFormat: 'D MMM YYYY, HH:mm',
+	},
+	vaultLock: {
+		lockAfterIdle: null,
+		lockOnSystemLock: false,
+	},
+} satisfies GlobalSettings as GlobalSettings;
+
 export const settingsSlice = createSlice({
 	name: 'settings',
-	initialState: {
-		checkForUpdates: true,
-		theme: {
-			name: 'auto',
-			accentColor: 'auto',
-		},
-		editor: {
-			mode: 'plaintext',
-			fontFamily: '',
-			fontSize: 18,
-			lineHeight: 1.5,
-			miniMap: false,
-			lineNumbers: false,
-			dateFormat: 'D MMM YYYY, HH:mm',
-		},
-		vaultLock: {
-			lockAfterIdle: null,
-			lockOnSystemLock: false,
-		},
-	} satisfies GlobalSettings as GlobalSettings,
+	initialState: defaultSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
 			return { ...state, ...payload } as GlobalSettings;

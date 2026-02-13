@@ -12,6 +12,7 @@ import {
 	selectEditorFontFamily,
 } from '@state/redux/settings/selectors/preferences';
 import {
+	defaultSettings,
 	EditorMode,
 	selectEditorMode,
 	settingsApi,
@@ -69,6 +70,7 @@ export const EditorConfig = () => {
 					<RelaxedSlider
 						min={8}
 						max={32}
+						resetValue={defaultSettings.editor.fontSize}
 						value={editorConfig.fontSize}
 						onChange={(value) => {
 							dispatch(settingsApi.setEditorConfig({ fontSize: value }));
@@ -81,7 +83,8 @@ export const EditorConfig = () => {
 						min={0.3}
 						max={5}
 						step={0.1}
-						value={editorConfig.lineHeight}
+						resetValue={1.5}
+						value={defaultSettings.editor.lineHeight}
 						onChange={(value) => {
 							dispatch(settingsApi.setEditorConfig({ lineHeight: value }));
 						}}
