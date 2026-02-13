@@ -142,6 +142,7 @@ export const SimpleComboBox = <T extends unknown>({
 									getScrollElement={() => listRootRef.current}
 									estimateSize={() => 40}
 									overscan={6}
+									useFlushSync={false}
 								>
 									{(virtualizer) => {
 										return (
