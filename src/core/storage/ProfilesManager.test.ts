@@ -1,7 +1,9 @@
-import { ProfilesManager } from './ProfilesManager';
+import { webcrypto } from 'node:crypto';
+
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { RootedFS } from '@core/features/files/RootedFS';
-import { webcrypto } from 'node:crypto';
+
+import { ProfilesManager } from './ProfilesManager';
 
 vi.stubGlobal('self', {
 	crypto: webcrypto,

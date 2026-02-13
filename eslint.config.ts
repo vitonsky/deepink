@@ -24,7 +24,6 @@ export default tseslint.config(
 	tseslint.configs.stylisticTypeCheckedOnly,
 	tseslint.configs.recommendedTypeChecked,
 	globalIgnores([
-		'**/*.test.ts',
 		// Use ignore rules from `.prettierignore`
 		...readLinesInFile('.prettierignore').filter(
 			(rule) => rule && !rule.startsWith('#'),

@@ -143,13 +143,13 @@ describe('data fetching', () => {
 
 		await expect(
 			registry.get({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
+				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')!.id],
 			}),
 		).resolves.toHaveLength(1);
 
 		await expect(
 			registry.get({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')!.id],
 			}),
 		).resolves.toHaveLength(1);
 
@@ -184,7 +184,7 @@ describe('data fetching', () => {
 
 		const tagsList = await tags.getTags();
 
-		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string;
+		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')!.id;
 		const [{ id: noteId }] = await registry.get({
 			limit: 1,
 			tags: [barTag],

@@ -1,4 +1,3 @@
-/* eslint-disable @cspell/spellchecker */
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';

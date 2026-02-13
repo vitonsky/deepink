@@ -1,14 +1,13 @@
-import { fillBufferWithRandomBytes } from '@core/encryption/utils/random';
-import { IFilesStorage } from '.';
-import { InMemoryFS } from './InMemoryFS';
-import { ZipFS } from './ZipFS';
 import { webcrypto } from 'crypto';
-import { OverlayFS } from './OverlayFS';
-import { RootedFS } from './RootedFS';
-import { EncryptedFS } from './EncryptedFS';
+import { AESGCMCipher } from '@core/encryption/ciphers/AES';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { getDerivedKeysManager, getMasterKey } from '@core/encryption/utils/keys';
-import { AESGCMCipher } from '@core/encryption/ciphers/AES';
+
+import { EncryptedFS } from './EncryptedFS';
+import { InMemoryFS } from './InMemoryFS';
+import { RootedFS } from './RootedFS';
+import { ZipFS } from './ZipFS';
+import { IFilesStorage } from '.';
 
 vi.stubGlobal('self', {
 	crypto: webcrypto,

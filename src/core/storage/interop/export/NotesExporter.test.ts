@@ -300,8 +300,10 @@ test('Export all notes and attached files as a zip file', async () => {
 		const file1 = await fs1.get(file);
 		const file2 = await fs2.get(file);
 
-		expect(new TextDecoder().decode(file1 as ArrayBuffer)).toEqual(
-			new TextDecoder().decode(file2 as ArrayBuffer),
+		expect(new TextDecoder().decode(file1!)).toEqual(
+			new TextDecoder().decode(file2!),
 		);
+		expect(file1).toBeInstanceOf(ArrayBuffer);
+		expect(file2).toBeInstanceOf(ArrayBuffer);
 	}
 });

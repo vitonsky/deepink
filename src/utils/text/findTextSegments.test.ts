@@ -1,3 +1,4 @@
+/* eslint-disable @cspell/spellchecker */
 import { findTextSegments } from './findTextSegments';
 
 test('No results for empty strings', () => {

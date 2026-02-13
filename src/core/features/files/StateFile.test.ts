@@ -1,7 +1,8 @@
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-import { StateFile } from './StateFile';
 import z, { ZodError } from 'zod';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { wait } from '@utils/time';
+
+import { StateFile } from './StateFile';
 
 const decodeBuffer = (buffer: ArrayBuffer | null) =>
 	buffer && new TextDecoder().decode(buffer);

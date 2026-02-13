@@ -1,4 +1,5 @@
 import { wait } from '@utils/time';
+
 import { DebouncedPromises } from './DebouncedPromises';
 
 vi.useFakeTimers();

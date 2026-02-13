@@ -1,10 +1,11 @@
+import ms from 'ms';
 import { getUUID } from 'src/__tests__/utils/uuid';
+import { Mock } from 'vitest';
 import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+
 import { NotesController } from '../controller/NotesController';
 import { DeletedNotesController } from './DeletedNotesController';
-import ms from 'ms';
-import { Mock } from 'vitest';
 
 const FAKE_WORKSPACE_ID = getUUID();
 

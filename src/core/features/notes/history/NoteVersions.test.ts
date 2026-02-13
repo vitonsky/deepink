@@ -4,7 +4,6 @@ import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from '../controller/NotesController';
 import { NoteVersions } from './NoteVersions';
-import { INote } from '..';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -65,7 +64,7 @@ describe('Note version control', () => {
 
 		// Fetch note
 		const noteId = await registry.add({ title: 'Title 1', text: 'Text 1' });
-		const noteDataV1 = (await registry.getById(noteId)) as INote;
+		const noteDataV1 = (await registry.getById(noteId))!;
 
 		// No snapshots yet
 		await expect(history.getList(noteId)).resolves.toHaveLength(0);

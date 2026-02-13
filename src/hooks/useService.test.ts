@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { renderHook } from '@testing-library/react';
-import { useService } from './useService';
 import { wait } from '@utils/time';
+
+import { useService } from './useService';
 
 vi.useFakeTimers();
 

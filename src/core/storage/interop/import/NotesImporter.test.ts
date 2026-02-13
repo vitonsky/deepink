@@ -1,4 +1,3 @@
-/* eslint-disable @cspell/spellchecker */
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
