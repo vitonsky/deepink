@@ -22,7 +22,7 @@
 		"make": "electron-forge make",
 		"typecheck": "tsc --noEmit --watch",
 		"prettify": "prettier --write \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint --fix \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint '**/*.css' --fix",
-		"lint": "prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint '**/*.css'",
+		"lint": "prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && eslint --max-warnings 0 \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint '**/*.css'",
 		"update-icons": "tsx ./scripts/icons/build.ts",
 		"upgrade": "npm-check-updates -u",
 		"release-preview": "npm version prerelease --preid=preview && git push --follow-tags",
