@@ -1,14 +1,7 @@
 import React, { useMemo } from 'react';
 import { FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
-import {
-	Divider,
-	HStack,
-	Select,
-	StackProps,
-	Text,
-	VStack,
-} from '@chakra-ui/react';
+import { Divider, HStack, Select, StackProps, Text, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
