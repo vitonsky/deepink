@@ -29,19 +29,28 @@
 	padding-left: 16px;
 }
 
+.RichEditor__h4,
+.RichEditor__h5,
+.RichEditor__h6 {
+	margin-bottom: 0.2em;
+}
+
 .RichEditor__h1 {
 	padding-bottom: 0.3em;
+	margin-bottom: 0.5em;
 	font-size: 2em;
 	border-bottom: 1px solid var(--chakra-colors-surface-border);
 }
 
 .RichEditor__h2 {
 	padding-bottom: 0.3em;
+	margin-bottom: 0.4em;
 	font-size: 1.5em;
 	border-bottom: 1px solid var(--chakra-colors-surface-border);
 }
 
 .RichEditor__h3 {
+	margin-bottom: 0.4em;
 	font-size: 1.25em;
 }
 
