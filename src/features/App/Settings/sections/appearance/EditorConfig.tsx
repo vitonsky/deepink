@@ -80,11 +80,11 @@ export const EditorConfig = () => {
 
 				<FeaturesOption title="Line height">
 					<RelaxedSlider
-						min={0.3}
+						min={1}
 						max={5}
 						step={0.1}
-						resetValue={1.5}
-						value={defaultSettings.editor.lineHeight}
+						resetValue={defaultSettings.editor.lineHeight}
+						value={editorConfig.lineHeight}
 						onChange={(value) => {
 							dispatch(settingsApi.setEditorConfig({ lineHeight: value }));
 						}}
