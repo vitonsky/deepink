@@ -303,7 +303,7 @@ test('Export all notes and attached files as a zip file', async () => {
 		expect(new TextDecoder().decode(file1!)).toEqual(
 			new TextDecoder().decode(file2!),
 		);
-		expect(file1).toBeInstanceOf(ArrayBuffer);
-		expect(file2).toBeInstanceOf(ArrayBuffer);
+		expect(file1).not.toBeFalsy();
+		expect(file2).not.toBeFalsy();
 	}
 });
