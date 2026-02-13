@@ -12,8 +12,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
-import { useAutoOpenProfile } from './useAutoOpenProfile';
-import { useOpenProfile } from './useOpenProfile';
+import { useProfileLoader } from './useProfileLoader';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
@@ -38,14 +37,12 @@ export const App: FC = () => {
 
 	// Open recent profile
 	const recentProfile = useRecentProfile(config);
-	const isProfileOpening = useAutoOpenProfile({
+	const { isOpening: isProfileOpening, onOpenProfile } = useProfileLoader({
 		profilesList,
 		recentProfile,
 		setCurrentProfileId: setCurrentProfileId,
 		profiles: profileContainers,
 	});
-
-	const onOpenProfile = useOpenProfile(profileContainers);
 
 	const [authScreen, setAuthScreen] = useState<'choose' | 'create' | 'login'>('choose');
 
