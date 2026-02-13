@@ -1,4 +1,4 @@
-import { getResolvedPath } from '@utils/fs/paths';
+import { getResolvedPath, joinPathSegments } from '@utils/fs/paths';
 
 import { OverlayFS } from './OverlayFS';
 import { IFilesStorage } from '.';
@@ -12,7 +12,9 @@ export class RootedFS extends OverlayFS {
 	}
 
 	private getHostPath(path: string) {
-		return getResolvedPath(path, this.root);
+		const resolvedPath = getResolvedPath(joinPathSegments([this.root, path]), '/');
+		const fixedPath = resolvedPath.startsWith(this.root) ? resolvedPath : this.root;
+		return fixedPath;
 	}
 
 	write(path: string, buffer: ArrayBuffer): Promise<void> {
