@@ -13,4 +13,8 @@ export const useGlobalShortcutHandlers = () => {
 	useShortcutCallback(Shortcuts.SYNC_DATABASE, () =>
 		command(GLOBAL_COMMANDS.SYNC_DATABASE),
 	);
+
+	useShortcutCallback(Shortcuts.OPEN_GLOBAL_SETTINGS, () => {
+		command(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS);
+	});
 };

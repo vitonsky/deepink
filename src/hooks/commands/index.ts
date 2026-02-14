@@ -113,13 +113,3 @@ export type CommandPayloadsMap = {
 		? CommandsWithPayload[K]
 		: void;
 };
-
-export const SHORTCUT_NAMES = {
-	[GLOBAL_COMMANDS.CREATE_NOTE]: 'Create note',
-	[GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE]: 'Close current note',
-	[GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE]: 'Restore closed note',
-	[GLOBAL_COMMANDS.FOCUS_NEXT_NOTE]: 'Go to next tab',
-	[GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE]: 'Go to previous tab',
-	[GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: 'Lock vault',
-	[GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS]: 'Open preferences',
-};
