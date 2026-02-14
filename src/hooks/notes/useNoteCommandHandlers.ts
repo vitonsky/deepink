@@ -11,9 +11,9 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
-import { selectConfirmMoveToBin } from '@state/redux/settings/selectors/preferences';
+import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { buildFileName, useNotesExport } from './useNotesExport';
@@ -39,18 +39,18 @@ export const useNoteCommandHandlers = () => {
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
-	const requiresConfirmMoveToBin = useAppSelector(selectConfirmMoveToBin);
-
+	const deletionConfig = useVaultSelector(selectDeletionConfig);
 	const eventBus = useEventBus();
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE,
 		async ({ noteId, permanently }) => {
 			if (permanently) {
-				const isConfirmed = confirm(
-					`Do you want to permanently delete this note?`,
-				);
-				if (!isConfirmed) return;
+				if (
+					deletionConfig.confirm &&
+					!confirm(`Do you want to permanently delete this note?`)
+				)
+					return;
 
 				noteActions.close(noteId);
 
@@ -59,12 +59,11 @@ export const useNoteCommandHandlers = () => {
 
 				eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
 			} else {
-				if (requiresConfirmMoveToBin) {
-					const isConfirmed = confirm(
-						`Do you want to move this note to the bin?`,
-					);
-					if (!isConfirmed) return;
-				}
+				if (
+					deletionConfig.confirm &&
+					!confirm(`Do you want to move this note to the bin?`)
+				)
+					return;
 
 				noteActions.close(noteId);
 
