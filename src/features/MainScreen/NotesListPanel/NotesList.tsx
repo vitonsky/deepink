@@ -103,7 +103,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (noteIds.length === 0) return;
 
 		loadViewportNotes(noteIds);
-	}, [notes, noteRegister, virtualNoteItems, loadViewportNotes]);
+	}, [notes, virtualNoteItems, loadViewportNotes]);
 
 	// Update preview when note content changes
 	const eventBus = useEventBus();
