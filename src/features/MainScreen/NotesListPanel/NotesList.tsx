@@ -31,7 +31,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
 
-	const noteRegister = useNotesRegistry();
+	const notesRegister = useNotesRegistry();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 	const notes = useWorkspaceSelector(selectNotes);
@@ -81,19 +81,19 @@ export const NotesList: FC<NotesListProps> = () => {
 	// Reset the scroll bar after a view change
 	const notesView = useWorkspaceSelector(selectNotesView);
 	useEffect(() => {
-		if (!activeNoteId || !notes.includes(activeNoteId)) {
-			virtualizer.scrollToOffset(0);
-		}
-	}, [notesView, notes, activeNoteId, virtualizer]);
+		virtualizer.scrollToOffset(0);
+	}, [notesView, virtualizer]);
 
 	// Load notes
-	const [notesInViewport, setNotesInViewport] = useState<Map<NoteId, INote>>(new Map());
+	const [notesInViewport, setNotesInViewport] = useState<Record<NoteId, INote>>({});
 	const loadViewportNotes = useDebouncedCallback(
 		(noteIds: NoteId[]) => {
-			noteRegister.getById(noteIds).then((loadedNotes) => {
+			notesRegister.getById(noteIds).then((loadedNotes) => {
 				if (loadedNotes.length === 0) return;
 
-				setNotesInViewport(new Map(loadedNotes.map((note) => [note.id, note])));
+				setNotesInViewport(
+					Object.fromEntries(loadedNotes.map((note) => [note.id, note])),
+				);
 			});
 		},
 		{ wait: 10 },
@@ -109,12 +109,12 @@ export const NotesList: FC<NotesListProps> = () => {
 	const eventBus = useEventBus();
 	useEffect(() => {
 		const update = (updatedNoteId: NoteId) => {
-			if (!notesInViewport.has(updatedNoteId)) return;
+			if (!notesInViewport[updatedNoteId]) return;
 
-			noteRegister.getById([updatedNoteId]).then(([note]) => {
-				if (!note) return;
-				setNotesInViewport((prev) => new Map(prev).set(note.id, note));
-			});
+			const noteIds = virtualNoteItems.map((i) => notes[i.index]);
+			if (noteIds.length === 0) return;
+
+			loadViewportNotes(noteIds);
 		};
 
 		const cleanupUpdated = eventBus.listen(WorkspaceEvents.NOTE_UPDATED, update);
@@ -124,7 +124,14 @@ export const NotesList: FC<NotesListProps> = () => {
 			cleanupUpdated();
 			cleanupEdited();
 		};
-	}, [eventBus, noteRegister, notesInViewport]);
+	}, [
+		eventBus,
+		notesRegister,
+		notesInViewport,
+		loadViewportNotes,
+		virtualNoteItems,
+		notes,
+	]);
 
 	// TODO: implement dragging and moving items
 	return (
@@ -163,7 +170,7 @@ export const NotesList: FC<NotesListProps> = () => {
 					>
 						{virtualNoteItems.map((virtualRow) => {
 							const id = notes[virtualRow.index];
-							const note = notesInViewport.get(id);
+							const note = notesInViewport[id];
 
 							if (!note)
 								return (
