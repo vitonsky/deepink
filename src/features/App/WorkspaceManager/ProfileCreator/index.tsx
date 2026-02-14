@@ -188,7 +188,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			<VStack
 				w="100%"
 				alignItems="start"
-				gap={'0.8rem'}
+				gap="0.8rem"
 				fontSize="18px"
 				color="typography.additional"
 			>
