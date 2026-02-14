@@ -6,9 +6,7 @@ import { GLOBAL_COMMANDS } from '..';
 import { SHORTCUTS_MAP } from '.';
 
 /**
- * Registers keyboard shortcuts for shortcut
- *
- * Configures the processing of global keyboard shortcuts, associating each combination with a command
+ * Registers keyboard shortcuts
  */
 export const useShortcutsBinding = () => {
 	const runCommand = useCommand();
