@@ -18,6 +18,7 @@ export enum Shortcuts {
 	SYNC_DATABASE,
 
 	FOCUS_SEARCH,
+	OPEN_GLOBAL_SETTINGS,
 }
 
 export const SHORTCUTS_MAP = {
@@ -40,4 +41,30 @@ export const SHORTCUTS_MAP = {
 	'CmdOrCtrl+S': Shortcuts.SYNC_DATABASE,
 
 	'CmdOrCtrl+F': Shortcuts.FOCUS_SEARCH,
+
+	'CmdOrCtrl+,': Shortcuts.OPEN_GLOBAL_SETTINGS,
+};
+
+export const SHORTCUT_NAMES = {
+	[Shortcuts.CREATE_NOTE]: 'Create note',
+	[Shortcuts.CLOSE_CURRENT_NOTE]: 'Close current note',
+	[Shortcuts.RESTORE_CLOSED_NOTE]: 'Restore closed note',
+	[Shortcuts.FOCUS_NEXT_NOTE]: 'Go to next tab',
+	[Shortcuts.FOCUS_PREVIOUS_NOTE]: 'Go to previous tab',
+
+	[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: 'Toggle archive status of the current note',
+	[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]:
+		'Toggle bookmark status of the current note',
+
+	[Shortcuts.DELETE_NOTE_TO_BIN]: 'Delete current note to bin',
+	[Shortcuts.DELETE_NOTE_PERMANENTLY]: 'Delete current note permanently',
+	[Shortcuts.RESTORE_NOTE_FROM_BIN]: 'Restore current note from bin',
+
+	[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: 'Toggle the note’s history panel',
+
+	[Shortcuts.SYNC_DATABASE]: 'Synchronize the database',
+	[Shortcuts.FOCUS_SEARCH]: 'Focus on the search input',
+
+	[Shortcuts.LOCK_CURRENT_PROFILE]: 'Lock vault',
+	[Shortcuts.OPEN_GLOBAL_SETTINGS]: 'Open preferences',
 };
