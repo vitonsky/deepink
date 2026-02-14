@@ -45,12 +45,15 @@ export const NotesList: FC<NotesListProps> = () => {
 
 	const parentRef = useRef<HTMLDivElement>(null);
 	const isActiveWorkspace = useIsActiveWorkspace();
+
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const virtualizer = useVirtualizer({
 		enabled: isActiveWorkspace,
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 5,
+		overscan: 10,
+		useFlushSync: false,
 	});
 
 	const virtualNoteItems = virtualizer.getVirtualItems();
