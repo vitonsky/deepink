@@ -1,0 +1,66 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`New service must wait completion of previous one > Intermediate runs must be skipped. Service that have been started, bust be completed. 1`] = `
+[
+  [
+    "init",
+    "started",
+    "abortion",
+    "completed",
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    "init",
+    "started",
+    "abortion",
+    "completed",
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    "init",
+    "started",
+    "abortion",
+    "completed",
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    "init",
+    "started",
+    "abortion",
+    "completed",
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    "init",
+    "started",
+    "abortion",
+    "completed",
+  ],
+  [],
+  [],
+  [
+    "init",
+    "started",
+    "abortion",
+    "completed",
+  ],
+]
+`;

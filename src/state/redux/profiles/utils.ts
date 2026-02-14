@@ -1,11 +1,17 @@
 import { INote, NoteId } from '@core/features/notes';
 import { createSelector } from '@reduxjs/toolkit';
 
-import { WorkspaceData } from './profiles';
+import { ProfileData, WorkspaceData } from './profiles';
 
 export const createWorkspaceSelector = createSelector.withTypes<WorkspaceData>();
+export const createVaultSelector = createSelector.withTypes<ProfileData>();
 
 export const selectWorkspaceRoot = (workspace: WorkspaceData | null) => workspace;
+
+export const selectWorkspaceRootSafe = (workspace: WorkspaceData | null) => {
+	if (!workspace) throw new Error('Workspace selector used out of workspace scope');
+	return workspace;
+};
 
 /**
  * Find a note near current, but except current note in edge cases

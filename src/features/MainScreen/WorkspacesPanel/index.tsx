@@ -1,20 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { FaGear, FaPlus } from 'react-icons/fa6';
+import React, { useMemo } from 'react';
+import { FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
-import {
-	Button,
-	Divider,
-	HStack,
-	Select,
-	StackProps,
-	Text,
-	VStack,
-} from '@chakra-ui/react';
+import { Divider, HStack, Select, StackProps, Text, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
-import { WorkspaceSettings } from '@features/WorkspaceSettings/WorkspaceSettings';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
@@ -25,13 +16,6 @@ export const WorkspacesPanel = (props: StackProps) => {
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();
-
-	const [isWorkspaceEditing, setIsWorkspaceEditing] = useState(false);
-	const editWorkspace = useCallback(() => {
-		setIsWorkspaceEditing(true);
-
-		telemetry.track(TELEMETRY_EVENT_NAME.SETTINGS_CLICK, { scope: 'workspace' });
-	}, [telemetry]);
 
 	const { profileId, workspaceId } = useWorkspaceData();
 
@@ -103,14 +87,7 @@ export const WorkspacesPanel = (props: StackProps) => {
 						</option>
 					))}
 				</Select>
-				<Button size="sm" title="Workspace settings" onClick={editWorkspace}>
-					<FaGear />
-				</Button>
 			</HStack>
-
-			{isWorkspaceEditing && (
-				<WorkspaceSettings onClose={() => setIsWorkspaceEditing(false)} />
-			)}
 		</VStack>
 	);
 };

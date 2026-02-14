@@ -15,7 +15,7 @@ import { isDevMode } from '@electron/utils/app';
 import { getUserDataPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { getConfig } from '@utils/os/getConfig';
-import { wait } from '@utils/tests';
+import { wait } from '@utils/time';
 
 import { getAbout } from '../../about';
 

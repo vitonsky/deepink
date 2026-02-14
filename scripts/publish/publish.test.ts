@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-/* eslint-disable @cspell/spellchecker */
+
 import { vol } from 'memfs';
 import path from 'path';
 
@@ -73,6 +73,7 @@ test('Publish script uploads all found artifacts as a new release', async () => 
 	const { default: main } = await import('./main');
 
 	getReleaseByTag.mockImplementationOnce(async () => {
+		// eslint-disable-next-line @typescript-eslint/only-throw-error
 		throw { status: 404 };
 	});
 	createRelease.mockReturnValueOnce(

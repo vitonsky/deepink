@@ -2,6 +2,11 @@
 import semver from 'semver';
 import { z } from 'zod';
 
+export type AppVersionInfo = {
+	version: string;
+	url: string;
+};
+
 export const ReleaseObjectScheme = z.object({
 	html_url: z.string(),
 	tag_name: z.string(),
@@ -18,7 +23,9 @@ export class GitHubReleaseUpdatesChecker {
 		},
 	) {}
 
-	public async checkForUpdates(context: { version: string }) {
+	public async checkForUpdates(context: {
+		version: string;
+	}): Promise<AppVersionInfo | null> {
 		const { owner, repo } = this.config;
 
 		try {

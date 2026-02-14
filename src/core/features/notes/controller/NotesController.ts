@@ -24,7 +24,7 @@ const RowScheme = z
 		updated_at: z.date(),
 		history_disabled: z.boolean(),
 		visible: z.boolean(),
-		deleted: z.boolean(),
+		deleted_at: z.date().nullable(),
 		archived: z.boolean(),
 		bookmarked: z.boolean(),
 	})
@@ -37,7 +37,7 @@ const RowScheme = z
 			updated_at,
 			history_disabled,
 			visible,
-			deleted,
+			deleted_at,
 			archived,
 			bookmarked,
 		}): INote => ({
@@ -46,7 +46,8 @@ const RowScheme = z
 			updatedTimestamp: updated_at.getTime(),
 			isSnapshotsDisabled: history_disabled,
 			isVisible: visible,
-			isDeleted: deleted,
+			isDeleted: deleted_at !== null,
+			deletedAt: deleted_at?.getTime(),
 			isArchived: archived,
 			isBookmarked: bookmarked,
 			content: { title, text },
@@ -54,26 +55,33 @@ const RowScheme = z
 	);
 
 function formatNoteMeta(meta: Partial<NoteMeta>) {
-	return Object.fromEntries(
-		Object.entries(meta).map((item): [string, DBTypes] => {
-			const [key, value] = item as unknown as {
-				[K in keyof NoteMeta]: [K, NoteMeta[K]];
-			}[keyof NoteMeta];
+	const fields: Record<string, DBTypes> = {};
 
-			switch (key) {
-				case 'isSnapshotsDisabled':
-					return ['history_disabled', Boolean(value)];
-				case 'isVisible':
-					return ['visible', Boolean(value)];
-				case 'isDeleted':
-					return ['deleted', Boolean(value)];
-				case 'isArchived':
-					return ['archived', Boolean(value)];
-				case 'isBookmarked':
-					return ['bookmarked', Boolean(value)];
-			}
-		}),
-	);
+	for (const item of Object.entries(meta)) {
+		const [key, value] = item as unknown as {
+			[K in keyof NoteMeta]: [K, NoteMeta[K]];
+		}[keyof NoteMeta];
+
+		switch (key) {
+			case 'isSnapshotsDisabled':
+				fields['history_disabled'] = Boolean(value);
+				break;
+			case 'isVisible':
+				fields['visible'] = Boolean(value);
+				break;
+			case 'isDeleted':
+				fields['deleted_at'] = value ? new Date() : null;
+				break;
+			case 'isArchived':
+				fields['archived'] = Boolean(value);
+				break;
+			case 'isBookmarked':
+				fields['bookmarked'] = Boolean(value);
+				break;
+		}
+	}
+
+	return fields;
 }
 
 function getFetchQuery(
@@ -84,22 +92,24 @@ function getFetchQuery(
 		select: Query<DBTypes>;
 		workspace?: string;
 	},
-	{ limit, page, tags = [], meta, search, sort }: NotesControllerFetchOptions = {},
+	{
+		limit,
+		page,
+		tags = [],
+		meta: { isDeleted, ...meta } = {},
+		search,
+		deletedAt = {},
+		sort,
+	}: NotesControllerFetchOptions = {},
 ) {
 	if (page !== undefined && page < 1)
 		throw new TypeError('Page value must not be less than 1');
-
-	const metaEntries = Object.entries(
-		formatNoteMeta({
-			isVisible: true,
-			...meta,
-		}),
-	);
 
 	const sortFieldMap: Record<NoteSortField, string> = {
 		id: 'id',
 		createdAt: 'created_at',
 		updatedAt: 'updated_at',
+		deletedAt: 'deleted_at',
 	};
 
 	const withQuery: { name: string; query: Query<DBTypes> }[] = [];
@@ -163,10 +173,29 @@ function getFetchQuery(
 		);
 	}
 
+	const metaEntries = Object.entries(
+		formatNoteMeta({
+			isVisible: true,
+			...meta,
+		}),
+	);
 	if (metaEntries.length > 0) {
 		filterQuery.push(
 			...metaEntries.map(([key, value]) => qb.sql`${qb.raw(key)} = ${value}`),
 		);
+	}
+
+	if (isDeleted !== undefined) {
+		filterQuery.push(
+			qb.sql`deleted_at IS ${isDeleted ? qb.sql`NOT NULL` : qb.sql`NULL`}`,
+		);
+	}
+
+	if (deletedAt.from) {
+		filterQuery.push(qb.sql`deleted_at >= ${deletedAt.from}`);
+	}
+	if (deletedAt.to) {
+		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to}`);
 	}
 
 	// Sort
@@ -256,7 +285,7 @@ export class NotesController implements INotesController {
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
-		const creationTime = new Date().getTime();
+		const creationTime = new Date();
 
 		// Insert data
 		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
@@ -289,15 +318,13 @@ export class NotesController implements INotesController {
 		await this.db.get().transaction(async (tx) => {
 			const db = wrapDB(tx);
 
-			const updateTime = new Date().getTime();
 			const result = await db.query(
 				qb.line(
 					'UPDATE notes SET',
 					qb.values({
 						title: updatedNote.title,
 						text: updatedNote.text,
-						// TODO: should we really update note by update meta?
-						updated_at: updateTime,
+						updated_at: new Date(),
 					}),
 					qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
 				),
@@ -329,6 +356,8 @@ export class NotesController implements INotesController {
 	}
 
 	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
+		if (ids.length === 0) return;
+
 		const db = wrapDB(this.db.get());
 
 		const { affectedRows = 0 } = await db.query(

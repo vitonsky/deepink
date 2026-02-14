@@ -77,7 +77,7 @@ export class NotesImporter {
 	constructor(
 		private readonly storage: {
 			notesRegistry: INotesController;
-			noteVersions: NoteVersions;
+			noteVersions?: NoteVersions;
 			tagsRegistry: TagsController;
 			filesRegistry: FilesController;
 			attachmentsRegistry: AttachmentsController;
@@ -307,7 +307,9 @@ export class NotesImporter {
 				}
 			}
 
-			await noteVersions.snapshot(noteId);
+			if (noteVersions) {
+				await noteVersions.snapshot(noteId);
+			}
 
 			updatingProgress.notify();
 		}

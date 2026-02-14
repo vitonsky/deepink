@@ -17,7 +17,7 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 
 // TODO: notify for successful import
-export const useNotesImport = () => {
+export const useNotesImport = ({ snapshots }: { snapshots?: boolean } = {}) => {
 	const [importSession, setImportSession] = useState<{
 		abortController: AbortController;
 		progress: OnProcessedPayload;
@@ -48,7 +48,7 @@ export const useNotesImport = () => {
 				{
 					filesRegistry,
 					notesRegistry,
-					noteVersions,
+					noteVersions: snapshots ? noteVersions : undefined,
 					attachmentsRegistry,
 					tagsRegistry,
 				},
@@ -60,13 +60,22 @@ export const useNotesImport = () => {
 					throttle: requestAnimationFrame,
 					...options,
 				},
-			).import(files, {
-				abortSignal: abortController.signal,
-				onProcessed(info) {
-					console.log('Import progress', info);
-					onProgress((value) => (value ? { ...value, progress: info } : value));
-				},
-			});
+			)
+				.import(files, {
+					abortSignal: abortController.signal,
+					onProcessed(info) {
+						console.log('Import progress', info);
+						onProgress((value) =>
+							value ? { ...value, progress: info } : value,
+						);
+					},
+				})
+				.catch((error) => {
+					onProgress.flush();
+					setImportSession(null);
+
+					throw error;
+				});
 
 			onProgress.flush();
 			setImportSession(null);
@@ -74,6 +83,7 @@ export const useNotesImport = () => {
 		},
 		[
 			attachmentsRegistry,
+			snapshots,
 			eventBus,
 			filesRegistry,
 			noteVersions,

@@ -50,7 +50,7 @@ test('Clear orphaned files', async () => {
 			const file = await files.get(fileId);
 			expect(file).not.toBeNull();
 
-			const fileBuffer = await (file as File).arrayBuffer();
+			const fileBuffer = await file!.arrayBuffer();
 			const originalFileBuffer = await testFiles[index].arrayBuffer();
 
 			const fileString = Buffer.from(fileBuffer).toString('utf-8');

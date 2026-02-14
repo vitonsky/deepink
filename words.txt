@@ -119,3 +119,5 @@ overscan
 ORDINALITY
 behaviour
 uuidv
+fuzzysort
+dbus

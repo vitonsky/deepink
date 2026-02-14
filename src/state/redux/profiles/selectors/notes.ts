@@ -1,13 +1,12 @@
-import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
+import {
+	createWorkspaceSelector,
+	selectWorkspaceRoot,
+	selectWorkspaceRootSafe,
+} from '../utils';
 
 export const selectWorkspaceName = createWorkspaceSelector(
-	[selectWorkspaceRoot],
-	(workspace) => {
-		if (!workspace) throw new Error('Workspace selector used out of workspace scope');
-
-		const { id, name } = workspace;
-		return { id, name };
-	},
+	[selectWorkspaceRootSafe],
+	({ id, name }) => ({ id, name }),
 );
 
 export const selectNotes = createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
@@ -76,5 +75,18 @@ export const selectRecentlyClosedNotes = createWorkspaceSelector(
 	(workspace) => {
 		if (!workspace) return [];
 		return workspace.recentlyClosedNotes;
+	},
+);
+
+export const selectWorkspaceConfig = createWorkspaceSelector(
+	[selectWorkspaceRootSafe],
+	(workspace) => {
+		return workspace.config;
+	},
+);
+export const selectNewNoteTemplate = createWorkspaceSelector(
+	[selectWorkspaceConfig],
+	(config) => {
+		return config.newNote;
 	},
 );

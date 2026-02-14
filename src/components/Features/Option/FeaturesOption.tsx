@@ -16,7 +16,7 @@ export const FeaturesOption: FC<FeaturesOptionProps> = ({
 			w="100%"
 			sx={{
 				display: 'grid',
-				gridTemplateColumns: '40% auto',
+				gridTemplateColumns: '40% minmax(auto, 60%)',
 				gridRowGap: '50rem',
 			}}
 		>

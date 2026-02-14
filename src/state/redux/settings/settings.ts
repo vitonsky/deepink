@@ -1,62 +1,87 @@
-import { accentColorsMap } from '@features/ThemeProvider';
+import z from 'zod';
+import { accentColorsMap } from '@features/accentColorsMap';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
 
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
-export type GlobalSettings = {
-	editorMode: EditorMode;
+export const settingsScheme = z.object({
+	checkForUpdates: z.boolean(),
+	theme: z.object({
+		name: z.union([
+			z.literal('auto'),
+			z.literal('light'),
+			z.literal('dark'),
+			z.literal('zen'),
+		]),
+		accentColor: z.string().optional(),
+	}),
+
+	editor: z.object({
+		mode: z.union([
+			z.literal('plaintext'),
+			z.literal('richtext'),
+			z.literal('split-screen'),
+		]),
+		fontFamily: z.string(),
+		fontSize: z.number(),
+		lineHeight: z.number(),
+		miniMap: z.boolean(),
+		lineNumbers: z.boolean(),
+		dateFormat: z.string(),
+	}),
+
+	vaultLock: z.object({
+		lockAfterIdle: z.number().nullable(),
+		lockOnSystemLock: z.boolean(),
+	}),
+});
+
+export type GlobalSettings = z.output<typeof settingsScheme>;
+
+export const defaultSettings = {
+	checkForUpdates: true,
 	theme: {
-		name: 'auto' | 'light' | 'dark' | 'zen';
-		accentColor?: string;
-	};
+		name: 'auto',
+		accentColor: 'auto',
+	},
 	editor: {
-		fontFamily: string;
-		fontSize: number;
-		lineHeight: number;
-		miniMap: boolean;
-		lineNumbers: boolean;
-	};
-	preferences: {
-		/**
-		 * Indicates if a confirmation is required before moving note to the bin
-		 */
-		confirmBeforeMoveToBin: boolean;
-	};
-};
+		mode: 'plaintext',
+		fontFamily: '',
+		fontSize: 16,
+		lineHeight: 1.6,
+		miniMap: false,
+		lineNumbers: false,
+		dateFormat: 'D MMM YYYY, HH:mm',
+	},
+	vaultLock: {
+		lockAfterIdle: null,
+		lockOnSystemLock: false,
+	},
+} satisfies GlobalSettings as GlobalSettings;
 
 export const settingsSlice = createSlice({
 	name: 'settings',
-	initialState: {
-		editorMode: 'plaintext',
-		theme: {
-			name: 'auto',
-			accentColor: 'auto',
-		},
-		editor: {
-			fontFamily:
-				// eslint-disable-next-line @cspell/spellchecker
-				'-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Segoe UI Variable", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", Arial, system-ui, sans-serif',
-			fontSize: 18,
-			lineHeight: 1.5,
-			miniMap: false,
-			lineNumbers: false,
-		},
-		preferences: {
-			confirmBeforeMoveToBin: false,
-		},
-	} satisfies GlobalSettings as GlobalSettings,
+	initialState: defaultSettings,
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
 			return { ...state, ...payload } as GlobalSettings;
 		},
+
 		setEditorMode: (
 			state,
-			{ payload }: PayloadAction<GlobalSettings['editorMode']>,
+			{ payload }: PayloadAction<GlobalSettings['editor']['mode']>,
 		) => {
-			return { ...state, editorMode: payload } as GlobalSettings;
+			state.editor.mode = payload;
 		},
+		setEditorConfig: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['editor']>>,
+		) => {
+			state.editor = { ...state.editor, ...payload };
+		},
+
 		setTheme: (
 			state,
 			{ payload }: PayloadAction<Partial<GlobalSettings['theme']>>,
@@ -68,11 +93,22 @@ export const settingsSlice = createSlice({
 
 			return { ...state, theme } as GlobalSettings;
 		},
-		setPreferences: (
+
+		setVaultLockConfig: (
 			state,
-			{ payload }: PayloadAction<GlobalSettings['preferences']>,
+			{ payload }: PayloadAction<Partial<GlobalSettings['vaultLock']>>,
 		) => {
-			return { ...state, preferences: payload } as GlobalSettings;
+			state.vaultLock = {
+				...state.vaultLock,
+				...payload,
+			};
+		},
+
+		setCheckForUpdates: (
+			state,
+			{ payload }: PayloadAction<Partial<GlobalSettings['checkForUpdates']>>,
+		) => {
+			state.checkForUpdates = payload;
 		},
 	},
 });
@@ -83,7 +119,7 @@ export const selectSettings = settingsSlice.selectSlice;
 
 export const selectEditorMode = createAppSelector(
 	selectSettings,
-	(settings) => settings.editorMode,
+	(settings) => settings.editor.mode,
 );
 
 export const selectTheme = createAppSelector(

@@ -1,9 +1,40 @@
+import z from 'zod';
 import { INote, NoteId } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { createAppSelector } from '../utils';
 import { findNearNote } from './utils';
+
+type ProfileMutator<T extends {}> = (profile: ProfileData, payload: T) => void;
+
+export const defaultVaultConfig = {
+	filesIntegrity: {
+		enabled: false,
+	},
+	snapshots: {
+		enabled: true,
+		interval: 30_000,
+	},
+	deletion: {
+		confirm: false,
+		permanentDeletion: false,
+		bin: {
+			autoClean: false,
+			cleanInterval: 30,
+		},
+	},
+} satisfies ProfileConfig;
+
+export function createProfileReducer<T extends {} = {}>(mutator: ProfileMutator<T>) {
+	return (state: ProfilesState, { payload }: PayloadAction<ProfileScoped<T>>) => {
+		const { profileId, ...rest } = payload;
+		const profile = state.profiles[profileId];
+		if (profile) {
+			mutator(profile, rest as unknown as T);
+		}
+	};
+}
 
 const selectWorkspaceObject = (
 	state: ProfilesState,
@@ -42,6 +73,13 @@ export const createWorkspaceObject = (workspace: {
 		selected: null,
 		list: [],
 	},
+
+	config: {
+		newNote: {
+			title: 'Untitled - {date:D MMM YYYY, HH:mm}',
+			tags: 'selected',
+		},
+	},
 });
 
 export type ProfileScoped<T extends {} = {}> = T & {
@@ -51,6 +89,13 @@ export type WorkspaceScoped<T extends {} = {}> = T &
 	ProfileScoped<{
 		workspaceId: string;
 	}>;
+
+export const WorkspaceConfigScheme = z.object({
+	newNote: z.object({
+		title: z.string(),
+		tags: z.union([z.literal('none'), z.literal('selected')]),
+	}),
+});
 
 export type WorkspaceData = {
 	id: string;
@@ -77,11 +122,35 @@ export type WorkspaceData = {
 		selected: string | null;
 		list: IResolvedTag[];
 	};
+
+	config: z.output<typeof WorkspaceConfigScheme>;
 };
+
+export const ProfileConfigScheme = z.object({
+	filesIntegrity: z.object({
+		enabled: z.boolean(),
+	}),
+	snapshots: z.object({
+		enabled: z.boolean(),
+		interval: z.number(),
+	}),
+	deletion: z.object({
+		confirm: z.boolean(),
+		permanentDeletion: z.boolean(),
+		bin: z.object({
+			autoClean: z.boolean(),
+			cleanInterval: z.number(),
+		}),
+	}),
+});
+
+export type ProfileConfig = z.output<typeof ProfileConfigScheme>;
 
 export type ProfileData = {
 	activeWorkspace: string | null;
 	workspaces: Record<string, WorkspaceData | undefined>;
+
+	config: ProfileConfig;
 };
 
 export type ProfilesState = {
@@ -333,6 +402,62 @@ export const profilesSlice = createSlice({
 
 			workspace.view = view;
 		},
+
+		setWorkspaceNoteTemplateConfig: (
+			state,
+			{
+				payload: { profileId, workspaceId, ...props },
+			}: PayloadAction<
+				WorkspaceScoped<Partial<WorkspaceData['config']['newNote']>>
+			>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.config.newNote = { ...workspace.config.newNote, ...props };
+		},
+
+		setSnapshotsConfig: createProfileReducer(
+			(profile, payload: Partial<ProfileData['config']['snapshots']>) => {
+				profile.config.snapshots = {
+					...profile.config.snapshots,
+					...payload,
+				};
+			},
+		),
+
+		setNoteDeletionConfig: createProfileReducer(
+			(
+				profile,
+				payload: Partial<
+					Pick<
+						ProfileData['config']['deletion'],
+						'permanentDeletion' | 'confirm'
+					>
+				>,
+			) => {
+				profile.config.deletion = {
+					...profile.config.deletion,
+					...payload,
+				};
+			},
+		),
+		setBinAutoDeletionConfig: createProfileReducer(
+			(profile, payload: Partial<ProfileData['config']['deletion']['bin']>) => {
+				profile.config.deletion.bin = {
+					...profile.config.deletion.bin,
+					...payload,
+				};
+			},
+		),
+		setFilesIntegrityConfig: createProfileReducer(
+			(profile, payload: Partial<ProfileData['config']['filesIntegrity']>) => {
+				profile.config.filesIntegrity = {
+					...profile.config.filesIntegrity,
+					...payload,
+				};
+			},
+		),
 	},
 });
 

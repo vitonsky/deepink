@@ -4,8 +4,9 @@ import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
 import { createEncryption } from '@core/features/encryption/createEncryption';
+import { IFilesStorage } from '@core/features/files';
+import { EncryptedFS } from '@core/features/files/EncryptedFS';
 import { FileController } from '@core/features/files/FileController';
-import { FileControllerWithEncryption } from '@core/features/files/FileControllerWithEncryption';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import {
 	openDatabase,
@@ -21,6 +22,7 @@ export type ProfileContainer = {
 	profile: ProfileEntry;
 	db: PGLiteDatabase;
 	encryptionController: EncryptionController;
+	files: IFilesStorage;
 };
 
 const decryptKey = async ({
@@ -102,12 +104,14 @@ export const useProfileContainers = () => {
 				encryptionController = encryption.getContent();
 			}
 
+			const encryptedProfileFS = new EncryptedFS(
+				profileFilesController,
+				encryptionController,
+			);
+
 			// Setup DB
 			const db = await openDatabase(
-				new FileControllerWithEncryption(
-					new FileController('deepink.db', profileFilesController),
-					encryptionController,
-				),
+				new FileController('deepink.db', encryptedProfileFS),
 			);
 
 			// Ensure at least one workspace exists
@@ -133,6 +137,7 @@ export const useProfileContainers = () => {
 					db,
 					profile: profileObject,
 					encryptionController,
+					files: encryptedProfileFS,
 				},
 				async () => {
 					// TODO: remove key of RAM. Set control with callback to remove key

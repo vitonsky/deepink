@@ -1,4 +1,3 @@
-/* eslint-disable @cspell/spellchecker */
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
@@ -12,7 +11,7 @@ import {
 	PGLiteDatabase,
 } from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
-import { wait } from '@utils/tests';
+import { wait } from '@utils/time';
 
 import { NotesImporter, OnProcessedPayload } from '.';
 
@@ -325,6 +324,78 @@ describe('Base notes import cases', () => {
 				resolvedName: 'paths',
 			}),
 		]);
+	});
+});
+
+describe('Invalid imports', () => {
+	const dbFile = createFileControllerMock();
+	const dbPromise = openDatabase(dbFile);
+
+	const fileManager = createFileManagerMock();
+	const createAppContext = createAppContextIterator();
+
+	afterAll(async () => {
+		const db = await dbPromise;
+		await db.close();
+	});
+
+	test('Empty files list imports nothing', async () => {
+		const db = await dbPromise;
+		const appContext = createAppContext(db, fileManager);
+
+		await expect(
+			new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'always',
+			}).import(createFileManagerMock({})),
+		).resolves.not.toThrow();
+
+		await expect(appContext.notesRegistry.get()).resolves.toEqual([]);
+	});
+
+	test('If nothing match note paths - imports nothing', async () => {
+		const db = await dbPromise;
+		const appContext = createAppContext(db, fileManager);
+
+		await expect(
+			new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'always',
+			}).import(
+				createFileManagerMock({
+					'/picture.jpeg': new ArrayBuffer(100),
+				}),
+			),
+		).resolves.not.toThrow();
+
+		await expect(appContext.notesRegistry.get()).resolves.toEqual([]);
+	});
+
+	test('Invalid notes must be imported with read bytes as text', async () => {
+		const db = await dbPromise;
+		const appContext = createAppContext(db, fileManager);
+
+		await expect(
+			new NotesImporter(appContext, {
+				noteExtensions: ['.md'],
+				convertPathToTag: 'always',
+			}).import(
+				createFileManagerMock({
+					'/invalid.md': new ArrayBuffer(100),
+				}),
+			),
+		).resolves.not.toThrow();
+
+		await expect(appContext.notesRegistry.get()).resolves.toEqual([
+			expect.objectContaining({
+				content: {
+					title: 'invalid',
+					text: expect.any(String),
+				},
+			}),
+		]);
+
+		await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([]);
 	});
 });
 

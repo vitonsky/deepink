@@ -18,11 +18,11 @@ test('Write files', async () => {
 
 	await filesController.write(
 		'test.txt',
-		new Uint8Array(Buffer.from('File text content')).buffer as ArrayBuffer,
+		new Uint8Array(Buffer.from('File text content')).buffer,
 	);
 	await filesController.write(
 		'/foo/bar/baz/test.txt',
-		new Uint8Array(Buffer.from('File text content')).buffer as ArrayBuffer,
+		new Uint8Array(Buffer.from('File text content')).buffer,
 	);
 
 	expect(vol.readdirSync('/', { recursive: true })).toMatchSnapshot(

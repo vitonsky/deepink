@@ -4,6 +4,7 @@ import { AttachmentsController } from '../attachments/AttachmentsController';
 import { IFilesStorage } from '../files';
 import { FilesController } from '../files/FilesController';
 
+// TODO: attach files to a note versions, and never delete attached files that is used at least in one version
 export class FilesIntegrityController {
 	constructor(
 		private readonly workspace: string,
@@ -21,6 +22,9 @@ export class FilesIntegrityController {
 		await this.deleteUnattachedFiles();
 	}
 
+	/**
+	 * Delete files that is in vault directory, but not listed in database
+	 */
 	public async deleteOrphanedFilesInFs() {
 		const filePathsInDB = await this.controllers.files
 			.query()
@@ -39,6 +43,9 @@ export class FilesIntegrityController {
 		await this.files.delete(orphanedFilePaths);
 	}
 
+	/**
+	 * Delete files that is not attached to any note
+	 */
 	public async deleteUnattachedFiles() {
 		const attachedFileIds = await this.controllers.attachments
 			.query()
@@ -59,20 +66,22 @@ export class FilesIntegrityController {
 		await this.controllers.files.delete(unattachedFileIds);
 	}
 
+	/**
+	 * Delete an attachments that refers to a non exists files
+	 */
 	public async fixAttachments() {
-		const filesId = await this.controllers.files
+		const fileIds = await this.controllers.files
 			.query()
 			.then((files) => new Set(files.map((file) => file.id)));
+
 		const attachments = await this.controllers.attachments.query();
+		const notFoundFileIds = attachments
+			.values()
+			.map((attachment) => attachment.file)
+			.filter((fileId) => !fileIds.has(fileId))
+			.toArray();
 
-		const lostFilesId: string[] = [];
-		attachments.forEach((attachment) => {
-			if (!filesId.has(attachment.file)) {
-				lostFilesId.push(attachment.file);
-			}
-		});
-
-		await this.controllers.attachments.delete(lostFilesId);
+		await this.controllers.attachments.delete(notFoundFileIds);
 	}
 
 	/**

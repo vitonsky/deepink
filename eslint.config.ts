@@ -24,7 +24,6 @@ export default tseslint.config(
 	tseslint.configs.stylisticTypeCheckedOnly,
 	tseslint.configs.recommendedTypeChecked,
 	globalIgnores([
-		'**/*.test.ts',
 		// Use ignore rules from `.prettierignore`
 		...readLinesInFile('.prettierignore').filter(
 			(rule) => rule && !rule.startsWith('#'),
@@ -77,7 +76,7 @@ export default tseslint.config(
 			'import/no-useless-path-segments': ['error', { noUselessIndex: true }],
 			'import/no-unresolved': [
 				'error',
-				{ ignore: ['^vitest/config', '^@docusaurus/', '^@site/'] },
+				{ ignore: ['^vitest/config', '^@docusaurus/', '^@site/', '^@assets/'] },
 			],
 			'import/export': 'off',
 			'import/namespace': 'warn',
@@ -255,6 +254,14 @@ export default tseslint.config(
 					// custom hooks with deps
 					additionalHooks:
 						'(useEqualMemo|useImmutableCallback|useIsomorphicLayoutEffect)',
+				},
+			],
+
+			'react/jsx-curly-brace-presence': [
+				'error',
+				{
+					props: 'never',
+					children: 'never',
 				},
 			],
 		},

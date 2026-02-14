@@ -143,13 +143,13 @@ describe('data fetching', () => {
 
 		await expect(
 			registry.get({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
+				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')!.id],
 			}),
 		).resolves.toHaveLength(1);
 
 		await expect(
 			registry.get({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string],
+				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')!.id],
 			}),
 		).resolves.toHaveLength(1);
 
@@ -184,7 +184,7 @@ describe('data fetching', () => {
 
 		const tagsList = await tags.getTags();
 
-		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')?.id as string;
+		const barTag = tagsList.find((tag) => tag.resolvedName === 'bar')!.id;
 		const [{ id: noteId }] = await registry.get({
 			limit: 1,
 			tags: [barTag],
@@ -220,10 +220,75 @@ describe('data fetching', () => {
 			.then((notes) => notes.map((note) => note.id));
 
 		// update status for 10 notes
+		vi.setSystemTime('2020-01-01T15:00:00.000Z');
 		await registry.updateMeta(notesId, { isDeleted: true });
 		await expect(registry.get({ meta: { isDeleted: true } })).resolves.toHaveLength(
 			10,
 		);
+
+		await expect(
+			registry.get({
+				deletedAt: {
+					from: new Date('2020-01-01T15:00:00.000Z'),
+					to: new Date('2020-01-01T15:00:00.000Z'),
+				},
+			}),
+			'Must find by exact time',
+		).resolves.toHaveLength(10);
+
+		await expect(
+			registry.get({
+				deletedAt: {
+					from: new Date('2020-01-01T15:00:00.000Z'),
+				},
+			}),
+			'Must find by exact "from" time',
+		).resolves.toHaveLength(10);
+
+		await expect(
+			registry.get({
+				deletedAt: {
+					from: new Date('2020-01-01T14:00:00.000Z'),
+				},
+			}),
+			'Must find by "from" time before deletion',
+		).resolves.toHaveLength(10);
+
+		await expect(
+			registry.get({
+				deletedAt: {
+					from: new Date('2020-01-01T15:00:00.001Z'),
+				},
+			}),
+			'Must not find by "from" time after deletion',
+		).resolves.toHaveLength(0);
+
+		await expect(
+			registry.get({
+				deletedAt: {
+					to: new Date('2020-01-01T15:00:00.000Z'),
+				},
+			}),
+			'Must find by exact "to" time',
+		).resolves.toHaveLength(10);
+
+		await expect(
+			registry.get({
+				deletedAt: {
+					to: new Date('2020-01-01T15:00:00.001Z'),
+				},
+			}),
+			'Must find by "to" time after deletion',
+		).resolves.toHaveLength(10);
+
+		await expect(
+			registry.get({
+				deletedAt: {
+					to: new Date('2020-01-01T14:00:00.000Z'),
+				},
+			}),
+			'Must not find by "to" time before deletion',
+		).resolves.toHaveLength(0);
 
 		// check only not deleted notes
 		await expect(registry.get({ meta: { isDeleted: false } })).resolves.toHaveLength(

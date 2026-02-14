@@ -1,30 +1,15 @@
-import { z } from 'zod';
-import { selectSettings, settingsApi } from '@state/redux/settings/settings';
+import {
+	selectSettings,
+	settingsApi,
+	settingsScheme,
+} from '@state/redux/settings/settings';
 import { AppStore } from '@state/redux/store';
 
 export const loadStore = (store: AppStore) => {
 	const rawSettings = localStorage.getItem('settings');
 	if (rawSettings) {
 		try {
-			const settings = z
-				.object({
-					editorMode: z.union([
-						z.literal('plaintext'),
-						z.literal('richtext'),
-						z.literal('split-screen'),
-					]),
-					theme: z.object({
-						name: z.union([
-							z.literal('auto'),
-							z.literal('light'),
-							z.literal('dark'),
-							z.literal('zen'),
-						]),
-						accentColor: z.string().optional(),
-					}),
-				})
-				.partial()
-				.safeParse(JSON.parse(rawSettings));
+			const settings = settingsScheme.partial().safeParse(JSON.parse(rawSettings));
 
 			if (settings.data) {
 				store.dispatch(settingsApi.setSettings(settings.data));

@@ -4,18 +4,15 @@ import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { SplashScreen } from '@features/SplashScreen';
 
+import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
-import { SettingsWindow } from './Settings/SettingsWindow';
-import { useAppUpdater } from './useAppUpdater';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
 
 export const App: FC = () => {
-	useAppUpdater();
-
 	const [config] = useState(
 		() =>
 			new ConfigStorage(
@@ -98,7 +95,7 @@ export const App: FC = () => {
 			}}
 		>
 			<Profiles profilesApi={profileContainers} />
-			<SettingsWindow />
+			<AppServices />
 		</Box>
 	);
 };

@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { DebouncedPromises } from '@utils/debounce/DebouncedPromises';
 
-import { IFileController } from '../files';
+import { IFileController } from '.';
 
 export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 	constructor(
@@ -8,16 +9,30 @@ export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 		private readonly scheme: T,
 		private readonly config: {
 			defaultValue?: D;
+			ignoreFileReadErrors?: boolean;
+			ignoreParsingErrors?: boolean;
 		} = {},
 	) {}
 
 	async get(
 		options: { onError?: (error: unknown) => void } = {},
 	): Promise<void extends D ? z.TypeOf<T> | null : z.TypeOf<T>> {
-		const { defaultValue = null } = this.config;
+		const {
+			defaultValue = null,
+			ignoreParsingErrors = true,
+			ignoreFileReadErrors,
+		} = this.config;
 
 		// Parse data in state file
-		const rawJson = await this.file.get();
+		const rawJson = await this.file.get().catch((error) => {
+			if (ignoreFileReadErrors) {
+				console.error(error);
+				if (options.onError) options.onError(error);
+				return null;
+			}
+
+			throw error;
+		});
 		if (!rawJson)
 			return defaultValue as void extends D ? z.TypeOf<T> | null : z.TypeOf<T>;
 
@@ -26,19 +41,24 @@ export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
 				JSON.parse(new TextDecoder().decode(rawJson)),
 			);
 			if (parseResult.success) return parseResult.data;
+			else if (!ignoreParsingErrors) throw parseResult.error;
 		} catch (error) {
+			if (!ignoreParsingErrors) throw error;
 			if (options.onError) options.onError(error);
 		}
 
 		return defaultValue as void extends D ? z.TypeOf<T> | null : z.TypeOf<T>;
 	}
 
+	private readonly queue = new DebouncedPromises();
 	async set(value: z.TypeOf<T>): Promise<void> {
 		const validValue = this.scheme.parse(value);
 
-		await this.file.write(
-			new TextEncoder().encode(JSON.stringify(validValue)).buffer,
-		);
+		await this.queue.add(async () => {
+			await this.file.write(
+				new TextEncoder().encode(JSON.stringify(validValue)).buffer,
+			);
+		});
 	}
 
 	async clean(): Promise<void> {

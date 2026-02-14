@@ -1,185 +1,188 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import {
-	Button,
-	Divider,
-	Input,
+	FaFileImport,
+	FaGear,
+	FaInbox,
+	FaKeyboard,
+	FaPalette,
+	FaVault,
+} from 'react-icons/fa6';
+import {
 	Modal,
 	ModalBody,
 	ModalCloseButton,
 	ModalContent,
 	ModalHeader,
 	ModalOverlay,
-	Select,
-	Switch,
-	VStack,
+	Tab,
+	TabList,
+	TabPanel,
+	TabPanels,
+	Tabs,
+	Text,
 } from '@chakra-ui/react';
-import { Features } from '@components/Features/Features';
-import { FeaturesGroup } from '@components/Features/Group';
-import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
+import { TextWithIcon } from '@components/TextWithIcon';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useCommandCallback } from '@hooks/commands/useCommandCallback';
-import { useAppSelector } from '@state/redux/hooks';
-import { selectTheme, settingsApi } from '@state/redux/settings/settings';
-import { getDevicePixelRatio } from '@utils/os/zoom';
+import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 
-import { AppZoomLevel } from './AppZoomLevel';
-import { ColorPicker } from './ColorPicker';
+import { AppearanceSettings } from './sections/appearance';
+import { GeneralSettings } from './sections/GeneralSettings';
+import { HotKeysSettings } from './sections/HotKeysSettings';
+import { ImportAndExport } from './sections/ImportAndExport';
+import { VaultSettings } from './sections/VaultSettings';
+import { WorkspaceSettings } from './sections/WorkspaceSettings';
 
+// TODO: add icons
+type SettingsSection = {
+	id: string;
+	title: string;
+	component: React.ComponentType;
+	icon?: React.ComponentType;
+};
+
+const tabs: SettingsSection[] = [
+	{
+		id: 'general',
+		title: 'General',
+		component: GeneralSettings,
+		icon: FaGear,
+	},
+	{
+		id: 'appearance',
+		title: 'Appearance',
+		component: AppearanceSettings,
+		icon: FaPalette,
+	},
+	{
+		id: 'hotkeys',
+		title: 'Hotkeys',
+		component: HotKeysSettings,
+		icon: FaKeyboard,
+	},
+];
+
+const vaultTabs: SettingsSection[] = [
+	{
+		id: 'vault',
+		title: 'Vault',
+		component: VaultSettings,
+		icon: FaVault,
+	},
+	{
+		id: 'workspace',
+		title: 'Workspace',
+		component: WorkspaceSettings,
+		icon: FaInbox,
+	},
+	{
+		id: 'import-and-export',
+		title: 'Import & Export',
+		component: ImportAndExport,
+		icon: FaFileImport,
+	},
+];
+
+// TODO: add help section with links
 export const SettingsWindow = () => {
-	const theme = useAppSelector(selectTheme);
-	const dispatch = useDispatch();
-
 	const [isOpen, setIsOpen] = useState(false);
 
-	useCommandCallback(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS, () => {
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS, () => {
 		setIsOpen(true);
 	});
 
 	return (
-		<Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size="4xl">
+		<Modal
+			isOpen={isOpen}
+			onClose={() => setIsOpen(false)}
+			size="4xl"
+			closeOnEsc={false}
+		>
 			<ModalOverlay />
-			<ModalContent w="800">
-				<ModalHeader>Preferences</ModalHeader>
+			<ModalContent maxWidth="800px" minHeight="500px">
+				<ModalHeader paddingInline="1rem">Preferences</ModalHeader>
 				<ModalCloseButton />
-				<ModalBody>
-					<VStack w="100%" minH="100%" p="2rem" justifyContent="center">
-						<Features maxWidth="600px">
-							<FeaturesGroup title="Appearance">
-								<FeaturesOption title="Theme">
-									<Select
-										value={theme.name}
-										size="sm"
-										width="auto"
-										onChange={(e) => {
-											dispatch(
-												settingsApi.setTheme({
-													name: e.target.value as any,
-												}),
-											);
-										}}
+				<ModalBody paddingInline="1rem" paddingBlockEnd="2rem">
+					<Tabs
+						orientation="vertical"
+						gap="1rem"
+						isLazy
+						lazyBehavior="keepMounted"
+					>
+						<TabList
+							display="flex"
+							flexWrap="wrap"
+							width="200px"
+							gap="1px"
+							flexShrink={0}
+						>
+							{tabs.map((tab) => {
+								return (
+									<Tab
+										key={tab.id}
+										justifyContent="start"
+										borderRadius="4px"
+										padding=".3rem .5rem"
 									>
-										<option
-											value="auto"
-											title="Follow the system styles"
+										<TextWithIcon icon={tab.icon && <tab.icon />}>
+											{tab.title}
+										</TextWithIcon>
+									</Tab>
+								);
+							})}
+
+							<Text fontWeight="bold" marginTop="2rem">
+								Vault Settings
+							</Text>
+							{vaultTabs.map((tab) => {
+								return (
+									<Tab
+										key={tab.id}
+										justifyContent="start"
+										borderRadius="4px"
+										padding=".3rem .5rem"
+									>
+										<TextWithIcon icon={tab.icon && <tab.icon />}>
+											{tab.title}
+										</TextWithIcon>
+									</Tab>
+								);
+							})}
+						</TabList>
+
+						<TabPanels maxWidth="600px" minWidth="400px" width="100%">
+							{tabs.map((tab) => {
+								return (
+									<TabPanel key={tab.id} padding={0}>
+										{tab.id !== 'general' && (
+											<Text
+												fontSize="1.5rem"
+												lineHeight="1"
+												marginBottom="1rem"
+											>
+												{tab.title}
+											</Text>
+										)}
+										<tab.component />
+									</TabPanel>
+								);
+							})}
+
+							{vaultTabs.map((tab) => {
+								return (
+									<TabPanel key={tab.id} padding={0}>
+										<Text
+											fontSize="1.5rem"
+											lineHeight="1"
+											marginBottom="1rem"
 										>
-											Auto
-										</option>
-										<option value="dark">Dark</option>
-										<option value="light">Light</option>
-										<option value="zen">Zen</option>
-									</Select>
-								</FeaturesOption>
-
-								<FeaturesOption
-									title="Accent color"
-									description={
-										theme.name === 'zen'
-											? 'Accent color is not applicable to selected theme.'
-											: undefined
-									}
-								>
-									<ColorPicker
-										isDisabled={theme.name === 'zen'}
-										color={theme.accentColor}
-										onChange={(color) => {
-											dispatch(
-												settingsApi.setTheme({
-													accentColor: color,
-												}),
-											);
-										}}
-									/>
-								</FeaturesOption>
-
-								<Divider />
-
-								<FeaturesOption
-									title="Zoom level"
-									description={`Adjust the default zoom level for all windows.\nIn case your system does not scale an apps automatically, you may change a zoom to make it fit an actual display pixel ratio (DPR). Detected DPR is ${getDevicePixelRatio()}.`}
-								>
-									<AppZoomLevel />
-								</FeaturesOption>
-							</FeaturesGroup>
-
-							<FeaturesGroup title="Database settings">
-								<FeaturesOption title="Database name">
-									<Input
-										placeholder="Enter database name"
-										defaultValue="My database"
-										size="sm"
-									/>
-								</FeaturesOption>
-
-								<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password.">
-									<Switch size="sm">
-										Remember workspaces passwords
-									</Switch>
-								</FeaturesOption>
-							</FeaturesGroup>
-
-							<FeaturesGroup title="Encryption">
-								<FeaturesOption title="Encryption algorithm">
-									<Select defaultValue="aes" size="sm">
-										{[
-											{
-												value: 'none',
-												text: 'None',
-											},
-											{
-												value: 'aes',
-												text: 'AES',
-											},
-											{
-												value: 'twofish',
-												text: 'Twofish',
-											},
-										].map(({ value, text }) => (
-											<option key={value} value={value}>
-												{text}
-											</option>
-										))}
-									</Select>
-								</FeaturesOption>
-
-								<FeaturesOption title="Password">
-									<Button size="sm">Update password</Button>
-								</FeaturesOption>
-							</FeaturesGroup>
-
-							<FeaturesGroup title="Synchronization">
-								<FeaturesOption description="Sync all data in database between your devices, to not loose it. All data are encrypted.">
-									<Switch size="sm">Enable synchronization</Switch>
-								</FeaturesOption>
-								<FeaturesOption title="Synchronization method">
-									<Select defaultValue="fs" size="sm">
-										{[
-											{
-												value: 'fs',
-												text: 'File system',
-											},
-											{
-												value: 'server',
-												text: 'Server',
-											},
-										].map(({ value, text }) => (
-											<option key={value} value={value}>
-												{text}
-											</option>
-										))}
-									</Select>
-								</FeaturesOption>
-								<FeaturesOption title="Synchronization directory">
-									<Input
-										size="sm"
-										placeholder="Enter path on directory"
-										defaultValue="/foo/bar"
-										disabled
-									/>
-								</FeaturesOption>
-							</FeaturesGroup>
-						</Features>
-					</VStack>
+											{tab.title}
+										</Text>
+										<tab.component />
+									</TabPanel>
+								);
+							})}
+						</TabPanels>
+					</Tabs>
 				</ModalBody>
 			</ModalContent>
 		</Modal>
