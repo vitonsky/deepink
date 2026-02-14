@@ -94,7 +94,7 @@ export enum GLOBAL_COMMANDS {
 }
 
 type CommandsWithPayload = {
-	[GLOBAL_COMMANDS.DELETE_NOTE]: { noteId: string; permanently: boolean };
+	[GLOBAL_COMMANDS.DELETE_NOTE]: { noteId: string; permanently?: boolean };
 	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { noteId: string };
 
 	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { noteId: string };

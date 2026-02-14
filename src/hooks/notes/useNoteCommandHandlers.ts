@@ -40,46 +40,48 @@ export const useNoteCommandHandlers = () => {
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
 	const deletionConfig = useVaultSelector(selectDeletionConfig);
+
 	const eventBus = useEventBus();
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE,
 		async ({ noteId, permanently }) => {
-			if (permanently) {
-				if (
-					deletionConfig.confirm &&
-					!confirm(`Do you want to permanently delete this note?`)
-				)
-					return;
+			const note = await notes.getById(noteId);
+			if (!note) return;
 
-				noteActions.close(noteId);
+			const shouldDeletePermanently =
+				deletionConfig.permanentDeletion || permanently || note.isDeleted;
 
+			const confirmMessage = shouldDeletePermanently
+				? `Do you want to permanently delete this note?`
+				: `Do you want to move this note to the bin?`;
+
+			if (deletionConfig.confirm && !confirm(confirmMessage)) return;
+
+			noteActions.close(noteId);
+
+			if (shouldDeletePermanently) {
 				await notes.delete([noteId]);
 				await tagsRegistry.setAttachedTags(noteId, []);
 
 				eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
 			} else {
-				if (
-					deletionConfig.confirm &&
-					!confirm(`Do you want to move this note to the bin?`)
-				)
-					return;
-
-				noteActions.close(noteId);
-
 				await notes.updateMeta([noteId], { isDeleted: true });
+
 				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 			}
 
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-				permanently,
-			});
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, { permanently });
 		},
 	);
 
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN,
 		async ({ noteId }) => {
+			// only deleted note can be restored
+			const note = await notes.getById(noteId);
+			if (note && !note.isDeleted) return;
+
 			await notes.updateMeta([noteId], { isDeleted: false });
 			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 
