@@ -74,9 +74,12 @@ export const useWorkspaceShortcutHandlers = () => {
 		},
 	};
 
-	useWorkspaceCommandCallback(GLOBAL_COMMANDS.SHORTCUTS_PRESSED, (pressedShortcut) => {
-		const commandToExecute = shortcutToCommandMap[pressedShortcut];
-		if (!commandToExecute) return;
-		commandToExecute();
-	});
+	useWorkspaceCommandCallback(
+		GLOBAL_COMMANDS.SHORTCUTS_PRESSED,
+		({ shortcuts: pressedShortcut }) => {
+			const commandToExecute = shortcutToCommandMap[pressedShortcut];
+			if (!commandToExecute) return;
+			commandToExecute();
+		},
+	);
 };
