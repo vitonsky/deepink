@@ -53,7 +53,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		count: notes.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
-		overscan: 10,
+		overscan: 7,
 		useFlushSync: false,
 	});
 
