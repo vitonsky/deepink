@@ -92,7 +92,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 					closeNote(id);
 
 					await notes.updateMeta([id], { isDeleted: true });
-					const updatedNote = await notes.getById(id);
+					const [updatedNote] = await notes.getById([id]);
 					if (updatedNote) noteUpdated(updatedNote);
 
 					updateNotes();
@@ -123,7 +123,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 
 				[NoteActions.RESTORE_FROM_BIN]: async (id: string) => {
 					await notes.updateMeta([id], { isDeleted: false });
-					const updatedNote = await notes.getById(id);
+					const [updatedNote] = await notes.getById([id]);
 					if (updatedNote) noteUpdated(updatedNote);
 
 					updateNotes();
@@ -132,7 +132,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				},
 
 				[NoteActions.DUPLICATE]: async (id: string) => {
-					const sourceNote = await notes.getById(id);
+					const [sourceNote] = await notes.getById([id]);
 
 					if (!sourceNote) {
 						console.warn(`Not found note with id ${sourceNote}`);
@@ -154,7 +154,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				},
 
 				[NoteActions.COPY_MARKDOWN_LINK]: async (id: string) => {
-					const note = await notes.getById(id);
+					const [note] = await notes.getById([id]);
 					if (!note) {
 						console.error(`Can't get data of note #${id}`);
 						return;
@@ -172,7 +172,7 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				},
 
 				[NoteActions.EXPORT]: async (id: string) => {
-					const note = await notes.getById(id);
+					const [note] = await notes.getById([id]);
 					await notesExport.exportNote(
 						id,
 						buildFileName(

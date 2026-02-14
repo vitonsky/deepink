@@ -10,7 +10,7 @@ export const useNotesControl = () => {
 
 	const open = useCallback(
 		async (id: string) => {
-			const note = await notesRegistry.getById(id);
+			const [note] = await notesRegistry.getById([id]);
 			if (!note) return false;
 
 			openNote(note);

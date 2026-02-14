@@ -55,7 +55,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 			eventBus.listen(WorkspaceEvents.NOTES_UPDATED, updateNotes),
 			eventBus.listen(WorkspaceEvents.NOTE_UPDATED, (noteId) => {
 				updateNotes();
-				notesRegistry.getById(noteId).then((note) => {
+				notesRegistry.getById([noteId]).then(([note]) => {
 					if (note) noteUpdated(note);
 				});
 			}),

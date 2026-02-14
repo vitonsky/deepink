@@ -244,17 +244,23 @@ export class NotesController implements INotesController {
 		this.workspace = workspace;
 	}
 
-	public async getById(id: NoteId): Promise<INote | null> {
+	public async getById(ids: NoteId[]): Promise<INote[]> {
 		const db = wrapDB(this.db.get());
 
-		const {
-			rows: [note],
-		} = await db.query(
-			qb.sql`SELECT * FROM notes WHERE workspace_id=${this.workspace} AND id=${id}`,
+		const { rows } = await db.query(
+			qb.sql`SELECT * FROM notes
+				JOIN unnest(ARRAY[${qb.values(ids)}]::uuid[]) WITH ORDINALITY AS ordering(id, position) ON notes.id = ordering.id
+				WHERE workspace_id = ${this.workspace} ORDER BY ordering.position`,
 			RowScheme,
 		);
 
-		return note ?? null;
+		if (rows.length !== ids.length) {
+			console.warn(
+				`Found notes count does not match the requested count. Expected: ${ids.length}; Found: ${rows.length}`,
+			);
+		}
+
+		return rows;
 	}
 
 	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
@@ -271,6 +277,17 @@ export class NotesController implements INotesController {
 		);
 
 		return count;
+	}
+
+	public async query(query: NotesControllerFetchOptions = {}): Promise<NoteId[]> {
+		const db = wrapDB(this.db.get());
+
+		const { rows } = await db.query(
+			getFetchQuery({ select: qb.sql`id`, workspace: this.workspace }, query),
+			z.object({ id: z.string() }).transform((row) => row.id),
+		);
+
+		return rows;
 	}
 
 	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {

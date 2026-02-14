@@ -253,7 +253,7 @@ export class NotesImporter {
 			checkForAbortion();
 			await waitNextTick(this.config.throttle);
 
-			const note = await notesRegistry.getById(noteId);
+			const [note] = await notesRegistry.getById([noteId]);
 			if (!note) throw new Error('Note with such id does not exist');
 
 			const noteTree = markdownProcessor.parse(note.content.text);

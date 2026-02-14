@@ -54,7 +54,7 @@ describe('CRUD operations', () => {
 		const modifiedData = { title: 'Modified title', text: 'Modified text' };
 		await registry.update(entryV1.id, modifiedData);
 
-		const entryV2 = await registry.getById(entryV1.id);
+		const [entryV2] = await registry.getById([entryV1.id]);
 		expect(entryV2?.content).toMatchObject(modifiedData);
 		expect(entryV2?.createdTimestamp).toBe(entryV1.createdTimestamp);
 		expect(entryV2?.updatedTimestamp).not.toBe(entryV1.updatedTimestamp);
@@ -173,6 +173,30 @@ describe('data fetching', () => {
 
 		const page2 = await registry.get({ limit: 100, page: 2 });
 		expect(page2[0].content).toMatchObject(notesSample[100]);
+
+		await db.close();
+	});
+
+	test('method query consider filters', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		await expect(registry.query()).resolves.toHaveLength(300);
+		await expect(registry.query({ limit: 100 })).resolves.toHaveLength(100);
+		await expect(
+			registry.query({ limit: 100, meta: { isDeleted: true } }),
+		).resolves.toHaveLength(0);
+
+		const tagsList = await tags.getTags();
+		const fooTag = tagsList.find((tag) => tag.resolvedName === 'foo');
+		expect(fooTag).toBeDefined();
+
+		await expect(
+			registry.query({
+				tags: [fooTag!.id],
+			}),
+		).resolves.toHaveLength(1);
 
 		await db.close();
 	});
@@ -354,6 +378,20 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
+
+	test('method getById returns notes in the requested order', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notes = await registry.get({ limit: 10 });
+
+		const shuffledNotes = notes.sort(() => Math.random() - 0.5);
+		const shuffledIds = shuffledNotes.map((n) => n.id);
+
+		await expect(registry.getById(shuffledIds)).resolves.toEqual(shuffledNotes);
+
+		await db.close();
+	});
 });
 
 describe('multi instances', () => {
@@ -402,24 +440,30 @@ describe('Notes meta control', () => {
 
 		// Create note
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isSnapshotsDisabled: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isSnapshotsDisabled: false,
+			},
+		]);
 
 		// Toggle snapshotting preferences
 		await registry.updateMeta([noteId], { isSnapshotsDisabled: true });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isSnapshotsDisabled: true,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isSnapshotsDisabled: true,
+			},
+		]);
 
 		// Toggle snapshotting preferences back
 		await registry.updateMeta([noteId], { isSnapshotsDisabled: false });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isSnapshotsDisabled: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isSnapshotsDisabled: false,
+			},
+		]);
 	});
 
 	test('toggle note visibility', async () => {
@@ -428,10 +472,12 @@ describe('Notes meta control', () => {
 
 		// Create note
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isVisible: true,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isVisible: true,
+			},
+		]);
 		await expect(registry.get()).resolves.toContainEqual(
 			expect.objectContaining({
 				id: noteId,
@@ -440,10 +486,12 @@ describe('Notes meta control', () => {
 
 		// Toggle snapshotting preferences
 		await registry.updateMeta([noteId], { isVisible: false });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isVisible: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isVisible: false,
+			},
+		]);
 		await expect(registry.get()).resolves.not.toContainEqual(
 			expect.objectContaining({
 				id: noteId,
@@ -452,10 +500,12 @@ describe('Notes meta control', () => {
 
 		// Toggle snapshotting preferences back
 		await registry.updateMeta([noteId], { isVisible: true });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isVisible: true,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isVisible: true,
+			},
+		]);
 		await expect(registry.get()).resolves.toContainEqual(
 			expect.objectContaining({
 				id: noteId,
@@ -469,24 +519,30 @@ describe('Notes meta control', () => {
 
 		// Create notes
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isDeleted: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isDeleted: false,
+			},
+		]);
 
 		// toggle deleted status
 		await registry.updateMeta([noteId], { isDeleted: true });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isDeleted: true,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isDeleted: true,
+			},
+		]);
 
 		// toggle deleted status back
 		await registry.updateMeta([noteId], { isDeleted: false });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isDeleted: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isDeleted: false,
+			},
+		]);
 	});
 
 	test('toggle note archived status', async () => {
@@ -495,24 +551,30 @@ describe('Notes meta control', () => {
 
 		// Create notes
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isArchived: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isArchived: false,
+			},
+		]);
 
 		// toggle archive status
 		await registry.updateMeta([noteId], { isArchived: true });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isArchived: true,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isArchived: true,
+			},
+		]);
 
 		// toggle archive status back
 		await registry.updateMeta([noteId], { isArchived: false });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isArchived: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isArchived: false,
+			},
+		]);
 	});
 
 	test('toggle note bookmarked status', async () => {
@@ -520,22 +582,28 @@ describe('Notes meta control', () => {
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isBookmarked: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isBookmarked: false,
+			},
+		]);
 
 		await registry.updateMeta([noteId], { isBookmarked: true });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isBookmarked: true,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isBookmarked: true,
+			},
+		]);
 
 		await registry.updateMeta([noteId], { isBookmarked: false });
-		await expect(registry.getById(noteId)).resolves.toMatchObject({
-			id: noteId,
-			isBookmarked: false,
-		});
+		await expect(registry.getById([noteId])).resolves.toMatchObject([
+			{
+				id: noteId,
+				isBookmarked: false,
+			},
+		]);
 	});
 });
 

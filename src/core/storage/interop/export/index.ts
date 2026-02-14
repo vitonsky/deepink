@@ -204,7 +204,7 @@ export class NotesExporter {
 				return fetchedFiles[id];
 			},
 			getNoteData: async (noteId: string) => {
-				const note = await notesRegistry.getById(noteId);
+				const [note] = await notesRegistry.getById([noteId]);
 				if (!note) return null;
 
 				const tags = await this.getNoteTags(note.id);

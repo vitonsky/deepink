@@ -47,7 +47,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 			// TODO: use actual workspace id once will be implemented
 			dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: null }));
 			dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes: [] }));
-			dispatch(workspacesApi.setNotes({ ...workspaceData, notes: [] }));
+			dispatch(workspacesApi.setNoteIds({ ...workspaceData, noteIds: [] }));
 		};
 	}, [dispatch, workspaceData]);
 
