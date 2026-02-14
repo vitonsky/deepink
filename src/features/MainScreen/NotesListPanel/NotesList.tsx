@@ -34,7 +34,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const notesRegister = useNotesRegistry();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	const notes = useWorkspaceSelector(selectNoteIds);
+	const noteIds = useWorkspaceSelector(selectNoteIds);
 
 	const search = useWorkspaceSelector(selectSearch);
 
@@ -50,7 +50,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	// eslint-disable-next-line react-hooks/incompatible-library
 	const virtualizer = useVirtualizer({
 		enabled: isActiveWorkspace,
-		count: notes.length,
+		count: noteIds.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 70,
 		overscan: 7,
@@ -70,13 +70,13 @@ export const NotesList: FC<NotesListProps> = () => {
 		if (activeNoteRef.current !== null && isElementInViewport(activeNoteRef.current))
 			return;
 
-		const noteIndex = notes.findIndex((noteId) => noteId === activeNoteId);
+		const noteIndex = noteIds.findIndex((noteId) => noteId === activeNoteId);
 		if (noteIndex === -1) return;
 
 		virtualizer.scrollToIndex(noteIndex, { align: 'start' });
 
 		scrollCorrectionIndexRef.current = noteIndex;
-	}, [activeNoteId, notes, virtualizer]);
+	}, [activeNoteId, noteIds, virtualizer]);
 
 	// Reset the scroll bar after a view change
 	const notesView = useWorkspaceSelector(selectNotesView);
@@ -99,11 +99,11 @@ export const NotesList: FC<NotesListProps> = () => {
 		{ wait: 10 },
 	);
 	useEffect(() => {
-		const noteIds = virtualNoteItems.map((i) => notes[i.index]);
-		if (noteIds.length === 0) return;
+		const ids = virtualNoteItems.map((i) => noteIds[i.index]);
+		if (ids.length === 0) return;
 
-		loadViewportNotes(noteIds);
-	}, [notes, virtualNoteItems, loadViewportNotes]);
+		loadViewportNotes(ids);
+	}, [noteIds, virtualNoteItems, loadViewportNotes]);
 
 	// Update preview when note content changes
 	const eventBus = useEventBus();
@@ -111,8 +111,8 @@ export const NotesList: FC<NotesListProps> = () => {
 		const update = (updatedNoteId: NoteId) => {
 			if (!notesInViewport[updatedNoteId]) return;
 
-			const noteIds = virtualNoteItems.map((i) => notes[i.index]);
-			if (noteIds.length === 0) return;
+			const ids = virtualNoteItems.map((i) => noteIds[i.index]);
+			if (ids.length === 0) return;
 
 			loadViewportNotes(noteIds);
 		};
@@ -130,7 +130,7 @@ export const NotesList: FC<NotesListProps> = () => {
 		notesInViewport,
 		loadViewportNotes,
 		virtualNoteItems,
-		notes,
+		noteIds,
 	]);
 
 	// TODO: implement dragging and moving items
@@ -145,7 +145,7 @@ export const NotesList: FC<NotesListProps> = () => {
 				userSelect: 'none',
 			}}
 		>
-			{notes.length === 0 ? (
+			{noteIds.length === 0 ? (
 				<Text pos="relative" top="40%">
 					Nothing added yet
 				</Text>
@@ -169,7 +169,7 @@ export const NotesList: FC<NotesListProps> = () => {
 						}}
 					>
 						{virtualNoteItems.map((virtualRow) => {
-							const id = notes[virtualRow.index];
+							const id = noteIds[virtualRow.index];
 							const note = notesInViewport[id];
 
 							if (!note)
