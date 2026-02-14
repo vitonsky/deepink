@@ -111,7 +111,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 								evt.preventDefault();
 
 								openNoteContextMenu(
-									note.id,
+									note,
 									getContextMenuCoords(evt.nativeEvent),
 								);
 							}}

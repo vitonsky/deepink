@@ -223,7 +223,7 @@ export const NotesList: FC<NotesListProps> = () => {
 									}
 									onContextMenu={(evt) => {
 										openNoteContextMenu(
-											note.id,
+											note,
 											getContextMenuCoords(evt.nativeEvent),
 										);
 									}}
