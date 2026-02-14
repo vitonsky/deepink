@@ -60,8 +60,10 @@ export const NotesList: FC<NotesListProps> = () => {
 	const virtualNoteItems = virtualizer.getVirtualItems();
 
 	// Scroll to active note
-	// Active note scroll may be off due to dynamic element sizes, apply corrective scroll after virtualizer updates measurements
 	const activeNoteRef = useRef<HTMLDivElement | null>(null);
+
+	// Save index to made a corrective scroll after the NotePreview is rendered and measured
+	// because sometimes after scrolling the preview remains outside the viewport
 	const scrollCorrectionIndexRef = useRef<number | null>(null);
 	useEffect(() => {
 		if (!activeNoteId) return;
