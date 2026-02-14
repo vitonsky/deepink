@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
@@ -71,7 +72,8 @@ export const App: FC = () => {
 	}, [profileContainers.profiles.length]);
 
 	const isLoadingState = Object.values(loadingState).some(Boolean);
-	if (isLoadingState) {
+	const [isShowSplash] = useDebounce(isLoadingState, 500);
+	if (isShowSplash) {
 		return <SplashScreen />;
 	}
 

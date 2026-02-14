@@ -7,6 +7,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { ButtonGroup, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useProfileControls } from '@features/App/Profile';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
@@ -14,6 +15,8 @@ import { useCreateNote } from '@hooks/notes/useCreateNote';
 
 export const ActivityBar = () => {
 	const telemetry = useTelemetryTracker();
+
+	const profileControls = useProfileControls();
 
 	const command = useCommand();
 
@@ -92,15 +95,16 @@ export const ActivityBar = () => {
 				size="sm"
 				variant="ghost"
 			>
-				<IconButton
-					icon={<MdLockOutline style={{ scale: 1.3 }} />}
-					title="Lock profile"
-					tooltipPlacement="right"
-					data-no-animation
-					onClick={() => {
-						command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE);
-					}}
-				/>
+				{profileControls.profile.profile.isEncrypted && (
+					// Only encrypted profiles can be locked
+					<IconButton
+						icon={<MdLockOutline style={{ scale: 1.3 }} />}
+						title="Lock profile"
+						tooltipPlacement="right"
+						data-no-animation
+						onClick={() => profileControls.close()}
+					/>
+				)}
 				<IconButton
 					icon={<GrSettingsOption style={{ scale: 1.2 }} />}
 					title="Global settings"

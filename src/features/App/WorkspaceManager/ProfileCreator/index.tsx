@@ -1,4 +1,4 @@
-import React, { createRef, FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import {
 	Button,
@@ -19,7 +19,6 @@ import {
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
 
@@ -31,21 +30,23 @@ export type NewProfile = {
 
 export type ProfileCreatorProps = {
 	onCreateProfile: (profile: NewProfile) => Promise<void | string>;
-	onCancel: () => void;
+	onCancel?: () => void;
+	defaultProfileName?: string;
 };
 
 export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	onCreateProfile,
 	onCancel,
+	defaultProfileName,
 }) => {
 	const telemetry = useTelemetryTracker();
 
-	const profileNameInputRef = useFocusableRef<HTMLInputElement>();
-	const passwordInputRef = createRef<HTMLInputElement>();
+	const profileNameInputRef = useRef<HTMLInputElement | null>(null);
+	const passwordInputRef = useRef<HTMLInputElement | null>(null);
 
 	const [isPending, setIsPending] = useState(false);
 
-	const [profileName, setProfileName] = useState('');
+	const [profileName, setProfileName] = useState(defaultProfileName ?? '');
 	const [profileNameError, setProfileNameError] = useState<null | string>(null);
 	useEffect(() => {
 		setProfileNameError(null);
@@ -105,6 +106,17 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 		],
 	);
 
+	// Set focus to the input
+	useEffect(() => {
+		const hasProfileName = profileNameInputRef.current?.value;
+		if (hasProfileName) {
+			passwordInputRef.current?.focus();
+			return;
+		}
+
+		profileNameInputRef.current?.focus();
+	}, []);
+
 	const noPasswordDialogState = useDisclosure();
 
 	return (
@@ -127,9 +139,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					>
 						Continue with no password
 					</Button>
-					<Button w="100%" onClick={onCancel} disabled={isPending}>
-						Cancel
-					</Button>
+					{onCancel && (
+						<Button w="100%" onClick={onCancel} disabled={isPending}>
+							Cancel
+						</Button>
+					)}
 
 					<Modal
 						isOpen={noPasswordDialogState.isOpen}
@@ -171,12 +185,19 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				</>
 			}
 		>
-			<VStack w="100%" alignItems="start">
+			<VStack
+				w="100%"
+				alignItems="start"
+				gap="0.8rem"
+				fontSize="18px"
+				color="typography.additional"
+			>
 				<VStack w="100%" alignItems="start">
+					<Text>Profile name</Text>
 					<Input
 						ref={profileNameInputRef}
 						size="lg"
-						placeholder="Profile name"
+						placeholder="e.g., Notes"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
 						focusBorderColor={profileNameError ? 'red.500' : undefined}
@@ -185,13 +206,16 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
 				</VStack>
-
 				<VStack w="100%" alignItems="start">
+					<HStack>
+						<Text>Encryption password</Text>
+						<Text variant="secondary">(recommended)</Text>
+					</HStack>
 					<Input
 						ref={passwordInputRef}
 						size="lg"
 						type="password"
-						placeholder="Enter password"
+						placeholder="Enter a strong password here"
 						value={password}
 						onChange={(evt) => setPassword(evt.target.value)}
 						focusBorderColor={passwordError ? 'red.500' : undefined}
