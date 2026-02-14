@@ -8,6 +8,7 @@ import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvi
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useGlobalShortcutHandlers } from '@hooks/useGlobalShortcutHandlers';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
@@ -153,8 +154,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	}, [db, isDevMode]);
 
 	useShortcutsBinding();
+	useGlobalShortcutHandlers();
 
 	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, controls.close);
+	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, db.sync);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

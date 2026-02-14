@@ -15,7 +15,7 @@ import { getItemByOffset } from '@utils/collections/getItemByOffset';
 /**
  * Hook handles note actions triggered via keyboard shortcuts, including create, close, restore and switch focus
  */
-export const useNoteShortcutActions = () => {
+export const useNotesShortcutActions = () => {
 	const telemetry = useTelemetryTracker();
 
 	const noteActions = useNoteActions();
