@@ -213,6 +213,6 @@ export const useNoteContextMenu = ({ closeNote, updateNotes }: ContextMenuOption
 				);
 			});
 		},
-		[deletionConfig.permanentDeletion, showMenu],
+		[deletionConfig.permanentDeletion, notes, showMenu],
 	);
 };

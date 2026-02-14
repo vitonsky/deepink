@@ -64,7 +64,7 @@ describe('Note version control', () => {
 
 		// Fetch note
 		const noteId = await registry.add({ title: 'Title 1', text: 'Text 1' });
-		const noteDataV1 = (await registry.getById([noteId]))[0]!;
+		const [noteDataV1] = await registry.getById([noteId]);
 
 		// No snapshots yet
 		await expect(history.getList(noteId)).resolves.toHaveLength(0);
