@@ -59,7 +59,7 @@ export const SHORTCUT_NAMES = {
 
 	[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: 'Toggle the note’s history panel',
 
-	[Shortcuts.SYNC_DATABASE]: 'Synchronize the database',
+	[Shortcuts.SYNC_DATABASE]: 'Save changes',
 	[Shortcuts.FOCUS_SEARCH]: 'Focus on the search input',
 
 	[Shortcuts.LOCK_CURRENT_PROFILE]: 'Lock vault',
