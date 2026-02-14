@@ -7,7 +7,7 @@ beforeEach(() => {
 const collection = ['Apple', 'Banana', 'Watermelon', 'Carrot', 'Eggplant'];
 
 test('Returns undefined for empty collection', () => {
-	expect(getRandomItem([])).toBe(undefined);
+	expect(getRandomItem([])).toBeUndefined();
 });
 
 test('Returns the value for collection with one item', () => {
@@ -15,7 +15,7 @@ test('Returns the value for collection with one item', () => {
 	expect(getRandomItem(smallCollection)).toBe(smallCollection[0]);
 });
 
-test('Returns the first and last items from the collection', () => {
+test('Can return the first and last items from the collection', () => {
 	vi.spyOn(Math, 'random')
 		.mockReturnValueOnce(0)
 		.mockReturnValueOnce(0.1)
