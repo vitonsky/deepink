@@ -189,9 +189,12 @@ describe('data fetching', () => {
 		).resolves.toHaveLength(0);
 
 		const tagsList = await tags.getTags();
+		const fooTag = tagsList.find((tag) => tag.resolvedName === 'foo');
+		expect(fooTag).toBeDefined();
+
 		await expect(
 			registry.query({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')!.id],
+				tags: [fooTag!.id],
 			}),
 		).resolves.toHaveLength(1);
 
@@ -380,14 +383,14 @@ describe('data fetching', () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
-		const notesId = await registry
-			.get({ limit: 10 })
-			.then((notes) => notes.map((note) => note.id));
+		const notes = await registry.get({ limit: 10 });
 
-		const reversedIds = notesId.reverse();
+		const shuffledNotes = notes.sort(() => Math.random() - 0.5);
+		const shuffledIds = shuffledNotes.map((n) => n.id);
 
-		const notes = await registry.getById(reversedIds);
-		expect(notes.map((note) => note.id)).toEqual(reversedIds);
+		await expect(registry.getById(shuffledIds)).resolves.toEqual(
+			shuffledIds.map((id) => expect.objectContaining({ id })),
+		);
 
 		await db.close();
 	});
