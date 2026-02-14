@@ -388,9 +388,7 @@ describe('data fetching', () => {
 		const shuffledNotes = notes.sort(() => Math.random() - 0.5);
 		const shuffledIds = shuffledNotes.map((n) => n.id);
 
-		await expect(registry.getById(shuffledIds)).resolves.toEqual(
-			shuffledIds.map((id) => expect.objectContaining({ id })),
-		);
+		await expect(registry.getById(shuffledIds)).resolves.toEqual(shuffledNotes);
 
 		await db.close();
 	});
