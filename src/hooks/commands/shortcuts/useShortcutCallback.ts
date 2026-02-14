@@ -12,7 +12,7 @@ export const useShortcutCallback = (
 ) => {
 	useCommandCallback(
 		GLOBAL_COMMANDS.SHORTCUTS_PRESSED,
-		({ shortcuts: pressedShortcut }) => {
+		({ shortcut: pressedShortcut }) => {
 			if (pressedShortcut !== shortcut) return;
 			callback();
 		},
