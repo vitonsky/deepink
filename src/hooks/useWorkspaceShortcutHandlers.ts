@@ -1,85 +1,93 @@
-import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { Shortcuts } from '@hooks/commands/shortcuts';
 import { useCommand } from '@hooks/commands/useCommand';
-import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
+
+import { useShortcutCallback } from './commands/shortcuts/useShortcutCallback';
+import { useIsActiveWorkspace } from './useIsActiveWorkspace';
 
 /**
  * Registers workspace keyboard shortcut handlers
  */
 export const useWorkspaceShortcutHandlers = () => {
-	const notesRegistry = useNotesRegistry();
 	const command = useCommand();
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
 
-	// Execute commands that require an active note
-	const commandWithActiveNote = (commandName: GLOBAL_COMMANDS, payload?: {}) => {
-		if (!activeNoteId) return;
-		command(commandName, { noteId: activeNoteId, ...payload });
-	};
+	const isActiveWorkspace = useIsActiveWorkspace();
 
-	const shortcutToCommandMap: Partial<Record<Shortcuts, () => void>> = {
-		[Shortcuts.CREATE_NOTE]: () => command(GLOBAL_COMMANDS.CREATE_NOTE),
+	useShortcutCallback(
+		Shortcuts.CREATE_NOTE,
+		() => command(GLOBAL_COMMANDS.CREATE_NOTE),
+		{ enabled: isActiveWorkspace },
+	);
 
-		[Shortcuts.CLOSE_CURRENT_NOTE]: () => command(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE),
+	useShortcutCallback(
+		Shortcuts.CLOSE_CURRENT_NOTE,
+		() => command(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE),
+		{ enabled: isActiveWorkspace },
+	);
 
-		[Shortcuts.RESTORE_CLOSED_NOTE]: () =>
-			command(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE),
+	useShortcutCallback(
+		Shortcuts.FOCUS_NEXT_NOTE,
+		() => command(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE),
+		{ enabled: isActiveWorkspace },
+	);
 
-		[Shortcuts.FOCUS_NEXT_NOTE]: () => command(GLOBAL_COMMANDS.FOCUS_NEXT_NOTE),
+	useShortcutCallback(
+		Shortcuts.FOCUS_PREVIOUS_NOTE,
+		() => command(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE),
+		{ enabled: isActiveWorkspace },
+	);
 
-		[Shortcuts.FOCUS_PREVIOUS_NOTE]: () =>
-			command(GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE),
+	useShortcutCallback(
+		Shortcuts.FOCUS_SEARCH,
+		() => command(GLOBAL_COMMANDS.FOCUS_SEARCH),
+		{ enabled: isActiveWorkspace },
+	);
 
-		[Shortcuts.FOCUS_SEARCH]: () => command(GLOBAL_COMMANDS.FOCUS_SEARCH),
-
-		[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: async () =>
-			commandWithActiveNote(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL),
-
-		[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: async () =>
-			commandWithActiveNote(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE),
-
-		[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]: async () =>
-			commandWithActiveNote(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK),
-
-		[Shortcuts.DELETE_NOTE_TO_BIN]: async () => {
+	useShortcutCallback(
+		Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE,
+		() => {
 			if (!activeNoteId) return;
-			const note = await notesRegistry.getById(activeNoteId);
-			if (note && note.isDeleted) {
-				console.warn(`Note with id ${activeNoteId} is already in the bin`);
-				return;
-			}
-
-			commandWithActiveNote(GLOBAL_COMMANDS.DELETE_NOTE, { permanently: false });
+			command(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, { noteId: activeNoteId });
 		},
+		{ enabled: isActiveWorkspace },
+	);
 
-		[Shortcuts.DELETE_NOTE_PERMANENTLY]: async () => {
+	useShortcutCallback(
+		Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK,
+		() => {
 			if (!activeNoteId) return;
-			const note = await notesRegistry.getById(activeNoteId);
-			if (note && !note.isDeleted) return;
-
-			commandWithActiveNote(GLOBAL_COMMANDS.DELETE_NOTE, { permanently: true });
+			command(GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK, { noteId: activeNoteId });
 		},
+		{ enabled: isActiveWorkspace },
+	);
 
-		[Shortcuts.RESTORE_NOTE_FROM_BIN]: async () => {
+	useShortcutCallback(
+		Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL,
+		() => {
 			if (!activeNoteId) return;
-			const note = await notesRegistry.getById(activeNoteId);
-
-			// only a deleted note can be restored from the bin
-			if (note && !note.isDeleted) return;
-
-			commandWithActiveNote(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN);
+			command(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL, { noteId: activeNoteId });
 		},
-	};
+		{ enabled: isActiveWorkspace },
+	);
 
-	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.SHORTCUTS_PRESSED,
-		({ shortcuts: pressedShortcut }) => {
-			const commandToExecute = shortcutToCommandMap[pressedShortcut];
-			if (!commandToExecute) return;
-			commandToExecute();
+	useShortcutCallback(
+		Shortcuts.DELETE_NOTE,
+		async () => {
+			if (!activeNoteId) return;
+			command(GLOBAL_COMMANDS.DELETE_NOTE, { noteId: activeNoteId });
 		},
+		{ enabled: isActiveWorkspace },
+	);
+
+	useShortcutCallback(
+		Shortcuts.RESTORE_NOTE_FROM_BIN,
+		async () => {
+			if (!activeNoteId) return;
+			command(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { noteId: activeNoteId });
+		},
+		{ enabled: isActiveWorkspace },
 	);
 };
