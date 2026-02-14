@@ -15,7 +15,7 @@ import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveNoteId,
-	selectNotes,
+	selectNoteIds,
 	selectSearch,
 } from '@state/redux/profiles/profiles';
 import { selectNotesView } from '@state/redux/profiles/selectors/view';
@@ -34,7 +34,7 @@ export const NotesList: FC<NotesListProps> = () => {
 	const notesRegister = useNotesRegistry();
 
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
-	const notes = useWorkspaceSelector(selectNotes);
+	const notes = useWorkspaceSelector(selectNoteIds);
 
 	const search = useWorkspaceSelector(selectSearch);
 

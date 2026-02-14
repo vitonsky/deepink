@@ -64,7 +64,7 @@ export const createWorkspaceObject = (workspace: {
 	recentlyClosedNotes: [],
 	openedNotes: [],
 
-	notes: [],
+	noteIds: [],
 
 	search: '',
 
@@ -114,7 +114,7 @@ export type WorkspaceData = {
 	recentlyClosedNotes: NoteId[];
 	openedNotes: INote[];
 
-	notes: NoteId[];
+	noteIds: NoteId[];
 
 	search: string;
 	view: NOTES_VIEW;
@@ -245,16 +245,16 @@ export const profilesSlice = createSlice({
 			workspace.activeNote = noteId;
 		},
 
-		setNotes: (
+		setNoteIds: (
 			state,
 			{
-				payload: { profileId, workspaceId, notes },
-			}: PayloadAction<WorkspaceScoped<{ notes: NoteId[] }>>,
+				payload: { profileId, workspaceId, noteIds },
+			}: PayloadAction<WorkspaceScoped<{ noteIds: NoteId[] }>>,
 		) => {
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
-			workspace.notes = notes;
+			workspace.noteIds = noteIds;
 		},
 
 		addOpenedNote: (

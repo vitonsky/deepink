@@ -9,10 +9,13 @@ export const selectWorkspaceName = createWorkspaceSelector(
 	({ id, name }) => ({ id, name }),
 );
 
-export const selectNotes = createWorkspaceSelector([selectWorkspaceRoot], (workspace) => {
-	if (!workspace) return [];
-	return workspace.notes;
-});
+export const selectNoteIds = createWorkspaceSelector(
+	[selectWorkspaceRoot],
+	(workspace) => {
+		if (!workspace) return [];
+		return workspace.noteIds;
+	},
+);
 
 export const selectOpenedNotes = createWorkspaceSelector(
 	[selectWorkspaceRoot],
@@ -33,9 +36,9 @@ export const selectNote = (noteId: string | null) =>
 		if (!workspace) return null;
 		if (!noteId) return null;
 
-		const { notes } = workspace;
+		const { noteIds } = workspace;
 
-		return notes.find((id) => id === noteId) ?? null;
+		return noteIds.find((id) => id === noteId) ?? null;
 	});
 
 export const selectActiveNoteId = createWorkspaceSelector(
