@@ -191,7 +191,7 @@ describe('data fetching', () => {
 		const tagsList = await tags.getTags();
 		await expect(
 			registry.query({
-				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')?.id as string],
+				tags: [tagsList.find((tag) => tag.resolvedName === 'foo')!.id],
 			}),
 		).resolves.toHaveLength(1);
 
@@ -388,6 +388,8 @@ describe('data fetching', () => {
 
 		const notes = await registry.getById(reversedIds);
 		expect(notes.map((note) => note.id)).toEqual(reversedIds);
+
+		await db.close();
 	});
 });
 
