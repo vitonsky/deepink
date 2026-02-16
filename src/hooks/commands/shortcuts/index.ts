@@ -8,8 +8,8 @@ export enum Shortcuts {
 	TOGGLE_CURRENT_NOTE_ARCHIVE,
 	TOGGLE_CURRENT_NOTE_BOOKMARK,
 
-	DELETE_NOTE,
-	RESTORE_NOTE_FROM_BIN,
+	DELETE_CURRENT_NOTE,
+	RESTORE_CURRENT_NOTE_FROM_BIN,
 
 	TOGGLE_CURRENT_NOTE_HISTORY_PANEL,
 
@@ -30,8 +30,8 @@ export const SHORTCUTS_MAP = {
 	'CmdOrCtrl+Shift+A': Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE,
 	'CmdOrCtrl+Shift+B': Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK,
 
-	'CmdOrCtrl+Delete': Shortcuts.DELETE_NOTE,
-	'CmdOrCtrl+Shift+R': Shortcuts.RESTORE_NOTE_FROM_BIN,
+	'CmdOrCtrl+Delete': Shortcuts.DELETE_CURRENT_NOTE,
+	'CmdOrCtrl+Shift+R': Shortcuts.RESTORE_CURRENT_NOTE_FROM_BIN,
 
 	'CmdOrCtrl+H': Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL,
 
@@ -54,8 +54,8 @@ export const SHORTCUT_NAMES = {
 	[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]:
 		'Toggle bookmark status of the current note',
 
-	[Shortcuts.DELETE_NOTE]: 'Delete current note',
-	[Shortcuts.RESTORE_NOTE_FROM_BIN]: 'Restore current note from bin',
+	[Shortcuts.DELETE_CURRENT_NOTE]: 'Delete current note',
+	[Shortcuts.RESTORE_CURRENT_NOTE_FROM_BIN]: 'Restore current note from bin',
 
 	[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: 'Toggle the note’s history panel',
 

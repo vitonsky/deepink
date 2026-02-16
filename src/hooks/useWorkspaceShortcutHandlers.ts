@@ -74,8 +74,8 @@ export const useWorkspaceShortcutHandlers = () => {
 	);
 
 	useShortcutCallback(
-		Shortcuts.DELETE_NOTE,
-		async () => {
+		Shortcuts.DELETE_CURRENT_NOTE,
+		() => {
 			if (!activeNoteId) return;
 			command(GLOBAL_COMMANDS.DELETE_NOTE, { noteId: activeNoteId });
 		},
@@ -83,8 +83,8 @@ export const useWorkspaceShortcutHandlers = () => {
 	);
 
 	useShortcutCallback(
-		Shortcuts.RESTORE_NOTE_FROM_BIN,
-		async () => {
+		Shortcuts.RESTORE_CURRENT_NOTE_FROM_BIN,
+		() => {
 			if (!activeNoteId) return;
 			command(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { noteId: activeNoteId });
 		},
