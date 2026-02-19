@@ -8,8 +8,8 @@ import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvi
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
+import { useVaultShortcutsHandlers } from '@hooks/shortcuts/useVaultShortcutsHandlers';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
-import { useVaultShortcutsHandlers } from '@hooks/useVaultShortcutsHandlers';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,

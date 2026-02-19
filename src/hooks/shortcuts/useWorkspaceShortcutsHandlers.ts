@@ -4,11 +4,11 @@ import { Shortcuts } from '@hooks/shortcuts';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
 
-import { useShortcutCallback } from './shortcuts/useShortcutCallback';
-import { useIsActiveWorkspace } from './useIsActiveWorkspace';
+import { useIsActiveWorkspace } from '../useIsActiveWorkspace';
+import { useShortcutCallback } from './useShortcutCallback';
 
 /**
- * Registers workspace keyboard shortcut handlers
+ * Registers workspace keyboard shortcuts handlers
  */
 export const useWorkspaceShortcutsHandlers = () => {
 	const command = useCommand();

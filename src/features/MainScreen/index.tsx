@@ -8,7 +8,7 @@ import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
 import { useNoteCommandHandlers } from '@hooks/notes/useNoteCommandHandlers';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
-import { useWorkspaceShortcutsHandlers } from '@hooks/useWorkspaceShortcutsHandlers';
+import { useWorkspaceShortcutsHandlers } from '@hooks/shortcuts/useWorkspaceShortcutsHandlers';
 
 import { NotificationsPopup } from '../NotificationsPopup';
 import { ActivityBar } from './ActivityBar';
