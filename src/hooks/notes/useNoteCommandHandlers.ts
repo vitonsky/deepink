@@ -49,8 +49,7 @@ export const useNoteCommandHandlers = () => {
 			const [note] = await notes.getById([noteId]);
 			if (!note) return;
 
-			const shouldDeletePermanently =
-				deletionConfig.permanentDeletion || permanently || note.isDeleted;
+			const shouldDeletePermanently = permanently || note.isDeleted;
 
 			const confirmMessage = shouldDeletePermanently
 				? `Do you want to permanently delete this note?`
@@ -71,7 +70,9 @@ export const useNoteCommandHandlers = () => {
 				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
 			}
 
-			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, { permanently });
+			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
+				permanently: shouldDeletePermanently,
+			});
 		},
 	);
 

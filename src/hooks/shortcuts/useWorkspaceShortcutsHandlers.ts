@@ -1,8 +1,9 @@
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { Shortcuts } from '@hooks/shortcuts';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useVaultSelector, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
+import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 
 import { useIsActiveWorkspace } from '../useIsActiveWorkspace';
 import { useShortcutCallback } from './useShortcutCallback';
@@ -73,11 +74,15 @@ export const useWorkspaceShortcutsHandlers = () => {
 		{ enabled: isActiveWorkspace },
 	);
 
+	const deletionConfig = useVaultSelector(selectDeletionConfig);
 	useShortcutCallback(
 		Shortcuts.DELETE_CURRENT_NOTE,
 		() => {
 			if (!activeNoteId) return;
-			command(GLOBAL_COMMANDS.DELETE_NOTE, { noteId: activeNoteId });
+			command(GLOBAL_COMMANDS.DELETE_NOTE, {
+				noteId: activeNoteId,
+				permanently: deletionConfig.permanentDeletion,
+			});
 		},
 		{ enabled: isActiveWorkspace },
 	);
