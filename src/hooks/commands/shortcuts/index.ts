@@ -40,7 +40,7 @@ export const SHORTCUTS_MAP = {
 
 	'CmdOrCtrl+F': Shortcuts.FOCUS_SEARCH,
 
-	'CmdOrCtrl+,': Shortcuts.OPEN_GLOBAL_SETTINGS,
+	'CmdOrCtrl+.': Shortcuts.OPEN_GLOBAL_SETTINGS,
 };
 
 export const SHORTCUT_NAMES = {

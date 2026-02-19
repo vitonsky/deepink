@@ -159,7 +159,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, () => controls.close(), {
 		enabled: controls.profile.profile.isEncrypted,
 	});
-	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, db.sync);
+	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
