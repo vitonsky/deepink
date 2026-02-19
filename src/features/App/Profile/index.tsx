@@ -4,11 +4,11 @@ import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
-import { useVaultShortcutsHandlers } from '@hooks/shortcuts/useVaultShortcutsHandlers';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {

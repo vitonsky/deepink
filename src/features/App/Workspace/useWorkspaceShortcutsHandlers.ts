@@ -1,12 +1,11 @@
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { Shortcuts } from '@hooks/shortcuts';
+import { useShortcutCallback } from '@hooks/shortcuts/useShortcutCallback';
+import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useVaultSelector, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
-
-import { useIsActiveWorkspace } from '../useIsActiveWorkspace';
-import { useShortcutCallback } from './useShortcutCallback';
 
 /**
  * Registers workspace keyboard shortcuts handlers
