@@ -46,7 +46,7 @@ export const useNoteCommandHandlers = () => {
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.DELETE_NOTE,
 		async ({ noteId, permanently }) => {
-			const note = await notes.getById(noteId);
+			const [note] = await notes.getById([noteId]);
 			if (!note) return;
 
 			const shouldDeletePermanently =
@@ -79,7 +79,7 @@ export const useNoteCommandHandlers = () => {
 		GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN,
 		async ({ noteId }) => {
 			// only deleted note can be restored
-			const note = await notes.getById(noteId);
+			const [note] = await notes.getById([noteId]);
 			if (note && !note.isDeleted) return;
 
 			await notes.updateMeta([noteId], { isDeleted: false });
@@ -90,7 +90,7 @@ export const useNoteCommandHandlers = () => {
 	);
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ noteId }) => {
-		const note = await notes.getById(noteId);
+		const [note] = await notes.getById([noteId]);
 		await notesExport.exportNote(
 			noteId,
 			buildFileName(
@@ -103,7 +103,7 @@ export const useNoteCommandHandlers = () => {
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK,
 		async ({ noteId }) => {
-			const note = await notes.getById(noteId);
+			const [note] = await notes.getById([noteId]);
 			if (!note) {
 				console.error(`Can't get data of note #${noteId}`);
 				return;
@@ -122,7 +122,7 @@ export const useNoteCommandHandlers = () => {
 	);
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.DUPLICATE_NOTE, async ({ noteId }) => {
-		const sourceNote = await notes.getById(noteId);
+		const [sourceNote] = await notes.getById([noteId]);
 
 		if (!sourceNote) {
 			console.warn(`Not found note with id ${sourceNote}`);
@@ -146,7 +146,7 @@ export const useNoteCommandHandlers = () => {
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE,
 		async ({ noteId }) => {
-			const note = await notesRegistry.getById(noteId);
+			const [note] = await notesRegistry.getById([noteId]);
 			if (!note) {
 				console.warn(`Not found note with id ${noteId}`);
 				return;
@@ -167,7 +167,7 @@ export const useNoteCommandHandlers = () => {
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK,
 		async ({ noteId }) => {
-			const note = await notesRegistry.getById(noteId);
+			const [note] = await notesRegistry.getById([noteId]);
 			if (!note) {
 				console.warn(`Not found note with id ${noteId}`);
 				return;
