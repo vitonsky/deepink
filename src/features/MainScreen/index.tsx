@@ -8,7 +8,7 @@ import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
 import { useNoteCommandHandlers } from '@hooks/notes/useNoteCommandHandlers';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
-import { useWorkspaceShortcutHandlers } from '@hooks/useWorkspaceShortcutHandlers';
+import { useWorkspaceShortcutsHandlers } from '@hooks/useWorkspaceShortcutsHandlers';
 
 import { NotificationsPopup } from '../NotificationsPopup';
 import { ActivityBar } from './ActivityBar';
@@ -17,7 +17,7 @@ import { StatusBar } from './StatusBar';
 import { TagsPanel } from './TagsPanel';
 
 export const MainScreen: FC = () => {
-	useWorkspaceShortcutHandlers();
+	useWorkspaceShortcutsHandlers();
 	useNoteCommandHandlers();
 
 	const tagsRegistry = useTagsRegistry();

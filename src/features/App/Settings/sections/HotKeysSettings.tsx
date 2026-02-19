@@ -2,7 +2,7 @@ import React, { Fragment, useMemo } from 'react';
 import { Box, Divider, HStack, Text } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesPanel } from '@components/Features/Group';
-import { SHORTCUT_NAMES, SHORTCUTS_MAP } from '@hooks/commands/shortcuts';
+import { SHORTCUT_NAMES, SHORTCUTS_MAP } from '@hooks/shortcuts';
 
 // TODO: implement recording view
 export const KeyboardShortcut = ({ shortcut }: { shortcut?: string }) => {

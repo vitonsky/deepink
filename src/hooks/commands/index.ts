@@ -1,4 +1,4 @@
-import { Shortcuts } from './shortcuts';
+import { Shortcuts } from '../shortcuts';
 
 export enum GLOBAL_COMMANDS {
 	/**

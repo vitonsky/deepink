@@ -1,5 +1,5 @@
-import { useCommandCallback } from '../useCommandCallback';
-import { GLOBAL_COMMANDS } from '..';
+import { GLOBAL_COMMANDS } from '../commands';
+import { useCommandCallback } from '../commands/useCommandCallback';
 import { Shortcuts } from '.';
 
 /**

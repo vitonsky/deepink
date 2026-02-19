@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
 
-import { useCommand } from '../useCommand';
-import { GLOBAL_COMMANDS } from '..';
+import { GLOBAL_COMMANDS } from '../commands';
+import { useCommand } from '../commands/useCommand';
 import { SHORTCUTS_MAP } from '.';
 
 /**

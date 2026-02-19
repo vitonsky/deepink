@@ -1,9 +1,9 @@
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { Shortcuts } from '@hooks/commands/shortcuts';
-import { useShortcutCallback } from '@hooks/commands/shortcuts/useShortcutCallback';
 import { useCommand } from '@hooks/commands/useCommand';
+import { Shortcuts } from '@hooks/shortcuts';
+import { useShortcutCallback } from '@hooks/shortcuts/useShortcutCallback';
 
-export const useGlobalShortcutHandlers = () => {
+export const useVaultShortcutsHandlers = () => {
 	const command = useCommand();
 
 	useShortcutCallback(Shortcuts.LOCK_CURRENT_PROFILE, () =>

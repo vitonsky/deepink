@@ -6,10 +6,10 @@ import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
-import { useGlobalShortcutHandlers } from '@hooks/useGlobalShortcutHandlers';
+import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
+import { useVaultShortcutsHandlers } from '@hooks/useVaultShortcutsHandlers';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
@@ -154,7 +154,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	}, [db, isDevMode]);
 
 	useShortcutsBinding();
-	useGlobalShortcutHandlers();
+	useVaultShortcutsHandlers();
 
 	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, () => controls.close(), {
 		enabled: controls.profile.profile.isEncrypted,
