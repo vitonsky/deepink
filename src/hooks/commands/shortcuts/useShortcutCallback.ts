@@ -11,7 +11,7 @@ export const useShortcutCallback = (
 	{ enabled = true }: { enabled?: boolean } = {},
 ) => {
 	useCommandCallback(
-		GLOBAL_COMMANDS.SHORTCUTS_PRESSED,
+		GLOBAL_COMMANDS.SHORTCUT_PRESSED,
 		({ shortcut: pressedShortcut }) => {
 			if (pressedShortcut !== shortcut) return;
 			callback();

@@ -39,7 +39,7 @@ export const useShortcutsBinding = () => {
 					capture: true,
 				},
 				() =>
-					runCommand(GLOBAL_COMMANDS.SHORTCUTS_PRESSED, {
+					runCommand(GLOBAL_COMMANDS.SHORTCUT_PRESSED, {
 						shortcut: shortcutName,
 					}),
 			);

@@ -90,7 +90,7 @@ export enum GLOBAL_COMMANDS {
 	/**
 	 * Indicates a keyboard shortcut was pressed
 	 */
-	SHORTCUTS_PRESSED = 'SHORTCUTS_PRESSED',
+	SHORTCUT_PRESSED = 'SHORTCUT_PRESSED',
 }
 
 type CommandsWithPayload = {
@@ -105,7 +105,7 @@ type CommandsWithPayload = {
 	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { noteId: string };
 	[GLOBAL_COMMANDS.DUPLICATE_NOTE]: { noteId: string };
 
-	[GLOBAL_COMMANDS.SHORTCUTS_PRESSED]: { shortcut: Shortcuts };
+	[GLOBAL_COMMANDS.SHORTCUT_PRESSED]: { shortcut: Shortcuts };
 };
 
 export type CommandPayloadsMap = {
