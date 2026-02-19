@@ -80,7 +80,7 @@ export const useNoteCommandHandlers = () => {
 		async ({ noteId }) => {
 			// only deleted note can be restored
 			const [note] = await notes.getById([noteId]);
-			if (note && !note.isDeleted) return;
+			if (!note || !note.isDeleted) return;
 
 			await notes.updateMeta([noteId], { isDeleted: false });
 			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
