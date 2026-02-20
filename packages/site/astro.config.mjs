@@ -8,6 +8,10 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
     vite: {
+        ssr: {
+            // Fix build error. See details at https://github.com/withastro/astro/issues/14117#issuecomment-3117797751
+            noExternal: ['zod'],
+        },
         plugins: [svgr({
             include: '**/*.svg?react',
             svgrOptions: {
