@@ -3,7 +3,6 @@ import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
-import { SplashScreen } from '@features/SplashScreen';
 import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -41,15 +40,47 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
-	// Close notes by unmount
+	// Load data for workspace and close notes by unmount
 	useEffect(() => {
+		workspace?.notesRegistry
+			.get()
+			.then((notes) => {
+				if (notes.length === 0) return;
+
+				dispatch(
+					workspacesApi.setOpenedNotes({
+						...workspaceData,
+						notes,
+					}),
+				);
+
+				dispatch(
+					workspacesApi.setActiveNote({
+						...workspaceData,
+						noteId: notes[0].id,
+					}),
+				);
+			})
+			.finally(() => {
+				dispatch(
+					workspacesApi.setIsWorkspaceReady({
+						...workspaceData,
+						isReady: true,
+					}),
+				);
+			});
+
 		return () => {
 			// TODO: use actual workspace id once will be implemented
 			dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: null }));
 			dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes: [] }));
 			dispatch(workspacesApi.setNoteIds({ ...workspaceData, noteIds: [] }));
+
+			dispatch(
+				workspacesApi.setIsWorkspaceReady({ ...workspaceData, isReady: false }),
+			);
 		};
-	}, [dispatch, workspaceData]);
+	}, [dispatch, workspaceData, workspace]);
 
 	// TODO: replace to hook
 	// Load tags
@@ -91,7 +122,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 				backgroundColor: 'surface.background',
 			}}
 		>
-			{workspace ? (
+			{workspace && (
 				<WorkspaceProvider
 					{...workspace}
 					notesApi={{
@@ -132,8 +163,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 						<SettingsWindow />
 					</WorkspaceModalProvider>
 				</WorkspaceProvider>
-			) : (
-				<SplashScreen />
 			)}
 		</Box>
 	);
