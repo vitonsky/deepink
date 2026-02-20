@@ -1,0 +1,31 @@
+name: "Site"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "packages/site/**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "packages/site/**"
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "22"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Build
+        working-directory: packages/site
+        run: npm run build
