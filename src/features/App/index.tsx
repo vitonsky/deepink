@@ -1,6 +1,5 @@
-import React, { FC, useMemo, useMemo, useState } from 'react';
+import React, { FC, useLayoutEffect, useMemo, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
-import { useDebounce } from 'use-debounce';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -8,6 +7,7 @@ import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
+import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
@@ -19,6 +19,17 @@ import { useRecentProfile } from './useRecentProfile';
 import { ProfileCreator } from './WorkspaceManager/ProfileCreator';
 import { ProfileLoginForm } from './WorkspaceManager/ProfileLoginForm';
 import { ProfilesForm } from './WorkspaceManager/ProfilesForm';
+
+const defaultProfileNames = [
+	'Creative drafts',
+	'Second brain',
+	'Digital garden',
+	'Creative space',
+	'Mind space',
+	'Idea lab',
+];
+
+type Screen = 'loading' | 'main' | 'choose' | 'create' | 'login';
 
 export const App: FC = () => {
 	const files = useFilesStorage();
@@ -44,35 +55,49 @@ export const App: FC = () => {
 		profiles: profileContainers,
 	});
 
-	const [authScreen, setAuthScreen] = useState<'choose' | 'create' | 'login'>('choose');
-
-	const screenName: 'loading' | 'main' | 'auth' = useMemo(() => {
+	const hasNoProfiles = profilesList.profiles.length === 0;
+	const [screen, setScreen] = useState<Screen>('loading');
+	useLayoutEffect(() => {
 		if (
 			!profilesList.isProfilesLoaded ||
 			!recentProfile.isLoaded ||
 			isProfileOpening
 		) {
-			return 'loading';
+			setScreen('loading');
+			return;
 		}
 
 		if (profileContainers.profiles.length > 0) {
-			return 'main';
+			setScreen('main');
+			return;
 		}
 
-		return 'auth';
+		if (currentProfileObject) {
+			setScreen('login');
+			return;
+		}
+
+		if (hasNoProfiles || screen === 'create') {
+			setScreen('create');
+			return;
+		}
+
+		setScreen('choose');
 	}, [
-		profilesList.isProfilesLoaded,
-		recentProfile.isLoaded,
+		currentProfileObject,
+		hasNoProfiles,
 		isProfileOpening,
 		profileContainers.profiles.length,
+		profilesList.isProfilesLoaded,
+		recentProfile.isLoaded,
+		screen,
 	]);
 
-	const [isShowSplash] = useDebounce(screenName === 'loading', 500);
-	if (isShowSplash) {
+	if (screen === 'loading') {
 		return <SplashScreen />;
 	}
 
-	if (screenName == 'main') {
+	if (screen === 'main') {
 		return (
 			<Box
 				sx={{
@@ -90,21 +115,6 @@ export const App: FC = () => {
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<Box maxW="500px" minW="350px" padding="1rem">
-				{authScreen === 'create' && (
-					<ProfileCreator
-						onCreateProfile={(profile) =>
-							profilesList.createProfile(profile).then((newProfile) => {
-								// setScreenName('main');
-								onOpenProfile(
-									newProfile,
-									profile.password ?? undefined,
-								).then(console.warn);
-							})
-						}
-						onCancel={() => setAuthScreen('choose')}
-					/>
-				)}
-
 				{currentProfileObject && (
 					<ProfileLoginForm
 						profile={currentProfileObject}
@@ -115,7 +125,24 @@ export const App: FC = () => {
 					/>
 				)}
 
-				{authScreen !== 'create' && !currentProfileId && (
+				{screen === 'create' && (
+					<ProfileCreator
+						onCreateProfile={(profile) =>
+							profilesList.createProfile(profile).then((newProfile) => {
+								onOpenProfile(
+									newProfile,
+									profile.password ?? undefined,
+								).then(console.warn);
+							})
+						}
+						onCancel={hasNoProfiles ? undefined : () => setScreen('choose')}
+						defaultProfileName={
+							hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
+						}
+					/>
+				)}
+
+				{screen === 'choose' && (
 					<ProfilesForm
 						title="Choose the profile"
 						controls={
@@ -124,7 +151,7 @@ export const App: FC = () => {
 									variant="accent"
 									size="lg"
 									w="100%"
-									onClick={() => setAuthScreen('create')}
+									onClick={() => setScreen('create')}
 								>
 									Create new profile
 								</Button>
