@@ -48,45 +48,155 @@ const features: {
 	image: string;
 }[] = [
 	{
-		title: 'Bulletproof vault',
+		title: 'Links',
 		content: (
 			<>
-				All your data is encrypted. Unlike other apps, it does mean really{' '}
-				<b>all your data</b>. You can choose the encryption algorithm you trust.
-				Deepink is open source and are opened to a security audits.
+				<p>
+					Copy a link to any note and reference it anywhere else in your vault.
+					Build connections between meeting notes and decisions, research and
+					conclusions, plans and execution — without repeating the same
+					information.
+				</p>
+
+				<p>
+					Everything stays in sync. Update a note once, and every linked
+					reference stays accurate.
+				</p>
+
+				<p>
+					Deepink also shows where a note is mentioned, so you can trace
+					connections and navigate your knowledge naturally.
+				</p>
+
+				<p>
+					You can also see where a note is mentioned, so you can trace
+					connections and navigate related content.
+				</p>
+
+				<p>
+					Your information shouldn’t live in silos. With Links, it becomes a
+					network.
+				</p>
 			</>
 		),
 		image: 'https://obsidian.md/images/sync-settings.png',
 	},
 	{
-		title: 'Bulletproof vault',
+		title: 'Workspaces',
 		content: (
 			<>
-				All your data is encrypted. Unlike other apps, it does mean really{' '}
-				<b>all your data</b>. You can choose the encryption algorithm you trust.
-				Deepink is open source and are opened to a security audits.
+				<p>Separate your world — without separating your vault.</p>
+
+				<p>
+					Workspaces let you create distinct areas inside a single secure vault.
+					Unlock once, then switch between focused environments like Client
+					Projects, Personal Journal, Health Tracking, or Learning — without
+					overlap.
+				</p>
+
+				<p>
+					Everything stays organized and context-specific. Share your screen in
+					a meeting with confidence, knowing personal or sensitive areas won’t
+					surface by accident.
+				</p>
+
+				<p>One vault. Clear boundaries. Zero friction.</p>
 			</>
 		),
 		image: 'https://obsidian.md/images/sync-settings.png',
 	},
 	{
-		title: 'Bulletproof vault',
+		title: 'History',
 		content: (
 			<>
-				All your data is encrypted. Unlike other apps, it does mean really{' '}
-				<b>all your data</b>. You can choose the encryption algorithm you trust.
-				Deepink is open source and are opened to a security audits.
+				<p>Every note keeps its own timeline.</p>
+
+				<p>
+					Deepink automatically saves previous versions, so you can review what
+					changed, restore an earlier draft, or track how an idea evolved over
+					time. Whether it’s yesterday’s edit or something from a year ago,
+					nothing important is lost.
+				</p>
+
+				<p>
+					History gives you confidence to refine, rewrite, and rethink — knowing
+					every step is preserved and accessible when you need it.
+				</p>
 			</>
 		),
 		image: 'https://obsidian.md/images/sync-settings.png',
 	},
 	{
-		title: 'Bulletproof vault',
+		title: 'Reminders',
 		content: (
 			<>
-				All your data is encrypted. Unlike other apps, it does mean really{' '}
-				<b>all your data</b>. You can choose the encryption algorithm you trust.
-				Deepink is open source and are opened to a security audits.
+				<p>Attach a reminder to any note and get notified when it matters.</p>
+
+				<p>
+					Set follow-ups for meeting notes, deadlines for project plans, renewal
+					dates for documents, or check-ins for personal goals. The reminder
+					stays connected to the exact context — not as a separate task in
+					another app.
+				</p>
+
+				<p>
+					When the time comes, you return directly to the note with all the
+					details in place.
+				</p>
+
+				<p>Reminders help you act on your information, not just store it.</p>
+			</>
+		),
+		image: 'https://obsidian.md/images/sync-settings.png',
+	},
+	{
+		title: 'Nested tags',
+		content: (
+			<>
+				<p>Structure your notes with tags that follow real hierarchies.</p>
+
+				<p>
+					Nested tags let you create parent–child relationships, so broader
+					themes can contain more specific subtopics. For example, a parent tag
+					like Clients can include individual client tags beneath it, or Finance
+					can branch into Taxes, Invoices, and Reports. This keeps high-level
+					areas clean while allowing detailed classification underneath.
+				</p>
+
+				<p>
+					Unlike folders or single-category systems, notes can have multiple
+					tags at once. A single note can belong to a specific client, relate to
+					a financial topic, and connect to a time period — all without
+					duplication.
+				</p>
+
+				<p>
+					Nested tags give you precise organization with the flexibility to
+					reflect how information actually overlaps.
+				</p>
+			</>
+		),
+		image: 'https://obsidian.md/images/sync-settings.png',
+	},
+	{
+		title: 'Encryption',
+		content: (
+			<>
+				<p>Your entire vault is encrypted — not just parts of it.</p>
+
+				<p>
+					Deepink applies encryption to everything: notes, attached files,
+					workspaces, and metadata. Unlike many apps that only encrypt synced
+					data or text content, Deepink protects the full structure of your
+					vault.
+				</p>
+
+				<p>
+					Attachments aren’t left exposed. Metadata isn’t readable. Even file
+					sizes are obfuscated to reduce the risk of analysis.
+				</p>
+
+				<p>What you store stays private — completely, by design.</p>
 			</>
 		),
 		image: 'https://obsidian.md/images/sync-settings.png',
@@ -197,11 +307,12 @@ export default function Hero() {
 
 				<section className={clsx(styles.Features)}>
 					<div className={clsx(styles.Features_Intro)}>
-						<h3 className={clsx(styles.Features_IntroTitle)}>Spark ideas</h3>
+						<h3 className={clsx(styles.Features_IntroTitle)}>
+							Your Thinking, Structured
+						</h3>
 						<p className={clsx(styles.Features_IntroText)}>
-							From personal notes to journaling, knowledge bases, and
-							project management, Obsidian gives you the tools to come up
-							with ideas and organize them.
+							Capture a quick insight or shape something complex — Deepink
+							brings order, focus, and structure to every idea.
 						</p>
 						<hr />
 					</div>
