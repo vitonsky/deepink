@@ -3,7 +3,14 @@
 import React, { Fragment, type ReactNode } from 'react';
 import clsx from 'clsx';
 
+import screenshot from './app.png';
 import RichLogo from './app.svg?react';
+import encryptionScreenshot from './features/encryption.png';
+import historyScreenshot from './features/history.png';
+import linksScreenshot from './features/links.png';
+import remindersScreenshot from './features/reminders.png';
+import tagsScreenshot from './features/tags.png';
+import workspacesScreenshot from './features/workspaces.png';
 import Logo from './icon-simple.svg?react';
 
 import styles from './index.module.css';
@@ -45,7 +52,7 @@ const highlights: {
 const features: {
 	title: string;
 	content: ReactNode;
-	image: string;
+	image: ImageMetadata;
 }[] = [
 	{
 		title: 'Links',
@@ -79,7 +86,7 @@ const features: {
 				</p>
 			</>
 		),
-		image: 'https://obsidian.md/images/sync-settings.png',
+		image: linksScreenshot,
 	},
 	{
 		title: 'Workspaces',
@@ -103,7 +110,7 @@ const features: {
 				<p>One vault. Clear boundaries. Zero friction.</p>
 			</>
 		),
-		image: 'https://obsidian.md/images/sync-settings.png',
+		image: workspacesScreenshot,
 	},
 	{
 		title: 'History',
@@ -124,7 +131,7 @@ const features: {
 				</p>
 			</>
 		),
-		image: 'https://obsidian.md/images/sync-settings.png',
+		image: historyScreenshot,
 	},
 	{
 		title: 'Reminders',
@@ -147,7 +154,7 @@ const features: {
 				<p>Reminders help you act on your information, not just store it.</p>
 			</>
 		),
-		image: 'https://obsidian.md/images/sync-settings.png',
+		image: remindersScreenshot,
 	},
 	{
 		title: 'Nested tags',
@@ -176,7 +183,7 @@ const features: {
 				</p>
 			</>
 		),
-		image: 'https://obsidian.md/images/sync-settings.png',
+		image: tagsScreenshot,
 	},
 	{
 		title: 'Encryption',
@@ -199,11 +206,11 @@ const features: {
 				<p>What you store stays private — completely, by design.</p>
 			</>
 		),
-		image: 'https://obsidian.md/images/sync-settings.png',
+		image: encryptionScreenshot,
 	},
 ];
 
-// TODO: update texts and images. Explain the product
+// TODO: update texts
 // TODO: split into components and infer layout to reuse
 // TODO: fix styles. Tune colors
 // TODO: localize page
@@ -267,7 +274,13 @@ export default function Hero() {
 							</a>
 						</div>
 					</div>
-					<img src="https://www.zettlr.com/themes/zettlr/assets/img/zettlr_v3.png" />
+					<img
+						src={screenshot.src}
+						style={{
+							aspectRatio: `${screenshot.width}/${screenshot.height}`,
+						}}
+						className={styles.Hero_Image}
+					/>
 				</section>
 
 				<section className={clsx(styles.Summary)}>
@@ -327,7 +340,12 @@ export default function Hero() {
 									{feature.content}
 								</p>
 								<p className={clsx(styles.Feature_Image)}>
-									<img src={feature.image} />
+									<img
+										src={feature.image.src}
+										style={{
+											aspectRatio: `${feature.image.width}/${feature.image.height}`,
+										}}
+									/>
 								</p>
 							</div>
 						))}

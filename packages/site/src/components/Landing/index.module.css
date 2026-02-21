@@ -9,6 +9,7 @@
 
 	img {
 		max-width: 100%;
+		background: #ffe7d3;
 	}
 
 	font-family:
@@ -134,6 +135,11 @@
 	color: var(--color-secondary);
 }
 
+.Hero_Image {
+	border-radius: 18px;
+	border: 3px solid #fed5b2;
+}
+
 .Hero_Button {
 	display: inline-block;
 	font-size: 18px;
@@ -255,7 +261,17 @@
 }
 
 .Feature_Image {
+	display: flex;
+	overflow: hidden;
 	margin: 0;
+	border: 3px solid #fed5b2;
+	border-radius: 14px;
+	max-height: 300px;
+
+	img {
+		object-fit: contain;
+		min-width: 100%;
+	}
 }
 
 .CTA {
