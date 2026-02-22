@@ -1,7 +1,13 @@
 import { useEffect } from 'react';
+import { FileController } from '@core/features/files/FileController';
+import { StateFile } from '@core/features/files/StateFile';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { NOTES_VIEW, workspacesApi } from '@state/redux/profiles/profiles';
+import {
+	NOTES_VIEW,
+	WorkspaceConfigScheme,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
@@ -17,6 +23,28 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 		controls,
 		workspaceId: workspaceData.workspaceId,
 	});
+
+	// Load config
+	useEffect(() => {
+		const loadConfig = async () => {
+			const config = await new StateFile(
+				new FileController(
+					`workspaces/${workspaceData.workspaceId}/config.json`,
+					controls.profile.files,
+				),
+				WorkspaceConfigScheme,
+			).get();
+
+			dispatch(
+				workspacesApi.setWorkspaceNoteTemplateConfig({
+					...workspaceData,
+					title: config?.newNote.title,
+					tags: config?.newNote.tags,
+				}),
+			);
+		};
+		loadConfig();
+	}, [controls.profile.files, dispatch, workspaceData, workspaceData.workspaceId]);
 
 	useEffect(() => {
 		if (!workspace) return;

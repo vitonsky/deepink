@@ -18,7 +18,6 @@ import {
 	ProfileConfigScheme,
 	selectIsActiveWorkspaceReady,
 	selectWorkspacesInfo,
-	WorkspaceConfigScheme,
 	WorkspaceData,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -80,20 +79,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		]).then(async ([workspaces, config, state]) => {
 			const [defaultWorkspace] = workspaces;
 
-			const workspaceConfigs = await Promise.all(
-				workspaces.map(async (workspace) => {
-					const config = await new StateFile(
-						new FileController(
-							`workspaces/${workspace.id}/config.json`,
-							controls.profile.files,
-						),
-						WorkspaceConfigScheme,
-					).get();
-
-					return [workspace.id, config] as const;
-				}),
-			).then((entries) => Object.fromEntries(entries));
-
 			if (!defaultWorkspace) return;
 
 			dispatch(
@@ -108,10 +93,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 									workspace.id,
 									{
 										...workspaceObject,
-										config: {
-											...workspaceObject.config,
-											...workspaceConfigs[workspace.id],
-										},
 									} satisfies WorkspaceData,
 								];
 							}),
