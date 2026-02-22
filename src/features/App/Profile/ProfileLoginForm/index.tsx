@@ -2,11 +2,11 @@ import React, { FC, useCallback, useEffect, useId, useState } from 'react';
 import { Button, Input, useToast, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
+import { OnPickProfile } from '@features/App/useProfileLoader';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
-import { OnPickProfile } from '..';
 
 export type ProfileLoginFormProps = {
 	profile: ProfileObject;

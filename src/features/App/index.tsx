@@ -10,15 +10,15 @@ import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { AppServices } from './AppServices';
+import { ProfileCreator } from './Profile/ProfileCreator';
+import { ProfileLoginForm } from './Profile/ProfileLoginForm';
+import { ProfilesForm } from './Profile/ProfilesForm';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
 import { useProfileLoader } from './useProfileLoader';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { ProfileCreator } from './WorkspaceManager/ProfileCreator';
-import { ProfileLoginForm } from './WorkspaceManager/ProfileLoginForm';
-import { ProfilesForm } from './WorkspaceManager/ProfilesForm';
 
 const defaultProfileNames = [
 	'Creative drafts',
