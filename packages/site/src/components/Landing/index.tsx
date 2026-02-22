@@ -1,7 +1,16 @@
 // TODO: fix all typos
 /* eslint-disable @cspell/spellchecker */
 import React, { Fragment, type ReactNode } from 'react';
-import clsx from 'clsx';
+import {
+	Box,
+	Flex,
+	Grid,
+	Heading,
+	HStack,
+	Image,
+	SimpleGrid,
+	VStack,
+} from '@chakra-ui/react';
 
 import screenshot from './app.png';
 import RichLogo from './app.svg?react';
@@ -12,8 +21,8 @@ import remindersScreenshot from './features/reminders.png';
 import tagsScreenshot from './features/tags.png';
 import workspacesScreenshot from './features/workspaces.png';
 import Logo from './icon-simple.svg?react';
-
-import styles from './index.module.css';
+import LandingLayout from './LandingLayout';
+import { Link, Text } from './StyledComponents';
 
 function getNativeLanguageName(langCode: string) {
 	const display = new Intl.DisplayNames([langCode], {
@@ -81,7 +90,7 @@ const features: {
 				</p>
 
 				<p>
-					Your information shouldn’t live in silos. With Links, it becomes a
+					Your information shouldn't live in silos. With Links, it becomes a
 					network.
 				</p>
 			</>
@@ -103,7 +112,7 @@ const features: {
 
 				<p>
 					Everything stays organized and context-specific. Share your screen in
-					a meeting with confidence, knowing personal or sensitive areas won’t
+					a meeting with confidence, knowing personal or sensitive areas won't
 					surface by accident.
 				</p>
 
@@ -121,7 +130,7 @@ const features: {
 				<p>
 					Deepink automatically saves previous versions, so you can review what
 					changed, restore an earlier draft, or track how an idea evolved over
-					time. Whether it’s yesterday’s edit or something from a year ago,
+					time. Whether it's yesterday's edit or something from a year ago,
 					nothing important is lost.
 				</p>
 
@@ -199,7 +208,7 @@ const features: {
 				</p>
 
 				<p>
-					Attachments aren’t left exposed. Metadata isn’t readable. Even file
+					Attachments aren't left exposed. Metadata isn't readable. Even file
 					sizes are obfuscated to reduce the risk of analysis.
 				</p>
 
@@ -211,7 +220,6 @@ const features: {
 ];
 
 // TODO: update texts
-// TODO: split into components and infer layout to reuse
 // TODO: fix styles. Tune colors
 // TODO: localize page
 // TODO: add download page & json page with data from github releases
@@ -224,273 +232,365 @@ const features: {
 // TODO: add docs
 // TODO: add blog
 export default function Hero() {
-	return (
-		<div className={styles.Page}>
-			<header className={styles.Header}>
-				<div className={clsx(styles.HeaderContent, styles.Container__fullWidth)}>
-					<a href="/" className={styles.AppLink}>
-						<Logo />
-						<span>Deepink</span>
-					</a>
+	const logoElement = (
+		<Link href="/" variant="logo">
+			<Box as={Logo} display="inline-block" w="1.2em" h="1.2em" />
+			<span>Deepink</span>
+		</Link>
+	);
 
-					<nav
-						aria-label="Main navigation"
-						className={clsx(styles.Navigation, styles.Navigation__type_main)}
-					>
-						<a href="/download">Download</a>
-						<a href="#features">Features</a>
-						<a href="/guides/example/">Docs</a>
-					</nav>
+	const mainNav = (
+		<>
+			<Link href="/download" variant="nav">
+				Download
+			</Link>
+			<Link href="#features" variant="nav">
+				Features
+			</Link>
+			<Link href="/guides/example/" variant="nav">
+				Docs
+			</Link>
+		</>
+	);
 
-					<nav
-						className={clsx(styles.Navigation, styles.Navigation__type_pulse)}
-					>
-						<a href="#">Blog</a>
-						<a href="#">Changelog</a>
-					</nav>
-				</div>
-			</header>
+	const secondaryNav = (
+		<>
+			<Link href="#" variant="nav">
+				Blog
+			</Link>
+			<Link href="#" variant="nav">
+				Changelog
+			</Link>
+		</>
+	);
 
-			<main className={styles.Container__fullWidth}>
-				<section className={clsx(styles.Hero)}>
-					<div className={styles.Hero_Message}>
-						<h2 className={styles.Hero_Header}>Snapshot your thoughts.</h2>
-						<p className={styles.Hero_Description}>
-							Deepink is a <b>privacy focused</b> note taking app with a
-							light speed workflow.
-						</p>
-						<div className={styles.Hero_Actions}>
-							<a
-								href="/download"
-								className={clsx(
-									styles.Hero_Button,
-									styles.Hero_Button__view_primary,
-								)}
-							>
-								Download
-							</a>
-							<a href="/download" className={styles.Hero_Button}>
-								See features
-							</a>
-						</div>
-					</div>
-					<img
-						src={screenshot.src}
-						style={{
-							aspectRatio: `${screenshot.width}/${screenshot.height}`,
-						}}
-						className={styles.Hero_Image}
-					/>
-				</section>
-
-				<section className={clsx(styles.Summary)}>
-					<div className={clsx(styles.Highlights)}>
-						{highlights.map((feature) => (
-							<div
-								key={feature.title}
-								className={clsx(styles.Highlights_Item)}
-							>
-								<h3 className={clsx(styles.Highlights_Title)}>
-									{feature.title}
-								</h3>
-								<p className={clsx(styles.Highlights_Description)}>
-									{feature.content}
-								</p>
-							</div>
-						))}
-					</div>
-
-					<div className={clsx(styles.SummaryAction)}>
-						<RichLogo className={clsx(styles.SummaryAction_Logo)} />
-
-						<div className={clsx(styles.SummaryAction_Content)}>
-							<div className={clsx(styles.SummaryAction_Text)}>
-								Free without limits.
-							</div>
-
-							<a
-								href="/download"
-								className={clsx(styles.SummaryAction_Link)}
-							>
-								Download now
-							</a>
-						</div>
-					</div>
-				</section>
-
-				<section className={clsx(styles.Features)}>
-					<div className={clsx(styles.Features_Intro)}>
-						<h3 className={clsx(styles.Features_IntroTitle)}>
-							Your Thinking, Structured
-						</h3>
-						<p className={clsx(styles.Features_IntroText)}>
-							Capture a quick insight or shape something complex — Deepink
-							brings order, focus, and structure to every idea.
-						</p>
-						<hr />
-					</div>
-
-					<div className={clsx(styles.Features_List)}>
-						{features.map((feature) => (
-							<div key={feature.title} className={clsx(styles.Feature)}>
-								<h3 className={clsx(styles.Feature_Title)}>
-									{feature.title}
-								</h3>
-								<p className={clsx(styles.Feature_Description)}>
-									{feature.content}
-								</p>
-								<p className={clsx(styles.Feature_Image)}>
-									<img
-										src={feature.image.src}
-										style={{
-											aspectRatio: `${feature.image.width}/${feature.image.height}`,
-										}}
-									/>
-								</p>
-							</div>
-						))}
-					</div>
-				</section>
-
-				<section className={clsx(styles.CTA)}>
-					<h3 className={clsx(styles.CTA_Title)}>Spark ideas</h3>
-					<p className={clsx(styles.CTA_Text)}>
-						From personal notes to journaling, knowledge bases, and project
-						management, Obsidian gives you the tools to come up with ideas and
-						organize them.
-					</p>
-					<a
-						href="/download"
-						className={clsx(
-							styles.CTA_Action,
-							styles.Hero_Button,
-							styles.Hero_Button__view_primary,
-						)}
-					>
-						Download
-					</a>
-				</section>
-			</main>
-
-			<footer className={clsx(styles.Footer)}>
-				<div className={clsx(styles.Container__fullWidth, styles.Footer_Content)}>
-					<div className={clsx(styles.Footer_About)}>
-						<a href="/" className={styles.AppLink}>
-							<Logo />
+	const footer = (
+		<>
+			<Box maxW="900px" mx="auto" px="1rem">
+				<Flex wrap="wrap" w="100%">
+					<VStack align="start" gap="1rem">
+						<Link href="/" variant="logo">
+							<Box as={Logo} display="inline-block" w="1.2em" h="1.2em" />
 							<span>Deepink</span>
-						</a>
+						</Link>
 
-						<div className={clsx(styles.LinksGroup)}>
-							<div className={clsx(styles.LinksGroup_Title)}>Follow us</div>
+						<VStack align="start" gap="0.8rem" fontWeight="500">
+							<Text
+								fontWeight="500"
+								fontSize="1.1rem"
+								color="brand.secondary"
+							>
+								Follow us
+							</Text>
+							<VStack
+								as="ul"
+								listStyleType="none"
+								m={0}
+								p={0}
+								gap="0.4rem"
+								align="start"
+							>
+								<Box as="li">
+									<Link href="/">GitHub</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">Mastodon</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">Bluesky</Link>
+								</Box>
+							</VStack>
+						</VStack>
 
-							<ul className={clsx(styles.LinksGroup_List)}>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">GitHub</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Mastodon</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Bluesky</a>
-								</li>
-							</ul>
-						</div>
-
-						<small className={clsx(styles.Footer_Copyright)}>
+						<Text as="small" fontWeight="500" color="brand.secondary">
 							© {new Date().getFullYear()} Deepink
-						</small>
-					</div>
+						</Text>
+					</VStack>
 
-					<div className={clsx(styles.Footer_Links)}>
-						<div className={clsx(styles.LinksGroup)}>
-							<div className={clsx(styles.LinksGroup_Title)}>
+					<Grid
+						templateColumns="repeat(auto-fit, minmax(100px, 1fr))"
+						gap="2rem"
+						flexGrow={1}
+						maxW="50%"
+						ml="auto"
+					>
+						<VStack align="start" gap="0.8rem" fontWeight="500">
+							<Text
+								fontWeight="500"
+								fontSize="1.1rem"
+								color="brand.secondary"
+							>
 								Get started
-							</div>
+							</Text>
+							<VStack
+								as="ul"
+								listStyleType="none"
+								m={0}
+								p={0}
+								gap="0.4rem"
+								align="start"
+							>
+								<Box as="li">
+									<Link href="/">Download</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">Docs</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">Overview</Link>
+								</Box>
+							</VStack>
+						</VStack>
 
-							<ul className={clsx(styles.LinksGroup_List)}>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Download</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Docs</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Overview</a>
-								</li>
-							</ul>
-						</div>
+						<VStack align="start" gap="0.8rem" fontWeight="500">
+							<Text
+								fontWeight="500"
+								fontSize="1.1rem"
+								color="brand.secondary"
+							>
+								Learn
+							</Text>
+							<VStack
+								as="ul"
+								listStyleType="none"
+								m={0}
+								p={0}
+								gap="0.4rem"
+								align="start"
+							>
+								<Box as="li">
+									<Link href="/">Help</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">Changelog</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">About</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">Roadmap</Link>
+								</Box>
+							</VStack>
+						</VStack>
 
-						<div className={clsx(styles.LinksGroup)}>
-							<div className={clsx(styles.LinksGroup_Title)}>Learn</div>
+						<VStack align="start" gap="0.8rem" fontWeight="500">
+							<Text
+								fontWeight="500"
+								fontSize="1.1rem"
+								color="brand.secondary"
+							>
+								Resources
+							</Text>
+							<VStack
+								as="ul"
+								listStyleType="none"
+								m={0}
+								p={0}
+								gap="0.4rem"
+								align="start"
+							>
+								<Box as="li">
+									<Link href="/">Terms of Use</Link>
+								</Box>
+								<Box as="li">
+									<Link href="/">Privacy Policy</Link>
+								</Box>
+							</VStack>
+						</VStack>
+					</Grid>
+				</Flex>
+			</Box>
 
-							<ul className={clsx(styles.LinksGroup_List)}>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Help</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Changelog</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">About</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Roadmap</a>
-								</li>
-							</ul>
-						</div>
+			<Box maxW="900px" mx="auto" px="1rem" mt="3rem">
+				<Flex
+					wrap="wrap"
+					fontSize="0.8rem"
+					py="1rem"
+					whiteSpace="pre-wrap"
+					justify="center"
+				>
+					{[
+						'bg',
+						'ca',
+						'cs',
+						'da',
+						'de',
+						'es',
+						'fr',
+						'hu',
+						'it',
+						'ja',
+						'ko',
+						'nb',
+						'pl',
+						'pt-br',
+						'pt-pt',
+						'ru',
+						'sl',
+						'sv',
+						'tr',
+						'uk',
+						'vi',
+						'zh-cn',
+						'zh-tw',
+					].map((language, index) => (
+						<Fragment key={language}>
+							{index > 0 ? ' | ' : undefined}
+							<Link href={`/${language}`}>
+								{getNativeLanguageName(language)?.trim()}
+							</Link>
+						</Fragment>
+					))}
+				</Flex>
+			</Box>
+		</>
+	);
 
-						<div className={clsx(styles.LinksGroup)}>
-							<div className={clsx(styles.LinksGroup_Title)}>Resources</div>
+	return (
+		<LandingLayout
+			logo={logoElement}
+			mainNavigation={mainNav}
+			secondaryNavigation={secondaryNav}
+			footer={footer}
+		>
+			{/* Hero Section */}
+			<VStack gap="3rem" my="5rem">
+				<VStack gap="1.6rem" align="start">
+					<Heading
+						as="h2"
+						fontWeight="500"
+						fontSize="42px"
+						m={0}
+						color="brand.heroHeader"
+					>
+						Snapshot your thoughts.
+					</Heading>
+					<Text fontSize="20px" m={0} color="brand.secondary">
+						Deepink is a <b>privacy focused</b> note taking app with a light
+						speed workflow.
+					</Text>
+					<HStack gap="0.8rem">
+						<Link href="/download" variant="button-primary">
+							Download
+						</Link>
+						<Link href="/download" variant="button-secondary">
+							See features
+						</Link>
+					</HStack>
+				</VStack>
+				<Image
+					src={screenshot.src}
+					style={{
+						aspectRatio: `${screenshot.width}/${screenshot.height}`,
+					}}
+					borderRadius="18px"
+					border="3px solid"
+					borderColor="brand.border"
+				/>
+			</VStack>
 
-							<ul className={clsx(styles.LinksGroup_List)}>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Terms of Use</a>
-								</li>
-								<li className={styles.LinksGroup_Link}>
-									<a href="/">Privacy Policy</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
+			{/* Summary Section */}
+			<Flex gap="3rem" my="5rem">
+				<VStack gap="2rem" maxW="500px" align="start">
+					{highlights.map((feature) => (
+						<VStack key={feature.title} gap="0.5rem" align="start">
+							<Heading as="h3" m={0} fontSize="22px" fontWeight="500">
+								{feature.title}
+							</Heading>
+							<Text m={0} fontSize="18px" color="brand.secondary">
+								{feature.content}
+							</Text>
+						</VStack>
+					))}
+				</VStack>
 
-				<div className={clsx(styles.Container__fullWidth, styles.Footer_Content)}>
-					<div className={clsx(styles.Footer_LanguagesList)}>
-						{[
-							'bg',
-							'ca',
-							'cs',
-							'da',
-							'de',
-							'es',
-							'fr',
-							'hu',
-							'it',
-							'ja',
-							'ko',
-							'nb',
-							'pl',
-							'pt-br',
-							'pt-pt',
-							'ru',
-							'sl',
-							'sv',
-							'tr',
-							'uk',
-							'vi',
-							'zh-cn',
-							'zh-tw',
-						].map((language, index) => (
-							<Fragment key={language}>
-								{index > 0 ? ' | ' : undefined}
-								<a href={`/${language}`}>
-									{getNativeLanguageName(language)?.trim()}
-								</a>
-							</Fragment>
-						))}
-					</div>
-				</div>
-			</footer>
-		</div>
+				<VStack align="center" fontSize="24px" gap="1.5rem">
+					<Box as={RichLogo} maxW="100%" h="auto" transform="rotate(10deg)" />
+					<VStack align="center" gap="0.3rem">
+						<Text>Free without limits.</Text>
+						<Link href="/download" variant="button-primary">
+							Download now
+						</Link>
+					</VStack>
+				</VStack>
+			</Flex>
+
+			{/* Features Section */}
+			<Box maxW="100%" my="10rem">
+				<Box mb="3rem">
+					<Heading as="h3" fontSize="32px" fontWeight="500" m={0}>
+						Your Thinking, Structured
+					</Heading>
+					<Text fontSize="22px" color="brand.secondary">
+						Capture a quick insight or shape something complex — Deepink
+						brings order, focus, and structure to every idea.
+					</Text>
+					<Box as="hr" />
+				</Box>
+
+				<SimpleGrid columns={2} gap="2rem" rowGap="3rem">
+					{features.map((feature) => (
+						<VStack key={feature.title} gap="0.5rem" align="start">
+							<Heading
+								as="h3"
+								m={0}
+								fontSize="22px"
+								fontWeight="500"
+								mb="0.3rem"
+							>
+								{feature.title}
+							</Heading>
+							<Text
+								m={0}
+								fontSize="18px"
+								mb="0.5rem"
+								color="brand.secondary"
+							>
+								{feature.content}
+							</Text>
+							<Box
+								overflow="hidden"
+								m={0}
+								border="3px solid"
+								borderColor="brand.border"
+								borderRadius="14px"
+								maxH="300px"
+							>
+								<Image
+									src={feature.image.src}
+									style={{
+										aspectRatio: `${feature.image.width}/${feature.image.height}`,
+									}}
+									objectFit="contain"
+									minW="100%"
+								/>
+							</Box>
+						</VStack>
+					))}
+				</SimpleGrid>
+			</Box>
+
+			{/* CTA Section */}
+			<VStack
+				minH="100vh"
+				align="center"
+				justify="start"
+				gap="2rem"
+				pt="15%"
+				boxSizing="border-box"
+			>
+				<Heading as="h3" fontSize="42px" m={0}>
+					Spark ideas
+				</Heading>
+				<Text maxW="50%" fontSize="22px" m={0}>
+					From personal notes to journaling, knowledge bases, and project
+					management, Obsidian gives you the tools to come up with ideas and
+					organize them.
+				</Text>
+				<Link href="/download" variant="button-primary">
+					Download
+				</Link>
+			</VStack>
+		</LandingLayout>
 	);
 }
