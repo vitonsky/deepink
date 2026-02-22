@@ -1,4 +1,4 @@
-import React, { createContext, FC, useEffect, useMemo } from 'react';
+import React, { createContext, FC, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
@@ -13,12 +13,11 @@ import {
 } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { useProfileControls } from '../Profile';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { WorkspaceServices } from './services/WorkspaceServices';
+import { useInitWorkspaceState } from './useInitWorkspaceState';
 import { useWorkspace } from './useWorkspace';
-import { useWorkspaceState } from './useWorkspaceState';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
@@ -40,82 +39,9 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
+	useInitWorkspaceState(workspace);
+
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
-
-	const controls = useProfileControls();
-	const getWorkspaceState = useWorkspaceState({
-		sync: true,
-		controls,
-		workspaceId: workspaceData.workspaceId,
-	});
-
-	// Load data for workspace and close notes by unmount
-	useEffect(() => {
-		if (!workspace) return;
-
-		const loadData = async () => {
-			try {
-				const state = await getWorkspaceState();
-				if (!state) return;
-				const { openedNotes, activeNote } = state;
-				if (!openedNotes || openedNotes?.length === 0) return;
-
-				const notes = await workspace?.notesRegistry.getById(openedNotes);
-
-				if (!notes || notes.length === 0) return;
-
-				dispatch(
-					workspacesApi.setOpenedNotes({
-						...workspaceData,
-						notes,
-					}),
-				);
-
-				dispatch(
-					workspacesApi.setActiveNote({
-						...workspaceData,
-						noteId: activeNote || null,
-					}),
-				);
-			} finally {
-				dispatch(
-					workspacesApi.setIsWorkspaceReady({
-						...workspaceData,
-						isReady: true,
-					}),
-				);
-			}
-		};
-		loadData();
-
-		return () => {
-			dispatch(
-				workspacesApi.setIsWorkspaceReady({ ...workspaceData, isReady: false }),
-			);
-
-			// TODO: use actual workspace id once will be implemented
-			dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: null }));
-			dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes: [] }));
-			dispatch(workspacesApi.setNoteIds({ ...workspaceData, noteIds: [] }));
-		};
-	}, [dispatch, workspaceData, workspace, getWorkspaceState]);
-
-	// TODO: replace to hook
-	// Load tags
-	useEffect(() => {
-		if (!workspace) return;
-
-		const { tagsRegistry } = workspace;
-		const updateTags = () =>
-			tagsRegistry.getTags().then((tags) => {
-				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
-			});
-
-		updateTags();
-
-		const cleanup = tagsRegistry.onChange(updateTags);
-		return cleanup;
-	}, [dispatch, workspace, workspaceData]);
 
 	const { profileId } = useWorkspaceData();
 
