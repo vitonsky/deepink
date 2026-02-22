@@ -1,12 +1,12 @@
 import React, { Fragment, type ReactNode } from 'react';
 import {
 	Box,
-	Flex,
 	Heading,
 	HStack,
 	Image,
 	Separator,
 	SimpleGrid,
+	Stack,
 	VStack,
 } from '@chakra-ui/react';
 
@@ -208,13 +208,12 @@ const features: {
 	},
 ];
 
-// TODO: localize page
 // TODO: add download page & json page with data from github releases
-// TODO: adopt to make it work on mobile
 // TODO: add most important pages
 // TODO: update links
-// TODO: add analytics
+// TODO: localize page
 
+// TODO: add analytics
 // TODO: tune CEO tags
 // TODO: add docs
 // TODO: add blog
@@ -226,9 +225,10 @@ export default function Hero() {
 				<VStack gap="1.6rem" align="start">
 					<Heading
 						as="h2"
+						m={0}
 						fontWeight="500"
 						fontSize="42px"
-						m={0}
+						lineHeight="1.1"
 						color="brand.heroHeader"
 					>
 						Snapshot your thoughts.
@@ -258,8 +258,13 @@ export default function Hero() {
 			</VStack>
 
 			{/* Summary Section */}
-			<Flex gap="3rem" my="5rem">
-				<VStack gap="2rem" maxW="500px" align="start">
+			<Stack
+				gap="3rem"
+				my="5rem"
+				direction={{ base: 'column', md: 'row' }}
+				separator={<Separator />}
+			>
+				<VStack gap="2rem" maxW={{ md: '500px' }} align="start">
 					{highlights.map((feature) => (
 						<VStack key={feature.title} gap="0.5rem" align="start">
 							<Heading as="h3" m={0} fontSize="22px" fontWeight="500">
@@ -272,21 +277,33 @@ export default function Hero() {
 					))}
 				</VStack>
 
-				<VStack align="center" fontSize="24px" gap="1.5rem">
-					<Box as={RichLogo} maxW="100%" h="auto" transform="rotate(10deg)" />
+				<VStack
+					align="center"
+					fontSize="24px"
+					gap="1.5rem"
+					minW={{ md: '200px' }}
+				>
+					<Box
+						as={RichLogo}
+						maxW="100%"
+						width={{ base: '350px', md: '100%' }}
+						h="auto"
+						transform="rotate(10deg) scale(.9)"
+					/>
 					<VStack align="center" gap="0.5rem" width="100%">
 						<Text>Free without limits.</Text>
 						<Link
 							href="/download"
 							variant="button-primary"
 							width="100%"
+							maxW={{ base: '250px', md: '100%' }}
 							textAlign="center"
 						>
 							Download now
 						</Link>
 					</VStack>
 				</VStack>
-			</Flex>
+			</Stack>
 
 			{/* Features Section */}
 			<Box maxW="100%" my="10rem">
@@ -301,7 +318,7 @@ export default function Hero() {
 					<Separator width="100%" />
 				</VStack>
 
-				<SimpleGrid columns={2} gap="2rem" rowGap="3rem">
+				<SimpleGrid columns={{ base: 1, md: 2 }} gap="2rem" rowGap="3rem">
 					{features.map((feature) => (
 						<VStack key={feature.title} gap="0.5rem" align="start">
 							<Heading
@@ -356,10 +373,21 @@ export default function Hero() {
 				pt="15%"
 				boxSizing="border-box"
 			>
-				<Heading as="h3" fontSize="42px" m={0}>
+				<Heading
+					as="h3"
+					m={0}
+					fontSize="42px"
+					lineHeight="1.1"
+					textAlign={{ base: 'center', md: 'start' }}
+				>
 					Notes for the mood you’re in
 				</Heading>
-				<Text maxW="60%" fontSize="22px" textAlign="center" m={0}>
+				<Text
+					maxW={{ base: undefined, md: '60%' }}
+					fontSize="22px"
+					textAlign="center"
+					m={0}
+				>
 					One space for everyday life, another for books, another for plans.
 					Switch contexts in a click, keep things clean, and keep writing
 					without overthinking where it should go.

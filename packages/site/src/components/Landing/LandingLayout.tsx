@@ -1,5 +1,20 @@
 import React, { Fragment, type ReactNode } from 'react';
-import { Box, Container, Flex, Grid, HStack, VStack } from '@chakra-ui/react';
+import { IoIosMenu } from 'react-icons/io';
+import {
+	Box,
+	CloseButton,
+	Container,
+	Drawer,
+	Flex,
+	Grid,
+	HStack,
+	IconButton,
+	List,
+	Portal,
+	Separator,
+	Stack,
+	VStack,
+} from '@chakra-ui/react';
 
 import { Logo } from './Logo';
 import { Link, Text } from './StyledComponents';
@@ -38,41 +53,120 @@ const languagesList = [
 	'zh-tw',
 ];
 
+type SimpleLink = {
+	text: string;
+	url: string;
+};
+
+const links = {
+	main: [
+		{ text: 'Download', url: '/download' },
+		{ text: 'Features', url: '#' },
+		{ text: 'Docs', url: '/guides/example/' },
+	],
+	additional: [
+		{ text: 'Blog', url: '#' },
+		{ text: 'Changelog', url: '#' },
+	],
+} satisfies Record<string, SimpleLink[]>;
+
 interface LandingLayoutProps {
 	children: ReactNode;
 }
 
 export default function LandingLayout({ children }: LandingLayoutProps) {
 	return (
-		<Box>
+		<>
 			{/* Header */}
-			<Box as="header">
+			<Box as="header" maxW="100%" overflow="auto" position="relative">
 				<Container maxW="900px" px="1rem">
 					<HStack gap="1rem" align="center" py="1rem">
 						<Link href="/" variant="plain">
 							<Logo />
 						</Link>
-						<Box as="nav" aria-label="Main navigation">
+
+						<Drawer.Root size="full">
+							<Drawer.Trigger asChild>
+								<IconButton
+									variant="ghost"
+									display={{ base: undefined, md: 'none' }}
+									marginInlineStart="auto"
+								>
+									<Box as={IoIosMenu} boxSize="100%" />
+								</IconButton>
+							</Drawer.Trigger>
+							<Portal>
+								<Drawer.Backdrop />
+								<Drawer.Positioner>
+									<Drawer.Content backgroundColor="bg.canvas">
+										<Drawer.Header>
+											<Drawer.Title>
+												<Logo />
+											</Drawer.Title>
+											<Drawer.CloseTrigger asChild>
+												<CloseButton size="xs" display="flex" />
+											</Drawer.CloseTrigger>
+										</Drawer.Header>
+										<Drawer.Body
+											fontSize="20px"
+											fontWeight="500"
+											paddingBlock="1rem"
+										>
+											<List.Root
+												as="ul"
+												listStyle="none"
+												gap=".5rem"
+											>
+												{links.main.map((link, index) => (
+													<List.Item key={index}>
+														<Link href={link.url}>
+															{link.text}
+														</Link>
+													</List.Item>
+												))}
+											</List.Root>
+
+											<Separator marginBlock="1.5rem" />
+
+											<List.Root
+												as="ul"
+												listStyle="none"
+												gap=".5rem"
+											>
+												{links.additional.map((link, index) => (
+													<List.Item key={index}>
+														<Link href={link.url}>
+															{link.text}
+														</Link>
+													</List.Item>
+												))}
+											</List.Root>
+										</Drawer.Body>
+									</Drawer.Content>
+								</Drawer.Positioner>
+							</Portal>
+						</Drawer.Root>
+
+						<Box
+							as="nav"
+							aria-label="Main navigation"
+							display={{ base: 'none', md: 'block' }}
+						>
 							<HStack gap="1px">
-								<Link href="/download" variant="nav">
-									Download
-								</Link>
-								<Link href="#features" variant="nav">
-									Features
-								</Link>
-								<Link href="/guides/example/" variant="nav">
-									Docs
-								</Link>
+								{links.main.map((link, index) => (
+									<Link key={index} href={link.url} variant="nav">
+										{link.text}
+									</Link>
+								))}
 							</HStack>
 						</Box>
-						<Box as="nav" ml="auto">
+						<Box as="nav" ml="auto" display={{ base: 'none', md: 'block' }}>
 							<HStack gap="1px">
-								<Link href="#" variant="nav">
-									Blog
-								</Link>
-								<Link href="#" variant="nav">
-									Changelog
-								</Link>
+								{links.additional.map((link, index) => (
+									<Link key={index} href={link.url} variant="nav">
+										{link.text}
+									</Link>
+								))}
 							</HStack>
 						</Box>
 					</HStack>
@@ -87,7 +181,12 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 			{/* Footer */}
 			<Box as="footer" pt="1rem" pb="5rem">
 				<Box maxW="900px" mx="auto" px="1rem">
-					<Flex wrap="wrap" w="100%">
+					<Stack
+						wrap="wrap"
+						w="100%"
+						direction={{ base: 'column-reverse', md: 'row' }}
+						gap={{ base: '3rem', md: '1rem' }}
+					>
 						<VStack align="start" gap="1rem">
 							<Link href="/" variant="plain">
 								<Logo />
@@ -127,11 +226,15 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 						</VStack>
 
 						<Grid
-							templateColumns="repeat(auto-fit, minmax(100px, 1fr))"
-							gap="2rem"
+							templateColumns={{
+								base: 'repeat(auto-fit, minmax(80px, 1fr))',
+								md: 'repeat(auto-fit, minmax(100px, 1fr))',
+							}}
+							gap={{ base: '.5rem', md: '2rem' }}
 							flexGrow={1}
-							maxW="50%"
-							ml="auto"
+							maxW={{ base: undefined, md: '50%' }}
+							ml={{ md: 'auto' }}
+							width={{ base: '100%', md: 'auto' }}
 						>
 							<VStack align="start" gap="0.6rem" fontWeight="500">
 								<Text
@@ -217,13 +320,13 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 								</VStack>
 							</VStack>
 						</Grid>
-					</Flex>
+					</Stack>
 				</Box>
 
 				<Box maxW="900px" mx="auto" px="1rem" mt="3rem">
 					<Flex
 						wrap="wrap"
-						fontSize="0.8rem"
+						fontSize={{ base: '1.1rem', md: '0.8rem' }}
 						py="1rem"
 						whiteSpace="pre-wrap"
 						justify="center"
@@ -239,6 +342,6 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 					</Flex>
 				</Box>
 			</Box>
-		</Box>
+		</>
 	);
 }

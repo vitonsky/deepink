@@ -56,6 +56,7 @@ const linkRecipe = defineRecipe({
 				_hover: {
 					color: 'link.hover',
 				},
+				display: 'inline-block',
 			},
 			plain: {
 				color: 'black',
