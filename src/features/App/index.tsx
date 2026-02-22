@@ -53,35 +53,14 @@ export const App: FC = () => {
 		profiles: profileContainers,
 	});
 
-	const [vaultView, setVaultView] = useState<'createVault' | 'chooseVault'>(
-		'chooseVault',
-	);
-	const currentScreen: 'loading' | 'main' | 'vaultManager' = useMemo(() => {
-		if (
-			!profilesList.isProfilesLoaded ||
-			!recentProfile.isLoaded ||
-			isProfileOpening
-		) {
-			return 'loading';
-		}
+	const [vaultView, setVaultView] = useState<'create' | 'choose'>('choose');
 
-		if (profileContainers.profiles.length > 0) {
-			return 'main';
-		}
-
-		return 'vaultManager';
-	}, [
-		isProfileOpening,
-		profileContainers.profiles.length,
-		profilesList.isProfilesLoaded,
-		recentProfile.isLoaded,
-	]);
-
-	if (currentScreen === 'loading') {
+	if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening) {
 		return <SplashScreen />;
 	}
 
-	if (currentScreen === 'main') {
+	// Profile screen
+	if (profileContainers.profiles.length > 0) {
 		return (
 			<Box
 				sx={{
@@ -96,6 +75,7 @@ export const App: FC = () => {
 		);
 	}
 
+	// Managing vault screens
 	const hasNoProfiles = profilesList.profiles.length === 0;
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
@@ -108,7 +88,7 @@ export const App: FC = () => {
 					/>
 				)}
 
-				{(vaultView === 'createVault' || hasNoProfiles) && (
+				{(vaultView === 'create' || hasNoProfiles) && (
 					<ProfileCreator
 						onCreateProfile={(profile) =>
 							profilesList.createProfile(profile).then((newProfile) => {
@@ -119,7 +99,7 @@ export const App: FC = () => {
 							})
 						}
 						onCancel={
-							hasNoProfiles ? undefined : () => setVaultView('chooseVault')
+							hasNoProfiles ? undefined : () => setVaultView('choose')
 						}
 						defaultProfileName={
 							hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
@@ -127,63 +107,61 @@ export const App: FC = () => {
 					/>
 				)}
 
-				{vaultView === 'chooseVault' &&
-					!currentProfileObject &&
-					!hasNoProfiles && (
-						<ProfilesForm
-							title="Choose the profile"
-							controls={
-								<Button
-									variant="accent"
-									size="lg"
-									w="100%"
-									onClick={() => setVaultView('createVault')}
-								>
-									Create new profile
-								</Button>
-							}
-						>
-							<NestedList
-								divider={<Divider margin="0px !important" />}
-								sx={{
-									w: '100%',
-									borderRadius: '4px',
-									maxHeight: '230px',
-									overflow: 'auto',
-									border: '1px solid',
-								}}
-								items={profilesList.profiles.map((profile) => ({
-									id: profile.id,
-									content: (
-										<HStack
-											as="button"
-											key={profile.id}
-											sx={{
-												padding: '.8rem 1rem',
-												w: '100%',
-												cursor: 'pointer',
-												gap: '.8rem',
-											}}
-											onClick={() => {
-												setCurrentProfileId(profile.id);
+				{vaultView !== 'create' && !currentProfileObject && !hasNoProfiles && (
+					<ProfilesForm
+						title="Choose the profile"
+						controls={
+							<Button
+								variant="accent"
+								size="lg"
+								w="100%"
+								onClick={() => setVaultView('create')}
+							>
+								Create new profile
+							</Button>
+						}
+					>
+						<NestedList
+							divider={<Divider margin="0px !important" />}
+							sx={{
+								w: '100%',
+								borderRadius: '4px',
+								maxHeight: '230px',
+								overflow: 'auto',
+								border: '1px solid',
+							}}
+							items={profilesList.profiles.map((profile) => ({
+								id: profile.id,
+								content: (
+									<HStack
+										as="button"
+										key={profile.id}
+										sx={{
+											padding: '.8rem 1rem',
+											w: '100%',
+											cursor: 'pointer',
+											gap: '.8rem',
+										}}
+										onClick={() => {
+											setCurrentProfileId(profile.id);
 
-												if (profile.encryption === null) {
-													onOpenProfile(profile);
-												}
+											if (profile.encryption === null) {
+												onOpenProfile(profile);
+											}
 
-												telemetry.track(
-													TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
-												);
-											}}
-										>
-											<FaUser />
-											<Text>{profile.name}</Text>
-										</HStack>
-									),
-								}))}
-							/>
-						</ProfilesForm>
-					)}
+											telemetry.track(
+												TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
+											);
+										}}
+									>
+										<FaUser />
+										<Text>{profile.name}</Text>
+									</HStack>
+								),
+							}))}
+						/>
+					</ProfilesForm>
+				)}
 			</Box>
 		</Box>
 	);

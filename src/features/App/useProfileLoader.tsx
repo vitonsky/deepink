@@ -12,6 +12,7 @@ type PickProfileResponse = {
 export type OnPickProfile = (
 	profile: ProfileObject,
 	password?: string,
+	shouldShowSplash?: boolean,
 ) => Promise<PickProfileResponse>;
 
 export type UseProfileLoaderProps = {
@@ -30,15 +31,16 @@ export const useProfileLoader = ({
 	recentProfile,
 	setCurrentProfileId,
 }: UseProfileLoaderProps) => {
-	const [isOpening, setIsOpening] = useState(true);
+	const [isProfileOpening, setIsProfileOpening] = useState(true);
 
 	const onOpenProfile: OnPickProfile = useCallback(
-		async (profile: ProfileObject, password?: string) => {
+		async (profile: ProfileObject, password?: string, shouldShowSplash = true) => {
+			if (shouldShowSplash) setIsProfileOpening(true);
+
 			// Profiles with no password
 			if (!profile.encryption) {
-				setIsOpening(true);
 				await profiles.openProfile({ profile }, true);
-				setIsOpening(false);
+				setIsProfileOpening(false);
 				return { status: 'ok' };
 			}
 
@@ -54,7 +56,7 @@ export const useProfileLoader = ({
 
 				return { status: 'error', message: 'Invalid password' };
 			} finally {
-				setIsOpening(false);
+				setIsProfileOpening(false);
 			}
 		},
 		[profiles],
@@ -73,7 +75,7 @@ export const useProfileLoader = ({
 			);
 
 			if (!profile || profile.encryption) {
-				setIsOpening(false);
+				setIsProfileOpening(false);
 				return;
 			}
 
@@ -85,7 +87,7 @@ export const useProfileLoader = ({
 	);
 
 	return {
-		isOpening,
+		isOpening: isProfileOpening,
 		onOpenProfile,
 	};
 };
