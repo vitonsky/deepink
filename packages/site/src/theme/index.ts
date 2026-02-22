@@ -57,45 +57,46 @@ const linkRecipe = defineRecipe({
 					color: 'link.hover',
 				},
 			},
+			plain: {
+				color: 'black',
+				textDecoration: 'none',
+				_hover: {
+					textDecoration: 'none',
+					color: 'black',
+				},
+			},
 			nav: {
 				display: 'inline-flex',
+				userSelect: 'none',
 				fontSize: '0.9rem',
-				px: '0.5rem',
+				px: '0.8rem',
 				py: '0.5rem',
 				borderRadius: '6px',
 				fontWeight: '500',
-				color: 'brand.navText',
+				color: '#262423',
 				_hover: {
-					color: 'black',
-					bg: 'brand.navHover',
-				},
-			},
-			logo: {
-				display: 'inline-flex',
-				gap: '0.3rem',
-				fontSize: '1.3rem',
-				fontWeight: 'bold',
-				color: 'black',
-				_hover: {
-					color: 'black',
+					bg: '#ffe2cb',
+					color: 'brand.buttonSecondaryText',
 				},
 			},
 			'button-primary': {
 				display: 'inline-block',
+				userSelect: 'none',
 				fontSize: '18px',
 				px: '1.4rem',
 				py: '0.7rem',
 				borderRadius: '8px',
 				fontWeight: '500',
-				bg: 'black',
+				bg: '#754f2f',
 				color: 'white',
 				_hover: {
-					bg: '#1a1a1a',
+					bg: '#975b29',
 					color: 'white',
 				},
 			},
 			'button-secondary': {
 				display: 'inline-block',
+				userSelect: 'none',
 				fontSize: '18px',
 				px: '1.4rem',
 				py: '0.7rem',
@@ -104,7 +105,7 @@ const linkRecipe = defineRecipe({
 				bg: 'brand.buttonSecondaryBg',
 				color: 'brand.buttonSecondaryText',
 				_hover: {
-					bg: '#ffd5ad',
+					bg: '#ffe2cb',
 					color: 'brand.buttonSecondaryText',
 				},
 			},
@@ -160,11 +161,8 @@ const customConfig = defineConfig({
 					primary: { value: '#b55d0e' },
 					primaryHover: { value: '#f36e02' },
 					secondary: { value: '#654c3d' },
-					border: { value: '#fed5b2' },
 					buttonSecondaryBg: { value: '#ffe7d3' },
 					buttonSecondaryText: { value: '#754f2f' },
-					navText: { value: '#262423' },
-					navHover: { value: '#ffc29136' },
 					heroHeader: { value: '#321e04' },
 					hrBorder: { value: '#f4e5dd' },
 				},
@@ -177,17 +175,34 @@ const customConfig = defineConfig({
 		},
 		semanticTokens: {
 			colors: {
+				'color-palette-focus-ring': {
+					value: '{colors.orange.500}',
+				},
+
 				'link.default': { value: '{colors.brand.primary}' },
 				'link.hover': { value: '{colors.brand.primaryHover}' },
+				border: {
+					thin: { value: '#f6e8d5' },
+					contrast: { value: '#ffdbbd' },
+				},
 			},
 		},
 		recipes: {
 			button: buttonRecipe,
 			link: linkRecipe,
 			text: textRecipe,
+			separator: defineRecipe({
+				base: {
+					borderColor: 'border.thin',
+				},
+			}),
 		},
 	},
 	globalCss: {
+		'::selection': {
+			bg: '#ffe7d3',
+			color: '#b55d0e',
+		},
 		body: {
 			margin: 0,
 			bg: 'bg.canvas',

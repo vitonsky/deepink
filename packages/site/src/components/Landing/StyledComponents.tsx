@@ -9,7 +9,7 @@ import { system } from '../../theme';
 export const Link = React.forwardRef<
 	HTMLAnchorElement,
 	React.ComponentProps<typeof chakra.a> & {
-		variant?: 'default' | 'nav' | 'logo' | 'button-primary' | 'button-secondary';
+		variant?: 'default' | 'nav' | 'plain' | 'button-primary' | 'button-secondary';
 	}
 >((props, ref) => {
 	const { variant = 'default', ...rest } = props;

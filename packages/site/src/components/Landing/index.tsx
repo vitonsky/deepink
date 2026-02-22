@@ -4,10 +4,10 @@ import React, { Fragment, type ReactNode } from 'react';
 import {
 	Box,
 	Flex,
-	Grid,
 	Heading,
 	HStack,
 	Image,
+	Separator,
 	SimpleGrid,
 	VStack,
 } from '@chakra-ui/react';
@@ -20,17 +20,8 @@ import linksScreenshot from './features/links.png';
 import remindersScreenshot from './features/reminders.png';
 import tagsScreenshot from './features/tags.png';
 import workspacesScreenshot from './features/workspaces.png';
-import Logo from './icon-simple.svg?react';
 import LandingLayout from './LandingLayout';
 import { Link, Text } from './StyledComponents';
-
-function getNativeLanguageName(langCode: string) {
-	const display = new Intl.DisplayNames([langCode], {
-		type: 'language',
-	});
-
-	return display.of(langCode);
-}
 
 const highlights: {
 	title: string;
@@ -232,229 +223,10 @@ const features: {
 // TODO: add docs
 // TODO: add blog
 export default function Hero() {
-	const logoElement = (
-		<Link href="/" variant="logo">
-			<Box as={Logo} display="inline-block" w="1.2em" h="1.2em" />
-			<span>Deepink</span>
-		</Link>
-	);
-
-	const mainNav = (
-		<>
-			<Link href="/download" variant="nav">
-				Download
-			</Link>
-			<Link href="#features" variant="nav">
-				Features
-			</Link>
-			<Link href="/guides/example/" variant="nav">
-				Docs
-			</Link>
-		</>
-	);
-
-	const secondaryNav = (
-		<>
-			<Link href="#" variant="nav">
-				Blog
-			</Link>
-			<Link href="#" variant="nav">
-				Changelog
-			</Link>
-		</>
-	);
-
-	const footer = (
-		<>
-			<Box maxW="900px" mx="auto" px="1rem">
-				<Flex wrap="wrap" w="100%">
-					<VStack align="start" gap="1rem">
-						<Link href="/" variant="logo">
-							<Box as={Logo} display="inline-block" w="1.2em" h="1.2em" />
-							<span>Deepink</span>
-						</Link>
-
-						<VStack align="start" gap="0.8rem" fontWeight="500">
-							<Text
-								fontWeight="500"
-								fontSize="1.1rem"
-								color="brand.secondary"
-							>
-								Follow us
-							</Text>
-							<VStack
-								as="ul"
-								listStyleType="none"
-								m={0}
-								p={0}
-								gap="0.4rem"
-								align="start"
-							>
-								<Box as="li">
-									<Link href="/">GitHub</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">Mastodon</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">Bluesky</Link>
-								</Box>
-							</VStack>
-						</VStack>
-
-						<Text as="small" fontWeight="500" color="brand.secondary">
-							© {new Date().getFullYear()} Deepink
-						</Text>
-					</VStack>
-
-					<Grid
-						templateColumns="repeat(auto-fit, minmax(100px, 1fr))"
-						gap="2rem"
-						flexGrow={1}
-						maxW="50%"
-						ml="auto"
-					>
-						<VStack align="start" gap="0.8rem" fontWeight="500">
-							<Text
-								fontWeight="500"
-								fontSize="1.1rem"
-								color="brand.secondary"
-							>
-								Get started
-							</Text>
-							<VStack
-								as="ul"
-								listStyleType="none"
-								m={0}
-								p={0}
-								gap="0.4rem"
-								align="start"
-							>
-								<Box as="li">
-									<Link href="/">Download</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">Docs</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">Overview</Link>
-								</Box>
-							</VStack>
-						</VStack>
-
-						<VStack align="start" gap="0.8rem" fontWeight="500">
-							<Text
-								fontWeight="500"
-								fontSize="1.1rem"
-								color="brand.secondary"
-							>
-								Learn
-							</Text>
-							<VStack
-								as="ul"
-								listStyleType="none"
-								m={0}
-								p={0}
-								gap="0.4rem"
-								align="start"
-							>
-								<Box as="li">
-									<Link href="/">Help</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">Changelog</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">About</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">Roadmap</Link>
-								</Box>
-							</VStack>
-						</VStack>
-
-						<VStack align="start" gap="0.8rem" fontWeight="500">
-							<Text
-								fontWeight="500"
-								fontSize="1.1rem"
-								color="brand.secondary"
-							>
-								Resources
-							</Text>
-							<VStack
-								as="ul"
-								listStyleType="none"
-								m={0}
-								p={0}
-								gap="0.4rem"
-								align="start"
-							>
-								<Box as="li">
-									<Link href="/">Terms of Use</Link>
-								</Box>
-								<Box as="li">
-									<Link href="/">Privacy Policy</Link>
-								</Box>
-							</VStack>
-						</VStack>
-					</Grid>
-				</Flex>
-			</Box>
-
-			<Box maxW="900px" mx="auto" px="1rem" mt="3rem">
-				<Flex
-					wrap="wrap"
-					fontSize="0.8rem"
-					py="1rem"
-					whiteSpace="pre-wrap"
-					justify="center"
-				>
-					{[
-						'bg',
-						'ca',
-						'cs',
-						'da',
-						'de',
-						'es',
-						'fr',
-						'hu',
-						'it',
-						'ja',
-						'ko',
-						'nb',
-						'pl',
-						'pt-br',
-						'pt-pt',
-						'ru',
-						'sl',
-						'sv',
-						'tr',
-						'uk',
-						'vi',
-						'zh-cn',
-						'zh-tw',
-					].map((language, index) => (
-						<Fragment key={language}>
-							{index > 0 ? ' | ' : undefined}
-							<Link href={`/${language}`}>
-								{getNativeLanguageName(language)?.trim()}
-							</Link>
-						</Fragment>
-					))}
-				</Flex>
-			</Box>
-		</>
-	);
-
 	return (
-		<LandingLayout
-			logo={logoElement}
-			mainNavigation={mainNav}
-			secondaryNavigation={secondaryNav}
-			footer={footer}
-		>
+		<LandingLayout>
 			{/* Hero Section */}
-			<VStack gap="3rem" my="5rem">
+			<VStack gap="3rem" my="5rem" align="start">
 				<VStack gap="1.6rem" align="start">
 					<Heading
 						as="h2"
@@ -465,7 +237,7 @@ export default function Hero() {
 					>
 						Snapshot your thoughts.
 					</Heading>
-					<Text fontSize="20px" m={0} color="brand.secondary">
+					<Text fontSize="22px" m={0} color="brand.secondary">
 						Deepink is a <b>privacy focused</b> note taking app with a light
 						speed workflow.
 					</Text>
@@ -485,7 +257,7 @@ export default function Hero() {
 					}}
 					borderRadius="18px"
 					border="3px solid"
-					borderColor="brand.border"
+					borderColor="border.contrast"
 				/>
 			</VStack>
 
@@ -506,9 +278,14 @@ export default function Hero() {
 
 				<VStack align="center" fontSize="24px" gap="1.5rem">
 					<Box as={RichLogo} maxW="100%" h="auto" transform="rotate(10deg)" />
-					<VStack align="center" gap="0.3rem">
+					<VStack align="center" gap="0.5rem" width="100%">
 						<Text>Free without limits.</Text>
-						<Link href="/download" variant="button-primary">
+						<Link
+							href="/download"
+							variant="button-primary"
+							width="100%"
+							textAlign="center"
+						>
 							Download now
 						</Link>
 					</VStack>
@@ -517,7 +294,7 @@ export default function Hero() {
 
 			{/* Features Section */}
 			<Box maxW="100%" my="10rem">
-				<Box mb="3rem">
+				<VStack mb="3rem" align="start" gap="1rem" w="100%">
 					<Heading as="h3" fontSize="32px" fontWeight="500" m={0}>
 						Your Thinking, Structured
 					</Heading>
@@ -525,8 +302,8 @@ export default function Hero() {
 						Capture a quick insight or shape something complex — Deepink
 						brings order, focus, and structure to every idea.
 					</Text>
-					<Box as="hr" />
-				</Box>
+					<Separator width="100%" />
+				</VStack>
 
 				<SimpleGrid columns={2} gap="2rem" rowGap="3rem">
 					{features.map((feature) => (
@@ -545,6 +322,10 @@ export default function Hero() {
 								fontSize="18px"
 								mb="0.5rem"
 								color="brand.secondary"
+								as="div"
+								display="flex"
+								flexDirection="column"
+								gap="1rem"
 							>
 								{feature.content}
 							</Text>
@@ -552,7 +333,7 @@ export default function Hero() {
 								overflow="hidden"
 								m={0}
 								border="3px solid"
-								borderColor="brand.border"
+								borderColor="border.contrast"
 								borderRadius="14px"
 								maxH="300px"
 							>
