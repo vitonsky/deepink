@@ -93,7 +93,7 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 								<Logo />
 							</Link>
 
-							<VStack align="start" gap="0.8rem" fontWeight="500">
+							<VStack align="start" gap="0.6rem" fontWeight="500">
 								<Text
 									fontWeight="500"
 									fontSize="1.1rem"
@@ -106,7 +106,7 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 									listStyleType="none"
 									m={0}
 									p={0}
-									gap="0.4rem"
+									gap="0.2rem"
 									align="start"
 								>
 									<Box as="li">
@@ -133,7 +133,7 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 							maxW="50%"
 							ml="auto"
 						>
-							<VStack align="start" gap="0.8rem" fontWeight="500">
+							<VStack align="start" gap="0.6rem" fontWeight="500">
 								<Text
 									fontWeight="500"
 									fontSize="1.1rem"
@@ -146,7 +146,7 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 									listStyleType="none"
 									m={0}
 									p={0}
-									gap="0.4rem"
+									gap="0.2rem"
 									align="start"
 								>
 									<Box as="li">

@@ -69,8 +69,7 @@ const linkRecipe = defineRecipe({
 				display: 'inline-flex',
 				userSelect: 'none',
 				fontSize: '0.9rem',
-				px: '0.8rem',
-				py: '0.5rem',
+				padding: '.4rem .5rem',
 				borderRadius: '6px',
 				fontWeight: '500',
 				color: '#262423',
@@ -87,10 +86,10 @@ const linkRecipe = defineRecipe({
 				py: '0.7rem',
 				borderRadius: '8px',
 				fontWeight: '500',
-				bg: '#754f2f',
+				bg: '#df560e',
 				color: 'white',
 				_hover: {
-					bg: '#975b29',
+					bg: '#ee5708',
 					color: 'white',
 				},
 			},
@@ -203,10 +202,12 @@ const customConfig = defineConfig({
 			bg: '#ffe7d3',
 			color: '#b55d0e',
 		},
-		body: {
-			margin: 0,
+		':root': {
 			bg: 'bg.canvas',
 			fontFamily: 'body',
+		},
+		body: {
+			margin: 0,
 		},
 		img: {
 			maxWidth: '100%',

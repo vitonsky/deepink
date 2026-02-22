@@ -1,5 +1,3 @@
-// TODO: fix all typos
-
 import React, { Fragment, type ReactNode } from 'react';
 import {
 	Box,
@@ -210,8 +208,6 @@ const features: {
 	},
 ];
 
-// TODO: update texts
-// TODO: fix styles. Tune colors
 // TODO: localize page
 // TODO: add download page & json page with data from github releases
 // TODO: adopt to make it work on mobile
