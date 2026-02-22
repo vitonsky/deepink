@@ -1,4 +1,4 @@
-import React, { FC, useLayoutEffect, useMemo, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
@@ -29,8 +29,6 @@ const defaultProfileNames = [
 	'Idea lab',
 ];
 
-type Screen = 'loading' | 'main' | 'choose' | 'create' | 'login';
-
 export const App: FC = () => {
 	const files = useFilesStorage();
 	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
@@ -55,49 +53,35 @@ export const App: FC = () => {
 		profiles: profileContainers,
 	});
 
-	const hasNoProfiles = profilesList.profiles.length === 0;
-	const [screen, setScreen] = useState<Screen>('loading');
-	useLayoutEffect(() => {
+	const [vaultView, setVaultView] = useState<'createVault' | 'chooseVault'>(
+		'chooseVault',
+	);
+	const currentScreen: 'loading' | 'main' | 'vaultManager' = useMemo(() => {
 		if (
 			!profilesList.isProfilesLoaded ||
 			!recentProfile.isLoaded ||
 			isProfileOpening
 		) {
-			setScreen('loading');
-			return;
+			return 'loading';
 		}
 
 		if (profileContainers.profiles.length > 0) {
-			setScreen('main');
-			return;
+			return 'main';
 		}
 
-		if (currentProfileObject) {
-			setScreen('login');
-			return;
-		}
-
-		if (hasNoProfiles || screen === 'create') {
-			setScreen('create');
-			return;
-		}
-
-		setScreen('choose');
+		return 'vaultManager';
 	}, [
-		currentProfileObject,
-		hasNoProfiles,
 		isProfileOpening,
 		profileContainers.profiles.length,
 		profilesList.isProfilesLoaded,
 		recentProfile.isLoaded,
-		screen,
 	]);
 
-	if (screen === 'loading') {
+	if (currentScreen === 'loading') {
 		return <SplashScreen />;
 	}
 
-	if (screen === 'main') {
+	if (currentScreen === 'main') {
 		return (
 			<Box
 				sx={{
@@ -112,6 +96,7 @@ export const App: FC = () => {
 		);
 	}
 
+	const hasNoProfiles = profilesList.profiles.length === 0;
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<Box maxW="500px" minW="350px" padding="1rem">
@@ -119,13 +104,11 @@ export const App: FC = () => {
 					<ProfileLoginForm
 						profile={currentProfileObject}
 						onLogin={onOpenProfile}
-						onPickAnotherProfile={() => {
-							setCurrentProfileId(null);
-						}}
+						onPickAnotherProfile={() => setCurrentProfileId(null)}
 					/>
 				)}
 
-				{screen === 'create' && (
+				{(vaultView === 'createVault' || hasNoProfiles) && (
 					<ProfileCreator
 						onCreateProfile={(profile) =>
 							profilesList.createProfile(profile).then((newProfile) => {
@@ -135,70 +118,72 @@ export const App: FC = () => {
 								).then(console.warn);
 							})
 						}
-						onCancel={hasNoProfiles ? undefined : () => setScreen('choose')}
+						onCancel={
+							hasNoProfiles ? undefined : () => setVaultView('chooseVault')
+						}
 						defaultProfileName={
 							hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
 						}
 					/>
 				)}
 
-				{screen === 'choose' && (
-					<ProfilesForm
-						title="Choose the profile"
-						controls={
-							<>
+				{vaultView === 'chooseVault' &&
+					!currentProfileObject &&
+					!hasNoProfiles && (
+						<ProfilesForm
+							title="Choose the profile"
+							controls={
 								<Button
 									variant="accent"
 									size="lg"
 									w="100%"
-									onClick={() => setScreen('create')}
+									onClick={() => setVaultView('createVault')}
 								>
 									Create new profile
 								</Button>
-							</>
-						}
-					>
-						<NestedList
-							divider={<Divider margin="0px !important" />}
-							sx={{
-								w: '100%',
-								borderRadius: '4px',
-								maxHeight: '230px',
-								overflow: 'auto',
+							}
+						>
+							<NestedList
+								divider={<Divider margin="0px !important" />}
+								sx={{
+									w: '100%',
+									borderRadius: '4px',
+									maxHeight: '230px',
+									overflow: 'auto',
+									border: '1px solid',
+								}}
+								items={profilesList.profiles.map((profile) => ({
+									id: profile.id,
+									content: (
+										<HStack
+											as="button"
+											key={profile.id}
+											sx={{
+												padding: '.8rem 1rem',
+												w: '100%',
+												cursor: 'pointer',
+												gap: '.8rem',
+											}}
+											onClick={() => {
+												setCurrentProfileId(profile.id);
 
-								border: '1px solid',
-							}}
-							items={(profilesList.profiles ?? []).map((profile) => ({
-								id: profile.id,
-								content: (
-									<HStack
-										as="button"
-										sx={{
-											padding: '.8rem 1rem',
-											w: '100%',
-											cursor: 'pointer',
-											gap: '.8rem',
-										}}
-										key={profile.id}
-										onClick={() => {
-											setCurrentProfileId(profile.id);
-											if (profile.encryption === null) {
-												onOpenProfile(profile);
-											}
+												if (profile.encryption === null) {
+													onOpenProfile(profile);
+												}
 
-											telemetry.track(
-												TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
-											);
-										}}
-									>
-										<FaUser />
-										<Text>{profile.name}</Text>
-									</HStack>
-								),
-							}))}
-						/>
-					</ProfilesForm>
-				)}
+												telemetry.track(
+													TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
+												);
+											}}
+										>
+											<FaUser />
+											<Text>{profile.name}</Text>
+										</HStack>
+									),
+								}))}
+							/>
+						</ProfilesForm>
+					)}
 			</Box>
 		</Box>
 	);
