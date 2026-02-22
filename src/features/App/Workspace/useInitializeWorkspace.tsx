@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { workspacesApi } from '@state/redux/profiles/profiles';
+import { NOTES_VIEW, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
@@ -36,6 +36,22 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 
 				if (!state) return;
+
+				if (state.view) {
+					dispatch(
+						workspacesApi.setView({
+							...workspaceData,
+							view: state.view as NOTES_VIEW,
+						}),
+					);
+				}
+
+				dispatch(
+					workspacesApi.setSearch({
+						...workspaceData,
+						search: state.search || '',
+					}),
+				);
 
 				const hasSelectedTag = tags.some((tag) => tag.id === state.selectedTagId);
 				if (hasSelectedTag) {

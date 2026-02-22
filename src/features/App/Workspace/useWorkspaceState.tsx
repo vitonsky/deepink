@@ -12,6 +12,8 @@ const WorkspaceScheme = z.object({
 	openedNoteIds: z.array(z.string()).nullable(),
 	activeNoteId: z.string().nullable(),
 	selectedTagId: z.string().nullable(),
+	view: z.string().nullable(),
+	search: z.string().nullable(),
 });
 
 export const useWorkspaceState = ({
@@ -50,6 +52,8 @@ export const useWorkspaceState = ({
 						openedNotes: state.openedNotes,
 						activeNoteId: state.activeNote,
 						selectedTagId: state.tags.selected,
+						view: state.view,
+						search: state.search,
 					};
 				},
 			),
@@ -62,6 +66,8 @@ export const useWorkspaceState = ({
 					openedNoteIds: noteIds,
 					activeNoteId: state.activeNoteId,
 					selectedTagId: state.selectedTagId,
+					view: state.view,
+					search: state.search,
 				});
 			},
 			init: false,
