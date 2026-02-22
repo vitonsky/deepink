@@ -3,7 +3,16 @@ import { ProfileObject } from '@core/storage/ProfilesManager';
 
 import { ProfilesApi } from './Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from './useProfilesList';
-import { OnPickProfile } from './WorkspaceManager';
+
+type PickProfileResponse = {
+	status: 'ok' | 'error';
+	message?: string;
+};
+
+export type OnPickProfile = (
+	profile: ProfileObject,
+	password?: string,
+) => Promise<PickProfileResponse>;
 
 export type UseProfileLoaderProps = {
 	profilesList: ProfilesListApi;

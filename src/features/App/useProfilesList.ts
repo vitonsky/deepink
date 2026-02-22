@@ -4,8 +4,9 @@ import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { RootedFS } from '@core/features/files/RootedFS';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
-import { NewProfile } from '@features/App/WorkspaceManager/ProfileCreator';
 import { useFilesStorage } from '@features/files';
+
+import { NewProfile } from './Profile/ProfileCreator';
 
 export type ProfilesListApi = {
 	isProfilesLoaded: boolean;
