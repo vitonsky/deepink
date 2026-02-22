@@ -1,5 +1,5 @@
 // TODO: fix all typos
-/* eslint-disable @cspell/spellchecker */
+
 import React, { Fragment, type ReactNode } from 'react';
 import {
 	Box,
@@ -243,7 +243,7 @@ export default function Hero() {
 					</Text>
 					<HStack gap="0.8rem">
 						<Link href="/download" variant="button-primary">
-							Download
+							Get Deepink
 						</Link>
 						<Link href="/download" variant="button-secondary">
 							See features
@@ -299,7 +299,7 @@ export default function Hero() {
 						Your Thinking, Structured
 					</Heading>
 					<Text fontSize="22px" color="brand.secondary">
-						Capture a quick insight or shape something complex — Deepink
+						Capture a quick insight or shape something complex - Deepink
 						brings order, focus, and structure to every idea.
 					</Text>
 					<Separator width="100%" />
@@ -361,15 +361,15 @@ export default function Hero() {
 				boxSizing="border-box"
 			>
 				<Heading as="h3" fontSize="42px" m={0}>
-					Spark ideas
+					Notes for the mood you’re in
 				</Heading>
-				<Text maxW="50%" fontSize="22px" m={0}>
-					From personal notes to journaling, knowledge bases, and project
-					management, Obsidian gives you the tools to come up with ideas and
-					organize them.
+				<Text maxW="60%" fontSize="22px" textAlign="center" m={0}>
+					One space for everyday life, another for books, another for plans.
+					Switch contexts in a click, keep things clean, and keep writing
+					without overthinking where it should go.
 				</Text>
 				<Link href="/download" variant="button-primary">
-					Download
+					Get Deepink
 				</Link>
 			</VStack>
 		</LandingLayout>
