@@ -7,7 +7,7 @@ import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
 
-export const useInitWorkspaceState = (workspace: WorkspaceContainer | null) => {
+export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const controls = useProfileControls();
@@ -20,7 +20,6 @@ export const useInitWorkspaceState = (workspace: WorkspaceContainer | null) => {
 
 	useEffect(() => {
 		if (!workspace) return;
-		let isMounted = true;
 
 		const cleanupTags = workspace.tagsRegistry.onChange(async () => {
 			workspace.tagsRegistry.getTags().then((tags) => {
@@ -34,12 +33,19 @@ export const useInitWorkspaceState = (workspace: WorkspaceContainer | null) => {
 					getWorkspaceState(),
 					workspace.tagsRegistry.getTags(),
 				]);
-
-				if (!isMounted) return;
-
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 
 				if (!state) return;
+
+				const hasSelectedTag = tags.some((tag) => tag.id === state.selectedTagId);
+				if (hasSelectedTag) {
+					dispatch(
+						workspacesApi.setSelectedTag({
+							...workspaceData,
+							tag: state.selectedTagId || null,
+						}),
+					);
+				}
 
 				if (!state.openedNoteIds || state.openedNoteIds.length === 0) return;
 				const notes = await workspace.notesRegistry.getById(state.openedNoteIds);
@@ -50,13 +56,6 @@ export const useInitWorkspaceState = (workspace: WorkspaceContainer | null) => {
 					workspacesApi.setActiveNote({
 						...workspaceData,
 						noteId: state.activeNoteId || null,
-					}),
-				);
-
-				dispatch(
-					workspacesApi.setSelectedTag({
-						...workspaceData,
-						tag: state.selectedTagId || null,
 					}),
 				);
 			} finally {
@@ -70,9 +69,8 @@ export const useInitWorkspaceState = (workspace: WorkspaceContainer | null) => {
 		};
 		initWorkspace();
 
-		// Reset workspace data and close notes by unmount
+		// Close notes by unmount
 		return () => {
-			isMounted = false;
 			cleanupTags();
 
 			dispatch(
