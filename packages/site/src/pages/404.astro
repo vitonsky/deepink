@@ -1,5 +1,8 @@
 ---
-import Page from "../features/404/index.astro"
+import Document from "../components/Document.astro"
+import Page from '../features/404';
 ---
 
-<Page/>
+<Document>
+  <Page client:load/>
+</Document>

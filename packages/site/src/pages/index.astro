@@ -1,5 +1,8 @@
 ---
-import Landing from "../features/Landing/index.astro"
+import Document from "../components/Document.astro"
+import Page from '../features/Landing';
 ---
 
-<Landing/>
+<Document>
+  <Page client:load/>
+</Document>
