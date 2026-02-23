@@ -67,8 +67,8 @@ const links = {
 		{ text: 'Docs', url: '/guides/example/' },
 	],
 	additional: [
-		{ text: 'Blog', url: '#' },
-		{ text: 'Changelog', url: '#' },
+		{ text: 'Blog', url: '/blog' },
+		{ text: 'Changelog', url: '/changelog' },
 	],
 } satisfies Record<string, SimpleLink[]>;
 
@@ -215,7 +215,12 @@ export default function Layout({ children }: LandingLayoutProps) {
 									align="start"
 								>
 									<Box as="li">
-										<Link href="/">GitHub</Link>
+										<Link
+											href="https://github.com/vitonsky/deepink"
+											target="_blank"
+										>
+											GitHub
+										</Link>
 									</Box>
 									<Box as="li">
 										<Link href="/">Mastodon</Link>
@@ -259,10 +264,10 @@ export default function Layout({ children }: LandingLayoutProps) {
 									align="start"
 								>
 									<Box as="li">
-										<Link href="/">Download</Link>
+										<Link href="/download">Download</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/">Docs</Link>
+										<Link href="/docs">Docs</Link>
 									</Box>
 									<Box as="li">
 										<Link href="/">Overview</Link>
@@ -287,16 +292,21 @@ export default function Layout({ children }: LandingLayoutProps) {
 									align="start"
 								>
 									<Box as="li">
-										<Link href="/">Help</Link>
+										<Link href="/docs">Help</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/">Changelog</Link>
+										<Link href="/changelog">Changelog</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/">About</Link>
+										<Link href="/about">About</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/">Roadmap</Link>
+										<Link
+											href="https://github.com/users/vitonsky/projects/3/views/2"
+											target="_blank"
+										>
+											Roadmap
+										</Link>
 									</Box>
 								</VStack>
 							</VStack>
@@ -318,10 +328,10 @@ export default function Layout({ children }: LandingLayoutProps) {
 									align="start"
 								>
 									<Box as="li">
-										<Link href="/">Terms of Use</Link>
+										<Link href="/terms">Terms of Use</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/">Privacy Policy</Link>
+										<Link href="/privacy">Privacy Policy</Link>
 									</Box>
 								</VStack>
 							</VStack>

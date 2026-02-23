@@ -210,10 +210,8 @@ const features: {
 	},
 ];
 
-// TODO: add download page & json page with data from github releases
 // TODO: add most important pages
-// TODO: update links
-// TODO: localize page
+// TODO: localize pages
 
 // TODO: add analytics
 // TODO: tune CEO tags
