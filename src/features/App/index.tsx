@@ -1,5 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
+import { useDebounce } from 'use-debounce';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -55,7 +56,10 @@ export const App: FC = () => {
 
 	const [vaultView, setVaultView] = useState<'create' | 'choose'>('choose');
 
-	if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening) {
+	const isLoading =
+		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening;
+	const [isShowSplash] = useDebounce(isLoading, 300);
+	if (isShowSplash) {
 		return <SplashScreen />;
 	}
 
