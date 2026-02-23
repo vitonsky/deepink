@@ -1,0 +1,17 @@
+---
+import Headers from "../../components/Headers.astro"
+import Landing from './index';
+---
+
+<html lang="en">
+  <head>
+    <Headers
+      title="Deepink - Snapshot your thoughts"
+      description="Deepink is a privacy focused note taking app with a light speed workflow. One space for everyday life, another for books, another for plans. Switch contexts in a click, keep things clean, and keep writing without overthinking where it should go."
+    />
+  </head>
+
+  <body>
+      <Landing client:load/>
+  </body>
+</html>
