@@ -1,8 +1,9 @@
 ---
+import appScreenshot from '../features/Landing/app.png';
 const {
   title,
   description,
-  image = "/og-image.png",
+  image = appScreenshot.src,
   url = Astro.site
 } = Astro.props;
 ---

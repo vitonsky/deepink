@@ -16,8 +16,10 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
+import ChakraProvider from '../ChakraProvider';
+import { Link } from '../Link';
+import { Text } from '../Text';
 import { Logo } from './Logo';
-import { Link, Text } from './StyledComponents';
 
 function getNativeLanguageName(langCode: string) {
 	const display = new Intl.DisplayNames([langCode], {
@@ -74,9 +76,9 @@ interface LandingLayoutProps {
 	children: ReactNode;
 }
 
-export default function LandingLayout({ children }: LandingLayoutProps) {
+export default function Layout({ children }: LandingLayoutProps) {
 	return (
-		<>
+		<ChakraProvider>
 			{/* Header */}
 			<Box as="header" maxW="100%" overflow="auto" position="relative">
 				<Container maxW="900px" px="1rem">
@@ -342,6 +344,6 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
 					</Flex>
 				</Box>
 			</Box>
-		</>
+		</ChakraProvider>
 	);
 }

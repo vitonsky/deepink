@@ -10,6 +10,10 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
+import LandingLayout from '../../components/Layout/Layout';
+import { Link } from '../../components/Link';
+import { Text } from '../../components/Text';
+
 import screenshot from './app.png';
 import RichLogo from './app.svg?react';
 import encryptionScreenshot from './features/encryption.png';
@@ -18,8 +22,6 @@ import linksScreenshot from './features/links.png';
 import remindersScreenshot from './features/reminders.png';
 import tagsScreenshot from './features/tags.png';
 import workspacesScreenshot from './features/workspaces.png';
-import LandingLayout from './LandingLayout';
-import { Link, Text } from './StyledComponents';
 
 const highlights: {
 	title: string;
@@ -217,7 +219,7 @@ const features: {
 // TODO: tune CEO tags
 // TODO: add docs
 // TODO: add blog
-export default function Hero() {
+export default function Landing() {
 	return (
 		<LandingLayout>
 			{/* Hero Section */}
