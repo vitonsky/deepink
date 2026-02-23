@@ -19,7 +19,7 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 	const controls = useProfileControls();
 
 	const getWorkspaceState = useWorkspaceState({
-		sync: true,
+		sync: Boolean(workspace),
 		controls,
 		workspaceId: workspaceData.workspaceId,
 	});
