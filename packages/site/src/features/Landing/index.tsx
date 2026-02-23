@@ -13,8 +13,8 @@ import {
 import LandingLayout from '../../components/Layout/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
+import { TheRock } from '../../components/TheRock';
 
-import Logo from './logo.svg?react';
 import screenshot from './screenshots/app.png';
 import encryptionScreenshot from './screenshots/encryption.png';
 import historyScreenshot from './screenshots/history.png';
@@ -260,13 +260,8 @@ export default function Landing() {
 			</VStack>
 
 			{/* Summary Section */}
-			<Stack
-				gap="3rem"
-				my="5rem"
-				direction={{ base: 'column', md: 'row' }}
-				separator={<Separator />}
-			>
-				<VStack gap="2rem" maxW={{ md: '500px' }} align="start">
+			<Stack gap="2rem" my="5rem" direction={{ base: 'column', md: 'row' }}>
+				<VStack gap="2rem" maxW={{ md: '550px' }} align="start">
 					{highlights.map((feature) => (
 						<VStack key={feature.title} gap="0.5rem" align="start">
 							<Heading as="h3" m={0} fontSize="22px" fontWeight="500">
@@ -279,21 +274,10 @@ export default function Landing() {
 					))}
 				</VStack>
 
-				<VStack
-					align="center"
-					fontSize="24px"
-					gap="1.5rem"
-					minW={{ md: '200px' }}
-				>
-					<Box
-						as={Logo}
-						maxW="100%"
-						width={{ base: '350px', md: '100%' }}
-						h="auto"
-						transform="rotate(10deg) scale(.9)"
-					/>
+				<VStack align="center" fontSize="24px" gap="2rem" minW={{ md: '200px' }}>
+					<TheRock maxW="300px" width={{ base: '350px', md: '100%' }} />
+
 					<VStack align="center" gap="0.5rem" width="100%">
-						<Text>Free without limits.</Text>
 						<Link
 							href="/download"
 							variant="button-primary"
@@ -303,6 +287,7 @@ export default function Landing() {
 						>
 							Download now
 						</Link>
+						<Text>Free without limits.</Text>
 					</VStack>
 				</VStack>
 			</Stack>
