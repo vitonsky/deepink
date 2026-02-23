@@ -18,7 +18,6 @@ import {
 	ProfileConfigScheme,
 	selectIsActiveWorkspaceReady,
 	selectWorkspacesInfo,
-	WorkspaceData,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
@@ -87,15 +86,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					profile: {
 						activeWorkspace: null,
 						workspaces: Object.fromEntries(
-							workspaces.map((workspace) => {
-								const workspaceObject = createWorkspaceObject(workspace);
-								return [
-									workspace.id,
-									{
-										...workspaceObject,
-									} satisfies WorkspaceData,
-								];
-							}),
+							workspaces.map((workspace) => [
+								workspace.id,
+								createWorkspaceObject(workspace),
+							]),
 						),
 						config: {
 							...defaultVaultConfig,
