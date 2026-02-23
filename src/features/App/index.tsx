@@ -1,6 +1,5 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
-import { useDebounce } from 'use-debounce';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -56,9 +55,24 @@ export const App: FC = () => {
 
 	const [vaultView, setVaultView] = useState<'create' | 'choose'>('choose');
 
-	const isLoading =
-		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening;
-	const [isShowSplash] = useDebounce(isLoading, 300);
+	const [isShowSplash, setIsShowSplash] = useState(false);
+	useEffect(() => {
+		if (
+			!profilesList.isProfilesLoaded ||
+			!recentProfile.isLoaded ||
+			isProfileOpening
+		) {
+			setIsShowSplash(true);
+			return;
+		}
+
+		const timer = setTimeout(() => {
+			setIsShowSplash(false);
+		}, 400);
+
+		return () => clearTimeout(timer);
+	}, [isProfileOpening, profilesList.isProfilesLoaded, recentProfile.isLoaded]);
+
 	if (isShowSplash) {
 		return <SplashScreen />;
 	}
@@ -84,18 +98,17 @@ export const App: FC = () => {
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<Box maxW="500px" minW="350px" padding="1rem">
-				{currentProfileObject && (
+				{currentProfileObject ? (
 					<ProfileLoginForm
 						profile={currentProfileObject}
 						onLogin={onOpenProfile}
 						onPickAnotherProfile={() => setCurrentProfileId(null)}
 					/>
-				)}
-
-				{(vaultView === 'create' || hasNoProfiles) && (
+				) : vaultView === 'create' || hasNoProfiles ? (
 					<ProfileCreator
 						onCreateProfile={(profile) =>
 							profilesList.createProfile(profile).then((newProfile) => {
+								setVaultView('choose');
 								onOpenProfile(
 									newProfile,
 									profile.password ?? undefined,
@@ -109,9 +122,7 @@ export const App: FC = () => {
 							hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
 						}
 					/>
-				)}
-
-				{vaultView !== 'create' && !currentProfileObject && !hasNoProfiles && (
+				) : (
 					<ProfilesForm
 						title="Choose the profile"
 						controls={
