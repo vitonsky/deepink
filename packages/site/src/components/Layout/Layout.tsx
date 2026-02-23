@@ -177,7 +177,9 @@ export default function Layout({ children }: LandingLayoutProps) {
 
 			{/* Main Content */}
 			<Box as="main">
-				<Container maxW="900px">{children}</Container>
+				<Container maxW="900px" px="1rem">
+					{children}
+				</Container>
 			</Box>
 
 			{/* Footer */}
