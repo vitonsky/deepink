@@ -1,4 +1,4 @@
-import React, { Fragment, type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import {
 	Box,
 	Heading,
@@ -14,14 +14,14 @@ import LandingLayout from '../../components/Layout/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
 
-import screenshot from './app.png';
-import RichLogo from './app.svg?react';
-import encryptionScreenshot from './features/encryption.png';
-import historyScreenshot from './features/history.png';
-import linksScreenshot from './features/links.png';
-import remindersScreenshot from './features/reminders.png';
-import tagsScreenshot from './features/tags.png';
-import workspacesScreenshot from './features/workspaces.png';
+import Logo from './logo.svg?react';
+import screenshot from './screenshots/app.png';
+import encryptionScreenshot from './screenshots/encryption.png';
+import historyScreenshot from './screenshots/history.png';
+import linksScreenshot from './screenshots/links.png';
+import remindersScreenshot from './screenshots/reminders.png';
+import tagsScreenshot from './screenshots/tags.png';
+import workspacesScreenshot from './screenshots/workspaces.png';
 
 const highlights: {
 	title: string;
@@ -286,7 +286,7 @@ export default function Landing() {
 					minW={{ md: '200px' }}
 				>
 					<Box
-						as={RichLogo}
+						as={Logo}
 						maxW="100%"
 						width={{ base: '350px', md: '100%' }}
 						h="auto"

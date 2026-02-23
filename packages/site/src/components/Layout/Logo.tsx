@@ -1,7 +1,7 @@
 import type React from 'react';
 import { Box, HStack } from '@chakra-ui/react';
 
-import LogoIcon from './icon-simple.svg?react';
+import LogoIcon from './logo-icon.svg?react';
 
 // TODO: use just an SVG element
 export const Logo = () => {
