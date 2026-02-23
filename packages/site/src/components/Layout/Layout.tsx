@@ -63,7 +63,7 @@ type SimpleLink = {
 const links = {
 	main: [
 		{ text: 'Download', url: '/download' },
-		{ text: 'Features', url: '#' },
+		{ text: 'Features', url: '/#features' },
 		{ text: 'Docs', url: '/guides/example/' },
 	],
 	additional: [

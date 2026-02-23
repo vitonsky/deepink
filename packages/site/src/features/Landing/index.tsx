@@ -243,7 +243,7 @@ export default function Landing() {
 						<Link href="/download" variant="button-primary">
 							Get Deepink
 						</Link>
-						<Link href="/download" variant="button-secondary">
+						<Link href="/#features" variant="button-secondary">
 							See features
 						</Link>
 					</HStack>
@@ -294,7 +294,14 @@ export default function Landing() {
 
 			{/* Features Section */}
 			<Box maxW="100%" my="10rem">
-				<VStack mb="3rem" align="start" gap="1rem" w="100%">
+				<VStack
+					mb="3rem"
+					align="start"
+					gap="1rem"
+					w="100%"
+					id="features"
+					scrollMarginBlock="3rem"
+				>
 					<Heading as="h3" fontSize="32px" fontWeight="500" m={0}>
 						Your Thinking, Structured
 					</Heading>
