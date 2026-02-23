@@ -17,10 +17,8 @@ export const useWorkspaceConfigSync = () => {
 	} = useProfileControls();
 
 	const workspaceData = useWorkspaceData();
-
 	const watchSelector = useWatchSelector();
 
-	// Watch on changes in workspace config
 	useEffect(() => {
 		const workspaceConfig = new StateFile(
 			new FileController(

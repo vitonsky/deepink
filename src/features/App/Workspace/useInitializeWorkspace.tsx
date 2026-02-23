@@ -24,36 +24,33 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 		workspaceId: workspaceData.workspaceId,
 	});
 
-	// Load config
+	// Load workspace config
 	useEffect(() => {
-		const loadConfig = async () => {
-			const config = await new StateFile(
+		const initConfig = async () => {
+			const workspaceConfig = await new StateFile(
 				new FileController(
 					`workspaces/${workspaceData.workspaceId}/config.json`,
 					controls.profile.files,
 				),
 				WorkspaceConfigScheme,
 			).get();
+			if (!workspaceConfig) return;
 
+			const { title, tags } = workspaceConfig.newNote;
 			dispatch(
 				workspacesApi.setWorkspaceNoteTemplateConfig({
 					...workspaceData,
-					title: config?.newNote.title,
-					tags: config?.newNote.tags,
+					title,
+					tags,
 				}),
 			);
 		};
-		loadConfig();
+		initConfig();
 	}, [controls.profile.files, dispatch, workspaceData, workspaceData.workspaceId]);
 
+	// Initialize workspace state
 	useEffect(() => {
 		if (!workspace) return;
-
-		const cleanupTags = workspace.tagsRegistry.onChange(async () => {
-			workspace.tagsRegistry.getTags().then((tags) => {
-				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
-			});
-		});
 
 		const initWorkspace = async () => {
 			try {
@@ -81,17 +78,18 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 					}),
 				);
 
-				const hasSelectedTag = tags.some((tag) => tag.id === state.selectedTagId);
-				if (hasSelectedTag) {
+				const selectedTag = tags.find((tag) => tag.id === state.selectedTagId);
+				if (selectedTag) {
 					dispatch(
 						workspacesApi.setSelectedTag({
 							...workspaceData,
-							tag: state.selectedTagId || null,
+							tag: selectedTag.id,
 						}),
 					);
 				}
 
 				if (!state.openedNoteIds || state.openedNoteIds.length === 0) return;
+
 				const notes = await workspace.notesRegistry.getById(state.openedNoteIds);
 				if (!notes || notes.length === 0) return;
 
@@ -113,10 +111,8 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 		};
 		initWorkspace();
 
-		// Close notes by unmount
+		// Reset workspace state on unmount
 		return () => {
-			cleanupTags();
-
 			dispatch(
 				workspacesApi.setIsWorkspaceReady({ ...workspaceData, isReady: false }),
 			);
@@ -126,4 +122,17 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 			dispatch(workspacesApi.setNoteIds({ ...workspaceData, noteIds: [] }));
 		};
 	}, [workspace, workspaceData, getWorkspaceState, dispatch]);
+
+	// Sync tag changes with the store
+	useEffect(() => {
+		if (!workspace) return;
+
+		const cleanupTags = workspace.tagsRegistry.onChange(async () => {
+			workspace.tagsRegistry.getTags().then((tags) => {
+				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
+			});
+		});
+
+		return () => cleanupTags();
+	}, [workspace, workspaceData, dispatch]);
 };
