@@ -103,7 +103,9 @@ export default function Layout({ children }: LandingLayoutProps) {
 									<Drawer.Content backgroundColor="bg.canvas">
 										<Drawer.Header>
 											<Drawer.Title>
-												<Logo />
+												<Link href="/" variant="plain">
+													<Logo />
+												</Link>
 											</Drawer.Title>
 											<Drawer.CloseTrigger asChild>
 												<CloseButton size="xs" display="flex" />
