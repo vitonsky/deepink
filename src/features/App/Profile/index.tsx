@@ -137,13 +137,19 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
-	const isReady = useAppSelector(selectIsActiveWorkspaceReady({ profileId }));
+	const isActiveWorkspaceReady = useAppSelector(
+		selectIsActiveWorkspaceReady({ profileId }),
+	);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{!isReady && <SplashScreen />}
+			{!isActiveWorkspaceReady && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
-			<Box width="100%" height="100vh" display={isReady ? 'block' : 'none'}>
+			<Box
+				width="100%"
+				height="100vh"
+				display={isActiveWorkspaceReady ? 'block' : 'none'}
+			>
 				{workspaces.map((workspace) =>
 					workspace.touched ? (
 						<WorkspaceContext.Provider
