@@ -1,8 +1,14 @@
 ---
 import Headers from "./Headers.astro"
+
+interface Props {
+	lang?: string;
+};
+
+const {lang = 'en'} = Astro.props;
 ---
 
-<html lang="en">
+<html lang={lang}>
   <head>
     <Headers/>
   </head>
