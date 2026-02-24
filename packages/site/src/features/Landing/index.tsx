@@ -11,7 +11,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
-import Layout, { type LayoutProps } from '../../components/Layout/Layout';
+import { WithLayout } from '../../components/Layout';
 import { Link } from '../../components/Link';
 import { useLocalePath } from '../../components/Locale';
 import { Text } from '../../components/Text';
@@ -25,7 +25,13 @@ import remindersScreenshot from './screenshots/reminders.png';
 import tagsScreenshot from './screenshots/tags.png';
 import workspacesScreenshot from './screenshots/workspaces.png';
 
-const Content = () => {
+// TODO: add most important pages
+
+// TODO: add analytics
+// TODO: tune CEO tags
+// TODO: add docs
+// TODO: add blog
+export default WithLayout(() => {
 	const localePath = useLocalePath();
 
 	const { t } = useTranslation('landing');
@@ -281,18 +287,4 @@ const Content = () => {
 			</VStack>
 		</>
 	);
-};
-
-// TODO: add most important pages
-
-// TODO: add analytics
-// TODO: tune CEO tags
-// TODO: add docs
-// TODO: add blog
-export default function Landing({ i18n }: Pick<LayoutProps, 'i18n'>) {
-	return (
-		<Layout i18n={i18n}>
-			<Content />
-		</Layout>
-	);
-}
+});
