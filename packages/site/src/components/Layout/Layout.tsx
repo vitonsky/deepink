@@ -44,9 +44,9 @@ export interface LayoutProps {
 }
 
 const LayoutContent = ({
-	supportedLanguages,
+	altVersions,
 	children,
-}: PropsWithChildren<Partial<Pick<i18nPageContext, 'supportedLanguages'>>>) => {
+}: PropsWithChildren<Partial<Pick<i18nPageContext, 'altVersions'>>>) => {
 	const { t } = useTranslation('layout');
 
 	const links = {
@@ -339,7 +339,7 @@ const LayoutContent = ({
 					</Stack>
 				</Box>
 
-				{supportedLanguages && supportedLanguages.length > 0 && (
+				{altVersions && altVersions.length > 0 && (
 					<Box maxW="900px" mx="auto" px="1rem" mt="3rem">
 						<Flex
 							wrap="wrap"
@@ -348,11 +348,11 @@ const LayoutContent = ({
 							whiteSpace="pre-wrap"
 							justify="center"
 						>
-							{supportedLanguages.map((language, index) => (
-								<Fragment key={language}>
+							{altVersions.map((version, index) => (
+								<Fragment key={version.langCode}>
 									{index > 0 ? ' | ' : undefined}
-									<Link href={`/${language}`}>
-										{getNativeLanguageName(language)?.trim()}
+									<Link href={version.url}>
+										{getNativeLanguageName(version.langCode)?.trim()}
 									</Link>
 								</Fragment>
 							))}
@@ -370,9 +370,7 @@ export default function Layout({ children, i18n }: LayoutProps) {
 			<I18nextProvider
 				i18n={createI18nInstance(i18n?.language ?? 'en', i18n?.resources ?? {})}
 			>
-				<LayoutContent supportedLanguages={i18n?.supportedLanguages}>
-					{children}
-				</LayoutContent>
+				<LayoutContent {...i18n}>{children}</LayoutContent>
 			</I18nextProvider>
 		</ChakraProvider>
 	);

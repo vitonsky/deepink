@@ -6,7 +6,11 @@ import { getReleases } from '../../features/releases';
 import { getStaticLangPaths, i18nGetContext } from '../../i18n/utils';
 
 const { lang } = Astro.params;
-const i18n = i18nGetContext(lang, ['landing']);
+const i18n = i18nGetContext({
+	language: lang,
+	namespaces: ['landing'],
+	path: Astro.url.pathname,
+});
 
 export function getStaticPaths() {
 	return getStaticLangPaths();

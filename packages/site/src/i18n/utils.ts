@@ -39,18 +39,36 @@ export function loadTranslations(
 	);
 }
 
-export function i18nGetContext(
-	lang: SupportedLanguage,
-	namespaces: string[] = [],
-): i18nPageContext {
-	const language = isValidLanguage(lang) ? lang : DEFAULT_LANGUAGE;
+export function i18nGetContext({
+	language,
+	namespaces,
+	path,
+}: {
+	language: SupportedLanguage;
+	namespaces: string[];
+	path?: string;
+}): i18nPageContext {
+	const currentLanguage = isValidLanguage(language) ? language : DEFAULT_LANGUAGE;
 
 	const commonNamespaces = ['layout'];
-	const resources = loadTranslations(language, [...commonNamespaces, ...namespaces]);
+	const resources = loadTranslations(currentLanguage, [
+		...commonNamespaces,
+		...namespaces,
+	]);
 
 	return {
-		language,
+		language: currentLanguage,
 		resources,
-		supportedLanguages: SUPPORTED_LANGUAGES,
+		altVersions: !path
+			? []
+			: SUPPORTED_LANGUAGES.values()
+					.filter((lang) => lang !== currentLanguage)
+					.map((lang) => {
+						const segments = path.split('/');
+						segments[1] = lang; // swap language only
+
+						return { langCode: lang, url: segments.join('/') };
+					})
+					.toArray(),
 	};
 }

@@ -4,10 +4,11 @@ export type i18nPageContext = {
 	language: string;
 	resources: Record<string, ResourceKey>;
 
-	// TODO: provide alt versions info on top level
-	// altVersions: {
-	// 	url: string;
-	// 	langCode: string;
-	// }[];
-	supportedLanguages: string[];
+	/**
+	 * Alt versions of current page
+	 */
+	altVersions: {
+		url: string;
+		langCode: string;
+	}[];
 };

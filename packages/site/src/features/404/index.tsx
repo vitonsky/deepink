@@ -1,14 +1,14 @@
 import React from 'react';
 import { VStack } from '@chakra-ui/react';
 
-import Layout from '../../components/Layout/Layout';
+import Layout, { type LayoutProps } from '../../components/Layout/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
 import { CONTACT_EMAIL } from '../../config';
 
-export default function Page() {
+export default function Page({ i18n }: Pick<LayoutProps, 'i18n'>) {
 	return (
-		<Layout>
+		<Layout i18n={i18n}>
 			<VStack minHeight="60vh" justifyContent="center" gap="3rem">
 				<VStack gap="0" textAlign="center">
 					<Text
