@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
@@ -56,22 +56,26 @@ export const App: FC = () => {
 	const [vaultView, setVaultView] = useState<'create' | 'choose'>('choose');
 
 	const [isShowSplash, setIsShowSplash] = useState(false);
+	const skipSplashRef = useRef(false);
 	useEffect(() => {
-		if (
-			!profilesList.isProfilesLoaded ||
-			!recentProfile.isLoaded ||
-			isProfileOpening
-		) {
+		if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) {
 			setIsShowSplash(true);
 			return;
 		}
 
-		const timer = setTimeout(() => {
-			setIsShowSplash(false);
-		}, 400);
+		if (isProfileOpening && !skipSplashRef.current) {
+			setIsShowSplash(true);
+			return;
+		}
 
+		const timer = setTimeout(() => setIsShowSplash(false), 400);
 		return () => clearTimeout(timer);
-	}, [isProfileOpening, profilesList.isProfilesLoaded, recentProfile.isLoaded]);
+	}, [
+		isProfileOpening,
+		profilesList.isProfilesLoaded,
+		recentProfile.isLoaded,
+		skipSplashRef,
+	]);
 
 	if (isShowSplash) {
 		return <SplashScreen />;
@@ -101,7 +105,12 @@ export const App: FC = () => {
 				{currentProfileObject ? (
 					<ProfileLoginForm
 						profile={currentProfileObject}
-						onLogin={onOpenProfile}
+						onLogin={async (...arg) => {
+							skipSplashRef.current = true;
+							const result = await onOpenProfile(...arg);
+							skipSplashRef.current = false;
+							return result;
+						}}
 						onPickAnotherProfile={() => setCurrentProfileId(null)}
 					/>
 				) : vaultView === 'create' || hasNoProfiles ? (

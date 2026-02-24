@@ -42,11 +42,9 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		setErrorMessage(null);
 		setIsPending(true);
 
-		const response = await onLogin(profile, secret || undefined, false).finally(
-			() => {
-				setIsPending(false);
-			},
-		);
+		const response = await onLogin(profile, secret || undefined).finally(() => {
+			setIsPending(false);
+		});
 
 		if (response.status === 'error') {
 			setErrorMessage(response.message ?? 'Unknown error');
