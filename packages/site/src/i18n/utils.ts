@@ -110,16 +110,16 @@ export function i18nGetContext({
 	return {
 		language: currentLanguage,
 		resources,
-		altVersions: !path
-			? []
-			: SUPPORTED_LANGUAGES.values()
-					.filter((lang) => lang !== currentLanguage)
-					.map((lang) => {
-						const segments = path.split('/');
-						segments[1] = lang; // swap language only
+		altVersions:
+			!path || !path.startsWith('/' + currentLanguage)
+				? []
+				: SUPPORTED_LANGUAGES.values()
+						.map((lang) => {
+							const segments = path.split('/');
+							segments[1] = lang; // swap language only
 
-						return { langCode: lang, url: segments.join('/') };
-					})
-					.toArray(),
+							return { langCode: lang, url: segments.join('/') };
+						})
+						.toArray(),
 	};
 }
