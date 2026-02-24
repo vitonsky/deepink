@@ -15,7 +15,7 @@ export type OnPickProfile = (
 	password?: string,
 ) => Promise<PickProfileResponse>;
 
-export type UseProfileLoaderProps = {
+type UseProfileLoaderProps = {
 	profilesList: ProfilesListApi;
 	profiles: ProfilesApi;
 	recentProfile: RecentProfile;
@@ -59,7 +59,7 @@ export const useProfileLoader = ({
 		[profiles],
 	);
 
-	// Open recent profile
+	// Automatically open an unencrypted vault
 	useEffect(
 		() => {
 			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
