@@ -50,7 +50,10 @@ const LayoutContent = ({
 }: PropsWithChildren<Partial<Pick<i18nPageContext, 'altVersions'>>>) => {
 	const localePath = useLocalePath();
 
-	const { t } = useTranslation('layout');
+	const {
+		t,
+		i18n: { language },
+	} = useTranslation('layout');
 
 	const links = {
 		main: [
@@ -357,7 +360,14 @@ const LayoutContent = ({
 							{altVersions.map((version, index) => (
 								<Fragment key={version.langCode}>
 									{index > 0 ? ' | ' : undefined}
-									<Link href={version.url}>
+									<Link
+										href={version.url}
+										fontWeight={
+											version.langCode === language
+												? 'bold'
+												: undefined
+										}
+									>
 										{getNativeLanguageName(version.langCode)?.trim()}
 									</Link>
 								</Fragment>
