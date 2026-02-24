@@ -13,7 +13,7 @@ import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
 
-export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => {
+export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const controls = useProfileControls();
@@ -62,6 +62,13 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 
 				if (!state) return;
 
+				dispatch(
+					workspacesApi.setSearch({
+						...workspaceData,
+						search: state.search || '',
+					}),
+				);
+
 				if (state.view) {
 					dispatch(
 						workspacesApi.setView({
@@ -70,13 +77,6 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 						}),
 					);
 				}
-
-				dispatch(
-					workspacesApi.setSearch({
-						...workspaceData,
-						search: state.search || '',
-					}),
-				);
 
 				const selectedTag = tags.find((tag) => tag.id === state.selectedTagId);
 				if (selectedTag) {
@@ -94,6 +94,7 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 				if (!notes || notes.length === 0) return;
 
 				dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes }));
+
 				dispatch(
 					workspacesApi.setActiveNote({
 						...workspaceData,
@@ -127,12 +128,10 @@ export const useInitializeWorkspace = (workspace: WorkspaceContainer | null) => 
 	useEffect(() => {
 		if (!workspace) return;
 
-		const cleanupTags = workspace.tagsRegistry.onChange(async () => {
+		return workspace.tagsRegistry.onChange(async () => {
 			workspace.tagsRegistry.getTags().then((tags) => {
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 			});
 		});
-
-		return () => cleanupTags();
 	}, [workspace, workspaceData, dispatch]);
 };

@@ -8,7 +8,7 @@ import { createAppSelector } from '@state/redux/utils';
 
 import { ProfileControls } from '../Profile';
 
-const WorkspaceScheme = z.object({
+const WorkspaceStateScheme = z.object({
 	openedNoteIds: z.array(z.string()).nullable(),
 	activeNoteId: z.string().nullable(),
 	selectedTagId: z.string().nullable(),
@@ -34,7 +34,7 @@ export const useWorkspaceState = ({
 		() =>
 			new StateFile(
 				new FileController(`workspaces/${workspaceId}/state.json`, files),
-				WorkspaceScheme.partial(),
+				WorkspaceStateScheme.partial(),
 			),
 	);
 
@@ -60,14 +60,11 @@ export const useWorkspaceState = ({
 			onChange(state) {
 				if (!state) return;
 
-				const noteIds = state.openedNotes.map((n) => n.id);
+				const openedNoteIds = state.openedNotes.map((n) => n.id);
 
 				workspaceState.set({
-					openedNoteIds: noteIds,
-					activeNoteId: state.activeNoteId,
-					selectedTagId: state.selectedTagId,
-					view: state.view,
-					search: state.search,
+					openedNoteIds,
+					...state,
 				});
 			},
 			init: false,

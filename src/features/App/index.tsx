@@ -20,7 +20,7 @@ import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 
-const defaultProfileNames = [
+const defaultVaultNames = [
 	'Creative drafts',
 	'Second brain',
 	'Digital garden',
@@ -49,7 +49,7 @@ export const App: FC = () => {
 	const { isProfileOpening, onOpenProfile } = useProfileLoader({
 		profilesList,
 		recentProfile,
-		setCurrentProfileId: setCurrentProfileId,
+		setCurrentProfileId,
 		profiles: profileContainers,
 	});
 
@@ -123,7 +123,7 @@ export const App: FC = () => {
 							hasNoProfiles ? undefined : () => setVaultView('choose')
 						}
 						defaultProfileName={
-							hasNoProfiles ? getRandomItem(defaultProfileNames) : undefined
+							hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
 						}
 					/>
 				) : (

@@ -15,7 +15,7 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
-import { useInitializeWorkspace } from './useInitializeWorkspace';
+import { useSetupWorkspace } from './useSetupWorkspace';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
@@ -38,7 +38,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
-	useInitializeWorkspace(workspace);
+	useSetupWorkspace(workspace);
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
