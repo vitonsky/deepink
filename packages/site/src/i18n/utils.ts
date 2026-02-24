@@ -4,9 +4,10 @@ import path from 'node:path';
 import type { ResourceKey } from 'i18next';
 
 import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, type SupportedLanguage } from './config';
+import type { i18nPageContext } from './types';
 
 export function isValidLanguage(lang: string): lang is SupportedLanguage {
-	return SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage);
+	return SUPPORTED_LANGUAGES.includes(lang);
 }
 
 /**
@@ -27,7 +28,7 @@ export function getStaticLangPaths() {
 
 export function loadTranslations(
 	lang: SupportedLanguage,
-	namespaces: string[] = ['layout', 'landing'],
+	namespaces: string[] = [],
 ): Record<string, ResourceKey> {
 	return Object.fromEntries(
 		namespaces.map((ns) => {
@@ -36,4 +37,20 @@ export function loadTranslations(
 			return [ns, JSON.parse(raw)];
 		}),
 	);
+}
+
+export function i18nGetContext(
+	lang: SupportedLanguage,
+	namespaces: string[] = [],
+): i18nPageContext {
+	const language = isValidLanguage(lang) ? lang : DEFAULT_LANGUAGE;
+
+	const commonNamespaces = ['layout'];
+	const resources = loadTranslations(language, [...commonNamespaces, ...namespaces]);
+
+	return {
+		language,
+		resources,
+		supportedLanguages: SUPPORTED_LANGUAGES,
+	};
 }

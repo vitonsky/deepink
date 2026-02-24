@@ -1,23 +1,17 @@
 ---
-import { getStaticLangPaths, isValidLanguage, loadTranslations } from "../../i18n/utils";
-import { DEFAULT_LANGUAGE } from "../../i18n/config";
-
-import Document from "../../components/Document.astro"
+import Document from '../../components/Document.astro';
 import Page from '../../features/Landing';
 
-const { lang } = Astro.params;
-const currentLang = isValidLanguage(lang) ? lang : DEFAULT_LANGUAGE;
+import { getStaticLangPaths, i18nGetContext } from '../../i18n/utils';
 
-// Runs at build time in Node.js — reads locale files from disk
-const translations = loadTranslations(currentLang);
+const { lang } = Astro.params;
+const i18n = i18nGetContext(lang, ['landing']);
 
 export function getStaticPaths() {
-  return getStaticLangPaths();
+	return getStaticLangPaths();
 }
-
-
 ---
 
 <Document>
-  <Page client:load i18n={{language: currentLang, resources: translations}}/>
+	<Page client:load i18n={i18n} />
 </Document>

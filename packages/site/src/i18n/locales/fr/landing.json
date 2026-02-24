@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Capturez vos pensées.",
+		"subtitle": "Deepink est une application de prise de notes <0>axée sur la confidentialité</0> avec un flux de travail ultra-rapide.",
+		"button": {
+			"get": "Obtenir Deepink",
+			"features": "Voir les fonctionnalités"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Coffre-fort blindé",
+				"text": "Toutes vos données sont chiffrées. Contrairement à d'autres applications, cela signifie vraiment <0>toutes vos données</0>. Vous pouvez choisir l'algorithme de chiffrement en qui vous avez confiance.\n\nDeepink est <1>open source</1> et ouvert aux audits de sécurité."
+			},
+			"workflow": {
+				"title": "Flux de travail ultra-rapide",
+				"text": "Pendant le développement, nous avons compté les actions nécessaires pour faire quoi que ce soit. Nous avons minimisé ces étapes pour la plupart des actions jusqu'à 80% par rapport aux autres applications de prise de notes."
+			},
+			"universality": {
+				"title": "Tout en un",
+				"text": "Vous créez un coffre-fort avec un bon mot de passe une fois, déplacez toutes vos notes et écrivez tout là-bas. Les espaces de travail et les tags imbriqués vous permettent d'organiser, d'isoler et d'accéder rapidement à tout, y compris votre journal quotidien, vos notes privées pour votre stratégie commerciale, vos recherches, le suivi de vos résultats sportifs, etc."
+			}
+		},
+		"cta": {
+			"text": "Gratuit sans limites.",
+			"button": "Télécharger maintenant"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Votre pensée, structurée",
+			"text": "Capturez une idée rapide ou façonnez quelque chose de complexe - Deepink apporte ordre, concentration et structure à chaque idée."
+		},
+		"content": {
+			"links": {
+				"title": "Liens",
+				"text": "Copiez un lien vers n'importe quelle note et référencez-la n'importe où dans votre coffre-fort. Créez des connexions entre les notes de réunion et les décisions, la recherche et les conclusions, les plans et l'exécution — sans répéter les mêmes informations.\n\nTout reste synchronisé. Mettez à jour une note une fois, et chaque référence liée reste exacte.\n\nDeepink montre également où une note est mentionnée, afin que vous puissiez tracer les connexions et naviguer naturellement dans vos connaissances.\n\nVous pouvez également voir où une note est mentionnée, afin de tracer les connexions et de naviguer dans le contenu associé.\n\nVos informations ne devraient pas vivre en silos. Avec les Liens, elles deviennent un réseau."
+			},
+			"workspaces": {
+				"title": "Espaces de travail",
+				"text": "Séparez votre monde — sans séparer votre coffre-fort.\n\nLes espaces de travail vous permettent de créer des zones distinctes à l'intérieur d'un seul coffre-fort sécurisé. Déverrouillez une fois, puis basculez entre des environnements ciblés comme Projets clients, Journal personnel, Suivi de santé ou Apprentissage — sans chevauchement.\n\nTout reste organisé et spécifique au contexte. Partagez votre écran lors d'une réunion en toute confiance, sachant que les zones personnelles ou sensibles n'apparaîtront pas par accident.\n\nUn coffre-fort. Des limites claires. Zéro friction."
+			},
+			"history": {
+				"title": "Historique",
+				"text": "Chaque note conserve sa propre chronologie.\n\nDeepink enregistre automatiquement les versions précédentes, afin que vous puissiez examiner ce qui a changé, restaurer un brouillon antérieur ou suivre l'évolution d'une idée au fil du temps. Qu'il s'agisse de la modification d'hier ou de quelque chose datant d'il y a un an, rien d'important n'est perdu.\n\nL'historique vous donne la confiance de peaufiner, réécrire et repenser — sachant que chaque étape est préservée et accessible quand vous en avez besoin."
+			},
+			"reminders": {
+				"title": "Rappels",
+				"text": "Attachez un rappel à n'importe quelle note et soyez notifié quand cela compte.\n\nDéfinissez des suivis pour les notes de réunion, des échéances pour les plans de projet, des dates de renouvellement pour les documents ou des vérifications pour les objectifs personnels. Le rappel reste connecté au contexte exact — pas comme une tâche séparée dans une autre application.\n\nQuand le moment vient, vous revenez directement à la note avec tous les détails en place.\n\nLes rappels vous aident à agir sur vos informations, pas seulement à les stocker."
+			},
+			"tags": {
+				"title": "Tags imbriqués",
+				"text": "Structurez vos notes avec des tags qui suivent de vraies hiérarchies.\n\nLes tags imbriqués vous permettent de créer des relations parent-enfant, afin que les thèmes plus larges puissent contenir des sous-thèmes plus spécifiques. Par exemple, un tag parent comme Clients peut inclure des tags de clients individuels en dessous, ou Finance peut se ramifier en Impôts, Factures et Rapports. Cela garde les zones de haut niveau propres tout en permettant une classification détaillée en dessous.\n\nContrairement aux dossiers ou aux systèmes à catégorie unique, les notes peuvent avoir plusieurs tags à la fois. Une seule note peut appartenir à un client spécifique, se rapporter à un sujet financier et se connecter à une période de temps — le tout sans duplication.\n\nLes tags imbriqués vous donnent une organisation précise avec la flexibilité de refléter comment les informations se chevauchent réellement."
+			},
+			"encryption": {
+				"title": "Chiffrement",
+				"text": "Votre coffre-fort entier est chiffré — pas seulement des parties.\n\nDeepink applique le chiffrement à tout : notes, fichiers joints, espaces de travail et métadonnées. Contrairement à de nombreuses applications qui ne chiffrent que les données synchronisées ou le contenu textuel, Deepink protège la structure complète de votre coffre-fort.\n\nLes pièces jointes ne sont pas laissées exposées. Les métadonnées ne sont pas lisibles. Même les tailles de fichiers sont obscurcies pour réduire le risque d'analyse.\n\nCe que vous stockez reste privé — complètement, par conception."
+			}
+		}
+	},
+	"cta": {
+		"title": "Des notes pour l'humeur dans laquelle vous êtes",
+		"text": "Un espace pour la vie quotidienne, un autre pour les livres, un autre pour les plans. Changez de contexte en un clic, gardez les choses propres et continuez à écrire sans trop réfléchir à où cela devrait aller.",
+		"button": "Obtenir Deepink"
+	}
+}

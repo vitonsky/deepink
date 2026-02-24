@@ -1,16 +1,20 @@
 ---
-import { getStaticLangPaths, isValidLanguage, loadTranslations } from "../../i18n/utils";
 import Document from '../../components/Document.astro';
 import Page from '../../features/Download';
 import { getReleases } from '../../features/releases';
 
+import { getStaticLangPaths, i18nGetContext } from '../../i18n/utils';
+
+const { lang } = Astro.params;
+const i18n = i18nGetContext(lang, ['landing']);
+
 export function getStaticPaths() {
-  return getStaticLangPaths();
+	return getStaticLangPaths();
 }
 
 const releases = await getReleases(import.meta.env.GITHUB_TOKEN);
 ---
 
 <Document>
-	<Page client:load versions={releases}/>
+	<Page client:load versions={releases} i18n={i18n}/>
 </Document>

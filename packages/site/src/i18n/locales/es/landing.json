@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Captura tus pensamientos.",
+		"subtitle": "Deepink es una aplicación de notas <0>centrada en la privacidad</0> con un flujo de trabajo ultrarrápido.",
+		"button": {
+			"get": "Obtener Deepink",
+			"features": "Ver características"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Bóveda a prueba de balas",
+				"text": "Todos tus datos están encriptados. A diferencia de otras aplicaciones, esto realmente significa <0>todos tus datos</0>. Puedes elegir el algoritmo de encriptación en el que confías.\n\nDeepink es <1>código abierto</1> y está abierto a auditorías de seguridad."
+			},
+			"workflow": {
+				"title": "Flujo de trabajo ultrarrápido",
+				"text": "Durante el desarrollo contamos las acciones necesarias para hacer cualquier cosa. Minimizamos estos pasos para la mayoría de las acciones hasta en un 80% en comparación con otras aplicaciones de notas."
+			},
+			"universality": {
+				"title": "Todo en uno",
+				"text": "Creas una bóveda con una buena contraseña una vez, mueves todas tus notas y escribes todo allí. Los espacios de trabajo y las etiquetas anidadas te permiten organizar, aislar y acceder rápidamente a cualquier cosa, incluido tu diario personal, notas privadas para tu estrategia empresarial, investigaciones, seguimiento de tus resultados deportivos, etc."
+			}
+		},
+		"cta": {
+			"text": "Gratis sin límites.",
+			"button": "Descargar ahora"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Tu pensamiento, estructurado",
+			"text": "Captura una idea rápida o da forma a algo complejo: Deepink aporta orden, enfoque y estructura a cada idea."
+		},
+		"content": {
+			"links": {
+				"title": "Enlaces",
+				"text": "Copia un enlace a cualquier nota y refiérelo en cualquier lugar de tu bóveda. Construye conexiones entre notas de reuniones y decisiones, investigación y conclusiones, planes y ejecución, sin repetir la misma información.\n\nTodo permanece sincronizado. Actualiza una nota una vez y cada referencia vinculada permanece precisa.\n\nDeepink también muestra dónde se menciona una nota, para que puedas rastrear conexiones y navegar por tu conocimiento de forma natural.\n\nTambién puedes ver dónde se menciona una nota, para rastrear conexiones y navegar por contenido relacionado.\n\nTu información no debería vivir en silos. Con Enlaces, se convierte en una red."
+			},
+			"workspaces": {
+				"title": "Espacios de trabajo",
+				"text": "Separa tu mundo, sin separar tu bóveda.\n\nLos espacios de trabajo te permiten crear áreas distintas dentro de una única bóveda segura. Desbloquea una vez, luego cambia entre entornos enfocados como Proyectos de clientes, Diario personal, Seguimiento de salud o Aprendizaje, sin superposiciones.\n\nTodo permanece organizado y específico del contexto. Comparte tu pantalla en una reunión con confianza, sabiendo que las áreas personales o sensibles no aparecerán por accidente.\n\nUna bóveda. Límites claros. Cero fricción."
+			},
+			"history": {
+				"title": "Historial",
+				"text": "Cada nota mantiene su propia línea de tiempo.\n\nDeepink guarda automáticamente versiones anteriores, para que puedas revisar qué cambió, restaurar un borrador anterior o rastrear cómo evolucionó una idea con el tiempo. Ya sea la edición de ayer o algo de hace un año, nada importante se pierde.\n\nEl historial te da confianza para refinar, reescribir y repensar, sabiendo que cada paso está preservado y accesible cuando lo necesites."
+			},
+			"reminders": {
+				"title": "Recordatorios",
+				"text": "Adjunta un recordatorio a cualquier nota y recibe notificaciones cuando importa.\n\nEstablece seguimientos para notas de reuniones, plazos para planes de proyectos, fechas de renovación para documentos o revisiones para objetivos personales. El recordatorio permanece conectado al contexto exacto, no como una tarea separada en otra aplicación.\n\nCuando llega el momento, vuelves directamente a la nota con todos los detalles en su lugar.\n\nLos recordatorios te ayudan a actuar sobre tu información, no solo a almacenarla."
+			},
+			"tags": {
+				"title": "Etiquetas anidadas",
+				"text": "Estructura tus notas con etiquetas que siguen jerarquías reales.\n\nLas etiquetas anidadas te permiten crear relaciones padre-hijo, para que los temas más amplios puedan contener subtemas más específicos. Por ejemplo, una etiqueta padre como Clientes puede incluir etiquetas de clientes individuales debajo, o Finanzas puede ramificarse en Impuestos, Facturas e Informes. Esto mantiene las áreas de alto nivel limpias mientras permite una clasificación detallada debajo.\n\nA diferencia de las carpetas o sistemas de categoría única, las notas pueden tener múltiples etiquetas a la vez. Una sola nota puede pertenecer a un cliente específico, relacionarse con un tema financiero y conectarse con un período de tiempo, todo sin duplicación.\n\nLas etiquetas anidadas te dan una organización precisa con la flexibilidad de reflejar cómo la información realmente se superpone."
+			},
+			"encryption": {
+				"title": "Encriptación",
+				"text": "Tu bóveda completa está encriptada, no solo partes de ella.\n\nDeepink aplica encriptación a todo: notas, archivos adjuntos, espacios de trabajo y metadatos. A diferencia de muchas aplicaciones que solo encriptan datos sincronizados o contenido de texto, Deepink protege la estructura completa de tu bóveda.\n\nLos archivos adjuntos no quedan expuestos. Los metadatos no son legibles. Incluso los tamaños de archivo están ofuscados para reducir el riesgo de análisis.\n\nLo que almacenas permanece privado, completamente, por diseño."
+			}
+		}
+	},
+	"cta": {
+		"title": "Notas para el estado de ánimo en el que estás",
+		"text": "Un espacio para la vida cotidiana, otro para libros, otro para planes. Cambia de contexto con un clic, mantén las cosas limpias y sigue escribiendo sin pensar demasiado en dónde debe ir.",
+		"button": "Obtener Deepink"
+	}
+}

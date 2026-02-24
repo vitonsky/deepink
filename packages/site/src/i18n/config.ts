@@ -1,26 +1,57 @@
-import { initReactI18next } from 'react-i18next';
-import { createInstance, type ResourceKey } from 'i18next';
+import fs from 'node:fs';
+import path from 'node:path';
 
-export const SUPPORTED_LANGUAGES = ['en'] as const;
-export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
-export const DEFAULT_LANGUAGE: SupportedLanguage = 'en';
+// TODO: translate to all languages
+// [
+// 	'bg',
+// 	'ca',
+// 	'cs',
+// 	'da',
+// 	'de',
+// 	'es',
+// 	'fr',
+// 	'hu',
+// 	'it',
+// 	'ja',
+// 	'ko',
+// 	'nb',
+// 	'pl',
+// 	'pt-br',
+// 	'pt-pt',
+// 	'ru',
+// 	'sl',
+// 	'sv',
+// 	'tr',
+// 	'uk',
+// 	'vi',
+// 	'zh-cn',
+// 	'zh-tw',
+// ]
 
-export function createI18nInstance(
-	lang: SupportedLanguage,
-	// Translations for a single language, keyed by namespace
-	resources: Record<string, ResourceKey>,
-) {
-	const instance = createInstance();
+/**
+ * Reads the locales directory and returns
+ * an array of supported language codes
+ * (folder names only).
+ *
+ * @param {string} localesPath - Absolute or relative path to locales directory
+ * @returns {string[]} Array of language codes
+ */
+function getSupportedLangs(localesPath: string) {
+	const fullPath = path.resolve(localesPath);
 
-	instance.use(initReactI18next).init({
-		lng: lang,
-		fallbackLng: 'en',
-		resources: {
-			// Shape expected by i18next: { [lang]: { [ns]: translations } }
-			[lang]: resources,
-		},
-		interpolation: { escapeValue: false },
-	});
+	if (!fs.existsSync(fullPath)) {
+		throw new Error(`Locales directory not found: ${fullPath}`);
+	}
 
-	return instance;
+	return fs
+		.readdirSync(fullPath, { withFileTypes: true })
+		.filter((dirent) => dirent.isDirectory())
+		.map((dirent) => dirent.name);
 }
+
+export const SUPPORTED_LANGUAGES = getSupportedLangs(
+	path.join(import.meta.dirname, 'locales'),
+);
+// export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+export type SupportedLanguage = string;
+export const DEFAULT_LANGUAGE: SupportedLanguage = 'en';

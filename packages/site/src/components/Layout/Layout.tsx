@@ -1,7 +1,6 @@
 import React, { Fragment, type PropsWithChildren, type ReactNode } from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import { IoIosMenu } from 'react-icons/io';
-import type { ResourceKey } from 'i18next';
 import {
 	Box,
 	CloseButton,
@@ -18,7 +17,8 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
-import { createI18nInstance, type SupportedLanguage } from '../../i18n/config';
+import { createI18nInstance } from '../../i18n/createI18nInstance';
+import type { i18nPageContext } from '../../i18n/types';
 
 import ChakraProvider from '../ChakraProvider';
 import { Link } from '../Link';
@@ -33,48 +33,20 @@ function getNativeLanguageName(langCode: string) {
 	return display.of(langCode);
 }
 
-const languagesList = [
-	'bg',
-	'ca',
-	'cs',
-	'da',
-	'de',
-	'es',
-	'fr',
-	'hu',
-	'it',
-	'ja',
-	'ko',
-	'nb',
-	'pl',
-	'pt-br',
-	'pt-pt',
-	'ru',
-	'sl',
-	'sv',
-	'tr',
-	'uk',
-	'vi',
-	'zh-cn',
-	'zh-tw',
-];
-
 type SimpleLink = {
 	text: string;
 	url: string;
 };
 
-export type LocalizationProps = {
-	language: SupportedLanguage;
-	resources: Record<string, ResourceKey>;
-};
-
-export interface LandingLayoutProps {
+export interface LayoutProps {
 	children: ReactNode;
-	i18n?: LocalizationProps;
+	i18n?: i18nPageContext;
 }
 
-const LayoutContent = ({ children }: PropsWithChildren) => {
+const LayoutContent = ({
+	supportedLanguages,
+	children,
+}: PropsWithChildren<Partial<Pick<i18nPageContext, 'supportedLanguages'>>>) => {
 	const { t } = useTranslation('layout');
 
 	const links = {
@@ -367,36 +339,40 @@ const LayoutContent = ({ children }: PropsWithChildren) => {
 					</Stack>
 				</Box>
 
-				<Box maxW="900px" mx="auto" px="1rem" mt="3rem">
-					<Flex
-						wrap="wrap"
-						fontSize={{ base: '1.1rem', md: '0.8rem' }}
-						py="1rem"
-						whiteSpace="pre-wrap"
-						justify="center"
-					>
-						{languagesList.map((language, index) => (
-							<Fragment key={language}>
-								{index > 0 ? ' | ' : undefined}
-								<Link href={`/${language}`}>
-									{getNativeLanguageName(language)?.trim()}
-								</Link>
-							</Fragment>
-						))}
-					</Flex>
-				</Box>
+				{supportedLanguages && supportedLanguages.length > 0 && (
+					<Box maxW="900px" mx="auto" px="1rem" mt="3rem">
+						<Flex
+							wrap="wrap"
+							fontSize={{ base: '1.1rem', md: '0.8rem' }}
+							py="1rem"
+							whiteSpace="pre-wrap"
+							justify="center"
+						>
+							{supportedLanguages.map((language, index) => (
+								<Fragment key={language}>
+									{index > 0 ? ' | ' : undefined}
+									<Link href={`/${language}`}>
+										{getNativeLanguageName(language)?.trim()}
+									</Link>
+								</Fragment>
+							))}
+						</Flex>
+					</Box>
+				)}
 			</Box>
 		</>
 	);
 };
 
-export default function Layout({ children, i18n }: LandingLayoutProps) {
+export default function Layout({ children, i18n }: LayoutProps) {
 	return (
 		<ChakraProvider>
 			<I18nextProvider
 				i18n={createI18nInstance(i18n?.language ?? 'en', i18n?.resources ?? {})}
 			>
-				<LayoutContent>{children}</LayoutContent>
+				<LayoutContent supportedLanguages={i18n?.supportedLanguages}>
+					{children}
+				</LayoutContent>
 			</I18nextProvider>
 		</ChakraProvider>
 	);

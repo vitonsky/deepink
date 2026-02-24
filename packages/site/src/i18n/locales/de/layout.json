@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "Download",
+		"features": "Funktionen",
+		"docs": "Dokumentation",
+		"blog": "Blog",
+		"changelog": "Änderungsprotokoll"
+	},
+	"links": {
+		"follow": {
+			"title": "Folge uns"
+		},
+		"introduction": {
+			"title": "Erste Schritte",
+			"content": {
+				"download": "Download",
+				"docs": "Dokumentation",
+				"overview": "Übersicht"
+			}
+		},
+		"learn": {
+			"title": "Lernen",
+			"content": {
+				"help": "Hilfe",
+				"changelog": "Änderungsprotokoll",
+				"about": "Über",
+				"roadmap": "Roadmap"
+			}
+		},
+		"resources": {
+			"title": "Ressourcen",
+			"content": {
+				"terms": "Nutzungsbedingungen",
+				"privacy": "Datenschutzerklärung"
+			}
+		}
+	}
+}

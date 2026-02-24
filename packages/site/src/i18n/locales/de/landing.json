@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Halte deine Gedanken fest.",
+		"subtitle": "Deepink ist eine <0>auf Privatsphäre fokussierte</0> Notiz-App mit einem blitzschnellen Workflow.",
+		"button": {
+			"get": "Deepink herunterladen",
+			"features": "Funktionen ansehen"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Kugelsicherer Tresor",
+				"text": "Alle deine Daten sind verschlüsselt. Im Gegensatz zu anderen Apps bedeutet das wirklich <0>alle deine Daten</0>. Du kannst den Verschlüsselungsalgorithmus wählen, dem du vertraust.\n\nDeepink ist <1>Open Source</1> und offen für Sicherheitsaudits."
+			},
+			"workflow": {
+				"title": "Blitzschneller Workflow",
+				"text": "Während der Entwicklung haben wir die Aktionen gezählt, die nötig sind, um etwas zu erledigen. Wir haben diese Schritte für die meisten Aktionen um bis zu 80% im Vergleich zu anderen Notiz-Apps minimiert."
+			},
+			"universality": {
+				"title": "Alles in einem",
+				"text": "Du erstellst einmal einen Tresor mit einem sicheren Passwort, verschiebst alle deine Notizen und schreibst alles dort. Arbeitsbereiche und verschachtelte Tags ermöglichen es dir, alles zu organisieren, zu isolieren und schnell darauf zuzugreifen – von deinem täglichen Tagebuch über private Notizen zu deiner Geschäftsstrategie, Recherchen, Tracking deiner Sportergebnisse und vieles mehr."
+			}
+		},
+		"cta": {
+			"text": "Kostenlos ohne Einschränkungen.",
+			"button": "Jetzt herunterladen"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Dein Denken, strukturiert",
+			"text": "Halte eine schnelle Einsicht fest oder forme etwas Komplexes – Deepink bringt Ordnung, Fokus und Struktur in jede Idee."
+		},
+		"content": {
+			"links": {
+				"title": "Links",
+				"text": "Kopiere einen Link zu jeder Notiz und verweise darauf überall in deinem Tresor. Baue Verbindungen zwischen Meeting-Notizen und Entscheidungen, Recherchen und Schlussfolgerungen, Plänen und Umsetzung auf – ohne dieselbe Information zu wiederholen.\n\nAlles bleibt synchronisiert. Aktualisiere eine Notiz einmal, und jede verlinkte Referenz bleibt korrekt.\n\nDeepink zeigt auch, wo eine Notiz erwähnt wird, sodass du Verbindungen nachverfolgen und natürlich durch dein Wissen navigieren kannst.\n\nDu kannst auch sehen, wo eine Notiz erwähnt wird, um Verbindungen zu verfolgen und durch verwandte Inhalte zu navigieren.\n\nDeine Informationen sollten nicht in Silos leben. Mit Links werden sie zu einem Netzwerk."
+			},
+			"workspaces": {
+				"title": "Arbeitsbereiche",
+				"text": "Trenne deine Welt – ohne deinen Tresor zu trennen.\n\nArbeitsbereiche ermöglichen es dir, unterschiedliche Bereiche innerhalb eines einzigen sicheren Tresors zu erstellen. Entsperre einmal, dann wechsle zwischen fokussierten Umgebungen wie Kundenprojekte, Persönliches Tagebuch, Gesundheits-Tracking oder Lernen – ohne Überschneidungen.\n\nAlles bleibt organisiert und kontextspezifisch. Teile deinen Bildschirm in einem Meeting mit Zuversicht, in dem Wissen, dass persönliche oder sensible Bereiche nicht versehentlich auftauchen.\n\nEin Tresor. Klare Grenzen. Null Reibung."
+			},
+			"history": {
+				"title": "Verlauf",
+				"text": "Jede Notiz behält ihre eigene Zeitleiste.\n\nDeepink speichert automatisch frühere Versionen, sodass du überprüfen kannst, was sich geändert hat, einen früheren Entwurf wiederherstellen oder nachverfolgen kannst, wie sich eine Idee im Laufe der Zeit entwickelt hat. Ob es die gestrige Bearbeitung oder etwas von vor einem Jahr ist, nichts Wichtiges geht verloren.\n\nDer Verlauf gibt dir die Zuversicht zu verfeinern, umzuschreiben und neu zu denken – in dem Wissen, dass jeder Schritt bewahrt und zugänglich ist, wenn du ihn brauchst."
+			},
+			"reminders": {
+				"title": "Erinnerungen",
+				"text": "Füge eine Erinnerung zu jeder Notiz hinzu und werde benachrichtigt, wenn es wichtig ist.\n\nSetze Follow-ups für Meeting-Notizen, Fristen für Projektpläne, Verlängerungsdaten für Dokumente oder Check-ins für persönliche Ziele. Die Erinnerung bleibt mit dem genauen Kontext verbunden – nicht als separate Aufgabe in einer anderen App.\n\nWenn die Zeit kommt, kehrst du direkt zur Notiz mit allen Details zurück.\n\nErinnerungen helfen dir, auf deine Informationen zu reagieren, nicht nur sie zu speichern."
+			},
+			"tags": {
+				"title": "Verschachtelte Tags",
+				"text": "Strukturiere deine Notizen mit Tags, die echten Hierarchien folgen.\n\nVerschachtelte Tags ermöglichen es dir, Eltern-Kind-Beziehungen zu erstellen, sodass breitere Themen spezifischere Unterthemen enthalten können. Zum Beispiel kann ein Eltern-Tag wie Kunden einzelne Kunden-Tags darunter enthalten, oder Finanzen kann sich in Steuern, Rechnungen und Berichte verzweigen. Dies hält übergeordnete Bereiche sauber und ermöglicht gleichzeitig eine detaillierte Klassifizierung darunter.\n\nIm Gegensatz zu Ordnern oder Einzelkategorie-Systemen können Notizen mehrere Tags gleichzeitig haben. Eine einzelne Notiz kann zu einem bestimmten Kunden gehören, sich auf ein finanzielles Thema beziehen und mit einem Zeitraum verbunden sein – alles ohne Duplizierung.\n\nVerschachtelte Tags geben dir präzise Organisation mit der Flexibilität, widerzuspiegeln, wie Informationen tatsächlich überlappen."
+			},
+			"encryption": {
+				"title": "Verschlüsselung",
+				"text": "Dein gesamter Tresor ist verschlüsselt – nicht nur Teile davon.\n\nDeepink wendet Verschlüsselung auf alles an: Notizen, angehängte Dateien, Arbeitsbereiche und Metadaten. Im Gegensatz zu vielen Apps, die nur synchronisierte Daten oder Textinhalte verschlüsseln, schützt Deepink die vollständige Struktur deines Tresors.\n\nAnhänge bleiben nicht ungeschützt. Metadaten sind nicht lesbar. Selbst Dateigrößen werden verschleiert, um das Risiko einer Analyse zu reduzieren.\n\nWas du speicherst, bleibt privat – vollständig, von Grund auf."
+			}
+		}
+	},
+	"cta": {
+		"title": "Notizen für die Stimmung, in der du bist",
+		"text": "Ein Raum für den Alltag, ein anderer für Bücher, ein anderer für Pläne. Wechsle den Kontext mit einem Klick, halte die Dinge sauber und schreibe weiter, ohne zu viel darüber nachzudenken, wohin es gehört.",
+		"button": "Deepink herunterladen"
+	}
+}

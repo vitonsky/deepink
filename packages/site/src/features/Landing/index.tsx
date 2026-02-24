@@ -11,7 +11,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
-import LandingLayout, { type LandingLayoutProps } from '../../components/Layout/Layout';
+import Layout, { type LayoutProps } from '../../components/Layout/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
 import { TheRock } from '../../components/TheRock';
@@ -286,10 +286,10 @@ const Content = () => {
 // TODO: tune CEO tags
 // TODO: add docs
 // TODO: add blog
-export default function Landing({ i18n }: Pick<LandingLayoutProps, 'i18n'>) {
+export default function Landing({ i18n }: Pick<LayoutProps, 'i18n'>) {
 	return (
-		<LandingLayout i18n={i18n}>
+		<Layout i18n={i18n}>
 			<Content />
-		</LandingLayout>
+		</Layout>
 	);
 }

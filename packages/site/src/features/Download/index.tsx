@@ -3,7 +3,7 @@ import { BiCloudDownload } from 'react-icons/bi';
 import { FaApple, FaLinux, FaWindows } from 'react-icons/fa6';
 import { Box, Heading, HStack, SimpleGrid, VStack } from '@chakra-ui/react';
 
-import Layout from '../../components/Layout/Layout';
+import Layout, { type LayoutProps } from '../../components/Layout/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
 import { TheRock } from '../../components/TheRock';
@@ -56,8 +56,9 @@ type DownloadGroup = {
 };
 
 export default function Page({
+	i18n,
 	versions,
-}: {
+}: Pick<LayoutProps, 'i18n'> & {
 	versions: {
 		url: string;
 		name: string;
@@ -143,7 +144,7 @@ export default function Page({
 	}, [versions]);
 
 	return (
-		<Layout>
+		<Layout i18n={i18n}>
 			<VStack paddingBlock="8rem" justifyContent="center" gap="3rem">
 				<VStack gap="3rem">
 					<TheRock maxW="100%" width="350px" />
