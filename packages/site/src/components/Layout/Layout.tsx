@@ -1,5 +1,7 @@
-import React, { Fragment, type ReactNode } from 'react';
+import React, { Fragment, type PropsWithChildren, type ReactNode } from 'react';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import { IoIosMenu } from 'react-icons/io';
+import type { ResourceKey } from 'i18next';
 import {
 	Box,
 	CloseButton,
@@ -15,6 +17,8 @@ import {
 	Stack,
 	VStack,
 } from '@chakra-ui/react';
+
+import { createI18nInstance, type SupportedLanguage } from '../../i18n/config';
 
 import ChakraProvider from '../ChakraProvider';
 import { Link } from '../Link';
@@ -60,25 +64,33 @@ type SimpleLink = {
 	url: string;
 };
 
-const links = {
-	main: [
-		{ text: 'Download', url: '/download' },
-		{ text: 'Features', url: '/#features' },
-		{ text: 'Docs', url: '/guides/example/' },
-	],
-	additional: [
-		{ text: 'Blog', url: '/blog' },
-		{ text: 'Changelog', url: '/changelog' },
-	],
-} satisfies Record<string, SimpleLink[]>;
+export type LocalizationProps = {
+	language: SupportedLanguage;
+	resources: Record<string, ResourceKey>;
+};
 
-interface LandingLayoutProps {
+export interface LandingLayoutProps {
 	children: ReactNode;
+	i18n?: LocalizationProps;
 }
 
-export default function Layout({ children }: LandingLayoutProps) {
+const LayoutContent = ({ children }: PropsWithChildren) => {
+	const { t } = useTranslation('layout');
+
+	const links = {
+		main: [
+			{ text: t('nav.download'), url: '/download' },
+			{ text: t('nav.features'), url: '/#features' },
+			{ text: t('nav.docs'), url: '/guides/example/' },
+		],
+		additional: [
+			{ text: t('nav.blog'), url: '/blog' },
+			{ text: t('nav.changelog'), url: '/changelog' },
+		],
+	} satisfies Record<string, SimpleLink[]>;
+
 	return (
-		<ChakraProvider>
+		<>
 			{/* Header */}
 			<Box as="header" maxW="100%" overflow="auto" position="relative">
 				<Container maxW="900px" px="1rem">
@@ -204,7 +216,7 @@ export default function Layout({ children }: LandingLayoutProps) {
 									fontSize="1.1rem"
 									color="brand.secondary"
 								>
-									Follow us
+									{t('links.follow.title')}
 								</Text>
 								<VStack
 									as="ul"
@@ -253,7 +265,7 @@ export default function Layout({ children }: LandingLayoutProps) {
 									fontSize="1.1rem"
 									color="brand.secondary"
 								>
-									Get started
+									{t('links.introduction.title')}
 								</Text>
 								<VStack
 									as="ul"
@@ -264,48 +276,18 @@ export default function Layout({ children }: LandingLayoutProps) {
 									align="start"
 								>
 									<Box as="li">
-										<Link href="/download">Download</Link>
+										<Link href="/download">
+											{t('links.introduction.content.download')}
+										</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/docs">Docs</Link>
+										<Link href="/docs">
+											{t('links.introduction.content.docs')}
+										</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/">Overview</Link>
-									</Box>
-								</VStack>
-							</VStack>
-
-							<VStack align="start" gap="0.8rem" fontWeight="500">
-								<Text
-									fontWeight="500"
-									fontSize="1.1rem"
-									color="brand.secondary"
-								>
-									Learn
-								</Text>
-								<VStack
-									as="ul"
-									listStyleType="none"
-									m={0}
-									p={0}
-									gap="0.4rem"
-									align="start"
-								>
-									<Box as="li">
-										<Link href="/docs">Help</Link>
-									</Box>
-									<Box as="li">
-										<Link href="/changelog">Changelog</Link>
-									</Box>
-									<Box as="li">
-										<Link href="/about">About</Link>
-									</Box>
-									<Box as="li">
-										<Link
-											href="https://github.com/users/vitonsky/projects/3/views/2"
-											target="_blank"
-										>
-											Roadmap
+										<Link href="/">
+											{t('links.introduction.content.overview')}
 										</Link>
 									</Box>
 								</VStack>
@@ -317,7 +299,7 @@ export default function Layout({ children }: LandingLayoutProps) {
 									fontSize="1.1rem"
 									color="brand.secondary"
 								>
-									Resources
+									{t('links.learn.title')}
 								</Text>
 								<VStack
 									as="ul"
@@ -328,10 +310,56 @@ export default function Layout({ children }: LandingLayoutProps) {
 									align="start"
 								>
 									<Box as="li">
-										<Link href="/terms">Terms of Use</Link>
+										<Link href="/docs">
+											{t('links.learn.content.help')}
+										</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/privacy">Privacy Policy</Link>
+										<Link href="/changelog">
+											{t('links.learn.content.changelog')}
+										</Link>
+									</Box>
+									<Box as="li">
+										<Link href="/about">
+											{t('links.learn.content.about')}
+										</Link>
+									</Box>
+									<Box as="li">
+										<Link
+											href="https://github.com/users/vitonsky/projects/3/views/2"
+											target="_blank"
+										>
+											{t('links.learn.content.roadmap')}
+										</Link>
+									</Box>
+								</VStack>
+							</VStack>
+
+							<VStack align="start" gap="0.8rem" fontWeight="500">
+								<Text
+									fontWeight="500"
+									fontSize="1.1rem"
+									color="brand.secondary"
+								>
+									{t('links.resources.title')}
+								</Text>
+								<VStack
+									as="ul"
+									listStyleType="none"
+									m={0}
+									p={0}
+									gap="0.4rem"
+									align="start"
+								>
+									<Box as="li">
+										<Link href="/terms">
+											{t('links.resources.content.terms')}
+										</Link>
+									</Box>
+									<Box as="li">
+										<Link href="/privacy">
+											{t('links.resources.content.privacy')}
+										</Link>
 									</Box>
 								</VStack>
 							</VStack>
@@ -358,6 +386,18 @@ export default function Layout({ children }: LandingLayoutProps) {
 					</Flex>
 				</Box>
 			</Box>
+		</>
+	);
+};
+
+export default function Layout({ children, i18n }: LandingLayoutProps) {
+	return (
+		<ChakraProvider>
+			<I18nextProvider
+				i18n={createI18nInstance(i18n?.language ?? 'en', i18n?.resources ?? {})}
+			>
+				<LayoutContent>{children}</LayoutContent>
+			</I18nextProvider>
 		</ChakraProvider>
 	);
 }

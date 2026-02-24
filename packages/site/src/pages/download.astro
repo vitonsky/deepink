@@ -1,11 +1,3 @@
 ---
-import Document from '../components/Document.astro';
-import Page from '../features/Download';
-import { getReleases } from '../features/releases';
-
-const releases = await getReleases(import.meta.env.GITHUB_TOKEN);
+return Astro.rewrite('/en/download');
 ---
-
-<Document>
-	<Page client:load versions={releases}/>
-</Document>
