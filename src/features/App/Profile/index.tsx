@@ -147,7 +147,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			<Box
 				width="100%"
 				height="100vh"
-				display={isActiveWorkspaceReady ? 'block' : 'none'}
+				display={isActiveWorkspaceReady ? 'flex' : 'none'}
 			>
 				{workspaces.map((workspace) =>
 					workspace.touched ? (

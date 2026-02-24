@@ -12,7 +12,6 @@ type PickProfileResponse = {
 export type OnPickProfile = (
 	profile: ProfileObject,
 	password?: string,
-	shouldShowSplash?: boolean,
 ) => Promise<PickProfileResponse>;
 
 export type UseProfileLoaderProps = {
@@ -34,8 +33,8 @@ export const useProfileLoader = ({
 	const [isProfileOpening, setIsProfileOpening] = useState(true);
 
 	const onOpenProfile: OnPickProfile = useCallback(
-		async (profile: ProfileObject, password?: string, shouldShowSplash = true) => {
-			if (shouldShowSplash) setIsProfileOpening(true);
+		async (profile: ProfileObject, password?: string) => {
+			setIsProfileOpening(true);
 
 			// Profiles with no password
 			if (!profile.encryption) {
