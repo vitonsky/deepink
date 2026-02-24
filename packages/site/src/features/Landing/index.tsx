@@ -178,7 +178,7 @@ const Content = () => {
 						>
 							{t('highlights.cta.button')}
 						</Link>
-						<Text>{t('highlights.cta.text')}</Text>
+						<Text textAlign="center">{t('highlights.cta.text')}</Text>
 					</VStack>
 				</VStack>
 			</Stack>
@@ -283,7 +283,6 @@ const Content = () => {
 	);
 };
 
-// TODO: fix styles of localized pages
 // TODO: add most important pages
 
 // TODO: add analytics

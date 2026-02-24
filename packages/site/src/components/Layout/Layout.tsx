@@ -228,12 +228,12 @@ const LayoutContent = ({
 
 						<Grid
 							templateColumns={{
-								base: 'repeat(auto-fit, minmax(80px, 1fr))',
-								md: 'repeat(auto-fit, minmax(100px, 1fr))',
+								base: 'repeat(auto-fit, minmax(180px, 1fr))',
+								md: 'repeat(auto-fit, minmax(150px, 1fr))',
 							}}
 							gap={{ base: '.5rem', md: '2rem' }}
 							flexGrow={1}
-							maxW={{ base: undefined, md: '50%' }}
+							maxW={{ md: '70%' }}
 							ml={{ md: 'auto' }}
 							width={{ base: '100%', md: 'auto' }}
 						>
