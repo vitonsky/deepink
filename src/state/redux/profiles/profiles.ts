@@ -534,16 +534,11 @@ export const selectActiveWorkspaceInfo = (scope: ProfileScoped) =>
 		workspace ? getWorkspaceInfo(workspace) : null,
 	);
 
-export const selectIsActiveWorkspaceReady = ({ profileId }: ProfileScoped) =>
-	createAppSelector(profilesSlice.selectSlice, (state) => {
-		const profile = state.profiles[profileId];
-		if (!profile) return false;
-
-		const activeWorkspace = profile.activeWorkspace;
-		if (!activeWorkspace) return false;
-
-		return profile.workspaces[activeWorkspace]?.isWorkspaceReady ?? false;
-	});
+export const selectIsActiveWorkspaceReady = (scope: ProfileScoped) =>
+	createAppSelector(
+		selectActiveWorkspace(scope),
+		(workspace) => workspace?.isWorkspaceReady ?? false,
+	);
 
 export * from './selectors/notes';
 export * from './selectors/tags';
