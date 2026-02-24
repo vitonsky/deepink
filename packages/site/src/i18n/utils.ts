@@ -3,8 +3,59 @@ import path from 'node:path';
 
 import type { ResourceKey } from 'i18next';
 
-import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, type SupportedLanguage } from './config';
 import type { i18nPageContext } from './types';
+import { DEFAULT_LANGUAGE, type SupportedLanguage } from '.';
+
+// TODO: translate to all languages
+// [
+// 	'bg',
+// 	'ca',
+// 	'cs',
+// 	'da',
+// 	'de',
+// 	'es',
+// 	'fr',
+// 	'hu',
+// 	'it',
+// 	'ja',
+// 	'ko',
+// 	'nb',
+// 	'pl',
+// 	'pt-br',
+// 	'pt-pt',
+// 	'ru',
+// 	'sl',
+// 	'sv',
+// 	'tr',
+// 	'uk',
+// 	'vi',
+// 	'zh-cn',
+// 	'zh-tw',
+// ]
+/**
+ * Reads the locales directory and returns
+ * an array of supported language codes
+ * (folder names only).
+ *
+ * @param {string} localesPath - Absolute or relative path to locales directory
+ * @returns {string[]} Array of language codes
+ */
+function getSupportedLangs(localesPath: string) {
+	const fullPath = path.resolve(localesPath);
+
+	if (!fs.existsSync(fullPath)) {
+		throw new Error(`Locales directory not found: ${fullPath}`);
+	}
+
+	return fs
+		.readdirSync(fullPath, { withFileTypes: true })
+		.filter((dirent) => dirent.isDirectory())
+		.map((dirent) => dirent.name);
+}
+
+export const SUPPORTED_LANGUAGES = getSupportedLangs(
+	path.join(import.meta.dirname, 'locales'),
+);
 
 export function isValidLanguage(lang: string): lang is SupportedLanguage {
 	return SUPPORTED_LANGUAGES.includes(lang);

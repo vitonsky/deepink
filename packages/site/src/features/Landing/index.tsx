@@ -13,6 +13,7 @@ import {
 
 import Layout, { type LayoutProps } from '../../components/Layout/Layout';
 import { Link } from '../../components/Link';
+import { useLocalePath } from '../../components/Locale';
 import { Text } from '../../components/Text';
 import { TheRock } from '../../components/TheRock';
 
@@ -25,6 +26,8 @@ import tagsScreenshot from './screenshots/tags.png';
 import workspacesScreenshot from './screenshots/workspaces.png';
 
 const Content = () => {
+	const localePath = useLocalePath();
+
 	const { t } = useTranslation('landing');
 	const highlights: {
 		title: string;
@@ -117,10 +120,10 @@ const Content = () => {
 						/>
 					</Text>
 					<HStack gap="0.8rem">
-						<Link href="/download" variant="button-primary">
+						<Link href={localePath('/download')} variant="button-primary">
 							{t('hero.button.get')}
 						</Link>
-						<Link href="/#features" variant="button-secondary">
+						<Link href={localePath('/#features')} variant="button-secondary">
 							{t('hero.button.features')}
 						</Link>
 					</HStack>
@@ -167,7 +170,7 @@ const Content = () => {
 
 					<VStack align="center" gap="0.5rem" width="100%">
 						<Link
-							href="/download"
+							href={localePath('/download')}
 							variant="button-primary"
 							width="100%"
 							maxW={{ base: '250px', md: '100%' }}
@@ -272,7 +275,7 @@ const Content = () => {
 				>
 					{t('cta.text')}
 				</Text>
-				<Link href="/download" variant="button-primary">
+				<Link href={localePath('/download')} variant="button-primary">
 					{t('cta.button')}
 				</Link>
 			</VStack>
@@ -280,6 +283,7 @@ const Content = () => {
 	);
 };
 
+// TODO: fix styles of localized pages
 // TODO: add most important pages
 
 // TODO: add analytics

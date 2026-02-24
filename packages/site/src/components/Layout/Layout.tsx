@@ -22,6 +22,7 @@ import type { i18nPageContext } from '../../i18n/types';
 
 import ChakraProvider from '../ChakraProvider';
 import { Link } from '../Link';
+import { LocaleContext, useLocalePath } from '../Locale';
 import { Text } from '../Text';
 import { Logo } from './Logo';
 
@@ -40,19 +41,21 @@ type SimpleLink = {
 
 export interface LayoutProps {
 	children: ReactNode;
-	i18n?: i18nPageContext;
+	i18n: i18nPageContext;
 }
 
 const LayoutContent = ({
 	altVersions,
 	children,
 }: PropsWithChildren<Partial<Pick<i18nPageContext, 'altVersions'>>>) => {
+	const localePath = useLocalePath();
+
 	const { t } = useTranslation('layout');
 
 	const links = {
 		main: [
-			{ text: t('nav.download'), url: '/download' },
-			{ text: t('nav.features'), url: '/#features' },
+			{ text: t('nav.download'), url: localePath('/download') },
+			{ text: t('nav.features'), url: localePath('/#features') },
 			{ text: t('nav.docs'), url: '/guides/example/' },
 		],
 		additional: [
@@ -67,7 +70,7 @@ const LayoutContent = ({
 			<Box as="header" maxW="100%" overflow="auto" position="relative">
 				<Container maxW="900px" px="1rem">
 					<HStack gap="1rem" align="center" py="1rem">
-						<Link href="/" variant="plain">
+						<Link href={localePath('/')} variant="plain">
 							<Logo />
 						</Link>
 
@@ -87,7 +90,10 @@ const LayoutContent = ({
 									<Drawer.Content backgroundColor="bg.canvas">
 										<Drawer.Header>
 											<Drawer.Title>
-												<Link href="/" variant="plain">
+												<Link
+													href={localePath('/')}
+													variant="plain"
+												>
 													<Logo />
 												</Link>
 											</Drawer.Title>
@@ -178,7 +184,7 @@ const LayoutContent = ({
 						gap={{ base: '3rem', md: '1rem' }}
 					>
 						<VStack align="start" gap="1rem">
-							<Link href="/" variant="plain">
+							<Link href={localePath('/')} variant="plain">
 								<Logo />
 							</Link>
 
@@ -248,7 +254,7 @@ const LayoutContent = ({
 									align="start"
 								>
 									<Box as="li">
-										<Link href="/download">
+										<Link href={localePath('/download')}>
 											{t('links.introduction.content.download')}
 										</Link>
 									</Box>
@@ -258,7 +264,7 @@ const LayoutContent = ({
 										</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/">
+										<Link href={localePath('/')}>
 											{t('links.introduction.content.overview')}
 										</Link>
 									</Box>
@@ -370,7 +376,9 @@ export default function Layout({ children, i18n }: LayoutProps) {
 			<I18nextProvider
 				i18n={createI18nInstance(i18n?.language ?? 'en', i18n?.resources ?? {})}
 			>
-				<LayoutContent {...i18n}>{children}</LayoutContent>
+				<LocaleContext.Provider value={i18n.language}>
+					<LayoutContent {...i18n}>{children}</LayoutContent>
+				</LocaleContext.Provider>
 			</I18nextProvider>
 		</ChakraProvider>
 	);

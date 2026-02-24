@@ -1,7 +1,7 @@
 import { initReactI18next } from 'react-i18next';
 import { createInstance, type ResourceKey } from 'i18next';
 
-import type { SupportedLanguage } from './config';
+import type { SupportedLanguage } from '.';
 
 export function createI18nInstance(
 	lang: SupportedLanguage,
