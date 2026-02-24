@@ -18,6 +18,6 @@ export function getStaticPaths() {
 console.log(i18n.altVersions)
 ---
 
-<Document lang={i18n.language}>
+<Document lang={i18n.language} meta={{ alts: i18n.altVersions }}>
 	<Page client:load i18n={i18n} />
 </Document>

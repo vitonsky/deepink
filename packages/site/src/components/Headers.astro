@@ -1,10 +1,21 @@
 ---
 import appScreenshot from '../features/Landing/screenshots/app.png';
+import type { i18nPageContext } from '../i18n/types';
+
+export interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	url?: string;
+	alts?: i18nPageContext['altVersions'];
+}
+
 const {
 	title = 'Deepink - Snapshot your thoughts',
 	description = 'Deepink is a privacy focused note taking app with a light speed workflow. One space for everyday life, another for books, another for plans. Switch contexts in a click, keep things clean, and keep writing without overthinking where it should go.',
 	image = appScreenshot.src,
 	url = Astro.site,
+	alts = [],
 } = Astro.props;
 ---
 
@@ -29,3 +40,16 @@ const {
 <meta name="twitter:image" content={image} />
 
 <link rel="canonical" href={url} />
+
+<meta name="robots" content="index, follow" />
+
+<!-- Alt languages -->
+{
+	alts.map((alt) => (
+		<link
+			rel="alternate"
+			hreflang={alt.langCode}
+			href={new URL(alt.url, Astro.site).href}
+		/>
+	))
+}

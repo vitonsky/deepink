@@ -7,6 +7,8 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+    // TODO: update site URL
+    site: 'https://site',
     vite: {
         ssr: {
             // Fix build error. See details at https://github.com/withastro/astro/issues/14117#issuecomment-3117797751

@@ -20,6 +20,6 @@ export function getStaticPaths() {
 const releases = await getReleases(import.meta.env.GITHUB_TOKEN);
 ---
 
-<Document lang={i18n.language}>
-	<Page client:load versions={releases} i18n={i18n}/>
+<Document lang={i18n.language} meta={{ alts: i18n.altVersions }}>
+	<Page client:load versions={releases} i18n={i18n} />
 </Document>
