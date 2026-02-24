@@ -3,6 +3,7 @@ import { ProfileObject } from '@core/storage/ProfilesManager';
 
 import { ProfilesApi } from './Profiles/hooks/useProfileContainers';
 import { ProfilesListApi } from './useProfilesList';
+import { RecentProfile } from './useRecentProfile';
 
 type PickProfileResponse = {
 	status: 'ok' | 'error';
@@ -17,10 +18,7 @@ export type OnPickProfile = (
 export type UseProfileLoaderProps = {
 	profilesList: ProfilesListApi;
 	profiles: ProfilesApi;
-	recentProfile: {
-		isLoaded: boolean;
-		profileId: string | null;
-	};
+	recentProfile: RecentProfile;
 	setCurrentProfileId: (id: string | null) => void;
 };
 
@@ -86,7 +84,7 @@ export const useProfileLoader = ({
 	);
 
 	return {
-		isOpening: isProfileOpening,
+		isProfileOpening,
 		onOpenProfile,
 	};
 };

@@ -46,7 +46,7 @@ export const App: FC = () => {
 
 	// Open recent profile
 	const recentProfile = useRecentProfile(config);
-	const { isOpening: isProfileOpening, onOpenProfile } = useProfileLoader({
+	const { isProfileOpening, onOpenProfile } = useProfileLoader({
 		profilesList,
 		recentProfile,
 		setCurrentProfileId: setCurrentProfileId,
@@ -70,12 +70,7 @@ export const App: FC = () => {
 
 		const timer = setTimeout(() => setIsShowSplash(false), 400);
 		return () => clearTimeout(timer);
-	}, [
-		isProfileOpening,
-		profilesList.isProfilesLoaded,
-		recentProfile.isLoaded,
-		skipSplashRef,
-	]);
+	}, [isProfileOpening, profilesList.isProfilesLoaded, recentProfile.isLoaded]);
 
 	if (isShowSplash) {
 		return <SplashScreen />;
