@@ -35,6 +35,13 @@ export const linkRecipe = defineRecipe({
 					color: 'link.hover',
 				},
 			},
+			header: {
+				color: 'inherit',
+				_hover: {
+					textDecoration: 'underline',
+					color: 'link.hover',
+				},
+			},
 			nav: {
 				display: 'inline-flex',
 				userSelect: 'none',

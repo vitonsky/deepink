@@ -1,0 +1,24 @@
+---
+import Document from '../../components/Document.astro';
+import Blog from '../../features/Blog';
+
+import { i18nGetContext } from '../../i18n/utils';
+
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog').then((posts) =>
+	posts.map(({ slug, data }) => ({
+		slug,
+		data,
+	})),
+);
+
+const i18n = i18nGetContext({
+	language: 'en',
+	namespaces: [],
+});
+---
+
+<Document lang={i18n.language} meta={{ alts: i18n.altVersions }}>
+	<Blog client:load i18n={i18n} posts={posts} />
+</Document>
