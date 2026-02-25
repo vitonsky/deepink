@@ -7,6 +7,7 @@ import {
 } from '@chakra-ui/react';
 
 import { linkRecipe } from '../components/Link';
+import { CSS_RESET_CLASS_NAME } from './constants';
 
 // Button recipe with variants
 const buttonRecipe = defineRecipe({
@@ -123,6 +124,7 @@ const customConfig = defineConfig({
 			separator: defineRecipe({
 				base: {
 					borderColor: 'border.thin',
+					borderBottomWidth: '0',
 				},
 			}),
 		},
@@ -158,4 +160,8 @@ const customConfig = defineConfig({
 	},
 });
 
-export const system = createSystem(defaultConfig, customConfig);
+export const system = createSystem(defaultConfig, customConfig, {
+	preflight: {
+		scope: `.${CSS_RESET_CLASS_NAME}`,
+	},
+});

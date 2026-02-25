@@ -19,6 +19,7 @@ import {
 
 import { createI18nInstance } from '../../i18n/createI18nInstance';
 import type { i18nPageContext } from '../../i18n/types';
+import { CSS_RESET_CLASS_NAME } from '../../theme/constants';
 
 import ChakraProvider from '../ChakraProvider';
 import { Link } from '../Link';
@@ -71,7 +72,7 @@ const LayoutContent = ({
 		<>
 			{/* Header */}
 			<Box as="header" maxW="100%" overflow="auto" position="relative">
-				<Container maxW="900px" px="1rem">
+				<Container maxW="900px" boxSizing="border-box" px="1rem">
 					<HStack gap="1rem" align="center" py="1rem">
 						<Link href={localePath('/')} variant="plain">
 							<Logo />
@@ -90,7 +91,10 @@ const LayoutContent = ({
 							<Portal>
 								<Drawer.Backdrop />
 								<Drawer.Positioner>
-									<Drawer.Content backgroundColor="bg.canvas">
+									<Drawer.Content
+										backgroundColor="bg.canvas"
+										className={CSS_RESET_CLASS_NAME}
+									>
 										<Drawer.Header>
 											<Drawer.Title>
 												<Link
@@ -172,14 +176,14 @@ const LayoutContent = ({
 
 			{/* Main Content */}
 			<Box as="main">
-				<Container maxW="900px" px="1rem">
+				<Container maxW="900px" boxSizing="border-box" px="1rem">
 					{children}
 				</Container>
 			</Box>
 
 			{/* Footer */}
 			<Box as="footer" pt="1rem" pb="5rem">
-				<Box maxW="900px" mx="auto" px="1rem">
+				<Box maxW="900px" boxSizing="border-box" mx="auto" px="1rem">
 					<Stack
 						wrap="wrap"
 						w="100%"
@@ -349,7 +353,13 @@ const LayoutContent = ({
 				</Box>
 
 				{altVersions && altVersions.length > 0 && (
-					<Box maxW="900px" mx="auto" px="1rem" mt="3rem">
+					<Box
+						maxW="900px"
+						boxSizing="border-box"
+						mx="auto"
+						px="1rem"
+						mt="3rem"
+					>
 						<Flex
 							wrap="wrap"
 							fontSize={{ base: '1.1rem', md: '0.8rem' }}
