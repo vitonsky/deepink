@@ -34,9 +34,11 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 				),
 				WorkspaceConfigScheme,
 			).get();
+
 			if (!workspaceConfig) return;
 
 			const { title, tags } = workspaceConfig.newNote;
+
 			dispatch(
 				workspacesApi.setWorkspaceNoteTemplateConfig({
 					...workspaceData,
@@ -45,10 +47,11 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 				}),
 			);
 		};
-		initConfig();
-	}, [controls.profile.files, dispatch, workspaceData, workspaceData.workspaceId]);
 
-	// Initialize workspace state
+		initConfig();
+	}, [controls.profile.files, dispatch, workspaceData]);
+
+	// Init workspace state
 	useEffect(() => {
 		if (!workspace) return;
 
@@ -58,6 +61,7 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 					getWorkspaceState(),
 					workspace.tagsRegistry.getTags(),
 				]);
+
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 
 				if (!persistedState) return;
@@ -105,7 +109,7 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 					}),
 				);
 
-				// If the saved note id doesn't exist use the first note as default
+				// Fallback to first note if saved active note is missing
 				const activeNote = notes.find((n) => n.id === activeNoteId) ?? notes[0];
 				dispatch(
 					workspacesApi.setActiveNote({
@@ -122,9 +126,10 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 				);
 			}
 		};
+
 		initWorkspace();
 
-		// Reset workspace state on unmount
+		// Cleanup notes and ready state on unmount
 		return () => {
 			dispatch(
 				workspacesApi.setIsWorkspaceReady({ ...workspaceData, isReady: false }),
@@ -140,7 +145,7 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 	useEffect(() => {
 		if (!workspace) return;
 
-		return workspace.tagsRegistry.onChange(async () => {
+		return workspace.tagsRegistry.onChange(() => {
 			workspace.tagsRegistry.getTags().then((tags) => {
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 			});
