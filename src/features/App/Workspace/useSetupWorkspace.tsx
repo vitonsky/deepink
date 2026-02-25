@@ -54,31 +54,35 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 
 		const initWorkspace = async () => {
 			try {
-				const [state, tags] = await Promise.all([
+				const [persistedState, tags] = await Promise.all([
 					getWorkspaceState(),
 					workspace.tagsRegistry.getTags(),
 				]);
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 
-				if (!state) return;
+				if (!persistedState) return;
+				const { search, view, selectedTagId, openedNoteIds, activeNoteId } =
+					persistedState;
 
+				// Restore base state
 				dispatch(
 					workspacesApi.setSearch({
 						...workspaceData,
-						search: state.search || '',
+						search: search ?? '',
 					}),
 				);
 
-				if (state.view) {
+				if (view) {
 					dispatch(
 						workspacesApi.setView({
 							...workspaceData,
-							view: state.view as NOTES_VIEW,
+							view: view as NOTES_VIEW,
 						}),
 					);
 				}
 
-				const selectedTag = tags.find((tag) => tag.id === state.selectedTagId);
+				// Restore selected tag only if it exists
+				const selectedTag = tags.find((tag) => tag.id === selectedTagId);
 				if (selectedTag) {
 					dispatch(
 						workspacesApi.setSelectedTag({
@@ -88,17 +92,25 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 					);
 				}
 
-				if (!state.openedNoteIds || state.openedNoteIds.length === 0) return;
+				// Restore notes
+				if (!openedNoteIds || openedNoteIds.length === 0) return;
 
-				const notes = await workspace.notesRegistry.getById(state.openedNoteIds);
+				const notes = await workspace.notesRegistry.getById(openedNoteIds);
 				if (!notes || notes.length === 0) return;
 
-				dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes }));
+				dispatch(
+					workspacesApi.setOpenedNotes({
+						...workspaceData,
+						notes,
+					}),
+				);
 
+				// If the saved note id doesn't exist use the first note as default
+				const activeNote = notes.find((n) => n.id === activeNoteId) ?? notes[0];
 				dispatch(
 					workspacesApi.setActiveNote({
 						...workspaceData,
-						noteId: state.activeNoteId || null,
+						noteId: activeNote.id,
 					}),
 				);
 			} finally {
