@@ -38,14 +38,49 @@ const i18n = i18nGetContext({
 
 <style>
 	:global(.sl-markdown-content) {
+		* + :is(h1, h2, h3) {
+			margin-top: 3rem;
+		}
+
+		ul {
+			padding-inline-start: 1rem;
+		}
+
+		ul > ul {
+			padding-inline-start: 3rem;
+		}
+
+		li {
+			margin-bottom: 1rem;
+			& & {
+				margin-bottom: 0.3rem;
+				& & {
+					margin-bottom: 0;
+				}
+			}
+		}
+
+		li:last-child {
+			margin-bottom: 0;
+		}
+
 		img {
 			height: auto;
 			max-width: 100%;
+			border: 1px solid #00000017;
+			border-radius: 8px;
 		}
 
 		pre[data-language] {
 			border: 1px solid peachpuff;
 			border-radius: 8px;
+		}
+
+		blockquote {
+			background: #ffdab93d;
+			margin: 0;
+			padding: 0.8rem 1.5rem;
+			border-radius: 12px;
 		}
 
 		--ec-frm-inlBtnFg: var(--chakra-colors-brand-secondary);

@@ -67,6 +67,7 @@ export default WithLayout(function Page({ posts }: { posts: BlogPostData[] }) {
 										marginBottom="1.5rem"
 										borderRadius="12px"
 										overflow="hidden"
+										border="1px solid #00000017"
 									>
 										<Image
 											src={image.src}
