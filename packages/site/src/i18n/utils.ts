@@ -53,9 +53,7 @@ function getSupportedLangs(localesPath: string) {
 		.map((dirent) => dirent.name);
 }
 
-export const SUPPORTED_LANGUAGES = getSupportedLangs(
-	path.join(import.meta.dirname, 'locales'),
-);
+export const SUPPORTED_LANGUAGES = getSupportedLangs(path.resolve(`src/i18n/locales`));
 
 export function isValidLanguage(lang: string): lang is SupportedLanguage {
 	return SUPPORTED_LANGUAGES.includes(lang);
