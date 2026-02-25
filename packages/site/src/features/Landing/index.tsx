@@ -25,12 +25,11 @@ import remindersScreenshot from './screenshots/reminders.png';
 import tagsScreenshot from './screenshots/tags.png';
 import workspacesScreenshot from './screenshots/workspaces.png';
 
-// TODO: add most important pages
+// TODO: proofread the blog posts
+// TODO: add most important pages - privacy, terms
 
 // TODO: add analytics
-// TODO: tune CEO tags
 // TODO: add docs
-// TODO: add blog
 export default WithLayout(() => {
 	const localePath = useLocalePath();
 
@@ -58,7 +57,13 @@ export default WithLayout(() => {
 		},
 		{
 			title: t('highlights.content.workflow.title'),
-			content: t('highlights.content.workflow.text'),
+			content: (
+				<Trans
+					t={t}
+					i18nKey="highlights.content.workflow.text"
+					components={[<Link key={1} href="/blog/the-workflow-cost" />]}
+				/>
+			),
 		},
 		{
 			title: t('highlights.content.universality.title'),
