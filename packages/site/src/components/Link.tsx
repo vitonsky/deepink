@@ -10,6 +10,7 @@ export const linkRecipe = defineRecipe({
 	base: {
 		textDecoration: 'none',
 		cursor: 'pointer',
+		boxSizing: 'border-box',
 	},
 	variants: {
 		variant: {
