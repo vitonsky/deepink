@@ -1,7 +1,7 @@
 {
 	"hero": {
 		"title": "Snapshot your thoughts.",
-		"subtitle": "Deepink is a <0>privacy focused</0> note taking app with a light speed workflow.",
+		"subtitle": "Deepink is a <0>privacy-focused</0> note-taking app with a lightning-fast workflow.",
 		"button": {
 			"get": "Get Deepink",
 			"features": "See features"
@@ -11,15 +11,15 @@
 		"content": {
 			"encryption": {
 				"title": "Bulletproof vault",
-				"text": "All your data is encrypted. Unlike other apps, it does mean really <0>all your data</0>. You can choose the encryption algorithm you trust.\n\nDeepink is <1>open source</1> and are opened to a security audits."
+				"text": "All your data is encrypted. Unlike other apps, it really does mean <0>all your data</0>. You can choose the encryption algorithm you trust.\n\nDeepink is <1>open source</1> and is open to security audits."
 			},
 			"workflow": {
-				"title": "Light-speed workflow",
-				"text": "While development we count an actions that is needed to do anything. We minimized these steps for most of actions up to 80% compared to other note taking apps."
+				"title": "Lightning-fast workflow",
+				"text": "During development, we count the actions needed to do anything. We've minimized these steps for most actions by up to 80% compared to other note-taking apps."
 			},
 			"universality": {
 				"title": "All in one",
-				"text": "You create vault with nice password once, move all your notes and write all the things there. Workspaces and nested tags let you organize, isolate and quickly access anything including your daily dairy, private notes for your business strategy, researches, tracking of your sport results, etc."
+				"text": "Create a vault with a strong password once, move all your notes, and write everything there. Workspaces and nested tags let you organize, isolate, and quickly access anything - including your daily diary, private notes for your business strategy, research, tracking of your sports results, and more."
 			}
 		},
 		"cta": {
@@ -43,7 +43,7 @@
 			},
 			"history": {
 				"title": "History",
-				"text": "Every note keeps its own timeline.\n\nDeepink automatically saves previous versions, so you can review whatchanged, restore an earlier draft, or track how an idea evolved overtime. Whether it's yesterday's edit or something from a year ago,nothing important is lost.\n\nHistory gives you confidence to refine, rewrite, and rethink — knowingevery step is preserved and accessible when you need it."
+				"text": "Every note keeps its own timeline.\n\nDeepink automatically saves previous versions, so you can review what changed, restore an earlier draft, or track how an idea evolved over time. Whether it's yesterday's edit or something from a year ago, nothing important is lost.\n\nHistory gives you confidence to refine, rewrite, and rethink — knowing every step is preserved and accessible when you need it."
 			},
 			"reminders": {
 				"title": "Reminders",
