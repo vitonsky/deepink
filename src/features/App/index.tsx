@@ -53,7 +53,7 @@ export const App: FC = () => {
 		profiles: profileContainers,
 	});
 
-	const [vaultView, setVaultView] = useState<'create' | 'choose'>('choose');
+	const [vaultManagerScreen, setVaultView] = useState<'create' | 'choose'>('choose');
 
 	const [isShowSplash, setIsShowSplash] = useState(false);
 	const skipSplashRef = useRef(false);
@@ -108,15 +108,15 @@ export const App: FC = () => {
 						}}
 						onPickAnotherProfile={() => setCurrentProfileId(null)}
 					/>
-				) : vaultView === 'create' || hasNoProfiles ? (
+				) : vaultManagerScreen === 'create' || hasNoProfiles ? (
 					<ProfileCreator
 						onCreateProfile={(profile) =>
 							profilesList.createProfile(profile).then((newProfile) => {
-								setVaultView('choose');
 								onOpenProfile(
 									newProfile,
 									profile.password ?? undefined,
 								).then(console.warn);
+								setVaultView('choose');
 							})
 						}
 						onCancel={
