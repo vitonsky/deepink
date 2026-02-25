@@ -49,7 +49,7 @@ export const useWorkspaceState = ({
 					if (!state) return null;
 
 					return {
-						openedNotes: state.openedNotes,
+						openedNoteIds: state.openedNotes.map((n) => n.id),
 						activeNoteId: state.activeNote,
 						selectedTagId: state.tags.selected,
 						view: state.view,
@@ -60,16 +60,11 @@ export const useWorkspaceState = ({
 			onChange(state) {
 				if (!state) return;
 
-				const openedNoteIds = state.openedNotes.map((n) => n.id);
-
-				workspaceState.set({
-					openedNoteIds,
-					...state,
-				});
+				workspaceState.set(state);
 			},
 			init: false,
 		});
-	}, [files, profileId, sync, workspaceState, watchSelector, workspaceId]);
+	}, [profileId, sync, workspaceState, watchSelector, workspaceId]);
 
 	return useCallback(() => workspaceState.get(), [workspaceState]);
 };
