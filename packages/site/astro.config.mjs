@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { defineConfig } from 'astro/config';
+import remarkExternalLinks from 'remark-external-links';
 import svgr from "vite-plugin-svgr";
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
@@ -23,6 +24,11 @@ export default defineConfig({
                 },
             },
         })]
+    },
+    markdown: {
+        remarkPlugins: [
+            [remarkExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }]
+        ]
     },
     integrations: [starlight({
         title: 'My Docs',
