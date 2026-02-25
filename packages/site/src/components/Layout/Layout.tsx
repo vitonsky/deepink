@@ -201,7 +201,7 @@ const LayoutContent = ({
 									fontSize="1.1rem"
 									color="brand.secondary"
 								>
-									{t('links.follow.title')}
+									{t('links.followUs.title')}
 								</Text>
 								<VStack
 									as="ul"
