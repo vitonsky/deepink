@@ -91,7 +91,9 @@ Here is my stats reported by the Sponsor Block:
 >
 > You've skipped **4005** segments ( **3d 1h 6.4 minutes** )
 
-As you can see, **I've saved a days of my live**. Now imagine how many things in your live takes your time and you don't know about that just because you have no time tracker for all of them.
+They have a public [Leaderboard with stats](https://leaderboard.sbstats.uk/) if you are interesting.
+
+As you can see, **I've saved a days of my live**. Now imagine how many other things in your live silently waste your time and you don't know about that just because you have no time tracker for all of them.
 
 ## What Deepink Does Differently: One-Step Defaults
 
