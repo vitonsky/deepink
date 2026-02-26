@@ -4,11 +4,11 @@
 		"features": "Возможности",
 		"docs": "Документация",
 		"blog": "Блог",
-		"changelog": "История изменений"
+		"changelog": "Changelog"
 	},
 	"links": {
 		"followUs": {
-			"title": "Подписаться"
+			"title": "Мы в соцсетях"
 		},
 		"introduction": {
 			"title": "Начало работы",
@@ -19,10 +19,10 @@
 			}
 		},
 		"learn": {
-			"title": "Материалы",
+			"title": "Узнать больше",
 			"content": {
-				"help": "Справка",
-				"changelog": "История изменений",
+				"help": "Помощь",
+				"changelog": "Changelog",
 				"about": "О приложении",
 				"roadmap": "Планы развития"
 			}
