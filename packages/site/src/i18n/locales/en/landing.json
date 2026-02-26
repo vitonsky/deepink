@@ -1,25 +1,25 @@
 {
 	"hero": {
-		"title": "Capture every thought.",
-		"subtitle": "Deepink is a <0>privacy-first</0> note-taking app to capture ideas fast, without the clutter.",
+		"title": "A better place for your notes.",
+		"subtitle": "Deepink is a <0>privacy-focused</0> note-taking app that keeps your notes organized.",
 		"button": {
-			"get": "Get Deepink",
-			"features": "Explore features"
+			"get": "Download Deepink",
+			"features": "Go to features"
 		}
 	},
 	"highlights": {
 		"content": {
 			"encryption": {
 				"title": "A vault you can trust",
-				"text": "Everything in your vault is encrypted — and we mean <0>all your data</0>: notes, files, and metadata. Pick the algorithm you trust.\n\nDeepink is <1>open source</1>, with code you can verify, not just trust."
+				"text": "Everything in your vault is encrypted. That means <0>all your data</0>: notes, files, and metadata. You can choose the algorithm you trust.\n\nDeepink is an <1>open source</1> app, with code you can verify, not just trust."
 			},
 			"workflow": {
 				"title": "Fast, focused workflow",
-				"text": "We measure clicks and keystrokes, then cut what doesn’t earn its place. For most tasks, Deepink needs <0>up to 80% fewer actions</0> than other note-taking apps."
+				"text": "Deepink is tuned for speed in everyday use, with friction removed from the most common tasks. For most tasks, it needs <0>up to 80% fewer actions</0> than other note-taking apps."
 			},
 			"universality": {
-				"title": "One vault, many worlds",
-				"text": "Create one password-protected vault, bring your notes in, and keep everything together. Workspaces and nested tags help you separate and find anything instantly — from project specs, contracts, and code snippets to book quotes, a daily journal, research, and more."
+				"title": "One vault, many contexts",
+				"text": "Create one password-protected vault, bring your notes in, and keep everything together. Workspaces and nested tags help you separate contexts and find what you need fast, from project specs, contracts, and code snippets to book quotes, a daily journal, research, and more."
 			}
 		},
 		"cta": {
