@@ -10,7 +10,7 @@ description: |
 date: 2026-02-25
 ---
 
-![alt text](favorited-note.png)
+![Deepink notes screen](favorited-note.png)
 
 Most note-taking apps don’t waste your time in obvious ways.
 
@@ -30,7 +30,7 @@ Bookmarking a note should be a single motion. But in many apps it looks like thi
 4. Choose a folder/group
 5. Close the dialog and get back to what you were doing
 
-![alt text](obsidian-bookmarks.png)
+![The Obsidian screen with bookmark window](obsidian-bookmarks.png)
 
 That’s not just time. It’s *reorientation*: you leave your thought, operate the UI, then try to resume the original task.
 
@@ -43,16 +43,6 @@ Human-computer interaction research has a blunt message: task time is built from
 The [Keystroke-Level Model (KLM)](https://cacm.acm.org/research/the-keystroke-level-model-for-user-performance-time-with-interactive-systems/) predicts task completion time by summing the small operators involved - pointing, clicking, typing, and mental preparation. If a workflow adds steps, it adds time - reliably.
 
 Even worse, frequent UI detours create a focus cost. [Research](https://www.sciencedirect.com/science/article/abs/pii/S0749597809000399 "Organizational Behavior and Human Decision Processes - Leroy, 2009") on **attention residue** shows that after switching tasks, part of your attention remains stuck on the previous task, reducing performance on the next one. That’s why "just a quick menu action" can feel mentally sticky.
-
-## The Compounding Effect: Seconds → Hours → Weeks
-
-Assume a micro-friction costs $3$–$5$ seconds (a couple extra clicks plus reorientation). Here’s what that looks like at different usage levels:
-
-| Micro-actions/day | Extra time per action | Time lost/day | Time lost/month ($20$ workdays) | Time lost/year ($250$ workdays) |
-|---:|---:|---:|---:|---:|
-| 100 | $3$–$5$s | $5$–$8.3$ min | $1.7$–$2.8$ hrs | $21$–$35$ hrs |
-| 300 | $3$–$5$s | $15$–$25$ min | $5$–$8.3$ hrs | $62$–$104$ hrs |
-| 600 | $3$–$5$s | $30$–$50$ min | $10$–$16.7$ hrs | $125$–$208$ hrs |
 
 A note-taking app isn’t just "writing notes." It’s the constant stream of micro-actions around thinking: capture, file, link, tag, search, reuse, share. If note work is part of the daily routine, **hundreds of micro-actions per day is normal** - which is exactly why micro-friction becomes a real-life time leak.
 
