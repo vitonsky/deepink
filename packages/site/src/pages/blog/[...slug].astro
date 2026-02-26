@@ -38,6 +38,8 @@ const i18n = i18nGetContext({
 
 <style>
 	:global(.sl-markdown-content) {
+		line-height: 1.7;
+		
 		* + :is(h1, h2, h3) {
 			margin-top: 3rem;
 		}
@@ -50,7 +52,7 @@ const i18n = i18nGetContext({
 			padding-inline-start: 3rem;
 		}
 
-		li {
+		li:has(li) {
 			margin-bottom: 1rem;
 			& & {
 				margin-bottom: 0.3rem;
