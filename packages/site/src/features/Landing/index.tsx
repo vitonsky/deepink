@@ -272,9 +272,10 @@ export default WithLayout(() => {
 				<Heading
 					as="h3"
 					m={0}
+					maxW={{ base: undefined, md: '70%' }}
 					fontSize="42px"
 					lineHeight="1.1"
-					textAlign={{ base: 'center', md: 'start' }}
+					textAlign="center"
 				>
 					{t('cta.title')}
 				</Heading>
