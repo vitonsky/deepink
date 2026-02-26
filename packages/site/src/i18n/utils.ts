@@ -47,10 +47,15 @@ function getSupportedLangs(localesPath: string) {
 		throw new Error(`Locales directory not found: ${fullPath}`);
 	}
 
-	return fs
-		.readdirSync(fullPath, { withFileTypes: true })
-		.filter((dirent) => dirent.isDirectory())
-		.map((dirent) => dirent.name);
+	return (
+		fs
+			.readdirSync(fullPath, { withFileTypes: true })
+			// .cache dir may appears while development
+			// it is created by translation tools
+			// so we can ignore that directory
+			.filter((dirent) => dirent.isDirectory() && dirent.name !== '.cache')
+			.map((dirent) => dirent.name)
+	);
 }
 
 export const SUPPORTED_LANGUAGES = getSupportedLangs(path.resolve(`src/i18n/locales`));

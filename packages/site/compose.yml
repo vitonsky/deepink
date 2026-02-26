@@ -7,12 +7,9 @@ services:
         dockerfile: Dockerfile
     working_dir: /app
     volumes:
-      - ./src/i18n/locales:/app/locales
       - .cache/locales:/app/locales/.cache
+      - ./src/i18n/locales:/app/locales
       - ./transmart.config.js:/app/transmart.config.js
-    env_file:
-      .env
-    # environment:
-    #   OPENAI_API_KEY: ${OPENROUTER_API_KEY}
-    #   OPENAI_API_URL: https://openrouter.ai/api/v1
-    #   TRANSMART_MODEL: openai/gpt-4o-mini
+    environment:
+      OPENAI_API_URL: ${OPENAI_API_URL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}

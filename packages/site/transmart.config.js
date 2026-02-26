@@ -14,10 +14,11 @@ Requirements:
 - Prefer concrete verbs and clear subjects. Remove ambiguity (e.g., specify what is unlocked/edited if English is unclear).
 - Keep terminology consistent across the whole text (e.g., “vault”, “workspace”, “note”). If a term should remain in English, keep it consistently; otherwise translate it consistently.
 - Don’t add new claims, features, or extra explanations. Don’t remove meaning.
-- Avoid any imperative in translation. Translated text must not to say to user what to do. The text must explain what Deepink can do for the user. Reader are authoritative persons who don't like to hear what to do.
+- Avoid any imperative overuse in translation. Translated text must not to say to user what to do. The text must explain what Deepink can do for the user. Reader are authoritative persons who don't like to hear what to do. You may only use imperative constructions to demonstrate use cases and make user imagine how they will work with the app. But do not over use that.
 - Bring the value in texts, not a fluff. Every slogan and description must contain the completed and insightful thought, not just the emotions.
 	- Bad: "Deepink — приложение для заметок с <0>акцентом на приватность</0>, которое помогает поддерживать идеальный порядок.". The "идеальный порядок" is a fluff, user can't understand why it does matter and why they needed in that.
 	- Good: "Deepink — приложение для быстрого создания и огранизации заметок, <0>уважающее вашу приватность</0>.". That is ergonomic and elegant description that explains the elaborates what exactly Deepink can organize, and how exactly it can be useful for user in real world.
+- Headers and introductions may be a bit playful and to sell a product
 	
 Constraints:
 - Preserve all literal newline escapes like "\n\n" and paragraph structure.
@@ -25,6 +26,8 @@ Constraints:
 - When text is wrapped via some substitutions <0>like that</0>, you must analyze what exactly is highlighted in original text from a semantic perspective, and wrap equal segment in the translation.
 - Use clear, modern, non-bureaucratic Russian (avoid канцелярит like “в рамках”, “протоколы встреч” unless the English explicitly implies minutes).
 - Keep sentences close in length to the original when possible.
+- Do not rephrase the idea and tone of the text and keep original meaning.
+- Translate the word "Ergonomic" directly with no explanation/adaptation when it possible. That word have a deep meaning that preferable to preserve as is.
 `.trim();
 
 // See config reference at https://github.com/Quilljou/transmart#options
@@ -35,8 +38,12 @@ module.exports = {
 
 	openAIApiKey: process.env.OPENAI_API_KEY,
 	openAIApiUrl: process.env.OPENAI_API_URL,
-	// openAIApiModel: 'google/gemini-3-flash-preview',
+
 	// openAIApiModel: 'openai/gpt-4o-mini',
-	openAIApiModel: 'anthropic/claude-sonnet-4.6',
+	// modelContextLimit: 128_000,
+
+	// openAIApiModel: 'anthropic/claude-sonnet-4.6',
+	openAIApiModel: 'anthropic/claude-opus-4.6',
+	modelContextLimit: 1_000_000,
 	context,
 };
