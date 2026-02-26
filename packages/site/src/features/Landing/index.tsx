@@ -123,7 +123,7 @@ export default WithLayout(() => {
 					>
 						{t('hero.title')}
 					</Heading>
-					<Text fontSize="22px" m={0} color="brand.secondary">
+					<Text fontSize="22px" m={0} color="brand.secondary" maxWidth="600px">
 						<Trans
 							t={t}
 							i18nKey="hero.subtitle"
