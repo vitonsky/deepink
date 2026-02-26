@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
@@ -29,6 +29,25 @@ const defaultVaultNames = [
 	'Idea lab',
 ];
 
+/**
+ * Immediately returns true, but waits delay time before switching to false
+ */
+const useMinimumVisible = (isLoading: boolean, delay: number) => {
+	const [visible, setVisible] = useState(isLoading);
+
+	useEffect(() => {
+		if (isLoading) {
+			setVisible(true);
+			return;
+		}
+
+		const timer = setTimeout(() => setVisible(false), delay);
+		return () => clearTimeout(timer);
+	}, [isLoading, delay]);
+
+	return visible;
+};
+
 export const App: FC = () => {
 	const files = useFilesStorage();
 	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
@@ -53,30 +72,22 @@ export const App: FC = () => {
 		profiles: profileContainers,
 	});
 
-	const [vaultManagerScreen, setVaultView] = useState<'create' | 'choose'>('choose');
+	const [vaultManagerScreen, setVaultManagerScreen] = useState<'create' | 'choose'>(
+		'choose',
+	);
 
-	const [isShowSplash, setIsShowSplash] = useState(false);
-	const skipSplashRef = useRef(false);
-	useEffect(() => {
-		if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) {
-			setIsShowSplash(true);
-			return;
-		}
+	const [openMode, setOpenMode] = useState<'auto' | 'manual'>('auto');
+	const isLoading =
+		!profilesList.isProfilesLoaded ||
+		!recentProfile.isLoaded ||
+		(isProfileOpening && openMode === 'auto');
 
-		if (isProfileOpening && !skipSplashRef.current) {
-			setIsShowSplash(true);
-			return;
-		}
-
-		const timer = setTimeout(() => setIsShowSplash(false), 400);
-		return () => clearTimeout(timer);
-	}, [isProfileOpening, profilesList.isProfilesLoaded, recentProfile.isLoaded]);
-
+	const isShowSplash = useMinimumVisible(isLoading, 400);
 	if (isShowSplash) {
 		return <SplashScreen />;
 	}
 
-	// Profile screen
+	// Vault screen
 	if (profileContainers.profiles.length > 0) {
 		return (
 			<Box
@@ -94,21 +105,26 @@ export const App: FC = () => {
 
 	// Managing vault screens
 	const hasNoProfiles = profilesList.profiles.length === 0;
+	const screen = currentProfileObject
+		? 'login'
+		: vaultManagerScreen === 'create' || hasNoProfiles
+			? 'create'
+			: 'choose';
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<Box maxW="500px" minW="350px" padding="1rem">
-				{currentProfileObject ? (
+				{screen === 'login' && currentProfileObject && (
 					<ProfileLoginForm
 						profile={currentProfileObject}
 						onLogin={async (...arg) => {
-							skipSplashRef.current = true;
-							const result = await onOpenProfile(...arg);
-							skipSplashRef.current = false;
-							return result;
+							setOpenMode('manual');
+							return await onOpenProfile(...arg);
 						}}
 						onPickAnotherProfile={() => setCurrentProfileId(null)}
 					/>
-				) : vaultManagerScreen === 'create' || hasNoProfiles ? (
+				)}
+
+				{screen === 'create' && (
 					<ProfileCreator
 						onCreateProfile={(profile) =>
 							profilesList.createProfile(profile).then((newProfile) => {
@@ -116,17 +132,21 @@ export const App: FC = () => {
 									newProfile,
 									profile.password ?? undefined,
 								).then(console.warn);
-								setVaultView('choose');
+								setVaultManagerScreen('choose');
 							})
 						}
 						onCancel={
-							hasNoProfiles ? undefined : () => setVaultView('choose')
+							hasNoProfiles
+								? undefined
+								: () => setVaultManagerScreen('choose')
 						}
 						defaultProfileName={
 							hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
 						}
 					/>
-				) : (
+				)}
+
+				{screen === 'choose' && (
 					<ProfilesForm
 						title="Choose the profile"
 						controls={
@@ -134,7 +154,7 @@ export const App: FC = () => {
 								variant="accent"
 								size="lg"
 								w="100%"
-								onClick={() => setVaultView('create')}
+								onClick={() => setVaultManagerScreen('create')}
 							>
 								Create new profile
 							</Button>
