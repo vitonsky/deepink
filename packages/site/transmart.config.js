@@ -18,11 +18,13 @@ Requirements:
 - Bring the value in texts, not a fluff. Every slogan and description must contain the completed and insightful thought, not just the emotions.
 	- Bad: "Deepink — приложение для заметок с <0>акцентом на приватность</0>, которое помогает поддерживать идеальный порядок.". The "идеальный порядок" is a fluff, user can't understand why it does matter and why they needed in that.
 	- Good: "Deepink — приложение для быстрого создания и огранизации заметок, <0>уважающее вашу приватность</0>.". That is ergonomic and elegant description that explains the elaborates what exactly Deepink can organize, and how exactly it can be useful for user in real world.
-
+	
 Constraints:
 - Preserve all literal newline escapes like "\n\n" and paragraph structure.
 - Don’t introduce punctuation/formatting that complicates localization.
 - When text is wrapped via some substitutions <0>like that</0>, you must analyze what exactly is highlighted in original text from a semantic perspective, and wrap equal segment in the translation.
+- Use clear, modern, non-bureaucratic Russian (avoid канцелярит like “в рамках”, “протоколы встреч” unless the English explicitly implies minutes).
+- Keep sentences close in length to the original when possible.
 `.trim();
 
 // See config reference at https://github.com/Quilljou/transmart#options
@@ -33,7 +35,8 @@ module.exports = {
 
 	openAIApiKey: process.env.OPENAI_API_KEY,
 	openAIApiUrl: process.env.OPENAI_API_URL,
-	openAIApiModel: 'google/gemini-3-flash-preview',
+	// openAIApiModel: 'google/gemini-3-flash-preview',
 	// openAIApiModel: 'openai/gpt-4o-mini',
+	openAIApiModel: 'anthropic/claude-sonnet-4.6',
 	context,
 };
