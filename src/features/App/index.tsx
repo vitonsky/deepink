@@ -13,25 +13,6 @@ import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { VaultScreenManager } from './VaultScreenManager';
 
-/**
- * Immediately returns true, but waits delay time before switching to false
- */
-const useMinimumVisible = (isLoading: boolean, delay: number) => {
-	const [visible, setVisible] = useState(isLoading);
-
-	useEffect(() => {
-		if (isLoading) {
-			setVisible(true);
-			return;
-		}
-
-		const timer = setTimeout(() => setVisible(false), delay);
-		return () => clearTimeout(timer);
-	}, [isLoading, delay]);
-
-	return visible;
-};
-
 export const App: FC = () => {
 	const files = useFilesStorage();
 	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
@@ -50,13 +31,24 @@ export const App: FC = () => {
 		profiles: profileContainers,
 	});
 
-	const [isManualOpen, setIsManualOpen] = useState(false);
+	const [isAutoLoading, setIsAutoLoading] = useState(true);
 	const isLoading =
 		!profilesList.isProfilesLoaded ||
 		!recentProfile.isLoaded ||
-		(isProfileOpening && !isManualOpen);
+		(isProfileOpening && isAutoLoading);
 
-	const isShowSplash = useMinimumVisible(isLoading, 400);
+	// Show Splash immediately, but delay hiding it
+	const [isShowSplash, setIsShowSplash] = useState(isLoading);
+	useEffect(() => {
+		if (isLoading) {
+			setIsShowSplash(true);
+			return;
+		}
+
+		const timer = setTimeout(() => setIsShowSplash(false), 400);
+		return () => clearTimeout(timer);
+	}, [isLoading]);
+
 	if (isShowSplash) {
 		return <SplashScreen />;
 	}
@@ -82,10 +74,10 @@ export const App: FC = () => {
 			<Box maxW="500px" minW="350px" padding="1rem">
 				<VaultScreenManager
 					currentProfile={currentProfileId}
+					onChooseProfile={setCurrentProfileId}
 					profiles={profilesList}
 					onOpenProfile={onOpenProfile}
-					onChooseProfile={setCurrentProfileId}
-					setIsManualOpen={() => setIsManualOpen(true)}
+					onLoginStart={() => setIsAutoLoading(false)}
 				/>
 			</Box>
 		</Box>
