@@ -7,10 +7,10 @@ import { SplashScreen } from '@features/SplashScreen';
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
-import { useProfileLoader } from './useProfileLoader';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
+import { useVaultOpener } from './useVaultOpener';
 import { VaultScreenManager } from './VaultScreenManager';
 
 export const App: FC = () => {
@@ -24,7 +24,7 @@ export const App: FC = () => {
 
 	// Open recent profile
 	const recentProfile = useRecentProfile(config);
-	const { isProfileOpening, onOpenProfile } = useProfileLoader({
+	const { isProfileOpening, onOpenProfile } = useVaultOpener({
 		profilesList,
 		recentProfile,
 		setCurrentProfileId,

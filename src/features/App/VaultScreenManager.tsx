@@ -9,8 +9,8 @@ import { getRandomItem } from '@utils/collections/getRandomItem';
 import { ProfileCreator } from './Profile/ProfileCreator';
 import { ProfileLoginForm } from './Profile/ProfileLoginForm';
 import { ProfilesForm } from './Profile/ProfilesForm';
-import { OnPickProfile } from './useProfileLoader';
 import { ProfilesListApi } from './useProfilesList';
+import { OnPickProfile } from './useVaultOpener';
 
 export type VaultScreenManagerProps = {
 	profiles: ProfilesListApi;
@@ -42,7 +42,7 @@ export const VaultScreenManager = ({
 	);
 
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
-	const hasNoProfiles = profiles.profiles.length === 0;
+	const hasNoVaults = profiles.profiles.length === 0;
 
 	if (currentProfileObject) {
 		return (
@@ -57,7 +57,7 @@ export const VaultScreenManager = ({
 		);
 	}
 
-	if (screen === 'create' || hasNoProfiles) {
+	if (screen === 'create' || hasNoVaults) {
 		return (
 			<ProfileCreator
 				onCreateProfile={(profile) =>
@@ -65,12 +65,11 @@ export const VaultScreenManager = ({
 						onOpenProfile(newProfile, profile.password ?? undefined).then(
 							console.warn,
 						);
-						setScreen('choose');
 					})
 				}
-				onCancel={hasNoProfiles ? undefined : () => setScreen('choose')}
+				onCancel={hasNoVaults ? undefined : () => setScreen('choose')}
 				defaultProfileName={
-					hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
+					hasNoVaults ? getRandomItem(defaultVaultNames) : undefined
 				}
 			/>
 		);

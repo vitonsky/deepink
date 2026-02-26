@@ -22,13 +22,16 @@ type UseProfileLoaderProps = {
 	setCurrentProfileId: (id: string | null) => void;
 };
 
-export const useProfileLoader = ({
+/**
+ * Handles vault opening, including auto-opening unencrypted vault
+ */
+export const useVaultOpener = ({
 	profilesList,
 	profiles,
 	recentProfile,
 	setCurrentProfileId,
 }: UseProfileLoaderProps) => {
-	const [isProfileOpening, setIsProfileOpening] = useState(true);
+	const [isProfileOpening, setIsProfileOpening] = useState(false);
 
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
@@ -72,7 +75,6 @@ export const useProfileLoader = ({
 			);
 
 			if (!profile || profile.encryption) {
-				setIsProfileOpening(false);
 				return;
 			}
 
