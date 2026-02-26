@@ -17,7 +17,7 @@ export type VaultScreenManagerProps = {
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
 	onOpenProfile: OnPickProfile;
-	onLoginStart: () => void;
+	onLoginStart?: () => void;
 };
 
 export const defaultVaultNames = [
@@ -36,7 +36,7 @@ export const VaultScreenManager = ({
 	onChooseProfile,
 	onLoginStart,
 }: VaultScreenManagerProps) => {
-	const currentProfileObject = useMemo(
+	const currentVaultObject = useMemo(
 		() => profiles.profiles?.find((profile) => profile.id === currentProfile) ?? null,
 		[currentProfile, profiles.profiles],
 	);
@@ -44,12 +44,12 @@ export const VaultScreenManager = ({
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
 	const hasNoVaults = profiles.profiles.length === 0;
 
-	if (currentProfileObject) {
+	if (currentVaultObject) {
 		return (
 			<ProfileLoginForm
-				profile={currentProfileObject}
+				profile={currentVaultObject}
 				onLogin={async (...arg) => {
-					onLoginStart();
+					if (onLoginStart) onLoginStart();
 					return await onOpenProfile(...arg);
 				}}
 				onPickAnotherProfile={() => onChooseProfile(null)}
