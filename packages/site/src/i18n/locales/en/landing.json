@@ -1,29 +1,29 @@
 {
 	"hero": {
 		"title": "A better place for your notes.",
-		"subtitle": "Deepink is a <0>privacy-focused</0> note-taking app that keeps your notes organized.",
+		"subtitle": "Deepink makes note-taking ergonomic and fun.",
 		"button": {
 			"get": "Download Deepink",
-			"features": "Go to features"
+			"features": "Learn more"
 		}
 	},
 	"highlights": {
 		"content": {
 			"encryption": {
 				"title": "A vault you can trust",
-				"text": "Everything in your vault is encrypted. That means <0>all your data</0>: notes, files, and metadata. You can choose the algorithm you trust.\n\nDeepink is an <1>open source</1> app, with code you can verify, not just trust."
+				"text": "Everything in your vault is encrypted. Unlike many other apps, it does really mean <0>all your data</0> including notes content, files, and metadata. You can choose the algorithm you trust.\n\nDeepink is an <1>open source</1> app, with code you can verify, not just trust."
 			},
 			"workflow": {
-				"title": "Fast, focused workflow",
-				"text": "Deepink is tuned for speed in everyday use, with friction removed from the most common tasks. For most tasks, it needs <0>up to 80% fewer actions</0> than other note-taking apps."
+				"title": "The ergonomics",
+				"text": "Deepink is built to be quick in everyday use, with friction removed from the most common tasks. For most tasks, it needs <0>up to 80% fewer actions</0> than other note-taking apps."
 			},
 			"universality": {
-				"title": "One vault, many contexts",
-				"text": "Create one password-protected vault, bring your notes in, and keep everything together. Workspaces and nested tags help you separate contexts and find what you need fast, from project specs, contracts, and code snippets to book quotes, a daily journal, research, and more."
+				"title": "Your vault fits everything",
+				"text": "Keep everything in your vault. Workspaces and nested tags help you separate contexts and find what you need quickly, from project specs, contracts, and code snippets to book quotes, a daily journal, research, and more."
 			}
 		},
 		"cta": {
-			"text": "Free. No limits.",
+			"text": "Free to use. No limits.",
 			"button": "Download now"
 		}
 	},
@@ -35,15 +35,15 @@
 		"content": {
 			"links": {
 				"title": "Links",
-				"text": "Copy a link to any note and reference it anywhere in your vault. Connect meeting notes to decisions, research to conclusions, and plans to execution without duplicating the same paragraph.\n\nEverything stays in sync. Edit a note once, and every reference stays up to date.\n\nDeepink shows every place a note is mentioned, so you can follow connections and navigate your knowledge naturally.\n\nKeep related information connected. With links, your vault stays consistent."
+				"text": "Links let you reference any note anywhere in your vault. Connect meeting notes to decisions, research to conclusions, and plans to execution without duplicating the same paragraph.\n\nBacklinks show every note that links to the note you’re viewing, so it’s easy to trace connections and navigate your knowledge naturally.\n\nLinks keep context connected, so related notes stay easy to follow."
 			},
 			"workspaces": {
 				"title": "Workspaces",
-				"text": "Keep different areas of your life separate without creating multiple vaults.\n\nWorkspaces create focused spaces inside one secure vault. Unlock your vault once, then switch between contexts like Client Projects, Personal Journal, Health Notes, or Learning without mixing anything.\n\nStay organized and context-specific. Share your screen with confidence: private workspaces won’t appear by mistake.\n\nOne vault. Clear boundaries. Zero friction."
+				"text": "Keep different areas of your life separate without creating multiple vaults.\n\nWorkspaces create focused spaces inside one secure vault. Unlock your vault once, then switch between contexts like Client Projects, Personal Journal, Health Notes, or Learning without mixing anything.\n\nStay organized and context-specific. Share your screen with confidence: private content won’t appear by mistake.\n\nOne vault. Clear boundaries. Zero friction."
 			},
 			"history": {
-				"title": "History",
-				"text": "Every note has its own version history.\n\nDeepink saves previous versions automatically, so you can see what changed, restore an earlier draft, or follow how an idea developed over time. Whether it was edited yesterday or a year ago, nothing important is lost.\n\nPrevious versions are always available when you need them."
+				"title": "Note versions",
+				"text": "Each note keeps a complete history of changes.\n\nDeepink saves versions automatically, so you can see what changed, restore an earlier draft, or follow how an idea developed over time. Whether it was edited yesterday or a year ago, nothing important is lost.\n\nPrevious versions are always available when you need them."
 			},
 			"reminders": {
 				"title": "Reminders",
@@ -51,11 +51,11 @@
 			},
 			"tags": {
 				"title": "Nested tags",
-				"text": "Organize your notes with tags that reflect a clear hierarchy.\n\nNested tags let you create a parent/child structure, so broad topics can contain specific subtopics. For example, Clients can include individual client names, and Finance can include Taxes, Invoices, and Reports.\n\nUnlike folders, tags aren’t exclusive. A note can have multiple tags at once—client, finance, and a time period—without duplication.\n\nNested tags give you both precision and flexibility, even when topics overlap."
+				"text": "Organize your notes with tags that reflect a clear hierarchy.\n\nNested tags let you create a parent/child structure, so broad topics can contain specific subtopics. For example, Clients can include individual client names, and Finance can include Taxes, Invoices, and Reports.\n\nUnlike folders, tags aren’t exclusive. A note can have multiple tags at once - client, finance, and a time period.\n\nNested tags give you both precision and flexibility, even when topics overlap."
 			},
 			"encryption": {
 				"title": "Encryption",
-				"text": "Your entire vault is encrypted, not just the parts an app treats as sensitive.\n\nDeepink encrypts everything: notes, attached files, workspaces, and metadata. Some apps only encrypt data during sync or the note text. Deepink protects the full structure of your vault.\n\nAttachments are never left exposed. Metadata isn’t readable. Even file sizes are obfuscated to reduce the risk of analysis.\n\nWhat you store stays private by design."
+				"text": "The entire vault is encrypted. Some apps only encrypt data during sync or the note text. Deepink protects the full structure of your vault.\n\nYour notes, attachments, and metadata are unreadable to anyone but you, including us. Even file sizes are obfuscated to reduce the risk of analysis.\n\nWhat you store stays private by design."
 			}
 		}
 	},

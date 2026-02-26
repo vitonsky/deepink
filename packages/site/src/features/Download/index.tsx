@@ -163,7 +163,10 @@ export default WithLayout(function Page({
 					</Link>
 					{lastReleaseDate && (
 						<Text variant="description" fontFamily="monospace">
-							{t('main.releaseDate', { date: lastReleaseDate })}
+							{t('main.releaseDate', {
+								date: lastReleaseDate,
+								version: versions[0].name,
+							})}
 						</Text>
 					)}
 				</VStack>

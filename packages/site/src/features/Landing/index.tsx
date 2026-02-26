@@ -123,12 +123,8 @@ export default WithLayout(() => {
 					>
 						{t('hero.title')}
 					</Heading>
-					<Text fontSize="22px" m={0} color="brand.secondary" maxWidth="600px">
-						<Trans
-							t={t}
-							i18nKey="hero.subtitle"
-							components={[<b key={0} />]}
-						/>
+					<Text fontSize="22px" m={0} color="brand.secondary">
+						<Trans t={t} i18nKey="hero.subtitle" />
 					</Text>
 					<HStack gap="0.8rem">
 						<Link href={localePath('/download')} variant="button-primary">

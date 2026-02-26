@@ -130,6 +130,9 @@ const customConfig = defineConfig({
 		},
 	},
 	globalCss: {
+		'*': {
+			boxSizing: 'border-box',
+		},
 		'::selection': {
 			bg: '#ffe7d3',
 			color: '#b55d0e',

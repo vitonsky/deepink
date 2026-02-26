@@ -1,7 +1,7 @@
 {
 	"main": {
 		"download": "Download for <0/>",
-		"releaseDate": "Updated on {{date}}"
+		"releaseDate": "Released on {{date}}"
 	},
 	"links": {
 		"title": "All platforms"
