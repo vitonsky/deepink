@@ -105,6 +105,18 @@ export const Link = React.forwardRef<
 	const recipe = system._config.theme?.recipes?.link;
 	const styles = recipe ? system.cva(recipe)({ variant }) : {};
 
-	return <chakra.a ref={ref} {...styles} {...rest} />;
+	return (
+		<chakra.a
+			ref={ref}
+			{...(props.href?.startsWith('http')
+				? {
+						target: '_blank',
+						rel: 'noopener noreferrer',
+					}
+				: undefined)}
+			{...styles}
+			{...rest}
+		/>
+	);
 });
 Link.displayName = 'Link';
