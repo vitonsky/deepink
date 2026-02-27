@@ -6,6 +6,17 @@ import type { ResourceKey } from 'i18next';
 import type { i18nPageContext } from './types';
 import { DEFAULT_LANGUAGE, type SupportedLanguage } from '.';
 
+function getNativeLanguageName(langCode: string) {
+	const display = new Intl.DisplayNames([langCode], {
+		type: 'language',
+	});
+
+	const name = display.of(langCode);
+	if (!name) throw new Error(`Cannot display language name for code ${langCode}`);
+
+	return name;
+}
+
 /**
  * Reads the locales directory and returns
  * an array of supported language codes
@@ -95,7 +106,11 @@ export function i18nGetContext({
 							const segments = path.split('/');
 							segments[1] = lang; // swap language only
 
-							return { langCode: lang, url: segments.join('/') };
+							return {
+								langCode: lang,
+								langName: getNativeLanguageName(lang),
+								url: segments.join('/'),
+							};
 						})
 						.toArray(),
 	};

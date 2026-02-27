@@ -28,14 +28,6 @@ import { LocaleContext, useLocalePath } from '../Locale';
 import { Text } from '../Text';
 import { Logo } from './Logo';
 
-function getNativeLanguageName(langCode: string) {
-	const display = new Intl.DisplayNames([langCode], {
-		type: 'language',
-	});
-
-	return display.of(langCode);
-}
-
 type SimpleLink = {
 	text: string;
 	url: string;
@@ -379,7 +371,7 @@ const LayoutContent = ({
 												: undefined
 										}
 									>
-										{getNativeLanguageName(version.langCode)?.trim()}
+										{version.langName}
 									</Link>
 								</Fragment>
 							))}

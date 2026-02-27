@@ -162,7 +162,11 @@ export default WithLayout(function Page({
 						/>
 					</Link>
 					{lastReleaseDate && (
-						<Text variant="description" fontFamily="monospace">
+						<Text
+							variant="description"
+							fontFamily="monospace"
+							suppressHydrationWarning
+						>
 							{t('main.releaseDate', {
 								date: lastReleaseDate,
 								version: versions[0].name,

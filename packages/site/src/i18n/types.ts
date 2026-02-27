@@ -10,5 +10,6 @@ export type i18nPageContext = {
 	altVersions: {
 		url: string;
 		langCode: string;
+		langName: string;
 	}[];
 };
