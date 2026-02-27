@@ -121,6 +121,7 @@ export const useProfileContainers = () => {
 				.then((workspaces) => workspaces.length > 0);
 			if (!isWorkspacesExists) {
 				await workspaces.create({ name: 'Notes' });
+				await db.sync();
 			}
 
 			// TODO: close DB first and close encryption last

@@ -72,6 +72,7 @@ export const WorkspaceCreatePopup = () => {
 									.create({ name })
 									.then(async (workspaceId) => {
 										await updateWorkspaces();
+										await db.sync();
 
 										dispatch(
 											workspacesApi.setActiveWorkspace({
