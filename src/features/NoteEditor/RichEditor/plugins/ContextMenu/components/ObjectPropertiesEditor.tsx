@@ -93,11 +93,11 @@ export const PropertiesForm = <T extends OptionObject[]>({
 			</VStack>
 
 			<HStack w="100%" justifyContent="end">
-				<Button variant="accent" type="submit" disabled={isDisabled}>
+				<Button variant="accent" type="submit" isDisabled={isDisabled}>
 					{submitButtonText}
 				</Button>
 				{onCancel && (
-					<Button onClick={onCancel} disabled={isDisabled}>
+					<Button onClick={onCancel} isDisabled={isDisabled}>
 						{cancelButtonText}
 					</Button>
 				)}
