@@ -61,6 +61,7 @@ export default defineConfig({
 		starlight({
 			plugins: [starlightThemeFlexoki()],
 			title: 'Deepink',
+			favicon: '/favicon.svg',
 			logo: {
 				replacesTitle: true,
 				src: './src/components/Layout/logo.svg',
