@@ -6,32 +6,6 @@ import type { ResourceKey } from 'i18next';
 import type { i18nPageContext } from './types';
 import { DEFAULT_LANGUAGE, type SupportedLanguage } from '.';
 
-// TODO: translate to all languages
-// [
-// 	'bg',
-// 	'ca',
-// 	'cs',
-// 	'da',
-// 	'de',
-// 	'es',
-// 	'fr',
-// 	'hu',
-// 	'it',
-// 	'ja',
-// 	'ko',
-// 	'nb',
-// 	'pl',
-// 	'pt-br',
-// 	'pt-pt',
-// 	'ru',
-// 	'sl',
-// 	'sv',
-// 	'tr',
-// 	'uk',
-// 	'vi',
-// 	'zh-cn',
-// 	'zh-tw',
-// ]
 /**
  * Reads the locales directory and returns
  * an array of supported language codes
