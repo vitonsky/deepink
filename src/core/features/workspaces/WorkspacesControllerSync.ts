@@ -18,15 +18,16 @@ export class WorkspacesControllerSync {
 	}
 
 	public async get(id: string) {
-		this.controller.get(id);
+		return await this.controller.get(id);
 	}
 
 	public async update(id: string, options: { name?: string }) {
-		this.controller.update(id, options);
+		await this.controller.update(id, options);
+		await this.db.sync();
 	}
 
 	public async getList() {
-		return this.controller.getList();
+		return await this.controller.getList();
 	}
 
 	public async delete(ids: string[]) {

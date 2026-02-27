@@ -1,4 +1,5 @@
 import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
+import { Mock } from 'vitest';
 
 import { WorkspacesController } from './WorkspacesController';
 import { WorkspacesControllerSync } from './WorkspacesControllerSync';
@@ -9,25 +10,36 @@ beforeEach(() => {
 	vi.restoreAllMocks();
 });
 
-test('Called synchronization after create', async () => {
-	const db = await getDB();
-	const syncMock = vi.spyOn(db, 'sync');
+describe('WorkspacesControllerSync methods trigger sync', () => {
+	let syncMock: Mock<() => Promise<void>>;
+	let workspacesSync: WorkspacesControllerSync;
+	let workspaceId: string;
 
-	const workspacesSync = new WorkspacesControllerSync(new WorkspacesController(db), db);
-	await workspacesSync.create({ name: 'test' });
+	beforeEach(async () => {
+		const db = await getDB();
+		syncMock = vi.spyOn(db, 'sync');
 
-	expect(syncMock).toHaveBeenCalledOnce();
-});
+		workspacesSync = new WorkspacesControllerSync(new WorkspacesController(db), db);
+		workspaceId = await workspacesSync.create({ name: 'My work' });
 
-test('Called synchronization after delete', async () => {
-	const db = await getDB();
-	const syncMock = vi.spyOn(db, 'sync');
+		syncMock.mockClear();
+	});
 
-	const workspacesSync = new WorkspacesControllerSync(new WorkspacesController(db), db);
-	const workspaceId = await workspacesSync.create({ name: 'test' });
-	expect(workspaceId).toBeDefined();
+	test('create trigger sync', async () => {
+		await workspacesSync.create({ name: 'My work' });
 
-	await workspacesSync.delete([workspaceId]);
+		expect(syncMock).toHaveBeenCalledOnce();
+	});
 
-	expect(syncMock).toHaveBeenCalledTimes(2);
+	test('delete triggers sync', async () => {
+		await workspacesSync.delete([workspaceId]);
+
+		expect(syncMock).toHaveBeenCalledOnce();
+	});
+
+	test('update triggers sync', async () => {
+		await workspacesSync.update(workspaceId, { name: 'Work again' });
+
+		expect(syncMock).toHaveBeenCalledOnce();
+	});
 });
