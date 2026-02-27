@@ -14,8 +14,6 @@ const i18n = i18nGetContext({
 export function getStaticPaths() {
 	return getStaticLangPaths();
 }
-
-console.log(i18n.altVersions)
 ---
 
 <Document lang={i18n.language} meta={{ alts: i18n.altVersions }}>
