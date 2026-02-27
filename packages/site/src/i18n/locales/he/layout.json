@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "הורדה",
+		"features": "תכונות",
+		"docs": "מדריכים",
+		"blog": "בלוג",
+		"changelog": "יומן שינויים"
+	},
+	"links": {
+		"followUs": {
+			"title": "עקבו אחרינו"
+		},
+		"introduction": {
+			"title": "התחלה",
+			"content": {
+				"download": "הורדה",
+				"docs": "מדריכים",
+				"overview": "סקירה כללית"
+			}
+		},
+		"learn": {
+			"title": "מידע נוסף",
+			"content": {
+				"help": "עזרה",
+				"changelog": "יומן שינויים",
+				"about": "אודות",
+				"roadmap": "מפת דרכים"
+			}
+		},
+		"resources": {
+			"title": "משאבים",
+			"content": {
+				"terms": "תנאי שימוש",
+				"privacy": "מדיניות פרטיות"
+			}
+		}
+	}
+}

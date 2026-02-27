@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "تحميل",
+		"features": "المزايا",
+		"docs": "المستندات",
+		"blog": "المدوّنة",
+		"changelog": "سجلّ التحديثات"
+	},
+	"links": {
+		"followUs": {
+			"title": "تابعونا"
+		},
+		"introduction": {
+			"title": "ابدأ الآن",
+			"content": {
+				"download": "تحميل",
+				"docs": "المستندات",
+				"overview": "نظرة عامة"
+			}
+		},
+		"learn": {
+			"title": "اعرف المزيد",
+			"content": {
+				"help": "المساعدة",
+				"changelog": "سجلّ التحديثات",
+				"about": "عن Deepink",
+				"roadmap": "خارطة التطوير"
+			}
+		},
+		"resources": {
+			"title": "الموارد",
+			"content": {
+				"terms": "شروط الاستخدام",
+				"privacy": "سياسة الخصوصية"
+			}
+		}
+	}
+}

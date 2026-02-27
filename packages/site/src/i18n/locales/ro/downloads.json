@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Descarcă pentru <0/>",
+		"releaseDate": "Actualizat pe {{date}}"
+	},
+	"links": {
+		"title": "Toate platformele"
+	}
+}
