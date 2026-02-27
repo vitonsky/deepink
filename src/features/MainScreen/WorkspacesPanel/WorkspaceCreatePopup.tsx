@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import { z } from 'zod';
 import {
@@ -43,6 +43,8 @@ export const WorkspaceCreatePopup = () => {
 		[db],
 	);
 
+	const [isPending, setIsPending] = useState(false);
+
 	const { update: updateWorkspaces } = useWorkspacesList();
 
 	return (
@@ -70,11 +72,15 @@ export const WorkspaceCreatePopup = () => {
 							]}
 							validatorScheme={workspacePropsValidator}
 							onUpdate={({ name }) => {
+								setIsPending(true);
+
 								workspacesManager
 									.create({ name })
 									.then(async (workspaceId) => {
 										onClose();
 										await updateWorkspaces();
+
+										setIsPending(false);
 
 										dispatch(
 											workspacesApi.setActiveWorkspace({
@@ -91,6 +97,7 @@ export const WorkspaceCreatePopup = () => {
 							submitButtonText="Add"
 							cancelButtonText="Cancel"
 							onCancel={onClose}
+							isDisabled={isPending}
 						/>
 					</Box>
 				</VStack>

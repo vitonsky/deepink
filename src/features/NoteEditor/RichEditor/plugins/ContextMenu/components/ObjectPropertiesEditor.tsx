@@ -33,6 +33,7 @@ export type PropertiesFormProps<T extends OptionObject[]> = StackProps & {
 	onCancel?: () => void;
 	submitButtonText?: string;
 	cancelButtonText?: string;
+	isDisabled?: boolean;
 };
 
 export const PropertiesForm = <T extends OptionObject[]>({
@@ -42,6 +43,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	onCancel,
 	submitButtonText = 'Save',
 	cancelButtonText = 'Cancel',
+	isDisabled = false,
 	...props
 }: PropertiesFormProps<T>) => {
 	const optionsValues = useMemo(
@@ -91,10 +93,14 @@ export const PropertiesForm = <T extends OptionObject[]>({
 			</VStack>
 
 			<HStack w="100%" justifyContent="end">
-				<Button variant="accent" type="submit">
+				<Button variant="accent" type="submit" disabled={isDisabled}>
 					{submitButtonText}
 				</Button>
-				{onCancel && <Button onClick={onCancel}>{cancelButtonText}</Button>}
+				{onCancel && (
+					<Button onClick={onCancel} disabled={isDisabled}>
+						{cancelButtonText}
+					</Button>
+				)}
 			</HStack>
 		</VStack>
 	);
