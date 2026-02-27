@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Boljši prostor za vaše zapiske.",
+		"subtitle": "Deepink naredi zapisovanje ergonomično in prijetno.",
+		"button": {
+			"get": "Prenesi Deepink",
+			"features": "Več o aplikaciji"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Trezor, ki mu lahko zaupate",
+				"text": "Vse v vašem trezorju je šifrirano. Za razliko od mnogih drugih aplikacij to resnično pomeni <0>vse vaše podatke</0>, vključno z vsebino zapiskov, datotekami in metapodatki. Izberete lahko algoritem, ki mu zaupate.\n\nDeepink je aplikacija z <1>odprto kodo</1>, ki jo lahko preverite, ne le zaupate."
+			},
+			"workflow": {
+				"title": "Ergonomija",
+				"text": "Deepink je zasnovan za hitro vsakodnevno uporabo, brez nepotrebnih korakov pri najpogostejših opravilih. Za večino nalog potrebuje <0>do 80 % manj dejanj</0> kot druge aplikacije za zapisovanje."
+			},
+			"universality": {
+				"title": "Vaš trezor sprejme vse",
+				"text": "Hranite vse na enem mestu. Delovni prostori in ugnezdene oznake pomagajo ločiti kontekste in hitro najti, kar potrebujete — od specifikacij projektov, pogodb in odrezkov kode do citatov iz knjig, dnevnika, raziskav in še več."
+			}
+		},
+		"cta": {
+			"text": "Brezplačno. Brez omejitev.",
+			"button": "Prenesi zdaj"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Strukturirajte svoje misli",
+			"text": "Zabeležite hitro idejo ali zgradite nekaj kompleksnega. Deepink prinaša red in fokus vsemu, kar zapišete."
+		},
+		"content": {
+			"links": {
+				"title": "Povezave",
+				"text": "Povezave omogočajo sklicevanje na kateri koli zapisek kjer koli v trezorju. Povežite zapiske s sestankov z odločitvami, raziskave z zaključki in načrte z izvedbo — brez podvajanja istega odstavka.\n\nPovratne povezave prikažejo vse zapiske, ki se sklicujejo na zapisek, ki si ga ogledujete, zato je sledenje povezavam in naravno krmarjenje po vašem znanju preprosto.\n\nPovezave ohranjajo kontekst povezan, tako da sorodnim zapiskom zlahka sledite."
+			},
+			"workspaces": {
+				"title": "Delovni prostori",
+				"text": "Ločite različna področja svojega življenja, ne da bi ustvarjali več trezorjev.\n\nDelovni prostori ustvarijo osredotočene prostore znotraj enega varnega trezorja. Odklenite trezor enkrat, nato preklapljajte med konteksti, kot so Projekti za stranke, Osebni dnevnik, Zdravstveni zapiski ali Učenje — brez mešanja.\n\nVsebina ostane organizirana in kontekstno ločena. Zaslon lahko delite brez skrbi: zasebna vsebina se ne prikaže po pomoti.\n\nEn trezor. Jasne meje. Brez trenja."
+			},
+			"history": {
+				"title": "Različice zapiskov",
+				"text": "Vsak zapisek hrani celotno zgodovino sprememb.\n\nDeepink samodejno shranjuje različice, tako da lahko vidite, kaj se je spremenilo, obnovite prejšnji osnutek ali spremljate, kako se je ideja razvijala skozi čas. Ne glede na to, ali je bil zapisek urejen včeraj ali pred letom dni, nič pomembnega ni izgubljenega.\n\nPrejšnje različice so vedno na voljo, ko jih potrebujete."
+			},
+			"reminders": {
+				"title": "Opomniki",
+				"text": "Pripnite opomnik na kateri koli zapisek in prejmite obvestilo ob pravem času.\n\nNastavite opomnike za spremljanje zapiskov s sestankov, roke za projektne načrte, datume podaljšanja dokumentov ali preverjanje osebnih ciljev. Vsak opomnik ostane pri točno določenem zapisku — ne kot ločeno opravilo v drugi aplikaciji.\n\nKo pride čas, odprete zapisek z vsemi podrobnostmi na mestu.\n\nOpomniki pomagajo ukrepati na podlagi vaših informacij, ne le shranjevati jih."
+			},
+			"tags": {
+				"title": "Ugnezdene oznake",
+				"text": "Organizirajte zapiske z oznakami, ki odražajo jasno hierarhijo.\n\nUgnezdene oznake omogočajo strukturo nadrejeni/podrejeni, tako da širše teme vsebujejo specifične podteme. Na primer, Stranke lahko vključujejo imena posameznih strank, Finance pa lahko vključujejo Davke, Račune in Poročila.\n\nZa razliko od map oznake niso izključujoče. Zapisek ima lahko več oznak hkrati — stranka, finance in časovno obdobje.\n\nUgnezdene oznake nudijo natančnost in prilagodljivost, tudi ko se teme prekrivajo."
+			},
+			"encryption": {
+				"title": "Šifriranje",
+				"text": "Celoten trezor je šifriran. Nekatere aplikacije šifrirajo podatke le med sinhronizacijo ali samo besedilo zapiska. Deepink ščiti celotno strukturo vašega trezorja.\n\nVaši zapiski, priponke in metapodatki so neberljivi za vse razen za vas — vključno z nami. Tudi velikosti datotek so zakriti, da se zmanjša tveganje analize.\n\nKar shranite, ostane zasebno po zasnovi."
+			}
+		}
+	},
+	"cta": {
+		"title": "Prostor za vsak del vašega življenja",
+		"text": "Hranite vsakodnevne zapiske, branje in načrte na enem zasebnem mestu. Preklapljajte med konteksti z enim klikom, ohranjajte red in pišite brez prekinitev.",
+		"button": "Prenesi Deepink"
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "Stáhnout",
+		"features": "Funkce",
+		"docs": "Dokumentace",
+		"blog": "Blog",
+		"changelog": "Seznam změn"
+	},
+	"links": {
+		"followUs": {
+			"title": "Sledujte nás"
+		},
+		"introduction": {
+			"title": "Začínáme",
+			"content": {
+				"download": "Stáhnout",
+				"docs": "Dokumentace",
+				"overview": "Přehled"
+			}
+		},
+		"learn": {
+			"title": "Zjistit více",
+			"content": {
+				"help": "Nápověda",
+				"changelog": "Seznam změn",
+				"about": "O aplikaci",
+				"roadmap": "Plán vývoje"
+			}
+		},
+		"resources": {
+			"title": "Zdroje",
+			"content": {
+				"terms": "Podmínky užívání",
+				"privacy": "Zásady ochrany soukromí"
+			}
+		}
+	}
+}

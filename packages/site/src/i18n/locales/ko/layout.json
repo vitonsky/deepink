@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "다운로드",
+		"features": "기능",
+		"docs": "문서",
+		"blog": "블로그",
+		"changelog": "변경 내역"
+	},
+	"links": {
+		"followUs": {
+			"title": "팔로우"
+		},
+		"introduction": {
+			"title": "시작하기",
+			"content": {
+				"download": "다운로드",
+				"docs": "문서",
+				"overview": "개요"
+			}
+		},
+		"learn": {
+			"title": "더 알아보기",
+			"content": {
+				"help": "도움말",
+				"changelog": "변경 내역",
+				"about": "소개",
+				"roadmap": "로드맵"
+			}
+		},
+		"resources": {
+			"title": "리소스",
+			"content": {
+				"terms": "이용약관",
+				"privacy": "개인정보 처리방침"
+			}
+		}
+	}
+}

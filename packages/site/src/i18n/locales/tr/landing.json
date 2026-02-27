@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Notlarınız için daha iyi bir yer.",
+		"subtitle": "Deepink, not tutmayı ergonomik ve keyifli hale getirir.",
+		"button": {
+			"get": "Deepink'i İndir",
+			"features": "Daha fazla bilgi"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Güvenebileceğiniz bir depo",
+				"text": "Deponuzdaki her şey şifrelenir. Birçok uygulamanın aksine bu gerçekten <0>tüm verileriniz</0> anlamına gelir — not içerikleri, dosyalar ve meta veriler dahil. Güvendiğiniz algoritmayı kendiniz seçebilirsiniz.\n\nDeepink <1>açık kaynaklı</1> bir uygulamadır; kodunu sadece güvenmek yerine doğrulayabilirsiniz."
+			},
+			"workflow": {
+				"title": "Ergonomi",
+				"text": "Deepink, günlük kullanımda hızlı olmak için tasarlandı; en sık yapılan işlemlerdeki gereksiz adımlar kaldırıldı. Çoğu işlem için diğer not uygulamalarına kıyasla <0>%80'e kadar daha az eylem</0> gerektirir."
+			},
+			"universality": {
+				"title": "Deponuz her şeyi barındırır",
+				"text": "Her şeyi deponuzda tutabilirsiniz. Çalışma alanları ve iç içe etiketler, bağlamları ayırmanıza ve aradığınızı hızla bulmanıza yardımcı olur — proje dökümanlarından sözleşmelere, kod parçacıklarından kitap alıntılarına, günlük tutmaktan araştırmaya ve çok daha fazlasına."
+			}
+		},
+		"cta": {
+			"text": "Ücretsiz kullanım. Sınırsız.",
+			"button": "Hemen indir"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Düşüncelerinizi yapılandırın",
+			"text": "Anlık bir fikri kaydedin ya da karmaşık bir yapı oluşturun. Deepink, yazdığınız her şeye düzen ve odak katar."
+		},
+		"content": {
+			"links": {
+				"title": "Bağlantılar",
+				"text": "Bağlantılar, deponuzdaki herhangi bir notu istediğiniz yerden referans göstermenizi sağlar. Toplantı notlarını kararlara, araştırmaları sonuçlara, planları uygulamaya aynı paragrafı kopyalamadan bağlayabilirsiniz.\n\nGeri bağlantılar, görüntülediğiniz nota bağlanan tüm notları gösterir; böylece bağlantıları takip etmek ve bilgi ağınızda doğal bir şekilde gezinmek kolaylaşır.\n\nBağlantılar bağlamı bir arada tutar, ilişkili notlar her zaman kolay takip edilir."
+			},
+			"workspaces": {
+				"title": "Çalışma alanları",
+				"text": "Hayatınızın farklı alanlarını birden fazla depo oluşturmadan ayrı tutabilirsiniz.\n\nÇalışma alanları, tek bir güvenli depo içinde odaklanmış alanlar oluşturur. Deponuzu bir kez açın, ardından Müşteri Projeleri, Kişisel Günlük, Sağlık Notları veya Öğrenme gibi bağlamlar arasında hiçbir şeyi karıştırmadan geçiş yapın.\n\nDüzenli ve bağlama özel kalın. Ekranınızı güvenle paylaşın: özel içerikler yanlışlıkla görünmez.\n\nTek depo. Net sınırlar. Sıfır sürtünme."
+			},
+			"history": {
+				"title": "Not sürümleri",
+				"text": "Her not, değişikliklerin eksiksiz geçmişini saklar.\n\nDeepink sürümleri otomatik olarak kaydeder; böylece nelerin değiştiğini görebilir, önceki bir taslağa dönebilir veya bir fikrin zaman içinde nasıl geliştiğini takip edebilirsiniz. Dün ya da bir yıl önce düzenlenmiş olsun, önemli hiçbir şey kaybolmaz.\n\nÖnceki sürümler ihtiyaç duyduğunuzda her zaman erişilebilir."
+			},
+			"reminders": {
+				"title": "Hatırlatıcılar",
+				"text": "Herhangi bir nota hatırlatıcı ekleyip doğru zamanda bildirim alabilirsiniz.\n\nToplantı notları için takip hatırlatıcıları, proje planları için son tarihler, belgeler için yenileme tarihleri veya kişisel hedefler için kontrol noktaları belirleyebilirsiniz. Her hatırlatıcı, başka bir uygulamadaki ayrı bir görev olarak değil, ilgili notun yanında kalır.\n\nZamanı geldiğinde, tüm ayrıntılarıyla birlikte notu açarsınız.\n\nHatırlatıcılar, bilgilerinizi sadece saklamanıza değil, harekete geçmenize yardımcı olur."
+			},
+			"tags": {
+				"title": "İç içe etiketler",
+				"text": "Notlarınızı net bir hiyerarşiyi yansıtan etiketlerle düzenleyebilirsiniz.\n\nİç içe etiketler, üst/alt yapı oluşturmanıza olanak tanır; böylece geniş konular belirli alt konuları içerebilir. Örneğin, Müşteriler etiketi altında müşteri isimleri, Finans altında Vergiler, Faturalar ve Raporlar yer alabilir.\n\nKlasörlerden farklı olarak etiketler birbirini dışlamaz. Bir not aynı anda birden fazla etikete sahip olabilir — müşteri, finans ve bir zaman dilimi gibi.\n\nİç içe etiketler, konular örtüşse bile hem hassasiyet hem de esneklik sağlar."
+			},
+			"encryption": {
+				"title": "Şifreleme",
+				"text": "Deponun tamamı şifrelenir. Bazı uygulamalar yalnızca senkronizasyon sırasında veya sadece not metnini şifreler. Deepink, deponuzun tüm yapısını korur.\n\nNotlarınız, ekleriniz ve meta verileriniz biz dahil sizden başka hiç kimse tarafından okunamaz. Analiz riskini azaltmak için dosya boyutları bile gizlenir.\n\nSakladığınız her şey, tasarımı gereği gizli kalır."
+			}
+		}
+	},
+	"cta": {
+		"title": "Hayatınızın her alanı için bir alan",
+		"text": "Günlük notlarınızı, okumalarınızı ve planlarınızı tek bir özel alanda tutun. Tek tıkla bağlam değiştirin, düzeninizi koruyun ve akışınızı bozmadan yazmaya devam edin.",
+		"button": "Deepink'i Edinin"
+	}
+}

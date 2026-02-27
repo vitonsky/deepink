@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "下載",
+		"features": "功能",
+		"docs": "文件",
+		"blog": "部落格",
+		"changelog": "更新日誌"
+	},
+	"links": {
+		"followUs": {
+			"title": "追蹤我們"
+		},
+		"introduction": {
+			"title": "開始使用",
+			"content": {
+				"download": "下載",
+				"docs": "文件",
+				"overview": "概覽"
+			}
+		},
+		"learn": {
+			"title": "深入了解",
+			"content": {
+				"help": "幫助",
+				"changelog": "更新日誌",
+				"about": "關於",
+				"roadmap": "發展藍圖"
+			}
+		},
+		"resources": {
+			"title": "資源",
+			"content": {
+				"terms": "使用條款",
+				"privacy": "隱私權政策"
+			}
+		}
+	}
+}

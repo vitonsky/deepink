@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "Преузимање",
+		"features": "Функције",
+		"docs": "Документација",
+		"blog": "Блог",
+		"changelog": "Историја измена"
+	},
+	"links": {
+		"followUs": {
+			"title": "Пратите нас"
+		},
+		"introduction": {
+			"title": "Први кораци",
+			"content": {
+				"download": "Преузимање",
+				"docs": "Документација",
+				"overview": "Преглед"
+			}
+		},
+		"learn": {
+			"title": "Сазнајте више",
+			"content": {
+				"help": "Помоћ",
+				"changelog": "Историја измена",
+				"about": "О апликацији",
+				"roadmap": "План развоја"
+			}
+		},
+		"resources": {
+			"title": "Ресурси",
+			"content": {
+				"terms": "Услови коришћења",
+				"privacy": "Политика приватности"
+			}
+		}
+	}
+}

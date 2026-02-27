@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "Download",
+		"features": "Recursos",
+		"docs": "Documentação",
+		"blog": "Blog",
+		"changelog": "Changelog"
+	},
+	"links": {
+		"followUs": {
+			"title": "Siga-nos"
+		},
+		"introduction": {
+			"title": "Comece aqui",
+			"content": {
+				"download": "Download",
+				"docs": "Documentação",
+				"overview": "Visão geral"
+			}
+		},
+		"learn": {
+			"title": "Saiba mais",
+			"content": {
+				"help": "Ajuda",
+				"changelog": "Changelog",
+				"about": "Sobre",
+				"roadmap": "Roadmap"
+			}
+		},
+		"resources": {
+			"title": "Recursos",
+			"content": {
+				"terms": "Termos de Uso",
+				"privacy": "Política de Privacidade"
+			}
+		}
+	}
+}

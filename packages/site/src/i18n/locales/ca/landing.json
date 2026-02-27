@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Un lloc millor per a les teves notes.",
+		"subtitle": "Deepink fa que prendre notes sigui ergonòmic i agradable.",
+		"button": {
+			"get": "Descarrega Deepink",
+			"features": "Més informació"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Un magatzem de confiança",
+				"text": "Tot el que hi ha al teu magatzem està xifrat. A diferència de moltes altres aplicacions, això inclou realment <0>totes les teves dades</0>: contingut de les notes, fitxers i metadades. Pots triar l'algorisme en què confies.\n\nDeepink és una aplicació de <1>codi obert</1>, amb un codi que pots verificar, no només confiar-hi."
+			},
+			"workflow": {
+				"title": "L'ergonomia",
+				"text": "Deepink està dissenyat per ser àgil en l'ús diari, eliminant la fricció de les tasques més habituals. Per a la majoria de tasques, necessita <0>fins a un 80% menys d'accions</0> que altres aplicacions de notes."
+			},
+			"universality": {
+				"title": "El teu magatzem ho acull tot",
+				"text": "Guarda-ho tot al teu magatzem. Els espais de treball i les etiquetes jeràrquiques t'ajuden a separar contextos i trobar el que necessites ràpidament: des d'especificacions de projectes, contractes i fragments de codi fins a cites de llibres, un diari personal, recerca i molt més."
+			}
+		},
+		"cta": {
+			"text": "Gratuït. Sense límits.",
+			"button": "Descarrega ara"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Estructura el teu pensament",
+			"text": "Captura una idea ràpida o construeix quelcom complex. Deepink aporta ordre i enfocament a tot el que escrius."
+		},
+		"content": {
+			"links": {
+				"title": "Enllaços",
+				"text": "Els enllaços permeten referenciar qualsevol nota des de qualsevol lloc del teu magatzem. Connecta notes de reunions amb decisions, recerca amb conclusions i plans amb execució, sense duplicar el mateix paràgraf.\n\nEls retroenllaços mostren cada nota que apunta a la nota que estàs consultant, de manera que és fàcil rastrejar connexions i navegar pel teu coneixement de forma natural.\n\nEls enllaços mantenen el context connectat perquè les notes relacionades siguin fàcils de seguir."
+			},
+			"workspaces": {
+				"title": "Espais de treball",
+				"text": "Mantén separades les diferents àrees de la teva vida sense crear múltiples magatzems.\n\nEls espais de treball creen àmbits diferenciats dins d'un únic magatzem segur. Desbloqueja el magatzem una vegada i canvia entre contextos com Projectes de Clients, Diari Personal, Notes de Salut o Aprenentatge sense barrejar res.\n\nTot queda organitzat i específic per context. Comparteix la pantalla amb tranquil·litat: el contingut privat no apareixerà per error.\n\nUn magatzem. Límits clars. Zero fricció."
+			},
+			"history": {
+				"title": "Versions de les notes",
+				"text": "Cada nota conserva un historial complet de canvis.\n\nDeepink desa les versions automàticament, de manera que pots veure què ha canviat, restaurar un esborrany anterior o seguir com ha evolucionat una idea al llarg del temps. Tant si es va editar ahir com fa un any, res important es perd.\n\nLes versions anteriors sempre estan disponibles quan les necessites."
+			},
+			"reminders": {
+				"title": "Recordatoris",
+				"text": "Associa un recordatori a qualsevol nota i rep una notificació en el moment adequat.\n\nConfigura recordatoris de seguiment per a notes de reunions, terminis per a plans de projecte, dates de renovació per a documents o revisions per a objectius personals. Cada recordatori queda vinculat a la nota exacta, no com una tasca separada en una altra aplicació.\n\nQuan arriba el moment, obres la nota amb tots els detalls al seu lloc.\n\nEls recordatoris t'ajuden a actuar sobre la teva informació, no només a emmagatzemar-la."
+			},
+			"tags": {
+				"title": "Etiquetes jeràrquiques",
+				"text": "Organitza les teves notes amb etiquetes que reflecteixen una jerarquia clara.\n\nLes etiquetes jeràrquiques permeten crear una estructura pare/fill, de manera que els temes amplis poden contenir subtemes específics. Per exemple, Clients pot incloure noms de clients individuals, i Finances pot incloure Impostos, Factures i Informes.\n\nA diferència de les carpetes, les etiquetes no són exclusives. Una nota pot tenir múltiples etiquetes alhora: client, finances i un període de temps.\n\nLes etiquetes jeràrquiques ofereixen precisió i flexibilitat, fins i tot quan els temes se superposen."
+			},
+			"encryption": {
+				"title": "Xifratge",
+				"text": "Tot el magatzem està xifrat. Algunes aplicacions només xifren les dades durant la sincronització o el text de la nota. Deepink protegeix l'estructura completa del teu magatzem.\n\nLes teves notes, fitxers adjunts i metadades són il·legibles per a qualsevol persona excepte tu, inclosos nosaltres. Fins i tot les mides dels fitxers s'ofusquen per reduir el risc d'anàlisi.\n\nEl que guardes roman privat per disseny."
+			}
+		}
+	},
+	"cta": {
+		"title": "Un espai per a cada àmbit de la teva vida",
+		"text": "Guarda notes del dia a dia, lectures i plans en un únic lloc privat. Canvia de context amb un clic, mantén l'ordre i continua escrivint sense interrompre el teu ritme.",
+		"button": "Obtén Deepink"
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "ダウンロード",
+		"features": "機能",
+		"docs": "ドキュメント",
+		"blog": "ブログ",
+		"changelog": "変更履歴"
+	},
+	"links": {
+		"followUs": {
+			"title": "フォローする"
+		},
+		"introduction": {
+			"title": "はじめに",
+			"content": {
+				"download": "ダウンロード",
+				"docs": "ドキュメント",
+				"overview": "概要"
+			}
+		},
+		"learn": {
+			"title": "詳しく知る",
+			"content": {
+				"help": "ヘルプ",
+				"changelog": "変更履歴",
+				"about": "Deepinkについて",
+				"roadmap": "ロードマップ"
+			}
+		},
+		"resources": {
+			"title": "リソース",
+			"content": {
+				"terms": "利用規約",
+				"privacy": "プライバシーポリシー"
+			}
+		}
+	}
+}

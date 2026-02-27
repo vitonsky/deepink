@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Letöltés <0/> rendszerre",
+		"releaseDate": "Frissítve: {{date}}"
+	},
+	"links": {
+		"title": "Minden platform"
+	}
+}

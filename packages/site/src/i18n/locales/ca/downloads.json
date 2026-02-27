@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Descarrega per a <0/>",
+		"releaseDate": "Actualitzat el {{date}}"
+	},
+	"links": {
+		"title": "Totes les plataformes"
+	}
+}

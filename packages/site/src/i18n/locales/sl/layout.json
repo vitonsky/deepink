@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "Prenos",
+		"features": "Funkcije",
+		"docs": "Dokumentacija",
+		"blog": "Blog",
+		"changelog": "Dnevnik sprememb"
+	},
+	"links": {
+		"followUs": {
+			"title": "Sledite nam"
+		},
+		"introduction": {
+			"title": "Začnite tukaj",
+			"content": {
+				"download": "Prenos",
+				"docs": "Dokumentacija",
+				"overview": "Pregled"
+			}
+		},
+		"learn": {
+			"title": "Več o aplikaciji",
+			"content": {
+				"help": "Pomoč",
+				"changelog": "Dnevnik sprememb",
+				"about": "O nas",
+				"roadmap": "Načrt razvoja"
+			}
+		},
+		"resources": {
+			"title": "Viri",
+			"content": {
+				"terms": "Pogoji uporabe",
+				"privacy": "Pravilnik o zasebnosti"
+			}
+		}
+	}
+}

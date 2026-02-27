@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "İndir",
+		"features": "Özellikler",
+		"docs": "Dokümantasyon",
+		"blog": "Blog",
+		"changelog": "Değişiklik Günlüğü"
+	},
+	"links": {
+		"followUs": {
+			"title": "Bizi takip edin"
+		},
+		"introduction": {
+			"title": "Başlayın",
+			"content": {
+				"download": "İndir",
+				"docs": "Dokümantasyon",
+				"overview": "Genel Bakış"
+			}
+		},
+		"learn": {
+			"title": "Daha fazlası",
+			"content": {
+				"help": "Yardım",
+				"changelog": "Değişiklik Günlüğü",
+				"about": "Hakkında",
+				"roadmap": "Yol Haritası"
+			}
+		},
+		"resources": {
+			"title": "Kaynaklar",
+			"content": {
+				"terms": "Kullanım Koşulları",
+				"privacy": "Gizlilik Politikası"
+			}
+		}
+	}
+}

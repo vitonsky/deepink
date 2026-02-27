@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Transferir para <0/>",
+		"releaseDate": "Atualizado a {{date}}"
+	},
+	"links": {
+		"title": "Todas as plataformas"
+	}
+}

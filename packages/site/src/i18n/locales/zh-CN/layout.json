@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "下载",
+		"features": "功能",
+		"docs": "文档",
+		"blog": "博客",
+		"changelog": "更新日志"
+	},
+	"links": {
+		"followUs": {
+			"title": "关注我们"
+		},
+		"introduction": {
+			"title": "开始使用",
+			"content": {
+				"download": "下载",
+				"docs": "文档",
+				"overview": "概览"
+			}
+		},
+		"learn": {
+			"title": "了解更多",
+			"content": {
+				"help": "帮助",
+				"changelog": "更新日志",
+				"about": "关于",
+				"roadmap": "路线图"
+			}
+		},
+		"resources": {
+			"title": "资源",
+			"content": {
+				"terms": "使用条款",
+				"privacy": "隐私政策"
+			}
+		}
+	}
+}

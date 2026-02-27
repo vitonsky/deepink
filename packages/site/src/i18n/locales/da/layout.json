@@ -1,0 +1,38 @@
+{
+	"nav": {
+		"download": "Download",
+		"features": "Funktioner",
+		"docs": "Dokumentation",
+		"blog": "Blog",
+		"changelog": "Ændringslog"
+	},
+	"links": {
+		"followUs": {
+			"title": "Følg os"
+		},
+		"introduction": {
+			"title": "Kom i gang",
+			"content": {
+				"download": "Download",
+				"docs": "Dokumentation",
+				"overview": "Overblik"
+			}
+		},
+		"learn": {
+			"title": "Læs mere",
+			"content": {
+				"help": "Hjælp",
+				"changelog": "Ændringslog",
+				"about": "Om os",
+				"roadmap": "Roadmap"
+			}
+		},
+		"resources": {
+			"title": "Ressourcer",
+			"content": {
+				"terms": "Brugsvilkår",
+				"privacy": "Privatlivspolitik"
+			}
+		}
+	}
+}
