@@ -212,14 +212,19 @@ export const profilesSlice = createSlice({
 			const profile = state.profiles[profileId];
 			if (!profile) return;
 
+			if (!workspaceId) {
+				profile.activeWorkspace = workspaceId;
+				return;
+			}
+
+			const workspace = profile.workspaces[workspaceId];
+			if (!workspace) return;
+
 			profile.activeWorkspace = workspaceId;
 
 			// Touch workspace
-			if (workspaceId) {
-				const workspace = profile.workspaces[workspaceId];
-				if (workspace && !workspace.touched) {
-					workspace.touched = true;
-				}
+			if (!workspace.touched) {
+				workspace.touched = true;
 			}
 		},
 
