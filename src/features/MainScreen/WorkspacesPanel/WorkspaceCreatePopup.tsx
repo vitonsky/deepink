@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { WorkspacesControllerSync } from '@core/features/workspaces/WorkspacesControllerSync';
 import { useProfileControls } from '@features/App/Profile';
 import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 import { useTelemetryTracker } from '@features/telemetry';
@@ -37,7 +38,10 @@ export const WorkspaceCreatePopup = () => {
 		profile: { db },
 	} = useProfileControls();
 
-	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
+	const workspacesManager = useMemo(
+		() => new WorkspacesControllerSync(new WorkspacesController(db), db),
+		[db],
+	);
 
 	const { update: updateWorkspaces } = useWorkspacesList();
 
@@ -66,13 +70,11 @@ export const WorkspaceCreatePopup = () => {
 							]}
 							validatorScheme={workspacePropsValidator}
 							onUpdate={({ name }) => {
-								onClose();
-
 								workspacesManager
 									.create({ name })
 									.then(async (workspaceId) => {
+										onClose();
 										await updateWorkspaces();
-										await db.sync();
 
 										dispatch(
 											workspacesApi.setActiveWorkspace({

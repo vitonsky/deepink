@@ -8,6 +8,7 @@ import { IFilesStorage } from '@core/features/files';
 import { EncryptedFS } from '@core/features/files/EncryptedFS';
 import { FileController } from '@core/features/files/FileController';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { WorkspacesControllerSync } from '@core/features/workspaces/WorkspacesControllerSync';
 import {
 	openDatabase,
 	PGLiteDatabase,
@@ -115,13 +116,15 @@ export const useProfileContainers = () => {
 			);
 
 			// Ensure at least one workspace exists
-			const workspaces = new WorkspacesController(db);
+			const workspaces = new WorkspacesControllerSync(
+				new WorkspacesController(db),
+				db,
+			);
 			const isWorkspacesExists = await workspaces
 				.getList()
 				.then((workspaces) => workspaces.length > 0);
 			if (!isWorkspacesExists) {
 				await workspaces.create({ name: 'Notes' });
-				await db.sync();
 			}
 
 			// TODO: close DB first and close encryption last
