@@ -25,9 +25,6 @@ import remindersScreenshot from './screenshots/reminders.png';
 import tagsScreenshot from './screenshots/tags.png';
 import workspacesScreenshot from './screenshots/workspaces.png';
 
-// TODO: proofread the blog posts
-// TODO: add most important pages - privacy, terms
-
 // TODO: add analytics
 // TODO: add docs
 export default WithLayout(() => {

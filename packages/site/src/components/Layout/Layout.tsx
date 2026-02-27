@@ -17,6 +17,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
+import { CHANGELOG_URL } from '../../config';
 import { createI18nInstance } from '../../i18n/createI18nInstance';
 import type { i18nPageContext } from '../../i18n/types';
 import { CSS_RESET_CLASS_NAME } from '../../theme/constants';
@@ -64,7 +65,7 @@ const LayoutContent = ({
 		],
 		additional: [
 			{ text: t('nav.blog'), url: '/blog' },
-			{ text: t('nav.changelog'), url: '/changelog' },
+			{ text: t('nav.changelog'), url: CHANGELOG_URL },
 		],
 	} satisfies Record<string, SimpleLink[]>;
 
@@ -300,7 +301,7 @@ const LayoutContent = ({
 										</Link>
 									</Box>
 									<Box as="li">
-										<Link href="/changelog">
+										<Link href={CHANGELOG_URL}>
 											{t('links.learn.content.changelog')}
 										</Link>
 									</Box>
