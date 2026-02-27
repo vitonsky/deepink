@@ -15,11 +15,11 @@
 			},
 			"workflow": {
 				"title": "A ergonomia",
-				"text": "Deepink foi criado para ser rápido no uso diário, eliminando atritos das tarefas mais comuns. Para a maioria das ações, são necessárias <0>até 80% menos interações</0> do que em outros apps de notas."
+				"text": "Deepink foi feito para ser rápido no uso diário, eliminando atritos das tarefas mais comuns. Para a maioria das ações, são necessárias <0>até 80% menos interações</0> do que em outros apps de notas."
 			},
 			"universality": {
 				"title": "Seu cofre comporta tudo",
-				"text": "Guarde tudo no seu cofre. Workspaces e tags aninhadas ajudam a separar contextos e encontrar o que você precisa rapidamente — de especificações de projetos, contratos e trechos de código a citações de livros, diário pessoal, pesquisas e muito mais."
+				"text": "Guarde tudo no seu cofre. Espaços de trabalho e tags aninhadas ajudam a separar contextos e encontrar o que você precisa rapidamente — de especificações de projetos, contratos e trechos de código a citações de livros, diário pessoal, pesquisas e muito mais."
 			}
 		},
 		"cta": {
@@ -38,20 +38,20 @@
 				"text": "Links permitem referenciar qualquer nota em qualquer lugar do seu cofre. Conecte anotações de reuniões a decisões, pesquisas a conclusões e planos à execução, sem duplicar o mesmo parágrafo.\n\nBacklinks mostram todas as notas que apontam para a nota que você está visualizando, facilitando rastrear conexões e navegar pelo seu conhecimento de forma natural.\n\nLinks mantêm o contexto conectado, para que notas relacionadas continuem fáceis de acompanhar."
 			},
 			"workspaces": {
-				"title": "Workspaces",
-				"text": "Mantenha diferentes áreas da sua vida separadas sem precisar criar vários cofres.\n\nWorkspaces criam espaços focados dentro de um único cofre seguro. Desbloqueie seu cofre uma vez e alterne entre contextos como Projetos de Clientes, Diário Pessoal, Notas de Saúde ou Aprendizado, sem misturar nada.\n\nOrganização clara e específica por contexto. Compartilhe sua tela com tranquilidade: conteúdo privado não aparece por engano.\n\nUm cofre. Limites claros. Zero atrito."
+				"title": "Espaços de trabalho",
+				"text": "Mantenha diferentes áreas da sua vida separadas sem precisar criar vários cofres.\n\nEspaços de trabalho criam ambientes focados dentro de um único cofre seguro. Desbloqueie seu cofre uma vez e alterne entre contextos como Projetos de Clientes, Diário Pessoal, Notas de Saúde ou Aprendizado, sem misturar nada.\n\nOrganização clara e específica por contexto. Compartilhe sua tela com tranquilidade: conteúdo privado não aparece por engano.\n\nUm cofre. Limites claros. Zero atrito."
 			},
 			"history": {
-				"title": "Versões de notas",
+				"title": "Versões da nota",
 				"text": "Cada nota mantém um histórico completo de alterações.\n\nDeepink salva versões automaticamente, permitindo ver o que mudou, restaurar um rascunho anterior ou acompanhar como uma ideia evoluiu ao longo do tempo. Seja uma edição de ontem ou de um ano atrás, nada importante se perde.\n\nVersões anteriores estão sempre disponíveis quando você precisar."
 			},
 			"reminders": {
 				"title": "Lembretes",
-				"text": "Anexe um lembrete a qualquer nota e receba a notificação no momento certo.\n\nDefina lembretes de acompanhamento para anotações de reuniões, prazos para planos de projeto, datas de renovação de documentos ou check-ins para metas pessoais. Cada lembrete fica vinculado à nota exata, não como uma tarefa separada em outro app.\n\nQuando chegar a hora, a nota abre com todos os detalhes no lugar.\n\nLembretes ajudam a agir com base nas suas informações, não apenas armazená-las."
+				"text": "Anexe um lembrete a qualquer nota e receba a notificação no momento certo.\n\nCrie lembretes de acompanhamento para anotações de reuniões, prazos para planos de projeto, datas de renovação de documentos ou check-ins para metas pessoais. Cada lembrete fica vinculado à nota exata, não como uma tarefa separada em outro app.\n\nQuando chegar a hora, a nota abre com todos os detalhes no lugar.\n\nLembretes ajudam a agir com base nas suas informações, não apenas armazená-las."
 			},
 			"tags": {
 				"title": "Tags aninhadas",
-				"text": "Organize suas notas com tags que refletem uma hierarquia clara.\n\nTags aninhadas permitem criar uma estrutura de pai e filho, onde tópicos amplos contêm subtópicos específicos. Por exemplo, Clientes pode incluir nomes individuais de clientes, e Financeiro pode incluir Impostos, Faturas e Relatórios.\n\nDiferente de pastas, tags não são exclusivas. Uma nota pode ter várias tags ao mesmo tempo — cliente, financeiro e um período de tempo.\n\nTags aninhadas oferecem precisão e flexibilidade, mesmo quando os temas se sobrepõem."
+				"text": "Organize suas notas com tags que refletem uma hierarquia clara.\n\nTags aninhadas permitem criar uma estrutura de pai e filho, onde temas amplos contêm subtemas específicos. Por exemplo, Clientes pode incluir nomes individuais de clientes, e Financeiro pode incluir Impostos, Faturas e Relatórios.\n\nDiferente de pastas, tags não são exclusivas. Uma nota pode ter várias tags ao mesmo tempo — cliente, financeiro e um período de tempo.\n\nTags aninhadas oferecem precisão e flexibilidade, mesmo quando os temas se sobrepõem."
 			},
 			"encryption": {
 				"title": "Criptografia",
@@ -61,7 +61,7 @@
 	},
 	"cta": {
 		"title": "Um espaço para cada parte da sua vida",
-		"text": "Notas do dia a dia, leituras e planos em um só lugar privado. Alterne entre contextos com um clique, mantenha tudo organizado e continue escrevendo sem perder o ritmo.",
+		"text": "Mantenha notas do dia a dia, leituras e planos em um só lugar privado. Alterne entre contextos com um clique, mantenha a organização e continue escrevendo sem perder o ritmo.",
 		"button": "Baixar Deepink"
 	}
 }
