@@ -19,11 +19,12 @@
 			}
 		},
 		"learn": {
-			"title": "Zjistit více",
+			"title": "Více informací",
 			"content": {
 				"help": "Nápověda",
 				"changelog": "Seznam změn",
 				"about": "O aplikaci",
+				"security": "Bezpečnost",
 				"roadmap": "Plán vývoje"
 			}
 		},

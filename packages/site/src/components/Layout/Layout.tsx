@@ -53,7 +53,7 @@ const LayoutContent = ({
 		main: [
 			{ text: t('nav.download'), url: localePath('/download') },
 			{ text: t('nav.features'), url: localePath('/#features') },
-			{ text: t('nav.docs'), url: '/guides/example/' },
+			{ text: t('nav.docs'), url: '/introduction' },
 		],
 		additional: [
 			{ text: t('nav.blog'), url: '/blog' },
@@ -300,6 +300,11 @@ const LayoutContent = ({
 									<Box as="li">
 										<Link href="/about">
 											{t('links.learn.content.about')}
+										</Link>
+									</Box>
+									<Box as="li">
+										<Link href="/introduction/security">
+											{t('links.learn.content.security')}
 										</Link>
 									</Box>
 									<Box as="li">

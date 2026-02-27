@@ -11,7 +11,7 @@
 			"title": "Urmărește-ne"
 		},
 		"introduction": {
-			"title": "Începe aici",
+			"title": "Primii pași",
 			"content": {
 				"download": "Descarcă",
 				"docs": "Documentație",
@@ -24,7 +24,8 @@
 				"help": "Ajutor",
 				"changelog": "Changelog",
 				"about": "Despre",
-				"roadmap": "Foaie de parcurs"
+				"security": "Securitate",
+				"roadmap": "Roadmap"
 			}
 		},
 		"resources": {

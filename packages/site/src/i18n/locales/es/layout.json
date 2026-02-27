@@ -24,13 +24,14 @@
 				"help": "Ayuda",
 				"changelog": "Novedades",
 				"about": "Acerca de",
+				"security": "Seguridad",
 				"roadmap": "Hoja de ruta"
 			}
 		},
 		"resources": {
 			"title": "Recursos",
 			"content": {
-				"terms": "Términos de uso",
+				"terms": "Condiciones de uso",
 				"privacy": "Política de privacidad"
 			}
 		}

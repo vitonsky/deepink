@@ -11,7 +11,7 @@
 			"title": "Seguici"
 		},
 		"introduction": {
-			"title": "Inizia ora",
+			"title": "Per iniziare",
 			"content": {
 				"download": "Download",
 				"docs": "Documentazione",
@@ -24,6 +24,7 @@
 				"help": "Assistenza",
 				"changelog": "Changelog",
 				"about": "Chi siamo",
+				"security": "Sicurezza",
 				"roadmap": "Roadmap"
 			}
 		},

@@ -11,7 +11,7 @@
 			"title": "تابعونا"
 		},
 		"introduction": {
-			"title": "ابدأ الآن",
+			"title": "البداية",
 			"content": {
 				"download": "تحميل",
 				"docs": "المستندات",
@@ -19,11 +19,12 @@
 			}
 		},
 		"learn": {
-			"title": "اعرف المزيد",
+			"title": "معرفة المزيد",
 			"content": {
 				"help": "المساعدة",
 				"changelog": "سجلّ التحديثات",
 				"about": "عن Deepink",
+				"security": "الأمان",
 				"roadmap": "خارطة التطوير"
 			}
 		},

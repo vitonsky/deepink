@@ -23,7 +23,8 @@
 			"content": {
 				"help": "Помощь",
 				"changelog": "Changelog",
-				"about": "О приложении",
+				"about": "О проекте",
+				"security": "Безопасность",
 				"roadmap": "Планы развития"
 			}
 		},
