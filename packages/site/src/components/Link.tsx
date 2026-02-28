@@ -61,7 +61,7 @@ export const linkRecipe = defineRecipe({
 			'button-primary': {
 				display: 'inline-block',
 				userSelect: 'none',
-				fontSize: '18px',
+				fontSize: '1.5rem',
 				px: '1.4rem',
 				py: '0.7rem',
 				borderRadius: '8px',
@@ -76,7 +76,7 @@ export const linkRecipe = defineRecipe({
 			'button-secondary': {
 				display: 'inline-block',
 				userSelect: 'none',
-				fontSize: '18px',
+				fontSize: '1.5rem',
 				px: '1.4rem',
 				py: '0.7rem',
 				borderRadius: '8px',

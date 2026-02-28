@@ -15,6 +15,14 @@ const textRecipe = defineRecipe({
 		margin: 0,
 	},
 	variants: {
+		size: {
+			md: {
+				fontSize: '1rem',
+			},
+			lg: {
+				fontSize: '1.4rem',
+			},
+		},
 		variant: {
 			body: {
 				fontFamily: 'body',
@@ -39,6 +47,7 @@ const textRecipe = defineRecipe({
 	},
 	defaultVariants: {
 		variant: 'body',
+		size: 'md',
 	},
 });
 

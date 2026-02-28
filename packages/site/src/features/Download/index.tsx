@@ -188,9 +188,9 @@ export default WithLayout(function Page({
 				>
 					<Heading>{t('links.title')}</Heading>
 					<SimpleGrid
-						columns={2}
+						columns={{ base: 1, sm: 2 }}
 						width="100%"
-						fontSize="20px"
+						fontSize="1.4rem"
 						css={{
 							rowGap: '1.5rem',
 							'& > *:not(:nth-last-child(-n + 2))': {
@@ -203,17 +203,22 @@ export default WithLayout(function Page({
 						{downloads.map((section) => (
 							<Fragment key={section.title}>
 								<Text
-									as={HStack}
-									alignItems="start"
 									textAlign="start"
-									gap=".3em"
+									fontSize="inherit"
+									alignItems="start"
 								>
-									{section.icon}
-									<span>{section.title}</span>
+									<HStack as="span" gap=".3em" alignItems="center">
+										{section.icon}
+										<span>{section.title}</span>
+									</HStack>
 								</Text>
 								<VStack align="start">
 									{section.links.map((link) => (
-										<Link key={link.url} href={link.url}>
+										<Link
+											key={link.url}
+											href={link.url}
+											fontSize="inherit"
+										>
 											<HStack gap=".3em">
 												<Box as={BiCloudDownload} />
 												<span>{link.title}</span>

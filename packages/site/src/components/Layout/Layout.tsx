@@ -250,6 +250,7 @@ const LayoutContent = ({
 								md: 'repeat(auto-fit, minmax(150px, 1fr))',
 							}}
 							gap={{ base: '.5rem', md: '2rem' }}
+							rowGap="2rem"
 							flexGrow={1}
 							maxW={{ md: '70%' }}
 							ml={{ md: 'auto' }}

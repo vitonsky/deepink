@@ -205,7 +205,9 @@ export default WithLayout(() => {
 						>
 							{t('highlights.cta.button')}
 						</Link>
-						<Text textAlign="center">{t('highlights.cta.text')}</Text>
+						<Text textAlign="center" fontSize="inherit">
+							{t('highlights.cta.text')}
+						</Text>
 					</VStack>
 				</VStack>
 			</Stack>
