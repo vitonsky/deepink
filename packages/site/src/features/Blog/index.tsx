@@ -50,12 +50,16 @@ export default WithLayout(function Page({ posts }: { posts: BlogPostData[] }) {
 								flexShrink={0}
 								boxSizing="border-box"
 							>
-								<Text variant="description" width="max-content">
+								<Text
+									variant="description"
+									width="max-content"
+									suppressHydrationWarning
+								>
 									{new Intl.DateTimeFormat('en', {
 										year: 'numeric',
 										month: 'long',
 										day: 'numeric',
-									}).format(new Date(date))}
+									}).format(date)}
 								</Text>
 							</VStack>
 							<VStack align="start">

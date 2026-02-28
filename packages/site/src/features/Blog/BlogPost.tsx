@@ -37,12 +37,13 @@ export const BlogPost = WithLayout(function Page({
 				width="max-content"
 				marginBottom="1rem"
 				fontSize="1rem"
+				suppressHydrationWarning
 			>
 				{new Intl.DateTimeFormat('en', {
 					year: 'numeric',
 					month: 'long',
 					day: 'numeric',
-				}).format(new Date(date))}
+				}).format(date)}
 			</Text>
 
 			<Box width="100%">{children}</Box>

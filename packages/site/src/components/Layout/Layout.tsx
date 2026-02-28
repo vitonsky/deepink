@@ -234,7 +234,12 @@ const LayoutContent = ({
 								</VStack>
 							</VStack>
 
-							<Text as="small" fontWeight="500" color="brand.secondary">
+							<Text
+								as="small"
+								fontWeight="500"
+								color="brand.secondary"
+								suppressHydrationWarning
+							>
 								© {new Date().getFullYear()} Deepink
 							</Text>
 						</VStack>
