@@ -153,8 +153,7 @@ export default WithLayout(() => {
 						aspectRatio: `${screenshot.width}/${screenshot.height}`,
 					}}
 					borderRadius="18px"
-					border="3px solid"
-					borderColor="border.contrast"
+					border="1px solid #00000017"
 				/>
 			</VStack>
 
@@ -267,8 +266,7 @@ export default WithLayout(() => {
 							<Box
 								overflow="hidden"
 								m={0}
-								border="3px solid"
-								borderColor="border.contrast"
+								border="1px solid #00000017"
 								borderRadius="14px"
 								maxH="300px"
 							>
