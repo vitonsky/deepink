@@ -16,6 +16,11 @@ jobs:
   build:
     name: Build site
     runs-on: ubuntu-latest
+    permissions:
+      actions: read # Only required for private GitHub Repo
+      contents: read
+      deployments: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v2
