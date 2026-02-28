@@ -201,7 +201,12 @@ export default WithLayout(function Page({
 				>
 					{downloads.map((section) => (
 						<Fragment key={section.title}>
-							<Text as={HStack} textAlign="start" gap=".3em">
+							<Text
+								as={HStack}
+								alignItems="start"
+								textAlign="start"
+								gap=".3em"
+							>
 								{section.icon}
 								<span>{section.title}</span>
 							</Text>

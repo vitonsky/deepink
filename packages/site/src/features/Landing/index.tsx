@@ -145,7 +145,7 @@ export default WithLayout(() => {
 
 			{/* Summary Section */}
 			<Stack gap="2rem" my="5rem" direction={{ base: 'column', md: 'row' }}>
-				<VStack gap="2rem" maxW={{ md: '550px' }} align="start">
+				<VStack gap="2rem" align="start">
 					{highlights.map((feature) => (
 						<VStack key={feature.title} gap="0.5rem" align="start">
 							<Heading as="h3" m={0} fontSize="22px" fontWeight="500">
@@ -167,7 +167,7 @@ export default WithLayout(() => {
 					align="center"
 					fontSize="24px"
 					gap="2rem"
-					minW={{ md: '200px' }}
+					minW={{ md: '200px', lg: '300px' }}
 					marginInlineStart={{ md: 'auto' }}
 				>
 					<TheRock maxW="300px" width={{ base: '350px', md: '100%' }} />

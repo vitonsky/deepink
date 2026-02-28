@@ -65,7 +65,11 @@ const LayoutContent = ({
 		<>
 			{/* Header */}
 			<Box as="header" maxW="100%" overflow="auto" position="relative">
-				<Container maxW="900px" boxSizing="border-box" px="1rem">
+				<Container
+					maxW="1200px"
+					boxSizing="border-box"
+					paddingInline={{ base: '1rem', md: '3rem' }}
+				>
 					<HStack gap="1rem" align="center" py="1rem">
 						<Link href={localePath('/')} variant="plain">
 							<Logo />
@@ -169,14 +173,23 @@ const LayoutContent = ({
 
 			{/* Main Content */}
 			<Box as="main">
-				<Container maxW="900px" boxSizing="border-box" px="1rem">
+				<Container
+					maxW="1200px"
+					boxSizing="border-box"
+					paddingInline={{ base: '1rem', md: '3rem' }}
+				>
 					{children}
 				</Container>
 			</Box>
 
 			{/* Footer */}
 			<Box as="footer" pt="1rem" pb="5rem">
-				<Box maxW="900px" boxSizing="border-box" mx="auto" px="1rem">
+				<Box
+					maxW="1200px"
+					boxSizing="border-box"
+					mx="auto"
+					paddingInline={{ base: '1rem', md: '3rem' }}
+				>
 					<Stack
 						wrap="wrap"
 						w="100%"
@@ -352,10 +365,10 @@ const LayoutContent = ({
 
 				{altVersions && altVersions.length > 0 && (
 					<Box
-						maxW="900px"
+						maxW="1200px"
 						boxSizing="border-box"
 						mx="auto"
-						px="1rem"
+						paddingInline={{ base: '1rem', md: '3rem' }}
 						mt="3rem"
 					>
 						<Flex
