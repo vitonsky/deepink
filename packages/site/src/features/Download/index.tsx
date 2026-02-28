@@ -5,7 +5,7 @@ import { FaApple, FaLinux, FaWindows } from 'react-icons/fa6';
 import { Box, Heading, HStack, SimpleGrid, VStack } from '@chakra-ui/react';
 
 import { WithLayout } from '../../components/Layout';
-import { Link } from '../../components/Link';
+import { Link, LinkContext } from '../../components/Link';
 import { Text } from '../../components/Text';
 import { TheRock } from '../../components/TheRock';
 
@@ -149,81 +149,83 @@ export default WithLayout(function Page({
 	}, [language, versions]);
 
 	return (
-		<VStack paddingBlock="8rem" justifyContent="center" gap="3rem">
-			<VStack gap="3rem">
-				<TheRock maxW="100%" width="350px" />
+		<LinkContext value="internal">
+			<VStack paddingBlock="8rem" justifyContent="center" gap="3rem">
+				<VStack gap="3rem">
+					<TheRock maxW="100%" width="350px" />
 
-				<VStack gap="1rem">
-					<Link variant="button-primary" href={downloadLink}>
-						<Trans
-							t={t}
-							i18nKey="main.download"
-							components={[<PlatformName key={0} />]}
-						/>
-					</Link>
-					{lastReleaseDate && (
-						<Text
-							variant="description"
-							fontFamily="monospace"
-							suppressHydrationWarning
-						>
-							{t('main.releaseDate', {
-								date: lastReleaseDate,
-								version: versions[0].name,
-							})}
-						</Text>
-					)}
+					<VStack gap="1rem">
+						<Link variant="button-primary" href={downloadLink}>
+							<Trans
+								t={t}
+								i18nKey="main.download"
+								components={[<PlatformName key={0} />]}
+							/>
+						</Link>
+						{lastReleaseDate && (
+							<Text
+								variant="description"
+								fontFamily="monospace"
+								suppressHydrationWarning
+							>
+								{t('main.releaseDate', {
+									date: lastReleaseDate,
+									version: versions[0].name,
+								})}
+							</Text>
+						)}
+					</VStack>
+				</VStack>
+
+				<VStack
+					maxWidth="500px"
+					width="100%"
+					padding="2rem"
+					border="3px solid"
+					borderColor="border.contrast"
+					borderRadius="6px"
+					gap="3rem"
+				>
+					<Heading>{t('links.title')}</Heading>
+					<SimpleGrid
+						columns={2}
+						width="100%"
+						fontSize="20px"
+						css={{
+							rowGap: '1.5rem',
+							'& > *:not(:nth-last-child(-n + 2))': {
+								paddingBottom: '1.5rem',
+								borderBottom: '1px solid',
+								borderColor: 'border.thin',
+							},
+						}}
+					>
+						{downloads.map((section) => (
+							<Fragment key={section.title}>
+								<Text
+									as={HStack}
+									alignItems="start"
+									textAlign="start"
+									gap=".3em"
+								>
+									{section.icon}
+									<span>{section.title}</span>
+								</Text>
+								<VStack align="start">
+									{section.links.map((link) => (
+										<Link key={link.url} href={link.url}>
+											<HStack gap=".3em">
+												<Box as={BiCloudDownload} />
+												<span>{link.title}</span>
+											</HStack>
+										</Link>
+									))}
+								</VStack>
+							</Fragment>
+						))}
+					</SimpleGrid>
 				</VStack>
 			</VStack>
-
-			<VStack
-				maxWidth="500px"
-				width="100%"
-				padding="2rem"
-				border="3px solid"
-				borderColor="border.contrast"
-				borderRadius="6px"
-				gap="3rem"
-			>
-				<Heading>{t('links.title')}</Heading>
-				<SimpleGrid
-					columns={2}
-					width="100%"
-					fontSize="20px"
-					css={{
-						rowGap: '1.5rem',
-						'& > *:not(:nth-last-child(-n + 2))': {
-							paddingBottom: '1.5rem',
-							borderBottom: '1px solid',
-							borderColor: 'border.thin',
-						},
-					}}
-				>
-					{downloads.map((section) => (
-						<Fragment key={section.title}>
-							<Text
-								as={HStack}
-								alignItems="start"
-								textAlign="start"
-								gap=".3em"
-							>
-								{section.icon}
-								<span>{section.title}</span>
-							</Text>
-							<VStack align="start">
-								{section.links.map((link) => (
-									<Link key={link.url} href={link.url}>
-										<HStack gap=".3em">
-											<Box as={BiCloudDownload} />
-											<span>{link.title}</span>
-										</HStack>
-									</Link>
-								))}
-							</VStack>
-						</Fragment>
-					))}
-				</SimpleGrid>
-			</VStack>
-		</VStack>
+		</LinkContext>
 	);
 });

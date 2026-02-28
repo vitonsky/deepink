@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { chakra, defineRecipe, type RecipeDefinition } from '@chakra-ui/react';
 
 import { system } from '../theme';
+
+export const LinkContext = createContext<'external' | 'internal' | 'auto'>('auto');
 
 // Create wrapper components that use our custom recipes
 // These will properly type-check with our variant definitions
@@ -105,10 +107,15 @@ export const Link = React.forwardRef<
 	const recipe = system._config.theme?.recipes?.link;
 	const styles = recipe ? system.cva(recipe)({ variant }) : {};
 
+	const linkContextMode = useContext(LinkContext);
+	const isExternalLink =
+		linkContextMode === 'external' ||
+		(linkContextMode === 'auto' && props.href?.startsWith('http'));
+
 	return (
 		<chakra.a
 			ref={ref}
-			{...(props.href?.startsWith('http')
+			{...(isExternalLink
 				? {
 						target: '_blank',
 						rel: 'noopener noreferrer',
