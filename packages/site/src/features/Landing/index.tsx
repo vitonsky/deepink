@@ -181,7 +181,6 @@ export default WithLayout(() => {
 
 				<VStack
 					align="center"
-					fontSize="24px"
 					gap="2rem"
 					minW={{ md: '200px', lg: '300px' }}
 					marginInlineStart={{ md: 'auto' }}

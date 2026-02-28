@@ -9,43 +9,6 @@ import {
 import { linkRecipe } from '../components/Link';
 import { CSS_RESET_CLASS_NAME } from './constants';
 
-// Button recipe with variants
-const buttonRecipe = defineRecipe({
-	base: {
-		display: 'inline-block',
-		fontSize: '18px',
-		px: '1.4rem',
-		py: '0.7rem',
-		borderRadius: '8px',
-		fontWeight: '500',
-		textDecoration: 'none',
-		cursor: 'pointer',
-	},
-	variants: {
-		variant: {
-			primary: {
-				bg: 'black',
-				color: 'white',
-				_hover: {
-					bg: '#1a1a1a',
-					color: 'white',
-				},
-			},
-			secondary: {
-				bg: 'brand.buttonSecondaryBg',
-				color: 'brand.buttonSecondaryText',
-				_hover: {
-					bg: '#ffd5ad',
-					color: 'brand.buttonSecondaryText',
-				},
-			},
-		},
-	},
-	defaultVariants: {
-		variant: 'primary',
-	},
-});
-
 // Text recipe with variants
 const textRecipe = defineRecipe({
 	base: {
@@ -121,7 +84,6 @@ const customConfig = defineConfig({
 			},
 		},
 		recipes: {
-			button: buttonRecipe,
 			link: linkRecipe,
 			text: textRecipe,
 			separator: defineRecipe({
