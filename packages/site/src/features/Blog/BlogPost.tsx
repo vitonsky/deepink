@@ -24,15 +24,20 @@ export const BlogPost = WithLayout(function Page({
 			paddingTop={{ base: '1rem', md: '3rem' }}
 			paddingBottom="10rem"
 			width="100%"
-			maxWidth="700px"
+			maxWidth="900px"
 			marginInline="auto"
 			gap={0}
 		>
-			<Heading fontSize="32px" margin={0} marginBottom=".8rem">
+			<Heading fontSize="2.4rem" lineHeight="3rem" margin={0} marginBottom=".8rem">
 				{title}
 			</Heading>
 
-			<Text variant="description" width="max-content" marginBottom="1rem">
+			<Text
+				variant="description"
+				width="max-content"
+				marginBottom="1rem"
+				fontSize="1rem"
+			>
 				{new Intl.DateTimeFormat('en', {
 					year: 'numeric',
 					month: 'long',
@@ -82,7 +87,12 @@ export const BlogPost = WithLayout(function Page({
 			<Box as="hr" width="100%" />
 
 			<HStack align="center" justify="center" width="100%" marginBlock="3rem">
-				<Link href="/blog" marginBottom="1.5rem" fontWeight="500" fontSize="20px">
+				<Link
+					href="/blog"
+					marginBottom="1.5rem"
+					fontWeight="500"
+					fontSize="1.4rem"
+				>
 					<HStack>
 						<Box as={FaBolt} boxSize=".8rem" />
 						<span>Go to all posts</span>
