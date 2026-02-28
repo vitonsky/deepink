@@ -29,3 +29,13 @@ jobs:
       - name: Build
         working-directory: packages/site
         run: npm run build
+
+      - name: "Deploy to Cloudflare Pages"
+        uses: andykenward/github-actions-cloudflare-pages@v3.0.0
+        with:
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          cloudflare-project-name: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          directory: packages/site/dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-environment: ${{ (github.ref == 'refs/heads/main' && 'production') || 'preview' }}
