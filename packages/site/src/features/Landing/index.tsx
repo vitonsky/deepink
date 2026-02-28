@@ -114,20 +114,35 @@ export default WithLayout(() => {
 						as="h2"
 						m={0}
 						fontWeight="500"
-						fontSize="42px"
-						lineHeight="1.1"
+						fontSize={{ base: '2.8rem', md: '3.8rem' }}
+						lineHeight={{ base: '2.9rem', md: '3.9rem' }}
 						color="brand.heroHeader"
 					>
 						{t('hero.title')}
 					</Heading>
-					<Text fontSize="22px" m={0} color="brand.secondary">
+					<Text
+						fontSize={{ base: '1.6rem', md: '2rem' }}
+						lineHeight={{ base: '2.6rem', md: '2.8rem' }}
+						m={0}
+						color="brand.secondary"
+					>
 						<Trans t={t} i18nKey="hero.subtitle" />
 					</Text>
 					<HStack gap="0.8rem">
-						<Link href={localePath('/download')} variant="button-primary">
+						<Link
+							href={localePath('/download')}
+							variant="button-primary"
+							fontSize={{ base: '1.1rem', md: '1.3rem' }}
+							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
+						>
 							{t('hero.button.get')}
 						</Link>
-						<Link href={localePath('/#features')} variant="button-secondary">
+						<Link
+							href={localePath('/#features')}
+							variant="button-secondary"
+							fontSize={{ base: '1.1rem', md: '1.3rem' }}
+							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
+						>
 							{t('hero.button.features')}
 						</Link>
 					</HStack>
@@ -145,15 +160,16 @@ export default WithLayout(() => {
 
 			{/* Summary Section */}
 			<Stack gap="2rem" my="5rem" direction={{ base: 'column', md: 'row' }}>
-				<VStack gap="2rem" align="start">
+				<VStack gap="3rem" align="start">
 					{highlights.map((feature) => (
-						<VStack key={feature.title} gap="0.5rem" align="start">
-							<Heading as="h3" m={0} fontSize="22px" fontWeight="500">
+						<VStack key={feature.title} gap="1rem" align="start">
+							<Heading as="h3" m={0} fontSize="1.8rem" fontWeight="500">
 								{feature.title}
 							</Heading>
 							<Text
 								m={0}
-								fontSize="18px"
+								fontSize="1.4rem"
+								lineHeight="2rem"
 								color="brand.secondary"
 								whiteSpace="pre-line"
 							>
@@ -179,6 +195,8 @@ export default WithLayout(() => {
 							width="100%"
 							maxW={{ base: '250px', md: '100%' }}
 							textAlign="center"
+							fontSize={{ base: '1.1rem', md: '1.3rem' }}
+							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
 						>
 							{t('highlights.cta.button')}
 						</Link>
@@ -192,15 +210,21 @@ export default WithLayout(() => {
 				<VStack
 					mb="3rem"
 					align="start"
-					gap="1rem"
+					gap="2rem"
 					w="100%"
 					id="features"
 					scrollMarginBlock="3rem"
 				>
-					<Heading as="h3" fontSize="32px" fontWeight="500" m={0}>
+					<Heading
+						as="h3"
+						fontSize="3.2rem"
+						lineHeight="2.9rem"
+						fontWeight="500"
+						m={0}
+					>
 						{t('features.intro.title')}
 					</Heading>
-					<Text fontSize="22px" color="brand.secondary">
+					<Text fontSize="2rem" lineHeight="2.8rem" color="brand.secondary">
 						{t('features.intro.text')}
 					</Text>
 					<Separator width="100%" />
@@ -212,7 +236,8 @@ export default WithLayout(() => {
 							<Heading
 								as="h3"
 								m={0}
-								fontSize="22px"
+								fontSize="2rem"
+								lineHeight="2.8rem"
 								fontWeight="500"
 								mb="0.3rem"
 							>
@@ -220,7 +245,8 @@ export default WithLayout(() => {
 							</Heading>
 							<Text
 								m={0}
-								fontSize="18px"
+								fontSize="1.3rem"
+								lineHeight="1.8rem"
 								mb="0.5rem"
 								color="brand.secondary"
 								as="div"
@@ -258,29 +284,34 @@ export default WithLayout(() => {
 				minH="100vh"
 				align="center"
 				justify="start"
-				gap="2rem"
+				gap="3rem"
 				pt="15%"
 				boxSizing="border-box"
 			>
 				<Heading
 					as="h3"
 					m={0}
-					maxW={{ base: undefined, md: '70%' }}
-					fontSize="42px"
-					lineHeight="1.1"
+					fontSize={{ base: '2.8rem', md: '3.8rem' }}
+					lineHeight={{ base: '2.9rem', md: '3.9rem' }}
 					textAlign="center"
 				>
 					{t('cta.title')}
 				</Heading>
 				<Text
 					maxW={{ base: undefined, md: '60%' }}
-					fontSize="22px"
+					fontSize={{ base: '1.6rem', md: '2rem' }}
+					lineHeight={{ base: '2.6rem', md: '2.8rem' }}
 					textAlign="center"
 					m={0}
 				>
 					{t('cta.text')}
 				</Text>
-				<Link href={localePath('/download')} variant="button-primary">
+				<Link
+					href={localePath('/download')}
+					variant="button-primary"
+					fontSize={{ base: '1.4rem', md: '1.6rem' }}
+					lineHeight={{ base: '2rem', md: '2.2rem' }}
+				>
 					{t('cta.button')}
 				</Link>
 			</VStack>

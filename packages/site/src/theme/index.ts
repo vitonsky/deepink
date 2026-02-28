@@ -101,6 +101,9 @@ const customConfig = defineConfig({
 				body: {
 					value: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Roboto, Inter, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 				},
+				heading: {
+					value: `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Inter", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
+				},
 			},
 		},
 		semanticTokens: {
