@@ -86,7 +86,11 @@ export const PropertiesForm = <T extends OptionObject[]>({
 					return (
 						<VStack key={id} as="label" align="start" w="100%" gap="0.3rem">
 							<Text paddingBottom=".2rem">{label}</Text>
-							<Input {...register(id)} placeholder={placeholder} />
+							<Input
+								{...register(id)}
+								placeholder={placeholder}
+								isDisabled={isPending}
+							/>
 							{error && <Text color="message.error">{error.message}</Text>}
 						</VStack>
 					);
