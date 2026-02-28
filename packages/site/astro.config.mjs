@@ -1,5 +1,5 @@
 /* eslint-disable @cspell/spellchecker */
-/* eslint-disable import/no-unresolved */
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import path from 'node:path';

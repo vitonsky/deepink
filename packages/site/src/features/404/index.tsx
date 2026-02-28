@@ -4,7 +4,6 @@ import { VStack } from '@chakra-ui/react';
 import { WithLayout } from '../../components/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
-import { CONTACT_EMAIL } from '../../config';
 
 export default WithLayout(() => {
 	return (
@@ -26,7 +25,7 @@ export default WithLayout(() => {
 				Our system have logged the missing page.
 				<br />
 				If something seems broken{' '}
-				<Link href={`mailto:${CONTACT_EMAIL}`} variant="native">
+				<Link href="mailto:contact@deepink.io" variant="native">
 					let us know
 				</Link>
 				.

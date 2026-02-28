@@ -17,7 +17,6 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
-import { CHANGELOG_URL } from '../../config';
 import { createI18nInstance } from '../../i18n/createI18nInstance';
 import type { i18nPageContext } from '../../i18n/types';
 import { CSS_RESET_CLASS_NAME } from '../../theme/constants';
@@ -27,6 +26,8 @@ import { Link } from '../Link';
 import { LocaleContext, useLocalePath } from '../Locale';
 import { Text } from '../Text';
 import { Logo } from './Logo';
+
+export const CHANGELOG_URL = 'https://github.com/vitonsky/deepink/releases';
 
 type SimpleLink = {
 	text: string;
