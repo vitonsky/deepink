@@ -97,7 +97,7 @@ export const WorkspaceCreatePopup = () => {
 							submitButtonText="Add"
 							cancelButtonText="Cancel"
 							onCancel={onClose}
-							isDisabled={isPending}
+							isPending={isPending}
 						/>
 					</Box>
 				</VStack>
