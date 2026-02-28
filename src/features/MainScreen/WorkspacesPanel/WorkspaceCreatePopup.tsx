@@ -74,7 +74,7 @@ export const WorkspaceCreatePopup = () => {
 									.create({ name })
 									.then(async (workspaceId) => {
 										// Synchronize immediately after creation to prevent workspace loss
-										// if the user closes the app before the next automatic sync
+										// if the user closes the app before the automatic sync
 										await db.sync();
 
 										onClose();
