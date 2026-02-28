@@ -13,15 +13,20 @@ We live in the age of computers. Computers contain a lot of insights about their
 
 There are people who know this and actively exploit that fact for corporate spying, blackmail, hacking, and phishing based on personal profiling, targeted marketing spam, etc.
 
-Your personal notes may be copied along with your entire disk by a random police officer at an airport or in the course of an insignificant investigation. Then your personal life will be analyzed, and any insights found may be used against you.
+Your personal notes [may be copied](https://www.theguardian.com/world/2014/jul/18/-sp-edward-snowden-nsa-whistleblower-interview-transcript) along with your entire disk by a random police officer at an airport or in the course of an insignificant investigation. Then your personal life will be analyzed, and any insights found may be used against you.
 
 Your personal photos and other data may be stolen by some random software you’ve installed. Did you know that “anti-virus” software can send any of your files to remote servers “with the intention to detect threats”?
 
-Most note-taking apps just ignore this reality, so users of such apps are actually in the same situation as a child with a physical diary where they write down their real personal insights. Those insights will remain “personal” only if their parents are fair and don’t read the diary in secret.
+As Edward Snowden said in a 2014 [interview with The Guardian](https://www.theguardian.com/world/2014/jul/18/-sp-edward-snowden-nsa-whistleblower-interview-transcript):
+> Many of the people searching through the haystacks were young, enlisted guys and … 18 to 22 years old. They’ve suddenly been thrust into a position of extraordinary responsibility where they now have access to all your private records. In the course of their daily work they stumble across something that is completely unrelated to their work, for example an intimate nude photo of someone in a sexually compromising situation but they’re extremely attractive. So what do they do? They turn around in their chair and they show a co-worker. And their co-worker says: “Oh, hey, that’s great. Send that to Bill down the way.” And then Bill sends it to George, George sends it to Tom and sooner or later this person’s whole life has been seen by all of these other people. Anything goes, more or less. You’re in a vaulted space. Everybody has sort of similar clearances, everybody knows everybody. It’s a small world.
+
+Most note-taking apps just ignore this reality, so users of such apps are basically in the same situation as a child with a physical diary where they write down their private thoughts — feelings, fears, loves, disappointments, disillusionments, and other deeply personal insights. 
+
+Those insights will remain “personal” only if their parents are fair and don’t read the diary in secret. In fact, nothing stops them from reading it, not even a cute lock.
 
 ## Why Deepink?
 
-Deepink admits this reality and protects its users.
+Deepink admits this reality and protects its users by default.
 
 It encrypts your vault and doesn’t make you think about the details.
 
