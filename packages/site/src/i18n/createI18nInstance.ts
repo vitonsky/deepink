@@ -11,6 +11,8 @@ export function createI18nInstance(
 	const instance = createInstance();
 
 	instance.use(initReactI18next).init({
+		// https://www.locize.com/docs/general-questions/why-am-i-seeing-a-support-notice-for-i18next/
+		showSupportNotice: false,
 		lng: lang,
 		fallbackLng: 'en',
 		resources: {
