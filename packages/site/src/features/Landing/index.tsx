@@ -187,15 +187,21 @@ export default WithLayout(() => {
 				>
 					<TheRock maxW="300px" width={{ base: '350px', md: '100%' }} />
 
-					<VStack align="center" gap="0.5rem" width="100%">
+					<VStack
+						align="center"
+						gap="1rem"
+						width="100%"
+						fontSize={{ base: '1.1rem', md: '1.3rem' }}
+						lineHeight={{ base: '1.3rem', md: '1.8rem' }}
+					>
 						<Link
 							href={localePath('/download')}
 							variant="button-primary"
 							width="100%"
 							maxW={{ base: '250px', md: '100%' }}
 							textAlign="center"
-							fontSize={{ base: '1.1rem', md: '1.3rem' }}
-							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
+							fontSize="inherit"
+							lineHeight="inherit"
 						>
 							{t('highlights.cta.button')}
 						</Link>
