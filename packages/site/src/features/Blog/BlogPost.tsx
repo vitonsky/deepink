@@ -36,7 +36,7 @@ export const BlogPost = WithLayout(function Page({
 				variant="description"
 				width="max-content"
 				marginBottom="1rem"
-				fontSize="1rem"
+				fontSize="1.2rem"
 				suppressHydrationWarning
 			>
 				{new Intl.DateTimeFormat('en', {
@@ -48,10 +48,11 @@ export const BlogPost = WithLayout(function Page({
 
 			<Box width="100%">{children}</Box>
 
-			<HStack width="100%" marginTop="3rem" marginBottom="1rem">
-				<Text variant="description" marginInlineEnd=".5rem">
+			<HStack width="100%" marginTop="3rem" marginBottom="1rem" fontSize="1.2rem">
+				<Text variant="description" marginInlineEnd=".5rem" fontSize="inherit">
 					Share this post
 				</Text>
+
 				<Link
 					href={`http://x.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`}
 					title="Share this on Twitter"

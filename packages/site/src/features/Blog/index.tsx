@@ -17,10 +17,10 @@ export default WithLayout(function Page({ posts }: { posts: BlogPostData[] }) {
 			width="100%"
 		>
 			<VStack align="start" width="100%" paddingLeft={{ md: '200px' }}>
-				<Heading fontSize="38px" marginBottom="1rem">
+				<Heading fontSize="3rem" marginBottom="1rem">
 					Blog posts
 				</Heading>
-				<Text variant="description" fontSize="22px">
+				<Text variant="description" fontSize="2rem">
 					What's new with Deepink?
 				</Text>
 			</VStack>
@@ -53,6 +53,7 @@ export default WithLayout(function Page({ posts }: { posts: BlogPostData[] }) {
 								<Text
 									variant="description"
 									width="max-content"
+									fontSize="1.2rem"
 									suppressHydrationWarning
 								>
 									{new Intl.DateTimeFormat('en', {
@@ -81,22 +82,31 @@ export default WithLayout(function Page({ posts }: { posts: BlogPostData[] }) {
 										/>
 									</Link>
 								)}
+
 								<Heading
 									as="h2"
 									margin={0}
-									fontSize="28px"
+									fontSize="2.4rem"
+									lineHeight="2.8rem"
 									marginBottom=".8rem"
 								>
 									<Link href={postUrl} variant="header">
 										{title}
 									</Link>
 								</Heading>
-								<Text whiteSpace="pre-wrap">{description}</Text>
+								<Text
+									whiteSpace="pre-wrap"
+									fontSize="1.2rem"
+									lineHeight="1.8rem"
+								>
+									{description}
+								</Text>
 
 								<Link
 									href={postUrl}
 									marginTop=".5rem"
 									display={{ base: 'none', md: 'inline-block' }}
+									fontSize="1.4rem"
 								>
 									<HStack>
 										<span>Read more</span>
