@@ -48,8 +48,8 @@ export const linkRecipe = defineRecipe({
 			nav: {
 				display: 'inline-flex',
 				userSelect: 'none',
-				fontSize: '0.9rem',
-				padding: '.4rem .5rem',
+				fontSize: '1rem',
+				padding: '.4rem .8rem',
 				borderRadius: '6px',
 				fontWeight: '500',
 				color: '#262423',

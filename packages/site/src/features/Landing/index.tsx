@@ -128,7 +128,7 @@ export default WithLayout(() => {
 					>
 						<Trans t={t} i18nKey="hero.subtitle" />
 					</Text>
-					<HStack gap="0.8rem">
+					<HStack gap="0.8rem" marginTop="1rem">
 						<Link
 							href={localePath('/download')}
 							variant="button-primary"
