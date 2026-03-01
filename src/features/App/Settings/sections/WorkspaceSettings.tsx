@@ -120,7 +120,7 @@ export const WorkspaceSettings = () => {
 			attachments,
 		}).fixAll();
 
-		// Delete dir with workspace
+		// Delete workspace config directory
 		const workspaceFileController = new FileController(
 			`workspaces/${currentWorkspace.workspaceId}`,
 			profileFileManager,
