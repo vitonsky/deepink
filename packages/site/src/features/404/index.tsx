@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { VStack } from '@chakra-ui/react';
 
+import { ANALYTICS_EVENT } from '../../components/analytics';
+import { useAnalytics } from '../../components/analytics/useAnalytics';
 import { WithLayout } from '../../components/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
 
 export default WithLayout(() => {
+	const analytics = useAnalytics();
+	useEffect(() => {
+		analytics.track(ANALYTICS_EVENT.PAGE_404);
+	}, [analytics]);
+
 	return (
 		<VStack minHeight="60vh" justifyContent="center" gap="3rem">
 			<VStack gap="0" textAlign="center">
