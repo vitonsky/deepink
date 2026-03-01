@@ -135,9 +135,12 @@ export default WithLayout(() => {
 							variant="button-primary"
 							fontSize={{ base: '1.1rem', md: '1.3rem' }}
 							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
-							onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD, {
-								context: 'landing-top',
-							})}
+							onClick={analytics.callback(
+								ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK,
+								{
+									context: 'Landing: Top',
+								},
+							)}
 						>
 							{t('hero.button.get')}
 						</Link>
@@ -205,9 +208,12 @@ export default WithLayout(() => {
 							textAlign="center"
 							fontSize="inherit"
 							lineHeight="inherit"
-							onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD, {
-								context: 'landing-highlights',
-							})}
+							onClick={analytics.callback(
+								ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK,
+								{
+									context: 'Landing: Highlights',
+								},
+							)}
 						>
 							{t('highlights.cta.button')}
 						</Link>
@@ -323,8 +329,8 @@ export default WithLayout(() => {
 					variant="button-primary"
 					fontSize={{ base: '1.4rem', md: '1.6rem' }}
 					lineHeight={{ base: '2rem', md: '2.2rem' }}
-					onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD, {
-						context: 'landing-cta',
+					onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK, {
+						context: 'Landing: CTA',
 					})}
 				>
 					{t('cta.button')}

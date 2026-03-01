@@ -4,6 +4,8 @@ import { BiCloudDownload } from 'react-icons/bi';
 import { FaApple, FaLinux, FaWindows } from 'react-icons/fa6';
 import { Box, Heading, HStack, SimpleGrid, VStack } from '@chakra-ui/react';
 
+import { ANALYTICS_EVENT } from '../../components/analytics';
+import { useAnalytics } from '../../components/analytics/useAnalytics';
 import { WithLayout } from '../../components/Layout';
 import { Link, LinkContext } from '../../components/Link';
 import { Text } from '../../components/Text';
@@ -70,6 +72,8 @@ export default WithLayout(function Page({
 		}[];
 	}[];
 }) {
+	const analytics = useAnalytics();
+
 	const {
 		t,
 		i18n: { language },
@@ -155,7 +159,19 @@ export default WithLayout(function Page({
 					<TheRock maxW="100%" width="350px" />
 
 					<VStack gap="1rem">
-						<Link variant="button-primary" href={downloadLink}>
+						<Link
+							variant="button-primary"
+							href={downloadLink}
+							onClick={analytics.callback(
+								ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK,
+								{
+									context: 'Download page: Download Button',
+									fileName: downloadLink
+										? downloadLink.split('/').at(-1)
+										: undefined,
+								},
+							)}
+						>
 							<Trans
 								t={t}
 								i18nKey="main.download"
@@ -218,6 +234,13 @@ export default WithLayout(function Page({
 											key={link.url}
 											href={link.url}
 											fontSize="inherit"
+											onClick={analytics.callback(
+												ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK,
+												{
+													context: `Download page: Platform - ${section.title}`,
+													fileName: link.url.split('/').at(-1),
+												},
+											)}
 										>
 											<HStack gap=".3em">
 												<Box as={BiCloudDownload} />
