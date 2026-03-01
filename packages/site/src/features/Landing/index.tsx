@@ -11,6 +11,8 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 
+import { ANALYTICS_EVENT } from '../../components/analytics';
+import { useAnalytics } from '../../components/analytics/useAnalytics';
 import { WithLayout } from '../../components/Layout';
 import { Link } from '../../components/Link';
 import { useLocalePath } from '../../components/Locale';
@@ -25,9 +27,8 @@ import remindersScreenshot from './screenshots/reminders.png';
 import tagsScreenshot from './screenshots/tags.png';
 import workspacesScreenshot from './screenshots/workspaces.png';
 
-// TODO: add analytics
-// TODO: add docs
 export default WithLayout(() => {
+	const analytics = useAnalytics();
 	const localePath = useLocalePath();
 
 	const { t } = useTranslation('landing');
@@ -134,6 +135,9 @@ export default WithLayout(() => {
 							variant="button-primary"
 							fontSize={{ base: '1.1rem', md: '1.3rem' }}
 							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
+							onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD, {
+								context: 'landing-top',
+							})}
 						>
 							{t('hero.button.get')}
 						</Link>
@@ -201,6 +205,9 @@ export default WithLayout(() => {
 							textAlign="center"
 							fontSize="inherit"
 							lineHeight="inherit"
+							onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD, {
+								context: 'landing-highlights',
+							})}
 						>
 							{t('highlights.cta.button')}
 						</Link>
@@ -316,6 +323,9 @@ export default WithLayout(() => {
 					variant="button-primary"
 					fontSize={{ base: '1.4rem', md: '1.6rem' }}
 					lineHeight={{ base: '2rem', md: '2.2rem' }}
+					onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD, {
+						context: 'landing-cta',
+					})}
 				>
 					{t('cta.button')}
 				</Link>

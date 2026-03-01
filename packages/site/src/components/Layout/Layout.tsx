@@ -21,6 +21,7 @@ import { createI18nInstance } from '../../i18n/createI18nInstance';
 import type { i18nPageContext } from '../../i18n/types';
 import { CSS_RESET_CLASS_NAME } from '../../theme/constants';
 
+import { AnalyticsProvider } from '../analytics/react';
 import ChakraProvider from '../ChakraProvider';
 import { Link } from '../Link';
 import { LocaleContext, useLocalePath } from '../Locale';
@@ -415,7 +416,9 @@ export default function Layout({ children, i18n }: LayoutProps) {
 				i18n={createI18nInstance(i18n?.language ?? 'en', i18n?.resources ?? {})}
 			>
 				<LocaleContext.Provider value={i18n.language}>
-					<LayoutContent {...i18n}>{children}</LayoutContent>
+					<AnalyticsProvider>
+						<LayoutContent {...i18n}>{children}</LayoutContent>
+					</AnalyticsProvider>
 				</LocaleContext.Provider>
 			</I18nextProvider>
 		</ChakraProvider>
