@@ -20,7 +20,7 @@ export const enableEngagementTracking = (plausible: Plausible) => {
 				Math.round((maxScroll / getMaxScroll()) * 100),
 			);
 
-			plausible.sendEvent('scroll', {
+			plausible.sendEvent('Page scrolled', {
 				props: {
 					scrollDepth,
 					timeOnPage: Math.round(engagementTracker.getTotalTime() / 1000),

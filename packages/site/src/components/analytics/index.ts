@@ -9,6 +9,15 @@ import {
 } from 'plausible-client';
 
 import { enableEngagementTracking } from './enableEngagementTracking';
+import { enableSessionScoring } from './enableSessionScoring';
+
+const getSessionId = () => {
+	try {
+		return crypto.randomUUID();
+	} catch {
+		return 'fallback-' + String(Math.round(Math.random() * 10000000000));
+	}
+};
 
 export const createPlausibleInstance = () => {
 	const plausible = new Plausible({
@@ -28,10 +37,15 @@ export const createPlausibleInstance = () => {
 			return transformers([
 				userId(),
 				(event) => {
+					let sessionId = sessionStorage.getItem('sessionId');
+					if (!sessionId) {
+						sessionId = getSessionId();
+						sessionStorage.setItem('sessionId', sessionId);
+					}
+
 					event.props = {
 						...event.props,
-						language: navigator.language,
-						languages: navigator.languages.join(','),
+						sessionId,
 					};
 					return event;
 				},
@@ -39,12 +53,13 @@ export const createPlausibleInstance = () => {
 		},
 	});
 
-	const cleanups: ((() => void) | undefined)[] = [];
+	const cleanups: ((() => void) | void)[] = [];
 
 	if (typeof window !== 'undefined') {
 		cleanups.push(enableAutoOutboundTracking(plausible));
 		cleanups.push(enableAutoPageviews(plausible));
 		cleanups.push(enableEngagementTracking(plausible));
+		cleanups.push(enableSessionScoring(plausible));
 	}
 
 	return {
@@ -56,12 +71,25 @@ export const createPlausibleInstance = () => {
 };
 
 export enum ANALYTICS_EVENT {
-	DOWNLOAD = 'download',
+	DOWNLOAD_BUTTON_CLICK = 'Download button click',
+	LANGUAGE_VERSION_CLICK = 'Language version click',
+	PAGE_404 = '404',
+	SHARE_POST = 'Share click',
+	MOBILE_MENU = 'Mobile menu click',
 }
 
 export type ANALYTICS_EVENT_PAYLOADS = {
-	[ANALYTICS_EVENT.DOWNLOAD]: {
+	[ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK]: {
 		context: string;
 		fileName?: string;
+	};
+	[ANALYTICS_EVENT.LANGUAGE_VERSION_CLICK]: {
+		languageCode: string;
+	};
+	[ANALYTICS_EVENT.SHARE_POST]: {
+		sharePlatform: string;
+	};
+	[ANALYTICS_EVENT.MOBILE_MENU]: {
+		state: 'opened' | 'closed';
 	};
 };
