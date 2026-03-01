@@ -20,7 +20,7 @@ export const enableEngagementTracking = (plausible: Plausible) => {
 				Math.round((maxScroll / getMaxScroll()) * 100),
 			);
 
-			plausible.sendEvent('Page scrolled', {
+			plausible.sendEvent('Page engagement', {
 				props: {
 					scrollDepth,
 					timeOnPage: Math.round(engagementTracker.getTotalTime() / 1000),
@@ -31,7 +31,7 @@ export const enableEngagementTracking = (plausible: Plausible) => {
 		{ leading: true, maxWait: 3000 },
 	);
 
-	const onScroll = () => {
+	const trackUserAction = () => {
 		// Ignore events if window is inactive
 		if (!engagementTracker.isActive()) return;
 
@@ -40,10 +40,11 @@ export const enableEngagementTracking = (plausible: Plausible) => {
 	};
 
 	engagementTracker.start();
-	const visibilityChangeCleanup = engagementTracker.onVisibilityChanged(onScroll);
-	window.addEventListener('scroll', onScroll);
+	const visibilityChangeCleanup =
+		engagementTracker.onVisibilityChanged(trackUserAction);
+	window.addEventListener('scroll', trackUserAction);
 	return () => {
-		window.removeEventListener('scroll', onScroll);
+		window.removeEventListener('scroll', trackUserAction);
 		visibilityChangeCleanup();
 		engagementTracker.stop();
 	};
