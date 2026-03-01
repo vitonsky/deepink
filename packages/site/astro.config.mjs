@@ -66,9 +66,7 @@ export default defineConfig({
 				replacesTitle: true,
 				src: './src/components/Layout/logo.svg',
 			},
-			customCss: [
-				'./src/styles.css'
-			],
+			customCss: ['./src/styles.css'],
 			social: [
 				{
 					icon: 'cloud-download',
@@ -87,6 +85,10 @@ export default defineConfig({
 					autogenerate: { directory: 'introduction' },
 				},
 			],
+
+			components: {
+				PageFrame: './src/components/PageFrame.astro',
+			},
 		}),
 		react(),
 	],
