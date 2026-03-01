@@ -14,6 +14,7 @@ import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { RelaxedInput } from '@components/RelaxedInput';
+import { FileController } from '@core/features/files/FileController';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
@@ -79,6 +80,10 @@ export const WorkspaceSettings = () => {
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
 
+	const {
+		profile: { files: profileFileManager },
+	} = useProfileControls();
+
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
 		const nextWorkspace = workspaces.workspaces.find(
@@ -115,6 +120,13 @@ export const WorkspaceSettings = () => {
 			attachments,
 		}).fixAll();
 
+		// Delete dir with workspace
+		const workspaceFileController = new FileController(
+			`workspaces/${currentWorkspace.workspaceId}`,
+			profileFileManager,
+		);
+		await workspaceFileController.delete();
+
 		dispatch(
 			workspacesApi.setActiveWorkspace({
 				workspaceId: nextWorkspace.id,
@@ -132,6 +144,7 @@ export const WorkspaceSettings = () => {
 		dispatch,
 		files,
 		filesController,
+		profileFileManager,
 		notes,
 		tags,
 		telemetry,
