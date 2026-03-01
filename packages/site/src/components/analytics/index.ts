@@ -74,7 +74,7 @@ export enum ANALYTICS_EVENT {
 	DOWNLOAD_BUTTON_CLICK = 'Download button click',
 	LANGUAGE_VERSION_CLICK = 'Language version click',
 	PAGE_404 = '404',
-	SHARE_POST = 'Share click',
+	SHARE_LINK = 'Share link click',
 	MOBILE_MENU = 'Mobile menu click',
 }
 
@@ -86,8 +86,8 @@ export type ANALYTICS_EVENT_PAYLOADS = {
 	[ANALYTICS_EVENT.LANGUAGE_VERSION_CLICK]: {
 		languageCode: string;
 	};
-	[ANALYTICS_EVENT.SHARE_POST]: {
-		sharePlatform: string;
+	[ANALYTICS_EVENT.SHARE_LINK]: {
+		method: string;
 	};
 	[ANALYTICS_EVENT.MOBILE_MENU]: {
 		state: 'opened' | 'closed';

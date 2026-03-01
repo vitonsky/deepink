@@ -2,6 +2,8 @@ import React, { type PropsWithChildren } from 'react';
 import { FaBolt, FaEnvelope, FaLinkedin, FaReddit, FaTwitter } from 'react-icons/fa6';
 import { Box, Heading, HStack, VStack } from '@chakra-ui/react';
 
+import { ANALYTICS_EVENT } from '../../components/analytics';
+import { useAnalytics } from '../../components/analytics/useAnalytics';
 import { WithLayout } from '../../components/Layout';
 import { Link } from '../../components/Link';
 import { Text } from '../../components/Text';
@@ -18,6 +20,8 @@ export const BlogPost = WithLayout(function Page({
 	meta: BlogPostData;
 	url: string;
 }>) {
+	const analytics = useAnalytics();
+
 	return (
 		<VStack
 			align="start"
@@ -58,6 +62,9 @@ export const BlogPost = WithLayout(function Page({
 					title="Share this on Twitter"
 					target="_blank"
 					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'Twitter',
+					})}
 				>
 					<Box boxSize="1.4rem" as={FaTwitter} />
 				</Link>
@@ -66,6 +73,9 @@ export const BlogPost = WithLayout(function Page({
 					title="Share this on Reddit"
 					target="_blank"
 					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'Reddit',
+					})}
 				>
 					<Box boxSize="1.4rem" as={FaReddit} />
 				</Link>
@@ -74,6 +84,9 @@ export const BlogPost = WithLayout(function Page({
 					title="Share this on LinkedIn"
 					target="_blank"
 					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'LinkedIn',
+					})}
 				>
 					<Box boxSize="1.4rem" as={FaLinkedin} />
 				</Link>
@@ -81,6 +94,9 @@ export const BlogPost = WithLayout(function Page({
 					href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`}
 					title="Share this via email"
 					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'Email',
+					})}
 				>
 					<Box boxSize="1.4rem" as={FaEnvelope} />
 				</Link>
