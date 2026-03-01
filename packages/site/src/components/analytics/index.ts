@@ -3,7 +3,7 @@ import {
 	enableAutoPageviews,
 	filters,
 	Plausible,
-	skipByFlag,
+	skipForHosts,
 	transformers,
 	userId,
 } from 'plausible-client';
@@ -26,10 +26,7 @@ export const createPlausibleInstance = () => {
 		filter: (event, eventName) => {
 			if (typeof window === 'undefined') return false;
 
-			return filters(
-				skipByFlag('developer'),
-				// skipForHosts(['localhost']),
-			)(event, eventName);
+			return filters(skipForHosts(['localhost']))(event, eventName);
 		},
 		transform: (event, eventName) => {
 			if (typeof window === 'undefined') return event;
