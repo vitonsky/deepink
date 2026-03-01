@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import { z } from 'zod';
 import {
@@ -39,8 +39,6 @@ export const WorkspaceCreatePopup = () => {
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
 
-	const [isPending, setIsPending] = useState(false);
-
 	const { update: updateWorkspaces } = useWorkspacesList();
 
 	return (
@@ -67,20 +65,13 @@ export const WorkspaceCreatePopup = () => {
 								},
 							]}
 							validatorScheme={workspacePropsValidator}
-							onUpdate={({ name }) => {
-								setIsPending(true);
+							onUpdate={async ({ name }) => {
+								onClose();
 
 								workspacesManager
 									.create({ name })
 									.then(async (workspaceId) => {
-										// Synchronize immediately after creation to prevent workspace loss
-										// if the user closes the app before the automatic sync
-										await db.sync();
-
-										onClose();
 										await updateWorkspaces();
-
-										setIsPending(false);
 
 										dispatch(
 											workspacesApi.setActiveWorkspace({
@@ -92,12 +83,15 @@ export const WorkspaceCreatePopup = () => {
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
 										);
+
+										// Synchronize immediately after creation to prevent workspace loss
+										// if the user closes the app before the automatic sync
+										await db.sync();
 									});
 							}}
 							submitButtonText="Add"
 							cancelButtonText="Cancel"
 							onCancel={onClose}
-							isPending={isPending}
 						/>
 					</Box>
 				</VStack>
