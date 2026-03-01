@@ -3,11 +3,7 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { useProfileControls } from '@features/App/Profile';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import {
-	createWorkspaceObject,
-	selectWorkspaces,
-	workspacesApi,
-} from '@state/redux/profiles/profiles';
+import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
 
 export const useWorkspacesList = () => {
 	const dispatch = useAppDispatch();
@@ -25,44 +21,13 @@ export const useWorkspacesList = () => {
 	const update = useCallback(async () => {
 		const updatedWorkspaces = await workspacesManager.getList();
 
-		const newWorkspaces = updatedWorkspaces.filter(
-			(workspace) => !workspaces.some(({ id }) => id === workspace.id),
-		);
-
-		const mergedWorkspaces = structuredClone({
-			...Object.fromEntries(
-				workspaces.map((workspace) => [workspace.id, workspace]),
-			),
-			...Object.fromEntries(
-				newWorkspaces.map((workspace) => [
-					workspace.id,
-					createWorkspaceObject(workspace),
-				]),
-			),
-		});
-
-		// Update names
-		updatedWorkspaces.forEach((workspace) => {
-			mergedWorkspaces[workspace.id].name = workspace.name;
-		});
-
-		// Delete workspaces that no more exists
-		for (const id in mergedWorkspaces) {
-			const isWorkspaceExists = updatedWorkspaces.some(
-				(workspace) => workspace.id === id,
-			);
-			if (!isWorkspaceExists) {
-				delete mergedWorkspaces[id];
-			}
-		}
-
 		dispatch(
-			workspacesApi.setWorkspaces({
+			workspacesApi.updateWorkspacesList({
 				profileId,
-				workspaces: mergedWorkspaces,
+				updatedWorkspaces,
 			}),
 		);
-	}, [dispatch, profileId, workspaces, workspacesManager]);
+	}, [dispatch, profileId, workspacesManager]);
 
 	return { workspaces, update };
 };
