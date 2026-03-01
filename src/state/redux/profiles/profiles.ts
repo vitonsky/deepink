@@ -254,7 +254,6 @@ export const profilesSlice = createSlice({
 			if (workspaceId) {
 				const workspace = profile.workspaces[workspaceId];
 				if (workspace && !workspace.touched) {
-					console.log('touch');
 					workspace.touched = true;
 				}
 			}
