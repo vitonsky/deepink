@@ -12,17 +12,18 @@ export const useAnalytics = () => {
 	const track = useCallback(
 		<T extends ANALYTICS_EVENT>(
 			eventName: T,
-			props: T extends keyof ANALYTICS_EVENT_PAYLOADS
-				? ANALYTICS_EVENT_PAYLOADS[T]
-				: Record<string, string | number | null | undefined>,
+			...rest: T extends keyof ANALYTICS_EVENT_PAYLOADS
+				? [ANALYTICS_EVENT_PAYLOADS[T]]
+				: [Record<string, string | number | null | undefined>] | []
 		) => {
+			const [props = {}] = rest;
 			plausible.trackEvent(eventName, { props });
 		},
 		[plausible],
 	);
 
 	const callback =
-		(...args: Parameters<typeof track>) =>
+		<T extends ANALYTICS_EVENT>(...args: Parameters<typeof track<T>>) =>
 		() => {
 			track(...args);
 		};

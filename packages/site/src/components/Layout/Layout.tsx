@@ -21,7 +21,9 @@ import { createI18nInstance } from '../../i18n/createI18nInstance';
 import type { i18nPageContext } from '../../i18n/types';
 import { CSS_RESET_CLASS_NAME } from '../../theme/constants';
 
+import { ANALYTICS_EVENT } from '../analytics';
 import { AnalyticsProvider } from '../analytics/react';
+import { useAnalytics } from '../analytics/useAnalytics';
 import ChakraProvider from '../ChakraProvider';
 import { Link } from '../Link';
 import { LocaleContext, useLocalePath } from '../Locale';
@@ -44,6 +46,8 @@ const LayoutContent = ({
 	altVersions,
 	children,
 }: PropsWithChildren<Partial<Pick<i18nPageContext, 'altVersions'>>>) => {
+	const analytics = useAnalytics();
+
 	const localePath = useLocalePath();
 
 	const {
@@ -83,6 +87,10 @@ const LayoutContent = ({
 									variant="ghost"
 									display={{ base: undefined, md: 'none' }}
 									marginInlineStart="auto"
+									onClick={analytics.callback(
+										ANALYTICS_EVENT.MOBILE_MENU,
+										{ state: 'opened' },
+									)}
 								>
 									<Box as={IoIosMenu} boxSize="100%" />
 								</IconButton>
@@ -104,7 +112,14 @@ const LayoutContent = ({
 												</Link>
 											</Drawer.Title>
 											<Drawer.CloseTrigger asChild>
-												<CloseButton size="xs" display="flex" />
+												<CloseButton
+													size="xs"
+													display="flex"
+													onClick={analytics.callback(
+														ANALYTICS_EVENT.MOBILE_MENU,
+														{ state: 'closed' },
+													)}
+												/>
 											</Drawer.CloseTrigger>
 										</Drawer.Header>
 										<Drawer.Body
@@ -391,6 +406,10 @@ const LayoutContent = ({
 									{index > 0 ? ' | ' : undefined}
 									<Link
 										href={version.url}
+										onClick={analytics.callback(
+											ANALYTICS_EVENT.LANGUAGE_VERSION_CLICK,
+											{ languageCode: version.langCode },
+										)}
 										fontWeight={
 											version.langCode === language
 												? 'bold'
