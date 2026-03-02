@@ -43,11 +43,8 @@ export const useNotesData = ({ noteIds }: { noteIds: NoteId[] }) => {
 	// Re-fetch note data by changes
 	const eventBus = useEventBus();
 	useEffect(() => {
-		if (notesData.size() === 0) return;
-
 		const onNoteUpdated = (noteId: NoteId) => {
 			if (notesData.has(noteId)) {
-				notesData.delete([noteId]);
 				loadNotesData();
 			}
 		};
