@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import {
-	Box,
+	Button,
+	HStack,
+	Input,
 	ModalBody,
 	ModalCloseButton,
 	ModalHeader,
@@ -12,7 +14,6 @@ import {
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
-import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -21,9 +22,7 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useWorkspacesList } from './useWorkspacesList';
 
-export const workspacePropsValidator = z.object({
-	name: z.string().min(1, 'Name must not be empty'),
-});
+export const workspaceNameValidator = z.string().trim().min(1, 'Name must not be empty');
 
 export const WorkspaceCreatePopup = () => {
 	const telemetry = useTelemetryTracker();
@@ -41,7 +40,53 @@ export const WorkspaceCreatePopup = () => {
 
 	const { update: updateWorkspaces } = useWorkspacesList();
 
+	const inputNameRef = useRef<HTMLInputElement | null>(null);
+
+	const [workspaceName, setWorkspaceName] = useState<string>('');
 	const [isPending, setIsPending] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+	const onClick = useCallback(async () => {
+		try {
+			const validName = workspaceNameValidator.parse(workspaceName);
+			setIsPending(true);
+
+			const workspaceId = await workspacesManager.create({ name: validName });
+
+			// Synchronize immediately after creation to prevent workspace loss
+			// if the user closes the app before the automatic sync
+			await db.sync();
+
+			await updateWorkspaces();
+
+			dispatch(workspacesApi.setActiveWorkspace({ workspaceId, profileId }));
+
+			telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_ADDED);
+
+			onClose();
+		} catch (error) {
+			console.warn(error);
+			const message =
+				error instanceof ZodError
+					? error.issues[0].message
+					: 'Unable to save the workspace. Please try again.';
+
+			setErrorMessage(message);
+			inputNameRef.current?.focus();
+		} finally {
+			setIsPending(false);
+		}
+	}, [
+		db,
+		dispatch,
+		workspaceName,
+		onClose,
+		profileId,
+		telemetry,
+		updateWorkspaces,
+		workspacesManager,
+	]);
+
 	return (
 		<>
 			<ModalCloseButton />
@@ -55,7 +100,43 @@ export const WorkspaceCreatePopup = () => {
 						your notes by scope.
 					</Text>
 
-					<Box as={AutoFocusInside} w="100%">
+					<VStack as={AutoFocusInside} gap="1.5rem" w="100%" minW="350px">
+						<VStack align="start" w="100%" gap="1rem">
+							<VStack as="label" align="start" w="100%" gap="0.3rem">
+								<Text paddingBottom=".2rem">Workspace name</Text>
+								<Input
+									ref={inputNameRef}
+									value={workspaceName}
+									onChange={(evt) => {
+										setWorkspaceName(evt.target.value);
+										setErrorMessage(null);
+									}}
+									placeholder="e.g., Personal"
+									isDisabled={isPending}
+								/>
+								{errorMessage && (
+									<Text color="message.error">{errorMessage}</Text>
+								)}
+							</VStack>
+						</VStack>
+
+						<HStack w="100%" justifyContent="end">
+							<Button
+								variant="accent"
+								type="submit"
+								isDisabled={isPending}
+								onClick={onClick}
+							>
+								Add
+							</Button>
+
+							<Button onClick={onClose} isDisabled={isPending}>
+								Cancel
+							</Button>
+						</HStack>
+					</VStack>
+
+					{/* <Box as={AutoFocusInside} w="100%">
 						<PropertiesForm
 							options={[
 								{
@@ -91,6 +172,9 @@ export const WorkspaceCreatePopup = () => {
 
 										onClose();
 									})
+									.catch((error) => {
+										console.warn(error);
+									})
 									.finally(() => {
 										setIsPending(false);
 									});
@@ -100,7 +184,7 @@ export const WorkspaceCreatePopup = () => {
 							onCancel={onClose}
 							isPending={isPending}
 						/>
-					</Box>
+					</Box> */}
 				</VStack>
 			</ModalBody>
 		</>
