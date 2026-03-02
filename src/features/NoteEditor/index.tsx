@@ -9,10 +9,11 @@ import React, {
 } from 'react';
 import {
 	FaArrowLeft,
-	FaBookmark,
 	FaBoxArchive,
-	FaFlag,
 	FaHashtag,
+	FaRegStar,
+	FaStar,
+	FaThumbtack,
 	FaXmark,
 } from 'react-icons/fa6';
 import { Panel, PanelResizeHandle } from 'react-resizable-panels';
@@ -241,8 +242,8 @@ export const Note: FC<NoteEditorProps> = memo(
 							variant="ghost"
 							title={
 								note.isBookmarked
-									? 'Remove from bookmarks'
-									: 'Add to bookmarks'
+									? 'Remove from favorites'
+									: 'Add to favorites'
 							}
 							size="xs"
 							onClick={async () => {
@@ -261,7 +262,10 @@ export const Note: FC<NoteEditorProps> = memo(
 							}}
 							isActive={note.isBookmarked}
 						>
-							<FaBookmark />
+							<Box
+								as={note.isBookmarked ? FaStar : FaRegStar}
+								transform="scale(1.2)"
+							/>
 						</Button>
 						<Button
 							variant="ghost"
@@ -287,10 +291,10 @@ export const Note: FC<NoteEditorProps> = memo(
 							}}
 							isActive={note.isArchived}
 						>
-							<FaBoxArchive />
+							<Box as={FaBoxArchive} transform="scale(1.1)" />
 						</Button>
 						<Button variant="ghost" size="xs">
-							<FaFlag />
+							<Box as={FaThumbtack} transform="scale(1.1)" />
 						</Button>
 					</HStack>
 

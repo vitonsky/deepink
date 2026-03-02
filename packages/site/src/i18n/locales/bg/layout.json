@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Изтегляне",
+		"features": "Функции",
+		"docs": "Документация",
+		"blog": "Блог",
+		"changelog": "Промени"
+	},
+	"links": {
+		"followUs": {
+			"title": "Последвайте ни"
+		},
+		"introduction": {
+			"title": "Първи стъпки",
+			"content": {
+				"download": "Изтегляне",
+				"docs": "Документация",
+				"overview": "Преглед"
+			}
+		},
+		"learn": {
+			"title": "Научете повече",
+			"content": {
+				"help": "Помощ",
+				"changelog": "Промени",
+				"about": "За нас",
+				"security": "Сигурност",
+				"roadmap": "Пътна карта"
+			}
+		},
+		"resources": {
+			"title": "Ресурси",
+			"content": {
+				"terms": "Условия за ползване",
+				"privacy": "Политика за поверителност"
+			}
+		}
+	}
+}

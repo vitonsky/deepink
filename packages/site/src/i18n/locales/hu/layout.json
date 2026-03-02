@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Letöltés",
+		"features": "Funkciók",
+		"docs": "Dokumentáció",
+		"blog": "Blog",
+		"changelog": "Változásnapló"
+	},
+	"links": {
+		"followUs": {
+			"title": "Kövess minket"
+		},
+		"introduction": {
+			"title": "Első lépések",
+			"content": {
+				"download": "Letöltés",
+				"docs": "Dokumentáció",
+				"overview": "Áttekintés"
+			}
+		},
+		"learn": {
+			"title": "Tudj meg többet",
+			"content": {
+				"help": "Súgó",
+				"changelog": "Változásnapló",
+				"about": "Rólunk",
+				"security": "Biztonság",
+				"roadmap": "Fejlesztési terv"
+			}
+		},
+		"resources": {
+			"title": "Források",
+			"content": {
+				"terms": "Felhasználási feltételek",
+				"privacy": "Adatvédelmi irányelvek"
+			}
+		}
+	}
+}

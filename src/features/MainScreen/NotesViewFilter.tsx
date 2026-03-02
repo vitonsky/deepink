@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
-import { FaBookmark, FaBoxArchive, FaCompass, FaTrash } from 'react-icons/fa6';
+import { FaBoxArchive, FaCompass, FaStar, FaTrash } from 'react-icons/fa6';
+import { IconBaseProps } from 'react-icons/lib';
 import { ButtonGroup, HStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -17,8 +18,10 @@ const FilterOptions = [
 	},
 	{
 		id: NOTES_VIEW.BOOKMARK,
-		icon: FaBookmark,
-		label: 'Bookmarked notes',
+		icon: (props: IconBaseProps) => (
+			<FaStar {...props} style={{ transform: 'scale(1.1)', ...props.style }} />
+		),
+		label: 'Favorite notes',
 	},
 	{
 		id: NOTES_VIEW.ARCHIVE,

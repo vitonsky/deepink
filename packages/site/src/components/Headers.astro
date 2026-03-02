@@ -1,0 +1,59 @@
+---
+import appScreenshot from '../features/Landing/screenshots/app.png';
+import type { i18nPageContext } from '../i18n/types';
+
+export interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	url?: string;
+	alts?: i18nPageContext['altVersions'];
+}
+
+const {
+	title = 'Deepink - Snapshot your thoughts',
+	description = 'Deepink is a privacy focused note taking app with a light speed workflow. One space for everyday life, another for books, another for plans. Switch contexts in a click, keep things clean, and keep writing without overthinking where it should go.',
+	image = appScreenshot.src,
+	url = Astro.site,
+	alts = [],
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#f97316" />
+<link rel="canonical" href={canonicalUrl} />
+
+<title>{title}</title>
+<meta name="description" content={description} />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" />
+
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:image" content={image} />
+<meta property="og:url" content={url} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+
+<link rel="canonical" href={url} />
+
+<meta name="robots" content="index, follow" />
+
+<!-- Alt languages -->
+{
+	alts.map((alt) => (
+		<link
+			rel="alternate"
+			hreflang={alt.langCode}
+			href={new URL(alt.url, Astro.site).href}
+		/>
+	))
+}

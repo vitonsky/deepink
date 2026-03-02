@@ -76,7 +76,15 @@ export default tseslint.config(
 			'import/no-useless-path-segments': ['error', { noUselessIndex: true }],
 			'import/no-unresolved': [
 				'error',
-				{ ignore: ['^vitest/config', '^@docusaurus/', '^@site/', '^@assets/'] },
+				{
+					ignore: [
+						'^vitest/config',
+						'^@docusaurus/',
+						'^@site/',
+						'^@assets/',
+						'^astro:',
+					],
+				},
 			],
 			'import/export': 'off',
 			'import/namespace': 'warn',

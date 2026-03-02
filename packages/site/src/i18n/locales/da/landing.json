@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Et bedre sted for dine noter.",
+		"subtitle": "Deepink gør notetagning ergonomisk og behagelig.",
+		"button": {
+			"get": "Download Deepink",
+			"features": "Læs mere"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Et arkiv du kan stole på",
+				"text": "Alt i dit arkiv er krypteret. I modsætning til mange andre apps betyder det virkelig <0>alle dine data</0> — noteindhold, filer og metadata. Du kan vælge den algoritme, du stoler på.\n\nDeepink er en <1>open source</1>-app med kode, du selv kan verificere — ikke bare stole på."
+			},
+			"workflow": {
+				"title": "Ergonomien",
+				"text": "Deepink er bygget til at være hurtig i daglig brug, hvor friktion er fjernet fra de mest almindelige opgaver. Til de fleste opgaver kræver det <0>op til 80 % færre handlinger</0> end andre noteapps."
+			},
+			"universality": {
+				"title": "Dit arkiv rummer alt",
+				"text": "Saml alt i dit arkiv. Arbejdsområder og indlejrede tags hjælper dig med at adskille kontekster og hurtigt finde det, du har brug for — fra projektspecifikationer, kontrakter og kodestykker til bogcitater, dagbog, research og meget mere."
+			}
+		},
+		"cta": {
+			"text": "Gratis at bruge. Ingen begrænsninger.",
+			"button": "Download nu"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Strukturér dine tanker",
+			"text": "Fang en hurtig idé eller byg noget komplekst. Deepink bringer orden og fokus til alt, du skriver ned."
+		},
+		"content": {
+			"links": {
+				"title": "Links",
+				"text": "Links gør det muligt at referere til enhver note hvor som helst i dit arkiv. Forbind mødenoter med beslutninger, research med konklusioner og planer med udførelse — uden at kopiere det samme afsnit.\n\nBacklinks viser alle noter, der linker til den note, du ser på, så det er nemt at spore forbindelser og navigere naturligt i din viden.\n\nLinks holder konteksten forbundet, så relaterede noter forbliver nemme at følge."
+			},
+			"workspaces": {
+				"title": "Arbejdsområder",
+				"text": "Hold forskellige dele af dit liv adskilt uden at oprette flere arkiver.\n\nArbejdsområder skaber fokuserede rum inden for ét sikkert arkiv. Lås dit arkiv op én gang, og skift derefter mellem kontekster som Kundeprojekter, Personlig dagbog, Sundhedsnoter eller Læring — uden at blande noget sammen.\n\nHold orden og kontekst. Del din skærm med ro i sindet: privat indhold dukker ikke op ved en fejl.\n\nÉt arkiv. Klare grænser. Ingen friktion."
+			},
+			"history": {
+				"title": "Noteversioner",
+				"text": "Hver note gemmer en komplet historik over ændringer.\n\nDeepink gemmer versioner automatisk, så du kan se, hvad der blev ændret, gendanne et tidligere udkast eller følge, hvordan en idé udviklede sig over tid. Uanset om noten blev redigeret i går eller for et år siden, går intet vigtigt tabt.\n\nTidligere versioner er altid tilgængelige, når du har brug for dem."
+			},
+			"reminders": {
+				"title": "Påmindelser",
+				"text": "Knyt en påmindelse til enhver note og bliv notificeret på det rette tidspunkt.\n\nSæt opfølgningspåmindelser til mødenoter, deadlines til projektplaner, fornyelsesdatoer til dokumenter eller check-ins til personlige mål. Hver påmindelse hører til den præcise note — ikke som en separat opgave i en anden app.\n\nNår tiden er inde, åbner du noten med alle detaljer på plads.\n\nPåmindelser hjælper dig med at handle på din information — ikke bare gemme den."
+			},
+			"tags": {
+				"title": "Indlejrede tags",
+				"text": "Organisér dine noter med tags, der afspejler et klart hierarki.\n\nIndlejrede tags giver mulighed for en forælder/barn-struktur, så brede emner kan indeholde specifikke underemner. For eksempel kan Kunder indeholde individuelle kundenavne, og Økonomi kan indeholde Skat, Fakturaer og Rapporter.\n\nI modsætning til mapper er tags ikke eksklusive. En note kan have flere tags på én gang — kunde, økonomi og en tidsperiode.\n\nIndlejrede tags giver både præcision og fleksibilitet, selv når emner overlapper."
+			},
+			"encryption": {
+				"title": "Kryptering",
+				"text": "Hele arkivet er krypteret. Nogle apps krypterer kun data under synkronisering eller selve noteteksten. Deepink beskytter den fulde struktur af dit arkiv.\n\nDine noter, vedhæftede filer og metadata er ulæselige for alle andre end dig — inklusiv os. Selv filstørrelser er slørede for at reducere risikoen for analyse.\n\nDet, du gemmer, forbliver privat by design."
+			}
+		}
+	},
+	"cta": {
+		"title": "Et rum til alle dele af dit liv",
+		"text": "Saml hverdagsnoter, læsning og planer ét privat sted. Skift kontekst med et klik, hold orden og bliv ved med at skrive uden at miste dit flow.",
+		"button": "Hent Deepink"
+	}
+}

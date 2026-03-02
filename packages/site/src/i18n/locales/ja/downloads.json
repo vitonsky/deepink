@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "<0/>版をダウンロード",
+		"releaseDate": "最終更新日：{{date}}"
+	},
+	"links": {
+		"title": "対応プラットフォーム"
+	}
+}

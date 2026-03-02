@@ -1,0 +1,135 @@
+import React, { type PropsWithChildren } from 'react';
+import { FaBolt, FaEnvelope, FaLinkedin, FaReddit, FaTwitter } from 'react-icons/fa6';
+import { Box, Heading, HStack, VStack } from '@chakra-ui/react';
+
+import { ANALYTICS_EVENT } from '../../components/analytics';
+import { useAnalytics } from '../../components/analytics/useAnalytics';
+import { WithLayout } from '../../components/Layout';
+import { Link } from '../../components/Link';
+import { Text } from '../../components/Text';
+
+import type { BlogPostData } from './types';
+
+export const BlogPost = WithLayout(function Page({
+	children,
+	meta: {
+		data: { title, date },
+	},
+	url,
+}: PropsWithChildren<{
+	meta: BlogPostData;
+	url: string;
+}>) {
+	const analytics = useAnalytics();
+
+	return (
+		<VStack
+			align="start"
+			paddingTop={{ base: '1rem', md: '2rem' }}
+			paddingBottom={{ base: '2rem', md: '10rem' }}
+			width="100%"
+			maxWidth="900px"
+			marginInline="auto"
+			gap={0}
+		>
+			<Heading
+				margin={0}
+				marginBottom=".8rem"
+				css={{
+					base: {
+						fontSize: '1.8rem',
+						lineHeight: '2.4rem',
+					},
+					md: {
+						fontSize: '2.4rem',
+						lineHeight: '3rem',
+					},
+				}}
+			>
+				{title}
+			</Heading>
+
+			<Text
+				variant="description"
+				width="max-content"
+				marginBottom="1rem"
+				fontSize="1.2rem"
+				suppressHydrationWarning
+			>
+				{new Intl.DateTimeFormat('en', {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+				}).format(date)}
+			</Text>
+
+			<Box width="100%">{children}</Box>
+
+			<HStack width="100%" marginTop="3rem" marginBottom="1rem" fontSize="1.2rem">
+				<Text variant="description" marginInlineEnd=".5rem" fontSize="inherit">
+					Share this post
+				</Text>
+
+				<Link
+					href={`http://x.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`}
+					title="Share this on Twitter"
+					target="_blank"
+					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'Twitter',
+					})}
+				>
+					<Box boxSize="1.4rem" as={FaTwitter} />
+				</Link>
+				<Link
+					href={`http://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`}
+					title="Share this on Reddit"
+					target="_blank"
+					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'Reddit',
+					})}
+				>
+					<Box boxSize="1.4rem" as={FaReddit} />
+				</Link>
+				<Link
+					href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=&summary=&source=`}
+					title="Share this on LinkedIn"
+					target="_blank"
+					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'LinkedIn',
+					})}
+				>
+					<Box boxSize="1.4rem" as={FaLinkedin} />
+				</Link>
+				<Link
+					href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`}
+					title="Share this via email"
+					display="inline-flex"
+					onClick={analytics.callback(ANALYTICS_EVENT.SHARE_LINK, {
+						method: 'Email',
+					})}
+				>
+					<Box boxSize="1.4rem" as={FaEnvelope} />
+				</Link>
+			</HStack>
+
+			<Box as="hr" width="100%" />
+
+			<HStack align="center" justify="center" width="100%" marginBlock="3rem">
+				<Link
+					href="/blog"
+					marginBottom="1.5rem"
+					fontWeight="500"
+					fontSize="1.4rem"
+				>
+					<HStack>
+						<Box as={FaBolt} boxSize=".8rem" />
+						<span>Go to all posts</span>
+					</HStack>
+				</Link>
+			</HStack>
+		</VStack>
+	);
+});

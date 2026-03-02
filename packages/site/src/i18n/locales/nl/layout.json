@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Download",
+		"features": "Functies",
+		"docs": "Documentatie",
+		"blog": "Blog",
+		"changelog": "Changelog"
+	},
+	"links": {
+		"followUs": {
+			"title": "Volg ons"
+		},
+		"introduction": {
+			"title": "Aan de slag",
+			"content": {
+				"download": "Download",
+				"docs": "Documentatie",
+				"overview": "Overzicht"
+			}
+		},
+		"learn": {
+			"title": "Meer informatie",
+			"content": {
+				"help": "Help",
+				"changelog": "Changelog",
+				"about": "Over ons",
+				"security": "Beveiliging",
+				"roadmap": "Roadmap"
+			}
+		},
+		"resources": {
+			"title": "Bronnen",
+			"content": {
+				"terms": "Gebruiksvoorwaarden",
+				"privacy": "Privacybeleid"
+			}
+		}
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Prenos za <0/>",
+		"releaseDate": "Posodobljeno {{date}}"
+	},
+	"links": {
+		"title": "Vse platforme"
+	}
+}

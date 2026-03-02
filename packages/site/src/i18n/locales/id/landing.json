@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Tempat yang lebih baik untuk catatan Anda.",
+		"subtitle": "Deepink menjadikan pencatatan ergonomis dan menyenangkan.",
+		"button": {
+			"get": "Unduh Deepink",
+			"features": "Pelajari lebih lanjut"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Brankas digital yang bisa Anda percaya",
+				"text": "Semua isi brankas Anda terenkripsi. Berbeda dari banyak aplikasi lain, ini benar-benar berarti <0>seluruh data Anda</0> — termasuk isi catatan, file, dan metadata. Anda bisa memilih algoritma yang Anda percaya.\n\nDeepink adalah aplikasi <1>open source</1>, dengan kode yang bisa Anda verifikasi, bukan sekadar dipercaya begitu saja."
+			},
+			"workflow": {
+				"title": "Ergonomis",
+				"text": "Deepink dirancang agar cepat digunakan sehari-hari, dengan menghilangkan hambatan dari tugas-tugas yang paling sering dilakukan. Untuk sebagian besar tugas, Deepink membutuhkan <0>hingga 80% lebih sedikit langkah</0> dibandingkan aplikasi catatan lainnya."
+			},
+			"universality": {
+				"title": "Brankas Anda menampung segalanya",
+				"text": "Simpan semuanya dalam brankas Anda. Workspace dan tag bertingkat membantu Anda memisahkan konteks dan menemukan apa yang dibutuhkan dengan cepat — mulai dari spesifikasi proyek, kontrak, dan potongan kode hingga kutipan buku, jurnal harian, riset, dan lainnya."
+			}
+		},
+		"cta": {
+			"text": "Gratis digunakan. Tanpa batasan.",
+			"button": "Unduh sekarang"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Susun pemikiran Anda",
+			"text": "Tangkap ide singkat atau bangun sesuatu yang kompleks. Deepink menghadirkan keteraturan dan fokus pada semua yang Anda tulis."
+		},
+		"content": {
+			"links": {
+				"title": "Tautan",
+				"text": "Tautan memungkinkan Anda merujuk catatan mana pun di seluruh brankas. Hubungkan catatan rapat dengan keputusan, riset dengan kesimpulan, dan rencana dengan eksekusi — tanpa menduplikasi paragraf yang sama.\n\nBacklink menampilkan setiap catatan yang menautkan ke catatan yang sedang Anda buka, sehingga mudah untuk menelusuri koneksi dan menavigasi pengetahuan Anda secara alami.\n\nTautan menjaga konteks tetap terhubung, sehingga catatan terkait tetap mudah diikuti."
+			},
+			"workspaces": {
+				"title": "Workspace",
+				"text": "Pisahkan berbagai area kehidupan Anda tanpa perlu membuat banyak brankas.\n\nWorkspace menciptakan ruang terfokus di dalam satu brankas yang aman. Buka brankas sekali, lalu beralih antar konteks seperti Proyek Klien, Jurnal Pribadi, Catatan Kesehatan, atau Pembelajaran tanpa mencampurkan apa pun.\n\nTetap terorganisir dan sesuai konteks. Berbagi layar pun bisa dilakukan dengan tenang — konten pribadi tidak akan muncul secara tidak sengaja.\n\nSatu brankas. Batas yang jelas. Tanpa hambatan."
+			},
+			"history": {
+				"title": "Versi catatan",
+				"text": "Setiap catatan menyimpan riwayat perubahan yang lengkap.\n\nDeepink menyimpan versi secara otomatis, sehingga Anda bisa melihat apa yang berubah, memulihkan draf sebelumnya, atau mengikuti perkembangan sebuah ide dari waktu ke waktu. Baik diedit kemarin maupun setahun lalu, tidak ada yang penting yang hilang.\n\nVersi sebelumnya selalu tersedia saat Anda membutuhkannya."
+			},
+			"reminders": {
+				"title": "Pengingat",
+				"text": "Lampirkan pengingat ke catatan mana pun dan dapatkan notifikasi di waktu yang tepat.\n\nAtur pengingat tindak lanjut untuk catatan rapat, tenggat waktu untuk rencana proyek, tanggal perpanjangan untuk dokumen, atau pengingat untuk tujuan pribadi. Setiap pengingat melekat pada catatan yang tepat — bukan sebagai tugas terpisah di aplikasi lain.\n\nSaat waktunya tiba, Anda membuka catatan dengan semua detail yang lengkap.\n\nPengingat membantu Anda menindaklanjuti informasi, bukan sekadar menyimpannya."
+			},
+			"tags": {
+				"title": "Tag bertingkat",
+				"text": "Organisasikan catatan Anda dengan tag yang mencerminkan hierarki yang jelas.\n\nTag bertingkat memungkinkan Anda membuat struktur induk/anak, sehingga topik umum bisa memuat subtopik yang lebih spesifik. Misalnya, Klien bisa mencakup nama klien individual, dan Keuangan bisa mencakup Pajak, Faktur, dan Laporan.\n\nBerbeda dari folder, tag tidak eksklusif. Satu catatan bisa memiliki beberapa tag sekaligus — klien, keuangan, dan periode waktu.\n\nTag bertingkat memberikan presisi sekaligus fleksibilitas, bahkan ketika topik saling tumpang tindih."
+			},
+			"encryption": {
+				"title": "Enkripsi",
+				"text": "Seluruh brankas terenkripsi. Beberapa aplikasi hanya mengenkripsi data saat sinkronisasi atau teks catatan saja. Deepink melindungi seluruh struktur brankas Anda.\n\nCatatan, lampiran, dan metadata Anda tidak bisa dibaca oleh siapa pun selain Anda — termasuk kami. Bahkan ukuran file disamarkan untuk mengurangi risiko analisis.\n\nApa yang Anda simpan tetap privat secara desain."
+			}
+		}
+	},
+	"cta": {
+		"title": "Satu ruang untuk setiap sisi kehidupan Anda",
+		"text": "Simpan catatan harian, bacaan, dan rencana di satu tempat yang privat. Beralih konteks dalam sekali klik, tetap terorganisir, dan terus menulis tanpa kehilangan fokus.",
+		"button": "Dapatkan Deepink"
+	}
+}

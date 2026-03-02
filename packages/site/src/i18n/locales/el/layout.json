@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Λήψη",
+		"features": "Χαρακτηριστικά",
+		"docs": "Τεκμηρίωση",
+		"blog": "Blog",
+		"changelog": "Ιστορικό αλλαγών"
+	},
+	"links": {
+		"followUs": {
+			"title": "Ακολουθήστε μας"
+		},
+		"introduction": {
+			"title": "Ξεκινήστε",
+			"content": {
+				"download": "Λήψη",
+				"docs": "Τεκμηρίωση",
+				"overview": "Επισκόπηση"
+			}
+		},
+		"learn": {
+			"title": "Μάθετε περισσότερα",
+			"content": {
+				"help": "Βοήθεια",
+				"changelog": "Ιστορικό αλλαγών",
+				"about": "Σχετικά",
+				"security": "Ασφάλεια",
+				"roadmap": "Χάρτης πορείας"
+			}
+		},
+		"resources": {
+			"title": "Πόροι",
+			"content": {
+				"terms": "Όροι χρήσης",
+				"privacy": "Πολιτική απορρήτου"
+			}
+		}
+	}
+}

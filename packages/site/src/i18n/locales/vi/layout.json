@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Tải xuống",
+		"features": "Tính năng",
+		"docs": "Tài liệu",
+		"blog": "Blog",
+		"changelog": "Nhật ký thay đổi"
+	},
+	"links": {
+		"followUs": {
+			"title": "Theo dõi chúng tôi"
+		},
+		"introduction": {
+			"title": "Bắt đầu",
+			"content": {
+				"download": "Tải xuống",
+				"docs": "Tài liệu",
+				"overview": "Tổng quan"
+			}
+		},
+		"learn": {
+			"title": "Tìm hiểu thêm",
+			"content": {
+				"help": "Trợ giúp",
+				"changelog": "Nhật ký thay đổi",
+				"about": "Giới thiệu",
+				"security": "Bảo mật",
+				"roadmap": "Lộ trình"
+			}
+		},
+		"resources": {
+			"title": "Tài nguyên",
+			"content": {
+				"terms": "Điều khoản sử dụng",
+				"privacy": "Chính sách bảo mật"
+			}
+		}
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Télécharger pour <0/>",
+		"releaseDate": "Mis à jour le {{date}}"
+	},
+	"links": {
+		"title": "Toutes les plateformes"
+	}
+}
