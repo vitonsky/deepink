@@ -33,7 +33,7 @@ jobs:
 
       - name: Build
         working-directory: packages/site
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build
 
