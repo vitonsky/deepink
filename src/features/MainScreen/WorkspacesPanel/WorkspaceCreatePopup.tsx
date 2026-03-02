@@ -71,6 +71,10 @@ export const WorkspaceCreatePopup = () => {
 								workspacesManager
 									.create({ name })
 									.then(async (workspaceId) => {
+										// Synchronize immediately after creation to prevent workspace loss
+										// if the user closes the app before the automatic sync
+										await db.sync();
+
 										await updateWorkspaces();
 
 										dispatch(
@@ -83,10 +87,6 @@ export const WorkspaceCreatePopup = () => {
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
 										);
-
-										// Synchronize immediately after creation to prevent workspace loss
-										// if the user closes the app before the automatic sync
-										await db.sync();
 									});
 							}}
 							submitButtonText="Add"
