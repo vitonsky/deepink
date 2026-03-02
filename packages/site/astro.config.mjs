@@ -70,6 +70,7 @@ export default defineConfig({
 				replacesTitle: true,
 				src: './src/components/Layout/logo.svg',
 			},
+			disable404Route: true,
 			customCss: ['./src/styles.css'],
 			social: [
 				{
