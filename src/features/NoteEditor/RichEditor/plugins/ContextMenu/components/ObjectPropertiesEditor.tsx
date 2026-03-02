@@ -33,6 +33,7 @@ export type PropertiesFormProps<T extends OptionObject[]> = StackProps & {
 	onCancel?: () => void;
 	submitButtonText?: string;
 	cancelButtonText?: string;
+	isPending?: boolean;
 };
 
 export const PropertiesForm = <T extends OptionObject[]>({
@@ -42,6 +43,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	onCancel,
 	submitButtonText = 'Save',
 	cancelButtonText = 'Cancel',
+	isPending = false,
 	...props
 }: PropertiesFormProps<T>) => {
 	const optionsValues = useMemo(
@@ -61,10 +63,11 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	});
 
 	useEffect(() => {
+		if (isPending) return;
 		if (isEqual(optionsValues, getValues())) return;
 
 		reset(optionsValues);
-	}, [getValues, optionsValues, reset, setValue]);
+	}, [getValues, isPending, optionsValues, reset, setValue]);
 
 	return (
 		<VStack
@@ -83,7 +86,11 @@ export const PropertiesForm = <T extends OptionObject[]>({
 					return (
 						<VStack key={id} as="label" align="start" w="100%" gap="0.3rem">
 							<Text paddingBottom=".2rem">{label}</Text>
-							<Input {...register(id)} placeholder={placeholder} />
+							<Input
+								{...register(id)}
+								placeholder={placeholder}
+								isDisabled={isPending}
+							/>
 							{error && <Text color="message.error">{error.message}</Text>}
 						</VStack>
 					);
@@ -91,10 +98,14 @@ export const PropertiesForm = <T extends OptionObject[]>({
 			</VStack>
 
 			<HStack w="100%" justifyContent="end">
-				<Button variant="accent" type="submit">
+				<Button variant="accent" type="submit" isDisabled={isPending}>
 					{submitButtonText}
 				</Button>
-				{onCancel && <Button onClick={onCancel}>{cancelButtonText}</Button>}
+				{onCancel && (
+					<Button onClick={onCancel} isDisabled={isPending}>
+						{cancelButtonText}
+					</Button>
+				)}
 			</HStack>
 		</VStack>
 	);

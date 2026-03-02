@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import { z } from 'zod';
 import {
@@ -41,6 +41,7 @@ export const WorkspaceCreatePopup = () => {
 
 	const { update: updateWorkspaces } = useWorkspacesList();
 
+	const [isPending, setIsPending] = useState(false);
 	return (
 		<>
 			<ModalCloseButton />
@@ -66,7 +67,7 @@ export const WorkspaceCreatePopup = () => {
 							]}
 							validatorScheme={workspacePropsValidator}
 							onUpdate={async ({ name }) => {
-								onClose();
+								setIsPending(true);
 
 								workspacesManager
 									.create({ name })
@@ -74,6 +75,9 @@ export const WorkspaceCreatePopup = () => {
 										// Synchronize immediately after creation to prevent workspace loss
 										// if the user closes the app before the automatic sync
 										await db.sync();
+
+										setIsPending(false);
+										onClose();
 
 										await updateWorkspaces();
 
@@ -92,6 +96,7 @@ export const WorkspaceCreatePopup = () => {
 							submitButtonText="Add"
 							cancelButtonText="Cancel"
 							onCancel={onClose}
+							isPending={isPending}
 						/>
 					</Box>
 				</VStack>
