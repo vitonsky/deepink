@@ -136,8 +136,7 @@ export const FormattingPlugin = () => {
 						)
 							return false;
 
-						// eslint-disable-next-line eqeqeq
-						if (end.offset != focusedNode.getTextContentSize()) return false;
+						if (end.offset !== focusedNode.getTextContentSize()) return false;
 
 						const textNode = $createTextNode(' ');
 						parent.insertAfter(textNode);

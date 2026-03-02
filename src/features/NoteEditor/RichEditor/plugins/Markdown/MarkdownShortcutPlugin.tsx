@@ -45,8 +45,7 @@ export const $transformTextToCheckbox = (textNode: TextNode) => {
 			listNode.replace(list, true);
 		}
 
-		// eslint-disable-next-line eqeqeq
-		const isChecked = checkboxSegmentInsideListMatch[1] != ' ';
+		const isChecked = checkboxSegmentInsideListMatch[1] !== ' ';
 		listItemNode.setChecked(isChecked);
 
 		const slice = textNode
@@ -65,8 +64,7 @@ export const $transformTextToCheckbox = (textNode: TextNode) => {
 		// if (parent instanceof ListItemNode) return;
 		if (!(parent instanceof ParagraphNode)) return;
 
-		// eslint-disable-next-line eqeqeq
-		const isChecked = checkboxMatch[2] != ' ';
+		const isChecked = checkboxMatch[2] !== ' ';
 		const listItemNode = $createListItemNode(isChecked);
 
 		const slice = textNode.getTextContent().slice(checkboxMatch[0].length);
