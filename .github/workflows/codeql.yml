@@ -21,6 +21,14 @@ on:
   workflow_dispatch:
 
 jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: rhysd/actionlint@v1
+
   tests:
     name: Tests
     runs-on: ubuntu-latest
