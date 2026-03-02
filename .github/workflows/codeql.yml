@@ -22,12 +22,13 @@ on:
 
 jobs:
   actionlint:
+    name: Lint the GitHub workflow files
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Run actionlint
-        uses: rhysd/actionlint@v1
+        uses: raven-actions/actionlint@v2
 
   tests:
     name: Tests
