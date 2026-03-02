@@ -48,7 +48,7 @@ export const WorkspaceCreatePopup = () => {
 	const [isPending, setIsPending] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-	const onClick = useCallback(async () => {
+	const onCreate = useCallback(async () => {
 		try {
 			const { name: validatedName } = workspaceNameValidator.parse({
 				name: workspaceName,
@@ -106,29 +106,27 @@ export const WorkspaceCreatePopup = () => {
 					</Text>
 
 					<VStack as={AutoFocusInside} gap="1.5rem" w="100%" minW="350px">
-						<VStack align="start" w="100%" gap="1rem">
-							<VStack as="label" align="start" w="100%" gap="0.3rem">
-								<Text paddingBottom=".2rem">Workspace name</Text>
-								<Input
-									ref={inputNameRef}
-									value={workspaceName}
-									onChange={(evt) => {
-										setWorkspaceName(evt.target.value);
-										setErrorMessage(null);
-									}}
-									placeholder="e.g., Personal"
-									isDisabled={isPending}
-								/>
-								{errorMessage && (
-									<Text color="message.error">{errorMessage}</Text>
-								)}
-							</VStack>
+						<VStack as="label" align="start" w="100%" gap="0.3rem">
+							<Text paddingBottom=".2rem">Workspace name</Text>
+							<Input
+								ref={inputNameRef}
+								value={workspaceName}
+								onChange={(evt) => {
+									setWorkspaceName(evt.target.value);
+									setErrorMessage(null);
+								}}
+								placeholder="e.g., Personal"
+								isDisabled={isPending}
+							/>
+							{errorMessage && (
+								<Text color="message.error">{errorMessage}</Text>
+							)}
 						</VStack>
 
 						<HStack w="100%" justifyContent="end">
 							<Button
 								variant="accent"
-								onClick={onClick}
+								onClick={onCreate}
 								isDisabled={isPending}
 							>
 								Add
