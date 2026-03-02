@@ -62,14 +62,13 @@ export const WorkspaceCreatePopup = () => {
 			await db.sync();
 
 			await updateWorkspaces();
-
 			dispatch(workspacesApi.setActiveWorkspace({ workspaceId, profileId }));
 
 			telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_ADDED);
 
 			onClose();
 		} catch (error) {
-			console.warn(error);
+			console.error(error);
 			const message =
 				error instanceof ZodError
 					? error.issues[0].message
