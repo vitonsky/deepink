@@ -12,15 +12,16 @@ export default WithLayout(function Page({ posts }: { posts: BlogPostData[] }) {
 	return (
 		<VStack
 			align="start"
-			paddingBottom="10rem"
+			paddingTop={{ md: '2rem' }}
+			paddingBottom={{ base: '5rem', md: '10rem' }}
 			gap={{ base: '3rem', md: '5rem' }}
 			width="100%"
 		>
-			<VStack align="start" width="100%" paddingLeft={{ md: '200px' }}>
-				<Heading fontSize="3rem" marginBottom="1rem">
+			<VStack align="start" width="100%" paddingLeft={{ md: '200px' }} gap="1rem">
+				<Heading fontSize="3rem" lineHeight="3.8rem" margin={0}>
 					Blog posts
 				</Heading>
-				<Text variant="description" fontSize="2rem">
+				<Text variant="description" fontSize={{ base: '1.6rem', md: '2rem' }}>
 					What's new with Deepink?
 				</Text>
 			</VStack>
@@ -86,9 +87,17 @@ export default WithLayout(function Page({ posts }: { posts: BlogPostData[] }) {
 								<Heading
 									as="h2"
 									margin={0}
-									fontSize="2.4rem"
-									lineHeight="2.8rem"
 									marginBottom=".8rem"
+									css={{
+										base: {
+											fontSize: '1.8rem',
+											lineHeight: '2.2rem',
+										},
+										md: {
+											fontSize: '2.4rem',
+											lineHeight: '2.8rem',
+										},
+									}}
 								>
 									<Link href={postUrl} variant="header">
 										{title}

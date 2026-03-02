@@ -108,7 +108,12 @@ export default WithLayout(() => {
 	return (
 		<>
 			{/* Hero Section */}
-			<VStack gap="3rem" my="5rem" align="start">
+			<VStack
+				gap={{ base: '2rem', md: '3rem' }}
+				marginBlockStart={{ base: '2rem', md: '4rem' }}
+				marginBlockEnd="5rem"
+				align="start"
+			>
 				<VStack gap="1.6rem" align="start">
 					<Heading
 						as="h2"
@@ -252,13 +257,22 @@ export default WithLayout(() => {
 					<Heading
 						as="h3"
 						fontSize="3.2rem"
-						lineHeight="2.9rem"
+						lineHeight="3.2rem"
 						fontWeight="500"
 						m={0}
 					>
 						{t('features.intro.title')}
 					</Heading>
-					<Text fontSize="2rem" lineHeight="2.8rem" color="brand.secondary">
+					<Text
+						color="brand.secondary"
+						css={{
+							base: { fontSize: '1.6rem', lineHeight: '2.4rem' },
+							md: {
+								fontSize: '2rem',
+								lineHeight: '2.8rem',
+							},
+						}}
+					>
 						{t('features.intro.text')}
 					</Text>
 					<Separator width="100%" />
@@ -327,7 +341,7 @@ export default WithLayout(() => {
 				<Heading
 					as="h3"
 					m={0}
-					fontSize={{ base: '2.8rem', md: '3.8rem' }}
+					fontSize={{ base: '2.4rem', md: '3.8rem' }}
 					lineHeight={{ base: '2.9rem', md: '3.9rem' }}
 					textAlign="center"
 				>

@@ -25,14 +25,27 @@ export const BlogPost = WithLayout(function Page({
 	return (
 		<VStack
 			align="start"
-			paddingTop={{ base: '1rem', md: '3rem' }}
-			paddingBottom="10rem"
+			paddingTop={{ base: '1rem', md: '2rem' }}
+			paddingBottom={{ base: '2rem', md: '10rem' }}
 			width="100%"
 			maxWidth="900px"
 			marginInline="auto"
 			gap={0}
 		>
-			<Heading fontSize="2.4rem" lineHeight="3rem" margin={0} marginBottom=".8rem">
+			<Heading
+				margin={0}
+				marginBottom=".8rem"
+				css={{
+					base: {
+						fontSize: '1.8rem',
+						lineHeight: '2.4rem',
+					},
+					md: {
+						fontSize: '2.4rem',
+						lineHeight: '3rem',
+					},
+				}}
+			>
 				{title}
 			</Heading>
 
