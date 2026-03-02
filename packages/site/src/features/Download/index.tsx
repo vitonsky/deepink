@@ -209,10 +209,19 @@ export default WithLayout(function Page({
 						fontSize="1.4rem"
 						css={{
 							rowGap: '1.5rem',
-							'& > *:not(:nth-last-child(-n + 2))': {
-								paddingBottom: '1.5rem',
-								borderBottom: '1px solid',
-								borderColor: 'border.thin',
+							base: {
+								'& > *:not(:nth-last-child(-n + 1))': {
+									paddingBottom: '1.5rem',
+									borderBottom: '1px solid',
+									borderColor: 'border.thin',
+								},
+							},
+							sm: {
+								'& > *:not(:nth-last-child(-n + 2))': {
+									paddingBottom: '1.5rem',
+									borderBottom: '1px solid',
+									borderColor: 'border.thin',
+								},
 							},
 						}}
 					>

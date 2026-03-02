@@ -3,7 +3,6 @@ import { Trans, useTranslation } from 'react-i18next';
 import {
 	Box,
 	Heading,
-	HStack,
 	Image,
 	Separator,
 	SimpleGrid,
@@ -129,12 +128,20 @@ export default WithLayout(() => {
 					>
 						<Trans t={t} i18nKey="hero.subtitle" />
 					</Text>
-					<HStack gap="0.8rem" marginTop="1rem">
+					<Stack
+						gap="0.8rem"
+						marginTop="1rem"
+						direction={{ base: 'column', sm: 'row' }}
+						flexWrap="wrap"
+						width="100%"
+					>
 						<Link
 							href={localePath('/download')}
 							variant="button-primary"
 							fontSize={{ base: '1.1rem', md: '1.3rem' }}
-							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
+							lineHeight={{ base: '2rem', md: '1.8rem' }}
+							width={{ base: '100%', sm: 'auto' }}
+							textAlign={{ base: 'center', sm: 'start' }}
 							onClick={analytics.callback(
 								ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK,
 								{
@@ -148,11 +155,13 @@ export default WithLayout(() => {
 							href={localePath('/#features')}
 							variant="button-secondary"
 							fontSize={{ base: '1.1rem', md: '1.3rem' }}
-							lineHeight={{ base: '1.3rem', md: '1.8rem' }}
+							lineHeight={{ base: '2rem', md: '1.8rem' }}
+							width={{ base: '100%', sm: 'auto' }}
+							textAlign={{ base: 'center', sm: 'start' }}
 						>
 							{t('hero.button.features')}
 						</Link>
-					</HStack>
+					</Stack>
 				</VStack>
 				<Image
 					src={screenshot.src}
@@ -165,7 +174,12 @@ export default WithLayout(() => {
 			</VStack>
 
 			{/* Summary Section */}
-			<Stack gap="2rem" my="5rem" direction={{ base: 'column', md: 'row' }}>
+			<Stack
+				gap="2rem"
+				rowGap={{ base: '3rem', sm: '10rem' }}
+				my="5rem"
+				direction={{ base: 'column', lg: 'row' }}
+			>
 				<VStack gap="3rem" align="start">
 					{highlights.map((feature) => (
 						<VStack key={feature.title} gap="1rem" align="start">
@@ -189,7 +203,7 @@ export default WithLayout(() => {
 					align="center"
 					gap="2rem"
 					minW={{ md: '200px', lg: '300px' }}
-					marginInlineStart={{ md: 'auto' }}
+					marginInlineStart={{ lg: 'auto' }}
 				>
 					<TheRock maxW="300px" width={{ base: '350px', md: '100%' }} />
 
@@ -204,10 +218,10 @@ export default WithLayout(() => {
 							href={localePath('/download')}
 							variant="button-primary"
 							width="100%"
-							maxW={{ base: '250px', md: '100%' }}
+							maxW={{ base: '100%', sm: '300px' }}
 							textAlign="center"
 							fontSize="inherit"
-							lineHeight="inherit"
+							lineHeight={{ base: '2rem', sm: 'inherit' }}
 							onClick={analytics.callback(
 								ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK,
 								{
@@ -303,8 +317,11 @@ export default WithLayout(() => {
 				align="center"
 				justify="start"
 				gap="3rem"
-				pt="15%"
 				boxSizing="border-box"
+				// Ensure space on top for all
+				paddingTop="15%"
+				// Ensure space on bottom for mobiles
+				paddingBottom="10rem"
 			>
 				<Heading
 					as="h3"
@@ -329,6 +346,7 @@ export default WithLayout(() => {
 					variant="button-primary"
 					fontSize={{ base: '1.4rem', md: '1.6rem' }}
 					lineHeight={{ base: '2rem', md: '2.2rem' }}
+					paddingInline="2rem"
 					onClick={analytics.callback(ANALYTICS_EVENT.DOWNLOAD_BUTTON_CLICK, {
 						context: 'Landing: CTA',
 					})}

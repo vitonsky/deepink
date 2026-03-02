@@ -95,6 +95,11 @@ const customConfig = defineConfig({
 		recipes: {
 			link: linkRecipe,
 			text: textRecipe,
+			heading: defineRecipe({
+				base: {
+					wordBreak: 'break-word',
+				},
+			}),
 			separator: defineRecipe({
 				base: {
 					borderColor: 'border.thin',
