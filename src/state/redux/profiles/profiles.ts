@@ -212,6 +212,7 @@ export const profilesSlice = createSlice({
 			const profile = state.profiles[profileId];
 			if (!profile) return;
 
+			// Reset active workspace
 			if (workspaceId === null) {
 				profile.activeWorkspace = null;
 				return;
