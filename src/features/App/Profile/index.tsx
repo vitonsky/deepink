@@ -122,13 +122,13 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			);
 			dispatch(workspacesApi.setActiveProfile(profileId));
 
-			const currentWorkspace =
-				workspaces.find((w) => w.id == state?.activeWorkspace) ??
-				defaultWorkspace;
+			const selectedWorkspace = state?.activeWorkspace
+				? workspaces.find((w) => w.id === state.activeWorkspace)
+				: null;
 			dispatch(
 				workspacesApi.setActiveWorkspace({
 					profileId,
-					workspaceId: currentWorkspace.id,
+					workspaceId: selectedWorkspace?.id ?? defaultWorkspace.id,
 				}),
 			);
 		});
