@@ -8,6 +8,7 @@ import {
 	userId,
 } from 'plausible-client';
 
+import { enableClickTracking } from './enableClickTracking';
 import { enableEngagementTracking } from './enableEngagementTracking';
 import { enableSessionScoring } from './enableSessionScoring';
 
@@ -53,8 +54,9 @@ export const createPlausibleInstance = () => {
 	const cleanups: ((() => void) | void)[] = [];
 
 	if (typeof window !== 'undefined') {
-		cleanups.push(enableAutoOutboundTracking(plausible));
 		cleanups.push(enableAutoPageviews(plausible));
+		cleanups.push(enableAutoOutboundTracking(plausible));
+		cleanups.push(enableClickTracking(plausible));
 		cleanups.push(enableEngagementTracking(plausible));
 		cleanups.push(enableSessionScoring(plausible));
 	}
