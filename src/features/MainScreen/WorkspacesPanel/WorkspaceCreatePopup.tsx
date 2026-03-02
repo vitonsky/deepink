@@ -41,7 +41,7 @@ export const WorkspaceCreatePopup = () => {
 
 	const { update: updateWorkspaces } = useWorkspacesList();
 
-	const [isPending, setIsPending] = useState(false);
+	const [isCreating, setIsCreating] = useState(false);
 	return (
 		<>
 			<ModalCloseButton />
@@ -67,7 +67,7 @@ export const WorkspaceCreatePopup = () => {
 							]}
 							validatorScheme={workspacePropsValidator}
 							onUpdate={async ({ name }) => {
-								setIsPending(true);
+								setIsCreating(true);
 
 								workspacesManager
 									.create({ name })
@@ -76,7 +76,7 @@ export const WorkspaceCreatePopup = () => {
 										// if the user closes the app before the automatic sync
 										await db.sync();
 
-										setIsPending(false);
+										setIsCreating(false);
 										onClose();
 
 										await updateWorkspaces();
@@ -96,7 +96,7 @@ export const WorkspaceCreatePopup = () => {
 							submitButtonText="Add"
 							cancelButtonText="Cancel"
 							onCancel={onClose}
-							isPending={isPending}
+							isPending={isCreating}
 						/>
 					</Box>
 				</VStack>
