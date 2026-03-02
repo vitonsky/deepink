@@ -4,7 +4,6 @@ export const enableClickTracking = (plausible: Plausible) => {
 	if (typeof window === 'undefined') return;
 
 	const onClick = (evt: MouseEvent) => {
-		console.log('Trace', evt.composedPath());
 		const linkElement = evt
 			.composedPath()
 			.find((node) => node instanceof HTMLAnchorElement);
