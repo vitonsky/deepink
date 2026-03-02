@@ -13,6 +13,16 @@
 	"engines": {
 		"node": ">=22"
 	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"onFail": "error"
+		},
+		"packageManager": {
+			"name": "npm",
+			"onFail": "error"
+		}
+	},
 	"scripts": {
 		"test": "vitest",
 		"clean": "rm -Rf dist out",
