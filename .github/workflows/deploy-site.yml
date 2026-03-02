@@ -33,6 +33,8 @@ jobs:
 
       - name: Build
         working-directory: packages/site
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build
 
       - name: "Deploy to Cloudflare Pages"
