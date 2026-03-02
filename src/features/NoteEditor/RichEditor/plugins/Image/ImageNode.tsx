@@ -36,7 +36,8 @@ export interface ImagePayload {
 
 function isGoogleDocCheckboxImg(img: HTMLImageElement): boolean {
 	return (
-		img.parentElement !== null &&
+		// eslint-disable-next-line eqeqeq
+		img.parentElement != null &&
 		img.parentElement.tagName === 'LI' &&
 		img.previousSibling === null &&
 		img.getAttribute('aria-roledescription') === 'checkbox'
