@@ -213,7 +213,7 @@ export const profilesSlice = createSlice({
 			if (!profile) return;
 
 			if (workspaceId === null) {
-				profile.activeWorkspace = workspaceId;
+				profile.activeWorkspace = null;
 				return;
 			}
 
