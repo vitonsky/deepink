@@ -14,6 +14,7 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://deepink.io',
+
 	vite: {
 		ssr: {
 			// Fix build error. See details at https://github.com/withastro/astro/issues/14117#issuecomment-3117797751
@@ -52,15 +53,18 @@ export default defineConfig({
 			},
 		],
 	},
+
 	markdown: {
 		remarkPlugins: [
 			[remarkExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
 		],
 	},
+
 	integrations: [
 		starlight({
 			plugins: [starlightThemeFlexoki()],
 			title: 'Deepink',
+			description: "Deepink is a privacy focused note taking app with a light speed workflow. One space for everyday life, another for books, another for plans. Switch contexts in a click, keep things clean, and keep writing without overthinking where it should go.",
 			favicon: '/favicon.svg',
 			logo: {
 				replacesTitle: true,
