@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Last ned for <0/>",
+		"releaseDate": "Oppdatert {{date}}"
+	},
+	"links": {
+		"title": "Alle plattformer"
+	}
+}

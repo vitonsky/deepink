@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Un lugar mejor para tus notas.",
+		"subtitle": "Deepink hace que tomar notas sea ergonómico y agradable.",
+		"button": {
+			"get": "Descargar Deepink",
+			"features": "Más información"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Un almacén en el que puedes confiar",
+				"text": "Todo en tu almacén está cifrado. A diferencia de muchas otras apps, esto significa realmente <0>todos tus datos</0>: contenido de las notas, archivos y metadatos. Puedes elegir el algoritmo en el que confías.\n\nDeepink es una app de <1>código abierto</1>, con código que puedes verificar, no solo confiar."
+			},
+			"workflow": {
+				"title": "La ergonomía",
+				"text": "Deepink está diseñado para ser ágil en el uso diario, eliminando la fricción de las tareas más habituales. Para la mayoría de las acciones, requiere <0>hasta un 80 % menos de pasos</0> que otras apps de notas."
+			},
+			"universality": {
+				"title": "Tu almacén lo abarca todo",
+				"text": "Guarda todo en tu almacén. Los espacios de trabajo y las etiquetas anidadas te ayudan a separar contextos y encontrar lo que necesitas rápidamente: desde especificaciones de proyectos, contratos y fragmentos de código hasta citas de libros, un diario personal, investigación y mucho más."
+			}
+		},
+		"cta": {
+			"text": "Gratis. Sin límites.",
+			"button": "Descargar ahora"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Estructura tu pensamiento",
+			"text": "Captura una idea rápida o construye algo complejo. Deepink aporta orden y enfoque a todo lo que escribes."
+		},
+		"content": {
+			"links": {
+				"title": "Enlaces",
+				"text": "Los enlaces permiten referenciar cualquier nota en cualquier parte de tu almacén. Conecta notas de reuniones con decisiones, investigación con conclusiones, y planes con ejecución sin duplicar el mismo párrafo.\n\nLos backlinks muestran cada nota que enlaza a la nota que estás viendo, así es fácil rastrear conexiones y navegar por tu conocimiento de forma natural.\n\nLos enlaces mantienen el contexto conectado, para que las notas relacionadas sean fáciles de seguir."
+			},
+			"workspaces": {
+				"title": "Espacios de trabajo",
+				"text": "Mantén separadas las distintas áreas de tu vida sin crear múltiples almacenes.\n\nLos espacios de trabajo crean entornos enfocados dentro de un único almacén seguro. Desbloquea tu almacén una vez y cambia entre contextos como Proyectos de clientes, Diario personal, Notas de salud o Aprendizaje sin mezclar nada.\n\nOrganización clara y específica por contexto. Comparte tu pantalla con tranquilidad: el contenido privado no aparecerá por error.\n\nUn almacén. Límites claros. Cero fricción."
+			},
+			"history": {
+				"title": "Versiones de notas",
+				"text": "Cada nota conserva un historial completo de cambios.\n\nDeepink guarda versiones automáticamente, para que puedas ver qué cambió, restaurar un borrador anterior o seguir cómo evolucionó una idea con el tiempo. Ya sea que se editó ayer o hace un año, nada importante se pierde.\n\nLas versiones anteriores siempre están disponibles cuando las necesitas."
+			},
+			"reminders": {
+				"title": "Recordatorios",
+				"text": "Adjunta un recordatorio a cualquier nota y recibe la notificación en el momento adecuado.\n\nConfigura recordatorios de seguimiento para notas de reuniones, fechas límite para planes de proyecto, fechas de renovación para documentos o revisiones para objetivos personales. Cada recordatorio permanece junto a la nota exacta, no como una tarea separada en otra app.\n\nCuando llega el momento, abres la nota con cada detalle en su lugar.\n\nLos recordatorios ayudan a actuar sobre tu información, no solo a almacenarla."
+			},
+			"tags": {
+				"title": "Etiquetas anidadas",
+				"text": "Organiza tus notas con etiquetas que reflejan una jerarquía clara.\n\nLas etiquetas anidadas permiten crear una estructura padre/hijo, de modo que los temas amplios pueden contener subtemas específicos. Por ejemplo, Clientes puede incluir nombres individuales de clientes, y Finanzas puede incluir Impuestos, Facturas e Informes.\n\nA diferencia de las carpetas, las etiquetas no son excluyentes. Una nota puede tener varias etiquetas a la vez: cliente, finanzas y un período de tiempo.\n\nLas etiquetas anidadas ofrecen precisión y flexibilidad, incluso cuando los temas se solapan."
+			},
+			"encryption": {
+				"title": "Cifrado",
+				"text": "El almacén completo está cifrado. Algunas apps solo cifran los datos durante la sincronización o el texto de la nota. Deepink protege la estructura completa de tu almacén.\n\nTus notas, archivos adjuntos y metadatos son ilegibles para cualquiera excepto tú, incluidos nosotros. Incluso los tamaños de archivo se ofuscan para reducir el riesgo de análisis.\n\nLo que guardas permanece privado por diseño."
+			}
+		}
+	},
+	"cta": {
+		"title": "Un espacio para cada parte de tu vida",
+		"text": "Notas del día a día, lecturas y planes en un solo lugar privado. Cambia de contexto con un clic, mantén el orden y sigue escribiendo sin perder el ritmo.",
+		"button": "Obtener Deepink"
+	}
+}

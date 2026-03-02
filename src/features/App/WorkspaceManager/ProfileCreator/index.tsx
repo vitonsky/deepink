@@ -121,7 +121,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	return (
 		<ProfilesForm
-			title="Create a new profile"
+			title="Create Vault"
 			controls={
 				<>
 					<Button
@@ -130,7 +130,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						onClick={() => onPressCreate(true)}
 						disabled={isPending}
 					>
-						Create profile
+						Create vault
 					</Button>
 					<Button
 						w="100%"
@@ -153,7 +153,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						<ModalOverlay />
 						<ModalContent>
 							<ModalCloseButton />
-							<ModalHeader>Create profile with no encryption</ModalHeader>
+							<ModalHeader>Create vault with no encryption</ModalHeader>
 							<ModalBody>
 								<Text color="typography.secondary">
 									All your data and notes will be stored with no
@@ -193,10 +193,10 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				color="typography.additional"
 			>
 				<VStack w="100%" alignItems="start">
-					<Text>Profile name</Text>
+					<Text>Vault name</Text>
 					<Input
 						ref={profileNameInputRef}
-						size="lg"
+						size="md"
 						placeholder="e.g., Notes"
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
@@ -213,7 +213,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					</HStack>
 					<Input
 						ref={passwordInputRef}
-						size="lg"
+						size="md"
 						type="password"
 						placeholder="Enter a strong password here"
 						value={password}
@@ -230,6 +230,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						Encryption algorithm
 					</Text>
 					<Select
+						size="md"
 						value={algorithm}
 						onChange={(evt) => setAlgorithm(evt.target.value)}
 						disabled={isPending}

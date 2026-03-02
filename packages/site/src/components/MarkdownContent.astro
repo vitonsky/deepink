@@ -1,0 +1,117 @@
+<div class="sl-markdown-content no-css-reset">
+	<slot />
+</div>
+
+<style>
+	:global(.sl-markdown-content) {
+		font-family:
+			ui-sans-serif,
+			system-ui,
+			-apple-system,
+			BlinkMacSystemFont,
+			Roboto,
+			Inter,
+			'Helvetica Neue',
+			Arial,
+			'Noto Sans',
+			sans-serif,
+			'Apple Color Emoji',
+			'Segoe UI Emoji',
+			'Segoe UI Symbol',
+			'Noto Color Emoji';
+
+		font-size: 1.2rem;
+		line-height: 2rem;
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			font-family:
+				ui-sans-serif,
+				system-ui,
+				-apple-system,
+				BlinkMacSystemFont,
+				Roboto,
+				'Inter',
+				'Helvetica Neue',
+				Arial,
+				'Noto Sans',
+				sans-serif,
+				'Apple Color Emoji',
+				'Segoe UI Emoji',
+				'Segoe UI Symbol',
+				'Noto Color Emoji';
+		}
+
+		h1 {
+			font-size: 2.8rem;
+			line-height: 3rem;
+		}
+
+		h2 {
+			font-size: 2.2rem;
+			line-height: 2.8rem;
+		}
+
+		h3 {
+			font-size: 2rem;
+			line-height: 2.4rem;
+		}
+
+		line-height: 1.7;
+
+		* + :is(h1, h2) {
+			margin-top: 3rem;
+		}
+		* + :is(h3) {
+			margin-top: 2rem;
+		}
+
+		ul {
+			padding-inline-start: 1rem;
+		}
+
+		ul > ul {
+			padding-inline-start: 3rem;
+		}
+
+		li:has(li) {
+			margin-bottom: 1rem;
+			& & {
+				margin-bottom: 0.3rem;
+				& & {
+					margin-bottom: 0;
+				}
+			}
+		}
+
+		li:last-child {
+			margin-bottom: 0;
+		}
+
+		img {
+			height: auto;
+			max-width: 100%;
+			border: 1px solid #00000017;
+			border-radius: 8px;
+		}
+
+		pre[data-language] {
+			border: 1px solid peachpuff;
+			border-radius: 8px;
+		}
+
+		blockquote {
+			background: #ffdab93d;
+			margin: 0;
+			padding: 0.8rem 1.5rem;
+			border-radius: 12px;
+		}
+
+		--ec-frm-inlBtnFg: var(--chakra-colors-brand-secondary);
+		--ec-frm-inlBtnBrd: var(--chakra-colors-border-thin);
+	}
+</style>

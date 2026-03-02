@@ -1,0 +1,21 @@
+---
+import Headers from './Headers.astro';
+import type { Props as HeaderProps } from './Headers.astro';
+
+export interface Props {
+	lang?: string;
+	meta?: HeaderProps;
+}
+
+const { lang = 'en', meta } = Astro.props;
+---
+
+<html lang={lang}>
+	<head>
+		<Headers {...meta} />
+	</head>
+
+	<body>
+		<slot />
+	</body>
+</html>

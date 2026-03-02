@@ -1,0 +1,48 @@
+name: "Site"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "packages/site/**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "packages/site/**"
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read # Only required for private GitHub Repo
+      contents: read
+      deployments: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Build
+        working-directory: packages/site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build
+
+      - name: "Deploy to Cloudflare Pages"
+        uses: andykenward/github-actions-cloudflare-pages@v3.0.0
+        with:
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          cloudflare-project-name: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          directory: packages/site/dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-environment: ${{ (github.ref == 'refs/heads/master' && 'production') || 'preview' }}

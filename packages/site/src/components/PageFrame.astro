@@ -1,0 +1,15 @@
+---
+import Default from '@astrojs/starlight/components/PageFrame.astro';
+---
+
+{/* Render the default Starlight <PageFrame> component. */}
+<Default>
+	<slot />
+	<slot name="header" slot="header" />
+	<slot name="sidebar" slot="sidebar" />
+</Default>
+
+<script>
+	import { createPlausibleInstance } from './analytics';
+	createPlausibleInstance();
+</script>

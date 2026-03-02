@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Завантажити",
+		"features": "Можливості",
+		"docs": "Документація",
+		"blog": "Блог",
+		"changelog": "Зміни"
+	},
+	"links": {
+		"followUs": {
+			"title": "Стежити за нами"
+		},
+		"introduction": {
+			"title": "Почати",
+			"content": {
+				"download": "Завантажити",
+				"docs": "Документація",
+				"overview": "Огляд"
+			}
+		},
+		"learn": {
+			"title": "Дізнатися більше",
+			"content": {
+				"help": "Довідка",
+				"changelog": "Зміни",
+				"about": "Про нас",
+				"security": "Безпека",
+				"roadmap": "Плани розвитку"
+			}
+		},
+		"resources": {
+			"title": "Ресурси",
+			"content": {
+				"terms": "Умови використання",
+				"privacy": "Політика конфіденційності"
+			}
+		}
+	}
+}

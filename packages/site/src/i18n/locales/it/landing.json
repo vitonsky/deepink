@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Un posto migliore per i tuoi appunti.",
+		"subtitle": "Deepink rende la scrittura di note ergonomica e piacevole.",
+		"button": {
+			"get": "Scarica Deepink",
+			"features": "Scopri di più"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Un archivio di cui fidarsi",
+				"text": "Tutto nel tuo archivio è crittografato. A differenza di molte altre app, questo significa davvero <0>tutti i tuoi dati</0>: contenuto delle note, file e metadati. L'algoritmo di crittografia è a tua scelta.\n\nDeepink è un'app <1>open source</1>, con codice che puoi verificare, non solo fidarti."
+			},
+			"workflow": {
+				"title": "L'ergonomia",
+				"text": "Deepink è progettata per essere veloce nell'uso quotidiano, eliminando ogni attrito dalle operazioni più comuni. Per la maggior parte delle attività servono <0>fino all'80% di azioni in meno</0> rispetto ad altre app per appunti."
+			},
+			"universality": {
+				"title": "Il tuo archivio contiene tutto",
+				"text": "Conserva tutto nel tuo archivio. Workspace e tag annidati aiutano a separare i contesti e trovare rapidamente ciò che serve: specifiche di progetto, contratti, frammenti di codice, citazioni da libri, diario personale, ricerche e molto altro."
+			}
+		},
+		"cta": {
+			"text": "Gratuita. Senza limiti.",
+			"button": "Scarica ora"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Dai struttura al tuo pensiero",
+			"text": "Un'intuizione veloce o un progetto complesso. Deepink porta ordine e concentrazione in tutto ciò che scrivi."
+		},
+		"content": {
+			"links": {
+				"title": "Link",
+				"text": "I link permettono di fare riferimento a qualsiasi nota ovunque nel tuo archivio. Collega gli appunti di una riunione alle decisioni, la ricerca alle conclusioni, i piani all'esecuzione, senza duplicare lo stesso paragrafo.\n\nI backlink mostrano ogni nota che rimanda a quella che stai leggendo, così è facile risalire alle connessioni e navigare tra le tue conoscenze in modo naturale.\n\nI link mantengono il contesto collegato: le note correlate restano sempre facili da seguire."
+			},
+			"workspaces": {
+				"title": "Workspace",
+				"text": "Tieni separati i diversi ambiti della tua vita senza creare più archivi.\n\nI workspace creano spazi dedicati all'interno di un unico archivio sicuro. Sblocca l'archivio una volta, poi passa da un contesto all'altro — Progetti Clienti, Diario Personale, Note Salute, Studio — senza mescolare nulla.\n\nOrganizzazione chiara e specifica per ogni contesto. Condividi lo schermo con tranquillità: i contenuti privati non appariranno per errore.\n\nUn archivio. Confini netti. Zero attriti."
+			},
+			"history": {
+				"title": "Versioni delle note",
+				"text": "Ogni nota conserva una cronologia completa delle modifiche.\n\nDeepink salva le versioni automaticamente: puoi vedere cosa è cambiato, ripristinare una bozza precedente o seguire come un'idea si è sviluppata nel tempo. Che la modifica risalga a ieri o a un anno fa, nulla di importante va perso.\n\nLe versioni precedenti sono sempre disponibili quando servono."
+			},
+			"reminders": {
+				"title": "Promemoria",
+				"text": "Associa un promemoria a qualsiasi nota e ricevi una notifica al momento giusto.\n\nPromemoria di follow-up per gli appunti di una riunione, scadenze per i piani di progetto, date di rinnovo per i documenti, check-in per gli obiettivi personali. Ogni promemoria resta collegato alla nota esatta, non come un'attività separata in un'altra app.\n\nQuando arriva il momento, la nota si apre con ogni dettaglio al suo posto.\n\nI promemoria aiutano ad agire sulle tue informazioni, non solo a conservarle."
+			},
+			"tags": {
+				"title": "Tag annidati",
+				"text": "Organizza le note con tag che riflettono una gerarchia chiara.\n\nI tag annidati permettono di creare una struttura padre/figlio, così gli argomenti generali possono contenere sotto-argomenti specifici. Ad esempio, Clienti può includere i nomi dei singoli clienti, e Finanza può includere Tasse, Fatture e Report.\n\nA differenza delle cartelle, i tag non sono esclusivi. Una nota può avere più tag contemporaneamente — cliente, finanza e un periodo temporale.\n\nI tag annidati offrono precisione e flessibilità, anche quando gli argomenti si sovrappongono."
+			},
+			"encryption": {
+				"title": "Crittografia",
+				"text": "L'intero archivio è crittografato. Alcune app proteggono i dati solo durante la sincronizzazione o il testo delle note. Deepink protegge l'intera struttura del tuo archivio.\n\nLe note, gli allegati e i metadati sono illeggibili per chiunque tranne te, inclusi noi. Anche le dimensioni dei file vengono offuscate per ridurre il rischio di analisi.\n\nCiò che conservi resta privato per design."
+			}
+		}
+	},
+	"cta": {
+		"title": "Uno spazio per ogni aspetto della tua vita",
+		"text": "Note quotidiane, letture e piani in un unico luogo privato. Cambia contesto con un clic, mantieni l'ordine e continua a scrivere senza interrompere il flusso.",
+		"button": "Scarica Deepink"
+	}
+}

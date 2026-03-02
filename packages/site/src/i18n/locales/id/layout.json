@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Unduh",
+		"features": "Fitur",
+		"docs": "Dokumentasi",
+		"blog": "Blog",
+		"changelog": "Changelog"
+	},
+	"links": {
+		"followUs": {
+			"title": "Ikuti kami"
+		},
+		"introduction": {
+			"title": "Mulai",
+			"content": {
+				"download": "Unduh",
+				"docs": "Dokumentasi",
+				"overview": "Ringkasan"
+			}
+		},
+		"learn": {
+			"title": "Pelajari lebih lanjut",
+			"content": {
+				"help": "Bantuan",
+				"changelog": "Changelog",
+				"about": "Tentang",
+				"security": "Keamanan",
+				"roadmap": "Roadmap"
+			}
+		},
+		"resources": {
+			"title": "Sumber Daya",
+			"content": {
+				"terms": "Ketentuan Penggunaan",
+				"privacy": "Kebijakan Privasi"
+			}
+		}
+	}
+}

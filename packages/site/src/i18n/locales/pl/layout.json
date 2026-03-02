@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Pobierz",
+		"features": "Funkcje",
+		"docs": "Dokumentacja",
+		"blog": "Blog",
+		"changelog": "Historia zmian"
+	},
+	"links": {
+		"followUs": {
+			"title": "Obserwuj nas"
+		},
+		"introduction": {
+			"title": "Rozpocznij",
+			"content": {
+				"download": "Pobierz",
+				"docs": "Dokumentacja",
+				"overview": "Przegląd"
+			}
+		},
+		"learn": {
+			"title": "Dowiedz się więcej",
+			"content": {
+				"help": "Pomoc",
+				"changelog": "Historia zmian",
+				"about": "O aplikacji",
+				"security": "Bezpieczeństwo",
+				"roadmap": "Plan rozwoju"
+			}
+		},
+		"resources": {
+			"title": "Zasoby",
+			"content": {
+				"terms": "Warunki użytkowania",
+				"privacy": "Polityka prywatności"
+			}
+		}
+	}
+}

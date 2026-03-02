@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Tải về cho <0/>",
+		"releaseDate": "Cập nhật ngày {{date}}"
+	},
+	"links": {
+		"title": "Tất cả nền tảng"
+	}
+}

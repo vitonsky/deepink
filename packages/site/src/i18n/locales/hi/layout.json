@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "डाउनलोड",
+		"features": "फ़ीचर्स",
+		"docs": "डॉक्स",
+		"blog": "ब्लॉग",
+		"changelog": "चेंजलॉग"
+	},
+	"links": {
+		"followUs": {
+			"title": "फ़ॉलो करें"
+		},
+		"introduction": {
+			"title": "शुरू करें",
+			"content": {
+				"download": "डाउनलोड",
+				"docs": "डॉक्स",
+				"overview": "अवलोकन"
+			}
+		},
+		"learn": {
+			"title": "और जानें",
+			"content": {
+				"help": "सहायता",
+				"changelog": "चेंजलॉग",
+				"about": "हमारे बारे में",
+				"security": "सुरक्षा",
+				"roadmap": "रोडमैप"
+			}
+		},
+		"resources": {
+			"title": "संसाधन",
+			"content": {
+				"terms": "उपयोग की शर्तें",
+				"privacy": "गोपनीयता नीति"
+			}
+		}
+	}
+}

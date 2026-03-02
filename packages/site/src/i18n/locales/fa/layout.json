@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "دانلود",
+		"features": "امکانات",
+		"docs": "مستندات",
+		"blog": "بلاگ",
+		"changelog": "تغییرات"
+	},
+	"links": {
+		"followUs": {
+			"title": "ما را دنبال کنید"
+		},
+		"introduction": {
+			"title": "شروع کنید",
+			"content": {
+				"download": "دانلود",
+				"docs": "مستندات",
+				"overview": "معرفی"
+			}
+		},
+		"learn": {
+			"title": "اطلاعات بیشتر",
+			"content": {
+				"help": "راهنما",
+				"changelog": "تغییرات",
+				"about": "درباره ما",
+				"security": "امنیت",
+				"roadmap": "نقشه راه"
+			}
+		},
+		"resources": {
+			"title": "منابع",
+			"content": {
+				"terms": "شرایط استفاده",
+				"privacy": "سیاست حریم خصوصی"
+			}
+		}
+	}
+}
