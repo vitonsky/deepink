@@ -22,7 +22,9 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useWorkspacesList } from './useWorkspacesList';
 
-export const workspaceNameValidator = z.string().trim().min(1, 'Name must not be empty');
+export const workspaceNameValidator = z.object({
+	name: z.string().min(1, 'Name must not be empty'),
+});
 
 export const WorkspaceCreatePopup = () => {
 	const telemetry = useTelemetryTracker();
@@ -48,10 +50,12 @@ export const WorkspaceCreatePopup = () => {
 
 	const onClick = useCallback(async () => {
 		try {
-			const validName = workspaceNameValidator.parse(workspaceName);
+			const { name: validatedName } = workspaceNameValidator.parse({
+				name: workspaceName,
+			});
 			setIsPending(true);
 
-			const workspaceId = await workspacesManager.create({ name: validName });
+			const workspaceId = await workspacesManager.create({ name: validatedName });
 
 			// Synchronize immediately after creation to prevent workspace loss
 			// if the user closes the app before the automatic sync
@@ -72,6 +76,7 @@ export const WorkspaceCreatePopup = () => {
 					: 'Unable to save the workspace. Please try again.';
 
 			setErrorMessage(message);
+
 			inputNameRef.current?.focus();
 		} finally {
 			setIsPending(false);
@@ -123,9 +128,8 @@ export const WorkspaceCreatePopup = () => {
 						<HStack w="100%" justifyContent="end">
 							<Button
 								variant="accent"
-								type="submit"
-								isDisabled={isPending}
 								onClick={onClick}
+								isDisabled={isPending}
 							>
 								Add
 							</Button>
@@ -135,56 +139,6 @@ export const WorkspaceCreatePopup = () => {
 							</Button>
 						</HStack>
 					</VStack>
-
-					{/* <Box as={AutoFocusInside} w="100%">
-						<PropertiesForm
-							options={[
-								{
-									id: 'name',
-									value: '',
-									label: 'Workspace name',
-									placeholder: 'e.g., Personal',
-								},
-							]}
-							validatorScheme={workspacePropsValidator}
-							onUpdate={async ({ name }) => {
-								setIsPending(true);
-
-								workspacesManager
-									.create({ name })
-									.then(async (workspaceId) => {
-										// Synchronize immediately after creation to prevent workspace loss
-										// if the user closes the app before the automatic sync
-										await db.sync();
-
-										await updateWorkspaces();
-
-										dispatch(
-											workspacesApi.setActiveWorkspace({
-												workspaceId,
-												profileId,
-											}),
-										);
-
-										telemetry.track(
-											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
-										);
-
-										onClose();
-									})
-									.catch((error) => {
-										console.warn(error);
-									})
-									.finally(() => {
-										setIsPending(false);
-									});
-							}}
-							submitButtonText="Add"
-							cancelButtonText="Cancel"
-							onCancel={onClose}
-							isPending={isPending}
-						/>
-					</Box> */}
 				</VStack>
 			</ModalBody>
 		</>
