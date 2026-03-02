@@ -158,6 +158,7 @@ export default WithLayout(() => {
 							lineHeight={{ base: '2rem', md: '1.8rem' }}
 							width={{ base: '100%', sm: 'auto' }}
 							textAlign={{ base: 'center', sm: 'start' }}
+							onClick={analytics.callback(ANALYTICS_EVENT.FEATURES_CLICK)}
 						>
 							{t('hero.button.features')}
 						</Link>

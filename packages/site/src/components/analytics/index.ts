@@ -73,6 +73,7 @@ export enum ANALYTICS_EVENT {
 	PAGE_404 = '404',
 	SHARE_LINK = 'Share link click',
 	MOBILE_MENU = 'Mobile menu click',
+	FEATURES_CLICK = 'Features button click',
 }
 
 export type ANALYTICS_EVENT_PAYLOADS = {
