@@ -49,11 +49,11 @@ export const WorkspaceCreatePopup = () => {
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const onCreate = useCallback(async () => {
+		setIsPending(true);
 		try {
 			const { name: validatedName } = workspaceNameValidator.parse({
 				name: workspaceName,
 			});
-			setIsPending(true);
 
 			const workspaceId = await workspacesManager.create({ name: validatedName });
 
