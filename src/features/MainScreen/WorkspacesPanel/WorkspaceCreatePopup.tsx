@@ -49,7 +49,9 @@ export const WorkspaceCreatePopup = () => {
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const onCreate = useCallback(async () => {
+		if (isPending) return;
 		setIsPending(true);
+
 		try {
 			const { name: validatedName } = workspaceNameValidator.parse({
 				name: workspaceName,
@@ -81,14 +83,15 @@ export const WorkspaceCreatePopup = () => {
 			setIsPending(false);
 		}
 	}, [
-		db,
-		dispatch,
+		isPending,
 		workspaceName,
-		onClose,
+		workspacesManager,
+		db,
+		updateWorkspaces,
+		dispatch,
 		profileId,
 		telemetry,
-		updateWorkspaces,
-		workspacesManager,
+		onClose,
 	]);
 
 	return (
