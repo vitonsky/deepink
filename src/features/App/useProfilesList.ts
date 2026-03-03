@@ -6,7 +6,7 @@ import { RootedFS } from '@core/features/files/RootedFS';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { useFilesStorage } from '@features/files';
 
-import { NewProfile } from './Profile/ProfileCreator';
+import { NewProfile } from './ProfileCreator';
 
 export type ProfilesListApi = {
 	isProfilesLoaded: boolean;
