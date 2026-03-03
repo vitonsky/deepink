@@ -6,9 +6,9 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
-import { ProfilesForm } from './Profile/ProfilesForm';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
+import { ProfilesForm } from './ProfilesForm';
 import { ProfilesListApi } from './useProfilesList';
 import { OnPickProfile } from './useVaultOpener';
 

@@ -6,7 +6,7 @@ import { OnPickProfile } from '@features/App/useVaultOpener';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
-import { ProfilesForm } from '../Profile/ProfilesForm';
+import { ProfilesForm } from '../ProfilesForm';
 
 export type ProfileLoginFormProps = {
 	profile: ProfileObject;
