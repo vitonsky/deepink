@@ -10,23 +10,6 @@ on:
     types: [opened, synchronize, reopened]
   pull_request_review_comment:
     types: [created]
-  workflow_dispatch:
-    inputs:
-      review-command:
-        type: choice
-        default: run
-        options:
-          - run
-          - run-inline
-          - run-context
-          - run-summary
-          - run-inline-reply
-          - run-summary-reply
-          - clear-inline
-          - clear-summary
-      pull-request-number:
-        type: string
-        required: true
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref ||
@@ -35,29 +18,17 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
 
 jobs:
-  ai-review:
+  review:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: Nikita-Filonov/ai-review@v0.59.0
-        with:
-          review-command: ${{ inputs.review-command || 'run-context' }}
+      - uses: coderabbitai/ai-pr-reviewer@latest
         env:
-          # --- LLM configuration ---
-          LLM__PROVIDER: "OPENROUTER"
-          LLM__META__MODEL: "anthropic/claude-sonnet-4.6"
-          LLM__META__MAX_TOKENS: "100000"
-          LLM__META__TEMPERATURE: "0.3"
-          LLM__HTTP_CLIENT__API_URL: "https://openrouter.ai/api/v1"
-          LLM__HTTP_CLIENT__API_TOKEN: ${{ secrets.OPENAI_API_KEY }}
-
-          # --- GitHub integration ---
-          VCS__PROVIDER: "GITHUB"
-          VCS__PIPELINE__OWNER: ${{ github.repository_owner }}
-          VCS__PIPELINE__REPO: ${{ github.event.repository.name }}
-          VCS__PIPELINE__PULL_NUMBER: ${{ github.event.pull_request.number || inputs.pull-request-number }}
-          VCS__HTTP_CLIENT__API_URL: "https://api.github.com"
-          VCS__HTTP_CLIENT__API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          debug: true
+          review_simple_changes: false
+          review_comment_lgtm: false
+          openai_base_url: "https://openrouter.ai/api/v1"
+          openai_light_model: "openai/gpt-5-nano"
+          openai_heavy_model: "anthropic/claude-sonnet-4.6"
