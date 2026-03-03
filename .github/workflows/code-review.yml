@@ -31,4 +31,4 @@ jobs:
           review_comment_lgtm: false
           openai_base_url: "https://openrouter.ai/api/v1"
           openai_light_model: "openai/gpt-5-nano"
-          openai_heavy_model: "anthropic/claude-sonnet-4.6"
+          openai_heavy_model: "meta-llama/llama-3-70b-instruct"
