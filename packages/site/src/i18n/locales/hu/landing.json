@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Jobb hely a jegyzeteidnek.",
+		"subtitle": "A Deepink ergonomikussá és élvezetessé teszi a jegyzetelést.",
+		"button": {
+			"get": "Deepink letöltése",
+			"features": "Tudj meg többet"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Egy tároló, amiben megbízhatsz",
+				"text": "A tárolódban minden titkosítva van. Sok más alkalmazással ellentétben ez valóban <0>az összes adatodra</0> vonatkozik, beleértve a jegyzetek tartalmát, a fájlokat és a metaadatokat. Te választod ki a titkosítási algoritmust, amiben megbízol.\n\nA Deepink egy <1>nyílt forráskódú</1> alkalmazás – a kódját ellenőrizheted, nem csak elhiheted."
+			},
+			"workflow": {
+				"title": "Az ergonómia",
+				"text": "A Deepink a mindennapi gyorsaságra lett tervezve, a leggyakoribb feladatokból eltávolítva a felesleges lépéseket. A legtöbb művelethez <0>akár 80%-kal kevesebb műveletre</0> van szükség, mint más jegyzetelő alkalmazásokban."
+			},
+			"universality": {
+				"title": "A tárolódba minden belefér",
+				"text": "Tartsd egy helyen az összes információdat. A munkaterek és a beágyazott címkék segítenek elkülöníteni a kontextusokat és gyorsan megtalálni, amire szükséged van – legyen szó projektleírásokról, szerződésekről, kódrészletekről, könyvidézetekről, naplóról, kutatásról vagy bármi másról."
+			}
+		},
+		"cta": {
+			"text": "Ingyenes. Korlátok nélkül.",
+			"button": "Letöltés most"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Adj struktúrát a gondolataidnak",
+			"text": "Rögzíts egy gyors ötletet, vagy építs fel valami összetettebbet. A Deepink rendet és fókuszt hoz mindenbe, amit leírsz."
+		},
+		"content": {
+			"links": {
+				"title": "Hivatkozások",
+				"text": "A hivatkozásokkal bármelyik jegyzetre hivatkozhatsz a tárolódon belül. Kösd össze a megbeszélések jegyzeteit a döntésekkel, a kutatást a következtetésekkel, a terveket a végrehajtással – anélkül, hogy ugyanazt a bekezdést többször kellene másolnod.\n\nA visszahivatkozások megmutatják az összes jegyzetet, amely az éppen megtekintett jegyzetre hivatkozik, így könnyen nyomon követheted az összefüggéseket és természetesen navigálhatsz a tudásbázisodban.\n\nA hivatkozások összekapcsolják a kontextust, így az összetartozó jegyzetek könnyen követhetők maradnak."
+			},
+			"workspaces": {
+				"title": "Munkaterek",
+				"text": "Az életed különböző területeit elkülönítheted anélkül, hogy több tárolót kellene létrehoznod.\n\nA munkaterek fókuszált tereket hoznak létre egyetlen biztonságos tárolón belül. Nyisd meg a tárolódat egyszer, aztán válts kontextust – Ügyfélprojektek, Személyes napló, Egészségügyi jegyzetek vagy Tanulás – anélkül, hogy bármi összekeveredne.\n\nRendezetten és kontextusban maradhatsz. Nyugodtan megoszthatod a képernyődet: a privát tartalom nem jelenik meg véletlenül.\n\nEgy tároló. Tiszta határok. Nulla súrlódás."
+			},
+			"history": {
+				"title": "Jegyzetverziók",
+				"text": "Minden jegyzet megőrzi a változtatások teljes előzményét.\n\nA Deepink automatikusan menti a verziókat, így láthatod, mi változott, visszaállíthatsz egy korábbi változatot, vagy nyomon követheted, hogyan fejlődött egy gondolat az idők során. Akár tegnap, akár egy éve szerkesztetted – semmi fontos nem vész el.\n\nA korábbi verziók mindig elérhetők, amikor szükséged van rájuk."
+			},
+			"reminders": {
+				"title": "Emlékeztetők",
+				"text": "Csatolj emlékeztetőt bármelyik jegyzethez, és kapj értesítést a megfelelő időben.\n\nÁllíts be utókövetési emlékeztetőt megbeszélés-jegyzetekhez, határidőt projekttervekhez, megújítási dátumot dokumentumokhoz, vagy ellenőrzési pontot személyes célokhoz. Minden emlékeztető az adott jegyzethez tartozik – nem egy külön feladatként egy másik alkalmazásban.\n\nAmikor eljön az ideje, megnyitod a jegyzetet, és minden részlet a helyén van.\n\nAz emlékeztetők segítenek cselekedni az információid alapján, nem csak tárolni azokat."
+			},
+			"tags": {
+				"title": "Beágyazott címkék",
+				"text": "Rendszerezd a jegyzeteidet olyan címkékkel, amelyek átlátható hierarchiát tükröznek.\n\nA beágyazott címkék szülő/gyermek struktúrát tesznek lehetővé, így a tágabb témák konkrét altémákat tartalmazhatnak. Például az Ügyfelek tartalmazhatja az egyes ügyfélneveket, a Pénzügyek pedig az Adók, Számlák és Jelentések altémákat.\n\nA mappákkal ellentétben a címkék nem kizárólagosak. Egy jegyzetnek egyszerre több címkéje is lehet – ügyfél, pénzügy és időszak.\n\nA beágyazott címkék egyszerre adnak pontosságot és rugalmasságot, még akkor is, ha a témák átfedik egymást."
+			},
+			"encryption": {
+				"title": "Titkosítás",
+				"text": "A teljes tároló titkosítva van. Egyes alkalmazások csak szinkronizálás közben vagy csak a jegyzet szövegét titkosítják. A Deepink a tárolód teljes struktúráját védi.\n\nA jegyzeteid, a csatolt fájlaid és a metaadataid senki számára nem olvashatók rajtad kívül – beleértve minket is. Még a fájlméretek is el vannak rejtve az elemzési kockázat csökkentése érdekében.\n\nAmit tárolsz, az eleve privát marad."
+			}
+		}
+	},
+	"cta": {
+		"title": "Hely az életed minden területének",
+		"text": "Tartsd a mindennapi jegyzeteidet, olvasmányaidat és terveidet egyetlen privát helyen. Válts kontextust egyetlen kattintással, maradj rendezett, és írj tovább a flow megszakítása nélkül.",
+		"button": "Deepink letöltése"
+	}
+}

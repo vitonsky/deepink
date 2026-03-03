@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Скачать",
+		"features": "Возможности",
+		"docs": "Документация",
+		"blog": "Блог",
+		"changelog": "Changelog"
+	},
+	"links": {
+		"followUs": {
+			"title": "Мы в соцсетях"
+		},
+		"introduction": {
+			"title": "Начало работы",
+			"content": {
+				"download": "Скачать",
+				"docs": "Документация",
+				"overview": "Обзор"
+			}
+		},
+		"learn": {
+			"title": "Узнать больше",
+			"content": {
+				"help": "Помощь",
+				"changelog": "Changelog",
+				"about": "О проекте",
+				"security": "Безопасность",
+				"roadmap": "Планы развития"
+			}
+		},
+		"resources": {
+			"title": "Ресурсы",
+			"content": {
+				"terms": "Условия использования",
+				"privacy": "Политика конфиденциальности"
+			}
+		}
+	}
+}

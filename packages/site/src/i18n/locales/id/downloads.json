@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Unduh untuk <0/>",
+		"releaseDate": "Diperbarui pada {{date}}"
+	},
+	"links": {
+		"title": "Semua platform"
+	}
+}

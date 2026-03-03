@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Descarcă",
+		"features": "Funcționalități",
+		"docs": "Documentație",
+		"blog": "Blog",
+		"changelog": "Changelog"
+	},
+	"links": {
+		"followUs": {
+			"title": "Urmărește-ne"
+		},
+		"introduction": {
+			"title": "Primii pași",
+			"content": {
+				"download": "Descarcă",
+				"docs": "Documentație",
+				"overview": "Prezentare generală"
+			}
+		},
+		"learn": {
+			"title": "Află mai multe",
+			"content": {
+				"help": "Ajutor",
+				"changelog": "Changelog",
+				"about": "Despre",
+				"security": "Securitate",
+				"roadmap": "Roadmap"
+			}
+		},
+		"resources": {
+			"title": "Resurse",
+			"content": {
+				"terms": "Termeni de utilizare",
+				"privacy": "Politica de confidențialitate"
+			}
+		}
+	}
+}

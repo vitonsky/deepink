@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Stáhnout pro <0/>",
+		"releaseDate": "Aktualizováno {{date}}"
+	},
+	"links": {
+		"title": "Všechny platformy"
+	}
+}

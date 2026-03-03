@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "<0/> için indir",
+		"releaseDate": "{{date}} tarihinde güncellendi"
+	},
+	"links": {
+		"title": "Tüm platformlar"
+	}
+}

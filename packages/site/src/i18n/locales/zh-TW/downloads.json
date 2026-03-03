@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "下載 <0/> 版本",
+		"releaseDate": "更新日期：{{date}}"
+	},
+	"links": {
+		"title": "所有平台"
+	}
+}

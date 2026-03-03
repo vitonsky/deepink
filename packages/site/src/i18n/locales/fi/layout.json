@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Lataa",
+		"features": "Ominaisuudet",
+		"docs": "Dokumentaatio",
+		"blog": "Blogi",
+		"changelog": "Muutosloki"
+	},
+	"links": {
+		"followUs": {
+			"title": "Seuraa meitä"
+		},
+		"introduction": {
+			"title": "Aloita tästä",
+			"content": {
+				"download": "Lataa",
+				"docs": "Dokumentaatio",
+				"overview": "Yleiskatsaus"
+			}
+		},
+		"learn": {
+			"title": "Lue lisää",
+			"content": {
+				"help": "Ohje",
+				"changelog": "Muutosloki",
+				"about": "Tietoa",
+				"security": "Tietoturva",
+				"roadmap": "Tiekartta"
+			}
+		},
+		"resources": {
+			"title": "Resurssit",
+			"content": {
+				"terms": "Käyttöehdot",
+				"privacy": "Tietosuojakäytäntö"
+			}
+		}
+	}
+}

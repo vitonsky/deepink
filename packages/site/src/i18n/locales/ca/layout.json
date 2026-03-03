@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Descarregar",
+		"features": "Funcionalitats",
+		"docs": "Documentació",
+		"blog": "Blog",
+		"changelog": "Registre de canvis"
+	},
+	"links": {
+		"followUs": {
+			"title": "Segueix-nos"
+		},
+		"introduction": {
+			"title": "Comença aquí",
+			"content": {
+				"download": "Descarregar",
+				"docs": "Documentació",
+				"overview": "Visió general"
+			}
+		},
+		"learn": {
+			"title": "Més informació",
+			"content": {
+				"help": "Ajuda",
+				"changelog": "Registre de canvis",
+				"about": "Sobre nosaltres",
+				"security": "Seguretat",
+				"roadmap": "Full de ruta"
+			}
+		},
+		"resources": {
+			"title": "Recursos",
+			"content": {
+				"terms": "Condicions d'ús",
+				"privacy": "Política de privadesa"
+			}
+		}
+	}
+}

@@ -1,0 +1,17 @@
+:root {
+	--sl-content-width: 50rem;
+	--sl-text-5xl: 3.5rem;
+}
+
+.site-title {
+	img {
+		max-height: 26px;
+	}
+}
+
+.sl-markdown-content {
+	img {
+		border: 1px solid #00000017;
+		border-radius: 8px;
+	}
+}

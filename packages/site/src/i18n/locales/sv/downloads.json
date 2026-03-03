@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Ladda ner för <0/>",
+		"releaseDate": "Uppdaterad {{date}}"
+	},
+	"links": {
+		"title": "Alla plattformar"
+	}
+}

@@ -69,6 +69,8 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 						throw new Error('Note not found');
 					}
 
+					const title = getNoteTitle(note.content, 50);
+
 					return (
 						<Tab
 							key={note.id}
@@ -82,7 +84,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 							whiteSpace="nowrap"
 							flex="1 1 auto"
 							marginBottom={0}
-							title={getNoteTitle(note.content)}
+							title={title}
 							textDecorationLine={
 								note.isDeleted ? 'line-through' : undefined
 							}
@@ -119,7 +121,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 									overflow="hidden"
 									textOverflow="ellipsis"
 								>
-									{getNoteTitle(note.content, 25)}
+									{title}
 								</Text>
 								<Box
 									title="Close tab"

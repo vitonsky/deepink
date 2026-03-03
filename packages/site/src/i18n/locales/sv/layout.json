@@ -1,0 +1,39 @@
+{
+	"nav": {
+		"download": "Ladda ner",
+		"features": "Funktioner",
+		"docs": "Dokumentation",
+		"blog": "Blogg",
+		"changelog": "Ändringslogg"
+	},
+	"links": {
+		"followUs": {
+			"title": "Följ oss"
+		},
+		"introduction": {
+			"title": "Kom igång",
+			"content": {
+				"download": "Ladda ner",
+				"docs": "Dokumentation",
+				"overview": "Översikt"
+			}
+		},
+		"learn": {
+			"title": "Läs mer",
+			"content": {
+				"help": "Hjälp",
+				"changelog": "Ändringslogg",
+				"about": "Om oss",
+				"security": "Säkerhet",
+				"roadmap": "Roadmap"
+			}
+		},
+		"resources": {
+			"title": "Resurser",
+			"content": {
+				"terms": "Användarvillkor",
+				"privacy": "Integritetspolicy"
+			}
+		}
+	}
+}

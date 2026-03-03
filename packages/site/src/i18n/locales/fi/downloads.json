@@ -1,0 +1,9 @@
+{
+	"main": {
+		"download": "Lataa – <0/>",
+		"releaseDate": "Päivitetty {{date}}"
+	},
+	"links": {
+		"title": "Kaikki alustat"
+	}
+}

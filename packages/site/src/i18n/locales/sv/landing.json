@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "En bättre plats för dina anteckningar.",
+		"subtitle": "Deepink gör antecknande ergonomiskt och roligt.",
+		"button": {
+			"get": "Ladda ner Deepink",
+			"features": "Läs mer"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Ett valv du kan lita på",
+				"text": "Allt i ditt valv är krypterat. Till skillnad från många andra appar innebär det verkligen <0>all din data</0> – anteckningarnas innehåll, filer och metadata. Du väljer själv vilken algoritm du litar på.\n\nDeepink är en app med <1>öppen källkod</1>, med kod du kan granska, inte bara lita på."
+			},
+			"workflow": {
+				"title": "Ergonomin",
+				"text": "Deepink är byggt för att vara snabbt i vardagen, med friktion borttagen från de vanligaste uppgifterna. För de flesta moment krävs <0>upp till 80 % färre åtgärder</0> jämfört med andra anteckningsappar."
+			},
+			"universality": {
+				"title": "Ditt valv rymmer allt",
+				"text": "Samla allt i ditt valv. Arbetsytor och nästlade taggar hjälper dig att separera sammanhang och snabbt hitta det du behöver – från projektspecar, avtal och kodsnuttar till bokcitat, dagbok, research och mer."
+			}
+		},
+		"cta": {
+			"text": "Gratis att använda. Inga begränsningar.",
+			"button": "Ladda ner nu"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Strukturera ditt tänkande",
+			"text": "Fånga en snabb insikt eller bygg något komplext. Deepink ger ordning och fokus åt allt du skriver ner."
+		},
+		"content": {
+			"links": {
+				"title": "Länkar",
+				"text": "Länkar gör det möjligt att referera till vilken anteckning som helst, var som helst i ditt valv. Koppla mötesanteckningar till beslut, research till slutsatser och planer till genomförande – utan att duplicera samma stycke.\n\nBaklänkar visar varje anteckning som länkar till den du tittar på, så det är enkelt att spåra kopplingar och navigera naturligt i din kunskap.\n\nLänkar håller sammanhanget ihop, så relaterade anteckningar förblir lätta att följa."
+			},
+			"workspaces": {
+				"title": "Arbetsytor",
+				"text": "Håll olika delar av ditt liv åtskilda utan att skapa flera valv.\n\nArbetsytor skapar fokuserade utrymmen inuti ett enda säkert valv. Lås upp valvet en gång och växla sedan mellan sammanhang som Kundprojekt, Personlig dagbok, Hälsoanteckningar eller Lärande utan att blanda ihop något.\n\nHåll ordning och håll dig i rätt kontext. Dela din skärm med tillförsikt – privat innehåll dyker inte upp av misstag.\n\nEtt valv. Tydliga gränser. Noll friktion."
+			},
+			"history": {
+				"title": "Anteckningsversioner",
+				"text": "Varje anteckning sparar en komplett historik över ändringar.\n\nDeepink sparar versioner automatiskt, så det går att se vad som ändrats, återställa ett tidigare utkast eller följa hur en idé utvecklats över tid. Oavsett om redigeringen skedde igår eller för ett år sedan – inget viktigt går förlorat.\n\nTidigare versioner finns alltid tillgängliga när de behövs."
+			},
+			"reminders": {
+				"title": "Påminnelser",
+				"text": "Koppla en påminnelse till valfri anteckning och bli notifierad vid rätt tidpunkt.\n\nSätt uppföljningspåminnelser för mötesanteckningar, deadlines för projektplaner, förnyelsedatum för dokument eller avstämningar för personliga mål. Varje påminnelse hör till den specifika anteckningen – inte som en separat uppgift i en annan app.\n\nNär det är dags öppnas anteckningen med alla detaljer på plats.\n\nPåminnelser hjälper dig att agera på din information, inte bara lagra den."
+			},
+			"tags": {
+				"title": "Nästlade taggar",
+				"text": "Organisera dina anteckningar med taggar som speglar en tydlig hierarki.\n\nNästlade taggar gör det möjligt att skapa en förälder/barn-struktur, så breda ämnen kan innehålla specifika underämnen. Till exempel kan Kunder innehålla enskilda kundnamn, och Ekonomi kan innehålla Skatt, Fakturor och Rapporter.\n\nTill skillnad från mappar är taggar inte exklusiva. En anteckning kan ha flera taggar samtidigt – kund, ekonomi och en tidsperiod.\n\nNästlade taggar ger både precision och flexibilitet, även när ämnen överlappar."
+			},
+			"encryption": {
+				"title": "Kryptering",
+				"text": "Hela valvet är krypterat. Vissa appar krypterar bara data under synkronisering eller själva anteckningstexten. Deepink skyddar hela strukturen i ditt valv.\n\nDina anteckningar, bilagor och metadata är oläsbara för alla utom dig – inklusive oss. Även filstorlekar maskeras för att minska risken för analys.\n\nDet du lagrar förblir privat by design."
+			}
+		}
+	},
+	"cta": {
+		"title": "Ett utrymme för varje del av ditt liv",
+		"text": "Samla vardagsanteckningar, läsning och planer på en privat plats. Växla kontext med ett klick, håll ordning och fortsätt skriva utan att tappa flödet.",
+		"button": "Hämta Deepink"
+	}
+}

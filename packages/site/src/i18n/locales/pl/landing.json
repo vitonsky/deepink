@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Lepsze miejsce na Twoje notatki.",
+		"subtitle": "Deepink sprawia, że tworzenie notatek jest ergonomiczne i przyjemne.",
+		"button": {
+			"get": "Pobierz Deepink",
+			"features": "Dowiedz się więcej"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Sejf, któremu można zaufać",
+				"text": "Wszystko w Twoim sejfie jest zaszyfrowane. W odróżnieniu od wielu innych aplikacji, oznacza to naprawdę <0>wszystkie dane</0> — treść notatek, pliki i metadane. Algorytm szyfrowania wybierasz sam.\n\nDeepink to aplikacja <1>open source</1> — kod można zweryfikować, a nie tylko ufać na słowo."
+			},
+			"workflow": {
+				"title": "Ergonomia",
+				"text": "Deepink jest zaprojektowany tak, by codzienne korzystanie było szybkie i bezproblemowe. Większość zadań wymaga <0>do 80% mniej działań</0> niż w innych aplikacjach do notatek."
+			},
+			"universality": {
+				"title": "Twój sejf pomieści wszystko",
+				"text": "Przechowuj wszystko w jednym miejscu. Przestrzenie robocze i zagnieżdżone tagi pomagają rozdzielać konteksty i szybko znajdować to, czego potrzebujesz — od specyfikacji projektów, umów i fragmentów kodu po cytaty z książek, dziennik, notatki z badań i wiele więcej."
+			}
+		},
+		"cta": {
+			"text": "Bezpłatnie. Bez ograniczeń.",
+			"button": "Pobierz teraz"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Uporządkuj swoje myśli",
+			"text": "Szybka myśl albo złożony projekt. Deepink nadaje strukturę i skupienie wszystkiemu, co zapiszesz."
+		},
+		"content": {
+			"links": {
+				"title": "Linki",
+				"text": "Linki pozwalają odwoływać się do dowolnej notatki w sejfie. Można powiązać notatki ze spotkań z decyzjami, badania z wnioskami, a plany z realizacją — bez kopiowania tych samych fragmentów.\n\nBacklinki pokazują każdą notatkę, która linkuje do aktualnie przeglądanej, dzięki czemu łatwo prześledzić powiązania i naturalnie poruszać się po swojej wiedzy.\n\nLinki utrzymują kontekst, więc powiązane notatki zawsze są pod ręką."
+			},
+			"workspaces": {
+				"title": "Przestrzenie robocze",
+				"text": "Różne obszary życia mogą być rozdzielone bez tworzenia wielu sejfów.\n\nPrzestrzenie robocze to wydzielone strefy wewnątrz jednego bezpiecznego sejfu. Wystarczy odblokować sejf raz, a potem przełączać się między kontekstami — Projekty klientów, Osobisty dziennik, Zdrowie, Nauka — bez mieszania treści.\n\nPorządek i jasny podział kontekstów. Udostępnianie ekranu bez obaw — prywatne treści nie pojawią się przypadkowo.\n\nJeden sejf. Wyraźne granice. Zero tarcia."
+			},
+			"history": {
+				"title": "Wersje notatek",
+				"text": "Każda notatka zachowuje pełną historię zmian.\n\nDeepink zapisuje wersje automatycznie — można sprawdzić, co się zmieniło, przywrócić wcześniejszy szkic albo prześledzić, jak rozwijał się pomysł. Niezależnie od tego, czy edycja była wczoraj, czy rok temu — nic ważnego nie ginie.\n\nPoprzednie wersje są zawsze dostępne, gdy ich potrzebujesz."
+			},
+			"reminders": {
+				"title": "Przypomnienia",
+				"text": "Do każdej notatki można dołączyć przypomnienie i otrzymać powiadomienie we właściwym momencie.\n\nPrzypomnienie o kontynuacji po spotkaniu, termin realizacji projektu, data odnowienia dokumentu, sprawdzenie postępów w osobistych celach — każde przypomnienie jest powiązane z konkretną notatką, a nie z osobnym zadaniem w innej aplikacji.\n\nGdy nadejdzie czas, otwierasz notatkę ze wszystkimi szczegółami na miejscu.\n\nPrzypomnienia pomagają działać na podstawie informacji, a nie tylko je przechowywać."
+			},
+			"tags": {
+				"title": "Zagnieżdżone tagi",
+				"text": "Notatki można organizować za pomocą tagów odzwierciedlających przejrzystą hierarchię.\n\nZagnieżdżone tagi tworzą strukturę nadrzędny/podrzędny — szerokie tematy mogą zawierać konkretne podtematy. Na przykład tag Klienci może obejmować nazwy poszczególnych klientów, a Finanse — Podatki, Faktury i Raporty.\n\nW odróżnieniu od folderów tagi nie są wykluczające. Jedna notatka może mieć kilka tagów jednocześnie — klient, finanse i okres rozliczeniowy.\n\nZagnieżdżone tagi dają precyzję i elastyczność, nawet gdy tematy się przenikają."
+			},
+			"encryption": {
+				"title": "Szyfrowanie",
+				"text": "Cały sejf jest zaszyfrowany. Niektóre aplikacje szyfrują dane tylko podczas synchronizacji albo sam tekst notatki. Deepink chroni pełną strukturę sejfu.\n\nNotatki, załączniki i metadane są nieczytelne dla nikogo poza Tobą — również dla nas. Nawet rozmiary plików są zaciemniane, by ograniczyć ryzyko analizy.\n\nTo, co przechowujesz, pozostaje prywatne z założenia."
+			}
+		}
+	},
+	"cta": {
+		"title": "Miejsce na każdy obszar Twojego życia",
+		"text": "Codzienne notatki, lektury i plany w jednym prywatnym miejscu. Przełączanie kontekstów jednym kliknięciem, porządek i pisanie bez przerywania toku myśli.",
+		"button": "Pobierz Deepink"
+	}
+}

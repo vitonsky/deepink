@@ -1,0 +1,67 @@
+{
+	"hero": {
+		"title": "Lepší místo pro vaše poznámky.",
+		"subtitle": "Deepink dělá psaní poznámek ergonomickým a příjemným.",
+		"button": {
+			"get": "Stáhnout Deepink",
+			"features": "Zjistit více"
+		}
+	},
+	"highlights": {
+		"content": {
+			"encryption": {
+				"title": "Úložiště, kterému můžete věřit",
+				"text": "Vše ve vašem úložišti je šifrované. Na rozdíl od mnoha jiných aplikací to skutečně znamená <0>všechna vaše data</0> včetně obsahu poznámek, souborů a metadat. Šifrovací algoritmus si můžete zvolit sami.\n\nDeepink je aplikace s <1>otevřeným zdrojovým kódem</1>, který si můžete ověřit, nejen mu důvěřovat."
+			},
+			"workflow": {
+				"title": "Ergonomie",
+				"text": "Deepink je navržený tak, aby byl v každodenním používání rychlý a odstranil zbytečné kroky z nejčastějších úkonů. U většiny úkolů vyžaduje <0>až o 80 % méně akcí</0> než jiné aplikace na poznámky."
+			},
+			"universality": {
+				"title": "Vaše úložiště pojme vše",
+				"text": "Uchovávejte vše na jednom místě. Pracovní prostory a vnořené štítky pomáhají oddělovat kontexty a rychle najít, co potřebujete — od specifikací projektů, smluv a úryvků kódu po citáty z knih, denní záznamy, výzkum a další."
+			}
+		},
+		"cta": {
+			"text": "Zdarma. Bez omezení.",
+			"button": "Stáhnout"
+		}
+	},
+	"features": {
+		"intro": {
+			"title": "Dejte myšlenkám strukturu",
+			"text": "Zachyťte rychlý nápad nebo vybudujte něco komplexního. Deepink přináší řád a soustředění do všeho, co si zapisujete."
+		},
+		"content": {
+			"links": {
+				"title": "Odkazy",
+				"text": "Odkazy umožňují odkazovat na jakoukoli poznámku kdekoli ve vašem úložišti. Propojte zápisy z jednání s rozhodnutími, výzkum se závěry a plány s realizací — bez kopírování stejného odstavce.\n\nZpětné odkazy zobrazují každou poznámku, která odkazuje na tu právě prohlíženou, takže je snadné sledovat souvislosti a přirozeně procházet vaše znalosti.\n\nOdkazy udržují kontext propojený, takže související poznámky zůstávají přehledné."
+			},
+			"workspaces": {
+				"title": "Pracovní prostory",
+				"text": "Oddělte různé oblasti svého života, aniž byste museli vytvářet více úložišť.\n\nPracovní prostory vytvářejí oddělené prostředí uvnitř jednoho zabezpečeného úložiště. Odemkněte úložiště jednou a pak přepínejte mezi kontexty jako Klientské projekty, Osobní deník, Zdravotní záznamy nebo Studium — bez jakéhokoli míchání.\n\nVše zůstává organizované a v kontextu. Sdílejte obrazovku s jistotou: soukromý obsah se nezobrazí omylem.\n\nJedno úložiště. Jasné hranice. Žádné zbytečné kroky."
+			},
+			"history": {
+				"title": "Verze poznámek",
+				"text": "Každá poznámka uchovává kompletní historii změn.\n\nDeepink ukládá verze automaticky, takže můžete vidět, co se změnilo, obnovit dřívější verzi nebo sledovat, jak se myšlenka vyvíjela v čase. Ať byla poznámka upravena včera nebo před rokem, nic důležitého se neztratí.\n\nPředchozí verze jsou vždy k dispozici, když je potřebujete."
+			},
+			"reminders": {
+				"title": "Připomínky",
+				"text": "Připojte připomínku k jakékoli poznámce a nechte se upozornit ve správný čas.\n\nNastavte si připomínky pro následné kroky ze schůzek, termíny projektových plánů, data obnovení dokumentů nebo kontroly osobních cílů. Každá připomínka zůstává u konkrétní poznámky, ne jako samostatný úkol v jiné aplikaci.\n\nKdyž přijde čas, otevřete poznámku se všemi detaily na místě.\n\nPřipomínky pomáhají s vašimi informacemi pracovat, ne je jen ukládat."
+			},
+			"tags": {
+				"title": "Vnořené štítky",
+				"text": "Organizujte poznámky pomocí štítků s jasnou hierarchií.\n\nVnořené štítky umožňují vytvořit strukturu nadřazený/podřazený, takže široká témata mohou obsahovat konkrétní podtémata. Například Klienti mohou zahrnovat jména jednotlivých klientů a Finance mohou obsahovat Daně, Faktury a Reporty.\n\nNa rozdíl od složek nejsou štítky exkluzivní. Poznámka může mít více štítků najednou — klient, finance a časové období.\n\nVnořené štítky nabízejí přesnost i flexibilitu, i když se témata překrývají."
+			},
+			"encryption": {
+				"title": "Šifrování",
+				"text": "Celé úložiště je šifrované. Některé aplikace šifrují data pouze při synchronizaci nebo jen text poznámky. Deepink chrání kompletní strukturu vašeho úložiště.\n\nVaše poznámky, přílohy a metadata jsou nečitelné pro kohokoli kromě vás, včetně nás. Dokonce i velikosti souborů jsou maskovány, aby se snížilo riziko analýzy.\n\nCo si uložíte, zůstává soukromé už od základu."
+			}
+		}
+	},
+	"cta": {
+		"title": "Prostor pro každou část vašeho života",
+		"text": "Uchovávejte každodenní poznámky, čtení i plány na jednom soukromém místě. Přepínejte kontexty jedním kliknutím, udržujte pořádek a pište bez přerušení.",
+		"button": "Získat Deepink"
+	}
+}

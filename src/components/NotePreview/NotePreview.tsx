@@ -30,7 +30,7 @@ export const NotePreview = forwardRef<
 					<TextSample
 						text={title}
 						highlightText={textToHighlight}
-						lengthLimit={30}
+						lengthLimit={50}
 					/>
 				</Text>
 
