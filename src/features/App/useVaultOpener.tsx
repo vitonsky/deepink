@@ -47,7 +47,7 @@ export const useVaultOpener = ({
 
 			try {
 				// Profiles with password
-				if (profile.encryption && password === undefined)
+				if (password === undefined)
 					return { status: 'error', message: 'Enter password' };
 
 				await profiles.openProfile({ profile, password }, true);
