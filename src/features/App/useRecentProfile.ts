@@ -7,7 +7,7 @@ export type RecentProfile = {
 };
 
 export const useRecentProfile = (config: ConfigStorage) => {
-	const [profileId, setProfileId] = useState<RecentProfile>({
+	const [recentProfile, setRecentProfile] = useState<RecentProfile>({
 		isLoaded: false,
 		profileId: null,
 	});
@@ -19,12 +19,12 @@ export const useRecentProfile = (config: ConfigStorage) => {
 
 		config.get('activeProfile').then((activeProfile) => {
 			isRestoredRef.current = true;
-			setProfileId({
+			setRecentProfile({
 				isLoaded: true,
 				profileId: activeProfile,
 			});
 		});
 	}, [config]);
 
-	return profileId;
+	return recentProfile;
 };
