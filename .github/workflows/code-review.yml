@@ -48,7 +48,7 @@ jobs:
         env:
           # --- LLM configuration ---
           LLM__PROVIDER: "OPENROUTER"
-          LLM__META__MODEL: "meta-llama/llama-3-70b-instruct"
+          LLM__META__MODEL: "anthropic/claude-sonnet-4.6"
           LLM__META__MAX_TOKENS: "100000"
           LLM__META__TEMPERATURE: "0.3"
           LLM__HTTP_CLIENT__API_URL: "https://openrouter.ai/api/v1"
