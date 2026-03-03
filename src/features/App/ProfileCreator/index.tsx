@@ -20,7 +20,7 @@ import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorith
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 
-import { ProfilesForm } from '../Profile/ProfilesForm';
+import { ProfilesForm } from '../ProfilesForm';
 
 export type NewProfile = {
 	name: string;
