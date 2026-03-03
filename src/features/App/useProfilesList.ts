@@ -4,7 +4,8 @@ import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
 import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
-import { NewProfile } from '@features/App/WorkspaceManager/ProfileCreator';
+
+import { NewProfile } from './ProfileCreator';
 
 export type ProfilesListApi = {
 	isProfilesLoaded: boolean;

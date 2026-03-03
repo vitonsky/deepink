@@ -392,6 +392,23 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
+
+	test('method getById returns all found notes and ignores missing ones', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		const notExistingNote = getUUID();
+
+		await expect(
+			registry.getById([...notesId, notExistingNote]),
+		).resolves.toHaveLength(10);
+
+		await db.close();
+	});
 });
 
 describe('multi instances', () => {
