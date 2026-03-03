@@ -35,17 +35,22 @@ export const useVaultOpener = ({
 
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
-			if (profile.encryption && password === undefined)
-				return { status: 'error', message: 'Enter password' };
-
 			setIsProfileOpening(true);
 
+			// Profiles with no password
+			if (!profile.encryption) {
+				await profiles.openProfile({ profile }, true);
+
+				setIsProfileOpening(false);
+				return { status: 'ok' };
+			}
+
 			try {
-				if (!profile.encryption) {
-					await profiles.openProfile({ profile }, true);
-				} else {
-					await profiles.openProfile({ profile, password }, true);
-				}
+				// Profiles with password
+				if (profile.encryption && password === undefined)
+					return { status: 'error', message: 'Enter password' };
+
+				await profiles.openProfile({ profile, password }, true);
 
 				return { status: 'ok' };
 			} catch (err) {
