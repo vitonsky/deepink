@@ -13,6 +13,9 @@ import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
 
+const isValidView = (view: string): view is NOTES_VIEW =>
+	Object.values(NOTES_VIEW).includes(view as NOTES_VIEW);
+
 export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -73,11 +76,11 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 					}),
 				);
 
-				if (view) {
+				if (view && isValidView(view)) {
 					dispatch(
 						workspacesApi.setView({
 							...workspaceData,
-							view: view as NOTES_VIEW,
+							view,
 						}),
 					);
 				}
