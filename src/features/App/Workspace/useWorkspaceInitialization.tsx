@@ -83,14 +83,17 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 				}
 
 				// Restore selected tag only if it exists
-				const selectedTag = tags.find((tag) => tag.id === selectedTagId);
-				if (selectedTag) {
-					dispatch(
-						workspacesApi.setSelectedTag({
-							...workspaceData,
-							tag: selectedTag.id,
-						}),
-					);
+				if (selectedTagId) {
+					const tag = tags.find((t) => t.id === selectedTagId);
+
+					if (tag) {
+						dispatch(
+							workspacesApi.setSelectedTag({
+								...workspaceData,
+								tag: tag.id,
+							}),
+						);
+					}
 				}
 
 				// Restore notes
