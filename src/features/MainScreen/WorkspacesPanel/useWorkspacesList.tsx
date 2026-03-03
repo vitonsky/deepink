@@ -22,9 +22,9 @@ export const useWorkspacesList = () => {
 		const updatedWorkspaces = await workspacesManager.getList();
 
 		dispatch(
-			workspacesApi.updateWorkspacesList({
+			workspacesApi.syncWorkspacesList({
 				profileId,
-				updatedWorkspaces,
+				workspacesList: updatedWorkspaces,
 			}),
 		);
 	}, [dispatch, profileId, workspacesManager]);
