@@ -13,16 +13,10 @@ import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
 
-export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
+export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const controls = useProfileControls();
-
-	const getWorkspaceState = useWorkspaceState({
-		sync: Boolean(workspace),
-		controls,
-		workspaceId: workspaceData.workspaceId,
-	});
 
 	// Load workspace config
 	useEffect(() => {
@@ -37,13 +31,11 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 
 			if (!workspaceConfig) return;
 
-			const { title, tags } = workspaceConfig.newNote;
-
 			dispatch(
 				workspacesApi.setWorkspaceNoteTemplateConfig({
 					...workspaceData,
-					title,
-					tags,
+					title: workspaceConfig.newNote.title,
+					tags: workspaceConfig.newNote.tags,
 				}),
 			);
 		};
@@ -52,23 +44,28 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 	}, [controls.profile.files, dispatch, workspaceData]);
 
 	// Init workspace state
+	const getWorkspaceState = useWorkspaceState({
+		sync: Boolean(workspace),
+		controls,
+		workspaceId: workspaceData.workspaceId,
+	});
 	useEffect(() => {
 		if (!workspace) return;
 
 		const initWorkspace = async () => {
 			try {
-				const [persistedState, tags] = await Promise.all([
+				const [state, tags] = await Promise.all([
 					getWorkspaceState(),
 					workspace.tagsRegistry.getTags(),
 				]);
 
+				// Load tags
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 
-				if (!persistedState) return;
+				if (!state) return;
 				const { search, view, selectedTagId, openedNoteIds, activeNoteId } =
-					persistedState;
+					state;
 
-				// Restore base state
 				dispatch(
 					workspacesApi.setSearch({
 						...workspaceData,
@@ -110,7 +107,9 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 				);
 
 				// Fallback to first note if saved active note is missing
-				const activeNote = notes.find((n) => n.id === activeNoteId) ?? notes[0];
+				const activeNote =
+					(activeNoteId && notes.find((n) => n.id === activeNoteId)) ||
+					notes[0];
 				dispatch(
 					workspacesApi.setActiveNote({
 						...workspaceData,
@@ -126,7 +125,6 @@ export const useSetupWorkspace = (workspace: WorkspaceContainer | null) => {
 				);
 			}
 		};
-
 		initWorkspace();
 
 		// Cleanup notes and ready state on unmount
