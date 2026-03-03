@@ -23,7 +23,7 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 import { useWorkspacesList } from './useWorkspacesList';
 
 export const workspaceNameValidator = z.object({
-	name: z.string().min(1, 'Name must not be empty'),
+	name: z.string().trim().min(1, 'Name must not be empty'),
 });
 
 export const WorkspaceCreatePopup = () => {
