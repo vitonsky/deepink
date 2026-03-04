@@ -92,6 +92,8 @@ export const useNoteCommandHandlers = () => {
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ noteId }) => {
 		const [note] = await notes.getById([noteId]);
+		if (!note) return;
+
 		await notesExport.exportNote(
 			noteId,
 			buildFileName(
@@ -116,8 +118,6 @@ export const useNoteCommandHandlers = () => {
 				.replace(mdCharsForEscapeRegEx, '\\$1');
 			const markdownLink = `[${noteTitle}](${formatNoteLink(noteId)})`;
 
-			console.log(`Copy markdown link ${markdownLink}`);
-
 			copyTextToClipboard(markdownLink);
 		},
 	);
@@ -126,7 +126,7 @@ export const useNoteCommandHandlers = () => {
 		const [sourceNote] = await notes.getById([noteId]);
 
 		if (!sourceNote) {
-			console.warn(`Not found note with id ${sourceNote}`);
+			console.warn(`Not found note with id ${noteId}`);
 			return;
 		}
 
