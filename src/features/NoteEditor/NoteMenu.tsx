@@ -32,7 +32,7 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 
 	return (
 		<Menu>
-			<MenuButton as={Button} variant="ghost" size="sm">
+			<MenuButton as={Button} variant="ghost" size="sm" title="Note options">
 				<FaEllipsis />
 			</MenuButton>
 			<MenuList>
