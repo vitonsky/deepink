@@ -117,7 +117,7 @@ export const useNoteCommandHandlers = () => {
 				.replace(mdCharsForEscapeRegEx, '\\$1');
 			const markdownLink = `[${noteTitle}](${formatNoteLink(noteId)})`;
 
-			copyTextToClipboard(markdownLink);
+			await copyTextToClipboard(markdownLink);
 		},
 	);
 
