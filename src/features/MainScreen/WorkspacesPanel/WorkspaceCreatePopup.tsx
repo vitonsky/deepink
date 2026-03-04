@@ -101,7 +101,16 @@ export const WorkspaceCreatePopup = () => {
 				<Text>Add new workspace</Text>
 			</ModalHeader>
 			<ModalBody paddingBottom="1rem">
-				<VStack w="100%" gap="2rem" align="start">
+				<VStack
+					as="form"
+					w="100%"
+					gap="2rem"
+					align="start"
+					onSubmit={(e) => {
+						e.preventDefault();
+						onCreate();
+					}}
+				>
 					<Text color="typography.secondary">
 						Create a new workspace to manage your notes even better. Separate
 						your notes by scope.
@@ -126,11 +135,7 @@ export const WorkspaceCreatePopup = () => {
 						</VStack>
 
 						<HStack w="100%" justifyContent="end">
-							<Button
-								variant="accent"
-								onClick={onCreate}
-								isDisabled={isPending}
-							>
+							<Button type="submit" variant="accent" isDisabled={isPending}>
 								Add
 							</Button>
 
