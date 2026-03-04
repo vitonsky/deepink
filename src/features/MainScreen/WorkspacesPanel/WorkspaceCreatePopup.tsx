@@ -50,6 +50,7 @@ export const WorkspaceCreatePopup = () => {
 
 	const onCreate = useCallback(async () => {
 		if (isPending) return;
+		setErrorMessage('');
 		setIsPending(true);
 
 		try {
