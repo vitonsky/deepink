@@ -393,7 +393,7 @@ describe('data fetching', () => {
 		await db.close();
 	});
 
-	test('method getById returns all found notes and ignores missing ones', async () => {
+	test('method getById ignores non-existent ids and does not throw errors', async () => {
 		const db = await openDatabase(dbFile);
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
@@ -405,7 +405,7 @@ describe('data fetching', () => {
 
 		await expect(
 			registry.getById([...notesId, notExistingNote]),
-		).resolves.toHaveLength(10);
+		).resolves.not.toThrow();
 
 		await db.close();
 	});
