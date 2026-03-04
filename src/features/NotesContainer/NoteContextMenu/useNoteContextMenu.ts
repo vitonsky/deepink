@@ -50,39 +50,39 @@ export const useNoteContextMenu = () => {
 	const runCommand = useCommand();
 
 	const noteContextMenuCallback = useCallback<ContextMenuCallback<NoteActions>>(
-		async ({ id, action }) => {
+		({ id, action }) => {
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CONTEXT_MENU_CLICK, {
 				action,
 			});
 
 			const actionsMap = {
-				[NoteActions.DELETE_TO_BIN]: async (noteId: string) => {
+				[NoteActions.DELETE_TO_BIN]: (noteId: string) => {
 					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
 						noteId,
 						permanently: false,
 					});
 				},
 
-				[NoteActions.DELETE_PERMANENTLY]: async (noteId: string) => {
+				[NoteActions.DELETE_PERMANENTLY]: (noteId: string) => {
 					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
 						noteId,
 						permanently: true,
 					});
 				},
 
-				[NoteActions.RESTORE_FROM_BIN]: async (noteId: string) => {
+				[NoteActions.RESTORE_FROM_BIN]: (noteId: string) => {
 					runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, { noteId });
 				},
 
-				[NoteActions.DUPLICATE]: async (noteId: string) => {
+				[NoteActions.DUPLICATE]: (noteId: string) => {
 					runCommand(GLOBAL_COMMANDS.DUPLICATE_NOTE, { noteId });
 				},
 
-				[NoteActions.COPY_MARKDOWN_LINK]: async (noteId: string) => {
+				[NoteActions.COPY_MARKDOWN_LINK]: (noteId: string) => {
 					runCommand(GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK, { noteId });
 				},
 
-				[NoteActions.EXPORT]: async (noteId: string) => {
+				[NoteActions.EXPORT]: (noteId: string) => {
 					runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { noteId });
 				},
 			};
