@@ -52,7 +52,7 @@ export const WorkspaceSettings = () => {
 	const telemetry = useTelemetryTracker();
 
 	const {
-		profile: { db },
+		profile: { db, files: profileFileManager },
 	} = useProfileControls();
 
 	const { abort: abortImport } = useImportNotesPreset();
@@ -79,10 +79,6 @@ export const WorkspaceSettings = () => {
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
-
-	const {
-		profile: { files: profileFileManager },
-	} = useProfileControls();
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
