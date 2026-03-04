@@ -33,7 +33,6 @@ export const useNoteCommandHandlers = () => {
 	const tagsRegistry = useTagsRegistry();
 
 	const noteActions = useNoteActions();
-	const notesRegistry = useNotesRegistry();
 
 	const notesExport = useNotesExport();
 	const currentWorkspace = useWorkspaceData();
@@ -98,7 +97,7 @@ export const useNoteCommandHandlers = () => {
 			noteId,
 			buildFileName(
 				workspaceData?.name,
-				note?.content.title.trim().slice(0, 50).trim() || `note_${noteId}`,
+				note.content.title.trim().slice(0, 50).trim() || `note_${noteId}`,
 			),
 		);
 	});
@@ -147,14 +146,14 @@ export const useNoteCommandHandlers = () => {
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE,
 		async ({ noteId }) => {
-			const [note] = await notesRegistry.getById([noteId]);
+			const [note] = await notes.getById([noteId]);
 			if (!note) {
 				console.warn(`Not found note with id ${noteId}`);
 				return;
 			}
 
 			const newArchivedState = !note.isArchived;
-			await notesRegistry.updateMeta([noteId], {
+			await notes.updateMeta([noteId], {
 				isArchived: newArchivedState,
 			});
 			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
@@ -168,14 +167,14 @@ export const useNoteCommandHandlers = () => {
 	useWorkspaceCommandCallback(
 		GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK,
 		async ({ noteId }) => {
-			const [note] = await notesRegistry.getById([noteId]);
+			const [note] = await notes.getById([noteId]);
 			if (!note) {
 				console.warn(`Not found note with id ${noteId}`);
 				return;
 			}
 
 			const newBookmarkedState = !note.isBookmarked;
-			await notesRegistry.updateMeta([noteId], {
+			await notes.updateMeta([noteId], {
 				isBookmarked: newBookmarkedState,
 			});
 			eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
