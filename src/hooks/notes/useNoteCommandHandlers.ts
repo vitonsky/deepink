@@ -56,7 +56,7 @@ export const useNoteCommandHandlers = () => {
 
 			if (deletionConfig.confirm && !confirm(confirmMessage)) return;
 
-			noteActions.close(noteId);
+			await noteActions.close(noteId);
 
 			if (shouldDeletePermanently) {
 				await notes.delete([noteId]);
