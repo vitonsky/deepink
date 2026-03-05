@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import chalk from 'chalk';
 import { app, Menu } from 'electron';
+import ms from 'ms';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
 import { FileController } from '@core/features/files/FileController';
 import { NodeFS } from '@core/features/files/NodeFS';
@@ -80,7 +81,10 @@ export class MainProcess {
 			const { telemetry } = this.context;
 			this.context = null;
 
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED);
+			await Promise.race([
+				telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED),
+				wait(ms('2s')),
+			]);
 		}
 
 		app.exit();
@@ -97,7 +101,7 @@ export class MainProcess {
 		// Setup telemetry
 		const telemetry = await this.setupTelemetry();
 
-		await telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
+		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
 		app.once('window-all-closed', () => this.quit());
 
 		// Init tray
@@ -244,9 +248,9 @@ export class MainProcess {
 
 		// Log app installs and updates
 		if (initVersions.isJustInstalled) {
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_INSTALLED);
+			telemetry.track(TELEMETRY_EVENT_NAME.APP_INSTALLED);
 		} else if (initVersions.isVersionUpdated) {
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_UPDATED, {
+			telemetry.track(TELEMETRY_EVENT_NAME.APP_UPDATED, {
 				previousVersion: initVersions.previousVersion?.version,
 			});
 		}
