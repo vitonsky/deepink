@@ -27,10 +27,14 @@ export enum GLOBAL_COMMANDS {
 	FOCUS_PREVIOUS_NOTE = 'Focus previous note',
 
 	/**
-	 * Deletes a note.
-	 * Behavior depends on the 'permanently' flag: false move the note to the bin, true removes it permanently
+	 * Deletes a note permanently
 	 */
-	DELETE_NOTE = 'Delete note',
+	DELETE_NOTE_PERMANENTLY = 'Delete note permanently',
+
+	/**
+	 * Move note to bin
+	 */
+	MOVE_NOTE_TO_BIN = 'Move note to bin',
 
 	/**
 	 * Restore a note from the Bin
@@ -94,7 +98,8 @@ export enum GLOBAL_COMMANDS {
 }
 
 type CommandsWithPayload = {
-	[GLOBAL_COMMANDS.DELETE_NOTE]: { noteId: string; permanently: boolean };
+	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { noteId: string };
+	[GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN]: { noteId: string };
 	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { noteId: string };
 
 	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { noteId: string };

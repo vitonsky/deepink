@@ -13,6 +13,7 @@ import {
 	FaShield,
 	FaSpellCheck,
 	FaTrashCan,
+	FaTrashCanArrowUp,
 } from 'react-icons/fa6';
 import {
 	Button,
@@ -26,9 +27,13 @@ import {
 import { INote } from '@core/features/notes';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
+import { useVaultSelector } from '@state/redux/profiles/hooks';
+import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 
 export const NoteMenu = memo(({ note }: { note: INote }) => {
 	const runCommand = useCommand();
+
+	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
 	return (
 		<Menu>
@@ -131,24 +136,42 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					</HStack>
 				</MenuItem>
 				<MenuItem
-					onClick={() =>
-						note.isDeleted
-							? runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, {
-									noteId: note.id,
-								})
-							: runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
-									noteId: note.id,
-									permanently: false,
-								})
-					}
+					onClick={() => {
+						if (deletionConfig.permanentDeletion || note.isDeleted) {
+							runCommand(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, {
+								noteId: note.id,
+							});
+							return;
+						}
+
+						runCommand(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, {
+							noteId: note.id,
+						});
+					}}
 				>
 					<HStack>
 						<FaTrashCan />
 						<Text>
-							{note.isDeleted ? 'Restore from Bin' : 'Delete to Bin'}
+							{deletionConfig.permanentDeletion || note.isDeleted
+								? 'Delete permanently'
+								: 'Delete to bin'}
 						</Text>
 					</HStack>
 				</MenuItem>
+				{note.isDeleted && (
+					<MenuItem
+						onClick={() =>
+							runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, {
+								noteId: note.id,
+							})
+						}
+					>
+						<HStack>
+							<FaTrashCanArrowUp />
+							<Text>Restore from bin</Text>
+						</HStack>
+					</MenuItem>
+				)}
 			</MenuList>
 		</Menu>
 	);

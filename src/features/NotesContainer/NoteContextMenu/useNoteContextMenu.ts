@@ -57,16 +57,14 @@ export const useNoteContextMenu = () => {
 
 			const actionsMap = {
 				[NoteActions.DELETE_TO_BIN]: (noteId: string) => {
-					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
+					runCommand(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, {
 						noteId,
-						permanently: false,
 					});
 				},
 
 				[NoteActions.DELETE_PERMANENTLY]: (noteId: string) => {
-					runCommand(GLOBAL_COMMANDS.DELETE_NOTE, {
+					runCommand(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, {
 						noteId,
-						permanently: true,
 					});
 				},
 
