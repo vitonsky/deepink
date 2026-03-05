@@ -113,7 +113,6 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 				<>
 					<OpenedNotesPanel
 						{...{
-							updateNotes,
 							notes: openedNotes,
 							tabs,
 							activeTab: activeNoteId ?? null,
