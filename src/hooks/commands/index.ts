@@ -4,93 +4,93 @@ export enum GLOBAL_COMMANDS {
 	/**
 	 * Create and open a new note
 	 */
-	CREATE_NOTE = 'createNote',
+	CREATE_NOTE = 'Create note',
 
 	/**
 	 * Close the current note
 	 */
-	CLOSE_CURRENT_NOTE = 'closeCurrentNote',
+	CLOSE_CURRENT_NOTE = 'Close current note',
 
 	/**
 	 * Reopen the last closed note
 	 */
-	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
+	RESTORE_CLOSED_NOTE = 'Restore closed note',
 
 	/**
 	 * Switch focus to the next open note
 	 */
-	FOCUS_NEXT_NOTE = 'focusNextNote',
+	FOCUS_NEXT_NOTE = 'Focus next note',
 
 	/**
 	 * Switch focus to the previous open note
 	 */
-	FOCUS_PREVIOUS_NOTE = 'focusPreviousNote',
+	FOCUS_PREVIOUS_NOTE = 'Focus previous note',
 
 	/**
 	 * Deletes a note.
 	 * Behavior depends on the 'permanently' flag: false move the note to the bin, true removes it permanently
 	 */
-	DELETE_NOTE = 'DELETE_NOTE',
+	DELETE_NOTE = 'Delete note',
 
 	/**
 	 * Restore a note from the Bin
 	 */
-	RESTORE_NOTE_FROM_BIN = 'RESTORE_NOTE_FROM_BIN',
+	RESTORE_NOTE_FROM_BIN = 'Restore note from bin',
 
 	/**
 	 * Toggle the archive status of the note
 	 */
-	TOGGLE_NOTE_ARCHIVE = 'TOGGLE_NOTE_ARCHIVE',
+	TOGGLE_NOTE_ARCHIVE = 'Toggle note archive status',
 
 	/**
 	 * Toggle the bookmark status of the note
 	 */
-	TOGGLE_NOTE_BOOKMARK = 'TOGGLE_NOTE_BOOKMARK',
+	TOGGLE_NOTE_BOOKMARK = 'Toggle note bookmark status',
 
 	/**
 	 * Open and close the history for a note
 	 */
-	TOGGLE_NOTE_HISTORY_PANEL = 'TOGGLE_NOTE_HISTORY_PANEL',
+	TOGGLE_NOTE_HISTORY_PANEL = 'Toggle note history panel',
 
 	/**
 	 * Export a note
 	 */
-	EXPORT_NOTE = 'EXPORT_NOTE',
+	EXPORT_NOTE = 'Export note',
 
 	/**
 	 * Copy the Markdown link for the note
 	 */
-	COPY_NOTE_MARKDOWN_LINK = 'COPY_NOTE_MARKDOWN_LINK',
+	COPY_NOTE_MARKDOWN_LINK = 'Copy Markdown link',
 
 	/**
 	 * Creates a copy of an existing note
 	 */
-	DUPLICATE_NOTE = 'DUPLICATE_NOTE',
+	DUPLICATE_NOTE = 'Duplicate note',
 
 	/**
 	 * Open global settings window
 	 */
-	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
+	OPEN_GLOBAL_SETTINGS = 'Open global settings',
 
 	/**
 	 * Synchronize the database
 	 */
-	SYNC_DATABASE = 'SYNC_DATABASE',
+	SYNC_DATABASE = 'Synchronize database',
 
 	/**
 	 * Lock the currently active user profile
 	 */
-	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
+	LOCK_CURRENT_PROFILE = 'Lock current profile',
 
 	/**
 	 * Focus the search input field
 	 */
-	FOCUS_SEARCH = 'FOCUS_SEARCH',
+	FOCUS_SEARCH = 'Focus search input',
 
 	/**
-	 * Indicates a keyboard shortcut was pressed
+	 * Handle keyboard shortcut
 	 */
-	SHORTCUT_PRESSED = 'SHORTCUT_PRESSED',
+	SHORTCUT_PRESSED = 'Shortcut pressed',
 }
 
 type CommandsWithPayload = {
