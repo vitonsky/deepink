@@ -22,18 +22,7 @@ import { getAbout } from '../../about';
 
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
-
-const onShutdown = (callback: () => any) => {
-	process.once('beforeExit', callback);
-	process.once('SIGTERM', callback);
-	process.once('SIGINT', callback);
-
-	return () => {
-		process.off('beforeExit', callback);
-		process.off('SIGTERM', callback);
-		process.off('SIGINT', callback);
-	};
-};
+import { onShutdown } from './onShutdown';
 
 export type AppContext = {
 	telemetry: Telemetry;
@@ -58,6 +47,8 @@ export class MainProcess {
 
 		// Force app shutdown by OS requests
 		onShutdown(() => this.quit());
+		// Handle case with Ctrl+C
+		app.once('before-quit', () => this.quit(true));
 
 		// Init app
 		this.setListeners();
@@ -66,11 +57,12 @@ export class MainProcess {
 	}
 
 	private isQuitInProcess = false;
-	public async quit() {
+	public async quit(force = false) {
 		if (this.isQuitInProcess) return;
 		this.isQuitInProcess = true;
 
-		// Clear context
+		// Close windows
+		// TODO: let windows to shut down gracefully
 		if (this.mainWindow) {
 			this.mainWindow.quit();
 			this.mainWindow = null;
@@ -81,13 +73,15 @@ export class MainProcess {
 			const { telemetry } = this.context;
 			this.context = null;
 
-			await Promise.race([
-				telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED),
-				wait(ms('2s')),
-			]);
+			if (!force) {
+				await Promise.race([
+					telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED),
+					wait(ms('2s')),
+				]);
+			}
 		}
 
-		app.exit();
+		app.quit();
 	}
 
 	private mainWindow: MainWindowAPI | null = null;
