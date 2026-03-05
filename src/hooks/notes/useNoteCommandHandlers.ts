@@ -42,35 +42,41 @@ export const useNoteCommandHandlers = () => {
 
 	const eventBus = useEventBus();
 
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, async ({ noteId }) => {
+		if (
+			deletionConfig.confirm &&
+			!confirm(`Do you want to move this note to the bin?`)
+		)
+			return;
+
+		await noteActions.close(noteId);
+
+		await notes.updateMeta([noteId], { isDeleted: true });
+		eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
+
+		telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
+			permanently: 'false',
+		});
+	});
+
 	useWorkspaceCommandCallback(
-		GLOBAL_COMMANDS.DELETE_NOTE,
-		async ({ noteId, permanently }) => {
-			const [note] = await notes.getById([noteId]);
-			if (!note) return;
-
-			const shouldDeletePermanently = permanently || note.isDeleted;
-
-			const confirmMessage = shouldDeletePermanently
-				? `Do you want to permanently delete this note?`
-				: `Do you want to move this note to the bin?`;
-
-			if (deletionConfig.confirm && !confirm(confirmMessage)) return;
+		GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY,
+		async ({ noteId }) => {
+			if (
+				deletionConfig.confirm &&
+				!confirm(`Do you want to permanently delete this note?`)
+			)
+				return;
 
 			await noteActions.close(noteId);
 
-			if (shouldDeletePermanently) {
-				await notes.delete([noteId]);
-				await tagsRegistry.setAttachedTags(noteId, []);
+			await notes.delete([noteId]);
+			await tagsRegistry.setAttachedTags(noteId, []);
 
-				eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
-			} else {
-				await notes.updateMeta([noteId], { isDeleted: true });
-
-				eventBus.emit(WorkspaceEvents.NOTE_UPDATED, noteId);
-			}
+			eventBus.emit(WorkspaceEvents.NOTES_UPDATED);
 
 			telemetry.track(TELEMETRY_EVENT_NAME.NOTE_DELETED, {
-				permanently: shouldDeletePermanently,
+				permanently: 'true',
 			});
 		},
 	);

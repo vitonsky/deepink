@@ -6,12 +6,15 @@ import { useVaultSelector, useWorkspaceSelector } from '@state/redux/profiles/ho
 import { selectActiveNoteId } from '@state/redux/profiles/profiles';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 
+import { useNotesRegistry } from './WorkspaceProvider';
+
 /**
  * Registers workspace keyboard shortcuts handlers
  */
 export const useWorkspaceShortcutsHandlers = () => {
 	const command = useCommand();
 	const activeNoteId = useWorkspaceSelector(selectActiveNoteId);
+	const notes = useNotesRegistry();
 
 	useWorkspaceShortcutsCallback(Shortcuts.CREATE_NOTE, () =>
 		command(GLOBAL_COMMANDS.CREATE_NOTE),
@@ -49,11 +52,21 @@ export const useWorkspaceShortcutsHandlers = () => {
 	});
 
 	const deletionConfig = useVaultSelector(selectDeletionConfig);
-	useWorkspaceShortcutsCallback(Shortcuts.DELETE_CURRENT_NOTE, () => {
+	useWorkspaceShortcutsCallback(Shortcuts.DELETE_CURRENT_NOTE, async () => {
 		if (!activeNoteId) return;
-		command(GLOBAL_COMMANDS.DELETE_NOTE, {
+
+		const [note] = await notes.getById([activeNoteId]);
+		if (!note) return;
+
+		if (deletionConfig.permanentDeletion || note.isDeleted) {
+			command(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, {
+				noteId: activeNoteId,
+			});
+			return;
+		}
+
+		command(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, {
 			noteId: activeNoteId,
-			permanently: deletionConfig.permanentDeletion,
 		});
 	});
 
