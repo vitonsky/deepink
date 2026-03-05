@@ -29,6 +29,10 @@ export class AppTray {
 
 	private trayCleanup: CleanupFn | null = null;
 
+	public isEnabled() {
+		return this.trayCleanup !== null;
+	}
+
 	public enable() {
 		if (this.trayCleanup) throw new Error('Tray already enabled');
 
