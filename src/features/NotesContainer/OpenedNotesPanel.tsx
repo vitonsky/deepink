@@ -14,8 +14,6 @@ export type TopBarProps = {
 	onClose: (id: NoteId) => void;
 
 	notes: INote[];
-
-	updateNotes: () => void;
 };
 
 // TODO: improve tabs style
