@@ -80,6 +80,7 @@ export class MainProcess {
 		for (const cleanup of this.cleanups) {
 			try {
 				cleanup();
+				this.cleanups.delete(cleanup);
 			} catch (err) {
 				console.warn('Error while run cleanup');
 				console.error(err);
