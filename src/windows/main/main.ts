@@ -14,6 +14,7 @@ import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
 import { debounce } from '@utils/debounce/debounce';
 import { createWatcher } from '@utils/effector/watcher';
+import { joinCallbacks } from '@utils/react/joinCallbacks';
 
 export type MainWindowAPI = {
 	quit: () => void;
@@ -30,16 +31,18 @@ const quitRequested = createEvent();
 export const openMainWindow = async ({
 	telemetry,
 }: AppContext): Promise<MainWindowAPI> => {
-	// Requests handlers
-	serveFiles();
-	serveInterop();
-	enableStorage();
-	enableContextMenu();
-	enableInteractions();
-	enableElectronPatches();
+	const cleanup = joinCallbacks(
+		// Requests handlers
+		serveFiles(),
+		serveInterop(),
+		enableStorage(),
+		enableContextMenu(),
+		enableInteractions(),
+		enableElectronPatches(),
 
-	// Notifications
-	enableScreenLockNotifications();
+		// Notifications
+		enableScreenLockNotifications(),
+	);
 
 	// State
 	const $windowState = createStore<WindowState>({
@@ -145,6 +148,7 @@ export const openMainWindow = async ({
 
 			quitRequested();
 			win.close();
+			cleanup();
 		},
 		openWindow: () => {
 			if (win.isDestroyed()) return;

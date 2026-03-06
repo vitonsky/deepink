@@ -2,6 +2,8 @@ import 'dotenv/config';
 
 import chalk from 'chalk';
 import { app, Menu } from 'electron';
+import ms from 'ms';
+import { onExit } from 'signal-exit';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
 import { FileController } from '@core/features/files/FileController';
 import { NodeFS } from '@core/features/files/NodeFS';
@@ -22,18 +24,6 @@ import { getAbout } from '../../about';
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
 
-const onShutdown = (callback: () => any) => {
-	process.once('beforeExit', callback);
-	process.once('SIGTERM', callback);
-	process.once('SIGINT', callback);
-
-	return () => {
-		process.off('beforeExit', callback);
-		process.off('SIGTERM', callback);
-		process.off('SIGINT', callback);
-	};
-};
-
 export type AppContext = {
 	telemetry: Telemetry;
 };
@@ -44,7 +34,27 @@ export class MainProcess {
 		this.userDataFs = new NodeFS({ root: getUserDataPath() });
 	}
 
+	private readonly cleanups = new Set<() => void>();
 	public async start() {
+		// Force app shutdown by OS requests
+		this.cleanups.add(
+			onExit((code, signal) => {
+				console.log('process exited!', code, signal);
+				this.quit();
+			}),
+		);
+
+		// Handle case with Ctrl+C
+		const onBeforeForcedQuit = (evt: { preventDefault: () => void }) => {
+			console.log('App force quit is requested...');
+			evt.preventDefault();
+			this.quit(true);
+		};
+		app.once('before-quit', onBeforeForcedQuit);
+		this.cleanups.add(() => {
+			app.off('before-quit', onBeforeForcedQuit);
+		});
+
 		// TODO: pass arguments when take a lock
 		const gotTheLock = app.requestSingleInstanceLock();
 
@@ -55,9 +65,6 @@ export class MainProcess {
 			return;
 		}
 
-		// Force app shutdown by OS requests
-		onShutdown(() => this.quit());
-
 		// Init app
 		this.setListeners();
 
@@ -65,11 +72,22 @@ export class MainProcess {
 	}
 
 	private isQuitInProcess = false;
-	public async quit() {
+	public async quit(force = false) {
 		if (this.isQuitInProcess) return;
 		this.isQuitInProcess = true;
 
-		// Clear context
+		// Run all cleanups
+		for (const cleanup of this.cleanups) {
+			try {
+				cleanup();
+				this.cleanups.delete(cleanup);
+			} catch (err) {
+				console.warn('Error while run cleanup');
+				console.error(err);
+			}
+		}
+
+		// Close windows
 		if (this.mainWindow) {
 			this.mainWindow.quit();
 			this.mainWindow = null;
@@ -80,10 +98,30 @@ export class MainProcess {
 			const { telemetry } = this.context;
 			this.context = null;
 
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED);
+			// Track a quit for a non-crash cases
+			if (!force) {
+				// We must ensure the quit will done successfully
+				try {
+					await Promise.race([
+						telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED),
+						wait(ms('2s')),
+					]);
+				} catch (error) {
+					// Just report the error and ignore it
+					console.warn(
+						'The error occurs while send the telemetry event while quit the app',
+					);
+					console.error(error);
+				}
+			}
 		}
 
-		app.exit();
+		if (force) {
+			app.exit();
+		} else {
+			// let windows to shut down gracefully
+			app.quit();
+		}
 	}
 
 	private mainWindow: MainWindowAPI | null = null;
@@ -97,7 +135,7 @@ export class MainProcess {
 		// Setup telemetry
 		const telemetry = await this.setupTelemetry();
 
-		await telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
+		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
 		app.once('window-all-closed', () => this.quit());
 
 		// Init tray
@@ -244,9 +282,9 @@ export class MainProcess {
 
 		// Log app installs and updates
 		if (initVersions.isJustInstalled) {
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_INSTALLED);
+			telemetry.track(TELEMETRY_EVENT_NAME.APP_INSTALLED);
 		} else if (initVersions.isVersionUpdated) {
-			await telemetry.track(TELEMETRY_EVENT_NAME.APP_UPDATED, {
+			telemetry.track(TELEMETRY_EVENT_NAME.APP_UPDATED, {
 				previousVersion: initVersions.previousVersion?.version,
 			});
 		}
