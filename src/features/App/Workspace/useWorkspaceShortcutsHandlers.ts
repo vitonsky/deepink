@@ -20,6 +20,10 @@ export const useWorkspaceShortcutsHandlers = () => {
 		command(GLOBAL_COMMANDS.CREATE_NOTE),
 	);
 
+	useWorkspaceShortcutsCallback(Shortcuts.RESTORE_CLOSED_NOTE, () =>
+		command(GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE),
+	);
+
 	useWorkspaceShortcutsCallback(Shortcuts.CLOSE_CURRENT_NOTE, () =>
 		command(GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE),
 	);
