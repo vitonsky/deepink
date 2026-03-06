@@ -38,10 +38,12 @@ export const useShortcutsBinding = () => {
 				{
 					capture: true,
 				},
-				() =>
+				(event) => {
+					event.preventDefault();
 					runCommand(GLOBAL_COMMANDS.SHORTCUT_PRESSED, {
 						shortcut: shortcutName,
-					}),
+					});
+				},
 			);
 		});
 
