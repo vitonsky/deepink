@@ -90,11 +90,21 @@ export class MainProcess {
 			const { telemetry } = this.context;
 			this.context = null;
 
+			// Track a quit for a non-crash cases
 			if (!force) {
-				await Promise.race([
-					telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED),
-					wait(ms('2s')),
-				]);
+				// We must ensure the quit will done successfully
+				try {
+					await Promise.race([
+						telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED),
+						wait(ms('2s')),
+					]);
+				} catch (error) {
+					// Just report the error and ignore it
+					console.warn(
+						'The error occurs while send the telemetry event while quit the app',
+					);
+					console.error(error);
+				}
 			}
 		}
 
