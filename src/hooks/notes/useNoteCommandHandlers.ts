@@ -15,14 +15,10 @@ import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks'
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 import { copyTextToClipboard } from '@utils/clipboard';
+import { getMarkdownTitle } from '@utils/getMarkdownLinkTitle';
+import { getNoteFileName } from '@utils/getNoteFileName';
 
 import { buildFileName, useNotesExport } from './useNotesExport';
-
-const mdCharsForEscape = ['\\', '[', ']'];
-const mdCharsForEscapeRegEx = new RegExp(
-	`(${mdCharsForEscape.map((char) => '\\' + char).join('|')})`,
-	'g',
-);
 
 /**
  * Registers handlers for commands that operate on a specific note
@@ -103,7 +99,7 @@ export const useNoteCommandHandlers = () => {
 			noteId,
 			buildFileName(
 				workspaceData?.name,
-				note.content.title.trim().slice(0, 50).trim() || `note_${noteId}`,
+				getNoteFileName(noteId, note.content.title),
 			),
 		);
 	});
@@ -117,13 +113,9 @@ export const useNoteCommandHandlers = () => {
 				return;
 			}
 
-			const { title, text } = note.content;
-			const noteTitle = (title || text.slice(0, 30))
-				.trim()
-				.replace(mdCharsForEscapeRegEx, '\\$1');
-			const markdownLink = `[${noteTitle}](${formatNoteLink(noteId)})`;
-
-			await copyTextToClipboard(markdownLink);
+			await copyTextToClipboard(
+				`[${getMarkdownTitle(note.content)}](${formatNoteLink(noteId)})`,
+			);
 		},
 	);
 
