@@ -44,23 +44,22 @@ export const SHORTCUTS_MAP = {
 };
 
 export const SHORTCUT_NAMES = {
-	[Shortcuts.CREATE_NOTE]: 'Create note',
-	[Shortcuts.CLOSE_CURRENT_NOTE]: 'Close current note',
-	[Shortcuts.RESTORE_CLOSED_NOTE]: 'Restore closed note',
-	[Shortcuts.FOCUS_NEXT_NOTE]: 'Go to next tab',
-	[Shortcuts.FOCUS_PREVIOUS_NOTE]: 'Go to previous tab',
+	[Shortcuts.CREATE_NOTE]: 'Create a new note',
+	[Shortcuts.CLOSE_CURRENT_NOTE]: 'Close active note',
+	[Shortcuts.RESTORE_CLOSED_NOTE]: 'Restore recently closed note',
+	[Shortcuts.FOCUS_NEXT_NOTE]: 'Go to next opened note',
+	[Shortcuts.FOCUS_PREVIOUS_NOTE]: 'Go to previous opened note',
 
-	[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: 'Toggle archive status of the current note',
-	[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]:
-		'Toggle bookmark status of the current note',
+	[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: 'Move active note in/out of archive',
+	[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]: 'Move active note in/out of bookmark',
 
-	[Shortcuts.DELETE_CURRENT_NOTE]: 'Delete current note',
-	[Shortcuts.RESTORE_CURRENT_NOTE_FROM_BIN]: 'Restore current note from bin',
+	[Shortcuts.DELETE_CURRENT_NOTE]: 'Delete active note',
+	[Shortcuts.RESTORE_CURRENT_NOTE_FROM_BIN]: 'Restore active note from bin',
 
-	[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: 'Toggle the note’s history panel',
+	[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: 'Show or hide history of active note',
 
-	[Shortcuts.SYNC_DATABASE]: 'Save changes',
-	[Shortcuts.FOCUS_SEARCH]: 'Focus on the search input',
+	[Shortcuts.FOCUS_SEARCH]: 'Search notes',
+	[Shortcuts.SYNC_DATABASE]: 'Sync vault to disk',
 
 	[Shortcuts.LOCK_CURRENT_PROFILE]: 'Lock vault',
 	[Shortcuts.OPEN_GLOBAL_SETTINGS]: 'Open preferences',
