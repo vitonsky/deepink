@@ -2,12 +2,10 @@ import React, { FC, useEffect } from 'react';
 import { Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { Box, HStack, VStack } from '@chakra-ui/react';
 import { SyncedPanelGroup } from '@components/SyncedPanelGroup';
-import { useWorkspaceShortcutsHandlers } from '@features/App/Workspace/useWorkspaceShortcutsHandlers';
 import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesListPanel } from '@features/MainScreen/NotesListPanel';
 import { WorkspacesPanel } from '@features/MainScreen/WorkspacesPanel';
 import { NotesContainer } from '@features/NotesContainer';
-import { useNoteCommandHandlers } from '@hooks/notes/useNoteCommandHandlers';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 
 import { NotificationsPopup } from '../NotificationsPopup';
@@ -15,11 +13,9 @@ import { ActivityBar } from './ActivityBar';
 import { NotesViewFilter } from './NotesViewFilter';
 import { StatusBar } from './StatusBar';
 import { TagsPanel } from './TagsPanel';
+import { WorkspaceCommandRegistry } from './WorkspaceCommandRegistry';
 
 export const MainScreen: FC = () => {
-	useWorkspaceShortcutsHandlers();
-	useNoteCommandHandlers();
-
 	const tagsRegistry = useTagsRegistry();
 	const updateNotes = useUpdateNotes();
 
@@ -65,6 +61,8 @@ export const MainScreen: FC = () => {
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
+			<WorkspaceCommandRegistry />
+
 			<HStack
 				align="start"
 				gap={0}
