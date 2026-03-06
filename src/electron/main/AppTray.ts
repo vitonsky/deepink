@@ -85,5 +85,6 @@ export class AppTray {
 		if (!this.trayCleanup) throw new Error('Tray is not enabled');
 
 		this.trayCleanup();
+		this.trayCleanup = null;
 	}
 }
