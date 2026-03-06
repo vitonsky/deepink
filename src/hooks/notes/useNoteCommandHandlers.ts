@@ -9,14 +9,14 @@ import {
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
+import { convertNoteToFileName } from '@hooks/notes/convertNoteToFileName';
+import { getNoteMarkdownLinkTitle } from '@hooks/notes/getNoteMarkdownLinkTitle';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useAppSelector } from '@state/redux/hooks';
 import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 import { copyTextToClipboard } from '@utils/clipboard';
-import { getMarkdownTitle } from '@utils/getMarkdownLinkTitle';
-import { getNoteFileName } from '@utils/getNoteFileName';
 
 import { buildFileName, useNotesExport } from './useNotesExport';
 
@@ -99,7 +99,7 @@ export const useNoteCommandHandlers = () => {
 			noteId,
 			buildFileName(
 				workspaceData?.name,
-				getNoteFileName(noteId, note.content.title),
+				convertNoteToFileName(noteId, note.content.title),
 			),
 		);
 	});
@@ -114,7 +114,7 @@ export const useNoteCommandHandlers = () => {
 			}
 
 			await copyTextToClipboard(
-				`[${getMarkdownTitle(note.content)}](${formatNoteLink(noteId)})`,
+				`[${getNoteMarkdownLinkTitle(note.content)}](${formatNoteLink(noteId)})`,
 			);
 		},
 	);
