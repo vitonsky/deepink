@@ -167,6 +167,7 @@
 		"remark-stringify": "^11.0.0",
 		"reselect": "^5.1.1",
 		"semver": "^7.7.3",
+		"signal-exit": "^4.1.0",
 		"systeminformation": "^5.30.6",
 		"twofish-ts": "^1.0.2",
 		"unified": "^11.0.5",

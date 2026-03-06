@@ -3,6 +3,7 @@ import 'dotenv/config';
 import chalk from 'chalk';
 import { app, Menu } from 'electron';
 import ms from 'ms';
+import { onExit } from 'signal-exit';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
 import { FileController } from '@core/features/files/FileController';
 import { NodeFS } from '@core/features/files/NodeFS';
@@ -22,7 +23,6 @@ import { getAbout } from '../../about';
 
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
-import { onShutdown } from './onShutdown';
 
 export type AppContext = {
 	telemetry: Telemetry;
@@ -34,7 +34,27 @@ export class MainProcess {
 		this.userDataFs = new NodeFS({ root: getUserDataPath() });
 	}
 
+	private readonly cleanups = new Set<() => void>();
 	public async start() {
+		// Force app shutdown by OS requests
+		this.cleanups.add(
+			onExit((code, signal) => {
+				console.log('process exited!', code, signal);
+				this.quit();
+			}),
+		);
+
+		// Handle case with Ctrl+C
+		const onBeforeQuit = (evt: { preventDefault: () => void }) => {
+			console.log('App want to be closed');
+			evt.preventDefault();
+			this.quit(true);
+		};
+		app.once('before-quit', onBeforeQuit);
+		this.cleanups.add(() => {
+			app.off('before-quit', onBeforeQuit);
+		});
+
 		// TODO: pass arguments when take a lock
 		const gotTheLock = app.requestSingleInstanceLock();
 
@@ -44,11 +64,6 @@ export class MainProcess {
 			app.quit();
 			return;
 		}
-
-		// Force app shutdown by OS requests
-		onShutdown(() => this.quit());
-		// Handle case with Ctrl+C
-		app.once('before-quit', () => this.quit(true));
 
 		// Init app
 		this.setListeners();
@@ -61,8 +76,10 @@ export class MainProcess {
 		if (this.isQuitInProcess) return;
 		this.isQuitInProcess = true;
 
+		// Run all cleanups
+		this.cleanups.forEach((cleanup) => cleanup());
+
 		// Close windows
-		// TODO: let windows to shut down gracefully
 		if (this.mainWindow) {
 			this.mainWindow.quit();
 			this.mainWindow = null;
@@ -81,7 +98,12 @@ export class MainProcess {
 			}
 		}
 
-		app.quit();
+		if (force) {
+			app.exit();
+		} else {
+			// let windows to shut down gracefully
+			app.quit();
+		}
 	}
 
 	private mainWindow: MainWindowAPI | null = null;
