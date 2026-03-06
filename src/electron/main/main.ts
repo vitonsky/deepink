@@ -45,14 +45,14 @@ export class MainProcess {
 		);
 
 		// Handle case with Ctrl+C
-		const onBeforeQuit = (evt: { preventDefault: () => void }) => {
-			console.log('App want to be closed');
+		const onBeforeForcedQuit = (evt: { preventDefault: () => void }) => {
+			console.log('App force quit is requested...');
 			evt.preventDefault();
 			this.quit(true);
 		};
-		app.once('before-quit', onBeforeQuit);
+		app.once('before-quit', onBeforeForcedQuit);
 		this.cleanups.add(() => {
-			app.off('before-quit', onBeforeQuit);
+			app.off('before-quit', onBeforeForcedQuit);
 		});
 
 		// TODO: pass arguments when take a lock
