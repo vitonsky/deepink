@@ -1,10 +1,9 @@
-import { BrowserWindow, dialog, ipcMain } from 'electron';
+import { BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
 
 import { CONFIRM_CHANNEL } from './shared';
 
 export const enableElectronPatches = () => {
-	// Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
-	ipcMain.on(CONFIRM_CHANNEL, (event, message?: string) => {
+	const onMessage = (event: IpcMainEvent, message?: string) => {
 		const targetWindow = BrowserWindow.fromWebContents(event.sender);
 		if (!targetWindow) return;
 
@@ -16,5 +15,12 @@ export const enableElectronPatches = () => {
 			message: message ?? '',
 		});
 		event.returnValue = result === 0;
-	});
+	};
+
+	// Patch confirm: original window.confirm causes focus loss; showMessageBoxSync keeps it modal
+	ipcMain.on(CONFIRM_CHANNEL, onMessage);
+
+	return () => {
+		ipcMain.off(CONFIRM_CHANNEL, onMessage);
+	};
 };

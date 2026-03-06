@@ -57,6 +57,7 @@ export class Telemetry implements TelemetryTracker {
 			uid,
 		};
 
+		// TODO: remember payload before send, to restore it later in case app crash while sending
 		try {
 			await this.eventTracker.sendEvent(eventName, composedPayload);
 
