@@ -77,7 +77,14 @@ export class MainProcess {
 		this.isQuitInProcess = true;
 
 		// Run all cleanups
-		this.cleanups.forEach((cleanup) => cleanup());
+		for (const cleanup of this.cleanups) {
+			try {
+				cleanup();
+			} catch (err) {
+				console.warn('Error while run cleanup');
+				console.error(err);
+			}
+		}
 
 		// Close windows
 		if (this.mainWindow) {
