@@ -31,7 +31,7 @@ export class AppUpdatesChecker {
 			const json = await response.json();
 			const releases = VersionObjectScheme.array().parse(json);
 
-			const latestRelease = releases[0];
+			const latestRelease = releases.find((version) => semver.valid(version.name));
 			if (!latestRelease) return null;
 
 			const latestVersion = latestRelease.name.replace(/^v/, '');

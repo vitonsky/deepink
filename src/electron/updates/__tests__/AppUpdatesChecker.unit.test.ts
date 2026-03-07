@@ -81,6 +81,35 @@ describe('Updates', () => {
 			url: 'https://update-url.com',
 		});
 	});
+
+	test('Latest valid version must be found', async () => {
+		mockVersions([
+			{
+				url: 'https://update-url.com',
+				name: 'invalid version',
+				prerelease: false,
+			},
+			{
+				url: 'https://update-url.com',
+				name: '0.0.3',
+				prerelease: false,
+			},
+			{
+				url: 'https://update-url.com',
+				name: '0.0.2',
+				prerelease: false,
+			},
+		]);
+
+		await expect(
+			updatesChecker.getUpdate({
+				version: '0.0.1-preview.1',
+			}),
+		).resolves.toEqual({
+			version: '0.0.3',
+			url: 'https://update-url.com',
+		});
+	});
 });
 
 describe('No updates cases', () => {
@@ -154,7 +183,7 @@ describe('No updates cases', () => {
 		).resolves.toEqual(null);
 	});
 
-	test('Returns null for invalid versions', async () => {
+	test('Invalid versions must be ignored', async () => {
 		mockVersions([
 			{
 				url: 'https://update-url.com',
@@ -169,9 +198,22 @@ describe('No updates cases', () => {
 			}),
 		).resolves.toEqual(null);
 
+		mockVersions([
+			{
+				url: 'https://update-url.com',
+				name: 'invalid version',
+				prerelease: false,
+			},
+			{
+				url: 'https://update-url.com',
+				name: '0.0.1-preview.1',
+				prerelease: false,
+			},
+		]);
+
 		await expect(
 			updatesChecker.getUpdate({
-				version: 'invalid version too',
+				version: '0.0.1-preview.1',
 			}),
 		).resolves.toEqual(null);
 	});
