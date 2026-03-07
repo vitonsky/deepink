@@ -17,6 +17,8 @@ import { RelaxedInput } from '@components/RelaxedInput';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { useVaultStorage } from '@features/files';
+import { getWorkspacePath } from '@features/files/paths';
 import { useWorkspacesList } from '@features/MainScreen/WorkspacesPanel/useWorkspacesList';
 import {
 	WorkspaceCreatePopup,
@@ -78,6 +80,7 @@ export const WorkspaceSettings = () => {
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
+	const workspaceFilesController = useVaultStorage();
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
@@ -115,6 +118,11 @@ export const WorkspaceSettings = () => {
 			attachments,
 		}).fixAll();
 
+		// Delete workspace config directory
+		await workspaceFilesController.delete([
+			getWorkspacePath(currentWorkspace.workspaceId),
+		]);
+
 		dispatch(
 			workspacesApi.setActiveWorkspace({
 				workspaceId: nextWorkspace.id,
@@ -125,18 +133,19 @@ export const WorkspaceSettings = () => {
 		await workspacesManager.delete([currentWorkspace.workspaceId]);
 		await workspaces.update();
 	}, [
+		workspaces,
+		workspaceInfo.name,
+		telemetry,
 		abortImport,
-		attachments,
-		currentWorkspace.profileId,
-		currentWorkspace.workspaceId,
-		dispatch,
+		tags,
+		notes,
 		files,
 		filesController,
-		notes,
-		tags,
-		telemetry,
-		workspaceInfo.name,
-		workspaces,
+		currentWorkspace.workspaceId,
+		currentWorkspace.profileId,
+		attachments,
+		workspaceFilesController,
+		dispatch,
 		workspacesManager,
 	]);
 
