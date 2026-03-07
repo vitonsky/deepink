@@ -153,4 +153,26 @@ describe('No updates cases', () => {
 			}),
 		).resolves.toEqual(null);
 	});
+
+	test('Returns null for invalid versions', async () => {
+		mockVersions([
+			{
+				url: 'https://update-url.com',
+				name: 'invalid version',
+				prerelease: false,
+			},
+		]);
+
+		await expect(
+			updatesChecker.getUpdate({
+				version: '0.0.1-preview.1',
+			}),
+		).resolves.toEqual(null);
+
+		await expect(
+			updatesChecker.getUpdate({
+				version: 'invalid version too',
+			}),
+		).resolves.toEqual(null);
+	});
 });
