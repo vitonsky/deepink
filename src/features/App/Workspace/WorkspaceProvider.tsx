@@ -47,9 +47,9 @@ export const useFilesRegistry = createContextGetterHook(FilesRegistryContext);
 export const FilesControllerContext = createContext<IFilesStorage | null>(null);
 export const useFilesController = createContextGetterHook(FilesControllerContext);
 
-export const WorkspaceFilesControllerContext = createContext<FileController | null>(null);
-export const useWorkspaceFilesController = createContextGetterHook(
-	WorkspaceFilesControllerContext,
+export const WorkspaceFileControllerContext = createContext<FileController | null>(null);
+export const useWorkspaceFileController = createContextGetterHook(
+	WorkspaceFileControllerContext,
 );
 
 export interface WorkspaceProviderProps extends PropsWithChildren {
@@ -101,7 +101,7 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 						<AttachmentsControllerContext.Provider
 							value={attachmentsController}
 						>
-							<WorkspaceFilesControllerContext.Provider
+							<WorkspaceFileControllerContext.Provider
 								value={workspaceFileController}
 							>
 								<TagsRegistryContext.Provider value={tagsRegistry}>
@@ -113,7 +113,7 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 										</NotesHistoryContext.Provider>
 									</NotesRegistryContext.Provider>
 								</TagsRegistryContext.Provider>
-							</WorkspaceFilesControllerContext.Provider>
+							</WorkspaceFileControllerContext.Provider>
 						</AttachmentsControllerContext.Provider>
 					</FilesControllerContext.Provider>
 				</FilesRegistryContext.Provider>

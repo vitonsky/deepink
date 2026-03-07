@@ -43,7 +43,7 @@ import {
 	useFilesRegistry,
 	useNotesRegistry,
 	useTagsRegistry,
-	useWorkspaceFilesController,
+	useWorkspaceFileController,
 } from '../../Workspace/WorkspaceProvider';
 
 export const WorkspaceSettings = () => {
@@ -79,7 +79,7 @@ export const WorkspaceSettings = () => {
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
-	const workspaceFileController = useWorkspaceFilesController();
+	const workspaceFileController = useWorkspaceFileController();
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
