@@ -30,7 +30,7 @@ export type WorkspaceContainer = {
 	};
 };
 
-export const useWorkspace = (currentProfile: ProfileContainer, workspaceId: string) => {
+export const useWorkspace = (currentProfile: ProfileContainer) => {
 	const [state, setState] = useState<WorkspaceContainer | null>(null);
 
 	const { workspaceId } = useWorkspaceData();

@@ -1,9 +1,11 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
+import { Box } from '@chakra-ui/react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
+import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
@@ -21,7 +23,8 @@ import {
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
-import { WorkspaceContainer } from '../Workspace/WorkspaceContainer';
+import { Workspace, WorkspaceContext } from '../Workspace';
+import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { useVaultState } from './useVaultState';
 
@@ -142,23 +145,31 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		<ProfileControlsContext.Provider value={controls}>
 			{!isActiveWorkspaceReady && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
-
-			{workspaces.map((workspace) =>
-				workspace.touched ? (
-					<WorkspaceContainer
-						key={workspace.id}
-						profile={currentProfile}
-						workspaceId={workspace.id}
-					>
-						{isDevMode && (
-							<ToggleSQLConsole
-								isVisible={isDBConsoleVisible}
-								onVisibilityChange={setIsDBConsoleVisible}
-							/>
-						)}
-					</WorkspaceContainer>
-				) : null,
-			)}
+			<Box
+				width="100%"
+				height="100vh"
+				display={isActiveWorkspaceReady ? 'flex' : 'none'}
+			>
+				{workspaces.map((workspace) =>
+					workspace.touched ? (
+						<WorkspaceContext.Provider
+							key={workspace.id}
+							value={{ profileId: profileId, workspaceId: workspace.id }}
+						>
+							<StatusBarProvider>
+								<Workspace profile={currentProfile} />
+								<ProfileStatusBar />
+								{isDevMode && (
+									<ToggleSQLConsole
+										isVisible={isDBConsoleVisible}
+										onVisibilityChange={setIsDBConsoleVisible}
+									/>
+								)}
+							</StatusBarProvider>
+						</WorkspaceContext.Provider>
+					) : null,
+				)}
+			</Box>
 			{isDevMode && (
 				<SQLConsole
 					isVisible={isDBConsoleVisible}
