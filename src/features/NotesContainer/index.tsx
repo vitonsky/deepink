@@ -15,7 +15,6 @@ import { OpenedNotesPanel } from '@features/NotesContainer/OpenedNotesPanel';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { useNotesShortcutActions } from '@hooks/notes/useNotesShortcutActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useVaultSelector, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -104,8 +103,6 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 			noteHistory,
 		],
 	);
-
-	useNotesShortcutActions();
 
 	return (
 		<VStack align="start" w="100%" h="100%" gap={0} overflow="hidden" {...props}>
