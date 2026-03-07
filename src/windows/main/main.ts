@@ -1,5 +1,6 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
+import windowStateKeeper from 'electron-window-state';
 import path from 'path';
 import url from 'url';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -52,11 +53,18 @@ export const openMainWindow = async ({
 
 	$windowState.on(quitRequested, (state) => ({ ...state, isForcedClosing: true }));
 
+	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+	const mainWindowState = windowStateKeeper({
+		defaultWidth: Math.min(1400, Math.round(width * 0.8)),
+		defaultHeight: Math.min(1000, Math.round(height * 0.9)),
+	});
+
 	// Open window
-	// TODO: remember size
 	const win = new BrowserWindow({
-		width: 1300,
-		height: 800,
+		x: mainWindowState.x,
+		y: mainWindowState.y,
+		width: mainWindowState.width,
+		height: mainWindowState.height,
 
 		// Auto hide menu on linux and windows
 		autoHideMenuBar: true,
@@ -70,6 +78,11 @@ export const openMainWindow = async ({
 			spellcheck: true,
 		},
 	});
+
+	// Let us register listeners on the window, so we can update the state
+	// automatically (the listeners will be removed when the window is closed)
+	// and restore the maximized or full screen state
+	mainWindowState.manage(win);
 
 	// Load page
 	const start = performance.now();

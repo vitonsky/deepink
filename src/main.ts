@@ -11,6 +11,7 @@ console.log({
 	appDir: app.getAppPath(),
 	platform: process.platform,
 	resourcesPath: getResourcesPath(),
+	userData: app.getPath('userData'),
 	directory: __dirname,
 	...(process.platform === 'linux'
 		? { linuxEnvironment: detectLinuxDesktopEnv() }
