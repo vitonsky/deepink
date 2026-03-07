@@ -24,14 +24,10 @@ test('Clear orphaned files', async () => {
 	const attachments = new AttachmentsController(db, FAKE_WORKSPACE_ID);
 	const files = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
 
-	const integrityController = new FilesIntegrityController(
-		FAKE_WORKSPACE_ID,
-		fileManager,
-		{
-			files,
-			attachments,
-		},
-	);
+	const integrityController = new FilesIntegrityController(fileManager, {
+		files,
+		attachments,
+	});
 
 	const NOTE_1 = getUUID();
 	const NOTE_2 = getUUID();

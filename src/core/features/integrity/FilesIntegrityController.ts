@@ -1,5 +1,3 @@
-import { joinPathSegments } from '@utils/fs/paths';
-
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { IFilesStorage } from '../files';
 import { FilesController } from '../files/FilesController';
@@ -7,7 +5,6 @@ import { FilesController } from '../files/FilesController';
 // TODO: attach files to a note versions, and never delete attached files that is used at least in one version
 export class FilesIntegrityController {
 	constructor(
-		private readonly workspace: string,
 		private readonly files: IFilesStorage,
 		private readonly controllers: {
 			attachments: AttachmentsController;
@@ -28,14 +25,14 @@ export class FilesIntegrityController {
 	public async deleteOrphanedFilesInFs() {
 		const filePathsInDB = await this.controllers.files
 			.query()
-			.then((files) => new Set(files.map((file) => this.getFilePath(file.id))));
+			.then((files) => new Set(files.map((file) => `/${file.id}`)));
 
 		const filesInStorage = await this.files.list();
 		const orphanedFilePaths = filesInStorage.filter((filePath) => {
-			const workspacePrefix = this.getFilePath();
-			// Skip files out of workspace directory and workspace directory itself
-			if (!filePath.startsWith(workspacePrefix) || filePath === workspacePrefix)
-				return false;
+			const basePath = '/';
+
+			// Skip files out of workspace directory and a workspace directory itself
+			if (!filePath.startsWith(basePath) || filePath === basePath) return false;
 
 			return !filePathsInDB.has(filePath);
 		});
@@ -95,16 +92,12 @@ export class FilesIntegrityController {
 
 		const filesInfo = await this.controllers.files.query();
 		filesInfo.forEach((file) => {
-			if (!filesInStorage.has(this.getFilePath(file.id))) {
+			if (!filesInStorage.has(`/${file.id}`)) {
 				lostFileIds.push(file.id);
 			}
 		});
 
 		// Delete
 		await this.controllers.files.delete(lostFileIds);
-	}
-
-	private getFilePath(filename?: string) {
-		return joinPathSegments([this.workspace, filename].filter(Boolean) as string[]);
 	}
 }
