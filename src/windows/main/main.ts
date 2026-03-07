@@ -1,5 +1,6 @@
 import { createEvent, createStore } from 'effector';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
+import windowStateKeeper from 'electron-window-state';
 import path from 'path';
 import url from 'url';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -14,6 +15,7 @@ import { enableStorage } from '@electron/requests/storage/main';
 import { isDevMode } from '@electron/utils/app';
 import { debounce } from '@utils/debounce/debounce';
 import { createWatcher } from '@utils/effector/watcher';
+import { joinCallbacks } from '@utils/react/joinCallbacks';
 
 export type MainWindowAPI = {
 	quit: () => void;
@@ -30,16 +32,18 @@ const quitRequested = createEvent();
 export const openMainWindow = async ({
 	telemetry,
 }: AppContext): Promise<MainWindowAPI> => {
-	// Requests handlers
-	serveFiles();
-	serveInterop();
-	enableStorage();
-	enableContextMenu();
-	enableInteractions();
-	enableElectronPatches();
+	const cleanup = joinCallbacks(
+		// Requests handlers
+		serveFiles(),
+		serveInterop(),
+		enableStorage(),
+		enableContextMenu(),
+		enableInteractions(),
+		enableElectronPatches(),
 
-	// Notifications
-	enableScreenLockNotifications();
+		// Notifications
+		enableScreenLockNotifications(),
+	);
 
 	// State
 	const $windowState = createStore<WindowState>({
@@ -49,11 +53,18 @@ export const openMainWindow = async ({
 
 	$windowState.on(quitRequested, (state) => ({ ...state, isForcedClosing: true }));
 
+	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+	const mainWindowState = windowStateKeeper({
+		defaultWidth: Math.min(1400, Math.round(width * 0.8)),
+		defaultHeight: Math.min(1000, Math.round(height * 0.9)),
+	});
+
 	// Open window
-	// TODO: remember size
 	const win = new BrowserWindow({
-		width: 1300,
-		height: 800,
+		x: mainWindowState.x,
+		y: mainWindowState.y,
+		width: mainWindowState.width,
+		height: mainWindowState.height,
 
 		// Auto hide menu on linux and windows
 		autoHideMenuBar: true,
@@ -67,6 +78,11 @@ export const openMainWindow = async ({
 			spellcheck: true,
 		},
 	});
+
+	// Let us register listeners on the window, so we can update the state
+	// automatically (the listeners will be removed when the window is closed)
+	// and restore the maximized or full screen state
+	mainWindowState.manage(win);
 
 	// Load page
 	const start = performance.now();
@@ -145,6 +161,7 @@ export const openMainWindow = async ({
 
 			quitRequested();
 			win.close();
+			cleanup();
 		},
 		openWindow: () => {
 			if (win.isDestroyed()) return;
