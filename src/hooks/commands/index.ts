@@ -6,6 +6,10 @@ export enum GLOBAL_COMMANDS {
 	 */
 	CREATE_NOTE = 'Create note',
 	CLOSE_CURRENT_NOTE = 'Close current note',
+
+	/**
+	 * Reopen the last closed note
+	 */
 	RESTORE_CLOSED_NOTE = 'Restore closed note',
 
 	/**
