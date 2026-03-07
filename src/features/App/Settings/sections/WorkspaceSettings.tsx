@@ -18,7 +18,7 @@ import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrit
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultStorage } from '@features/files';
-import { getWorkspacePath } from '@features/files/paths';
+import { getWorkspaceRoot } from '@features/files/paths';
 import { useWorkspacesList } from '@features/MainScreen/WorkspacesPanel/useWorkspacesList';
 import {
 	WorkspaceCreatePopup,
@@ -80,7 +80,7 @@ export const WorkspaceSettings = () => {
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
-	const workspaceFilesController = useVaultStorage();
+	const workspaceFiles = useVaultStorage(getWorkspaceRoot());
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
@@ -119,9 +119,7 @@ export const WorkspaceSettings = () => {
 		}).fixAll();
 
 		// Delete workspace config directory
-		await workspaceFilesController.delete([
-			getWorkspacePath(currentWorkspace.workspaceId),
-		]);
+		await workspaceFiles.delete([currentWorkspace.workspaceId]);
 
 		dispatch(
 			workspacesApi.setActiveWorkspace({
@@ -144,7 +142,7 @@ export const WorkspaceSettings = () => {
 		currentWorkspace.workspaceId,
 		currentWorkspace.profileId,
 		attachments,
-		workspaceFilesController,
+		workspaceFiles,
 		dispatch,
 		workspacesManager,
 	]);
