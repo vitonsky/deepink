@@ -111,7 +111,7 @@ export const useProfileContainers = () => {
 
 			// Setup DB
 			const db = await openDatabase(
-				new FileController('deepink.db', encryptedProfileFS),
+				new FileController('vault.db', encryptedProfileFS),
 			);
 
 			// Ensure at least one workspace exists
