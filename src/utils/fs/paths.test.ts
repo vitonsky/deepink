@@ -1,4 +1,10 @@
-import { getRelativePath, getResolvedPath, joinPathSegments } from './paths';
+import {
+	getRelativePath,
+	getResolvedPath,
+	getRootedPath,
+	joinPathSegments,
+	normalizePath,
+} from './paths';
 
 test('joinPathSegments', () => {
 	expect(joinPathSegments([])).toBe('/');
@@ -76,4 +82,35 @@ describe('getRelativePath', () => {
 
 		expect(getRelativePath('///foo//////bar/x', '/foo/bar/baz')).toBe('../x');
 	});
+});
+
+test('Normalized paths must be fully qualified', () => {
+	expect(normalizePath('.')).toBe('/');
+	expect(normalizePath('..')).toBe('/');
+
+	expect(normalizePath('foo')).toBe('/foo');
+	expect(normalizePath('bar')).toBe('/bar');
+	expect(normalizePath('foo/bar')).toBe('/foo/bar');
+
+	expect(normalizePath('/foo/bar')).toBe('/foo/bar');
+	expect(normalizePath('///foo/bar')).toBe('/foo/bar');
+	expect(normalizePath('../foo/bar')).toBe('/foo/bar');
+
+	expect(normalizePath('foo/bar/../baz')).toBe('/foo/baz');
+});
+
+test('Rooted paths must be always under root', () => {
+	const basePath = '/foo/bar';
+
+	expect(getRootedPath('/foo/bar', basePath)).toBe('/foo/bar');
+	expect(getRootedPath('/foo/bar/baz', basePath)).toBe('/foo/bar/baz');
+
+	expect(getRootedPath('/foo', basePath)).toBe(basePath);
+	expect(getRootedPath('/', basePath)).toBe(basePath);
+
+	expect(getRootedPath('/workspaces/abc/files/img.png', '/')).toBe(
+		'/workspaces/abc/files/img.png',
+	);
+
+	expect(getRootedPath('/foo/barOTHER', basePath)).toBe('/foo/bar');
 });
