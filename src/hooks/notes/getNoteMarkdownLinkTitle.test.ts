@@ -1,0 +1,49 @@
+import { getNoteMarkdownLinkTitle } from './getNoteMarkdownLinkTitle';
+
+test('uses title if provided, defaults to text when title is empty', () => {
+	const title = 'About cat';
+	const text = 'The cat, also called domestic cat';
+
+	expect(getNoteMarkdownLinkTitle({ title, text })).toBe(title);
+	expect(getNoteMarkdownLinkTitle({ title, text: '' })).toBe(title);
+
+	expect(getNoteMarkdownLinkTitle({ title: '', text })).toBe(text);
+	expect(getNoteMarkdownLinkTitle({ title: '   ', text })).toBe(text);
+});
+
+test('truncates text longer than maxLength', () => {
+	const longText =
+		'The cat, also called domestic cat and house cat, is a small carnivorous mammal.';
+
+	expect(
+		getNoteMarkdownLinkTitle({ title: longText, text: '' }).length,
+	).toBeLessThanOrEqual(50);
+
+	expect(
+		getNoteMarkdownLinkTitle({ title: '', text: longText }).length,
+	).toBeLessThanOrEqual(50);
+});
+
+test('escapes Markdown link special characters', () => {
+	const noteLink = '[Note](note://123)';
+	const escapesNoteLink = '\\[Note\\](note://123)';
+
+	expect(getNoteMarkdownLinkTitle({ title: noteLink, text: '' })).toBe(escapesNoteLink);
+	expect(getNoteMarkdownLinkTitle({ title: '', text: noteLink })).toBe(escapesNoteLink);
+
+	const externalLink = '[w](https://www.wikipedia.org/)';
+	const escapesExternalLink = '\\[w\\](https://www.wikipedia.org/)';
+
+	expect(getNoteMarkdownLinkTitle({ title: externalLink, text: '' })).toBe(
+		escapesExternalLink,
+	);
+	expect(getNoteMarkdownLinkTitle({ title: '', text: externalLink })).toBe(
+		escapesExternalLink,
+	);
+});
+
+test('returns "Untitled" when both title and text are empty', () => {
+	expect(getNoteMarkdownLinkTitle({ title: '', text: '' })).toBe('Untitled');
+	expect(getNoteMarkdownLinkTitle({ title: '    ', text: '' })).toBe('Untitled');
+	expect(getNoteMarkdownLinkTitle({ title: '', text: '   ' })).toBe('Untitled');
+});

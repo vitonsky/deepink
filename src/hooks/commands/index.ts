@@ -1,50 +1,71 @@
+import { Shortcuts } from '../shortcuts';
+
 export enum GLOBAL_COMMANDS {
 	/**
 	 * Create and open a new note
 	 */
-	CREATE_NOTE = 'createNote',
-
-	/**
-	 * Close the current note
-	 */
-	CLOSE_CURRENT_NOTE = 'closeCurrentNote',
+	CREATE_NOTE = 'Create note',
+	CLOSE_CURRENT_NOTE = 'Close current note',
 
 	/**
 	 * Reopen the last closed note
 	 */
-	RESTORE_CLOSED_NOTE = 'restoreClosedNote',
+	RESTORE_CLOSED_NOTE = 'Restore closed note',
 
 	/**
 	 * Switch focus to the next open note
 	 */
-	FOCUS_NEXT_NOTE = 'focusNextNote',
+	FOCUS_NEXT_NOTE = 'Focus next note',
 
 	/**
 	 * Switch focus to the previous open note
 	 */
-	FOCUS_PREVIOUS_NOTE = 'focusPreviousNote',
+	FOCUS_PREVIOUS_NOTE = 'Focus previous note',
+
+	DELETE_NOTE_PERMANENTLY = 'Delete note permanently',
+	MOVE_NOTE_TO_BIN = 'Move note to bin',
+	RESTORE_NOTE_FROM_BIN = 'Restore note from bin',
+	TOGGLE_NOTE_ARCHIVE = 'Toggle note archive status',
+	TOGGLE_NOTE_BOOKMARK = 'Toggle note bookmark status',
 
 	/**
-	 * Lock the currently active user profile
+	 * Open and close the history for a note
 	 */
-	LOCK_CURRENT_PROFILE = 'lockCurrentProfile',
+	TOGGLE_NOTE_HISTORY_PANEL = 'Toggle note history panel',
+	EXPORT_NOTE = 'Export note',
+	COPY_NOTE_MARKDOWN_LINK = 'Copy Markdown link',
 
 	/**
-	 * Open global settings window
+	 * Creates a copy of an existing note
 	 */
-	OPEN_GLOBAL_SETTINGS = 'OPEN_GLOBAL_SETTINGS',
+	DUPLICATE_NOTE = 'Duplicate note',
+	OPEN_GLOBAL_SETTINGS = 'Open global settings',
+	SYNC_DATABASE = 'Synchronize database',
+
+	LOCK_CURRENT_PROFILE = 'Lock current profile',
+	FOCUS_SEARCH = 'Focus search input',
+
+	SHORTCUT_PRESSED = 'Shortcut pressed',
 }
 
-// In the future, we can define a type for the payload like this:
-// type CommandPayloads = { [GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: { profileId: string }; }
-export type CommandPayloadsMap = Record<GLOBAL_COMMANDS, void>;
+type CommandsWithPayload = {
+	[GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY]: { noteId: string };
+	[GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN]: { noteId: string };
+	[GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN]: { noteId: string };
 
-export const SHORTCUT_NAMES = {
-	[GLOBAL_COMMANDS.CREATE_NOTE]: 'Create note',
-	[GLOBAL_COMMANDS.CLOSE_CURRENT_NOTE]: 'Close current note',
-	[GLOBAL_COMMANDS.RESTORE_CLOSED_NOTE]: 'Restore closed note',
-	[GLOBAL_COMMANDS.FOCUS_NEXT_NOTE]: 'Go to next tab',
-	[GLOBAL_COMMANDS.FOCUS_PREVIOUS_NOTE]: 'Go to previous tab',
-	[GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE]: 'Lock vault',
-	[GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS]: 'Open preferences',
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE]: { noteId: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_BOOKMARK]: { noteId: string };
+	[GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL]: { noteId: string };
+
+	[GLOBAL_COMMANDS.EXPORT_NOTE]: { noteId: string };
+	[GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK]: { noteId: string };
+	[GLOBAL_COMMANDS.DUPLICATE_NOTE]: { noteId: string };
+
+	[GLOBAL_COMMANDS.SHORTCUT_PRESSED]: { shortcut: Shortcuts };
+};
+
+export type CommandPayloadsMap = {
+	[K in GLOBAL_COMMANDS]: K extends keyof CommandsWithPayload
+		? CommandsWithPayload[K]
+		: void;
 };

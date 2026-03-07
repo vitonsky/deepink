@@ -13,6 +13,7 @@ import {
 	FaShield,
 	FaSpellCheck,
 	FaTrashCan,
+	FaTrashCanArrowUp,
 } from 'react-icons/fa6';
 import {
 	Button,
@@ -24,102 +25,154 @@ import {
 	Text,
 } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useCommand } from '@hooks/commands/useCommand';
+import { useVaultSelector } from '@state/redux/profiles/hooks';
+import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 
-import { NoteSidebarTabs } from '.';
+export const NoteMenu = memo(({ note }: { note: INote }) => {
+	const runCommand = useCommand();
 
-// TODO: call commands by click items
-export const NoteMenu = memo(
-	({
-		note,
-		onClick,
-	}: {
-		note: INote;
-		onClick?: (command: NoteSidebarTabs) => void;
-	}) => {
-		return (
-			<Menu>
-				<MenuButton as={Button} variant="ghost" size="sm">
-					<FaEllipsis />
-				</MenuButton>
-				<MenuList>
-					<MenuItem>
-						<HStack>
-							<FaCopy />
-							<Text>Copy reference on note</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaBell />
-							<Text>Remind me</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem onClick={() => onClick?.(NoteSidebarTabs.HISTORY)}>
-						<HStack>
-							<FaClock />
-							<Text>History</Text>
-							{note.isSnapshotsDisabled && (
-								<Text color="typography.secondary">(Disabled)</Text>
-							)}
-						</HStack>
-					</MenuItem>
-					<MenuItem onClick={() => onClick?.(NoteSidebarTabs.BACK_LINKS)}>
-						<HStack>
-							<FaLink />
-							<Text>Back links</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaEye />
-							<Text>Readonly mode</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaDownload />
-							<Text>Download and convert a network media</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaSpellCheck />
-							<Text>Spellcheck</Text>
-						</HStack>
-					</MenuItem>
+	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
-					<MenuItem>
+	return (
+		<Menu>
+			<MenuButton as={Button} variant="ghost" size="sm" title="Note options">
+				<FaEllipsis />
+			</MenuButton>
+			<MenuList>
+				<MenuItem
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.COPY_NOTE_MARKDOWN_LINK, {
+							noteId: note.id,
+						})
+					}
+				>
+					<HStack>
+						<FaCopy />
+						<Text>Copy reference on note</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem>
+					<HStack>
+						<FaBell />
+						<Text>Remind me</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_HISTORY_PANEL, {
+							noteId: note.id,
+						})
+					}
+				>
+					<HStack>
+						<FaClock />
+						<Text>History</Text>
+						{note.isSnapshotsDisabled && (
+							<Text color="typography.secondary">(Disabled)</Text>
+						)}
+					</HStack>
+				</MenuItem>
+				<MenuItem>
+					<HStack>
+						<FaLink />
+						<Text>Back links</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem>
+					<HStack>
+						<FaEye />
+						<Text>Readonly mode</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem>
+					<HStack>
+						<FaDownload />
+						<Text>Download and convert a network media</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem>
+					<HStack>
+						<FaSpellCheck />
+						<Text>Spellcheck</Text>
+					</HStack>
+				</MenuItem>
+
+				<MenuItem
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.EXPORT_NOTE, { noteId: note.id })
+					}
+				>
+					<HStack>
+						<FaFileExport />
+						<Text>Export...</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem>
+					<HStack>
+						<FaShield />
+						<Text>Password protection...</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem>
+					<HStack>
+						<FaRotate />
+						<Text>Disable sync</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+						runCommand(GLOBAL_COMMANDS.TOGGLE_NOTE_ARCHIVE, {
+							noteId: note.id,
+						})
+					}
+				>
+					<HStack>
+						<FaBoxArchive />
+						<Text>
+							{note.isArchived ? 'Remove from archive' : 'Move to archive'}
+						</Text>
+					</HStack>
+				</MenuItem>
+				<MenuItem
+					onClick={() => {
+						if (deletionConfig.permanentDeletion || note.isDeleted) {
+							runCommand(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, {
+								noteId: note.id,
+							});
+							return;
+						}
+
+						runCommand(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, {
+							noteId: note.id,
+						});
+					}}
+				>
+					<HStack>
+						<FaTrashCan />
+						<Text>
+							{deletionConfig.permanentDeletion || note.isDeleted
+								? 'Delete permanently'
+								: 'Delete to bin'}
+						</Text>
+					</HStack>
+				</MenuItem>
+				{note.isDeleted && (
+					<MenuItem
+						onClick={() =>
+							runCommand(GLOBAL_COMMANDS.RESTORE_NOTE_FROM_BIN, {
+								noteId: note.id,
+							})
+						}
+					>
 						<HStack>
-							<FaFileExport />
-							<Text>Export...</Text>
+							<FaTrashCanArrowUp />
+							<Text>Restore from bin</Text>
 						</HStack>
 					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaShield />
-							<Text>Password protection...</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaRotate />
-							<Text>Disable sync</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaBoxArchive />
-							<Text>Archive</Text>
-						</HStack>
-					</MenuItem>
-					<MenuItem>
-						<HStack>
-							<FaTrashCan />
-							<Text>Delete</Text>
-						</HStack>
-					</MenuItem>
-				</MenuList>
-			</Menu>
-		);
-	},
-);
+				)}
+			</MenuList>
+		</Menu>
+	);
+});

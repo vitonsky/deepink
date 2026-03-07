@@ -4,10 +4,11 @@ import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
-import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
+import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
@@ -153,10 +154,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	}, [db, isDevMode]);
 
 	useShortcutsBinding();
+	useVaultShortcutsHandlers();
 
 	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, () => controls.close(), {
 		enabled: controls.profile.profile.isEncrypted,
 	});
+	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
