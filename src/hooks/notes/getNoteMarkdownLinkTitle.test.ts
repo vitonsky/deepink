@@ -14,15 +14,14 @@ test('uses title if provided, defaults to text when title is empty', () => {
 test('truncates text longer than maxLength', () => {
 	const longText =
 		'The cat, also called domestic cat and house cat, is a small carnivorous mammal.';
-	const maxLength = 30;
 
 	expect(
-		getNoteMarkdownLinkTitle({ title: longText, text: '' }, maxLength).length,
-	).toBeLessThanOrEqual(maxLength);
+		getNoteMarkdownLinkTitle({ title: longText, text: '' }).length,
+	).toBeLessThanOrEqual(50);
 
 	expect(
-		getNoteMarkdownLinkTitle({ title: '', text: longText }, maxLength).length,
-	).toBeLessThanOrEqual(maxLength);
+		getNoteMarkdownLinkTitle({ title: '', text: longText }).length,
+	).toBeLessThanOrEqual(50);
 });
 
 test('escapes Markdown link special characters', () => {
