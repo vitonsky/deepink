@@ -403,9 +403,13 @@ describe('data fetching', () => {
 
 		const notExistingNote = getUUID();
 
-		await expect(
-			registry.getById([...notesId, notExistingNote]),
-		).resolves.not.toThrow();
+		const shuffledNotes = [...notesId, notExistingNote].sort(
+			() => Math.random() - 0.5,
+		);
+
+		await expect(registry.getById(shuffledNotes)).resolves.not.toContainEqual(
+			expect.objectContaining({ id: notExistingNote }),
+		);
 
 		await db.close();
 	});
