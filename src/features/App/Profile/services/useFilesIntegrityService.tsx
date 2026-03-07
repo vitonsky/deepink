@@ -46,7 +46,7 @@ export const useFilesIntegrityService = () => {
 						getWorkspaceFilesPath(workspace.id),
 					);
 
-					return new FilesIntegrityController(workspace.id, filesController, {
+					return new FilesIntegrityController(filesController, {
 						attachments: new AttachmentsController(db, workspace.id),
 						files: new FilesController(db, filesController, workspace.id),
 					});
