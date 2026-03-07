@@ -213,15 +213,19 @@ export const profilesSlice = createSlice({
 			const profile = state.profiles[profileId];
 			if (!profile) return;
 
-			profile.activeWorkspace = workspaceId;
+			// Reset active workspace
+			if (workspaceId === null) {
+				profile.activeWorkspace = null;
+				return;
+			}
+
+			const workspace = profile.workspaces[workspaceId];
+			if (!workspace) return;
 
 			// Touch workspace
-			if (workspaceId) {
-				const workspace = profile.workspaces[workspaceId];
-				if (workspace && !workspace.touched) {
-					workspace.touched = true;
-				}
-			}
+			workspace.touched = true;
+
+			profile.activeWorkspace = workspaceId;
 		},
 
 		setActiveNote: (

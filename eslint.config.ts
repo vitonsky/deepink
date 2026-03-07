@@ -184,6 +184,7 @@ export default tseslint.config(
 					ignoreRestSiblings: true,
 				},
 			],
+			eqeqeq: ['error', 'always'],
 
 			// TODO: remove style comments that may have conflicts with prettier
 			// Formatting

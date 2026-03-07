@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import { z } from 'zod';
 import {
@@ -9,10 +9,10 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
+import { PropertiesForm } from '@components/PropertiesForm';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useProfileControls } from '@features/App/Profile';
-import { PropertiesForm } from '@features/NoteEditor/RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -22,7 +22,7 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 import { useWorkspacesList } from './useWorkspacesList';
 
 export const workspacePropsValidator = z.object({
-	name: z.string().min(1, 'Name must not be empty'),
+	name: z.string().trim().min(1, 'Name must not be empty'),
 });
 
 export const WorkspaceCreatePopup = () => {
@@ -40,6 +40,8 @@ export const WorkspaceCreatePopup = () => {
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
 
 	const { update: updateWorkspaces } = useWorkspacesList();
+
+	const [isPending, setIsPending] = useState(false);
 
 	return (
 		<>
@@ -66,11 +68,16 @@ export const WorkspaceCreatePopup = () => {
 							]}
 							validatorScheme={workspacePropsValidator}
 							onUpdate={({ name }) => {
-								onClose();
+								if (isPending) return;
+								setIsPending(true);
 
 								workspacesManager
 									.create({ name })
 									.then(async (workspaceId) => {
+										// Synchronize immediately after creation to prevent workspace loss
+										// if the user closes the app before the automatic sync
+										await db.sync();
+
 										await updateWorkspaces();
 
 										dispatch(
@@ -83,11 +90,17 @@ export const WorkspaceCreatePopup = () => {
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
 										);
+
+										onClose();
+									})
+									.finally(() => {
+										setIsPending(false);
 									});
 							}}
 							submitButtonText="Add"
 							cancelButtonText="Cancel"
 							onCancel={onClose}
+							isPending={isPending}
 						/>
 					</Box>
 				</VStack>

@@ -121,6 +121,9 @@ export const useProfileContainers = () => {
 				.then((workspaces) => workspaces.length > 0);
 			if (!isWorkspacesExists) {
 				await workspaces.create({ name: 'Notes' });
+
+				// Sync to avoid losing the default workspace if the app closes before the automatic sync
+				await db.sync();
 			}
 
 			// TODO: close DB first and close encryption last
