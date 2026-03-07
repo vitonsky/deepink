@@ -14,7 +14,6 @@ import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { useVaultStorage } from '@features/files';
 import { getWorkspaceFilesPath, getWorkspacePath } from '@features/files/paths';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 
@@ -31,7 +30,7 @@ export type WorkspaceContainer = {
 	};
 };
 
-export const useWorkspace = (currentProfile: ProfileContainer) => {
+export const useWorkspace = (currentProfile: ProfileContainer, workspaceId: string) => {
 	const [state, setState] = useState<WorkspaceContainer | null>(null);
 
 	const { workspaceId } = useWorkspaceData();

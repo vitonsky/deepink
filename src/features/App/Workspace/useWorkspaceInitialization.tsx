@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import {
 	NOTES_VIEW,
 	WorkspaceConfigScheme,
@@ -16,10 +15,21 @@ import { useWorkspaceState } from './useWorkspaceState';
 const isValidView = (view: string): view is NOTES_VIEW =>
 	Object.values(NOTES_VIEW).includes(view as NOTES_VIEW);
 
-export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null) => {
+export const useWorkspaceInitialization = (
+	workspace: WorkspaceContainer | null,
+	profileId: string,
+	workspaceId: string,
+) => {
 	const dispatch = useAppDispatch();
-	const workspaceData = useWorkspaceData();
 	const controls = useProfileControls();
+
+	const workspaceData = useMemo(
+		() => ({
+			profileId,
+			workspaceId,
+		}),
+		[profileId, workspaceId],
+	);
 
 	// Load workspace config
 	useEffect(() => {
