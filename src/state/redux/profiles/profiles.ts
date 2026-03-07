@@ -221,10 +221,10 @@ export const profilesSlice = createSlice({
 			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return;
 
-			profile.activeWorkspace = workspaceId;
-
 			// Touch workspace
 			workspace.touched = true;
+
+			profile.activeWorkspace = workspaceId;
 		},
 
 		setActiveNote: (
