@@ -1,6 +1,5 @@
 import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
-import { Box } from '@chakra-ui/react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
@@ -144,31 +143,26 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		<ProfileControlsContext.Provider value={controls}>
 			{!isActiveWorkspaceReady && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
-			<Box
-				width="100%"
-				height="100vh"
-				display={isActiveWorkspaceReady ? 'flex' : 'none'}
-			>
-				{workspaces.map((workspace) =>
-					workspace.touched ? (
-						<WorkspaceContext.Provider
-							key={workspace.id}
-							value={{ profileId: profileId, workspaceId: workspace.id }}
-						>
-							<StatusBarProvider>
-								<Workspace profile={currentProfile} />
-								<ProfileStatusBar />
-								{isDevMode && (
-									<ToggleSQLConsole
-										isVisible={isDBConsoleVisible}
-										onVisibilityChange={setIsDBConsoleVisible}
-									/>
-								)}
-							</StatusBarProvider>
-						</WorkspaceContext.Provider>
-					) : null,
-				)}
-			</Box>
+
+			{workspaces.map((workspace) =>
+				workspace.touched ? (
+					<WorkspaceContext.Provider
+						key={workspace.id}
+						value={{ profileId: profileId, workspaceId: workspace.id }}
+					>
+						<StatusBarProvider>
+							<Workspace profile={currentProfile} />
+							<ProfileStatusBar />
+							{isDevMode && (
+								<ToggleSQLConsole
+									isVisible={isDBConsoleVisible}
+									onVisibilityChange={setIsDBConsoleVisible}
+								/>
+							)}
+						</StatusBarProvider>
+					</WorkspaceContext.Provider>
+				) : null,
+			)}
 			{isDevMode && (
 				<SQLConsole
 					isVisible={isDBConsoleVisible}
