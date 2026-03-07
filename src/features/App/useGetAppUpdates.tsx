@@ -69,6 +69,8 @@ export const useGetAppUpdates = () => {
 				.then((newVersion) => {
 					if (!newVersion) return null;
 
+					newVersion.url = 'https://deepink.io/download';
+
 					showToast({
 						duration: null,
 						position: 'top-right',
