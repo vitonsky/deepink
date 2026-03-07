@@ -110,11 +110,10 @@ export const WorkspaceSettings = () => {
 			.then((filesList) => files.delete(filesList.map((file) => file.id)));
 		await filesController.delete([currentWorkspace.workspaceId]);
 
-		await new FilesIntegrityController(
-			currentWorkspace.workspaceId,
-			filesController,
-			{ files, attachments },
-		).fixAll();
+		await new FilesIntegrityController(filesController, {
+			files,
+			attachments,
+		}).fixAll();
 
 		dispatch(
 			workspacesApi.setActiveWorkspace({

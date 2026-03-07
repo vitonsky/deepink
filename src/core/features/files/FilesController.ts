@@ -12,14 +12,11 @@ import { IFilesStorage } from '.';
  * Files manager for local database
  */
 export class FilesController {
-	private readonly db;
-	private readonly fileController;
-	private readonly workspace;
-	constructor(db: PGLiteDatabase, fileController: IFilesStorage, workspace: string) {
-		this.db = db;
-		this.fileController = fileController;
-		this.workspace = workspace;
-	}
+	constructor(
+		protected readonly db: PGLiteDatabase,
+		protected readonly filesStorage: IFilesStorage,
+		protected readonly workspace: string,
+	) {}
 
 	public async add(file: File) {
 		const db = wrapDB(this.db.get());
@@ -33,21 +30,20 @@ export class FilesController {
 		);
 
 		// TODO: delete entry in DB if can't upload file. Or try to upload first and then add file to DB
-		// TODO: encrypt file
 		// Write file
 		const buffer = await file.arrayBuffer();
-		await this.fileController.write(this.getFilePath(fileId), buffer);
+		await this.filesStorage.write(fileId, buffer);
 
 		return fileId;
 	}
 
-	public async get(id: string) {
+	public async get(fileId: string) {
 		const db = wrapDB(this.db.get());
 
 		// Insert in DB
 		const [fileEntry] = await db
 			.query(
-				qb.sql`SELECT * FROM files WHERE workspace_id=${this.workspace} AND id=${id}`,
+				qb.sql`SELECT * FROM files WHERE workspace_id=${this.workspace} AND id=${fileId}`,
 
 				z.object({
 					name: z.string(),
@@ -60,10 +56,9 @@ export class FilesController {
 
 		const { name, mimetype } = fileEntry;
 
-		const buffer = await this.fileController.get(this.getFilePath(id));
+		const buffer = await this.filesStorage.get(fileId);
 		if (!buffer) return null;
 
-		// TODO: decrypt file
 		return new File([buffer], name, { type: mimetype });
 	}
 
@@ -81,9 +76,7 @@ export class FilesController {
 		);
 
 		// Delete files
-		await this.fileController.delete(
-			filesId.map((filename) => this.getFilePath(filename)),
-		);
+		await this.filesStorage.delete(filesId);
 	}
 
 	public async query() {
@@ -99,9 +92,5 @@ export class FilesController {
 				}),
 			)
 			.then(({ rows }) => rows);
-	}
-
-	private getFilePath(filename: string) {
-		return [this.workspace, filename].join('/');
 	}
 }

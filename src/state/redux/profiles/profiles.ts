@@ -1,3 +1,4 @@
+import ms from 'ms';
 import z from 'zod';
 import { INote, NoteId } from '@core/features/notes';
 import { IResolvedTag } from '@core/features/tags';
@@ -14,7 +15,7 @@ export const defaultVaultConfig = {
 	},
 	snapshots: {
 		enabled: true,
-		interval: 30_000,
+		interval: ms('30s'),
 	},
 	deletion: {
 		confirm: false,

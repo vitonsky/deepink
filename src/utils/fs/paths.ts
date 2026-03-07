@@ -87,3 +87,29 @@ export const getRelativePath = (path: string, base: string): string => {
 
 	return relativePath.length === 0 ? './' : relativePath.join('/');
 };
+
+/**
+ * Normalize path to a fully qualified path with leading slash
+ */
+export const normalizePath = (path: string) => {
+	const resolvedPath = getResolvedPath(path, '/');
+
+	return resolvedPath;
+};
+
+/**
+ * Ensures the target path will be under a root path
+ */
+export const getRootedPath = (path: string, root: string) => {
+	const resolvedRootPath = normalizePath(root);
+	const resolvedPath = getResolvedPath(path, root);
+
+	if (resolvedRootPath === '/') return resolvedPath;
+
+	const resolvedPathSegments = resolvedPath.split('/');
+	const isPathUnderRoot = resolvedRootPath
+		.split('/')
+		.every((segment, index) => resolvedPathSegments[index] === segment);
+
+	return isPathUnderRoot ? resolvedPath : resolvedRootPath;
+};

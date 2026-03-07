@@ -43,11 +43,11 @@ export type GlobalSettings = z.output<typeof settingsScheme>;
 export const defaultSettings = {
 	checkForUpdates: true,
 	theme: {
-		name: 'auto',
+		name: 'zen',
 		accentColor: 'auto',
 	},
 	editor: {
-		mode: 'plaintext',
+		mode: 'richtext',
 		fontFamily: '',
 		fontSize: 16,
 		lineHeight: 1.6,

@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
+import { IFilesStorage } from '@core/features/files';
 import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
+import { useVaultStorage } from '@features/files';
+import { getWorkspaceFilesPath } from '@features/files/paths';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 
 export type WorkspaceContainer = {
 	attachmentsController: AttachmentsController;
-	filesController: ElectronFilesController;
+	filesController: IFilesStorage;
 	filesRegistry: FilesController;
 	tagsRegistry: TagsController;
 	notesRegistry: NotesController;
@@ -23,25 +25,21 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 
 	const { workspaceId } = useWorkspaceData();
 
+	const files = useVaultStorage(getWorkspaceFilesPath(workspaceId));
 	useEffect(() => {
-		const { db, profile, encryptionController } = currentProfile;
+		const { db } = currentProfile;
 
 		// Setup files
 		// TODO: implement methods to close the objects after use
-		const filesController = new ElectronFilesController(
-			storageApi,
-			[profile.id, 'files'].join('/'),
-			encryptionController,
-		);
 		setState({
-			filesController,
+			filesController: files,
 			attachmentsController: new AttachmentsController(db, workspaceId),
-			filesRegistry: new FilesController(db, filesController, workspaceId),
+			filesRegistry: new FilesController(db, files, workspaceId),
 			tagsRegistry: new TagsController(db, workspaceId),
 			notesRegistry: new NotesController(db, workspaceId),
 			notesHistory: new NoteVersions(db, workspaceId),
 		});
-	}, [currentProfile, workspaceId]);
+	}, [currentProfile, files, workspaceId]);
 
 	return state;
 };
