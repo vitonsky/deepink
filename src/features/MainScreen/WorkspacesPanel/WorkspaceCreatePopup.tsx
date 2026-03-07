@@ -21,7 +21,7 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useWorkspacesList } from './useWorkspacesList';
 
-export const workspaceNameValidator = z.object({
+export const workspacePropsValidator = z.object({
 	name: z.string().trim().min(1, 'Name must not be empty'),
 });
 
@@ -66,7 +66,7 @@ export const WorkspaceCreatePopup = () => {
 									placeholder: 'e.g., Personal',
 								},
 							]}
-							validatorScheme={workspaceNameValidator}
+							validatorScheme={workspacePropsValidator}
 							onUpdate={({ name }) => {
 								if (isPending) return;
 								setIsPending(true);

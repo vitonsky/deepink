@@ -56,8 +56,6 @@ export const PropertiesForm = <T extends OptionObject[]>({
 		reset(optionsValues);
 	}, [getValues, isPending, optionsValues, reset, setValue]);
 
-	console.log(isPending);
-
 	return (
 		<VStack
 			as="form"

@@ -20,7 +20,7 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { useWorkspacesList } from '@features/MainScreen/WorkspacesPanel/useWorkspacesList';
 import {
 	WorkspaceCreatePopup,
-	workspaceNameValidator,
+	workspacePropsValidator,
 } from '@features/MainScreen/WorkspacesPanel/WorkspaceCreatePopup';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
@@ -67,7 +67,7 @@ export const WorkspaceSettings = () => {
 		defaultValues: {
 			name: workspaceData?.name ?? '',
 		},
-		resolver: zodResolver(workspaceNameValidator),
+		resolver: zodResolver(workspacePropsValidator),
 	});
 
 	const dispatch = useAppDispatch();
