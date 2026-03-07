@@ -1,4 +1,4 @@
-import { AppUpdatesChecker, VersionObject } from './AppUpdatesChecker';
+import { AppUpdatesChecker, VersionObject } from '../AppUpdatesChecker';
 
 const mockFetch = vi.fn();
 globalThis.fetch = mockFetch;
