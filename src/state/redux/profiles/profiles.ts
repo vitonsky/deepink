@@ -190,35 +190,34 @@ export const profilesSlice = createSlice({
 			state.activeProfile = payload;
 		},
 
-		syncWorkspacesList: (
+		setWorkspaces: (
 			state,
 			{
-				payload: { profileId, workspacesList },
+				payload: { profileId, workspaces },
 			}: PayloadAction<
-				ProfileScoped<{ workspacesList: { id: string; name: string }[] }>
+				ProfileScoped<{ workspaces: { id: string; name: string }[] }>
 			>,
 		) => {
 			const profile = state.profiles[profileId];
 			if (!profile) return;
 
-			const workspaces = profile.workspaces;
-
-			workspacesList.forEach((workspace) => {
-				const existingWorkspace = workspaces[workspace.id];
+			workspaces.forEach((workspace) => {
+				// Rename
+				const existingWorkspace = profile.workspaces[workspace.id];
 				if (existingWorkspace) {
 					existingWorkspace.name = workspace.name;
 					return;
 				}
 
 				// Create new workspace
-				workspaces[workspace.id] = createWorkspaceObject(workspace);
+				profile.workspaces[workspace.id] = createWorkspaceObject(workspace);
 			});
 
 			// Delete workspaces that no more exists
-			const updatedIds = new Set(workspacesList.map((workspace) => workspace.id));
-			for (const id in workspaces) {
+			const updatedIds = new Set(workspaces.map((workspace) => workspace.id));
+			for (const id in profile.workspaces) {
 				if (!updatedIds.has(id)) {
-					delete workspaces[id];
+					delete profile.workspaces[id];
 				}
 			}
 		},
