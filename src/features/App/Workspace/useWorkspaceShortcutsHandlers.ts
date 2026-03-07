@@ -56,21 +56,22 @@ export const useWorkspaceShortcutsHandlers = () => {
 	});
 
 	const deletionConfig = useVaultSelector(selectDeletionConfig);
-	useWorkspaceShortcutsCallback(Shortcuts.DELETE_CURRENT_NOTE, async () => {
+	useWorkspaceShortcutsCallback(Shortcuts.DELETE_CURRENT_NOTE, () => {
 		if (!activeNoteId) return;
 
-		const [note] = await notes.getById([activeNoteId]);
-		if (!note) return;
+		notes.getById([activeNoteId]).then(([note]) => {
+			if (!note) return;
 
-		if (deletionConfig.permanentDeletion || note.isDeleted) {
-			command(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, {
+			if (deletionConfig.permanentDeletion || note.isDeleted) {
+				command(GLOBAL_COMMANDS.DELETE_NOTE_PERMANENTLY, {
+					noteId: activeNoteId,
+				});
+				return;
+			}
+
+			command(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, {
 				noteId: activeNoteId,
 			});
-			return;
-		}
-
-		command(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, {
-			noteId: activeNoteId,
 		});
 	});
 
