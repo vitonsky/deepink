@@ -77,3 +77,18 @@ test('Greater version must be considered as new version', async () => {
 		}),
 	).resolves.toEqual(null);
 });
+
+test('Returns null for a network errors', async () => {
+	const spyError = vi.spyOn(console, 'error');
+	mockFetch.mockImplementation(() => {
+		throw new Error('Network error emulation');
+	});
+
+	await expect(
+		updatesChecker.getUpdate({
+			version: '0.0.1',
+		}),
+	).resolves.toEqual(null);
+
+	expect(spyError).toBeCalledWith(new Error('Network error emulation'));
+});
