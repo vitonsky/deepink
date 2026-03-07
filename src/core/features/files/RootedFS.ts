@@ -38,7 +38,7 @@ export class RootedFS extends OverlayFS {
 					? rootedPath
 					: joinPathSegments(rootedPath.split('/').slice(rootSegmentsCount));
 			})
-			.filter((path) => path !== this.root)
+			.filter((path) => path !== '/')
 			.toArray();
 	}
 }
