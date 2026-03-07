@@ -5,15 +5,7 @@ export enum GLOBAL_COMMANDS {
 	 * Create and open a new note
 	 */
 	CREATE_NOTE = 'Create note',
-
-	/**
-	 * Close the current note
-	 */
 	CLOSE_CURRENT_NOTE = 'Close current note',
-
-	/**
-	 * Reopen the last closed note
-	 */
 	RESTORE_CLOSED_NOTE = 'Restore closed note',
 
 	/**
@@ -26,74 +18,29 @@ export enum GLOBAL_COMMANDS {
 	 */
 	FOCUS_PREVIOUS_NOTE = 'Focus previous note',
 
-	/**
-	 * Deletes a note permanently
-	 */
 	DELETE_NOTE_PERMANENTLY = 'Delete note permanently',
-
-	/**
-	 * Move note to bin
-	 */
 	MOVE_NOTE_TO_BIN = 'Move note to bin',
-
-	/**
-	 * Restore a note from the Bin
-	 */
 	RESTORE_NOTE_FROM_BIN = 'Restore note from bin',
-
-	/**
-	 * Toggle the archive status of the note
-	 */
 	TOGGLE_NOTE_ARCHIVE = 'Toggle note archive status',
-
-	/**
-	 * Toggle the bookmark status of the note
-	 */
 	TOGGLE_NOTE_BOOKMARK = 'Toggle note bookmark status',
 
 	/**
 	 * Open and close the history for a note
 	 */
 	TOGGLE_NOTE_HISTORY_PANEL = 'Toggle note history panel',
-
-	/**
-	 * Export a note
-	 */
 	EXPORT_NOTE = 'Export note',
-
-	/**
-	 * Copy the Markdown link for the note
-	 */
 	COPY_NOTE_MARKDOWN_LINK = 'Copy Markdown link',
 
 	/**
 	 * Creates a copy of an existing note
 	 */
 	DUPLICATE_NOTE = 'Duplicate note',
-
-	/**
-	 * Open global settings window
-	 */
 	OPEN_GLOBAL_SETTINGS = 'Open global settings',
-
-	/**
-	 * Synchronize the database
-	 */
 	SYNC_DATABASE = 'Synchronize database',
 
-	/**
-	 * Lock the currently active user profile
-	 */
 	LOCK_CURRENT_PROFILE = 'Lock current profile',
-
-	/**
-	 * Focus the search input field
-	 */
 	FOCUS_SEARCH = 'Focus search input',
 
-	/**
-	 * Handle keyboard shortcut
-	 */
 	SHORTCUT_PRESSED = 'Shortcut pressed',
 }
 
