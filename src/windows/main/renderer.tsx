@@ -5,8 +5,10 @@ import { createEvent } from 'effector';
 import { EventBus } from '@api/events/EventBus';
 import { GlobalEventsPayloadMap } from '@api/events/global';
 import { patchWindow } from '@electron/requests/electronPatches/renderer';
+import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { App } from '@features/App/index';
+import { FilesStorageContext } from '@features/files';
 import { TelemetryContext } from '@features/telemetry';
 import { ThemeProvider } from '@features/ThemeProvider';
 import { CommandEventProvider } from '@hooks/commands/CommandEventProvider';
@@ -44,16 +46,20 @@ const globalEventBus = {
 	},
 } satisfies EventBus<GlobalEventsPayloadMap>;
 
+const filesController = new ElectronFilesController(storageApi, `/`);
+
 const reactRoot = createRoot(rootNode);
 reactRoot.render(
 	<TelemetryContext value={telemetry}>
 		<Provider store={store}>
 			<GlobalEventBusContext value={globalEventBus}>
-				<CommandEventProvider>
-					<ThemeProvider>
-						<App />
-					</ThemeProvider>
-				</CommandEventProvider>
+				<FilesStorageContext value={filesController}>
+					<CommandEventProvider>
+						<ThemeProvider>
+							<App />
+						</ThemeProvider>
+					</CommandEventProvider>
+				</FilesStorageContext>
 			</GlobalEventBusContext>
 		</Provider>
 	</TelemetryContext>,

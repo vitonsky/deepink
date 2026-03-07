@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
-import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
+import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { AppServices } from './AppServices';
@@ -14,13 +14,8 @@ import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
 
 export const App: FC = () => {
-	const [config] = useState(
-		() =>
-			new ConfigStorage(
-				'config.json',
-				new ElectronFilesController(storageApi, '/'),
-			),
-	);
+	const files = useFilesStorage();
+	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
 
 	const profilesList = useProfilesList();
 	const profileContainers = useProfileContainers();

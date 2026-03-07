@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import ms from 'ms';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { FilesController } from '@core/features/files/FilesController';
+import { RootedFS } from '@core/features/files/RootedFS';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
-import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
+import { useVaultStorage } from '@features/files';
+import { getWorkspaceFilesPath } from '@features/files/paths';
 import { useService } from '@hooks/useService';
 import { useVaultSelector } from '@state/redux/profiles/hooks';
 import {
@@ -26,6 +28,7 @@ export const useFilesIntegrityService = () => {
 	const { enabled: isServiceEnabled } = useVaultSelector(selectIntegrityServiceConfig);
 
 	const runService = useService();
+	const vaultStorage = useVaultStorage();
 
 	useEffect(() => {
 		if (!isServiceEnabled) return;
@@ -38,13 +41,12 @@ export const useFilesIntegrityService = () => {
 
 			const controls = await Promise.all(
 				workspaces.map((workspace) => {
-					const filesController = new ElectronFilesController(
-						storageApi,
-						[profileId, 'files'].join('/'),
-						encryptionController,
+					const filesController = new RootedFS(
+						vaultStorage,
+						getWorkspaceFilesPath(workspace.id),
 					);
 
-					return new FilesIntegrityController(workspace.id, filesController, {
+					return new FilesIntegrityController(filesController, {
 						attachments: new AttachmentsController(db, workspace.id),
 						files: new FilesController(db, filesController, workspace.id),
 					});
@@ -91,5 +93,13 @@ export const useFilesIntegrityService = () => {
 				await workerPromise;
 			};
 		});
-	}, [isServiceEnabled, db, encryptionController, profileId, runService, workspaces]);
+	}, [
+		isServiceEnabled,
+		db,
+		encryptionController,
+		profileId,
+		runService,
+		workspaces,
+		vaultStorage,
+	]);
 };
