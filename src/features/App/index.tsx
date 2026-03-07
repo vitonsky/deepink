@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { useFilesStorage } from '@features/files';
