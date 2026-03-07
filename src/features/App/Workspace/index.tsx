@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveWorkspaceInfo,
+	selectIsWorkspaceReady,
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -50,6 +51,11 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	);
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
+
+	const isWorkspaceReady = useAppSelector(
+		selectIsWorkspaceReady({ profileId, workspaceId: workspaceData.workspaceId }),
+	);
+	if (!isWorkspaceReady) return;
 
 	return (
 		<Box

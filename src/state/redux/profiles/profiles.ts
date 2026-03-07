@@ -564,5 +564,13 @@ export const selectIsActiveWorkspaceReady = (scope: ProfileScoped) =>
 		(workspace) => workspace?.isWorkspaceReady ?? false,
 	);
 
+export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScoped) =>
+	createAppSelector(profilesSlice.selectSlice, (state) => {
+		const profile = state.profiles[profileId];
+		if (!profile) return null;
+
+		return profile.workspaces[workspaceId]?.isWorkspaceReady ?? false;
+	});
+
 export * from './selectors/notes';
 export * from './selectors/tags';
