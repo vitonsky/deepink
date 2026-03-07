@@ -6,6 +6,7 @@ import { NotesController } from '@core/features/notes/controller/NotesController
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { useVaultStorage } from '@features/files';
+import { getWorkspaceFilesPath } from '@features/files/paths';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -24,7 +25,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 
 	const { workspaceId } = useWorkspaceData();
 
-	const files = useVaultStorage(`files`);
+	const files = useVaultStorage(getWorkspaceFilesPath(workspaceId));
 	useEffect(() => {
 		const { db } = currentProfile;
 

@@ -5,6 +5,7 @@ import { FilesController } from '@core/features/files/FilesController';
 import { RootedFS } from '@core/features/files/RootedFS';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { useVaultStorage } from '@features/files';
+import { getWorkspaceFilesPath } from '@features/files/paths';
 import { useService } from '@hooks/useService';
 import { useVaultSelector } from '@state/redux/profiles/hooks';
 import {
@@ -27,7 +28,7 @@ export const useFilesIntegrityService = () => {
 	const { enabled: isServiceEnabled } = useVaultSelector(selectIntegrityServiceConfig);
 
 	const runService = useService();
-	const files = useVaultStorage();
+	const vaultStorage = useVaultStorage();
 
 	useEffect(() => {
 		if (!isServiceEnabled) return;
@@ -40,8 +41,10 @@ export const useFilesIntegrityService = () => {
 
 			const controls = await Promise.all(
 				workspaces.map((workspace) => {
-					// TODO: keep files in vaults/[profileId]/[workspaceId]
-					const filesController = new RootedFS(files, 'files');
+					const filesController = new RootedFS(
+						vaultStorage,
+						getWorkspaceFilesPath(workspace.id),
+					);
 
 					return new FilesIntegrityController(workspace.id, filesController, {
 						attachments: new AttachmentsController(db, workspace.id),
@@ -97,6 +100,6 @@ export const useFilesIntegrityService = () => {
 		profileId,
 		runService,
 		workspaces,
-		files,
+		vaultStorage,
 	]);
 };
