@@ -118,7 +118,7 @@ export const WorkspaceSettings = () => {
 			attachments,
 		}).fixAll();
 
-		// Delete workspace config directory
+		// Delete workspace directory
 		await workspaceFiles.delete([currentWorkspace.workspaceId]);
 
 		dispatch(
