@@ -17,7 +17,7 @@ import {
 import { Features } from '@components/Features/Features';
 import { FeaturesGroup, FeaturesPanel } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
-import { AppVersionInfo } from '@electron/updates/GitHubReleaseUpdatesChecker';
+import { AppVersionInfo } from '@electron/updates/AppUpdatesChecker';
 import { useGetAppUpdates } from '@features/App/useGetAppUpdates';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
