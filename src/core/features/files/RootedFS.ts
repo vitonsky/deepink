@@ -1,20 +1,17 @@
-import { getResolvedPath, joinPathSegments } from '@utils/fs/paths';
+import { getRootedPath, joinPathSegments, normalizePath } from '@utils/fs/paths';
 
 import { OverlayFS } from './OverlayFS';
 import { IFilesStorage } from '.';
 
 export class RootedFS extends OverlayFS {
-	constructor(
-		storage: IFilesStorage,
-		private readonly root: string,
-	) {
+	private readonly root;
+	constructor(storage: IFilesStorage, root: string) {
 		super(storage);
+		this.root = normalizePath(root);
 	}
 
 	private getHostPath(path: string) {
-		const resolvedPath = getResolvedPath(joinPathSegments([this.root, path]), '/');
-		const fixedPath = resolvedPath.startsWith(this.root) ? resolvedPath : this.root;
-		return fixedPath;
+		return getRootedPath(joinPathSegments([this.root, path]), this.root);
 	}
 
 	write(path: string, buffer: ArrayBuffer): Promise<void> {
@@ -31,10 +28,17 @@ export class RootedFS extends OverlayFS {
 
 	async list(): Promise<string[]> {
 		const files = await super.list();
+
+		const rootSegmentsCount = this.root.split('/').length;
 		return files
 			.values()
-			.filter((path) => path.startsWith(this.root))
-			.map((path) => path.slice(this.root.length))
+			.map((path) => {
+				const rootedPath = getRootedPath(path, this.root);
+				return this.root === '/'
+					? rootedPath
+					: joinPathSegments(rootedPath.split('/').slice(rootSegmentsCount));
+			})
+			.filter((path) => path !== this.root)
 			.toArray();
 	}
 }
