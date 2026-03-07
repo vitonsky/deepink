@@ -7,13 +7,14 @@ import { createEncryption } from '@core/features/encryption/createEncryption';
 import { IFilesStorage } from '@core/features/files';
 import { EncryptedFS } from '@core/features/files/EncryptedFS';
 import { FileController } from '@core/features/files/FileController';
+import { RootedFS } from '@core/features/files/RootedFS';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import {
 	openDatabase,
 	PGLiteDatabase,
 } from '@core/storage/database/pglite/PGLiteDatabase';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
+import { useFilesStorage } from '@features/files';
 import { DisposableBox } from '@utils/disposable';
 
 import { createProfilesApi, ProfileEntry } from './profiles';
@@ -56,6 +57,8 @@ export const useProfileContainers = () => {
 	const profiles = useUnit($profiles);
 	const activeProfile = useUnit($activeProfile);
 
+	const files = useFilesStorage();
+
 	const { profileOpened, activeProfileChanged } = api.events;
 	const openProfile = useCallback(
 		async (
@@ -64,10 +67,7 @@ export const useProfileContainers = () => {
 		) => {
 			const cleanups: (() => void)[] = [];
 
-			const profileFilesController = new ElectronFilesController(
-				storageApi,
-				`/vaults/${profile.id}`,
-			);
+			const profileFilesController = new RootedFS(files, `/vaults/${profile.id}`);
 
 			// Setup encryption
 			let encryptionController: EncryptionController;
@@ -160,7 +160,7 @@ export const useProfileContainers = () => {
 
 			return newProfile;
 		},
-		[activeProfileChanged, profileOpened],
+		[activeProfileChanged, files, profileOpened],
 	);
 
 	return {

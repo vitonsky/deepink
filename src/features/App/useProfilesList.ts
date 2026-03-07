@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { bytesToBase64 } from '@core/encryption/utils/encoding';
 import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
+import { RootedFS } from '@core/features/files/RootedFS';
 import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
-import { ElectronFilesController, storageApi } from '@electron/requests/storage/renderer';
 import { NewProfile } from '@features/App/WorkspaceManager/ProfileCreator';
+import { useFilesStorage } from '@features/files';
 
 export type ProfilesListApi = {
 	isProfilesLoaded: boolean;
@@ -16,13 +17,14 @@ export type ProfilesListApi = {
  * Hook to manage profile accounts
  */
 export const useProfilesList = (): ProfilesListApi => {
-	const [profilesManager] = useState(
+	const files = useFilesStorage();
+	const profilesManager = useMemo(
 		() =>
 			new ProfilesManager(
-				new ElectronFilesController(storageApi, '/'),
-				(profileName) =>
-					new ElectronFilesController(storageApi, `/vaults/${profileName}`),
+				files,
+				(profileName) => new RootedFS(files, `/vaults/${profileName}`),
 			),
+		[files],
 	);
 
 	const [profiles, setProfiles] = useState<ProfileObject[]>([]);
