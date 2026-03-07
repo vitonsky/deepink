@@ -5,7 +5,10 @@ test('uses title if provided, defaults to text when title is empty', () => {
 	const text = 'The cat, also called domestic cat';
 
 	expect(getNoteMarkdownLinkTitle({ title, text })).toBe(title);
+	expect(getNoteMarkdownLinkTitle({ title, text: '' })).toBe(title);
+
 	expect(getNoteMarkdownLinkTitle({ title: '', text })).toBe(text);
+	expect(getNoteMarkdownLinkTitle({ title: '   ', text })).toBe(text);
 });
 
 test('truncates text longer than maxLength', () => {
@@ -23,8 +26,20 @@ test('truncates text longer than maxLength', () => {
 });
 
 test('escapes Markdown special characters', () => {
-	expect(getNoteMarkdownLinkTitle({ title: '[Note](note://123)', text: '' })).toBe(
-		'\\[Note\\](note://123)',
+	const noteLink = '[Note](note://123)';
+	const escapesNoteLink = '\\[Note\\](note://123)';
+
+	expect(getNoteMarkdownLinkTitle({ title: noteLink, text: '' })).toBe(escapesNoteLink);
+	expect(getNoteMarkdownLinkTitle({ title: '', text: noteLink })).toBe(escapesNoteLink);
+
+	const externalLink = '[w](https://www.wikipedia.org/)';
+	const escapesExternalLink = '\\[w\\](https://www.wikipedia.org/)';
+
+	expect(getNoteMarkdownLinkTitle({ title: externalLink, text: '' })).toBe(
+		escapesExternalLink,
+	);
+	expect(getNoteMarkdownLinkTitle({ title: '', text: externalLink })).toBe(
+		escapesExternalLink,
 	);
 });
 
