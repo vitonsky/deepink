@@ -30,7 +30,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 		// TODO: implement methods to close the objects after use
 		const filesController = new ElectronFilesController(
 			storageApi,
-			[profile.id, 'files'].join('/'),
+			['vaults', profile.id, 'files'].join('/'),
 			encryptionController,
 		);
 		setState({

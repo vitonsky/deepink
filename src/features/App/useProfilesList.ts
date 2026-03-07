@@ -21,7 +21,7 @@ export const useProfilesList = (): ProfilesListApi => {
 			new ProfilesManager(
 				new ElectronFilesController(storageApi, '/'),
 				(profileName) =>
-					new ElectronFilesController(storageApi, `/${profileName}`),
+					new ElectronFilesController(storageApi, `/vaults/${profileName}`),
 			),
 	);
 

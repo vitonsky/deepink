@@ -38,9 +38,10 @@ export const useFilesIntegrityService = () => {
 
 			const controls = await Promise.all(
 				workspaces.map((workspace) => {
+					// TODO: keep files in vaults/[profileId]/[workspaceId]
 					const filesController = new ElectronFilesController(
 						storageApi,
-						[profileId, 'files'].join('/'),
+						['vaults', profileId, 'files'].join('/'),
 						encryptionController,
 					);
 

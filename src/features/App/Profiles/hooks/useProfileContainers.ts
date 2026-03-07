@@ -66,7 +66,7 @@ export const useProfileContainers = () => {
 
 			const profileFilesController = new ElectronFilesController(
 				storageApi,
-				`/${profile.id}`,
+				`/vaults/${profile.id}`,
 			);
 
 			// Setup encryption
