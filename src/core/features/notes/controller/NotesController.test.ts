@@ -392,6 +392,27 @@ describe('data fetching', () => {
 
 		await db.close();
 	});
+
+	test('method getById ignores non-existent ids and does not throw errors', async () => {
+		const db = await openDatabase(dbFile);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		const notExistingNote = getUUID();
+
+		const shuffledNotes = [...notesId, notExistingNote].sort(
+			() => Math.random() - 0.5,
+		);
+
+		await expect(registry.getById(shuffledNotes)).resolves.not.toContainEqual(
+			expect.objectContaining({ id: notExistingNote }),
+		);
+
+		await db.close();
+	});
 });
 
 describe('multi instances', () => {

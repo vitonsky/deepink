@@ -60,6 +60,7 @@ export const createWorkspaceObject = (workspace: {
 }): WorkspaceData => ({
 	...workspace,
 	touched: false,
+	isWorkspaceReady: false,
 
 	activeNote: null,
 	recentlyClosedNotes: [],
@@ -102,6 +103,7 @@ export const WorkspaceConfigScheme = z.object({
 export type WorkspaceData = {
 	id: string;
 	name: string;
+	isWorkspaceReady: boolean;
 
 	/**
 	 * Defines were workspace opened by user or not
@@ -188,6 +190,18 @@ export const profilesSlice = createSlice({
 
 		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
 			state.activeProfile = payload;
+		},
+
+		setIsWorkspaceReady: (
+			state,
+			{
+				payload: { profileId, workspaceId, isReady },
+			}: PayloadAction<WorkspaceScoped<{ isReady: boolean }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.isWorkspaceReady = isReady;
 		},
 
 		setWorkspaces: (
@@ -519,6 +533,20 @@ export const selectActiveWorkspaceInfo = (scope: ProfileScoped) =>
 	createAppSelector(selectActiveWorkspace(scope), (workspace) =>
 		workspace ? getWorkspaceInfo(workspace) : null,
 	);
+
+export const selectIsActiveWorkspaceReady = (scope: ProfileScoped) =>
+	createAppSelector(
+		selectActiveWorkspace(scope),
+		(workspace) => workspace?.isWorkspaceReady ?? false,
+	);
+
+export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScoped) =>
+	createAppSelector(profilesSlice.selectSlice, (state) => {
+		const profile = state.profiles[profileId];
+		if (!profile) return null;
+
+		return profile.workspaces[workspaceId]?.isWorkspaceReady ?? false;
+	});
 
 export * from './selectors/notes';
 export * from './selectors/tags';

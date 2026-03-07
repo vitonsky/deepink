@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 
+export type RecentProfile = {
+	isLoaded: boolean;
+	profileId: string | null;
+};
+
 export const useRecentProfile = (config: ConfigStorage) => {
-	const [profileId, setProfileId] = useState<{
-		isLoaded: boolean;
-		profileId: string | null;
-	}>({
+	const [recentProfile, setRecentProfile] = useState<RecentProfile>({
 		isLoaded: false,
 		profileId: null,
 	});
@@ -17,12 +19,12 @@ export const useRecentProfile = (config: ConfigStorage) => {
 
 		config.get('activeProfile').then((activeProfile) => {
 			isRestoredRef.current = true;
-			setProfileId({
+			setRecentProfile({
 				isLoaded: true,
 				profileId: activeProfile,
 			});
 		});
 	}, [config]);
 
-	return profileId;
+	return recentProfile;
 };

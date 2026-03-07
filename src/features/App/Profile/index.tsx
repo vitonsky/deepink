@@ -5,6 +5,7 @@ import { StateFile } from '@core/features/files/StateFile';
 import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useShortcutsBinding } from '@hooks/commands/shortcuts/useShortcutsBinding';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
@@ -14,9 +15,8 @@ import {
 	createWorkspaceObject,
 	defaultVaultConfig,
 	ProfileConfigScheme,
+	selectIsActiveWorkspaceReady,
 	selectWorkspacesInfo,
-	WorkspaceConfigScheme,
-	WorkspaceData,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
@@ -77,20 +77,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		]).then(async ([workspaces, config, state]) => {
 			const [defaultWorkspace] = workspaces;
 
-			const workspaceConfigs = await Promise.all(
-				workspaces.map(async (workspace) => {
-					const config = await new StateFile(
-						new FileController(
-							`workspaces/${workspace.id}/config.json`,
-							controls.profile.files,
-						),
-						WorkspaceConfigScheme,
-					).get();
-
-					return [workspace.id, config] as const;
-				}),
-			).then((entries) => Object.fromEntries(entries));
-
 			if (!defaultWorkspace) return;
 
 			dispatch(
@@ -99,19 +85,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					profile: {
 						activeWorkspace: null,
 						workspaces: Object.fromEntries(
-							workspaces.map((workspace) => {
-								const workspaceObject = createWorkspaceObject(workspace);
-								return [
-									workspace.id,
-									{
-										...workspaceObject,
-										config: {
-											...workspaceObject.config,
-											...workspaceConfigs[workspace.id],
-										},
-									} satisfies WorkspaceData,
-								];
-							}),
+							workspaces.map((workspace) => [
+								workspace.id,
+								createWorkspaceObject(workspace),
+							]),
 						),
 						config: {
 							...defaultVaultConfig,
@@ -158,9 +135,15 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		enabled: controls.profile.profile.isEncrypted,
 	});
 
+	const isActiveWorkspaceReady = useAppSelector(
+		selectIsActiveWorkspaceReady({ profileId }),
+	);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
+			{!isActiveWorkspaceReady && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
+
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
 					<WorkspaceContext.Provider
