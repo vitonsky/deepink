@@ -25,7 +25,7 @@ test('truncates text longer than maxLength', () => {
 	).toBeLessThanOrEqual(maxLength);
 });
 
-test('escapes Markdown special characters', () => {
+test('escapes Markdown link special characters', () => {
 	const noteLink = '[Note](note://123)';
 	const escapesNoteLink = '\\[Note\\](note://123)';
 
