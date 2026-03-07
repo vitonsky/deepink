@@ -3,7 +3,7 @@ import ms from 'ms';
 import { getAbout } from 'src/about';
 import { Button, useToast, UseToastOptions } from '@chakra-ui/react';
 import { AppToast } from '@components/AppToast';
-import { GitHubReleaseUpdatesChecker } from '@electron/updates/GitHubReleaseUpdatesChecker';
+import { AppUpdatesChecker } from '@electron/updates/AppUpdatesChecker';
 import { getDevFlag } from '@utils/dev';
 
 export const useGetAppUpdates = () => {
@@ -60,13 +60,10 @@ export const useGetAppUpdates = () => {
 				}
 			}
 
-			const appReleases = new GitHubReleaseUpdatesChecker({
-				owner: 'vitonsky',
-				repo: 'deepink',
-			});
+			const appReleases = new AppUpdatesChecker({ host: 'https://deepink.io' });
 
 			return appReleases
-				.checkForUpdates({
+				.getUpdate({
 					version: getDevFlag('version') ?? getAbout().version,
 				})
 				.then((newVersion) => {
