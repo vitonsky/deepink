@@ -4,6 +4,7 @@ import { EventBus } from '@api/events/EventBus';
 import { WorkspaceEventsPayloadMap } from '@api/events/workspace';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
+import { FileController } from '@core/features/files/FileController';
 import { FilesController } from '@core/features/files/FilesController';
 import { INote } from '@core/features/notes';
 import { INotesController } from '@core/features/notes/controller';
@@ -46,6 +47,11 @@ export const useFilesRegistry = createContextGetterHook(FilesRegistryContext);
 export const FilesControllerContext = createContext<IFilesStorage | null>(null);
 export const useFilesController = createContextGetterHook(FilesControllerContext);
 
+export const WorkspaceFilesControllerContext = createContext<FileController | null>(null);
+export const useWorkspaceFilesController = createContextGetterHook(
+	WorkspaceFilesControllerContext,
+);
+
 export interface WorkspaceProviderProps extends PropsWithChildren {
 	notesApi: NotesApi;
 	filesController: IFilesStorage;
@@ -54,6 +60,7 @@ export interface WorkspaceProviderProps extends PropsWithChildren {
 	tagsRegistry: TagsController;
 	notesRegistry: INotesController;
 	notesHistory: NoteVersions;
+	workspaceFileController: FileController;
 }
 
 export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
@@ -65,6 +72,7 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 	notesRegistry,
 	notesHistory,
 	children,
+	workspaceFileController,
 }) => {
 	const [eventBus] = useState(() => {
 		const event = createEvent<{
@@ -93,13 +101,19 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 						<AttachmentsControllerContext.Provider
 							value={attachmentsController}
 						>
-							<TagsRegistryContext.Provider value={tagsRegistry}>
-								<NotesRegistryContext.Provider value={notesRegistry}>
-									<NotesHistoryContext.Provider value={notesHistory}>
-										{children}
-									</NotesHistoryContext.Provider>
-								</NotesRegistryContext.Provider>
-							</TagsRegistryContext.Provider>
+							<WorkspaceFilesControllerContext.Provider
+								value={workspaceFileController}
+							>
+								<TagsRegistryContext.Provider value={tagsRegistry}>
+									<NotesRegistryContext.Provider value={notesRegistry}>
+										<NotesHistoryContext.Provider
+											value={notesHistory}
+										>
+											{children}
+										</NotesHistoryContext.Provider>
+									</NotesRegistryContext.Provider>
+								</TagsRegistryContext.Provider>
+							</WorkspaceFilesControllerContext.Provider>
 						</AttachmentsControllerContext.Provider>
 					</FilesControllerContext.Provider>
 				</FilesRegistryContext.Provider>

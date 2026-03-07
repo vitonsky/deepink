@@ -14,7 +14,6 @@ import { Features } from '@components/Features/Features';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { RelaxedInput } from '@components/RelaxedInput';
-import { FileController } from '@core/features/files/FileController';
 import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrityController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
@@ -44,6 +43,7 @@ import {
 	useFilesRegistry,
 	useNotesRegistry,
 	useTagsRegistry,
+	useWorkspaceFilesController,
 } from '../../Workspace/WorkspaceProvider';
 
 export const WorkspaceSettings = () => {
@@ -52,7 +52,7 @@ export const WorkspaceSettings = () => {
 	const telemetry = useTelemetryTracker();
 
 	const {
-		profile: { db, files: profileFileManager },
+		profile: { db },
 	} = useProfileControls();
 
 	const { abort: abortImport } = useImportNotesPreset();
@@ -79,6 +79,7 @@ export const WorkspaceSettings = () => {
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
+	const workspaceFileController = useWorkspaceFilesController();
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
@@ -117,10 +118,6 @@ export const WorkspaceSettings = () => {
 		}).fixAll();
 
 		// Delete workspace config directory
-		const workspaceFileController = new FileController(
-			`workspaces/${currentWorkspace.workspaceId}`,
-			profileFileManager,
-		);
 		await workspaceFileController.delete();
 
 		dispatch(
@@ -133,19 +130,19 @@ export const WorkspaceSettings = () => {
 		await workspacesManager.delete([currentWorkspace.workspaceId]);
 		await workspaces.update();
 	}, [
+		workspaces,
+		workspaceInfo.name,
+		telemetry,
 		abortImport,
-		attachments,
-		currentWorkspace.profileId,
-		currentWorkspace.workspaceId,
-		dispatch,
+		tags,
+		notes,
 		files,
 		filesController,
-		profileFileManager,
-		notes,
-		tags,
-		telemetry,
-		workspaceInfo.name,
-		workspaces,
+		currentWorkspace.workspaceId,
+		currentWorkspace.profileId,
+		attachments,
+		workspaceFileController,
+		dispatch,
 		workspacesManager,
 	]);
 
