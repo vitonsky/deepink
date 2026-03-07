@@ -3,7 +3,7 @@ import ms from 'ms';
 import { getAbout } from 'src/about';
 import { Button, useToast, UseToastOptions } from '@chakra-ui/react';
 import { AppToast } from '@components/AppToast';
-import { AppUpdatesChecker } from '@electron/updates/AppUpdatesChecker';
+import { AppUpdatesChecker, AppVersionInfo } from '@electron/updates/AppUpdatesChecker';
 import { getDevFlag } from '@utils/dev';
 
 export const useGetAppUpdates = () => {
@@ -69,7 +69,7 @@ export const useGetAppUpdates = () => {
 				.then((newVersion) => {
 					if (!newVersion) return null;
 
-					newVersion.url = 'https://deepink.io/download';
+					const updateUrl = 'https://deepink.io/download';
 
 					showToast({
 						duration: null,
@@ -88,7 +88,7 @@ export const useGetAppUpdates = () => {
 												size="sm"
 												variant="accent"
 												onClick={() => {
-													window.open(newVersion.url);
+													window.open(updateUrl);
 													localStorage.removeItem(
 														ignoreFlagKey,
 													);
@@ -113,7 +113,10 @@ export const useGetAppUpdates = () => {
 						},
 					});
 
-					return newVersion;
+					return {
+						version: newVersion.version,
+						url: updateUrl,
+					} satisfies AppVersionInfo;
 				});
 		},
 		[ignoreUpdate, showToast],
