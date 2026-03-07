@@ -13,11 +13,9 @@ import {
 } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { WorkspaceServices } from './services/WorkspaceServices';
-import { useWorkspace } from './useWorkspace';
-import { useWorkspaceInitialization } from './useWorkspaceInitialization';
+import { WorkspaceContainer } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
@@ -28,18 +26,15 @@ export const WorkspaceContext = createContext<{
 export const useWorkspaceContext = createContextGetterHook(WorkspaceContext);
 
 export interface WorkspaceProps {
-	profile: ProfileContainer;
+	workspace: WorkspaceContainer | null;
 }
 
 /**
  * Manage one workspace
  */
-export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
-	const workspace = useWorkspace(profile);
+export const Workspace: FC<WorkspaceProps> = ({ workspace }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
-
-	useWorkspaceInitialization(workspace);
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
