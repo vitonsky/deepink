@@ -1,2 +1,4 @@
+export const getWorkspacePath = (workspaceId: string) => `/workspaces/${workspaceId}`;
+
 export const getWorkspaceFilesPath = (workspaceId: string) =>
-	`/workspaces/${workspaceId}/files`;
+	`${getWorkspacePath(workspaceId)}/files`;
