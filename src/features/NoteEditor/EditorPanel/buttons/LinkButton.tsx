@@ -11,9 +11,8 @@ import {
 	Text,
 	VStack,
 } from '@chakra-ui/react';
+import { PropertiesForm } from '@components/PropertiesForm';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
-
-import { PropertiesForm } from '../../RichEditor/plugins/ContextMenu/components/ObjectPropertiesEditor';
 
 import { InsertingPayloadMap } from '..';
 
