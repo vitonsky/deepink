@@ -1,64 +1,46 @@
 import {
 	enableAutoOutboundTracking,
 	enableAutoPageviews,
+	enableEngagementTracking,
+	enableLinkClicksCapture,
+	enableSessionScoring,
 	filters,
 	Plausible,
 	skipForHosts,
 	transformers,
 	userId,
 } from 'plausible-client';
-
-import { enableClickTracking } from './enableClickTracking';
-import { enableEngagementTracking } from './enableEngagementTracking';
-import { enableSessionScoring } from './enableSessionScoring';
-
-const getSessionId = () => {
-	try {
-		return crypto.randomUUID();
-	} catch {
-		return 'fallback-' + String(Math.round(Math.random() * 10000000000));
-	}
-};
+import { getSessionId } from 'plausible-client/utils/uid';
 
 export const createPlausibleInstance = () => {
 	const plausible = new Plausible({
 		apiHost: 'https://uxt.vitonsky.net',
 		domain: 'deepink.io',
-		filter: (event, eventName) => {
-			if (typeof window === 'undefined') return false;
+		filter: filters(skipForHosts(['localhost'])),
+		transform: transformers(userId(), (event) => {
+			let sessionId = sessionStorage.getItem('sessionId');
+			if (!sessionId) {
+				sessionId = getSessionId();
+				sessionStorage.setItem('sessionId', sessionId);
+			}
 
-			return filters(skipForHosts(['localhost']))(event, eventName);
-		},
-		transform: (event, eventName) => {
-			if (typeof window === 'undefined') return event;
-
-			return transformers([
-				userId(),
-				(event) => {
-					let sessionId = sessionStorage.getItem('sessionId');
-					if (!sessionId) {
-						sessionId = getSessionId();
-						sessionStorage.setItem('sessionId', sessionId);
-					}
-
-					event.props = {
-						...event.props,
-						sessionId,
-					};
-					return event;
-				},
-			])(event, eventName);
-		},
+			event.props = {
+				...event.props,
+				sessionId,
+			};
+			return event;
+		}),
 	});
 
 	const cleanups: ((() => void) | void)[] = [];
 
 	if (typeof window !== 'undefined') {
 		cleanups.push(enableAutoPageviews(plausible));
-		cleanups.push(enableAutoOutboundTracking(plausible));
-		cleanups.push(enableClickTracking(plausible));
 		cleanups.push(enableEngagementTracking(plausible));
 		cleanups.push(enableSessionScoring(plausible));
+
+		cleanups.push(enableAutoOutboundTracking(plausible, { captureText: true }));
+		cleanups.push(enableLinkClicksCapture(plausible, { captureText: true }));
 	}
 
 	return {
