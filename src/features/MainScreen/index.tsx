@@ -13,6 +13,7 @@ import { ActivityBar } from './ActivityBar';
 import { NotesViewFilter } from './NotesViewFilter';
 import { StatusBar } from './StatusBar';
 import { TagsPanel } from './TagsPanel';
+import { WorkspaceCommands } from './WorkspaceCommands';
 
 export const MainScreen: FC = () => {
 	const tagsRegistry = useTagsRegistry();
@@ -60,6 +61,8 @@ export const MainScreen: FC = () => {
 
 	return (
 		<VStack gap={0} w="100%" h="100%">
+			<WorkspaceCommands />
+
 			<HStack
 				align="start"
 				gap={0}

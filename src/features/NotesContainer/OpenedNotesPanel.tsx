@@ -14,8 +14,6 @@ export type TopBarProps = {
 	onClose: (id: NoteId) => void;
 
 	notes: INote[];
-
-	updateNotes: () => void;
 };
 
 // TODO: improve tabs style
@@ -25,12 +23,8 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 	activeTab,
 	onClose,
 	onPick,
-	updateNotes,
 }) => {
-	const openNoteContextMenu = useNoteContextMenu({
-		closeNote: onClose,
-		updateNotes,
-	});
+	const openNoteContextMenu = useNoteContextMenu();
 
 	const existsTabs = useMemo(
 		() => tabs.filter((noteId) => notes.some((note) => note.id === noteId)),

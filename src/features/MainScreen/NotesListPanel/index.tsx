@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
 import { useDebouncedCallback } from 'use-debounce';
 import {
@@ -16,6 +16,8 @@ import {
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { NotesList } from '@features/MainScreen/NotesListPanel/NotesList';
 import { useTelemetryTracker } from '@features/telemetry';
+import { GLOBAL_COMMANDS } from '@hooks/commands';
+import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -67,6 +69,11 @@ export const NotesListPanel = () => {
 		setSearchInput('');
 	};
 
+	const searchInputRef = useRef<HTMLInputElement | null>(null);
+	useWorkspaceCommandCallback(GLOBAL_COMMANDS.FOCUS_SEARCH, () =>
+		searchInputRef.current?.focus(),
+	);
+
 	return (
 		<VStack
 			align="start"
@@ -84,6 +91,7 @@ export const NotesListPanel = () => {
 							<FaMagnifyingGlass />
 						</InputLeftElement>
 						<Input
+							ref={searchInputRef}
 							borderRadius="6px"
 							placeholder="Search..."
 							value={searchInput}
