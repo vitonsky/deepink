@@ -80,7 +80,7 @@ export const WorkspaceSettings = () => {
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
-	const workspaceFiles = useVaultStorage(getWorkspaceRoot());
+	const workspaceFiles = useVaultStorage(getWorkspacePath(currentWorkspace.workspaceId));
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {
