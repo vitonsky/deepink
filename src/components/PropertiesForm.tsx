@@ -76,7 +76,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 							<Input
 								{...register(id)}
 								placeholder={placeholder}
-								disabled={isPending}
+								isDisabled={isPending}
 							/>
 							{error && <Text color="message.error">{error.message}</Text>}
 						</VStack>
