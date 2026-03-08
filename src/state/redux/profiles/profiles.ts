@@ -60,7 +60,11 @@ export const createWorkspaceObject = (workspace: {
 }): WorkspaceData => ({
 	...workspace,
 	touched: false,
-	isWorkspaceReady: false,
+	loadingStatus: {
+		isConfigReady: false,
+		// isTagsReady: false,
+		isDataReady: false,
+	},
 
 	activeNote: null,
 	recentlyClosedNotes: [],
@@ -100,10 +104,16 @@ export const WorkspaceConfigScheme = z.object({
 	}),
 });
 
+export type LoadingStatus = {
+	isConfigReady: boolean;
+	// isTagsReady: boolean;
+	isDataReady: boolean;
+};
+
 export type WorkspaceData = {
 	id: string;
 	name: string;
-	isWorkspaceReady: boolean;
+	loadingStatus: LoadingStatus;
 
 	/**
 	 * Defines were workspace opened by user or not
@@ -192,16 +202,16 @@ export const profilesSlice = createSlice({
 			state.activeProfile = payload;
 		},
 
-		setIsWorkspaceReady: (
+		setWorkspaceLoadingStatus: (
 			state,
 			{
-				payload: { profileId, workspaceId, isReady },
-			}: PayloadAction<WorkspaceScoped<{ isReady: boolean }>>,
+				payload: { profileId, workspaceId, changes },
+			}: PayloadAction<WorkspaceScoped<{ changes: Partial<LoadingStatus> }>>,
 		) => {
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
-			workspace.isWorkspaceReady = isReady;
+			Object.assign(workspace.loadingStatus, changes);
 		},
 
 		updateWorkspacesList: (
@@ -559,17 +569,25 @@ export const selectActiveWorkspaceInfo = (scope: ProfileScoped) =>
 	);
 
 export const selectIsActiveWorkspaceReady = (scope: ProfileScoped) =>
-	createAppSelector(
-		selectActiveWorkspace(scope),
-		(workspace) => workspace?.isWorkspaceReady ?? false,
-	);
+	createAppSelector(selectActiveWorkspace(scope), (workspace) => {
+		if (!workspace) return null;
+
+		return Object.values(workspace.loadingStatus).some((status) => !status)
+			? false
+			: true;
+	});
 
 export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
 		const profile = state.profiles[profileId];
 		if (!profile) return null;
 
-		return profile.workspaces[workspaceId]?.isWorkspaceReady ?? false;
+		const workspace = profile.workspaces[workspaceId];
+		if (!workspace) return;
+
+		return Object.values(workspace.loadingStatus).some((status) => !status)
+			? false
+			: true;
 	});
 
 export * from './selectors/notes';

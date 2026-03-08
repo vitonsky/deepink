@@ -16,15 +16,15 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 
 	// Load workspace config
 	useEffect(() => {
-		const initConfig = async () => {
-			const workspaceConfig = await new StateFile(
-				new FileController(
-					`workspaces/${workspaceData.workspaceId}/config.json`,
-					controls.profile.files,
-				),
-				WorkspaceConfigScheme,
-			).get();
+		const state = new StateFile(
+			new FileController(
+				`workspaces/${workspaceData.workspaceId}/config.json`,
+				controls.profile.files,
+			),
+			WorkspaceConfigScheme,
+		);
 
+		state.get().then((workspaceConfig) => {
 			if (!workspaceConfig) return;
 
 			dispatch(
@@ -34,9 +34,16 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 					tags: workspaceConfig.newNote.tags,
 				}),
 			);
-		};
 
-		initConfig();
+			dispatch(
+				workspacesApi.setWorkspaceLoadingStatus({
+					...workspaceData,
+					changes: {
+						isConfigReady: true,
+					},
+				}),
+			);
+		});
 	}, [controls.profile.files, dispatch, workspaceData]);
 
 	// Init workspace state
@@ -117,9 +124,11 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 				);
 			} finally {
 				dispatch(
-					workspacesApi.setIsWorkspaceReady({
+					workspacesApi.setWorkspaceLoadingStatus({
 						...workspaceData,
-						isReady: true,
+						changes: {
+							isDataReady: true,
+						},
 					}),
 				);
 			}
@@ -129,7 +138,12 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 		// Cleanup notes and ready state on unmount
 		return () => {
 			dispatch(
-				workspacesApi.setIsWorkspaceReady({ ...workspaceData, isReady: false }),
+				workspacesApi.setWorkspaceLoadingStatus({
+					...workspaceData,
+					changes: {
+						isDataReady: false,
+					},
+				}),
 			);
 
 			dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: null }));
