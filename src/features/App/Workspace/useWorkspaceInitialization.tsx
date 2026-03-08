@@ -1,15 +1,77 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { WorkspaceConfigScheme, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	NOTES_VIEW,
+	selectTags,
+	WorkspaceConfigScheme,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
+import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingstatus';
 
 import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
 
-export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null) => {
+type Filters = {
+	search?: string | null;
+	view?: NOTES_VIEW | null;
+	selectedTagId?: string | null;
+};
+
+const useRestoreFilter = () => {
+	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
+
+	const tags = useWorkspaceSelector(selectTags);
+
+	return useCallback(
+		async ({ search, view, selectedTagId }: Filters) => {
+			// Restore selected tag only if it exists
+			if (tags.length !== 0 && selectedTagId) {
+				const tag = tags.find((t) => t.id === selectedTagId);
+				if (tag) {
+					dispatch(
+						workspacesApi.setSelectedTag({
+							...workspaceData,
+							tag: tag.id,
+						}),
+					);
+				}
+			}
+
+			dispatch(
+				workspacesApi.setSearch({
+					...workspaceData,
+					search: search ?? '',
+				}),
+			);
+
+			if (view) {
+				dispatch(
+					workspacesApi.setView({
+						...workspaceData,
+						view,
+					}),
+				);
+			}
+
+			dispatch(
+				workspacesApi.setWorkspaceLoadingStatus({
+					...workspaceData,
+					changes: {
+						isFiltersReady: true,
+					},
+				}),
+			);
+		},
+		[dispatch, tags, workspaceData],
+	);
+};
+
+export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const controls = useProfileControls();
@@ -25,15 +87,15 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 		);
 
 		state.get().then((workspaceConfig) => {
-			if (!workspaceConfig) return;
-
-			dispatch(
-				workspacesApi.setWorkspaceNoteTemplateConfig({
-					...workspaceData,
-					title: workspaceConfig.newNote.title,
-					tags: workspaceConfig.newNote.tags,
-				}),
-			);
+			if (workspaceConfig) {
+				dispatch(
+					workspacesApi.setWorkspaceNoteTemplateConfig({
+						...workspaceData,
+						title: workspaceConfig.newNote.title,
+						tags: workspaceConfig.newNote.tags,
+					}),
+				);
+			}
 
 			dispatch(
 				workspacesApi.setWorkspaceLoadingStatus({
@@ -52,56 +114,24 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 		controls,
 		workspaceId: workspaceData.workspaceId,
 	});
+
+	const restoreFilter = useRestoreFilter();
+	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
 	useEffect(() => {
-		if (!workspace) return;
+		if (!workspace || !isTagsReady) return;
 
-		const initWorkspace = async () => {
-			try {
-				const [state, tags] = await Promise.all([
-					getWorkspaceState(),
-					workspace.tagsRegistry.getTags(),
-				]);
+		getWorkspaceState().then(async (state) => {
+			const { search, view, selectedTagId, openedNoteIds, activeNoteId } =
+				state ?? {};
 
-				// Load tags
-				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
+			await restoreFilter({
+				search: search || undefined,
+				view: view || undefined,
+				selectedTagId: selectedTagId || undefined,
+			});
 
-				if (!state) return;
-				const { search, view, selectedTagId, openedNoteIds, activeNoteId } =
-					state;
-
-				dispatch(
-					workspacesApi.setSearch({
-						...workspaceData,
-						search: search ?? '',
-					}),
-				);
-
-				if (view) {
-					dispatch(
-						workspacesApi.setView({
-							...workspaceData,
-							view,
-						}),
-					);
-				}
-
-				// Restore selected tag only if it exists
-				if (selectedTagId) {
-					const tag = tags.find((t) => t.id === selectedTagId);
-
-					if (tag) {
-						dispatch(
-							workspacesApi.setSelectedTag({
-								...workspaceData,
-								tag: tag.id,
-							}),
-						);
-					}
-				}
-
-				// Restore notes
-				if (!openedNoteIds || openedNoteIds.length === 0) return;
-
+			// Restore notes
+			if (openedNoteIds && openedNoteIds.length > 0) {
 				const notes = await workspace.notesRegistry.getById(openedNoteIds);
 				if (!notes || notes.length === 0) return;
 
@@ -112,7 +142,6 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 					}),
 				);
 
-				// Fallback to first note if saved active note is missing
 				const activeNote =
 					(activeNoteId && notes.find((n) => n.id === activeNoteId)) ||
 					notes[0];
@@ -122,44 +151,23 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 						noteId: activeNote.id,
 					}),
 				);
-			} finally {
-				dispatch(
-					workspacesApi.setWorkspaceLoadingStatus({
-						...workspaceData,
-						changes: {
-							isDataReady: true,
-						},
-					}),
-				);
 			}
-		};
-		initWorkspace();
 
-		// Cleanup notes and ready state on unmount
-		return () => {
 			dispatch(
 				workspacesApi.setWorkspaceLoadingStatus({
 					...workspaceData,
 					changes: {
-						isDataReady: false,
+						isDataReady: true,
 					},
 				}),
 			);
-
-			dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: null }));
-			dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes: [] }));
-			dispatch(workspacesApi.setNoteIds({ ...workspaceData, noteIds: [] }));
-		};
-	}, [workspace, workspaceData, getWorkspaceState, dispatch]);
-
-	// Sync tag changes with the store
-	useEffect(() => {
-		if (!workspace) return;
-
-		return workspace.tagsRegistry.onChange(() => {
-			workspace.tagsRegistry.getTags().then((tags) => {
-				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
-			});
 		});
-	}, [workspace, workspaceData, dispatch]);
+	}, [
+		workspace,
+		workspaceData,
+		getWorkspaceState,
+		dispatch,
+		restoreFilter,
+		isTagsReady,
+	]);
 };

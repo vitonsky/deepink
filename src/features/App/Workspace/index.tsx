@@ -1,4 +1,4 @@
-import React, { createContext, FC, useMemo } from 'react';
+import React, { createContext, FC, useEffect, useMemo, useRef } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
@@ -17,7 +17,7 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { useWorkspace } from './useWorkspace';
-import { useWorkspaceInitialization } from './useWorkspaceInitialization';
+import { useRestoreWorkspace } from './useWorkspaceInitialization';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
@@ -39,7 +39,35 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
-	useWorkspaceInitialization(workspace);
+	// Load tags
+	const hasSetTagsReady = useRef(false);
+	useEffect(() => {
+		if (!workspace) return;
+
+		const { tagsRegistry } = workspace;
+
+		const updateTags = async () => {
+			const tags = await tagsRegistry.getTags();
+			dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
+
+			if (!hasSetTagsReady.current) {
+				hasSetTagsReady.current = true;
+				dispatch(
+					workspacesApi.setWorkspaceLoadingStatus({
+						...workspaceData,
+						changes: { isTagsReady: true },
+					}),
+				);
+			}
+		};
+
+		updateTags();
+
+		const cleanup = tagsRegistry.onChange(updateTags);
+		return cleanup;
+	}, [dispatch, workspace, workspaceData]);
+
+	useRestoreWorkspace(workspace);
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 

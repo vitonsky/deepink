@@ -62,7 +62,8 @@ export const createWorkspaceObject = (workspace: {
 	touched: false,
 	loadingStatus: {
 		isConfigReady: false,
-		// isTagsReady: false,
+		isFiltersReady: false,
+		isTagsReady: false,
 		isDataReady: false,
 	},
 
@@ -106,7 +107,8 @@ export const WorkspaceConfigScheme = z.object({
 
 export type LoadingStatus = {
 	isConfigReady: boolean;
-	// isTagsReady: boolean;
+	isFiltersReady: boolean;
+	isTagsReady: boolean;
 	isDataReady: boolean;
 };
 
@@ -588,6 +590,17 @@ export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScop
 		return Object.values(workspace.loadingStatus).some((status) => !status)
 			? false
 			: true;
+	});
+
+export const selectWorkspaceStatus = ({ profileId, workspaceId }: WorkspaceScoped) =>
+	createAppSelector(profilesSlice.selectSlice, (state) => {
+		const profile = state.profiles[profileId];
+		if (!profile) return null;
+
+		const workspace = profile.workspaces[workspaceId];
+		if (!workspace) return;
+
+		return workspace.loadingStatus;
 	});
 
 export * from './selectors/notes';
