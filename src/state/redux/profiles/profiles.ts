@@ -190,18 +190,38 @@ export const profilesSlice = createSlice({
 			state.activeProfile = payload;
 		},
 
-		setWorkspaces: (
+		updateWorkspacesList: (
 			state,
 			{
 				payload: { profileId, workspaces },
 			}: PayloadAction<
-				ProfileScoped<{ workspaces: Record<string, WorkspaceData> }>
+				ProfileScoped<{ workspaces: { id: string; name: string }[] }>
 			>,
 		) => {
 			const profile = state.profiles[profileId];
 			if (!profile) return;
 
-			profile.workspaces = workspaces;
+			workspaces.forEach((workspace) => {
+				// Rename
+				const existingWorkspace = profile.workspaces[workspace.id];
+				if (existingWorkspace) {
+					existingWorkspace.name = workspace.name;
+					return;
+				}
+
+				// Create new workspace
+				profile.workspaces[workspace.id] = createWorkspaceObject(workspace);
+			});
+
+			// Delete workspaces that no more exists
+			const actualWorkspaceIds = new Set(
+				workspaces.map((workspace) => workspace.id),
+			);
+			for (const id in profile.workspaces) {
+				if (!actualWorkspaceIds.has(id)) {
+					delete profile.workspaces[id];
+				}
+			}
 		},
 
 		setActiveWorkspace: (
@@ -213,15 +233,19 @@ export const profilesSlice = createSlice({
 			const profile = state.profiles[profileId];
 			if (!profile) return;
 
-			profile.activeWorkspace = workspaceId;
+			// Reset active workspace
+			if (workspaceId === null) {
+				profile.activeWorkspace = null;
+				return;
+			}
+
+			const workspace = profile.workspaces[workspaceId];
+			if (!workspace) return;
 
 			// Touch workspace
-			if (workspaceId) {
-				const workspace = profile.workspaces[workspaceId];
-				if (workspace && !workspace.touched) {
-					workspace.touched = true;
-				}
-			}
+			workspace.touched = true;
+
+			profile.activeWorkspace = workspaceId;
 		},
 
 		setActiveNote: (
