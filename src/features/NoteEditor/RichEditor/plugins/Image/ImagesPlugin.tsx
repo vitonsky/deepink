@@ -203,6 +203,7 @@ function getDragSelection(event: DragEvent): Range | null | undefined {
 	let range;
 	const target = event.target as null | Element | Document;
 	const targetWindow =
+		// eslint-disable-next-line eqeqeq
 		target == null
 			? null
 			: target.nodeType === 9

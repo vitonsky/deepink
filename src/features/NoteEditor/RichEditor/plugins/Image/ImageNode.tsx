@@ -36,6 +36,7 @@ export interface ImagePayload {
 
 function isGoogleDocCheckboxImg(img: HTMLImageElement): boolean {
 	return (
+		// eslint-disable-next-line eqeqeq
 		img.parentElement != null &&
 		img.parentElement.tagName === 'LI' &&
 		img.previousSibling === null &&

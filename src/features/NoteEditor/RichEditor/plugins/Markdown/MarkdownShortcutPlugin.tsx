@@ -45,7 +45,7 @@ export const $transformTextToCheckbox = (textNode: TextNode) => {
 			listNode.replace(list, true);
 		}
 
-		const isChecked = checkboxSegmentInsideListMatch[1] != ' ';
+		const isChecked = checkboxSegmentInsideListMatch[1] !== ' ';
 		listItemNode.setChecked(isChecked);
 
 		const slice = textNode
@@ -64,7 +64,7 @@ export const $transformTextToCheckbox = (textNode: TextNode) => {
 		// if (parent instanceof ListItemNode) return;
 		if (!(parent instanceof ParagraphNode)) return;
 
-		const isChecked = checkboxMatch[2] != ' ';
+		const isChecked = checkboxMatch[2] !== ' ';
 		const listItemNode = $createListItemNode(isChecked);
 
 		const slice = textNode.getTextContent().slice(checkboxMatch[0].length);
