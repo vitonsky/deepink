@@ -9,7 +9,7 @@ import {
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
-import { getNoteMarkdownLinkTitle } from '@hooks/notes/getNoteMarkdownLinkTitle';
+import { getNoteContentPreview } from '@hooks/notes/getNoteContentPreview';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useAppSelector } from '@state/redux/hooks';
 import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
@@ -116,7 +116,7 @@ export const useNoteCommandHandlers = () => {
 			}
 
 			await copyTextToClipboard(
-				`[${getNoteMarkdownLinkTitle(note.content, note.deletedAt)}](${formatNoteLink(noteId)})`,
+				`[${getNoteContentPreview(note.content) || 'Untitled note'}](${formatNoteLink(noteId)})`,
 			);
 		},
 	);
