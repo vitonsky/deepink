@@ -114,7 +114,7 @@ export const useNoteCommandHandlers = () => {
 			}
 
 			await copyTextToClipboard(
-				`[${getNoteMarkdownLinkTitle(note.content)}](${formatNoteLink(noteId)})`,
+				`[${getNoteMarkdownLinkTitle(note.content, note.deletedAt)}](${formatNoteLink(noteId)})`,
 			);
 		},
 	);
