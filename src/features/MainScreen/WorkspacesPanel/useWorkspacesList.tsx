@@ -22,7 +22,7 @@ export const useWorkspacesList = () => {
 		const updatedWorkspaces = await workspacesManager.getList();
 
 		dispatch(
-			workspacesApi.setWorkspaces({
+			workspacesApi.updateWorkspacesList({
 				profileId,
 				workspaces: updatedWorkspaces,
 			}),

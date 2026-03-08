@@ -18,7 +18,7 @@ import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrit
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultStorage } from '@features/files';
-import { getWorkspaceRoot } from '@features/files/paths';
+import { getWorkspacePath } from '@features/files/paths';
 import { useWorkspacesList } from '@features/MainScreen/WorkspacesPanel/useWorkspacesList';
 import {
 	WorkspaceCreatePopup,
@@ -80,7 +80,9 @@ export const WorkspaceSettings = () => {
 	const files = useFilesRegistry();
 	const filesController = useFilesController();
 	const attachments = useAttachmentsController();
-	const workspaceFiles = useVaultStorage(getWorkspacePath(currentWorkspace.workspaceId));
+	const workspaceFiles = useVaultStorage(
+		getWorkspacePath(currentWorkspace.workspaceId),
+	);
 
 	const isOtherWorkspacesExists = workspaces.workspaces.length > 1;
 	const onDelete = useCallback(async () => {

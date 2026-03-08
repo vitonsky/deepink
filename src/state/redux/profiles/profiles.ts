@@ -190,7 +190,7 @@ export const profilesSlice = createSlice({
 			state.activeProfile = payload;
 		},
 
-		setWorkspaces: (
+		updateWorkspacesList: (
 			state,
 			{
 				payload: { profileId, workspaces },
@@ -214,9 +214,11 @@ export const profilesSlice = createSlice({
 			});
 
 			// Delete workspaces that no more exists
-			const updatedIds = new Set(workspaces.map((workspace) => workspace.id));
+			const actualWorkspaceIds = new Set(
+				workspaces.map((workspace) => workspace.id),
+			);
 			for (const id in profile.workspaces) {
-				if (!updatedIds.has(id)) {
+				if (!actualWorkspaceIds.has(id)) {
 					delete profile.workspaces[id];
 				}
 			}
