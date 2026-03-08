@@ -3,7 +3,7 @@ import z from 'zod';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
-import { selectWorkspace } from '@state/redux/profiles/profiles';
+import { NOTES_VIEW, selectWorkspace } from '@state/redux/profiles/profiles';
 import { createAppSelector } from '@state/redux/utils';
 
 import { ProfileControls } from '../Profile';
@@ -12,7 +12,7 @@ const WorkspaceStateScheme = z.object({
 	openedNoteIds: z.array(z.string()).nullable(),
 	activeNoteId: z.string().nullable(),
 	selectedTagId: z.string().nullable(),
-	view: z.string().nullable(),
+	view: z.enum(NOTES_VIEW).nullable(),
 	search: z.string().nullable(),
 });
 

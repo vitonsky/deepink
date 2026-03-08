@@ -3,18 +3,11 @@ import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import {
-	NOTES_VIEW,
-	WorkspaceConfigScheme,
-	workspacesApi,
-} from '@state/redux/profiles/profiles';
+import { WorkspaceConfigScheme, workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
-
-const isValidView = (view: string): view is NOTES_VIEW =>
-	Object.values(NOTES_VIEW).includes(view as NOTES_VIEW);
 
 export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null) => {
 	const dispatch = useAppDispatch();
@@ -76,7 +69,7 @@ export const useWorkspaceInitialization = (workspace: WorkspaceContainer | null)
 					}),
 				);
 
-				if (view && isValidView(view)) {
+				if (view) {
 					dispatch(
 						workspacesApi.setView({
 							...workspaceData,
