@@ -9,7 +9,6 @@ import {
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
-import { convertNoteToFileName } from '@hooks/notes/convertNoteToFileName';
 import { getNoteMarkdownLinkTitle } from '@hooks/notes/getNoteMarkdownLinkTitle';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useAppSelector } from '@state/redux/hooks';
@@ -18,7 +17,7 @@ import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 import { copyTextToClipboard } from '@utils/clipboard';
 
-import { buildFileName, useNotesExport } from './useNotesExport';
+import { buildFileName, configureNoteNameGetter, useNotesExport } from './useNotesExport';
 
 /**
  * Registers handlers for commands that operate on a specific note
@@ -91,15 +90,18 @@ export const useNoteCommandHandlers = () => {
 		},
 	);
 
+	const getName = configureNoteNameGetter(true);
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.EXPORT_NOTE, async ({ noteId }) => {
 		const [note] = await notes.getById([noteId]);
 		if (!note) return;
+
+		const tags = await tagsRegistry.getAttachedTags(noteId);
 
 		await notesExport.exportNote(
 			noteId,
 			buildFileName(
 				workspaceData?.name,
-				convertNoteToFileName(noteId, note.content.title),
+				getName({ ...note, tags: tags.map((t) => t.resolvedName) }),
 			),
 		);
 	});
