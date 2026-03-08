@@ -119,7 +119,7 @@ export const WorkspaceSettings = () => {
 		}).fixAll();
 
 		// Delete workspace directory
-		await workspaceFiles.delete([currentWorkspace.workspaceId]);
+		await workspaceFiles.delete(['/']);
 
 		dispatch(
 			workspacesApi.setActiveWorkspace({
