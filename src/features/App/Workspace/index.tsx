@@ -39,27 +39,29 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
+	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
+
+	// TODO: replace to hook
 	// Load tags
-	const hasSetTagsReady = useRef(false);
+	const isTagsReadyDispatched = useRef(false);
 	useEffect(() => {
 		if (!workspace) return;
 
 		const { tagsRegistry } = workspace;
+		const updateTags = () =>
+			tagsRegistry.getTags().then((tags) => {
+				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 
-		const updateTags = async () => {
-			const tags = await tagsRegistry.getTags();
-			dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
-
-			if (!hasSetTagsReady.current) {
-				hasSetTagsReady.current = true;
-				dispatch(
-					workspacesApi.setWorkspaceLoadingStatus({
-						...workspaceData,
-						changes: { isTagsReady: true },
-					}),
-				);
-			}
-		};
+				if (!isTagsReadyDispatched.current) {
+					isTagsReadyDispatched.current = true;
+					dispatch(
+						workspacesApi.setWorkspaceLoadingStatus({
+							...workspaceData,
+							changes: { isTagsReady: true },
+						}),
+					);
+				}
+			});
 
 		updateTags();
 
@@ -68,8 +70,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	}, [dispatch, workspace, workspaceData]);
 
 	useRestoreWorkspace(workspace);
-
-	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
 	const { profileId } = useWorkspaceData();
 
