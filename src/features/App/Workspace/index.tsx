@@ -17,8 +17,8 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
+import { useRestoreWorkspace } from './useRestoreWorkspace';
 import { useWorkspace } from './useWorkspace';
-import { useRestoreWorkspace } from './useWorkspaceInitialization';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
