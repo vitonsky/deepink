@@ -1,8 +1,10 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
+import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
+import { SplashScreen } from '@features/SplashScreen';
 import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -83,9 +85,11 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const isWorkspaceReady = useAppSelector(
 		selectIsWorkspaceReady({ profileId, workspaceId: workspaceData.workspaceId }),
 	);
-	if (!isWorkspaceReady) return;
+	const [isShowSplash] = useDebounce(!isWorkspaceReady, 500);
 
-	return (
+	return isShowSplash ? (
+		<SplashScreen />
+	) : (
 		<Box
 			data-workspace={workspaceName}
 			sx={{

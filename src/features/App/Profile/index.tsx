@@ -5,7 +5,6 @@ import { StateFile } from '@core/features/files/StateFile';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
-import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
@@ -15,7 +14,6 @@ import {
 	createWorkspaceObject,
 	defaultVaultConfig,
 	ProfileConfigScheme,
-	selectIsActiveWorkspaceReady,
 	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -136,13 +134,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
-	const isActiveWorkspaceReady = useAppSelector(
-		selectIsActiveWorkspaceReady({ profileId }),
-	);
-
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{!isActiveWorkspaceReady && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
 
 			{workspaces.map((workspace) =>
