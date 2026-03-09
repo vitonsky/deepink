@@ -137,7 +137,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{workspaces.length > 0 && <ProfileServices />}
-
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
 					<WorkspaceContext.Provider
