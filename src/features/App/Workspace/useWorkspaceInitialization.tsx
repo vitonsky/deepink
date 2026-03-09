@@ -11,7 +11,7 @@ import {
 	WorkspaceConfigScheme,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingstatus';
+import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 
 import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
@@ -136,7 +136,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 
 	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
 	useEffect(() => {
-		if (!workspace || !isTagsReady) return;
+		if (!isTagsReady) return;
 
 		getWorkspaceState().then(async (state) => {
 			if (state) {
@@ -159,7 +159,6 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 			);
 		});
 	}, [
-		workspace,
 		workspaceData,
 		getWorkspaceState,
 		dispatch,

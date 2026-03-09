@@ -12,7 +12,7 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingstatus';
+import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -49,7 +49,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 		if (!workspace) return;
 
 		const { tagsRegistry } = workspace;
-
 		const updateTags = () =>
 			tagsRegistry.getTags().then((tags) => {
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
