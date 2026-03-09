@@ -58,7 +58,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					dispatch(
 						workspacesApi.setWorkspaceLoadingStatus({
 							...workspaceData,
-							changes: { isTagsReady: true },
+							status: { isTagsReady: true },
 						}),
 					);
 				}

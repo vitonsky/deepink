@@ -207,13 +207,13 @@ export const profilesSlice = createSlice({
 		setWorkspaceLoadingStatus: (
 			state,
 			{
-				payload: { profileId, workspaceId, changes },
-			}: PayloadAction<WorkspaceScoped<{ changes: Partial<LoadingStatus> }>>,
+				payload: { profileId, workspaceId, status },
+			}: PayloadAction<WorkspaceScoped<{ status: Partial<LoadingStatus> }>>,
 		) => {
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
-			Object.assign(workspace.loadingStatus, changes);
+			Object.assign(workspace.loadingStatus, status);
 		},
 
 		updateWorkspacesList: (

@@ -49,7 +49,7 @@ export const useRestoreWorkspaceConfig = () => {
 			dispatch(
 				workspacesApi.setWorkspaceLoadingStatus({
 					...workspaceData,
-					changes: {
+					status: {
 						isConfigReady: true,
 					},
 				}),
@@ -151,7 +151,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 			dispatch(
 				workspacesApi.setWorkspaceLoadingStatus({
 					...workspaceData,
-					changes: {
+					status: {
 						isDataReady: true,
 						isFiltersReady: true,
 					},
