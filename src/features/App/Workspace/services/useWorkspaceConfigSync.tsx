@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
+import { useVaultStorage } from '@features/files';
+import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
@@ -19,12 +21,10 @@ export const useWorkspaceConfigSync = () => {
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
 
+	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
 		const workspaceConfig = new StateFile(
-			new FileController(
-				`workspaces/${workspaceData.workspaceId}/config.json`,
-				files,
-			),
+			new FileController(`config.json`, workspaceFiles),
 			WorkspaceConfigScheme,
 		);
 
@@ -41,5 +41,5 @@ export const useWorkspaceConfigSync = () => {
 				});
 			},
 		});
-	}, [files, profileId, watchSelector, workspaceData.workspaceId]);
+	}, [files, profileId, workspaceFiles, watchSelector, workspaceData.workspaceId]);
 };

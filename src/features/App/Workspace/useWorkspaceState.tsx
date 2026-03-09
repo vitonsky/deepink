@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import z from 'zod';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
+import { useVaultStorage } from '@features/files';
+import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { NOTES_VIEW, selectWorkspace } from '@state/redux/profiles/profiles';
 import { createAppSelector } from '@state/redux/utils';
@@ -20,7 +22,6 @@ export const useWorkspaceState = ({
 	sync,
 	controls: {
 		profile: {
-			files,
 			profile: { id: profileId },
 		},
 	},
@@ -30,10 +31,11 @@ export const useWorkspaceState = ({
 	controls: ProfileControls;
 	workspaceId: string;
 }) => {
+	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceId));
 	const [workspaceState] = useState(
 		() =>
 			new StateFile(
-				new FileController(`workspaces/${workspaceId}/state.json`, files),
+				new FileController(`state.json`, workspaceFiles),
 				WorkspaceStateScheme.partial(),
 			),
 	);

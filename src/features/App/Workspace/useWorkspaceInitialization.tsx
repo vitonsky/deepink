@@ -1,6 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
+import { useVaultStorage } from '@features/files';
+import { getWorkspacePath } from '@features/files/paths';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -77,12 +79,10 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 	const controls = useProfileControls();
 
 	// Load workspace config
+	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
 		const state = new StateFile(
-			new FileController(
-				`workspaces/${workspaceData.workspaceId}/config.json`,
-				controls.profile.files,
-			),
+			new FileController(`config.json`, workspaceFiles),
 			WorkspaceConfigScheme,
 		);
 
@@ -106,7 +106,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 				}),
 			);
 		});
-	}, [controls.profile.files, dispatch, workspaceData]);
+	}, [controls.profile.files, dispatch, workspaceData, workspaceFiles]);
 
 	// Init workspace state
 	const getWorkspaceState = useWorkspaceState({
