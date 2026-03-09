@@ -31,11 +31,8 @@ export const App: FC = () => {
 		profiles: profileContainers,
 	});
 
-	const [isAutoLoading, setIsAutoLoading] = useState(true);
 	const isLoading =
-		!profilesList.isProfilesLoaded ||
-		!recentProfile.isLoaded ||
-		(isProfileOpening && isAutoLoading);
+		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening;
 
 	// Show Splash immediately, but delay hiding it
 	const [isShowSplash, setIsShowSplash] = useState(isLoading);
@@ -77,7 +74,6 @@ export const App: FC = () => {
 					onChooseProfile={setCurrentProfileId}
 					profiles={profilesList}
 					onOpenProfile={onOpenProfile}
-					onLoginStart={() => setIsAutoLoading(false)}
 				/>
 			</Box>
 		</Box>
