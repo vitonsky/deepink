@@ -585,7 +585,7 @@ export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScop
 		if (!profile) return null;
 
 		const workspace = profile.workspaces[workspaceId];
-		if (!workspace) return;
+		if (!workspace) return null;
 
 		return Object.values(workspace.loadingStatus).some((status) => !status)
 			? false
