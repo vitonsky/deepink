@@ -36,6 +36,9 @@ export const useWorkspaceState = ({
 		() =>
 			new StateFile(
 				new FileController(`state.json`, workspaceFiles),
+
+				// State contains only the properties that the user has interacted with
+				// so some fields may be missing
 				WorkspaceStateScheme.partial(),
 			),
 	);
