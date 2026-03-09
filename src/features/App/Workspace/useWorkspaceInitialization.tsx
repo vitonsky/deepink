@@ -17,68 +17,17 @@ import { useProfileControls } from '../Profile';
 import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
 
-type Filters = {
+type WorkspaceFilters = {
 	search?: string | null;
-	view?: NOTES_VIEW | null;
 	selectedTagId?: string | null;
+	view?: NOTES_VIEW | null;
 };
 
-const useRestoreFilter = () => {
+export const useRestoreWorkspaceConfig = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
-	const tags = useWorkspaceSelector(selectTags);
-
-	return useCallback(
-		async ({ search, view, selectedTagId }: Filters) => {
-			// Restore selected tag only if it exists
-			if (tags.length !== 0 && selectedTagId) {
-				const tag = tags.find((t) => t.id === selectedTagId);
-				if (tag) {
-					dispatch(
-						workspacesApi.setSelectedTag({
-							...workspaceData,
-							tag: tag.id,
-						}),
-					);
-				}
-			}
-
-			dispatch(
-				workspacesApi.setSearch({
-					...workspaceData,
-					search: search ?? '',
-				}),
-			);
-
-			if (view) {
-				dispatch(
-					workspacesApi.setView({
-						...workspaceData,
-						view,
-					}),
-				);
-			}
-
-			dispatch(
-				workspacesApi.setWorkspaceLoadingStatus({
-					...workspaceData,
-					changes: {
-						isFiltersReady: true,
-					},
-				}),
-			);
-		},
-		[dispatch, tags, workspaceData],
-	);
-};
-
-export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
-	const dispatch = useAppDispatch();
-	const workspaceData = useWorkspaceData();
-	const controls = useProfileControls();
-
-	// Load workspace config
+	// Load workspace configuration
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
 		const state = new StateFile(
@@ -106,51 +55,97 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 				}),
 			);
 		});
-	}, [controls.profile.files, dispatch, workspaceData, workspaceFiles]);
+	}, [dispatch, workspaceData, workspaceFiles]);
+};
 
-	// Init workspace state
+export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
+	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
+	const controls = useProfileControls();
+
+	useRestoreWorkspaceConfig();
+
+	const restoreOpenedNotes = useCallback(
+		async (openedNoteIds?: string[] | null, activeNoteId?: string | null) => {
+			if (!workspace) return;
+			if (!openedNoteIds || openedNoteIds.length === 0) return;
+
+			const notes = await workspace.notesRegistry.getById(openedNoteIds);
+			if (!notes || notes.length === 0) return;
+
+			dispatch(
+				workspacesApi.setOpenedNotes({
+					...workspaceData,
+					notes,
+				}),
+			);
+
+			const activeNote =
+				(activeNoteId && notes.find((n) => n.id === activeNoteId)) || notes[0];
+			dispatch(
+				workspacesApi.setActiveNote({
+					...workspaceData,
+					noteId: activeNote.id,
+				}),
+			);
+		},
+		[dispatch, workspace, workspaceData],
+	);
+
+	const tags = useWorkspaceSelector(selectTags);
+	const restoreFilters = useCallback(
+		({ search, view, selectedTagId }: WorkspaceFilters) => {
+			// Restore the selected tag if it exists
+			if (tags.length !== 0 && selectedTagId) {
+				const tag = tags.find((t) => t.id === selectedTagId);
+				if (tag) {
+					dispatch(
+						workspacesApi.setSelectedTag({
+							...workspaceData,
+							tag: tag.id,
+						}),
+					);
+				}
+			}
+
+			if (view) {
+				dispatch(
+					workspacesApi.setView({
+						...workspaceData,
+						view,
+					}),
+				);
+			}
+
+			dispatch(
+				workspacesApi.setSearch({
+					...workspaceData,
+					search: search ?? '',
+				}),
+			);
+		},
+		[dispatch, tags, workspaceData],
+	);
+
+	// Initialize workspace state
 	const getWorkspaceState = useWorkspaceState({
 		sync: Boolean(workspace),
 		controls,
 		workspaceId: workspaceData.workspaceId,
 	});
 
-	const restoreFilter = useRestoreFilter();
 	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
 	useEffect(() => {
 		if (!workspace || !isTagsReady) return;
 
 		getWorkspaceState().then(async (state) => {
-			const { search, view, selectedTagId, openedNoteIds, activeNoteId } =
-				state ?? {};
-
-			await restoreFilter({
-				search: search || undefined,
-				view: view || undefined,
-				selectedTagId: selectedTagId || undefined,
-			});
-
-			// Restore notes
-			if (openedNoteIds && openedNoteIds.length > 0) {
-				const notes = await workspace.notesRegistry.getById(openedNoteIds);
-				if (!notes || notes.length === 0) return;
-
-				dispatch(
-					workspacesApi.setOpenedNotes({
-						...workspaceData,
-						notes,
-					}),
-				);
-
-				const activeNote =
-					(activeNoteId && notes.find((n) => n.id === activeNoteId)) ||
-					notes[0];
-				dispatch(
-					workspacesApi.setActiveNote({
-						...workspaceData,
-						noteId: activeNote.id,
-					}),
-				);
+			if (state) {
+				await restoreOpenedNotes(state.openedNoteIds, state.activeNoteId);
+				restoreFilters({
+					search: state.search,
+					view: state.view,
+					selectedTagId: state.selectedTagId,
+				});
 			}
 
 			dispatch(
@@ -158,6 +153,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 					...workspaceData,
 					changes: {
 						isDataReady: true,
+						isFiltersReady: true,
 					},
 				}),
 			);
@@ -167,7 +163,8 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 		workspaceData,
 		getWorkspaceState,
 		dispatch,
-		restoreFilter,
+		restoreFilters,
 		isTagsReady,
+		restoreOpenedNotes,
 	]);
 };

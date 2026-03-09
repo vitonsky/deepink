@@ -1,4 +1,4 @@
-import React, { createContext, FC, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
@@ -12,6 +12,7 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingstatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -43,17 +44,17 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 
 	// TODO: replace to hook
 	// Load tags
-	const isTagsReadyDispatched = useRef(false);
+	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
 	useEffect(() => {
 		if (!workspace) return;
 
 		const { tagsRegistry } = workspace;
+
 		const updateTags = () =>
 			tagsRegistry.getTags().then((tags) => {
 				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
 
-				if (!isTagsReadyDispatched.current) {
-					isTagsReadyDispatched.current = true;
+				if (!isTagsReady) {
 					dispatch(
 						workspacesApi.setWorkspaceLoadingStatus({
 							...workspaceData,
@@ -67,7 +68,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 
 		const cleanup = tagsRegistry.onChange(updateTags);
 		return cleanup;
-	}, [dispatch, workspace, workspaceData]);
+	}, [dispatch, workspace, workspaceData, isTagsReady]);
 
 	useRestoreWorkspace(workspace);
 
