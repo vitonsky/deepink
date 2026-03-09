@@ -454,6 +454,37 @@ export const profilesSlice = createSlice({
 			workspace.view = view;
 		},
 
+		restoreFilters: (
+			state,
+			{
+				payload: { profileId, workspaceId, view, search, selectedTag },
+			}: PayloadAction<
+				WorkspaceScoped<{
+					view: NOTES_VIEW | null;
+					search: string | null;
+					selectedTag: string | null;
+				}>
+			>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			if (view) {
+				workspace.view = view;
+			}
+			if (search) {
+				workspace.search = search;
+			}
+
+			// Set the selected tag if it exists
+			if (selectedTag) {
+				const isSelectedTagExists = workspace.tags.list.some(
+					({ id }) => id === workspace.tags.selected,
+				);
+				if (isSelectedTagExists) workspace.tags.selected = selectedTag;
+			}
+		},
+
 		setWorkspaceNoteTemplateConfig: (
 			state,
 			{
@@ -590,17 +621,6 @@ export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScop
 		return Object.values(workspace.loadingStatus).some((status) => !status)
 			? false
 			: true;
-	});
-
-export const selectWorkspaceStatus = ({ profileId, workspaceId }: WorkspaceScoped) =>
-	createAppSelector(profilesSlice.selectSlice, (state) => {
-		const profile = state.profiles[profileId];
-		if (!profile) return null;
-
-		const workspace = profile.workspaces[workspaceId];
-		if (!workspace) return;
-
-		return workspace.loadingStatus;
 	});
 
 export * from './selectors/notes';
