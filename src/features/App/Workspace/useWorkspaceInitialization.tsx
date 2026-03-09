@@ -4,12 +4,15 @@ import { StateFile } from '@core/features/files/StateFile';
 import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	useWorkspaceActions,
+	useWorkspaceData,
+	useWorkspaceSelector,
+} from '@state/redux/profiles/hooks';
 import {
 	NOTES_VIEW,
 	selectTags,
 	WorkspaceConfigScheme,
-	workspacesApi,
 } from '@state/redux/profiles/profiles';
 import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 
@@ -26,6 +29,7 @@ type WorkspaceFilters = {
 export const useRestoreWorkspaceConfig = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
+	const workspaceActions = useWorkspaceActions();
 
 	// Load workspace configuration
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
@@ -38,8 +42,7 @@ export const useRestoreWorkspaceConfig = () => {
 		state.get().then((workspaceConfig) => {
 			if (workspaceConfig) {
 				dispatch(
-					workspacesApi.setWorkspaceNoteTemplateConfig({
-						...workspaceData,
+					workspaceActions.setWorkspaceNoteTemplateConfig({
 						title: workspaceConfig.newNote.title,
 						tags: workspaceConfig.newNote.tags,
 					}),
@@ -47,21 +50,21 @@ export const useRestoreWorkspaceConfig = () => {
 			}
 
 			dispatch(
-				workspacesApi.setWorkspaceLoadingStatus({
-					...workspaceData,
+				workspaceActions.setWorkspaceLoadingStatus({
 					status: {
 						isConfigReady: true,
 					},
 				}),
 			);
 		});
-	}, [dispatch, workspaceData, workspaceFiles]);
+	}, [dispatch, workspaceActions, workspaceFiles]);
 };
 
 export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const controls = useProfileControls();
+	const workspaceActions = useWorkspaceActions();
 
 	useRestoreWorkspaceConfig();
 
@@ -74,8 +77,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 			if (!notes || notes.length === 0) return;
 
 			dispatch(
-				workspacesApi.setOpenedNotes({
-					...workspaceData,
+				workspaceActions.setOpenedNotes({
 					notes,
 				}),
 			);
@@ -83,13 +85,12 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 			const activeNote =
 				(activeNoteId && notes.find((n) => n.id === activeNoteId)) || notes[0];
 			dispatch(
-				workspacesApi.setActiveNote({
-					...workspaceData,
+				workspaceActions.setActiveNote({
 					noteId: activeNote.id,
 				}),
 			);
 		},
-		[dispatch, workspace, workspaceData],
+		[dispatch, workspaceActions, workspace],
 	);
 
 	const tags = useWorkspaceSelector(selectTags);
@@ -100,8 +101,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 				const tag = tags.find((t) => t.id === selectedTagId);
 				if (tag) {
 					dispatch(
-						workspacesApi.setSelectedTag({
-							...workspaceData,
+						workspaceActions.setSelectedTag({
 							tag: tag.id,
 						}),
 					);
@@ -110,21 +110,19 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 
 			if (view) {
 				dispatch(
-					workspacesApi.setView({
-						...workspaceData,
+					workspaceActions.setView({
 						view,
 					}),
 				);
 			}
 
 			dispatch(
-				workspacesApi.setSearch({
-					...workspaceData,
+				workspaceActions.setSearch({
 					search: search ?? '',
 				}),
 			);
 		},
-		[dispatch, tags, workspaceData],
+		[dispatch, tags, workspaceActions],
 	);
 
 	// Initialize workspace state
@@ -149,8 +147,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 			}
 
 			dispatch(
-				workspacesApi.setWorkspaceLoadingStatus({
-					...workspaceData,
+				workspaceActions.setWorkspaceLoadingStatus({
 					status: {
 						isDataReady: true,
 						isFiltersReady: true,
@@ -159,11 +156,11 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 			);
 		});
 	}, [
-		workspaceData,
 		getWorkspaceState,
 		dispatch,
 		restoreFilters,
 		isTagsReady,
 		restoreOpenedNotes,
+		workspaceActions,
 	]);
 };
