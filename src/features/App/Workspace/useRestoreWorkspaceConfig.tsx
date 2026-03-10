@@ -33,7 +33,7 @@ export const useRestoreWorkspaceConfig = () => {
 			dispatch(
 				workspaceActions.setWorkspaceLoadingStatus({
 					status: {
-						isConfigReady: true,
+						isConfigLoaded: true,
 					},
 				}),
 			);

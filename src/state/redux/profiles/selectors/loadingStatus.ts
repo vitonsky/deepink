@@ -5,6 +5,6 @@ export const selectIsTagsReady = createWorkspaceSelector(
 	(workspace) => {
 		if (!workspace) return false;
 
-		return workspace.loadingStatus.isTagsReady;
+		return workspace.loadingStatus.isTagsLoaded;
 	},
 );

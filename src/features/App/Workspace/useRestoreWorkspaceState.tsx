@@ -5,7 +5,7 @@ import {
 	useWorkspaceData,
 	useWorkspaceSelector,
 } from '@state/redux/profiles/hooks';
-import { selectIsWorkspaceReady } from '@state/redux/profiles/profiles';
+import { selectIsWorkspaceLoaded } from '@state/redux/profiles/profiles';
 import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 
 import { useProfileControls } from '../Profile';
@@ -20,9 +20,9 @@ export const useRestoreWorkspaceState = () => {
 	const notesRegistry = useNotesRegistry();
 
 	// Initialize workspace state
-	const isWorkspaceReady = useAppSelector(selectIsWorkspaceReady(workspaceData));
+	const isWorkspaceLoaded = useAppSelector(selectIsWorkspaceLoaded(workspaceData));
 	const getWorkspaceState = useWorkspaceState({
-		sync: Boolean(isWorkspaceReady),
+		sync: Boolean(isWorkspaceLoaded),
 		controls,
 		workspaceId: workspaceData.workspaceId,
 	});
@@ -69,8 +69,8 @@ export const useRestoreWorkspaceState = () => {
 			dispatch(
 				workspaceActions.setWorkspaceLoadingStatus({
 					status: {
-						isDataReady: true,
-						isFiltersReady: true,
+						isOpenedNotesLoaded: true,
+						isFiltersLoaded: true,
 					},
 				}),
 			);

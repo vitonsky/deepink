@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
 	selectActiveWorkspaceInfo,
-	selectIsWorkspaceReady,
+	selectIsWorkspaceLoaded,
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -63,8 +63,8 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
-	const isWorkspaceReady = useAppSelector(selectIsWorkspaceReady(workspaceData));
-	const [isSplashVisible] = useDebounce(!isWorkspaceReady, 500);
+	const isWorkspaceLoaded = useAppSelector(selectIsWorkspaceLoaded(workspaceData));
+	const [isSplashVisible] = useDebounce(!isWorkspaceLoaded, 500);
 
 	return workspace ? (
 		<WorkspaceProvider

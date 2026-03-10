@@ -61,10 +61,10 @@ export const createWorkspaceObject = (workspace: {
 	...workspace,
 	touched: false,
 	loadingStatus: {
-		isConfigReady: false,
-		isFiltersReady: false,
-		isTagsReady: false,
-		isDataReady: false,
+		isConfigLoaded: false,
+		isFiltersLoaded: false,
+		isTagsLoaded: false,
+		isOpenedNotesLoaded: false,
 	},
 
 	activeNote: null,
@@ -106,10 +106,10 @@ export const WorkspaceConfigScheme = z.object({
 });
 
 export type LoadingStatus = {
-	isConfigReady: boolean;
-	isFiltersReady: boolean;
-	isTagsReady: boolean;
-	isDataReady: boolean;
+	isConfigLoaded: boolean;
+	isFiltersLoaded: boolean;
+	isTagsLoaded: boolean;
+	isOpenedNotesLoaded: boolean;
 };
 
 export type WorkspaceData = {
@@ -204,18 +204,6 @@ export const profilesSlice = createSlice({
 			state.activeProfile = payload;
 		},
 
-		setWorkspaceLoadingStatus: (
-			state,
-			{
-				payload: { profileId, workspaceId, status },
-			}: PayloadAction<WorkspaceScoped<{ status: Partial<LoadingStatus> }>>,
-		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
-			if (!workspace) return;
-
-			Object.assign(workspace.loadingStatus, status);
-		},
-
 		updateWorkspacesList: (
 			state,
 			{
@@ -272,6 +260,18 @@ export const profilesSlice = createSlice({
 			workspace.touched = true;
 
 			profile.activeWorkspace = workspaceId;
+		},
+
+		setWorkspaceLoadingStatus: (
+			state,
+			{
+				payload: { profileId, workspaceId, status },
+			}: PayloadAction<WorkspaceScoped<{ status: Partial<LoadingStatus> }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			Object.assign(workspace.loadingStatus, status);
 		},
 
 		setActiveNote: (
@@ -601,7 +601,7 @@ export const selectActiveWorkspaceInfo = (scope: ProfileScoped) =>
 		workspace ? getWorkspaceInfo(workspace) : null,
 	);
 
-export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScoped) =>
+export const selectIsWorkspaceLoaded = ({ profileId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
 		const profile = state.profiles[profileId];
 		if (!profile) return null;
@@ -609,9 +609,7 @@ export const selectIsWorkspaceReady = ({ profileId, workspaceId }: WorkspaceScop
 		const workspace = profile.workspaces[workspaceId];
 		if (!workspace) return null;
 
-		return Object.values(workspace.loadingStatus).some((status) => !status)
-			? false
-			: true;
+		return Object.values(workspace.loadingStatus).every(Boolean);
 	});
 
 export * from './selectors/notes';
