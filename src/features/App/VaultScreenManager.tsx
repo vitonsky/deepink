@@ -46,9 +46,7 @@ export const VaultScreenManager = ({
 		return (
 			<ProfileLoginForm
 				profile={currentVaultObject}
-				onLogin={async (profile, password) => {
-					return await onOpenProfile(profile, password, { manual: true });
-				}}
+				onLogin={onOpenProfile}
 				onPickAnotherProfile={() => onChooseProfile(null)}
 			/>
 		);

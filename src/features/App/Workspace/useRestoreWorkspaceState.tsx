@@ -21,7 +21,6 @@ export const useRestoreWorkspaceState = () => {
 
 	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
 
-	// Initialize workspace state
 	const isWorkspaceLoaded = useAppSelector(selectIsWorkspaceLoaded(workspaceData));
 	const getWorkspaceState = useWorkspaceState({
 		sync: Boolean(isWorkspaceLoaded),
@@ -51,6 +50,7 @@ export const useRestoreWorkspaceState = () => {
 		[dispatch, workspaceActions, notesRegistry],
 	);
 
+	// Initialize workspace state
 	useEffect(() => {
 		if (!isTagsReady) return;
 
@@ -71,6 +71,7 @@ export const useRestoreWorkspaceState = () => {
 				});
 			}
 
+			// Mark workspace as fully loaded
 			dispatch(
 				workspaceActions.setWorkspaceLoadingStatus({
 					status: {

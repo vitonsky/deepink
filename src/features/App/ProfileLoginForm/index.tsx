@@ -42,7 +42,9 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		setErrorMessage(null);
 		setIsPending(true);
 
-		const response = await onLogin(profile, secret || undefined).finally(() => {
+		const response = await onLogin(profile, secret || undefined, {
+			manual: true,
+		}).finally(() => {
 			setIsPending(false);
 		});
 
