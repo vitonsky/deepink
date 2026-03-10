@@ -6,7 +6,7 @@ import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus
 import { useTagsRegistry } from './WorkspaceProvider';
 
 /**
- * Loads tags from registry and subscribes to changes
+ * Loads tags and subscribes to tag changes
  */
 export const useWorkspaceTags = () => {
 	const workspaceActions = useWorkspaceActions();
@@ -31,7 +31,6 @@ export const useWorkspaceTags = () => {
 
 		updateTags();
 
-		const cleanup = tagsRegistry.onChange(updateTags);
-		return cleanup;
+		return tagsRegistry.onChange(updateTags);
 	}, [dispatch, isTagsReady, tagsRegistry, workspaceActions]);
 };

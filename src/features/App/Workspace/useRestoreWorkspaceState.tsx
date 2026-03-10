@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	useWorkspaceActions,
@@ -19,6 +19,8 @@ export const useRestoreWorkspaceState = () => {
 	const workspaceActions = useWorkspaceActions();
 	const notesRegistry = useNotesRegistry();
 
+	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
+
 	// Initialize workspace state
 	const isWorkspaceLoaded = useAppSelector(selectIsWorkspaceLoaded(workspaceData));
 	const getWorkspaceState = useWorkspaceState({
@@ -27,12 +29,33 @@ export const useRestoreWorkspaceState = () => {
 		workspaceId: workspaceData.workspaceId,
 	});
 
-	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
+	const restoreOpenedNotes = useCallback(
+		async ({
+			openedNoteIds,
+			activeNoteId,
+		}: {
+			openedNoteIds?: string[] | null;
+			activeNoteId?: string | null;
+		}) => {
+			if (!openedNoteIds || openedNoteIds.length === 0) return;
+
+			const notes = await notesRegistry.getById(openedNoteIds);
+			if (!notes || notes.length === 0) return;
+
+			dispatch(workspaceActions.setOpenedNotes({ notes }));
+
+			const activeNote =
+				(activeNoteId && notes.find((n) => n.id === activeNoteId)) || notes[0];
+			dispatch(workspaceActions.setActiveNote({ noteId: activeNote.id }));
+		},
+		[dispatch, workspaceActions, notesRegistry],
+	);
+
 	useEffect(() => {
 		if (!isTagsReady) return;
 
-		// Restore workspace state
 		getWorkspaceState().then(async (state) => {
+			// Restore workspace state if it exists
 			if (state) {
 				dispatch(
 					workspaceActions.restoreFilters({
@@ -42,30 +65,12 @@ export const useRestoreWorkspaceState = () => {
 					}),
 				);
 
-				// Restore opened notes
-				if (state.openedNoteIds && state.openedNoteIds.length !== 0) {
-					const notes = await notesRegistry.getById(state.openedNoteIds);
-					if (notes && notes.length !== 0) {
-						dispatch(
-							workspaceActions.setOpenedNotes({
-								notes,
-							}),
-						);
-
-						const activeNote =
-							(state.activeNoteId &&
-								notes.find((n) => n.id === state.activeNoteId)) ||
-							notes[0];
-						dispatch(
-							workspaceActions.setActiveNote({
-								noteId: activeNote.id,
-							}),
-						);
-					}
-				}
+				await restoreOpenedNotes({
+					openedNoteIds: state.openedNoteIds,
+					activeNoteId: state.activeNoteId,
+				});
 			}
 
-			// Finish restoring
 			dispatch(
 				workspaceActions.setWorkspaceLoadingStatus({
 					status: {
@@ -75,5 +80,5 @@ export const useRestoreWorkspaceState = () => {
 				}),
 			);
 		});
-	}, [getWorkspaceState, dispatch, isTagsReady, workspaceActions, notesRegistry]);
+	}, [getWorkspaceState, isTagsReady, restoreOpenedNotes, dispatch, workspaceActions]);
 };

@@ -37,8 +37,8 @@ export const useWorkspaceState = ({
 			new StateFile(
 				new FileController(`state.json`, workspaceFiles),
 
-				// State contains only the properties that the user has interacted with
-				// so some fields may be missing
+				// Use Partial because the state includes only the properties the user has interacted with,
+				// so some fields might be missing
 				WorkspaceStateScheme.partial(),
 			),
 	);
@@ -67,7 +67,6 @@ export const useWorkspaceState = ({
 
 				workspaceState.set(state);
 			},
-			init: false,
 		});
 	}, [profileId, sync, workspaceState, watchSelector, workspaceId]);
 
