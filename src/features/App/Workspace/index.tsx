@@ -98,9 +98,10 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					),
 			}}
 		>
-			<WorkspaceInitializer />
-
 			{isSplashVisible && <SplashScreen />}
+
+			<WorkspaceInitializer />
+			<WorkspaceServices />
 
 			<Box
 				data-workspace={workspaceName}
@@ -115,8 +116,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					backgroundColor: 'surface.background',
 				}}
 			>
-				<WorkspaceServices />
-
 				<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
 					<MainScreen />
 					<WorkspaceStatusBarItems />

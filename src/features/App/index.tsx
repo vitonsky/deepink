@@ -35,18 +35,18 @@ export const App: FC = () => {
 		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening;
 
 	// Show Splash immediately, but delay hiding it
-	const [isShowSplash, setIsShowSplash] = useState(isLoading);
+	const [isSplashVisible, setIsSplashVisible] = useState(isLoading);
 	useEffect(() => {
 		if (isLoading) {
-			setIsShowSplash(true);
+			setIsSplashVisible(true);
 			return;
 		}
 
-		const timer = setTimeout(() => setIsShowSplash(false), 400);
+		const timer = setTimeout(() => setIsSplashVisible(false), 400);
 		return () => clearTimeout(timer);
 	}, [isLoading]);
 
-	if (isShowSplash) {
+	if (isSplashVisible) {
 		return <SplashScreen />;
 	}
 
