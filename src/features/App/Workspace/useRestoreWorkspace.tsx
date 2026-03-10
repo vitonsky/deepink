@@ -3,13 +3,16 @@ import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
-import { useAppDispatch } from '@state/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	useWorkspaceActions,
 	useWorkspaceData,
 	useWorkspaceSelector,
 } from '@state/redux/profiles/hooks';
-import { WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
+import {
+	selectIsWorkspaceReady,
+	WorkspaceConfigScheme,
+} from '@state/redux/profiles/profiles';
 import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 
 import { useProfileControls } from '../Profile';
@@ -51,8 +54,9 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 	}, [dispatch, workspaceActions, workspaceFiles]);
 
 	// Initialize workspace state
+	const isWorkspaceReady = useAppSelector(selectIsWorkspaceReady(workspaceData));
 	const getWorkspaceState = useWorkspaceState({
-		sync: Boolean(workspace),
+		sync: Boolean(isWorkspaceReady),
 		controls,
 		workspaceId: workspaceData.workspaceId,
 	});

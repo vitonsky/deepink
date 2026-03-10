@@ -51,7 +51,7 @@ export const App: FC = () => {
 	}
 
 	// Vault screen
-	if (profileContainers.profiles.length > 0) {
+	if (profileContainers.profiles.length > 0 && profileContainers.activeProfile) {
 		return (
 			<Box
 				sx={{

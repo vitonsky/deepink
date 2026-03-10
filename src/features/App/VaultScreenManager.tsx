@@ -17,7 +17,6 @@ export type VaultScreenManagerProps = {
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
 	onOpenProfile: OnPickProfile;
-	onLoginStart?: () => void;
 };
 
 export const defaultVaultNames = [
