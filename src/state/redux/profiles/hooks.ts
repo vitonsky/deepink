@@ -97,7 +97,7 @@ export const useWorkspaceActions = () => {
 			Object.entries(workspacesApi).map(([key, action]) => [
 				key,
 				(props: Record<any, any>) =>
-					action({ ...workspaceData, ...props } as any),
+					action({ ...props, ...workspaceData } as any),
 			]),
 		) as unknown as StripPropsInActionCreator<
 			typeof workspacesApi,
