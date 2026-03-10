@@ -8,14 +8,12 @@ import {
 import { selectIsWorkspaceLoaded } from '@state/redux/profiles/profiles';
 import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 
-import { useProfileControls } from '../Profile';
 import { useWorkspaceState } from './useWorkspaceState';
 import { useNotesRegistry } from './WorkspaceProvider';
 
 export const useRestoreWorkspaceState = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
-	const controls = useProfileControls();
 	const workspaceActions = useWorkspaceActions();
 	const notesRegistry = useNotesRegistry();
 
@@ -24,7 +22,7 @@ export const useRestoreWorkspaceState = () => {
 	const isWorkspaceLoaded = useAppSelector(selectIsWorkspaceLoaded(workspaceData));
 	const getWorkspaceState = useWorkspaceState({
 		sync: Boolean(isWorkspaceLoaded),
-		controls,
+		profileId: workspaceData.profileId,
 		workspaceId: workspaceData.workspaceId,
 	});
 

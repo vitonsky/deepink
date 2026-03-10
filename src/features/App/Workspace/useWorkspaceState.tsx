@@ -8,8 +8,6 @@ import { useWatchSelector } from '@hooks/useWatchSelector';
 import { NOTES_VIEW, selectWorkspace } from '@state/redux/profiles/profiles';
 import { createAppSelector } from '@state/redux/utils';
 
-import { ProfileControls } from '../Profile';
-
 const WorkspaceStateScheme = z.object({
 	openedNoteIds: z.array(z.string()).nullable(),
 	activeNoteId: z.string().nullable(),
@@ -20,15 +18,12 @@ const WorkspaceStateScheme = z.object({
 
 export const useWorkspaceState = ({
 	sync,
-	controls: {
-		profile: {
-			profile: { id: profileId },
-		},
-	},
+	profileId,
+
 	workspaceId,
 }: {
 	sync: boolean;
-	controls: ProfileControls;
+	profileId: string;
 	workspaceId: string;
 }) => {
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceId));
