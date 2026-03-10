@@ -1,57 +1,23 @@
 import { useEffect } from 'react';
-import { FileController } from '@core/features/files/FileController';
-import { StateFile } from '@core/features/files/StateFile';
-import { useVaultStorage } from '@features/files';
-import { getWorkspacePath } from '@features/files/paths';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	useWorkspaceActions,
 	useWorkspaceData,
 	useWorkspaceSelector,
 } from '@state/redux/profiles/hooks';
-import {
-	selectIsWorkspaceReady,
-	WorkspaceConfigScheme,
-} from '@state/redux/profiles/profiles';
+import { selectIsWorkspaceReady } from '@state/redux/profiles/profiles';
 import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 
 import { useProfileControls } from '../Profile';
-import { WorkspaceContainer } from './useWorkspace';
 import { useWorkspaceState } from './useWorkspaceState';
+import { useNotesRegistry } from './WorkspaceProvider';
 
-export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
+export const useRestoreWorkspaceState = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const controls = useProfileControls();
 	const workspaceActions = useWorkspaceActions();
-
-	// Load workspace configuration
-	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
-	useEffect(() => {
-		const state = new StateFile(
-			new FileController(`config.json`, workspaceFiles),
-			WorkspaceConfigScheme,
-		);
-
-		state.get().then((workspaceConfig) => {
-			if (workspaceConfig) {
-				dispatch(
-					workspaceActions.setWorkspaceNoteTemplateConfig({
-						title: workspaceConfig.newNote.title,
-						tags: workspaceConfig.newNote.tags,
-					}),
-				);
-			}
-
-			dispatch(
-				workspaceActions.setWorkspaceLoadingStatus({
-					status: {
-						isConfigReady: true,
-					},
-				}),
-			);
-		});
-	}, [dispatch, workspaceActions, workspaceFiles]);
+	const notesRegistry = useNotesRegistry();
 
 	// Initialize workspace state
 	const isWorkspaceReady = useAppSelector(selectIsWorkspaceReady(workspaceData));
@@ -78,9 +44,7 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 
 				// Restore opened notes
 				if (state.openedNoteIds && state.openedNoteIds.length !== 0) {
-					const notes = await workspace?.notesRegistry.getById(
-						state.openedNoteIds,
-					);
+					const notes = await notesRegistry.getById(state.openedNoteIds);
 					if (notes && notes.length !== 0) {
 						dispatch(
 							workspaceActions.setOpenedNotes({
@@ -111,11 +75,5 @@ export const useRestoreWorkspace = (workspace: WorkspaceContainer | null) => {
 				}),
 			);
 		});
-	}, [
-		getWorkspaceState,
-		dispatch,
-		isTagsReady,
-		workspaceActions,
-		workspace?.notesRegistry,
-	]);
+	}, [getWorkspaceState, dispatch, isTagsReady, workspaceActions, notesRegistry]);
 };
