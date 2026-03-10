@@ -19,7 +19,6 @@ const WorkspaceStateScheme = z.object({
 export const useWorkspaceState = ({
 	sync,
 	profileId,
-
 	workspaceId,
 }: {
 	sync: boolean;

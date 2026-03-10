@@ -69,7 +69,6 @@ export const useRestoreWorkspaceState = () => {
 				});
 			}
 
-			// Mark workspace as fully loaded
 			dispatch(
 				workspaceActions.setWorkspaceLoadingStatus({
 					status: {
