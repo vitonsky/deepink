@@ -53,6 +53,9 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
+	const isWorkspaceLoaded = useAppSelector(selectIsWorkspaceLoaded(workspaceData));
+	const [isSplashVisible] = useDebounce(!isWorkspaceLoaded, 400);
+
 	const activeWorkspace = useAppSelector(
 		useMemo(
 			() => selectActiveWorkspaceInfo({ profileId: workspaceData.profileId }),
@@ -61,10 +64,9 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 		isEqual,
 	);
 	const isVisibleWorkspace =
-		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
-
-	const isWorkspaceLoaded = useAppSelector(selectIsWorkspaceLoaded(workspaceData));
-	const [isSplashVisible] = useDebounce(!isWorkspaceLoaded, 500);
+		!isSplashVisible &&
+		activeWorkspace &&
+		activeWorkspace.id === workspaceData.workspaceId;
 
 	return (
 		<>
@@ -109,8 +111,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					<Box
 						data-workspace={workspaceName}
 						sx={{
-							display:
-								isVisibleWorkspace && !isSplashVisible ? 'flex' : 'none',
+							display: isVisibleWorkspace ? 'flex' : 'none',
 							flexDirection: 'column',
 							flexGrow: '100',
 							width: '100%',
