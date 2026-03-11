@@ -43,7 +43,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		setIsPending(true);
 
 		const response = await onLogin(profile, secret || undefined, {
-			manual: true,
+			isManual: true,
 		}).finally(() => {
 			setIsPending(false);
 		});

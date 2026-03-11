@@ -13,7 +13,7 @@ type PickProfileResponse = {
 export type OnPickProfile = (
 	profile: ProfileObject,
 	password?: string,
-	options?: { manual?: boolean },
+	options?: { isManual?: boolean },
 ) => Promise<PickProfileResponse>;
 
 type UseProfileLoaderProps = {
@@ -38,9 +38,9 @@ export const useVaultOpener = ({
 		async (
 			profile: ProfileObject,
 			password?: string,
-			options: { manual?: boolean } = { manual: false },
+			options: { isManual?: boolean } = { isManual: false },
 		) => {
-			if (!options.manual) setIsProfileOpening(true);
+			if (!options.isManual) setIsProfileOpening(true);
 
 			// Profiles with no password
 			if (!profile.encryption) {
