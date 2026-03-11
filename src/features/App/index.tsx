@@ -1,8 +1,9 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
+import { useDelayedFalse } from '@hooks/useDelayedFalse';
 
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
@@ -35,17 +36,7 @@ export const App: FC = () => {
 		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening;
 
 	// Show Splash immediately, but delay hiding it
-	const [isSplashVisible, setIsSplashVisible] = useState(isLoading);
-	useEffect(() => {
-		if (isLoading) {
-			setIsSplashVisible(true);
-			return;
-		}
-
-		const timer = setTimeout(() => setIsSplashVisible(false), 400);
-		return () => clearTimeout(timer);
-	}, [isLoading]);
-
+	const isSplashVisible = useDelayedFalse(isLoading);
 	if (isSplashVisible) {
 		return <SplashScreen />;
 	}
