@@ -30,7 +30,7 @@ export const useWorkspaceContext = createContextGetterHook(WorkspaceContext);
 
 export interface WorkspaceProps {
 	profile: ProfileContainer;
-	isUIVisible: boolean;
+	isReady: boolean;
 }
 
 const WorkspaceInitializer = () => {
@@ -44,7 +44,7 @@ const WorkspaceInitializer = () => {
 /**
  * Manage one workspace
  */
-export const Workspace: FC<WorkspaceProps> = ({ profile, isUIVisible }) => {
+export const Workspace: FC<WorkspaceProps> = ({ profile, isReady }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -59,9 +59,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile, isUIVisible }) => {
 		isEqual,
 	);
 	const isVisibleWorkspace =
-		isUIVisible &&
-		activeWorkspace &&
-		activeWorkspace.id === workspaceData.workspaceId;
+		isReady && activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
 	return workspace ? (
 		<WorkspaceProvider

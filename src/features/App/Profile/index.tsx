@@ -153,7 +153,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						<StatusBarProvider>
 							<Workspace
 								profile={currentProfile}
-								isUIVisible={!isSplashVisible}
+								isReady={!isSplashVisible}
 							/>
 							<ProfileStatusBar />
 							{isDevMode && (

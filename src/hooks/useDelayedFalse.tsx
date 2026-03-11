@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 /**
  * Returns true immediately, but delays returning false by the specified delay.
@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 export const useDelayedFalse = (value: boolean, delay = 500) => {
 	const [delayedValue, setDelayedValue] = useState(value);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (value) {
 			setDelayedValue(true);
 			return;
