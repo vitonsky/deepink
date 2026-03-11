@@ -5,15 +5,18 @@ import { StateFile } from '@core/features/files/StateFile';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
+import { useDelayedFalse } from '@hooks/useDelayedFalse';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
 	defaultVaultConfig,
 	ProfileConfigScheme,
+	selectIsActiveWorkspaceReady,
 	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -134,8 +137,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
+	const isWorkspaceReady = useAppSelector(selectIsActiveWorkspaceReady({ profileId }));
+	const isSplashVisible = useDelayedFalse(!isWorkspaceReady);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
+			{isSplashVisible && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
@@ -144,7 +151,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId: profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<Workspace profile={currentProfile} />
+							<Workspace
+								profile={currentProfile}
+								isUIVisible={!isSplashVisible}
+							/>
 							<ProfileStatusBar />
 							{isDevMode && (
 								<ToggleSQLConsole
