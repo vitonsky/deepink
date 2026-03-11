@@ -454,7 +454,7 @@ export const profilesSlice = createSlice({
 			workspace.view = view;
 		},
 
-		restoreFilters: (
+		setFilters: (
 			state,
 			{
 				payload: { profileId, workspaceId, view, search, selectedTagId },

@@ -11,7 +11,7 @@ import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus
 import { useWorkspaceState } from './useWorkspaceState';
 import { useNotesRegistry } from './WorkspaceProvider';
 
-export const useRestoreWorkspaceState = () => {
+export const useRestoreWorkspace = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
@@ -56,7 +56,7 @@ export const useRestoreWorkspaceState = () => {
 			// Restore workspace state if it exists
 			if (state) {
 				dispatch(
-					workspaceActions.restoreFilters({
+					workspaceActions.setFilters({
 						search: state.search || null,
 						view: state.view || null,
 						selectedTagId: state.selectedTagId || null,

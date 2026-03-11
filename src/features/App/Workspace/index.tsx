@@ -15,8 +15,8 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
+import { useRestoreWorkspace } from './useRestoreWorkspace';
 import { useRestoreWorkspaceConfig } from './useRestoreWorkspaceConfig';
-import { useRestoreWorkspaceState } from './useRestoreWorkspaceState';
 import { useWorkspace } from './useWorkspace';
 import { useWorkspaceTags } from './useWorkspaceTags';
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -35,7 +35,7 @@ export interface WorkspaceProps {
 
 const WorkspaceInitializer = () => {
 	useWorkspaceTags();
-	useRestoreWorkspaceState();
+	useRestoreWorkspace();
 	useRestoreWorkspaceConfig();
 
 	return null;
