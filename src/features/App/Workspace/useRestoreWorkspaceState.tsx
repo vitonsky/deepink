@@ -59,7 +59,7 @@ export const useRestoreWorkspaceState = () => {
 					workspaceActions.restoreFilters({
 						search: state.search || null,
 						view: state.view || null,
-						selectedTag: state.selectedTagId || null,
+						selectedTagId: state.selectedTagId || null,
 					}),
 				);
 

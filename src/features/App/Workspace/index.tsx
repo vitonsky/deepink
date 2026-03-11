@@ -61,59 +61,64 @@ export const Workspace: FC<WorkspaceProps> = ({ profile, isReady }) => {
 	const isVisibleWorkspace =
 		isReady && activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
-	return workspace ? (
-		<WorkspaceProvider
-			{...workspace}
-			notesApi={{
-				openNote: (note: INote, focus = true) => {
-					dispatch(workspacesApi.addOpenedNote({ ...workspaceData, note }));
-					if (focus) {
-						dispatch(
-							workspacesApi.setActiveNote({
-								...workspaceData,
-								noteId: note.id,
-							}),
-						);
-					}
-				},
-				noteUpdated: (note: INote) =>
-					dispatch(
-						workspacesApi.updateOpenedNote({
-							...workspaceData,
-							note,
-						}),
-					),
-				noteClosed: (noteId: string) =>
-					dispatch(
-						workspacesApi.removeOpenedNote({
-							...workspaceData,
-							noteId,
-						}),
-					),
+	return (
+		<Box
+			data-workspace={workspaceName}
+			sx={{
+				display: isVisibleWorkspace ? 'flex' : 'none',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				backgroundColor: 'surface.background',
 			}}
 		>
-			<WorkspaceInitializer />
-			<WorkspaceServices />
+			{workspace ? (
+				<WorkspaceProvider
+					{...workspace}
+					notesApi={{
+						openNote: (note: INote, focus = true) => {
+							dispatch(
+								workspacesApi.addOpenedNote({ ...workspaceData, note }),
+							);
 
-			<Box
-				data-workspace={workspaceName}
-				sx={{
-					display: isVisibleWorkspace ? 'flex' : 'none',
-					flexDirection: 'column',
-					flexGrow: '100',
-					width: '100%',
-					height: '100vh',
-					maxWidth: '100%',
-					maxHeight: '100%',
-					backgroundColor: 'surface.background',
-				}}
-			>
-				<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
-					<MainScreen />
-					<WorkspaceStatusBarItems />
-					<SettingsWindow />
-				</WorkspaceModalProvider>
-			</Box>
-		</WorkspaceProvider>
-	) : null;
+							if (focus) {
+								dispatch(
+									workspacesApi.setActiveNote({
+										...workspaceData,
+										noteId: note.id,
+									}),
+								);
+							}
+						},
+						noteUpdated: (note: INote) =>
+							dispatch(
+								workspacesApi.updateOpenedNote({
+									...workspaceData,
+									note,
+								}),
+							),
+						noteClosed: (noteId: string) =>
+							dispatch(
+								workspacesApi.removeOpenedNote({
+									...workspaceData,
+									noteId,
+								}),
+							),
+					}}
+				>
+					<WorkspaceInitializer />
+					<WorkspaceServices />
+
+					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
+						<MainScreen />
+						<WorkspaceStatusBarItems />
+						<SettingsWindow />
+					</WorkspaceModalProvider>
+				</WorkspaceProvider>
+			) : null}
+		</Box>
+	);
 };

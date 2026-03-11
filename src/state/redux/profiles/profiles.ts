@@ -457,12 +457,12 @@ export const profilesSlice = createSlice({
 		restoreFilters: (
 			state,
 			{
-				payload: { profileId, workspaceId, view, search, selectedTag },
+				payload: { profileId, workspaceId, view, search, selectedTagId },
 			}: PayloadAction<
 				WorkspaceScoped<{
 					view: NOTES_VIEW | null;
 					search: string | null;
-					selectedTag: string | null;
+					selectedTagId: string | null;
 				}>
 			>,
 		) => {
@@ -477,11 +477,11 @@ export const profilesSlice = createSlice({
 			}
 
 			// Set the selected tag if it exists
-			if (selectedTag) {
+			if (selectedTagId) {
 				const isSelectedTagExists = workspace.tags.list.some(
-					({ id }) => id === selectedTag,
+					({ id }) => id === selectedTagId,
 				);
-				if (isSelectedTagExists) workspace.tags.selected = selectedTag;
+				if (isSelectedTagExists) workspace.tags.selected = selectedTagId;
 			}
 		},
 
