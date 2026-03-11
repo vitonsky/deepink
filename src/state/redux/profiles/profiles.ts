@@ -271,7 +271,7 @@ export const profilesSlice = createSlice({
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
-			Object.assign(workspace.loadingStatus, status);
+			workspace.loadingStatus = { ...workspace.loadingStatus, ...status };
 		},
 
 		setActiveNote: (
