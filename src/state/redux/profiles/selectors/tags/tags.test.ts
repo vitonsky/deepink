@@ -37,6 +37,36 @@ describe('Tags sorting', () => {
 			);
 		});
 
+		test('Multi locales order', () => {
+			expect(
+				[
+					'Арбуз',
+					'Яблоко',
+					'Банан',
+					'!!!',
+					'123',
+					'@#$',
+					'Apple',
+					'Watermelon',
+					'Banana',
+				]
+					.map((text) => ({ id: text, name: text }) as TagNode)
+					.sort(sortTagsLexicographically),
+			).toEqual(
+				[
+					'!!!',
+					'@#$',
+					'123',
+					'Apple',
+					'Banana',
+					'Watermelon',
+					'Арбуз',
+					'Банан',
+					'Яблоко',
+				].map((text) => expect.objectContaining({ name: text })),
+			);
+		});
+
 		test('Order is determined', () => {
 			const tags = [
 				{ id: 'foo', name: 'foo' },
