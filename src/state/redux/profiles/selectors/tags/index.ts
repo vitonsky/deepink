@@ -1,6 +1,7 @@
-import { ITag } from '@core/features/tags';
+import { createWorkspaceSelector, selectWorkspaceRoot } from '../../utils';
 
-import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
+import { sortTagsLexicographically } from './sort';
+import { TagNode } from './types';
 
 export const selectActiveTag = createWorkspaceSelector(
 	[selectWorkspaceRoot],
@@ -19,17 +20,6 @@ export const selectTags = createWorkspaceSelector([selectWorkspaceRoot], (worksp
 
 	return workspace.tags.list;
 });
-
-export const sortTagsLexicographically = (a: TagNode, b: TagNode) => {
-	const nameOrder = a.name.localeCompare(b.name);
-	if (nameOrder !== 0) return nameOrder;
-
-	return a.id.localeCompare(b.id);
-};
-
-export type TagNode = Pick<ITag, 'id' | 'name'> & {
-	childrens?: TagNode[];
-};
 
 export const selectTagsTree = createWorkspaceSelector(
 	[selectWorkspaceRoot],

@@ -1,6 +1,7 @@
 /* eslint-disable @cspell/spellchecker */
 
-import { sortTagsLexicographically, TagNode } from './tags';
+import { sortTagsLexicographically } from './sort';
+import { TagNode } from './types';
 
 describe('Tags sorting', () => {
 	describe('Lexicographical sorting', () => {
