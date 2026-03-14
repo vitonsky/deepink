@@ -1,27 +1,22 @@
-import React, { FC, ReactNode, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronUp, FaHashtag } from 'react-icons/fa6';
 import { Button, HStack, Text } from '@chakra-ui/react';
 import { ListItem, NestedList } from '@components/NestedList';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
+import { TagNode } from '@state/redux/profiles/selectors/tags/types';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
 
-export type TagItem = {
-	id: string;
-	content: ReactNode;
-	childrens?: TagItem[];
-};
-
 export type ITagsListProps = {
-	tags: TagItem[];
+	tags: TagNode[];
 	activeTag?: string;
 	onTagClick?: (id: string) => void;
 	contextMenu: TagContextMenuCallbacks;
 };
 
 const convertTagToListItem = (
-	tags: TagItem[],
-	mapper: (tag: TagItem) => ListItem,
+	tags: TagNode[],
+	mapper: (tag: TagNode) => ListItem,
 ): ListItem[] =>
 	tags.map((tag) => {
 		const { childrens } = tag;
@@ -46,7 +41,7 @@ export const TagsList: FC<ITagsListProps> = ({
 	const onTagMenu = useTagContextMenu(contextMenu);
 
 	const items: ListItem[] = useMemo(() => {
-		return convertTagToListItem(tags, ({ id, content, childrens }) => {
+		return convertTagToListItem(tags, ({ id, name, childrens }) => {
 			const isToggledGroup = toggledTags.includes(id);
 			const isOpenedGroup = !isToggledGroup;
 			const isHaveChilds = childrens !== undefined && childrens.length > 0;
@@ -67,7 +62,7 @@ export const TagsList: FC<ITagsListProps> = ({
 						<FaHashtag size={14} />
 
 						<Text overflow="hidden" textOverflow="ellipsis">
-							{content}
+							{name}
 						</Text>
 
 						{isHaveChilds ? (

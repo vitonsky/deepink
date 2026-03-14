@@ -1,6 +1,7 @@
-import { TagItem } from '@features/MainScreen/TagsPanel/TagsList';
+import { createWorkspaceSelector, selectWorkspaceRoot } from '../../utils';
 
-import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
+import { sortTagsLexicographically } from './sort';
+import { TagNode } from './types';
 
 export const selectActiveTag = createWorkspaceSelector(
 	[selectWorkspaceRoot],
@@ -27,14 +28,14 @@ export const selectTagsTree = createWorkspaceSelector(
 
 		const flatTags = workspace.tags.list;
 
-		const tagsMap: Record<string, TagItem> = {};
+		const tagsMap: Record<string, TagNode> = {};
 		const tagToParentMap: Record<string, string> = {};
 
 		// Fill maps
 		flatTags.forEach(({ id, name, parent }) => {
 			tagsMap[id] = {
 				id,
-				content: name,
+				name,
 			};
 
 			if (parent !== null) {
@@ -58,12 +59,19 @@ export const selectTagsTree = createWorkspaceSelector(
 			parentTag.childrens.push(tag);
 		}
 
+		// Sort tags
+		for (const tag of Object.values(tagsMap)) {
+			if (tag.childrens && tag.childrens.length > 0) {
+				tag.childrens.sort(sortTagsLexicographically);
+			}
+		}
+
 		// Delete nested tags from tags map
 		Object.keys(tagToParentMap).forEach((nestedTagId) => {
 			delete tagsMap[nestedTagId];
 		});
 
 		// Collect tags array from a map
-		return Object.values(tagsMap);
+		return Object.values(tagsMap).sort(sortTagsLexicographically);
 	},
 );
