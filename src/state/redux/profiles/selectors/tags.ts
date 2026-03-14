@@ -20,7 +20,7 @@ export const selectTags = createWorkspaceSelector([selectWorkspaceRoot], (worksp
 	return workspace.tags.list;
 });
 
-const sortTagsLexicographically = (a: TagItem, b: TagItem) =>
+export const sortTagsLexicographically = (a: TagItem, b: TagItem) =>
 	(b.content ?? '') > (a.content ?? '') ? -1 : 1;
 
 export const selectTagsTree = createWorkspaceSelector(
