@@ -20,6 +20,9 @@ export const selectTags = createWorkspaceSelector([selectWorkspaceRoot], (worksp
 	return workspace.tags.list;
 });
 
+const sortTagsLexicographically = (a: TagItem, b: TagItem) =>
+	(b.content ?? '') > (a.content ?? '') ? -1 : 1;
+
 export const selectTagsTree = createWorkspaceSelector(
 	[selectWorkspaceRoot],
 	(workspace) => {
@@ -58,12 +61,19 @@ export const selectTagsTree = createWorkspaceSelector(
 			parentTag.childrens.push(tag);
 		}
 
+		// Sort tags
+		for (const tag of Object.values(tagsMap)) {
+			if (tag.childrens && tag.childrens.length > 0) {
+				tag.childrens.sort(sortTagsLexicographically);
+			}
+		}
+
 		// Delete nested tags from tags map
 		Object.keys(tagToParentMap).forEach((nestedTagId) => {
 			delete tagsMap[nestedTagId];
 		});
 
 		// Collect tags array from a map
-		return Object.values(tagsMap);
+		return Object.values(tagsMap).sort(sortTagsLexicographically);
 	},
 );
