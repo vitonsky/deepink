@@ -26,7 +26,7 @@ export const selectIsWorkspaceLoaded = createWorkspaceSelector(
 	},
 );
 
-export const selectIsTagsReady = createWorkspaceSelector(
+export const selectIsWorkspaceTagsLoaded = createWorkspaceSelector(
 	[selectWorkspaceRoot],
 	(workspace) => {
 		if (!workspace) return false;

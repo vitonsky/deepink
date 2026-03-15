@@ -19,7 +19,7 @@ import {
 	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/loadingStatus';
+import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';

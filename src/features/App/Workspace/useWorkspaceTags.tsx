@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
+import { selectIsWorkspaceTagsLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 
 import { useTagsRegistry } from './WorkspaceProvider';
 
@@ -14,13 +14,13 @@ export const useWorkspaceTags = () => {
 	const tagsRegistry = useTagsRegistry();
 
 	// Load tags
-	const isTagsReady = useWorkspaceSelector(selectIsTagsReady);
+	const isWorkspaceTagsLoaded = useWorkspaceSelector(selectIsWorkspaceTagsLoaded);
 	useEffect(() => {
 		const updateTags = () =>
 			tagsRegistry.getTags().then((tags) => {
 				dispatch(workspaceActions.setTags({ tags }));
 
-				if (!isTagsReady) {
+				if (!isWorkspaceTagsLoaded) {
 					dispatch(
 						workspaceActions.setWorkspaceLoadingStatus({
 							isTagsLoaded: true,
@@ -32,5 +32,5 @@ export const useWorkspaceTags = () => {
 		updateTags();
 
 		return tagsRegistry.onChange(updateTags);
-	}, [dispatch, isTagsReady, tagsRegistry, workspaceActions]);
+	}, [dispatch, isWorkspaceTagsLoaded, tagsRegistry, workspaceActions]);
 };

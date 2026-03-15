@@ -6,7 +6,7 @@ import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectWorkspace, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
-import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/loadingStatus';
+import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createAppSelector } from '@state/redux/utils';
 
 export const useWorkspaceConfigSync = () => {
