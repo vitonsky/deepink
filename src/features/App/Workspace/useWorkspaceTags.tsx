@@ -23,7 +23,7 @@ export const useWorkspaceTags = () => {
 				if (!isTagsReady) {
 					dispatch(
 						workspaceActions.setWorkspaceLoadingStatus({
-							status: { isTagsLoaded: true },
+							isTagsLoaded: true,
 						}),
 					);
 				}

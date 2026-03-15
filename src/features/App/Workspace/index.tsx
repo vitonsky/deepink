@@ -11,12 +11,12 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/loadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { useRestoreWorkspace } from './useRestoreWorkspace';
-import { useRestoreWorkspaceConfig } from './useRestoreWorkspaceConfig';
 import { useWorkspace } from './useWorkspace';
 import { useWorkspaceTags } from './useWorkspaceTags';
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -30,13 +30,11 @@ export const useWorkspaceContext = createContextGetterHook(WorkspaceContext);
 
 export interface WorkspaceProps {
 	profile: ProfileContainer;
-	isReady: boolean;
 }
 
 const WorkspaceInitializer = () => {
 	useWorkspaceTags();
 	useRestoreWorkspace();
-	useRestoreWorkspaceConfig();
 
 	return null;
 };
@@ -44,7 +42,7 @@ const WorkspaceInitializer = () => {
 /**
  * Manage one workspace
  */
-export const Workspace: FC<WorkspaceProps> = ({ profile, isReady }) => {
+export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -59,22 +57,12 @@ export const Workspace: FC<WorkspaceProps> = ({ profile, isReady }) => {
 		isEqual,
 	);
 	const isVisibleWorkspace =
-		isReady && activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
+		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
+
+	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
 
 	return (
-		<Box
-			data-workspace={workspaceName}
-			sx={{
-				display: isVisibleWorkspace ? 'flex' : 'none',
-				flexDirection: 'column',
-				flexGrow: '100',
-				width: '100%',
-				height: '100vh',
-				maxWidth: '100%',
-				maxHeight: '100%',
-				backgroundColor: 'surface.background',
-			}}
-		>
+		<>
 			{workspace ? (
 				<WorkspaceProvider
 					{...workspace}
@@ -83,7 +71,6 @@ export const Workspace: FC<WorkspaceProps> = ({ profile, isReady }) => {
 							dispatch(
 								workspacesApi.addOpenedNote({ ...workspaceData, note }),
 							);
-
 							if (focus) {
 								dispatch(
 									workspacesApi.setActiveNote({
@@ -112,13 +99,31 @@ export const Workspace: FC<WorkspaceProps> = ({ profile, isReady }) => {
 					<WorkspaceInitializer />
 					<WorkspaceServices />
 
-					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
-						<MainScreen />
-						<WorkspaceStatusBarItems />
-						<SettingsWindow />
-					</WorkspaceModalProvider>
+					{isWorkspaceLoaded && (
+						<Box
+							data-workspace={workspaceName}
+							sx={{
+								display: isVisibleWorkspace ? 'flex' : 'none',
+								flexDirection: 'column',
+								flexGrow: '100',
+								width: '100%',
+								height: '100vh',
+								maxWidth: '100%',
+								maxHeight: '100%',
+								backgroundColor: 'surface.background',
+							}}
+						>
+							<WorkspaceModalProvider
+								isVisible={isVisibleWorkspace ?? false}
+							>
+								<MainScreen />
+								<WorkspaceStatusBarItems />
+								<SettingsWindow />
+							</WorkspaceModalProvider>
+						</Box>
+					)}
 				</WorkspaceProvider>
 			) : null}
-		</Box>
+		</>
 	);
 };
