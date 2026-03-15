@@ -3,14 +3,14 @@ import { wrap } from 'comlink';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import SQLWorker from '@core/storage/database/sqlite/SQLiteDatabase.worker';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
-import { SQLiteDB } from './sqlite';
-import SQLWorker from './sqlite/SQLite.worker';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';

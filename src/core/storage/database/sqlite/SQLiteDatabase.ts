@@ -1,4 +1,5 @@
 import sqlite, { ParamsObject, QueryExecResult } from 'sql.js';
+import { v4 as uuidv4 } from 'uuid';
 
 import { SQLiteDB } from '.';
 
@@ -30,21 +31,34 @@ const loadSQLite = async () => {
 	return sqlite({ locateFile: () => sqliteWasmUrl });
 };
 
-export class Database implements SQLiteDB {
-	protected db: Promise<sqlite.Database> | null = null;
-	protected async getDB() {
-		if (!this.db) {
-			this.db = loadSQLite().then((sqlite) => new sqlite.Database());
-		}
+export class SQLiteDatabase implements SQLiteDB {
+	protected db;
+	constructor(data?: ArrayLike<number> | Buffer | null) {
+		this.db = loadSQLite().then((sqlite) => {
+			const db = new sqlite.Database(data);
 
-		return this.db;
+			db.create_function('gen_random_uuid', () => uuidv4());
+			db.create_function('now', () => new Date().toISOString());
+
+			return db;
+		});
+	}
+
+	async export() {
+		const db = await this.db;
+		return db.export();
+	}
+
+	async close() {
+		const db = await this.db;
+		db.close();
 	}
 
 	async query(
 		query: string,
 		params?: sqlite.BindParams,
 	): Promise<sqlite.ParamsObject[]> {
-		const db = await this.getDB();
+		const db = await this.db;
 
 		const result = db.exec(query, params);
 
