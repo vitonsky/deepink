@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectIsWorkspaceTagsLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+import { useWorkspaceActions } from '@state/redux/profiles/hooks';
 
 import { useTagsRegistry } from './WorkspaceProvider';
 
@@ -14,23 +13,21 @@ export const useWorkspaceTags = () => {
 	const tagsRegistry = useTagsRegistry();
 
 	// Load tags
-	const isWorkspaceTagsLoaded = useWorkspaceSelector(selectIsWorkspaceTagsLoaded);
 	useEffect(() => {
+		let isCanceled = false;
+
 		const updateTags = () =>
 			tagsRegistry.getTags().then((tags) => {
+				if (isCanceled) return;
 				dispatch(workspaceActions.setTags({ tags }));
-
-				if (!isWorkspaceTagsLoaded) {
-					dispatch(
-						workspaceActions.setWorkspaceLoadingStatus({
-							isTagsLoaded: true,
-						}),
-					);
-				}
 			});
 
 		updateTags();
 
-		return tagsRegistry.onChange(updateTags);
-	}, [dispatch, isWorkspaceTagsLoaded, tagsRegistry, workspaceActions]);
+		const cleanup = tagsRegistry.onChange(updateTags);
+		return () => {
+			isCanceled = true;
+			cleanup();
+		};
+	}, [dispatch, tagsRegistry, workspaceActions]);
 };

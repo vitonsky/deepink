@@ -9,8 +9,10 @@ import {
 	useWorkspaceData,
 	useWorkspaceSelector,
 } from '@state/redux/profiles/hooks';
-import { WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
-import { selectIsWorkspaceTagsLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+import {
+	selectIsTagsLoaded,
+	WorkspaceConfigScheme,
+} from '@state/redux/profiles/profiles';
 
 import { WorkspaceStateScheme } from './services/useWorkspaceStateSync';
 import { useNotesRegistry } from './WorkspaceProvider';
@@ -23,11 +25,11 @@ export const useRestoreWorkspace = () => {
 	const notesRegistry = useNotesRegistry();
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
-	const isWorkspaceTagsLoaded = useWorkspaceSelector(selectIsWorkspaceTagsLoaded);
+	const isTagsLoaded = useWorkspaceSelector(selectIsTagsLoaded);
 
-	// Initialize workspace state
 	useEffect(() => {
-		if (!isWorkspaceTagsLoaded) return;
+		// Don’t restore filters until tags are loaded, or selectedTagId will be ignored
+		if (!isTagsLoaded) return;
 
 		const workspaceConfig = new StateFile(
 			new FileController(`config.json`, workspaceFiles),
@@ -88,11 +90,5 @@ export const useRestoreWorkspace = () => {
 				);
 			},
 		);
-	}, [
-		isWorkspaceTagsLoaded,
-		dispatch,
-		workspaceActions,
-		workspaceFiles,
-		notesRegistry,
-	]);
+	}, [dispatch, workspaceActions, workspaceFiles, notesRegistry, isTagsLoaded]);
 };
