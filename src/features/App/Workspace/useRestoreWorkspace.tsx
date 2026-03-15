@@ -10,29 +10,20 @@ import {
 	useWorkspaceSelector,
 } from '@state/redux/profiles/hooks';
 import { WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
-import {
-	selectIsTagsReady,
-	selectIsWorkspaceLoaded,
-} from '@state/redux/profiles/selectors/loadingStatus';
+import { selectIsTagsReady } from '@state/redux/profiles/selectors/loadingStatus';
 
-import { useWorkspaceState } from './useWorkspaceState';
+import { WorkspaceStateScheme } from './services/useWorkspaceStateSync';
 import { useNotesRegistry } from './WorkspaceProvider';
 
 export const useRestoreWorkspace = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
+
 	const notesRegistry = useNotesRegistry();
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
 	const isTagsLoaded = useWorkspaceSelector(selectIsTagsReady);
-
-	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
-	const getWorkspaceState = useWorkspaceState({
-		sync: isWorkspaceLoaded,
-		profileId: workspaceData.profileId,
-		workspaceId: workspaceData.workspaceId,
-	});
 
 	// Initialize workspace state
 	useEffect(() => {
@@ -43,15 +34,20 @@ export const useRestoreWorkspace = () => {
 			WorkspaceConfigScheme,
 		);
 
-		Promise.all([getWorkspaceState(), workspaceConfig.get()]).then(
+		const workspaceState = new StateFile(
+			new FileController(`state.json`, workspaceFiles),
+			WorkspaceStateScheme,
+		);
+
+		Promise.all([workspaceState.get(), workspaceConfig.get()]).then(
 			async ([state, workspaceConfig]) => {
 				// Restore workspace state if it exists
 				if (state) {
 					dispatch(
 						workspaceActions.setFilters({
-							search: state.search || null,
-							view: state.view || null,
-							selectedTagId: state.selectedTagId || null,
+							search: state.search,
+							view: state.view,
+							selectedTagId: state.selectedTagId || undefined,
 						}),
 					);
 
@@ -92,12 +88,5 @@ export const useRestoreWorkspace = () => {
 				);
 			},
 		);
-	}, [
-		getWorkspaceState,
-		isTagsLoaded,
-		dispatch,
-		workspaceActions,
-		workspaceFiles,
-		notesRegistry,
-	]);
+	}, [isTagsLoaded, dispatch, workspaceActions, workspaceFiles, notesRegistry]);
 };

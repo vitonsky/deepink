@@ -11,6 +11,7 @@ import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { useVaultSelector } from '@state/redux/profiles/hooks';
 import {
 	createWorkspaceObject,
 	defaultVaultConfig,
@@ -136,7 +137,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
-	const isWorkspaceReady = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
+	const isWorkspaceReady = useVaultSelector(selectIsActiveWorkspaceLoaded);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

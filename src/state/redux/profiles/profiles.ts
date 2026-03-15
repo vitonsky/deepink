@@ -459,20 +459,22 @@ export const profilesSlice = createSlice({
 			{
 				payload: { profileId, workspaceId, view, search, selectedTagId },
 			}: PayloadAction<
-				WorkspaceScoped<{
-					view: NOTES_VIEW | null;
-					search: string | null;
-					selectedTagId: string | null;
-				}>
+				WorkspaceScoped<
+					Partial<{
+						view: NOTES_VIEW;
+						search: string;
+						selectedTagId: string;
+					}>
+				>
 			>,
 		) => {
 			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
 			if (!workspace) return;
 
-			if (view) {
+			if (view !== undefined) {
 				workspace.view = view;
 			}
-			if (search) {
+			if (search !== undefined) {
 				workspace.search = search;
 			}
 

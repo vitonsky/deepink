@@ -1,18 +1,23 @@
-import { createAppSelector } from '@state/redux/utils';
-
-import { ProfileScoped, selectActiveWorkspace } from '../profiles';
 import {
+	createVaultSelector,
 	createWorkspaceSelector,
 	selectWorkspaceRoot,
 	selectWorkspaceRootSafe,
 } from '../utils';
+import { selectVault } from './vault';
 
-export const selectIsActiveWorkspaceLoaded = (scope: ProfileScoped) =>
-	createAppSelector(selectActiveWorkspace(scope), (workspace) => {
+export const selectIsActiveWorkspaceLoaded = createVaultSelector(
+	[selectVault],
+	(vault) => {
+		const activeWorkspace = vault.activeWorkspace;
+		if (!activeWorkspace) return false;
+
+		const workspace = vault.workspaces[activeWorkspace];
 		if (!workspace) return false;
 
 		return Object.values(workspace.loadingStatus).every(Boolean);
-	});
+	},
+);
 
 export const selectIsWorkspaceLoaded = createWorkspaceSelector(
 	[selectWorkspaceRootSafe],

@@ -4,25 +4,20 @@ import { StateFile } from '@core/features/files/StateFile';
 import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectWorkspace, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
+import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/loadingStatus';
 import { createAppSelector } from '@state/redux/utils';
 
-import { useProfileControls } from '../../Profile';
-
 export const useWorkspaceConfigSync = () => {
-	const {
-		profile: {
-			files,
-			profile: { id: profileId },
-		},
-	} = useProfileControls();
-
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
+	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
 
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
+		if (!isWorkspaceLoaded) return;
+
 		const workspaceConfig = new StateFile(
 			new FileController(`config.json`, workspaceFiles),
 			WorkspaceConfigScheme,
@@ -30,7 +25,7 @@ export const useWorkspaceConfigSync = () => {
 
 		return watchSelector({
 			selector: createAppSelector(
-				selectWorkspace({ profileId, workspaceId: workspaceData.workspaceId }),
+				selectWorkspace(workspaceData),
 				(workspace) => workspace?.config,
 			),
 			onChange(config) {
@@ -41,5 +36,5 @@ export const useWorkspaceConfigSync = () => {
 				});
 			},
 		});
-	}, [files, profileId, workspaceFiles, watchSelector, workspaceData.workspaceId]);
+	}, [workspaceFiles, watchSelector, workspaceData, isWorkspaceLoaded]);
 };
