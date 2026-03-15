@@ -37,6 +37,9 @@ export default merge(commonConfig, {
 	externals: {
 		electron: 'global electron',
 	},
+	experiments: {
+		asyncWebAssembly: true,
+	},
 	module: {
 		rules: [
 			{
@@ -92,6 +95,10 @@ export default merge(commonConfig, {
 			},
 			{
 				test: /\.ttf$/,
+				type: 'asset/resource',
+			},
+			{
+				test: /\.wasm$/,
 				type: 'asset/resource',
 			},
 			{

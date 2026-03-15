@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
+import { wrap } from 'comlink';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
@@ -8,10 +9,24 @@ import { SplashScreen } from '@features/SplashScreen';
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { SQLiteDB } from './sqlite';
+import SQLWorker from './sqlite/SQLite.worker';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
+
+const db = wrap<SQLiteDB>(new SQLWorker());
+
+console.log('Database in worker:', db);
+
+(window as any).db = db;
+(window as any).time = async () => {
+	const time = await db.query(
+		`SELECT strftime('%Y-%m-%d %H:%M:%S', datetime('now')) as now`,
+	);
+	console.log('Time', time[0]);
+};
 
 export const App: FC = () => {
 	const files = useFilesStorage();

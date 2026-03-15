@@ -77,7 +77,7 @@ export default {
 	},
 	output: {
 		path: outputPath,
-		publicPath: '',
+		publicPath: './',
 
 		// Better chunk naming for caching
 		chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].js',
