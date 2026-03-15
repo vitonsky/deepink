@@ -2,11 +2,11 @@ import React, { FC, useCallback, useEffect, useId, useState } from 'react';
 import { Button, Input, useToast, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { OnPickProfile } from '@features/App/useVaultOpener';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
 import { ProfilesForm } from '../ProfilesForm';
+import { OnPickProfile } from '../VaultScreenManager';
 
 export type ProfileLoginFormProps = {
 	profile: ProfileObject;
@@ -42,9 +42,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		setErrorMessage(null);
 		setIsPending(true);
 
-		const response = await onLogin(profile, secret || undefined, {
-			isManual: true,
-		}).finally(() => {
+		const response = await onLogin(profile, secret || undefined).finally(() => {
 			setIsPending(false);
 		});
 

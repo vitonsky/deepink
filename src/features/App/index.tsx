@@ -1,9 +1,9 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
-import { useDelayedFalse } from '@hooks/useDelayedFalse';
 
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
@@ -11,7 +11,6 @@ import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { useVaultOpener } from './useVaultOpener';
 import { VaultScreenManager } from './VaultScreenManager';
 
 export const App: FC = () => {
@@ -23,20 +22,38 @@ export const App: FC = () => {
 
 	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
 
-	// Open recent profile
-	const recentProfile = useRecentProfile(config);
-	const { isProfileOpening, onOpenProfile } = useVaultOpener({
-		profilesList,
-		recentProfile,
-		setCurrentProfileId,
-		profiles: profileContainers,
-	});
+	// Automatically open an unencrypted vault
+	const recentVault = useRecentProfile(config);
+	const [isOpeningRecentVault, setIsOpeningRecentVault] = useState(false);
+	useEffect(
+		() => {
+			if (!profilesList.isProfilesLoaded || !recentVault.isLoaded) return;
+
+			// Restore profile id
+			setCurrentProfileId(recentVault.profileId);
+
+			const vault = profilesList.profiles.find(
+				(profile) => profile.id === recentVault.profileId,
+			);
+
+			// open only unencrypted vault
+			if (vault && !vault.encryption) {
+				setIsOpeningRecentVault(true);
+
+				profileContainers
+					.openProfile({ profile: vault })
+					.then(() => setIsOpeningRecentVault(false));
+			}
+		},
+		// Depends only of loading status and run only once
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[profilesList.isProfilesLoaded, recentVault.isLoaded],
+	);
 
 	const isLoading =
-		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening;
+		!profilesList.isProfilesLoaded || !recentVault.isLoaded || isOpeningRecentVault;
 
-	// Show Splash immediately, but delay hiding it
-	const isSplashVisible = useDelayedFalse(isLoading);
+	const [isSplashVisible] = useDebounce(isLoading, 600);
 	if (isSplashVisible) {
 		return <SplashScreen />;
 	}
@@ -63,8 +80,8 @@ export const App: FC = () => {
 				<VaultScreenManager
 					currentProfile={currentProfileId}
 					onChooseProfile={setCurrentProfileId}
-					profiles={profilesList}
-					onOpenProfile={onOpenProfile}
+					profiles={profileContainers}
+					profilesManager={profilesList}
 				/>
 			</Box>
 		</Box>

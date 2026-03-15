@@ -1,22 +1,34 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { ProfileObject } from '@core/storage/ProfilesManager';
 import { telemetry } from '@electron/requests/telemetry/renderer';
+import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
+import { ProfilesApi } from './Profiles/hooks/useProfileContainers';
 import { ProfilesForm } from './ProfilesForm';
 import { ProfilesListApi } from './useProfilesList';
-import { OnPickProfile } from './useVaultOpener';
+
+type PickProfileResponse = {
+	status: 'ok' | 'error';
+	message?: string;
+};
+
+export type OnPickProfile = (
+	profile: ProfileObject,
+	password?: string,
+) => Promise<PickProfileResponse>;
 
 export type VaultScreenManagerProps = {
-	profiles: ProfilesListApi;
+	profiles: ProfilesApi;
+	profilesManager: ProfilesListApi;
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
-	onOpenProfile: OnPickProfile;
 };
 
 export const defaultVaultNames = [
@@ -31,33 +43,71 @@ export const defaultVaultNames = [
 export const VaultScreenManager = ({
 	currentProfile,
 	profiles,
-	onOpenProfile,
+	profilesManager,
 	onChooseProfile,
 }: VaultScreenManagerProps) => {
+	const [isVaultOpening, setIsVaultOpening] = useState(false);
+
+	const onVaultProfile: OnPickProfile = useCallback(
+		async (profile: ProfileObject, password?: string) => {
+			setIsVaultOpening(true);
+
+			// Profiles with no password
+			if (!profile.encryption) {
+				await profiles.openProfile({ profile }, true);
+
+				setIsVaultOpening(false);
+				return { status: 'ok' };
+			}
+
+			try {
+				// Profiles with password
+				if (password === undefined)
+					return { status: 'error', message: 'Enter password' };
+
+				await profiles.openProfile({ profile, password }, true);
+
+				return { status: 'ok' };
+			} catch (err) {
+				console.error(err);
+
+				return { status: 'error', message: 'Invalid password' };
+			} finally {
+				setIsVaultOpening(false);
+			}
+		},
+		[profiles],
+	);
+
 	const currentVaultObject = useMemo(
-		() => profiles.profiles?.find((profile) => profile.id === currentProfile) ?? null,
-		[currentProfile, profiles.profiles],
+		() =>
+			profilesManager.profiles?.find((profile) => profile.id === currentProfile) ??
+			null,
+		[currentProfile, profilesManager.profiles],
 	);
 
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
-	const hasNoVaults = profiles.profiles.length === 0;
+	const hasNoVaults = profilesManager.profiles.length === 0;
 
-	if (currentVaultObject) {
+	// Do not show Splash screen while the user is logging in
+	if (currentVaultObject && currentVaultObject.encryption) {
 		return (
 			<ProfileLoginForm
 				profile={currentVaultObject}
-				onLogin={onOpenProfile}
+				onLogin={onVaultProfile}
 				onPickAnotherProfile={() => onChooseProfile(null)}
 			/>
 		);
 	}
 
+	if (isVaultOpening) return <SplashScreen />;
+
 	if (screen === 'create' || hasNoVaults) {
 		return (
 			<ProfileCreator
 				onCreateProfile={(profile) =>
-					profiles.createProfile(profile).then((newProfile) => {
-						onOpenProfile(newProfile, profile.password ?? undefined).then(
+					profilesManager.createProfile(profile).then((newProfile) => {
+						onVaultProfile(newProfile, profile.password ?? undefined).then(
 							console.warn,
 						);
 					})
@@ -74,14 +124,16 @@ export const VaultScreenManager = ({
 		<ProfilesForm
 			title="Choose the profile"
 			controls={
-				<Button
-					variant="accent"
-					size="lg"
-					w="100%"
-					onClick={() => setScreen('create')}
-				>
-					Create new profile
-				</Button>
+				<>
+					<Button
+						variant="accent"
+						size="lg"
+						w="100%"
+						onClick={() => setScreen('create')}
+					>
+						Create new profile
+					</Button>
+				</>
 			}
 		>
 			<NestedList
@@ -93,7 +145,7 @@ export const VaultScreenManager = ({
 					overflow: 'auto',
 					border: '1px solid',
 				}}
-				items={profiles.profiles.map((profile) => ({
+				items={(profilesManager.profiles ?? []).map((profile) => ({
 					id: profile.id,
 					content: (
 						<HStack
@@ -109,7 +161,7 @@ export const VaultScreenManager = ({
 								onChooseProfile(profile.id);
 
 								if (profile.encryption === null) {
-									onOpenProfile(profile);
+									onVaultProfile(profile);
 								}
 
 								telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_SELECTED);
