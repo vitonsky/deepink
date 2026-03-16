@@ -17,10 +17,20 @@ export const useWorkspaceTags = () => {
 		let isCanceled = false;
 
 		const updateTags = () =>
-			tagsRegistry.getTags().then((tags) => {
-				if (isCanceled) return;
-				dispatch(workspaceActions.setTags({ tags }));
-			});
+			tagsRegistry
+				.getTags()
+				.then((tags) => {
+					if (isCanceled) return;
+					dispatch(workspaceActions.setTags({ tags }));
+				})
+				.catch((error) => {
+					console.error(error);
+					dispatch(
+						workspaceActions.setWorkspaceLoadingError({
+							errorMessage: 'Workspace tags loading error',
+						}),
+					);
+				});
 
 		updateTags();
 
