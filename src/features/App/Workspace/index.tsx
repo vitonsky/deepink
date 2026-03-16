@@ -1,4 +1,4 @@
-import React, { createContext, FC, useMemo } from 'react';
+import React, { createContext, FC, ReactNode, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
@@ -11,7 +11,6 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -32,6 +31,9 @@ export interface WorkspaceProps {
 	profile: ProfileContainer;
 }
 
+/**
+ * Loads tags and restores previous workspace state
+ */
 const WorkspaceInitializer = () => {
 	useWorkspaceTags();
 	useRestoreWorkspace();
@@ -41,10 +43,61 @@ const WorkspaceInitializer = () => {
 
 /**
  * Manage one workspace
+ * Sets up providers and services for a workspace
  */
-export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
+export const WorkspaceContainer: FC<WorkspaceProps & { children?: ReactNode }> = ({
+	profile,
+	children,
+}) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
+	const workspaceData = useWorkspaceData();
+
+	if (!workspace) return null;
+
+	return (
+		<WorkspaceProvider
+			{...workspace}
+			notesApi={{
+				openNote: (note: INote, focus = true) => {
+					dispatch(workspacesApi.addOpenedNote({ ...workspaceData, note }));
+					if (focus) {
+						dispatch(
+							workspacesApi.setActiveNote({
+								...workspaceData,
+								noteId: note.id,
+							}),
+						);
+					}
+				},
+				noteUpdated: (note: INote) =>
+					dispatch(
+						workspacesApi.updateOpenedNote({
+							...workspaceData,
+							note,
+						}),
+					),
+				noteClosed: (noteId: string) =>
+					dispatch(
+						workspacesApi.removeOpenedNote({
+							...workspaceData,
+							noteId,
+						}),
+					),
+			}}
+		>
+			<WorkspaceInitializer />
+			<WorkspaceServices />
+
+			{children}
+		</WorkspaceProvider>
+	);
+};
+
+/**
+ * Renders workspace UI
+ */
+export const Workspace = () => {
 	const workspaceData = useWorkspaceData();
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
@@ -59,71 +112,25 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
-	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
-
 	return (
-		<>
-			{workspace ? (
-				<WorkspaceProvider
-					{...workspace}
-					notesApi={{
-						openNote: (note: INote, focus = true) => {
-							dispatch(
-								workspacesApi.addOpenedNote({ ...workspaceData, note }),
-							);
-							if (focus) {
-								dispatch(
-									workspacesApi.setActiveNote({
-										...workspaceData,
-										noteId: note.id,
-									}),
-								);
-							}
-						},
-						noteUpdated: (note: INote) =>
-							dispatch(
-								workspacesApi.updateOpenedNote({
-									...workspaceData,
-									note,
-								}),
-							),
-						noteClosed: (noteId: string) =>
-							dispatch(
-								workspacesApi.removeOpenedNote({
-									...workspaceData,
-									noteId,
-								}),
-							),
-					}}
-				>
-					<WorkspaceInitializer />
-					<WorkspaceServices />
-
-					{isWorkspaceLoaded && (
-						<Box
-							data-workspace={workspaceName}
-							sx={{
-								display: isVisibleWorkspace ? 'flex' : 'none',
-								flexDirection: 'column',
-								flexGrow: '100',
-								width: '100%',
-								height: '100vh',
-								maxWidth: '100%',
-								maxHeight: '100%',
-								backgroundColor: 'surface.background',
-							}}
-						>
-							<WorkspaceModalProvider
-								isVisible={isVisibleWorkspace ?? false}
-							>
-								<MainScreen />
-								<WorkspaceStatusBarItems />
-								<SettingsWindow />
-							</WorkspaceModalProvider>
-						</Box>
-					)}
-				</WorkspaceProvider>
-			) : null}
-		</>
+		<Box
+			data-workspace={workspaceName}
+			sx={{
+				display: isVisibleWorkspace ? 'flex' : 'none',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				backgroundColor: 'surface.background',
+			}}
+		>
+			<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
+				<MainScreen />
+				<WorkspaceStatusBarItems />
+				<SettingsWindow />
+			</WorkspaceModalProvider>
+		</Box>
 	);
 };

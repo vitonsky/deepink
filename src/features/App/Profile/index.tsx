@@ -6,6 +6,7 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
+import { useIsSplashVisible } from '@features/SplashScreen/useIsSplashVisible';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
@@ -22,7 +23,7 @@ import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/w
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
-import { Workspace, WorkspaceContext } from '../Workspace';
+import { Workspace, WorkspaceContainer, WorkspaceContext } from '../Workspace';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { useVaultState } from './useVaultState';
@@ -137,10 +138,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
 	const isWorkspaceReady = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
+	const isSplashVisible = useIsSplashVisible(!isWorkspaceReady, 500);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{!isWorkspaceReady && <SplashScreen />}
+			{isSplashVisible && <SplashScreen />}
+
 			{workspaces.length > 0 && <ProfileServices />}
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
@@ -149,7 +152,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId: profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<Workspace profile={currentProfile} />
+							<WorkspaceContainer profile={currentProfile}>
+								{!isSplashVisible && <Workspace />}
+							</WorkspaceContainer>
+
 							<ProfileStatusBar />
 							{isDevMode && (
 								<ToggleSQLConsole
