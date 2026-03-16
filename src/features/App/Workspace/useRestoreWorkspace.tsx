@@ -41,8 +41,8 @@ export const useRestoreWorkspace = () => {
 			WorkspaceStateScheme,
 		);
 
-		Promise.all([workspaceState.get(), workspaceConfig.get()]).then(
-			async ([state, workspaceConfig]) => {
+		Promise.all([workspaceState.get(), workspaceConfig.get()])
+			.then(async ([state, workspaceConfig]) => {
 				// Restore workspace state if it exists
 				if (state) {
 					dispatch(
@@ -88,7 +88,14 @@ export const useRestoreWorkspace = () => {
 						isConfigLoaded: true,
 					}),
 				);
-			},
-		);
+			})
+			.catch((error) => {
+				console.error(error);
+				dispatch(
+					workspaceActions.setWorkspaceLoadingError({
+						errorMessage: 'Workspace restoring error',
+					}),
+				);
+			});
 	}, [dispatch, workspaceActions, workspaceFiles, notesRegistry, isTagsLoaded]);
 };

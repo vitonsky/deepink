@@ -65,6 +65,7 @@ export const createWorkspaceObject = (workspace: {
 		isFiltersLoaded: false,
 		isOpenedNotesLoaded: false,
 	},
+	loadingError: null,
 
 	activeNote: null,
 	recentlyClosedNotes: [],
@@ -115,6 +116,7 @@ export type WorkspaceData = {
 	id: string;
 	name: string;
 	loadingStatus: LoadingStatus;
+	loadingError: string | null;
 
 	/**
 	 * Defines were workspace opened by user or not
@@ -260,6 +262,9 @@ export const profilesSlice = createSlice({
 			workspace.touched = true;
 
 			profile.activeWorkspace = workspaceId;
+
+			// Reset error to allow re-initialization when workspace is re-selected
+			workspace.loadingError = null;
 		},
 
 		setWorkspaceLoadingStatus: (
@@ -272,6 +277,18 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.loadingStatus = { ...workspace.loadingStatus, ...status };
+		},
+
+		setWorkspaceLoadingError: (
+			state,
+			{
+				payload: { profileId, workspaceId, errorMessage },
+			}: PayloadAction<WorkspaceScoped<{ errorMessage: string | null }>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.loadingError = errorMessage;
 		},
 
 		setActiveNote: (

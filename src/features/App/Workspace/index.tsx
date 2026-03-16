@@ -11,6 +11,7 @@ import {
 	selectWorkspaceName,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectWorkspaceLoadingError } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -18,6 +19,7 @@ import { SettingsWindow } from '../Settings/SettingsWindow';
 import { useRestoreWorkspace } from './useRestoreWorkspace';
 import { useWorkspace } from './useWorkspace';
 import { useWorkspaceTags } from './useWorkspaceTags';
+import { WorkspaceLoadError } from './WorkspaceLoadError';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
@@ -53,6 +55,8 @@ export const WorkspaceContainer: FC<WorkspaceProps & { children?: ReactNode }> =
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 
+	const workspaceLoadingError = useWorkspaceSelector(selectWorkspaceLoadingError);
+
 	if (!workspace) return null;
 
 	return (
@@ -86,7 +90,8 @@ export const WorkspaceContainer: FC<WorkspaceProps & { children?: ReactNode }> =
 					),
 			}}
 		>
-			<WorkspaceInitializer />
+			{/* Component unmounted on error to reset all effects, re-mounting on error clearance triggers a fresh restore attempt */}
+			{!workspaceLoadingError && <WorkspaceInitializer />}
 			<WorkspaceServices />
 
 			{children}
@@ -112,6 +117,8 @@ export const Workspace = () => {
 	const isVisibleWorkspace =
 		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
 
+	const workspaceLoadingError = useWorkspaceSelector(selectWorkspaceLoadingError);
+
 	return (
 		<Box
 			data-workspace={workspaceName}
@@ -127,9 +134,15 @@ export const Workspace = () => {
 			}}
 		>
 			<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
-				<MainScreen />
-				<WorkspaceStatusBarItems />
-				<SettingsWindow />
+				{workspaceLoadingError ? (
+					<WorkspaceLoadError />
+				) : (
+					<>
+						<MainScreen />
+						<WorkspaceStatusBarItems />
+						<SettingsWindow />
+					</>
+				)}
 			</WorkspaceModalProvider>
 		</Box>
 	);
