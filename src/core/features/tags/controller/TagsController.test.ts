@@ -1,4 +1,4 @@
-import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 
 import { TAG_ERROR_CODE, TagsController } from './TagsController';
@@ -6,7 +6,7 @@ import { TAG_ERROR_CODE, TagsController } from './TagsController';
 const FAKE_WORKSPACE_ID = getUUID();
 
 describe('manage tags', () => {
-	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
+	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
 
 	test('tags can be added', async () => {
 		const db = await getDB();
@@ -436,7 +436,7 @@ describe('manage tags', () => {
 });
 
 describe('manage attachments', () => {
-	const { getDB } = makeAutoClosedDB({ closeHook: afterEach, clearFS: true });
+	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
 
 	const FAKE_NOTE_ID = getUUID();
 

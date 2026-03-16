@@ -2,9 +2,10 @@
 import { createEvent } from 'effector';
 import { Query } from 'nano-queries';
 import { z } from 'zod';
-import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { DBTypes, qb } from '@utils/db/query-builder';
-import { wrapDB } from '@utils/db/wrapDB';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { DBTypes, qb } from '@core/storage/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
 
 import tagsQuery from './selectTagsWithResolvedNames.sql';
 import { IResolvedTag, ITag } from '..';
@@ -100,7 +101,8 @@ export class TagsController {
 	private readonly db;
 	private readonly workspace;
 	private readonly onChanged;
-	constructor(db: PGLiteDatabase, workspace: string) {
+
+	constructor(db: ManagedDatabase<SQLiteDB>, workspace: string) {
 		this.db = db;
 		this.workspace = workspace;
 		this.onChanged = createEvent<ChangeEvent>();
@@ -112,15 +114,15 @@ export class TagsController {
 	}
 
 	/**
-	 * Returns tags  list
+	 * Returns tags list.
 	 */
 	public async getTags(): Promise<IResolvedTag[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
+		const rows = await db.query(
 			qb.line(
-				tagsQuery,
-				qb.sql`JOIN (SELECT id, ctid FROM tags) s ON t.id = s.id WHERE workspace_id=${this.workspace} ORDER BY s.ctid`,
+				qb.raw(tagsQuery),
+				qb.sql`JOIN (SELECT id, rowid FROM tags) s ON t.id = s.id WHERE workspace_id=${this.workspace} ORDER BY s.rowid`,
 			),
 			RowScheme,
 		);
@@ -133,100 +135,94 @@ export class TagsController {
 
 		let lastId: string | null = null;
 
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
-
-			let resolvedTagName: string;
-			if (!parent) {
-				resolvedTagName = name;
-			} else {
-				// find parent resolved name
-				const {
-					rows: [parentTag],
-				} = await db.query(
-					selectResolvedTags(this.workspace, {
-						where: [qb.sql`id = ${parent}`],
-						limit: 1,
-					}),
-					RowScheme,
-				);
-				// If the parent tag is not found in the database, the tag cannot be created
-				if (!parentTag)
-					throw new TagControllerError(
-						`Parent tag ${parent} does not exist`,
-						TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST,
-					);
-				resolvedTagName = `${parentTag.resolvedName}/${name}`;
-			}
-
-			// Check tag uniqueness
-			const {
-				rows: [duplicateTag],
-			} = await db.query(
+		const db = wrapSQLite(this.db.get());
+		let resolvedTagName: string;
+		if (!parent) {
+			resolvedTagName = name;
+		} else {
+			// find parent resolved name
+			const [parentTag] = await db.query(
 				selectResolvedTags(this.workspace, {
-					where: [qb.sql`resolved_name = ${resolvedTagName}`],
+					where: [qb.sql`id = ${parent}`],
 					limit: 1,
 				}),
 				RowScheme,
 			);
-			if (duplicateTag) {
+
+			// If the parent tag is not found in the database, the tag cannot be created
+			if (!parentTag)
 				throw new TagControllerError(
-					`Tag ${duplicateTag.resolvedName} already exists`,
-					TAG_ERROR_CODE.DUPLICATE,
+					`Parent tag ${parent} does not exist`,
+					TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST,
 				);
-			}
 
-			const resolvedTagSegments = resolvedTagName.split('/');
+			resolvedTagName = `${parentTag.resolvedName}/${name}`;
+		}
 
-			// Build an array of all path variants to find existing tags that match exactly this one
-			// 'foo/bar/baz' - ['foo', 'foo/bar', 'foo/bar/baz']
-			// The found tag allows detecting non-existing segments from resolvedTagSegments and creating only those
-			const resolvedTagVariants = resolvedTagSegments.map((_, index, segments) =>
-				segments.slice(0, index + 1).join('/'),
+		// Check tag uniqueness
+		const [duplicateTag] = await db.query(
+			selectResolvedTags(this.workspace, {
+				where: [qb.sql`resolved_name = ${resolvedTagName}`],
+				limit: 1,
+			}),
+			RowScheme,
+		);
+		if (duplicateTag) {
+			throw new TagControllerError(
+				`Tag ${duplicateTag.resolvedName} already exists`,
+				TAG_ERROR_CODE.DUPLICATE,
 			);
-			const {
-				rows: [rootTag],
-			} = await db.query(
-				selectResolvedTags(this.workspace, {
-					where: [qb.sql`resolved_name IN (${qb.values(resolvedTagVariants)})`],
-					order: qb.sql`LENGTH(resolved_name) DESC`,
-					limit: 1,
-				}),
-				RowScheme,
+		}
+
+		const resolvedTagSegments = resolvedTagName.split('/');
+
+		// Build an array of all path variants to find existing tags that match exactly this one
+		// 'foo/bar/baz' - ['foo', 'foo/bar', 'foo/bar/baz']
+		// The found tag allows detecting non-existing segments from resolvedTagSegments and creating only those
+		const resolvedTagVariants = resolvedTagSegments.map((_, index, segments) =>
+			segments.slice(0, index + 1).join('/'),
+		);
+		const [rootTag] = await db.query(
+			selectResolvedTags(this.workspace, {
+				where: [qb.sql`resolved_name IN (${qb.values(resolvedTagVariants)})`],
+				order: qb.sql`LENGTH(resolved_name) DESC`,
+				limit: 1,
+			}),
+			RowScheme,
+		);
+
+		// If parent was provided, at least one existing segment root must be found
+		if (!rootTag && parent !== null)
+			throw new Error('Parent tag provided but root tag not founded');
+
+		// For newly created tags with no root or parent yet, parentTagId is set to null
+		const parentTagId = rootTag ? rootTag.id : null;
+		const segmentsForCreation = rootTag
+			? resolvedTagSegments.slice(rootTag.resolvedName.split('/').length)
+			: resolvedTagSegments;
+
+		for (let idx = 0; idx < segmentsForCreation.length; idx++) {
+			const segmentName = segmentsForCreation[idx];
+			const segmentParent = idx === 0 ? parentTagId : lastId;
+
+			// SQLite 3.35+ supports RETURNING
+			const [newTag] = await db.query(
+				qb.sql`INSERT INTO tags (workspace_id, name, parent) VALUES (${qb.values([
+					this.workspace,
+					segmentName,
+					segmentParent,
+				])}) RETURNING id`,
+				z.object({ id: z.string() }),
 			);
 
-			// If parent was provided, at least one existing segment root must be found
-			if (!rootTag && parent !== null)
-				throw new Error('Parent tag provided but root tag not founded');
-
-			// For newly created tags with no root or parent yet, parentTagId is set to null
-			const parentTagId = rootTag ? rootTag.id : null;
-			const segmentsForCreation = rootTag
-				? resolvedTagSegments.slice(rootTag.resolvedName.split('/').length)
-				: resolvedTagSegments;
-
-			for (let idx = 0; idx < segmentsForCreation.length; idx++) {
-				const name = segmentsForCreation[idx];
-				const parent = idx === 0 ? parentTagId : lastId;
-
-				const {
-					rows: [newTag],
-				} = await db.query(
-					qb.sql`INSERT INTO tags ("workspace_id", "name", "parent") VALUES (${qb.values(
-						[this.workspace, name, parent],
-					)}) RETURNING id`,
-					z.object({ id: z.string() }),
-				);
-				lastId = newTag.id;
-			}
-		});
+			lastId = newTag.id as string | null;
+		}
 
 		if (!lastId) {
 			throw new Error("Can't get id of inserted row");
 		}
 
 		this.onChanged('tags');
-
 		return lastId;
 	}
 
@@ -244,7 +240,7 @@ export class TagsController {
 			);
 		}
 
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
 		await db.query(
 			qb.sql`UPDATE tags SET name=${name}, parent=${parent} WHERE id=${id} AND workspace_id=${this.workspace}`,
@@ -254,52 +250,50 @@ export class TagsController {
 	}
 
 	public async delete(id: string): Promise<void> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows: tagsIdForRemove } = await db.query(
+		// Recursive CTE to collect all descendant tag IDs
+		const tagsIdForRemove = await db.query(
 			qb.sql`WITH RECURSIVE tagTree AS (
-				SELECT
-					id, parent, name, id AS root
+				SELECT id, parent, name, id AS root
 				FROM tags
-				UNION ALL
-				SELECT
-					t.id, t.parent, t.name, t2.root
+				WHERE id = ${id}
+			  UNION ALL
+				SELECT t.id, t.parent, t.name, t2.root
 				FROM tags t
-				INNER JOIN tagTree t2
-				ON t.parent = t2.id
+				INNER JOIN tagTree t2 ON t.parent = t2.id
 			)
 			SELECT id FROM tagTree WHERE root IN (${id}) GROUP BY id`,
 			z.object({ id: z.string() }).transform((row) => row.id),
 		);
 
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
-
-			await db.query(
-				qb.sql`DELETE FROM tags WHERE workspace_id=${
-					this.workspace
-				} AND id IN (${qb.values(tagsIdForRemove)})`,
-			);
-			await db.query(
-				qb.sql`DELETE FROM attached_tags WHERE workspace_id=${
-					this.workspace
-				} AND source IN (${qb.values(tagsIdForRemove)})`,
-			);
-		});
+		await db.query(
+			qb.sql`DELETE FROM tags WHERE workspace_id=${
+				this.workspace
+			} AND id IN (${qb.values(tagsIdForRemove)})`,
+		);
+		await db.query(
+			qb.sql`DELETE FROM attached_tags WHERE workspace_id=${
+				this.workspace
+			} AND source IN (${qb.values(tagsIdForRemove)})`,
+		);
 
 		this.onChanged('tags');
 	}
 
 	/**
-	 * Returns tags attached to a entity
+	 * Returns tags attached to an entity
 	 */
 	public async getAttachedTags(target: string): Promise<IResolvedTag[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
+		const rows = await db.query(
 			qb.line(
-				tagsQuery,
-				qb.sql`WHERE t.id IN (SELECT source FROM attached_tags WHERE workspace_id=${this.workspace} AND target=${target})`,
+				qb.raw(tagsQuery),
+				qb.sql`WHERE t.id IN (
+					SELECT source FROM attached_tags
+					WHERE workspace_id=${this.workspace} AND target=${target}
+				)`,
 			),
 			RowScheme,
 		);
@@ -311,23 +305,21 @@ export class TagsController {
 		// attach only unique tags
 		const uniqueTags = Array.from(new Set(tags));
 
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
+		const db = wrapSQLite(this.db.get());
 
+		await db.query(
+			qb.sql`DELETE FROM attached_tags WHERE workspace_id=${this.workspace} AND target=${target}`,
+		);
+
+		if (uniqueTags.length > 0) {
 			await db.query(
-				qb.sql`DELETE FROM attached_tags WHERE workspace_id=${this.workspace} AND target=${target}`,
+				qb.sql`INSERT INTO attached_tags(workspace_id,source,target) VALUES ${qb.set(
+					uniqueTags.map((tagId) =>
+						qb.values([this.workspace, tagId, target]).withParenthesis(),
+					),
+				)}`,
 			);
-
-			if (tags.length > 0) {
-				await db.query(
-					qb.sql`INSERT INTO attached_tags(workspace_id,source,target) VALUES ${qb.set(
-						uniqueTags.map((tagId) =>
-							qb.values([this.workspace, tagId, target]).withParenthesis(),
-						),
-					)}`,
-				);
-			}
-		});
+		}
 
 		this.onChanged('noteTags');
 	}

@@ -1,0 +1,45 @@
+import { IFileController } from '@core/features/files';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+
+export const makeAutoClosedSQLiteDB = ({
+	file,
+	closeHook = afterAll,
+	clearFS,
+}: {
+	file?: IFileController;
+	closeHook?: (callback: () => Promise<void>) => void;
+	clearFS?: boolean;
+} = {}) => {
+	if (!file) {
+		file = createFileControllerMock();
+	}
+
+	let dbPromise: Promise<ManagedDatabase<SQLiteDB>> | null = null;
+
+	// Close and cleanup DB
+	closeHook(async () => {
+		if (!dbPromise) return;
+
+		const db = await dbPromise;
+		await db.close();
+		dbPromise = null;
+
+		if (clearFS) {
+			file = createFileControllerMock();
+		}
+	});
+
+	return {
+		getDB() {
+			if (!dbPromise) {
+				if (!file) throw new Error('File is not set');
+				dbPromise = openSQLite(file);
+			}
+
+			return dbPromise;
+		},
+	};
+};
