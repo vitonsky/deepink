@@ -47,7 +47,7 @@ export const useRestoreWorkspace = ({
 		);
 
 		Promise.all([workspaceState.get(), workspaceConfig.get()])
-			.then(async ([state, workspaceConfig]) => {
+			.then(async ([state, config]) => {
 				// Restore workspace state if it exists
 				if (state) {
 					dispatch(
@@ -76,12 +76,12 @@ export const useRestoreWorkspace = ({
 					}
 				}
 
-				// Restore config if it exist
-				if (workspaceConfig) {
+				// Restore config if it exists
+				if (config) {
 					dispatch(
 						workspaceActions.setWorkspaceNoteTemplateConfig({
-							title: workspaceConfig.newNote.title,
-							tags: workspaceConfig.newNote.tags,
+							title: config.newNote.title,
+							tags: config.newNote.tags,
 						}),
 					);
 				}

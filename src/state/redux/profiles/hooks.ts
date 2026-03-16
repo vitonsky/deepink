@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { useProfileControls } from '@features/App/Profile';
-import { useWorkspaceContext } from '@features/App/Workspace';
+import { useWorkspaceContext } from '@features/App/Workspace/WorkspaceContainer';
 import { ActionCreatorWithPayload, Selector } from '@reduxjs/toolkit';
 
 import { useAppSelector } from '../hooks';
