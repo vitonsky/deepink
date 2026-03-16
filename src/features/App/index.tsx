@@ -19,19 +19,17 @@ import { WorkspaceManager } from './WorkspaceManager';
 openSQLite(new FileController('/db', new InMemoryFS())).then((db) => {
 	console.log('Spawned SQLite in worker', db);
 
-	(window as any).db = db;
+	(window as any).db = db.get();
 	(window as any).time = async () => {
-		const time = await db.query(
-			`SELECT strftime('%Y-%m-%d %H:%M:%S', datetime('now')) as now`,
-		);
+		const time = await db.get().query(`SELECT now() as now`);
 		console.log('Time', time[0]);
 	};
 
-	db.onChange((operation, database, table, rowId) => {
+	db.get().onChange((operation, database, table, rowId) => {
 		console.log(`Client side: ${operation} on ${database}.${table} row ${rowId}`);
 	});
 	(window as any).dbInsert = async () => {
-		return db.query(`INSERT INTO workspaces(name) VALUES('test')`);
+		return db.get().query(`INSERT INTO workspaces(name) VALUES('test')`);
 	};
 });
 

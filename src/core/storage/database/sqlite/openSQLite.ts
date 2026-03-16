@@ -1,4 +1,8 @@
+import { createEvent } from 'effector';
 import { IFileController } from '@core/features/files';
+
+import { ManagedDatabase } from '../ManagedDatabase';
+import { SQLiteDB } from '.';
 
 export const openSQLite = async (file: IFileController) => {
 	const getInitData = async () => {
@@ -17,5 +21,29 @@ export const openSQLite = async (file: IFileController) => {
 				},
 			);
 
-	return db;
+	const onChanged = createEvent();
+	db.onChange(() => onChanged());
+
+	let isOpened = true;
+	return new ManagedDatabase<SQLiteDB>(
+		{
+			getDatabase() {
+				return db;
+			},
+			async getData() {
+				const data = await db.export();
+				return data.buffer as ArrayBuffer;
+			},
+
+			isOpened() {
+				return isOpened;
+			},
+			close() {
+				isOpened = false;
+				return db.close();
+			},
+			onChanged: onChanged,
+		},
+		file,
+	);
 };
