@@ -37,14 +37,16 @@ export const WorkspaceLoadError = () => {
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<VStack maxW="400px" minW="350px" gap="2rem">
-				<Text as="h3" fontSize="20px">
+				<Text fontSize="1.3rem" fontWeight="600">
 					Workspace failed to load
 				</Text>
 
 				<Text color="typography.base">
-					An error occurred while loading workspace. The workspace data may be
-					corrupted. Try loading another workspace or create a new one
+					Something went wrong while loading your workspace. The workspace data
+					may be corrupted. Try opening a different workspace or create a new
+					one to continue.
 				</Text>
+
 				<VStack
 					alignItems="start"
 					color="typography.additional"
@@ -57,7 +59,7 @@ export const WorkspaceLoadError = () => {
 						gap="0.5rem"
 						color="typography.additional"
 					>
-						<Text>Choose another workspace</Text>
+						<Text>Choose another workspace to continue working</Text>
 
 						<HStack w="100%" marginTop="auto">
 							<Select
@@ -96,7 +98,7 @@ export const WorkspaceLoadError = () => {
 						gap="0.5rem"
 						color="typography.additional"
 					>
-						<Text>Create workspace</Text>
+						<Text>Create a new workspace</Text>
 						<Button
 							w="100%"
 							onClick={() => {
@@ -119,7 +121,7 @@ export const WorkspaceLoadError = () => {
 					color="typography.additional"
 				>
 					<Text>Close current vault</Text>
-					<Button w="100%" onClick={profileControls.close}>
+					<Button w="100%" onClick={() => profileControls.close()}>
 						<Text>Close vault</Text>
 					</Button>
 				</VStack>
