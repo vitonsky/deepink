@@ -9,7 +9,7 @@ CREATE TABLE files (
   workspace_id TEXT NOT NULL REFERENCES workspaces(id),
   name         TEXT NOT NULL,
   mimetype     TEXT NOT NULL,
-  created_at   TEXT NOT NULL DEFAULT (now())
+  created_at   INTEGER NOT NULL DEFAULT (timestamp('now'))
 );
 
 CREATE TABLE tags (
@@ -28,9 +28,9 @@ CREATE TABLE notes (
   bookmarked       INTEGER NOT NULL DEFAULT 0,
   visible          INTEGER NOT NULL DEFAULT 1,
   history_disabled INTEGER NOT NULL DEFAULT 0,
-  created_at       TEXT NOT NULL DEFAULT (now()),
-  updated_at       TEXT NOT NULL DEFAULT (now()),
-  deleted_at       TEXT
+  created_at       INTEGER NOT NULL DEFAULT (timestamp('now')),
+  updated_at       INTEGER NOT NULL DEFAULT (timestamp('now')),
+  deleted_at       INTEGER
 );
 
 CREATE TABLE note_versions (
@@ -38,7 +38,7 @@ CREATE TABLE note_versions (
   note_id    TEXT NOT NULL REFERENCES notes(id),
   title      TEXT NOT NULL,
   text       TEXT NOT NULL,
-  created_at TEXT NOT NULL DEFAULT (now())
+  created_at INTEGER NOT NULL DEFAULT (timestamp('now'))
 );
 
 CREATE TABLE attached_tags (
@@ -58,7 +58,7 @@ CREATE TABLE attachments (
 CREATE TABLE schema_migrations (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   name        TEXT NOT NULL,
-  executed_at TEXT NOT NULL DEFAULT (now())
+  executed_at INTEGER NOT NULL DEFAULT (timestamp('now'))
 );
 
 -- Indexes

@@ -12,6 +12,13 @@ test('Test custom functions', async () => {
 		{ now: expect.any(String) },
 	]);
 
+	await expect(db.get().query(`SELECT timestamp('now') as time`)).resolves.toEqual([
+		{ time: expect.any(Number) },
+	]);
+	await expect(
+		db.get().query(`SELECT timestamp('10/10/2000') as time`),
+	).resolves.toEqual([{ time: 971128800000 }]);
+
 	await expect(db.get().query(`SELECT gen_random_uuid() as uuid`)).resolves.toEqual([
 		{ uuid: expect.any(String) },
 	]);

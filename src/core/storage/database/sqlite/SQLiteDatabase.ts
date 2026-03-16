@@ -45,6 +45,9 @@ export class SQLiteDatabase implements SQLiteDB {
 			// Custom functions
 			db.create_function('gen_random_uuid', () => uuidv4());
 			db.create_function('now', () => new Date().toISOString());
+			db.create_function('timestamp', (date: string) =>
+				(date && date !== 'now' ? new Date(date) : new Date()).getTime(),
+			);
 
 			return db;
 		});
