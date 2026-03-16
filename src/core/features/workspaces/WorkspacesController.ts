@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { qb } from '@utils/db/query-builder';
-import { wrapDB } from '@utils/db/wrapDB';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { qb } from '@core/storage/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
 
 const workspaceType = z.object({
 	id: z.string(),
@@ -10,16 +11,14 @@ const workspaceType = z.object({
 
 export class WorkspacesController {
 	private readonly db;
-	constructor(db: PGLiteDatabase) {
+	constructor(db: ManagedDatabase<SQLiteDB>) {
 		this.db = db;
 	}
 
 	public async create({ name }: { name: string }) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const {
-			rows: [{ id }],
-		} = await db.query(
+		const [{ id }] = await db.query(
 			qb.sql`INSERT INTO workspaces ("name") VALUES (${name}) RETURNING id`,
 			z.object({ id: z.string() }),
 		);
@@ -28,12 +27,10 @@ export class WorkspacesController {
 	}
 
 	public async get(id: string) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const {
-			rows: [info],
-		} = await db.query(
-			qb.sql`SELECT * FROM workspaces WHERE id=${id} ORDER BY ctid`,
+		const [info] = await db.query(
+			qb.sql`SELECT * FROM workspaces WHERE id=${id} ORDER BY rowid`,
 			workspaceType,
 		);
 
@@ -41,7 +38,7 @@ export class WorkspacesController {
 	}
 
 	public async update(id: string, options: { name?: string }) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
 		if (Object.values(options).length === 0) return;
 
@@ -55,15 +52,13 @@ export class WorkspacesController {
 	}
 
 	public async getList() {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(qb.sql`SELECT * FROM workspaces`, workspaceType);
-
-		return rows;
+		return await db.query(qb.sql`SELECT * FROM workspaces`, workspaceType);
 	}
 
 	public async delete(ids: string[]) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
 		await db.query(
 			qb.sql`DELETE FROM workspaces WHERE id IN (${qb.values(ids)})`,
