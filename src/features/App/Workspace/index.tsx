@@ -1,11 +1,15 @@
-import React, { createContext, FC, ReactNode, useMemo } from 'react';
+import React, { createContext, FC, PropsWithChildren, useCallback, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	useWorkspaceActions,
+	useWorkspaceData,
+	useWorkspaceSelector,
+} from '@state/redux/profiles/hooks';
 import {
 	selectActiveWorkspaceInfo,
 	selectWorkspaceName,
@@ -37,8 +41,22 @@ export interface WorkspaceProps {
  * Loads tags and restores previous workspace state
  */
 const WorkspaceInitializer = () => {
-	useWorkspaceTags();
-	useRestoreWorkspace();
+	const dispatch = useAppDispatch();
+	const workspaceActions = useWorkspaceActions();
+
+	const handleError = useCallback(
+		(errorMessage: string) => {
+			dispatch(
+				workspaceActions.setWorkspaceLoadingError({
+					errorMessage,
+				}),
+			);
+		},
+		[dispatch, workspaceActions],
+	);
+
+	useWorkspaceTags({ onError: handleError });
+	useRestoreWorkspace({ onError: handleError });
 
 	return null;
 };
@@ -47,7 +65,7 @@ const WorkspaceInitializer = () => {
  * Manage one workspace
  * Sets up providers and services for a workspace
  */
-export const WorkspaceContainer: FC<WorkspaceProps & { children?: ReactNode }> = ({
+export const WorkspaceContainer: FC<PropsWithChildren<WorkspaceProps>> = ({
 	profile,
 	children,
 }) => {
@@ -90,8 +108,10 @@ export const WorkspaceContainer: FC<WorkspaceProps & { children?: ReactNode }> =
 					),
 			}}
 		>
-			{/* Component unmounted on error to reset all effects, re-mounting on error clearance triggers a fresh restore attempt */}
+			{/* Component unmounted on error to reset all effects, 
+			re-mounting on error clearance triggers a fresh restore attempt */}
 			{!workspaceLoadingError && <WorkspaceInitializer />}
+
 			<WorkspaceServices />
 
 			{children}

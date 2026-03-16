@@ -17,7 +17,11 @@ import {
 import { WorkspaceStateScheme } from './services/useWorkspaceStateSync';
 import { useNotesRegistry } from './WorkspaceProvider';
 
-export const useRestoreWorkspace = () => {
+export const useRestoreWorkspace = ({
+	onError,
+}: {
+	onError: (message: string) => void;
+}) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
@@ -26,9 +30,9 @@ export const useRestoreWorkspace = () => {
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
 	const isTagsLoaded = useWorkspaceSelector(selectIsTagsLoaded);
-
 	useEffect(() => {
-		// Don’t restore filters until tags are loaded, or selectedTagId will be ignored
+		// Must wait for tags to be loaded first,
+		// otherwise selectedTagId from state will be ignored
 		if (!isTagsLoaded) return;
 
 		const workspaceConfig = new StateFile(
@@ -91,11 +95,14 @@ export const useRestoreWorkspace = () => {
 			})
 			.catch((error) => {
 				console.error(error);
-				dispatch(
-					workspaceActions.setWorkspaceLoadingError({
-						errorMessage: 'Workspace restoring error',
-					}),
-				);
+				onError(error.message);
 			});
-	}, [dispatch, workspaceActions, workspaceFiles, notesRegistry, isTagsLoaded]);
+	}, [
+		dispatch,
+		workspaceActions,
+		workspaceFiles,
+		notesRegistry,
+		isTagsLoaded,
+		onError,
+	]);
 };

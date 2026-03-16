@@ -7,7 +7,7 @@ import { useTagsRegistry } from './WorkspaceProvider';
 /**
  * Loads tags and subscribes to tag changes
  */
-export const useWorkspaceTags = () => {
+export const useWorkspaceTags = ({ onError }: { onError: (message: string) => void }) => {
 	const workspaceActions = useWorkspaceActions();
 	const dispatch = useAppDispatch();
 	const tagsRegistry = useTagsRegistry();
@@ -25,11 +25,7 @@ export const useWorkspaceTags = () => {
 				})
 				.catch((error) => {
 					console.error(error);
-					dispatch(
-						workspaceActions.setWorkspaceLoadingError({
-							errorMessage: 'Workspace tags loading error',
-						}),
-					);
+					onError(error.message);
 				});
 
 		updateTags();
@@ -39,5 +35,5 @@ export const useWorkspaceTags = () => {
 			isCanceled = true;
 			cleanup();
 		};
-	}, [dispatch, tagsRegistry, workspaceActions]);
+	}, [dispatch, onError, tagsRegistry, workspaceActions]);
 };
