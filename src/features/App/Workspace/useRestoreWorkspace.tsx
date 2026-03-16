@@ -10,6 +10,7 @@ import {
 	useWorkspaceSelector,
 } from '@state/redux/profiles/hooks';
 import {
+	NOTES_VIEW,
 	selectIsTagsLoaded,
 	WorkspaceConfigScheme,
 } from '@state/redux/profiles/profiles';
@@ -57,7 +58,7 @@ export const useRestoreWorkspace = ({
 						}),
 					);
 
-					// Restore notes
+					// Restore opened notes
 					const { openedNoteIds, activeNoteId } = state;
 					if (openedNoteIds && openedNoteIds.length > 0) {
 						const notes = await notesRegistry.getById(openedNoteIds);
@@ -73,6 +74,29 @@ export const useRestoreWorkspace = ({
 							);
 						}
 					}
+
+					// Restore notes list
+					const noteIds = await notesRegistry.query({
+						tags: state.selectedTagId !== null ? [state.selectedTagId] : [],
+						sort: { by: 'updatedAt', order: 'desc' },
+						search: state.search
+							? {
+									text: state.search,
+								}
+							: undefined,
+						meta: {
+							isDeleted: state.view === NOTES_VIEW.BIN,
+							// show archived notes only in archive view
+							// but do not filter by the archived flag in bin view
+							...(state.view !== NOTES_VIEW.BIN && {
+								isArchived: state.view === NOTES_VIEW.ARCHIVE,
+							}),
+							...(state.view === NOTES_VIEW.BOOKMARK && {
+								isBookmarked: true,
+							}),
+						},
+					});
+					dispatch(workspaceActions.setNoteIds({ noteIds }));
 				}
 
 				// Restore config if it exist
@@ -90,6 +114,7 @@ export const useRestoreWorkspace = ({
 						isOpenedNotesLoaded: true,
 						isFiltersLoaded: true,
 						isConfigLoaded: true,
+						isNoteIdsLoaded: true,
 					}),
 				);
 			})
