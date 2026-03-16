@@ -1,7 +1,6 @@
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openSQLite } from './openSQLite';
-import scheme from './scheme.sql';
 import { qb } from './utils/query-builder';
 import { wrapSQLite } from './utils/wrapDB';
 
@@ -26,7 +25,6 @@ describe('SQLite Database persistence', () => {
 		onTestFinished(() => db.close());
 
 		const wrappedDb = wrapSQLite(db.get());
-		await wrappedDb.query(qb.raw(scheme));
 
 		await expect(
 			wrappedDb.query(qb.sql`INSERT INTO workspaces(name) VALUES('foo')`),
