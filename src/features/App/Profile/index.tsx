@@ -1,12 +1,12 @@
 import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
+import { useDebounce } from 'use-debounce';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
-import { useIsSplashVisible } from '@features/SplashScreen/useIsSplashVisible';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
@@ -137,8 +137,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
-	const isWorkspaceReady = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
-	const isSplashVisible = useIsSplashVisible(!isWorkspaceReady, 500);
+	const isDataLoaded = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
+	const [isSplashVisible] = useDebounce(!isDataLoaded, 500, { leading: true });
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
@@ -153,6 +153,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					>
 						<StatusBarProvider>
 							<WorkspaceContainer profile={currentProfile}>
+								{/* Render workspace only after the Splash screen is hidden */}
 								{!isSplashVisible && <Workspace />}
 							</WorkspaceContainer>
 
