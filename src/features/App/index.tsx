@@ -11,7 +11,7 @@ import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { VaultScreenManager } from './VaultScreenManager';
+import { VaultEntryScreens } from './VaultEntryScreens';
 
 export const App: FC = () => {
 	const files = useFilesStorage();
@@ -53,7 +53,7 @@ export const App: FC = () => {
 	const isLoading =
 		!profilesList.isProfilesLoaded || !recentVault.isLoaded || isOpeningRecentVault;
 
-	const [isSplashVisible] = useDebounce(isLoading, 600);
+	const [isSplashVisible] = useDebounce(isLoading, 500);
 	if (isSplashVisible) {
 		return <SplashScreen />;
 	}
@@ -77,7 +77,7 @@ export const App: FC = () => {
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<Box maxW="500px" minW="350px" padding="1rem">
-				<VaultScreenManager
+				<VaultEntryScreens
 					currentProfile={currentProfileId}
 					onChooseProfile={setCurrentProfileId}
 					profiles={profileContainers}

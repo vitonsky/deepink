@@ -40,7 +40,10 @@ export const defaultVaultNames = [
 	'Idea lab',
 ];
 
-export const VaultScreenManager = ({
+/**
+ * Controls which vault entry screen is shown
+ */
+export const VaultEntryScreens = ({
 	currentProfile,
 	profiles,
 	profilesManager,
