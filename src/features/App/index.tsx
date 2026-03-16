@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { wrap } from 'comlink';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
+import { FileController } from '@core/features/files/FileController';
+import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
-import { SQLiteDB } from '@core/storage/database/sqlite';
-import SQLWorker from '@core/storage/database/sqlite/SQLiteDatabase.worker';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
@@ -16,17 +16,17 @@ import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
 
-const db = wrap<SQLiteDB>(new SQLWorker());
+openSQLite(new FileController('/db', new InMemoryFS())).then((db) => {
+	console.log('Spawned SQLite in worker', db);
 
-console.log('Database in worker:', db);
-
-(window as any).db = db;
-(window as any).time = async () => {
-	const time = await db.query(
-		`SELECT strftime('%Y-%m-%d %H:%M:%S', datetime('now')) as now`,
-	);
-	console.log('Time', time[0]);
-};
+	(window as any).db = db;
+	(window as any).time = async () => {
+		const time = await db.query(
+			`SELECT strftime('%Y-%m-%d %H:%M:%S', datetime('now')) as now`,
+		);
+		console.log('Time', time[0]);
+	};
+});
 
 export const App: FC = () => {
 	const files = useFilesStorage();

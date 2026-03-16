@@ -5,3 +5,7 @@ export interface SQLiteDB {
 	export(): Promise<Uint8Array>;
 	close(): Promise<void>;
 }
+
+export interface SQLiteDBWorker extends SQLiteDB {
+	init(data?: ArrayLike<number> | Buffer | null): Promise<void>;
+}

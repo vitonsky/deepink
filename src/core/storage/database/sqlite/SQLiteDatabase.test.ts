@@ -1,10 +1,13 @@
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+
+import { openSQLite } from './openSQLite';
 import scheme from './scheme.sql';
-import { SQLiteDatabase } from './SQLiteDatabase';
 import { qb } from './utils/query-builder';
 import { wrapSQLite } from './utils/wrapDB';
 
 test('sqlite query', async () => {
-	const db = new SQLiteDatabase();
+	const file = createFileControllerMock();
+	const db = await openSQLite(file);
 
 	const wrappedDb = wrapSQLite(db);
 	await wrappedDb.query(qb.raw(scheme));

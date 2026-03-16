@@ -26,8 +26,6 @@ const loadSQLite = async () => {
 	if (typeof process !== 'undefined') return sqlite();
 
 	const { default: sqliteWasmUrl } = await import('sql.js/dist/sql-wasm.wasm');
-	console.log('WASM path', sqliteWasmUrl);
-
 	return sqlite({ locateFile: () => sqliteWasmUrl });
 };
 
