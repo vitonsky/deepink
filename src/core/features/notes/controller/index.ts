@@ -59,6 +59,11 @@ export type NotesControllerFetchOptions = {
 	deletedAt?: Partial<DateRange>;
 
 	/**
+	 * Filter by update date
+	 */
+	updatedAt?: Partial<DateRange>;
+
+	/**
 	 * Sorting options
 	 */
 	sort?: {

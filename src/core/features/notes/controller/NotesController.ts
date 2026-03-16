@@ -98,6 +98,7 @@ function getFetchQuery(
 		tags = [],
 		meta: { isDeleted, ...meta } = {},
 		deletedAt = {},
+		updatedAt = {},
 		sort,
 	}: Omit<NotesControllerFetchOptions, 'search'> = {},
 ) {
@@ -149,6 +150,13 @@ function getFetchQuery(
 	}
 	if (deletedAt.to) {
 		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to.getTime()}`);
+	}
+
+	if (updatedAt.from) {
+		filterQuery.push(qb.sql`updated_at >= ${updatedAt.from.getTime()}`);
+	}
+	if (updatedAt.to) {
+		filterQuery.push(qb.sql`updated_at <= ${updatedAt.to.getTime()}`);
 	}
 
 	// Sort
