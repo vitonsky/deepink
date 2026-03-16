@@ -35,6 +35,14 @@ export class SQLiteDatabase implements SQLiteDB {
 		this.db = loadSQLite().then((sqlite) => {
 			const db = new sqlite.Database(data);
 
+			// Notify updates
+			db.updateHook((operation, database, table, rowId) => {
+				this.onChangeCallbacks.forEach((callback) =>
+					callback(operation, database, table, rowId),
+				);
+			});
+
+			// Custom functions
 			db.create_function('gen_random_uuid', () => uuidv4());
 			db.create_function('now', () => new Date().toISOString());
 
@@ -61,5 +69,13 @@ export class SQLiteDatabase implements SQLiteDB {
 		const result = db.exec(query, params);
 
 		return queryResultsToParams(result);
+	}
+
+	private readonly onChangeCallbacks = new Set<sqlite.UpdateHookCallback>();
+	onChange(callback: sqlite.UpdateHookCallback) {
+		this.onChangeCallbacks.add(callback);
+		return () => {
+			this.onChangeCallbacks.delete(callback);
+		};
 	}
 }

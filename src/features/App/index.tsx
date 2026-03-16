@@ -26,6 +26,13 @@ openSQLite(new FileController('/db', new InMemoryFS())).then((db) => {
 		);
 		console.log('Time', time[0]);
 	};
+
+	db.onChange((operation, database, table, rowId) => {
+		console.log(`Client side: ${operation} on ${database}.${table} row ${rowId}`);
+	});
+	(window as any).dbInsert = async () => {
+		return db.query(`INSERT INTO workspaces(name) VALUES('test')`);
+	};
 });
 
 export const App: FC = () => {

@@ -1,5 +1,5 @@
-import { wrap } from 'comlink';
-import { BindParams } from 'sql.js';
+import { proxy, wrap } from 'comlink';
+import { BindParams, UpdateHookCallback } from 'sql.js';
 
 import SQLWorker from './SQLiteDatabase.worker';
 import { SQLiteDB, SQLiteDBWorker } from '.';
@@ -24,5 +24,21 @@ export class SQLiteDatabaseWorker implements SQLiteDB {
 	async close() {
 		const db = await this.db;
 		return db.close();
+	}
+
+	onChange(callback: UpdateHookCallback): () => void {
+		let isUnsubscribed = false;
+		let cleanupPromise: Promise<() => void> | null = null;
+
+		this.db.then((db) => {
+			if (isUnsubscribed) return;
+
+			cleanupPromise = db.onChange(proxy(callback));
+		});
+
+		return () => {
+			isUnsubscribed = true;
+			if (cleanupPromise) cleanupPromise.then((cleanup) => cleanup());
+		};
 	}
 }

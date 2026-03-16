@@ -1,4 +1,4 @@
-import { expose } from 'comlink';
+import { expose, proxy } from 'comlink';
 
 import { SQLiteDatabase } from './SQLiteDatabase';
 import { SQLiteDBWorker } from '.';
@@ -29,5 +29,10 @@ expose({
 		if (!db)
 			throw new Error('Database instance is not created yet. Call init() first');
 		return db.close(...args);
+	},
+	onChange(callback) {
+		if (!db)
+			throw new Error('Database instance is not created yet. Call init() first');
+		return proxy(db.onChange(callback));
 	},
 } satisfies SQLiteDBWorker);

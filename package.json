@@ -36,6 +36,7 @@
 		"update-icons": "tsx ./scripts/icons/build.ts",
 		"upgrade": "npm-check-updates -u",
 		"release-preview": "npm version prerelease --preid=preview && git push --follow-tags",
+		"postinstall": "patch-package",
 		"prepare": "husky install"
 	},
 	"devDependencies": {
@@ -92,6 +93,7 @@
 		"node-loader": "^2.1.0",
 		"npm-check-updates": "^19.3.2",
 		"p-limit": "^7.2.0",
+		"patch-package": "^8.0.1",
 		"prettier": "^3.8.1",
 		"sharp": "^0.34.5",
 		"sharp-ico": "^0.1.5",
