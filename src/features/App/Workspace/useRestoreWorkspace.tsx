@@ -74,29 +74,6 @@ export const useRestoreWorkspace = ({
 							);
 						}
 					}
-
-					// Restore notes list
-					const noteIds = await notesRegistry.query({
-						tags: state.selectedTagId !== null ? [state.selectedTagId] : [],
-						sort: { by: 'updatedAt', order: 'desc' },
-						search: state.search
-							? {
-									text: state.search,
-								}
-							: undefined,
-						meta: {
-							isDeleted: state.view === NOTES_VIEW.BIN,
-							// show archived notes only in archive view
-							// but do not filter by the archived flag in bin view
-							...(state.view !== NOTES_VIEW.BIN && {
-								isArchived: state.view === NOTES_VIEW.ARCHIVE,
-							}),
-							...(state.view === NOTES_VIEW.BOOKMARK && {
-								isBookmarked: true,
-							}),
-						},
-					});
-					dispatch(workspaceActions.setNoteIds({ noteIds }));
 				}
 
 				// Restore config if it exist
@@ -107,6 +84,33 @@ export const useRestoreWorkspace = ({
 							tags: workspaceConfig.newNote.tags,
 						}),
 					);
+				}
+
+				// Restore notes list
+				const tags =
+					state && state.selectedTagId !== null ? [state.selectedTagId] : [];
+				const noteIds = await notesRegistry.query({
+					tags,
+					sort: { by: 'updatedAt', order: 'desc' },
+					search: state?.search
+						? {
+								text: state.search,
+							}
+						: undefined,
+					meta: {
+						isDeleted: state?.view === NOTES_VIEW.BIN,
+						// show archived notes only in archive view
+						// but do not filter by the archived flag in bin view
+						...(state?.view !== NOTES_VIEW.BIN && {
+							isArchived: state?.view === NOTES_VIEW.ARCHIVE,
+						}),
+						...(state?.view === NOTES_VIEW.BOOKMARK && {
+							isBookmarked: true,
+						}),
+					},
+				});
+				if (noteIds.length > 0) {
+					dispatch(workspaceActions.setNoteIds({ noteIds }));
 				}
 
 				dispatch(

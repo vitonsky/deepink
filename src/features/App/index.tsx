@@ -11,7 +11,7 @@ import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { VaultEntryScreens } from './VaultEntryScreens';
+import { VaultEntryScreenManager } from './VaultEntryScreenManager';
 
 export const App: FC = () => {
 	const files = useFilesStorage();
@@ -22,7 +22,7 @@ export const App: FC = () => {
 
 	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
 
-	// Automatically open an unencrypted vault
+	// Open recent vault
 	const recentVault = useRecentProfile(config);
 	const [isOpeningRecentVault, setIsOpeningRecentVault] = useState(false);
 	useEffect(
@@ -42,7 +42,7 @@ export const App: FC = () => {
 
 				profileContainers
 					.openProfile({ profile: vault })
-					.then(() => setIsOpeningRecentVault(false));
+					.finally(() => setIsOpeningRecentVault(false));
 			}
 		},
 		// Depends only of loading status and run only once
@@ -77,7 +77,7 @@ export const App: FC = () => {
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<Box maxW="500px" minW="350px" padding="1rem">
-				<VaultEntryScreens
+				<VaultEntryScreenManager
 					currentProfile={currentProfileId}
 					onChooseProfile={setCurrentProfileId}
 					profiles={profileContainers}

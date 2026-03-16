@@ -24,7 +24,7 @@ export type OnPickProfile = (
 	password?: string,
 ) => Promise<PickProfileResponse>;
 
-export type VaultScreenManagerProps = {
+export type VaultEntryScreensProps = {
 	profiles: ProfilesApi;
 	profilesManager: ProfilesListApi;
 	currentProfile: string | null;
@@ -41,40 +41,40 @@ export const defaultVaultNames = [
 ];
 
 /**
- * Controls which vault entry screen is shown
+ * Controls which vault entry screen is shown: login form, vault creation, or vault picker
  */
-export const VaultEntryScreens = ({
+export const VaultEntryScreenManager = ({
 	currentProfile,
 	profiles,
 	profilesManager,
 	onChooseProfile,
-}: VaultScreenManagerProps) => {
+}: VaultEntryScreensProps) => {
 	const [isVaultOpening, setIsVaultOpening] = useState(false);
 
-	const onVaultProfile: OnPickProfile = useCallback(
+	const onOpenVault: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
 			setIsVaultOpening(true);
 
-			// Profiles with no password
-			if (!profile.encryption) {
-				await profiles.openProfile({ profile }, true);
-
-				setIsVaultOpening(false);
-				return { status: 'ok' };
-			}
-
 			try {
+				// Profiles with no password
+				if (!profile.encryption) {
+					await profiles.openProfile({ profile }, true);
+					return { status: 'ok' };
+				}
+
 				// Profiles with password
-				if (password === undefined)
-					return { status: 'error', message: 'Enter password' };
+				try {
+					if (password === undefined)
+						return { status: 'error', message: 'Enter password' };
 
-				await profiles.openProfile({ profile, password }, true);
+					await profiles.openProfile({ profile, password }, true);
 
-				return { status: 'ok' };
-			} catch (err) {
-				console.error(err);
+					return { status: 'ok' };
+				} catch (err) {
+					console.error(err);
 
-				return { status: 'error', message: 'Invalid password' };
+					return { status: 'error', message: 'Invalid password' };
+				}
 			} finally {
 				setIsVaultOpening(false);
 			}
@@ -92,12 +92,12 @@ export const VaultEntryScreens = ({
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
 	const hasNoVaults = profilesManager.profiles.length === 0;
 
-	// Do not show Splash screen while the user is logging in
+	// SplashScreen is skipped here, ProfileLoginForm should remain visible while the vault is opening
 	if (currentVaultObject && currentVaultObject.encryption) {
 		return (
 			<ProfileLoginForm
 				profile={currentVaultObject}
-				onLogin={onVaultProfile}
+				onLogin={onOpenVault}
 				onPickAnotherProfile={() => onChooseProfile(null)}
 			/>
 		);
@@ -110,7 +110,7 @@ export const VaultEntryScreens = ({
 			<ProfileCreator
 				onCreateProfile={(profile) =>
 					profilesManager.createProfile(profile).then((newProfile) => {
-						onVaultProfile(newProfile, profile.password ?? undefined).then(
+						onOpenVault(newProfile, profile.password ?? undefined).then(
 							console.warn,
 						);
 					})
@@ -164,7 +164,7 @@ export const VaultEntryScreens = ({
 								onChooseProfile(profile.id);
 
 								if (profile.encryption === null) {
-									onVaultProfile(profile);
+									onOpenVault(profile);
 								}
 
 								telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_SELECTED);
