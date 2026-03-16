@@ -1,9 +1,13 @@
 import { z } from 'zod';
 import { DebouncedPromises } from '@utils/debounce/DebouncedPromises';
 
+import { AsyncState } from './AsyncState';
 import { IFileController } from '.';
 
-export class StateFile<T extends z.ZodType, D extends z.TypeOf<T> | void> {
+export class StateFile<
+	T extends z.ZodType,
+	D extends z.TypeOf<T> | void,
+> implements AsyncState<z.TypeOf<T>> {
 	constructor(
 		private readonly file: IFileController,
 		private readonly scheme: T,

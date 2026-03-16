@@ -1,0 +1,66 @@
+import { getUUID } from 'src/__tests__/utils/uuid';
+import z from 'zod';
+import { InMemoryFS } from '@core/features/files/InMemoryFS';
+import { StateFile } from '@core/features/files/StateFile';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
+import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+
+import { NotesController } from './NotesController';
+import { NotesTextIndex } from './NotesTextIndex';
+import { NotesTextIndexScanner } from './NotesTextIndexScanner';
+
+const FAKE_WORKSPACE_ID = getUUID();
+
+vi.useFakeTimers();
+
+test('incremental index building', async () => {
+	const db = await openSQLite(createFileControllerMock());
+	onTestFinished(db.close);
+
+	const index = new NotesTextIndex(new InMemoryFS());
+	const notes = new NotesController(db, FAKE_WORKSPACE_ID, index);
+
+	const indexScannerFile = createFileControllerMock();
+	const indexScanner = new NotesTextIndexScanner(
+		notes,
+		index,
+		new StateFile(indexScannerFile, z.object({ lastUpdate: z.number().nullable() })),
+	);
+
+	// Scan for empty notes
+	vi.setSystemTime('01/01/2000 12:00');
+	vi.runAllTimersAsync();
+	await expect(indexScanner.update(), 'No notes to scan').resolves.toBe(0);
+
+	// Add notes and scan
+	vi.setSystemTime('01/01/2001 12:00');
+	vi.runAllTimersAsync();
+	const note1 = await notes.add({ title: '2001', text: 'Dummy text' });
+
+	vi.setSystemTime('01/01/2002 12:00');
+	vi.runAllTimersAsync();
+	await notes.add({ title: '2002', text: 'Dummy text' });
+
+	await expect(indexScanner.update(), 'All notes is now in index').resolves.toBe(2);
+	await expect(notes.get({ search: { text: 'dummy text' } })).resolves.toEqual([
+		expect.objectContaining({ content: expect.objectContaining({ title: '2001' }) }),
+		expect.objectContaining({ content: expect.objectContaining({ title: '2002' }) }),
+	]);
+
+	// Can't find texts that is not in index yet
+	vi.setSystemTime('01/01/2003 12:00');
+	vi.runAllTimersAsync();
+	await notes.update(note1, { title: '2005', text: 'Updated demo text' });
+
+	await expect(notes.get({ search: { text: 'updated demo' } })).resolves.toEqual([]);
+
+	// Can find the texts after index
+	await expect(indexScanner.update(), 'All notes is now in index').resolves.toBe(1);
+	await expect(notes.get({ search: { text: 'updated demo' } })).resolves.toEqual([
+		expect.objectContaining({ content: expect.objectContaining({ title: '2005' }) }),
+	]);
+
+	// Deletion automatically clear cache
+	await notes.delete([note1]);
+	await expect(notes.get({ search: { text: 'updated demo' } })).resolves.toEqual([]);
+});

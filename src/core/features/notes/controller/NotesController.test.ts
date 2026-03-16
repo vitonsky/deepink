@@ -1,6 +1,8 @@
 /* eslint-disable @cspell/spellchecker */
 import { getUUID } from 'src/__tests__/utils/uuid';
+import z from 'zod';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
+import { StateFile } from '@core/features/files/StateFile';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
@@ -668,7 +670,16 @@ describe('Notes search', () => {
 	test('Update lexemes', async () => {
 		const db = await dbPromise;
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const indexScanner = new NotesTextIndexScanner(registry, index);
+
+		const indexScannerFile = createFileControllerMock();
+		const indexScanner = new NotesTextIndexScanner(
+			registry,
+			index,
+			new StateFile(
+				indexScannerFile,
+				z.object({ lastUpdate: z.number().nullable() }),
+			),
+		);
 		await expect(indexScanner.update()).resolves.toBeGreaterThan(0);
 	});
 
