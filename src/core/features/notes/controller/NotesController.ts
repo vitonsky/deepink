@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-conversion */
 /* eslint-disable @cspell/spellchecker */
 /* eslint-disable camelcase */
 import { Query } from 'nano-queries';
 import { z } from 'zod';
-import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { DBTypes, qb } from '@utils/db/query-builder';
-import { wrapDB } from '@utils/db/wrapDB';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { DBTypes, qb } from '@core/storage/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
 
 import { INote, INoteContent, NoteId } from '..';
 import {
@@ -20,13 +20,13 @@ const RowScheme = z
 		id: z.string(),
 		title: z.string(),
 		text: z.string(),
-		created_at: z.date(),
-		updated_at: z.date(),
-		history_disabled: z.boolean(),
-		visible: z.boolean(),
-		deleted_at: z.date().nullable(),
-		archived: z.boolean(),
-		bookmarked: z.boolean(),
+		created_at: z.coerce.date(),
+		updated_at: z.coerce.date(),
+		history_disabled: z.coerce.boolean(),
+		visible: z.coerce.boolean(),
+		deleted_at: z.coerce.date().nullable(),
+		archived: z.coerce.boolean(),
+		bookmarked: z.coerce.boolean(),
 	})
 	.transform(
 		({
@@ -64,19 +64,19 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 
 		switch (key) {
 			case 'isSnapshotsDisabled':
-				fields['history_disabled'] = Boolean(value);
+				fields['history_disabled'] = Number(value);
 				break;
 			case 'isVisible':
-				fields['visible'] = Boolean(value);
+				fields['visible'] = Number(value);
 				break;
 			case 'isDeleted':
-				fields['deleted_at'] = value ? new Date() : null;
+				fields['deleted_at'] = value ? new Date().getTime() : null;
 				break;
 			case 'isArchived':
-				fields['archived'] = Boolean(value);
+				fields['archived'] = Number(value);
 				break;
 			case 'isBookmarked':
-				fields['bookmarked'] = Boolean(value);
+				fields['bookmarked'] = Number(value);
 				break;
 		}
 	}
@@ -192,10 +192,10 @@ function getFetchQuery(
 	}
 
 	if (deletedAt.from) {
-		filterQuery.push(qb.sql`deleted_at >= ${deletedAt.from}`);
+		filterQuery.push(qb.sql`deleted_at >= ${deletedAt.from.getTime()}`);
 	}
 	if (deletedAt.to) {
-		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to}`);
+		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to.getTime()}`);
 	}
 
 	// Sort
@@ -239,36 +239,39 @@ function getFetchQuery(
 export class NotesController implements INotesController {
 	private readonly db;
 	private readonly workspace;
-	constructor(db: PGLiteDatabase, workspace: string) {
+	constructor(db: ManagedDatabase<SQLiteDB>, workspace: string) {
 		this.db = db;
 		this.workspace = workspace;
 	}
 
 	public async getById(ids: NoteId[]): Promise<INote[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
-			qb.sql`SELECT * FROM notes
-				JOIN unnest(ARRAY[${qb.values(ids)}]::uuid[]) WITH ORDINALITY AS ordering(id, position) ON notes.id = ordering.id
-				WHERE workspace_id = ${this.workspace} ORDER BY ordering.position`,
+		const rows = await db.query(
+			qb.sql`SELECT * FROM notes WHERE workspace_id = ${this.workspace} AND id IN ${qb.values(ids).withParenthesis()}`,
 			RowScheme,
 		);
 
-		if (rows.length !== ids.length) {
+		const rowsMap = new Map(rows.map((note) => [note.id, note]));
+		const sortedNotes = ids
+			.values()
+			.map((id) => rowsMap.get(id))
+			.filter((note) => note !== undefined)
+			.toArray();
+
+		if (sortedNotes.length !== ids.length) {
 			console.warn(
-				`Found notes count does not match the requested count. Expected: ${ids.length}; Found: ${rows.length}`,
+				`Found notes count does not match the requested count. Expected: ${ids.length}; Found: ${sortedNotes.length}`,
 			);
 		}
 
-		return rows;
+		return sortedNotes;
 	}
 
 	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const {
-			rows: [{ count }],
-		} = await db.query(
+		const [{ count }] = await db.query(
 			getFetchQuery(
 				{ select: qb.sql`COUNT(*) as count`, workspace: this.workspace },
 				query,
@@ -280,112 +283,85 @@ export class NotesController implements INotesController {
 	}
 
 	public async query(query: NotesControllerFetchOptions = {}): Promise<NoteId[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
+		return await db.query(
 			getFetchQuery({ select: qb.sql`id`, workspace: this.workspace }, query),
 			z.object({ id: z.string() }).transform((row) => row.id),
 		);
-
-		return rows;
 	}
 
 	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
+		return await db.query(
 			getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query),
 			RowScheme,
 		);
-
-		return rows;
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
-		const creationTime = new Date();
+		const creationTime = Date.now();
 
 		// Insert data
 		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
 
-		return this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
+		const db = wrapSQLite(this.db.get());
 
-			const {
-				rows: [id],
-			} = await db.query(
-				qb.sql`INSERT INTO notes (${qb.set([
-					qb.sql`"workspace_id","title","text","created_at","updated_at"`,
-					...(metaEntries ? metaEntries.map(([key]) => key) : []),
-				])}) VALUES (${qb.values([
-					this.workspace,
-					note.title,
-					note.text,
-					creationTime,
-					creationTime,
-					...metaEntries.map(([_key, value]) => value),
-				])}) RETURNING id`,
-				z.object({ id: z.string() }).transform(({ id }) => id),
-			);
+		const [id] = await db.query(
+			qb.sql`INSERT INTO notes (${qb.set([
+				qb.sql`"workspace_id","title","text","created_at","updated_at"`,
+				...(metaEntries ? metaEntries.map(([key]) => key) : []),
+			])}) VALUES (${qb.values([
+				this.workspace,
+				note.title,
+				note.text,
+				creationTime,
+				creationTime,
+				...metaEntries.map(([_key, value]) => value),
+			])}) RETURNING id`,
+			z.object({ id: z.string() }).transform(({ id }) => id),
+		);
 
-			return id;
-		});
+		return id;
 	}
 
 	public async update(id: string, updatedNote: INoteContent) {
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
+		const db = wrapSQLite(this.db.get());
 
-			const result = await db.query(
-				qb.line(
-					'UPDATE notes SET',
-					qb.values({
-						title: updatedNote.title,
-						text: updatedNote.text,
-						updated_at: new Date(),
-					}),
-					qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
-				),
-			);
-
-			if (!result.affectedRows || result.affectedRows < 1) {
-				throw new Error('Note did not updated');
-			}
-		});
+		await db.query(
+			qb.line(
+				'UPDATE notes SET',
+				qb.values({
+					title: updatedNote.title,
+					text: updatedNote.text,
+					updated_at: Date.now(),
+				}),
+				qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
+			),
+		);
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
 		if (!ids.length) return;
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
 
-			const { affectedRows = 0 } = await db.query(
-				qb.sql`DELETE FROM notes WHERE workspace_id=${
-					this.workspace
-				} AND id IN (${qb.values(ids)})`,
-			);
+		const db = wrapSQLite(this.db.get());
 
-			if (affectedRows !== ids.length) {
-				console.warn(
-					`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
-				);
-			}
-		});
+		await db.query(
+			qb.sql`DELETE FROM notes WHERE workspace_id=${
+				this.workspace
+			} AND id IN (${qb.values(ids)})`,
+		);
 	}
 
 	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
 		if (ids.length === 0) return;
 
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { affectedRows = 0 } = await db.query(
+		await db.query(
 			qb.sql`UPDATE notes SET ${qb.values(formatNoteMeta(meta))}
 				WHERE workspace_id=${this.workspace} AND id IN (${qb.values(ids)})`,
 		);
-
-		if (affectedRows !== ids.length) {
-			console.warn(
-				`Not match updated entries length. Expected: ${ids.length}; Updated: ${affectedRows}`,
-			);
-		}
 	}
 }
