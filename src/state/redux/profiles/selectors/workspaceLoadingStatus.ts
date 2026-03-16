@@ -23,7 +23,5 @@ export const selectIsWorkspaceLoaded = createWorkspaceSelector(
 
 export const selectWorkspaceLoadingError = createWorkspaceSelector(
 	[selectWorkspaceRootSafe],
-	({ loadingError: restoreError }) => {
-		return restoreError;
-	},
+	({ loadingError }) => loadingError,
 );

@@ -109,9 +109,7 @@ export const useRestoreWorkspace = ({
 						}),
 					},
 				});
-				if (noteIds.length > 0) {
-					dispatch(workspaceActions.setNoteIds({ noteIds }));
-				}
+				dispatch(workspaceActions.setNoteIds({ noteIds }));
 
 				dispatch(
 					workspaceActions.setWorkspaceLoadingStatus({
