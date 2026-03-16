@@ -265,7 +265,7 @@ export const profilesSlice = createSlice({
 
 			profile.activeWorkspace = workspaceId;
 
-			// Reset error to allow re-initialization when workspace is re-selected
+			// Reset error to allow re-initialization on workspace change
 			workspace.loadingError = null;
 		},
 

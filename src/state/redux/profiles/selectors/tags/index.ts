@@ -24,8 +24,7 @@ export const selectTags = createWorkspaceSelector([selectWorkspaceRoot], (worksp
 export const selectIsTagsLoaded = createWorkspaceSelector(
 	[selectWorkspaceRoot],
 	(workspace) => {
-		if (!workspace) return [];
-
+		if (!workspace) return false;
 		return workspace.tags.isTagsLoaded;
 	},
 );
