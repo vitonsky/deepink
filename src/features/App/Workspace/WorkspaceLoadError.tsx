@@ -42,9 +42,9 @@ export const WorkspaceLoadError = () => {
 				</Text>
 
 				<Text color="typography.base">
-					Something went wrong while loading your workspace. The workspace data
-					may be corrupted. Try opening a different workspace or create a new
-					one to continue.
+					Something went wrong while loading workspace. The workspace data may
+					be corrupted. Try opening a different workspace or create a new one to
+					continue.
 				</Text>
 
 				<VStack
