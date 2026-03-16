@@ -1,4 +1,3 @@
-/* eslint-disable @cspell/spellchecker */
 /* eslint-disable camelcase */
 import { Query } from 'nano-queries';
 import { z } from 'zod';
@@ -7,6 +6,7 @@ import { SQLiteDB } from '@core/storage/database/sqlite';
 import { DBTypes, qb } from '@core/storage/database/sqlite/utils/query-builder';
 import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
 
+import { NotesTextIndex } from './NotesTextIndex';
 import { INote, INoteContent, NoteId } from '..';
 import {
 	INotesController,
@@ -97,10 +97,9 @@ function getFetchQuery(
 		page,
 		tags = [],
 		meta: { isDeleted, ...meta } = {},
-		search,
 		deletedAt = {},
 		sort,
-	}: NotesControllerFetchOptions = {},
+	}: Omit<NotesControllerFetchOptions, 'search'> = {},
 ) {
 	if (page !== undefined && page < 1)
 		throw new TypeError('Page value must not be less than 1');
@@ -117,52 +116,6 @@ function getFetchQuery(
 	const joinQuery: Query<DBTypes>[] = [];
 	const filterQuery: Query<DBTypes>[] = [];
 	const orderQuery: Query<DBTypes>[] = [];
-
-	// Search
-	if (search) {
-		// In case a user input contains typos, tsquery will not match,
-		// so we extends a query and adds a few alternative lexemes to each
-		// Alternative lexemes is extracted from real texts in DB
-		// We find the top N of most similar lexemes via trgm
-		withQuery.push({
-			name: 'user_tokens',
-			query: qb.sql`SELECT regexp_split_to_table(lower(unaccent(${search.text})), '\s+') AS token`,
-		});
-		withQuery.push({
-			name: 'token_alternatives',
-			query: qb.sql`SELECT t.token,
-					l.word AS candidate
-				FROM user_tokens t
-				LEFT JOIN lexemes l
-				ON l.word % t.token
-				LIMIT 5`,
-		});
-		withQuery.push({
-			name: 'grouped_alternatives',
-			query: qb.sql`SELECT
-				plainto_tsquery('simple', string_agg(token, ' ')) AS token,
-				to_tsquery('simple', string_agg(candidate, ' | ')) AS or_group
-				FROM token_alternatives
-				GROUP BY token`,
-		});
-		withQuery.push({
-			name: 'expanded_tsquery',
-			query: qb.sql` SELECT
-				tsquery_and_agg(token) AS original_query,
-				tsquery_and_agg(or_group) AS query
-				FROM grouped_alternatives ga`,
-		});
-
-		// Filter by expanded query to get more results
-		joinQuery.push(qb.sql`CROSS JOIN expanded_tsquery et`);
-		filterQuery.push(qb.sql`text_tsv @@ et.query`);
-
-		// Order by original query match first
-		orderQuery.push(qb.sql`ts_rank_cd(text_tsv, et.original_query) DESC`);
-
-		// Order not matched results by extended query
-		orderQuery.push(qb.sql`ts_rank_cd(text_tsv, et.query) DESC`);
-	}
 
 	// Filtering
 	if (tags.length > 0) {
@@ -233,16 +186,28 @@ function getFetchQuery(
 	);
 }
 
+function intersectSets<T>(a: Set<T>, b: Set<T>): Set<T> {
+	// Always iterate over the smaller set for fewer lookups
+	const [smaller, larger] = a.size <= b.size ? [a, b] : [b, a];
+
+	const result = new Set<T>();
+	for (const item of smaller) {
+		if (larger.has(item)) {
+			result.add(item);
+		}
+	}
+	return result;
+}
+
 /**
  * Synced notes registry
  */
 export class NotesController implements INotesController {
-	private readonly db;
-	private readonly workspace;
-	constructor(db: ManagedDatabase<SQLiteDB>, workspace: string) {
-		this.db = db;
-		this.workspace = workspace;
-	}
+	constructor(
+		private readonly db: ManagedDatabase<SQLiteDB>,
+		private readonly workspace: string,
+		private readonly index?: NotesTextIndex,
+	) {}
 
 	public async getById(ids: NoteId[]): Promise<INote[]> {
 		const db = wrapSQLite(this.db.get());
@@ -268,8 +233,50 @@ export class NotesController implements INotesController {
 		return sortedNotes;
 	}
 
+	protected async searchCandidates(
+		query: NotesControllerFetchOptions,
+	): Promise<string[]> {
+		const db = wrapSQLite(this.db.get());
+
+		// Handle simple case
+		if (!query.search || !this.index) {
+			return [];
+		}
+
+		// Iterative fetching
+		const [textMatchCandidates, filtersCandidates] = await Promise.all([
+			this.index.query(query.search.text).then((results) => new Set(results)),
+			db
+				.query(
+					getFetchQuery(
+						{ select: qb.sql`id`, workspace: this.workspace },
+						{ ...query, limit: undefined, page: undefined },
+					),
+					z.object({ id: z.string() }).transform((row) => row.id),
+				)
+				.then((results) => new Set(results)),
+		]);
+
+		const results = intersectSets(textMatchCandidates, filtersCandidates);
+
+		if (query.limit) {
+			const offset =
+				query.page && query.page > 0 ? (query.page - 1) * query.limit : 0;
+			return results.values().drop(offset).take(query.limit).toArray();
+		}
+
+		return Array.from(intersectSets(textMatchCandidates, filtersCandidates));
+	}
+
 	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
 		const db = wrapSQLite(this.db.get());
+
+		if (query.search && this.index)
+			return this.searchCandidates({
+				...query,
+				page: undefined,
+				limit: undefined,
+			}).then((results) => results.length);
 
 		const [{ count }] = await db.query(
 			getFetchQuery(
@@ -285,6 +292,10 @@ export class NotesController implements INotesController {
 	public async query(query: NotesControllerFetchOptions = {}): Promise<NoteId[]> {
 		const db = wrapSQLite(this.db.get());
 
+		if (query.search && this.index) {
+			return this.searchCandidates(query);
+		}
+
 		return await db.query(
 			getFetchQuery({ select: qb.sql`id`, workspace: this.workspace }, query),
 			z.object({ id: z.string() }).transform((row) => row.id),
@@ -292,12 +303,8 @@ export class NotesController implements INotesController {
 	}
 
 	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
-		const db = wrapSQLite(this.db.get());
-
-		return await db.query(
-			getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query),
-			RowScheme,
-		);
+		const ids = await this.query(query);
+		return this.getById(ids);
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
@@ -352,6 +359,12 @@ export class NotesController implements INotesController {
 				this.workspace
 			} AND id IN (${qb.values(ids)})`,
 		);
+
+		if (this.index) {
+			const index = await this.index.createIndexSession();
+			await Promise.all(ids.map((id) => index.remove(id)));
+			await index.commit();
+		}
 	}
 
 	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {

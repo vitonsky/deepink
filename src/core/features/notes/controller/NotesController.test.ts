@@ -1,11 +1,13 @@
 /* eslint-disable @cspell/spellchecker */
+import { Index } from 'flexsearch';
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { LexemesRegistry } from './LexemesRegistry';
 import { NotesController } from './NotesController';
+import { NotesTextIndex } from './NotesTextIndex';
+import { NotesTextIndexScanner } from './NotesTextIndexScanner';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -607,9 +609,11 @@ describe('Notes meta control', () => {
 	});
 });
 
-describe.skip('Notes search', () => {
+describe('Notes search', () => {
 	const dbFile = createFileControllerMock();
 	const dbPromise = openSQLite(dbFile);
+
+	const index = new NotesTextIndex(new Index({ tokenize: 'tolerant' }));
 
 	const texts = [
 		'A fast auburn fox leaped above a sleepy canine',
@@ -663,13 +667,14 @@ describe.skip('Notes search', () => {
 
 	test('Update lexemes', async () => {
 		const db = await dbPromise;
-		const lexemes = new LexemesRegistry(db);
-		await expect(lexemes.index()).resolves.not.toHaveLength(0);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const indexScanner = new NotesTextIndexScanner(registry, index);
+		await expect(indexScanner.update()).resolves.toBeGreaterThan(0);
 	});
 
 	test('Search by text', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID, index);
 
 		await expect(
 			registry.get({ search: { text: 'fox' }, limit: 3 }),
@@ -724,7 +729,7 @@ describe.skip('Notes search', () => {
 
 	test('Search by text and filter by tags', async () => {
 		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const registry = new NotesController(db, FAKE_WORKSPACE_ID, index);
 
 		await expect(
 			registry.get({ search: { text: 'Note' } }),
@@ -787,45 +792,46 @@ describe.skip('Notes search', () => {
 		]);
 	});
 
-	test('Lexemes list can be updated after changes', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const lexemes = new LexemesRegistry(db);
+	// TODO: add tests for index actuality
+	// test.skip('Lexemes list can be updated after changes', async () => {
+	// 	const db = await dbPromise;
+	// 	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+	// 	const lexemes = new LexemesRegistry(db);
 
-		const [note] = await registry.get({ search: { text: 'leaped' }, limit: 1 });
+	// 	const [note] = await registry.get({ search: { text: 'leaped' }, limit: 1 });
 
-		expect(note).not.toBeUndefined();
-		expect(note.content.text, 'Found expected note').toBe(
-			'A fast auburn fox leaped above a sleepy canine',
-		);
+	// 	expect(note).not.toBeUndefined();
+	// 	expect(note.content.text, 'Found expected note').toBe(
+	// 		'A fast auburn fox leaped above a sleepy canine',
+	// 	);
 
-		await expect(
-			lexemes.getList(),
-			'Lexemes list have words of note text',
-		).resolves.toContain('leaped');
-		await expect(
-			lexemes.getList(),
-			'Lexemes list have no a target word for test',
-		).resolves.not.toContain('unique');
+	// 	await expect(
+	// 		lexemes.getList(),
+	// 		'Lexemes list have words of note text',
+	// 	).resolves.toContain('leaped');
+	// 	await expect(
+	// 		lexemes.getList(),
+	// 		'Lexemes list have no a target word for test',
+	// 	).resolves.not.toContain('unique');
 
-		await registry.update(note.id, {
-			title: 'Updated note',
-			text: 'Updated text with unique text',
-		});
-		await expect(lexemes.index()).resolves.not.toHaveLength(0);
-		await expect(lexemes.prune()).resolves.not.toHaveLength(0);
+	// 	await registry.update(note.id, {
+	// 		title: 'Updated note',
+	// 		text: 'Updated text with unique text',
+	// 	});
+	// 	await expect(lexemes.index()).resolves.not.toHaveLength(0);
+	// 	await expect(lexemes.prune()).resolves.not.toHaveLength(0);
 
-		await expect(
-			lexemes.getList(),
-			'Unused lexeme must be deleted',
-		).resolves.not.toContain('leaped');
-		await expect(lexemes.getList(), 'New lexemes must be added').resolves.toContain(
-			'unique',
-		);
+	// 	await expect(
+	// 		lexemes.getList(),
+	// 		'Unused lexeme must be deleted',
+	// 	).resolves.not.toContain('leaped');
+	// 	await expect(lexemes.getList(), 'New lexemes must be added').resolves.toContain(
+	// 		'unique',
+	// 	);
 
-		await expect(
-			registry.get({ search: { text: 'unique text' }, limit: 1 }),
-			'Note can be found by updated text',
-		).resolves.toEqual([expect.objectContaining({ id: note.id })]);
-	});
+	// 	await expect(
+	// 		registry.get({ search: { text: 'unique text' }, limit: 1 }),
+	// 		'Note can be found by updated text',
+	// 	).resolves.toEqual([expect.objectContaining({ id: note.id })]);
+	// });
 });
