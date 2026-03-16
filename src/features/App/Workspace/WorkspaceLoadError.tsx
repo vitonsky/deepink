@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { createSelector } from 'reselect';
-import { Box, Button, Divider, HStack, Select, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Divider, Select, Text, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspaceCreatePopup } from '@features/MainScreen/WorkspacesPanel/WorkspaceCreatePopup';
 import { useTelemetryTracker } from '@features/telemetry';
@@ -37,7 +37,7 @@ export const WorkspaceLoadError = () => {
 	return (
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<VStack maxW="400px" minW="350px" gap="2rem">
-				<Text fontSize="1.3rem" fontWeight="600">
+				<Text fontSize="1.3rem" fontWeight="bold">
 					Workspace failed to load
 				</Text>
 
@@ -53,51 +53,37 @@ export const WorkspaceLoadError = () => {
 					w="100%"
 					gap="1.5rem"
 				>
-					<VStack
-						alignItems="start"
-						w="100%"
-						gap="0.5rem"
-						color="typography.additional"
-					>
+					<VStack alignItems="start" w="100%" gap="0.5rem">
 						<Text>Choose another workspace to continue working</Text>
 
-						<HStack w="100%" marginTop="auto">
-							<Select
-								size="sm"
-								borderRadius="6px"
-								value={workspaceId}
-								onChange={(evt) => {
-									const workspaceId = evt.target.value;
-									dispatch(
-										workspacesApi.setActiveWorkspace({
-											profileId,
-											workspaceId,
-										}),
-									);
+						<Select
+							size="sm"
+							marginTop="auto"
+							borderRadius="6px"
+							value={workspaceId}
+							onChange={(evt) => {
+								const workspaceId = evt.target.value;
+								dispatch(
+									workspacesApi.setActiveWorkspace({
+										profileId,
+										workspaceId,
+									}),
+								);
 
-									telemetry.track(
-										TELEMETRY_EVENT_NAME.WORKSPACE_SELECTED,
-										{
-											totalWorkspacesCount: workspaces.length,
-										},
-									);
-								}}
-							>
-								{workspaces.map((workspace) => (
-									<option key={workspace.id} value={workspace.id}>
-										{workspace.content}
-									</option>
-								))}
-							</Select>
-						</HStack>
+								telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_SELECTED, {
+									totalWorkspacesCount: workspaces.length,
+								});
+							}}
+						>
+							{workspaces.map((workspace) => (
+								<option key={workspace.id} value={workspace.id}>
+									{workspace.content}
+								</option>
+							))}
+						</Select>
 					</VStack>
 
-					<VStack
-						alignItems="start"
-						w="100%"
-						gap="0.5rem"
-						color="typography.additional"
-					>
+					<VStack alignItems="start" w="100%" gap="0.5rem">
 						<Text>Create a new workspace</Text>
 						<Button
 							w="100%"
