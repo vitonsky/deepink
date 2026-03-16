@@ -1,6 +1,6 @@
 /* eslint-disable @cspell/spellchecker */
-import { Index } from 'flexsearch';
 import { getUUID } from 'src/__tests__/utils/uuid';
+import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
@@ -613,7 +613,7 @@ describe('Notes search', () => {
 	const dbFile = createFileControllerMock();
 	const dbPromise = openSQLite(dbFile);
 
-	const index = new NotesTextIndex(new Index({ tokenize: 'tolerant' }));
+	const index = new NotesTextIndex(new InMemoryFS());
 
 	const texts = [
 		'A fast auburn fox leaped above a sleepy canine',
