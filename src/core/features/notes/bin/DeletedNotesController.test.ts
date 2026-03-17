@@ -1,7 +1,7 @@
 import ms from 'ms';
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { Mock } from 'vitest';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from '../controller/NotesController';
@@ -25,7 +25,7 @@ const getNoteIds = async (notes: NotesController) =>
 
 describe('Purge expired notes', () => {
 	test('Purge notes in bin that is deleted longer than retention time', async () => {
-		const db = await openDatabase(dbFile);
+		const db = await openSQLite(dbFile);
 		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
 		const bin = new DeletedNotesController(
 			{ notes: notesController },
@@ -78,7 +78,7 @@ describe('Purge expired notes', () => {
 	});
 
 	test('Modification time is considered when required', async () => {
-		const db = await openDatabase(dbFile);
+		const db = await openSQLite(dbFile);
 		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
 		const bin = new DeletedNotesController(
 			{ notes: notesController },
@@ -126,7 +126,7 @@ describe('Purge expired notes', () => {
 });
 
 test('Empty bin', async () => {
-	const db = await openDatabase(dbFile);
+	const db = await openSQLite(dbFile);
 	const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
 	const bin = new DeletedNotesController(
 		{ notes: notesController },
@@ -183,7 +183,7 @@ describe('Service must delete expired notes', () => {
 		vi.setSystemTime('2020-01-01T00:00:00.000Z');
 
 		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+		const db = await openSQLite(dbFile);
 		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
 		const bin = new DeletedNotesController(
 			{ notes: notesController },
@@ -267,7 +267,7 @@ describe('Service must delete expired notes', () => {
 		vi.setSystemTime('2020-01-01T00:00:00.000Z');
 
 		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+		const db = await openSQLite(dbFile);
 		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
 		const bin = new DeletedNotesController(
 			{ notes: notesController },
@@ -314,7 +314,7 @@ describe('Service must delete expired notes', () => {
 		vi.setSystemTime('2020-01-01T00:00:00.000Z');
 
 		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+		const db = await openSQLite(dbFile);
 		const notesController = new NotesController(db, FAKE_WORKSPACE_ID);
 		const bin = new DeletedNotesController(
 			{ notes: notesController },
