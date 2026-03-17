@@ -19,7 +19,10 @@ import {
 	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+import {
+	selectActiveWorkspaceLoadingError,
+	selectIsActiveWorkspaceLoaded,
+} from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -139,7 +142,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
 	const isDataLoaded = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
-	const [isSplashVisible] = useDebounce(!isDataLoaded, 500, { leading: true });
+	const dataLoadError = useAppSelector(
+		selectActiveWorkspaceLoadingError({ profileId }),
+	);
+	const [isSplashVisible] = useDebounce(!isDataLoaded && !dataLoadError, 500, {
+		leading: true,
+	});
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

@@ -5,13 +5,16 @@ import { createWorkspaceSelector, selectWorkspaceRootSafe } from '../utils';
 
 export const selectIsActiveWorkspaceLoaded = (scope: ProfileScoped) =>
 	createAppSelector(selectActiveWorkspace(scope), (workspace) => {
+		if (!workspace) return false;
+
+		return Object.values(workspace.loadingStatus).every(Boolean);
+	});
+
+export const selectActiveWorkspaceLoadingError = (scope: ProfileScoped) =>
+	createAppSelector(selectActiveWorkspace(scope), (workspace) => {
 		if (!workspace) return null;
 
-		// If an error occurs during loading, it means the loading process has stopped
-		return (
-			workspace.loadingError !== null ||
-			Object.values(workspace.loadingStatus).every(Boolean)
-		);
+		return workspace.loadingError;
 	});
 
 export const selectIsWorkspaceLoaded = createWorkspaceSelector(

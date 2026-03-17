@@ -24,7 +24,7 @@ export type OnPickProfile = (
 	password?: string,
 ) => Promise<PickProfileResponse>;
 
-export type VaultEntryScreensProps = {
+export type VaultEntryScreenManagerProps = {
 	profiles: ProfilesApi;
 	profilesManager: ProfilesListApi;
 	currentProfile: string | null;
@@ -48,7 +48,7 @@ export const VaultEntryScreenManager = ({
 	profiles,
 	profilesManager,
 	onChooseProfile,
-}: VaultEntryScreensProps) => {
+}: VaultEntryScreenManagerProps) => {
 	const [isVaultOpening, setIsVaultOpening] = useState(false);
 
 	const onOpenVault: OnPickProfile = useCallback(

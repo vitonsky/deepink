@@ -12,12 +12,9 @@ import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles'
 import { useProfileControls } from '../Profile';
 
 export const WorkspaceLoadError = () => {
-	const profileControls = useProfileControls();
-
-	const telemetry = useTelemetryTracker();
-
 	const dispatch = useAppDispatch();
-
+	const telemetry = useTelemetryTracker();
+	const profileControls = useProfileControls();
 	const { profileId, workspaceId } = useWorkspaceData();
 
 	const selectWorkspacesWithMemo = useMemo(
@@ -54,7 +51,7 @@ export const WorkspaceLoadError = () => {
 					gap="1.5rem"
 				>
 					<VStack alignItems="start" w="100%" gap="0.5rem">
-						<Text>Choose another workspace to continue working</Text>
+						<Text>Choose another workspace</Text>
 
 						<Select
 							size="sm"

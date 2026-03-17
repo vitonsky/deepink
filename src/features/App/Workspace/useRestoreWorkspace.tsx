@@ -30,6 +30,8 @@ export const useRestoreWorkspace = ({
 	const notesRegistry = useNotesRegistry();
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
+	// const update = useUpdateNotes();
+
 	const isTagsLoaded = useWorkspaceSelector(selectIsTagsLoaded);
 	useEffect(() => {
 		// Must wait for tags to be loaded first,
@@ -89,14 +91,11 @@ export const useRestoreWorkspace = ({
 				// Restore notes list
 				const tags =
 					state && state.selectedTagId !== null ? [state.selectedTagId] : [];
+				const search = state && state.search ? { text: state.search } : undefined;
 				const noteIds = await notesRegistry.query({
 					tags,
+					search,
 					sort: { by: 'updatedAt', order: 'desc' },
-					search: state?.search
-						? {
-								text: state.search,
-							}
-						: undefined,
 					meta: {
 						isDeleted: state?.view === NOTES_VIEW.BIN,
 						// show archived notes only in archive view
