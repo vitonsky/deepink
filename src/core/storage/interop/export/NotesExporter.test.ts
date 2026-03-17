@@ -10,7 +10,7 @@ import { ZipFS } from '@core/features/files/ZipFS';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesExporter } from '.';
@@ -18,7 +18,7 @@ import { NotesExporter } from '.';
 const FAKE_WORKSPACE_ID = getUUID();
 
 const dbFile = createFileControllerMock();
-const dbPromise = openDatabase(dbFile);
+const dbPromise = openSQLite(dbFile);
 
 afterAll(async () => {
 	const db = await dbPromise;
