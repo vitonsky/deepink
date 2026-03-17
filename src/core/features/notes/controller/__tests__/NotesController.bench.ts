@@ -1,11 +1,15 @@
 import { getLongText } from 'src/__tests__/samples';
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { bench } from 'vitest';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import z from 'zod';
+import { InMemoryFS } from '@core/features/files/InMemoryFS';
+import { StateFile } from '@core/features/files/StateFile';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { LexemesRegistry } from '../LexemesRegistry';
 import { NotesController } from '../NotesController';
+import { NotesTextIndex } from '../NotesTextIndex';
+import { NotesTextIndexScanner } from '../NotesTextIndexScanner';
 
 function getRandomNumber(min: number, max: number) {
 	min = Math.ceil(min);
@@ -26,9 +30,18 @@ const benchConfig = {
 
 describe.sequential('Note ops performance', async () => {
 	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
-	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const lexemes = new LexemesRegistry(db);
+	const db = await openSQLite(dbFile);
+
+	const index = new NotesTextIndex(new InMemoryFS());
+	const notes = new NotesController(db, FAKE_WORKSPACE_ID, index);
+	const indexScanner = new NotesTextIndexScanner(
+		notes,
+		index,
+		new StateFile(
+			createFileControllerMock(),
+			z.object({ lastUpdate: z.number().nullable() }),
+		),
+	);
 
 	let noteCounter = 0;
 	const getNoteId = () => ++noteCounter;
@@ -37,7 +50,7 @@ describe.sequential('Note ops performance', async () => {
 		bench(
 			'Add note with 10k chars text',
 			async () => {
-				await registry.add({
+				await notes.add({
 					title: `Note #${getNoteId()}`,
 					text: textSample.slice(0, 10_000),
 				});
@@ -48,7 +61,7 @@ describe.sequential('Note ops performance', async () => {
 		bench(
 			'Add note with 50k chars text',
 			async () => {
-				await registry.add({
+				await notes.add({
 					title: `Note #${getNoteId()}`,
 					text: textSample.slice(0, 50_000),
 				});
@@ -59,7 +72,7 @@ describe.sequential('Note ops performance', async () => {
 		bench(
 			'Add note with 90k chars text',
 			async () => {
-				await registry.add({
+				await notes.add({
 					title: `Note #${getNoteId()}`,
 					text: textSample.slice(0, 90_000),
 				});
@@ -79,14 +92,14 @@ describe.sequential('Note ops performance', async () => {
 					text: `Updated note #${getNoteId()}`,
 					title: textSample.slice(0, 300),
 				};
-				await registry.update(randomId, updatedData);
+				await notes.update(randomId, updatedData);
 			},
 			{
 				...benchConfig,
 				iterations: 100,
 				async setup(_task, mode) {
 					if (mode !== 'warmup') return;
-					noteIds = await registry
+					noteIds = await notes
 						.get()
 						.then((notes) => notes.map(({ id }) => id));
 				},
@@ -102,14 +115,14 @@ describe.sequential('Note ops performance', async () => {
 					text: `Updated note #${getNoteId()}`,
 					title: textSample.slice(0, 10_000),
 				};
-				await registry.update(randomId, updatedData);
+				await notes.update(randomId, updatedData);
 			},
 			{
 				...benchConfig,
 				iterations: 100,
 				async setup(_task, mode) {
 					if (mode !== 'warmup') return;
-					noteIds = await registry
+					noteIds = await notes
 						.get()
 						.then((notes) => notes.map(({ id }) => id));
 				},
@@ -125,14 +138,14 @@ describe.sequential('Note ops performance', async () => {
 					text: `Updated note #${getNoteId()}`,
 					title: textSample.slice(0, 80_000),
 				};
-				await registry.update(randomId, updatedData);
+				await notes.update(randomId, updatedData);
 			},
 			{
 				...benchConfig,
 				iterations: 100,
 				async setup(_task, mode) {
 					if (mode !== 'warmup') return;
-					noteIds = await registry
+					noteIds = await notes
 						.get()
 						.then((notes) => notes.map(({ id }) => id));
 				},
@@ -144,8 +157,8 @@ describe.sequential('Note ops performance', async () => {
 		bench(
 			'Search note with random text',
 			async function () {
-				await lexemes.index();
-				await registry.get({
+				await indexScanner.update();
+				await notes.get({
 					// Text with typo
 					search: { text: `powr` },
 					limit: 10,
@@ -155,16 +168,6 @@ describe.sequential('Note ops performance', async () => {
 				...benchConfig,
 				iterations: 10,
 			},
-		);
-	});
-
-	describe('Lexemes pruning', () => {
-		bench(
-			'Prune lexemes',
-			async () => {
-				await lexemes.prune();
-			},
-			{ ...benchConfig, iterations: 10 },
 		);
 	});
 });
