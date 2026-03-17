@@ -92,7 +92,7 @@ export const VaultEntryScreenManager = ({
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
 	const hasNoVaults = profilesManager.profiles.length === 0;
 
-	// SplashScreen is skipped here, ProfileLoginForm should remain visible while the vault is opening
+	// SplashScreen is skipped here, login form should remain visible while the vault is opening
 	if (currentVaultObject && currentVaultObject.encryption) {
 		return (
 			<ProfileLoginForm

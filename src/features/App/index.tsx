@@ -58,7 +58,7 @@ export const App: FC = () => {
 		return <SplashScreen />;
 	}
 
-	// Vault screen
+	// Main vault screen
 	if (profileContainers.profiles.length > 0 && profileContainers.activeProfile) {
 		return (
 			<Box
