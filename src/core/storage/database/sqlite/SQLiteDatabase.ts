@@ -69,8 +69,12 @@ export class SQLiteDatabase implements SQLiteDB {
 		return data;
 	}
 
+	protected isClosed = false;
 	async close() {
+		if (this.isClosed) return;
+
 		const db = await this.db;
+		this.isClosed = true;
 		db.close();
 	}
 
@@ -78,6 +82,8 @@ export class SQLiteDatabase implements SQLiteDB {
 		query: string,
 		params?: sqlite.BindParams,
 	): Promise<sqlite.ParamsObject[]> {
+		if (this.isClosed) throw new Error('Database is closed');
+
 		const db = await this.db;
 
 		const result = db.exec(query, params);

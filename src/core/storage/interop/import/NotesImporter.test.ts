@@ -6,10 +6,9 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import {
-	openDatabase,
-	PGLiteDatabase,
-} from '@core/storage/database/pglite/PGLiteDatabase';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { wait } from '@utils/time';
 
@@ -26,7 +25,7 @@ globalThis.requestAnimationFrame = (callback) => {
 const FAKE_WORKSPACE_ID = getUUID();
 
 const createAppContextIterator = () => {
-	return (db: PGLiteDatabase, fileManager: IFilesStorage) => {
+	return (db: ManagedDatabase<SQLiteDB>, fileManager: IFilesStorage) => {
 		const namespace = getUUID();
 
 		const notesRegistry = new NotesController(db, namespace);
@@ -51,7 +50,7 @@ const createTextBuffer = (text: string): ArrayBuffer =>
 
 describe('Base notes import cases', () => {
 	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
+	const dbPromise = openSQLite(dbFile);
 
 	afterAll(async () => {
 		const db = await dbPromise;
@@ -329,7 +328,7 @@ describe('Base notes import cases', () => {
 
 describe('Invalid imports', () => {
 	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
+	const dbPromise = openSQLite(dbFile);
 
 	const fileManager = createFileManagerMock();
 	const createAppContext = createAppContextIterator();
@@ -401,7 +400,7 @@ describe('Invalid imports', () => {
 
 describe('Import notes with different options', () => {
 	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
+	const dbPromise = openSQLite(dbFile);
 
 	afterAll(async () => {
 		const db = await dbPromise;
@@ -607,7 +606,7 @@ describe('Import interruptions', () => {
 
 	describe('Importer throw error by call for abort signal', async () => {
 		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+		const db = await openSQLite(dbFile);
 
 		const fileManager = createFileManagerMock();
 
@@ -702,7 +701,7 @@ describe('Import interruptions', () => {
 
 	test('Importer throw error if DB closed while importing', async () => {
 		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+		const db = await openSQLite(dbFile);
 
 		const fileManager = createFileManagerMock();
 
@@ -727,8 +726,8 @@ describe('Import interruptions', () => {
 				convertPathToTag: 'always',
 				// Slow down the processing
 				async throttle(callback) {
-					if (!db.get().closed) {
-						await db.close();
+					if (db.dbContainer.isOpened()) {
+						await db.dbContainer.close();
 					}
 
 					callback();
@@ -738,6 +737,6 @@ describe('Import interruptions', () => {
 
 		await expect(
 			importer.import(createFileManagerMock(filesSample)),
-		).rejects.toThrowError('PGlite is closed');
+		).rejects.toThrowError('Database is closed');
 	});
 });
