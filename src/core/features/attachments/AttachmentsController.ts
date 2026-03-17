@@ -1,58 +1,51 @@
 import { z } from 'zod';
-import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { qb } from '@utils/db/query-builder';
-import { wrapDB } from '@utils/db/wrapDB';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { qb } from '@core/storage/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
 
 /**
  * attachments manager, to track attachments usage and to keep consistency
  */
 export class AttachmentsController {
-	private readonly db;
-	private readonly workspace;
-	constructor(db: PGLiteDatabase, workspace: string) {
-		this.db = db;
-		this.workspace = workspace;
-	}
+	constructor(
+		private readonly db: ManagedDatabase<SQLiteDB>,
+		private readonly workspace: string,
+	) {}
 
 	public async set(targetId: string, attachments: string[]) {
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
+		const db = wrapSQLite(this.db.get());
 
+		await db.query(
+			qb.sql`DELETE FROM attachments WHERE workspace_id=${this.workspace} AND note=${targetId}`,
+		);
+
+		if (attachments.length > 0) {
 			await db.query(
-				qb.sql`DELETE FROM attachments WHERE workspace_id=${this.workspace} AND note=${targetId}`,
+				qb.sql`INSERT INTO attachments ("workspace_id", "note", "file") VALUES ${qb.set(
+					attachments.map((fileId) =>
+						qb.values([this.workspace, targetId, fileId]).withParenthesis(),
+					),
+				)}`,
 			);
-
-			if (attachments.length > 0) {
-				await db.query(
-					qb.sql`INSERT INTO attachments ("workspace_id", "note", "file") VALUES ${qb.set(
-						attachments.map((fileId) =>
-							qb
-								.values([this.workspace, targetId, fileId])
-								.withParenthesis(),
-						),
-					)}`,
-				);
-			}
-		});
+		}
 	}
 
 	public async get(targetId: string): Promise<string[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
+		return await db.query(
 			qb.sql`
 				SELECT file FROM attachments
 				WHERE workspace_id=${this.workspace} AND note=${targetId}
-				ORDER BY ctid
+				ORDER BY rowid
 			`,
 			z.object({ file: z.string() }).transform((row) => row.file),
 		);
-
-		return rows;
 	}
 
 	public async delete(resources: string[]) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
 		if (resources.length === 0) return;
 
@@ -64,9 +57,9 @@ export class AttachmentsController {
 	}
 
 	public async query() {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
+		return await db.query(
 			qb.sql`SELECT id, file, note FROM attachments WHERE workspace_id=${this.workspace}`,
 			z.object({
 				id: z.string(),
@@ -74,7 +67,5 @@ export class AttachmentsController {
 				note: z.string(),
 			}),
 		);
-
-		return rows;
 	}
 }
