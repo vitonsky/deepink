@@ -1,5 +1,5 @@
 import { getUUID } from 'src/__tests__/utils/uuid';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from '../controller/NotesController';
@@ -9,7 +9,7 @@ const FAKE_WORKSPACE_ID = getUUID();
 
 describe('Note version control', () => {
 	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
+	const dbPromise = openSQLite(dbFile);
 
 	afterAll(async () => {
 		const db = await dbPromise;
@@ -174,7 +174,7 @@ describe('Note version control', () => {
 
 describe('Delete note versions', () => {
 	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
+	const dbPromise = openSQLite(dbFile);
 
 	afterAll(async () => {
 		const db = await dbPromise;
