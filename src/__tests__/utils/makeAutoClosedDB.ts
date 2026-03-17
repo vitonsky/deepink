@@ -1,8 +1,7 @@
 import { IFileController } from '@core/features/files';
-import {
-	openDatabase,
-	PGLiteDatabase,
-} from '@core/storage/database/pglite/PGLiteDatabase';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 export const makeAutoClosedDB = ({
@@ -18,7 +17,7 @@ export const makeAutoClosedDB = ({
 		file = createFileControllerMock();
 	}
 
-	let dbPromise: Promise<PGLiteDatabase> | null = null;
+	let dbPromise: Promise<ManagedDatabase<SQLiteDB>> | null = null;
 
 	// Close and cleanup DB
 	closeHook(async () => {
@@ -37,7 +36,7 @@ export const makeAutoClosedDB = ({
 		getDB() {
 			if (!dbPromise) {
 				if (!file) throw new Error('File is not set');
-				dbPromise = openDatabase(file);
+				dbPromise = openSQLite(file);
 			}
 
 			return dbPromise;
