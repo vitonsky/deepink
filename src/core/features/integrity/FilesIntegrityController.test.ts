@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 
 import { getUUID } from 'src/__tests__/utils/uuid';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { createFileManagerMock } from '../files/__tests__/mocks/createFileManagerMock';
 import { createTextFile } from '../files/__tests__/mocks/createTextFile';
 import { FilesController } from '../files/FilesController';
+import { NotesController } from '../notes/controller/NotesController';
 import { FilesIntegrityController } from './FilesIntegrityController';
 
 const FAKE_WORKSPACE_ID = getUUID();
@@ -18,7 +19,7 @@ const testFiles = Array(5)
 
 test('Clear orphaned files', async () => {
 	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
+	const db = await openSQLite(dbFile);
 
 	const fileManager = createFileManagerMock();
 	const attachments = new AttachmentsController(db, FAKE_WORKSPACE_ID);
@@ -29,8 +30,11 @@ test('Clear orphaned files', async () => {
 		attachments,
 	});
 
-	const NOTE_1 = getUUID();
-	const NOTE_2 = getUUID();
+	const notes = new NotesController(db, FAKE_WORKSPACE_ID);
+	const [NOTE_1, NOTE_2] = await Promise.all([
+		notes.add({ title: '', text: '' }),
+		notes.add({ title: '', text: '' }),
+	]);
 
 	// Upload file and attach
 	const fileToAttach = createTextFile('Attached file');
