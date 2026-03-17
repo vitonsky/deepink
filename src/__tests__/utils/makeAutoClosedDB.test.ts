@@ -1,10 +1,11 @@
-import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
 
 import { makeAutoClosedDB } from './makeAutoClosedDB';
 
 describe('DB is closed at hook time', () => {
 	describe('afterAll (default)', () => {
-		let dbFromFirstTest: PGLiteDatabase;
+		let dbFromFirstTest: ManagedDatabase<SQLiteDB>;
 
 		describe('DB is available for all tests inside describe block', () => {
 			const { getDB } = makeAutoClosedDB();
@@ -12,15 +13,13 @@ describe('DB is closed at hook time', () => {
 			test('DB is available when test in run', async () => {
 				const db = await getDB();
 				expect(db).toHaveProperty('get', expect.any(Function));
-				expect(db.get().closed).toBe(false);
+				expect(db.dbContainer.isOpened()).toBe(true);
 				await expect(db.get().query(`SELECT NOW() as time;`)).resolves.toEqual(
-					expect.objectContaining({
-						rows: expect.arrayContaining([
-							{
-								time: expect.any(Date),
-							},
-						]),
-					}),
+					expect.arrayContaining([
+						{
+							time: expect.any(String),
+						},
+					]),
 				);
 
 				dbFromFirstTest = db;
@@ -28,46 +27,42 @@ describe('DB is closed at hook time', () => {
 
 			test('DB is available for next test', async () => {
 				expect(dbFromFirstTest).toHaveProperty('get', expect.any(Function));
-				expect(dbFromFirstTest.get().closed).toBe(false);
+				expect(dbFromFirstTest.dbContainer.isOpened()).toBe(true);
 				await expect(
 					dbFromFirstTest.get().query(`SELECT NOW() as time;`),
 				).resolves.toEqual(
-					expect.objectContaining({
-						rows: expect.arrayContaining([
-							{
-								time: expect.any(Date),
-							},
-						]),
-					}),
+					expect.arrayContaining([
+						{
+							time: expect.any(String),
+						},
+					]),
 				);
 			});
 		});
 
 		test('DB is not available after block where hook is called', async () => {
 			expect(dbFromFirstTest).toHaveProperty('get', expect.any(Function));
-			expect(dbFromFirstTest.get().closed).toBe(true);
+			expect(dbFromFirstTest.dbContainer.isOpened()).toBe(false);
 			await expect(
 				dbFromFirstTest.get().query(`SELECT NOW() as time;`),
-			).rejects.toThrowError('PGlite is closed');
+			).rejects.toThrowError('Database is closed');
 		});
 	});
 
 	describe('afterEach', () => {
 		const { getDB } = makeAutoClosedDB({ closeHook: afterEach });
 
-		let dbFromFirstTest: PGLiteDatabase;
+		let dbFromFirstTest: ManagedDatabase<SQLiteDB>;
 		test('DB is available when test in run', async () => {
 			const db = await getDB();
 			expect(db).toHaveProperty('get', expect.any(Function));
-			expect(db.get().closed).toBe(false);
+			expect(db.dbContainer.isOpened()).toBe(true);
 			await expect(db.get().query(`SELECT NOW() as time;`)).resolves.toEqual(
-				expect.objectContaining({
-					rows: expect.arrayContaining([
-						{
-							time: expect.any(Date),
-						},
-					]),
-				}),
+				expect.arrayContaining([
+					{
+						time: expect.any(String),
+					},
+				]),
 			);
 
 			dbFromFirstTest = db;
@@ -75,10 +70,10 @@ describe('DB is closed at hook time', () => {
 
 		test('DB is closed for next test', async () => {
 			expect(dbFromFirstTest).toHaveProperty('get', expect.any(Function));
-			expect(dbFromFirstTest.get().closed).toBe(true);
+			expect(dbFromFirstTest.dbContainer.isOpened()).toBe(false);
 			await expect(
 				dbFromFirstTest.get().query(`SELECT NOW() as time;`),
-			).rejects.toThrowError('PGlite is closed');
+			).rejects.toThrowError('Database is closed');
 		});
 	});
 });
