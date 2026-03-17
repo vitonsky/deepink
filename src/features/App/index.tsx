@@ -24,7 +24,7 @@ export const App: FC = () => {
 
 	// Open recent vault
 	const recentVault = useRecentProfile(config);
-	const [isOpeningRecentVault, setIsOpeningRecentVault] = useState(false);
+	const [isOpeningRecentVault, setIsOpeningRecentVault] = useState(true);
 	useEffect(
 		() => {
 			if (!profilesList.isProfilesLoaded || !recentVault.isLoaded) return;
@@ -36,24 +36,24 @@ export const App: FC = () => {
 				(profile) => profile.id === recentVault.profileId,
 			);
 
-			// open only unencrypted vault
-			if (vault && !vault.encryption) {
-				setIsOpeningRecentVault(true);
-
-				profileContainers
-					.openProfile({ profile: vault })
-					.finally(() => setIsOpeningRecentVault(false));
+			if (!vault || vault.encryption) {
+				setIsOpeningRecentVault(false);
+				return;
 			}
+
+			// Automatically open vault with no encryption
+			profileContainers
+				.openProfile({ profile: vault })
+				.finally(() => setIsOpeningRecentVault(false));
 		},
 		// Depends only of loading status and run only once
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[profilesList.isProfilesLoaded, recentVault.isLoaded],
 	);
-
 	const isLoading =
 		!profilesList.isProfilesLoaded || !recentVault.isLoaded || isOpeningRecentVault;
 
-	const [isSplashVisible] = useDebounce(isLoading, 500);
+	const [isSplashVisible] = useDebounce(isLoading, 500, { leading: true });
 	if (isSplashVisible) {
 		return <SplashScreen />;
 	}
