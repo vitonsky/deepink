@@ -11,7 +11,7 @@ import { formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { NoteExportData } from '@core/storage/interop/export';
 import {
 	FilesRegistryContext,
@@ -39,7 +39,7 @@ describe('Export notes', async () => {
 	const fileManager = createFileManagerMock();
 
 	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
+	const dbPromise = openSQLite(dbFile);
 
 	afterAll(async () => {
 		const db = await dbPromise;
