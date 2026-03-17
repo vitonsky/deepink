@@ -19,14 +19,7 @@
  * slowest single shard, not the sum of all shards.
  */
 
-// ─── file storage contract ────────────────────────────────────────────────────
-
-export type IFilesStorage = {
-	write: (uuid: string, buffer: ArrayBuffer) => Promise<void>;
-	get: (uuid: string) => Promise<ArrayBuffer | null>;
-	delete: (uuid: string[]) => Promise<void>;
-	list: () => Promise<string[]>;
-};
+import { IFilesStorage } from '@core/features/files';
 
 // ─── tuning ───────────────────────────────────────────────────────────────────
 
