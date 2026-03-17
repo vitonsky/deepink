@@ -1,3 +1,4 @@
+-- TODO: enable references for workspace ids - `workspace_id TEXT NOT NULL REFERENCES workspaces(id),`
 -- Core tables
 CREATE TABLE workspaces (
   id    TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
@@ -6,7 +7,7 @@ CREATE TABLE workspaces (
 
 CREATE TABLE files (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  workspace_id TEXT NOT NULL REFERENCES workspaces(id),
+  workspace_id TEXT NOT NULL,
   name         TEXT NOT NULL,
   mimetype     TEXT NOT NULL,
   created_at   INTEGER NOT NULL DEFAULT (timestamp('now'))
@@ -14,14 +15,14 @@ CREATE TABLE files (
 
 CREATE TABLE tags (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  workspace_id TEXT NOT NULL REFERENCES workspaces(id),
+  workspace_id TEXT NOT NULL,
   name         TEXT NOT NULL,
   parent       TEXT REFERENCES tags(id)
 );
 
 CREATE TABLE notes (
   id               TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  workspace_id     TEXT NOT NULL REFERENCES workspaces(id),
+  workspace_id     TEXT NOT NULL,
   title            TEXT NOT NULL,
   text             TEXT NOT NULL,
   archived         INTEGER NOT NULL DEFAULT 0,
@@ -35,7 +36,7 @@ CREATE TABLE notes (
 
 CREATE TABLE note_versions (
   id         TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  note_id    TEXT NOT NULL REFERENCES notes(id),
+  note_id    TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
   title      TEXT NOT NULL,
   text       TEXT NOT NULL,
   created_at INTEGER NOT NULL DEFAULT (timestamp('now'))
@@ -43,14 +44,14 @@ CREATE TABLE note_versions (
 
 CREATE TABLE attached_tags (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  workspace_id TEXT NOT NULL REFERENCES workspaces(id),
+  workspace_id TEXT NOT NULL,
   source       TEXT NOT NULL,
   target       TEXT NOT NULL
 );
 
 CREATE TABLE attachments (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  workspace_id TEXT NOT NULL REFERENCES workspaces(id),
+  workspace_id TEXT NOT NULL,
   note         TEXT NOT NULL REFERENCES notes(id),
   file         TEXT NOT NULL REFERENCES files(id)
 );

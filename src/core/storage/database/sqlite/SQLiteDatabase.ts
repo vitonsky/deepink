@@ -1,4 +1,4 @@
-import sqlite, { ParamsObject, QueryExecResult } from 'sql.js';
+import sqlite, { Database, ParamsObject, QueryExecResult } from 'sql.js';
 import { v4 as uuidv4 } from 'uuid';
 
 import { SQLiteDB } from '.';
@@ -29,6 +29,10 @@ const loadSQLite = async () => {
 	return sqlite({ locateFile: () => sqliteWasmUrl });
 };
 
+function applyConfig(db: Database) {
+	db.exec('PRAGMA foreign_keys = ON;');
+}
+
 export class SQLiteDatabase implements SQLiteDB {
 	protected db;
 	constructor(data?: ArrayLike<number> | Buffer | null) {
@@ -41,6 +45,8 @@ export class SQLiteDatabase implements SQLiteDB {
 					callback(operation, database, table, rowId),
 				);
 			});
+
+			applyConfig(db);
 
 			// Custom functions
 			db.create_function('gen_random_uuid', () => uuidv4());
@@ -55,7 +61,12 @@ export class SQLiteDatabase implements SQLiteDB {
 
 	async export() {
 		const db = await this.db;
-		return db.export();
+		const data = db.export();
+
+		// Restore config
+		applyConfig(db);
+
+		return data;
 	}
 
 	async close() {
