@@ -2,10 +2,12 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defaultExclude, defineConfig } from 'vitest/config';
+import { workerPlugin } from './scripts/tests/worker-plugin'
 
 export default defineConfig({
 	plugins: [
 		tsconfigPaths(),
+		workerPlugin(),
 		{
 			name: 'vite-plugin-sql-import',
 			enforce: 'pre',
