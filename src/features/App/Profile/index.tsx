@@ -30,6 +30,7 @@ import { Workspace } from '../Workspace';
 import { WorkspaceContainer, WorkspaceContext } from '../Workspace/WorkspaceContainer';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
+import { useVaultOpenErrorToast } from './useVaultOpenErrorToast';
 import { useVaultState } from './useVaultState';
 
 export type ProfileControls = {
@@ -55,6 +56,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
+	const { show: showError } = useVaultOpenErrorToast();
+
 	const getVaultState = useVaultState({
 		sync: Object.keys(workspaces).length > 0,
 		controls,
@@ -70,46 +73,50 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			ProfileConfigScheme,
 		);
 
-		Promise.all([
-			workspacesManager.getList(),
-			vaultConfig.get(),
-			getVaultState(),
-		]).then(async ([workspaces, config, state]) => {
-			const [defaultWorkspace] = workspaces;
+		Promise.all([workspacesManager.getList(), vaultConfig.get(), getVaultState()])
+			.then(async ([workspaces, config, state]) => {
+				const [defaultWorkspace] = workspaces;
 
-			if (!defaultWorkspace) return;
+				if (!defaultWorkspace) return;
 
-			dispatch(
-				workspacesApi.addProfile({
-					profileId,
-					profile: {
-						activeWorkspace: null,
-						workspaces: Object.fromEntries(
-							workspaces.map((workspace) => [
-								workspace.id,
-								createWorkspaceObject(workspace),
-							]),
-						),
-						config: {
-							...defaultVaultConfig,
-							...config,
+				dispatch(
+					workspacesApi.addProfile({
+						profileId,
+						profile: {
+							activeWorkspace: null,
+							workspaces: Object.fromEntries(
+								workspaces.map((workspace) => [
+									workspace.id,
+									createWorkspaceObject(workspace),
+								]),
+							),
+							config: {
+								...defaultVaultConfig,
+								...config,
+							},
 						},
-					},
-				}),
-			);
-			dispatch(workspacesApi.setActiveProfile(profileId));
+					}),
+				);
+				dispatch(workspacesApi.setActiveProfile(profileId));
 
-			const selectedWorkspace =
-				(state?.activeWorkspace &&
-					workspaces.find((w) => w.id === state.activeWorkspace)) ||
-				defaultWorkspace;
-			dispatch(
-				workspacesApi.setActiveWorkspace({
-					profileId,
-					workspaceId: selectedWorkspace.id,
-				}),
-			);
-		});
+				const selectedWorkspace =
+					(state?.activeWorkspace &&
+						workspaces.find((w) => w.id === state.activeWorkspace)) ||
+					defaultWorkspace;
+				dispatch(
+					workspacesApi.setActiveWorkspace({
+						profileId,
+						workspaceId: selectedWorkspace.id,
+					}),
+				);
+			})
+			.catch((error) => {
+				console.error(error);
+
+				// close vault and show error
+				controls.close();
+				showError(profileId, `Cannot open vault: ${currentProfile.profile.name}`);
+			});
 
 		return () => {
 			dispatch(
@@ -118,7 +125,16 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				}),
 			);
 		};
-	}, [controls.profile.files, dispatch, getVaultState, profileId, workspacesManager]);
+	}, [
+		controls,
+		controls.profile.files,
+		currentProfile.profile.name,
+		dispatch,
+		getVaultState,
+		profileId,
+		showError,
+		workspacesManager,
+	]);
 
 	const isDevMode = useIsDeveloper();
 
