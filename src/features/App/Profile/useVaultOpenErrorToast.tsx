@@ -1,5 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { createStandaloneToast } from '@chakra-ui/react';
+import { useAppSelector } from '@state/redux/hooks';
+import { selectActiveProfile } from '@state/redux/profiles/profiles';
 
 export const { toast } = createStandaloneToast();
 
@@ -23,6 +25,16 @@ export const useVaultOpenErrorToast = () => {
 			toast.close(id);
 		}
 	}, []);
+
+	// Close error message while changed vault
+	const currentProfile = useAppSelector(selectActiveProfile);
+	const prevVaultId = useRef(currentProfile);
+	useEffect(() => {
+		if (prevVaultId.current && prevVaultId.current !== currentProfile) {
+			close(prevVaultId.current);
+		}
+		prevVaultId.current = currentProfile;
+	}, [close, currentProfile]);
 
 	return { show, close };
 };
