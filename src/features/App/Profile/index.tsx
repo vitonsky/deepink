@@ -115,7 +115,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 				// close vault and show error
 				controls.close();
-				showError(profileId, `Cannot open vault: ${currentProfile.profile.name}`);
+				showError(
+					profileId,
+					`Failed to load profile "${currentProfile.profile.name}"`,
+				);
 			});
 
 		return () => {

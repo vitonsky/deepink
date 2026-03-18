@@ -64,7 +64,7 @@ export const App: FC = () => {
 	const isLoading =
 		!profilesList.isProfilesLoaded || !recentVault.isLoaded || isOpeningRecentVault;
 
-	const [isSplashVisible] = useDebounce(isLoading, 500, { leading: true });
+	const [isSplashVisible] = useDebounce(isLoading, 500);
 	if (isSplashVisible) {
 		return <SplashScreen />;
 	}
