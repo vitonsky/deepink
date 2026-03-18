@@ -44,11 +44,11 @@ export const useOpenProfile = (profiles: ProfilesApi) => {
 			}
 
 			// Profiles with password
-			if (password === undefined) {
-				return { status: 'error', message: 'Enter password' };
-			}
-
 			try {
+				if (password === undefined) {
+					return { status: 'error', message: 'Enter password' };
+				}
+
 				await profiles.openProfile({ profile, password }, true);
 
 				return { status: 'ok' };
