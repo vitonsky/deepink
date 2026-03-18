@@ -1,9 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { ProfileObject } from '@core/storage/ProfilesManager';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
@@ -12,17 +11,8 @@ import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 import { ProfilesApi } from './Profiles/hooks/useProfileContainers';
 import { ProfilesForm } from './ProfilesForm';
+import { useOpenProfile } from './useOpenProfile';
 import { ProfilesListApi } from './useProfilesList';
-
-type PickProfileResponse = {
-	status: 'ok' | 'error';
-	message?: string;
-};
-
-export type OnPickProfile = (
-	profile: ProfileObject,
-	password?: string,
-) => Promise<PickProfileResponse>;
 
 export type VaultEntryScreenManagerProps = {
 	profiles: ProfilesApi;
@@ -49,38 +39,7 @@ export const VaultEntryScreenManager = ({
 	profilesManager,
 	onChooseProfile,
 }: VaultEntryScreenManagerProps) => {
-	const [isVaultOpening, setIsVaultOpening] = useState(false);
-
-	const onOpenVault: OnPickProfile = useCallback(
-		async (profile: ProfileObject, password?: string) => {
-			setIsVaultOpening(true);
-
-			try {
-				// Profiles with no password
-				if (!profile.encryption) {
-					await profiles.openProfile({ profile }, true);
-					return { status: 'ok' };
-				}
-
-				// Profiles with password
-				try {
-					if (password === undefined)
-						return { status: 'error', message: 'Enter password' };
-
-					await profiles.openProfile({ profile, password }, true);
-
-					return { status: 'ok' };
-				} catch (err) {
-					console.error(err);
-
-					return { status: 'error', message: 'Invalid password' };
-				}
-			} finally {
-				setIsVaultOpening(false);
-			}
-		},
-		[profiles],
-	);
+	const { onOpenProfile, isProfileOpening } = useOpenProfile(profiles);
 
 	const currentVaultObject = useMemo(
 		() =>
@@ -97,20 +56,20 @@ export const VaultEntryScreenManager = ({
 		return (
 			<ProfileLoginForm
 				profile={currentVaultObject}
-				onLogin={onOpenVault}
+				onLogin={onOpenProfile}
 				onPickAnotherProfile={() => onChooseProfile(null)}
 			/>
 		);
 	}
 
-	if (isVaultOpening) return <SplashScreen />;
+	if (isProfileOpening) return <SplashScreen />;
 
 	if (screen === 'create' || hasNoVaults) {
 		return (
 			<ProfileCreator
 				onCreateProfile={(profile) =>
 					profilesManager.createProfile(profile).then((newProfile) => {
-						onOpenVault(newProfile, profile.password ?? undefined).then(
+						onOpenProfile(newProfile, profile.password ?? undefined).then(
 							console.warn,
 						);
 					})
@@ -164,7 +123,7 @@ export const VaultEntryScreenManager = ({
 								onChooseProfile(profile.id);
 
 								if (profile.encryption === null) {
-									onOpenVault(profile);
+									onOpenProfile(profile);
 								}
 
 								telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_SELECTED);

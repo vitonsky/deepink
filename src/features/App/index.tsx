@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
@@ -6,9 +6,9 @@ import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { AppServices } from './AppServices';
-import { useVaultOpenErrorToast } from './Profile/useVaultOpenErrorToast';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { useOpenProfile } from './useOpenProfile';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
@@ -23,19 +23,9 @@ export const App: FC = () => {
 
 	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
 
-	// Close error message while changed vault
-	const { close: closeError } = useVaultOpenErrorToast();
-	const prevVaultId = useRef(currentProfileId);
-	useEffect(() => {
-		if (prevVaultId.current) {
-			closeError(prevVaultId.current);
-		}
-		prevVaultId.current = currentProfileId;
-	}, [closeError, currentProfileId]);
-
 	// Open recent vault
 	const recentVault = useRecentProfile(config);
-	const [isOpeningRecentVault, setIsOpeningRecentVault] = useState(true);
+	const { onOpenProfile, isProfileOpening } = useOpenProfile(profileContainers);
 	useEffect(
 		() => {
 			if (!profilesList.isProfilesLoaded || !recentVault.isLoaded) return;
@@ -48,21 +38,18 @@ export const App: FC = () => {
 			);
 
 			if (!vault || vault.encryption) {
-				setIsOpeningRecentVault(false);
 				return;
 			}
 
 			// Automatically open vault with no encryption
-			profileContainers
-				.openProfile({ profile: vault })
-				.finally(() => setIsOpeningRecentVault(false));
+			onOpenProfile(vault);
 		},
 		// Depends only of loading status and run only once
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[profilesList.isProfilesLoaded, recentVault.isLoaded],
 	);
 	const isLoading =
-		!profilesList.isProfilesLoaded || !recentVault.isLoaded || isOpeningRecentVault;
+		!profilesList.isProfilesLoaded || !recentVault.isLoaded || isProfileOpening;
 
 	const [isSplashVisible] = useDebounce(isLoading, 500);
 	if (isSplashVisible) {
