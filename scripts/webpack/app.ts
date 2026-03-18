@@ -21,6 +21,9 @@ export default merge(commonConfig, {
 			]),
 		),
 	},
+	output: {
+		module: true,
+	},
 	plugins: [
 		...windows.map(
 			({ name }) =>
@@ -29,6 +32,7 @@ export default merge(commonConfig, {
 					filename: `window-${name}.html`,
 					chunks: [`window-${name}`],
 					template: path.join(projectRoot, 'src/templates/window.html'),
+					scriptLoading: 'module',
 				}),
 		),
 		new MiniCssExtractPlugin({}),
@@ -39,6 +43,7 @@ export default merge(commonConfig, {
 	},
 	experiments: {
 		asyncWebAssembly: true,
+		outputModule: true,
 	},
 	module: {
 		rules: [

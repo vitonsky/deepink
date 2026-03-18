@@ -9,10 +9,9 @@ import { EncryptedFS } from '@core/features/files/EncryptedFS';
 import { FileController } from '@core/features/files/FileController';
 import { RootedFS } from '@core/features/files/RootedFS';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import {
-	openDatabase,
-	PGLiteDatabase,
-} from '@core/storage/database/pglite/PGLiteDatabase';
+import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
+import { SQLiteDB } from '@core/storage/database/sqlite';
+import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { useFilesStorage } from '@features/files';
 import { DisposableBox } from '@utils/disposable';
@@ -21,7 +20,7 @@ import { createProfilesApi, ProfileEntry } from './profiles';
 
 export type ProfileContainer = {
 	profile: ProfileEntry;
-	db: PGLiteDatabase;
+	db: ManagedDatabase<SQLiteDB>;
 	encryptionController: EncryptionController;
 	files: IFilesStorage;
 };
@@ -110,7 +109,7 @@ export const useProfileContainers = () => {
 			);
 
 			// Setup DB
-			const db = await openDatabase(
+			const db = await openSQLite(
 				new FileController('vault.db', encryptedProfileFS),
 			);
 
@@ -141,7 +140,7 @@ export const useProfileContainers = () => {
 					profile: profileObject,
 					encryptionController,
 					files: encryptedProfileFS,
-				},
+				} satisfies ProfileContainer,
 				async () => {
 					// TODO: remove key of RAM. Set control with callback to remove key
 					for (const cleanup of cleanups) {

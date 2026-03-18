@@ -1,6 +1,8 @@
 import { useCallback, useRef } from 'react';
-import { useProfileControls } from '@features/App/Profile';
-import { useNotesRegistry } from '@features/App/Workspace/WorkspaceProvider';
+import {
+	useNotesRegistry,
+	useWorkspaceContainer,
+} from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -18,8 +20,8 @@ export const useUpdateNotes = () => {
 	const notesView = useWorkspaceSelector(selectNotesView);
 
 	const {
-		api: { lexemes },
-	} = useProfileControls();
+		notesIndex: { controller: notesIndexController },
+	} = useWorkspaceContainer();
 
 	const notesRegistry = useNotesRegistry();
 	const activeTag = useWorkspaceSelector(selectActiveTag);
@@ -35,7 +37,7 @@ export const useUpdateNotes = () => {
 		if (searchText) {
 			console.debug('Notes text indexing...');
 			const start = performance.now();
-			await lexemes.index();
+			await notesIndexController.update();
 
 			if (isRequestCanceled()) return;
 			console.debug('Notes indexing is completed', performance.now() - start);
@@ -65,5 +67,13 @@ export const useUpdateNotes = () => {
 		if (isRequestCanceled()) return;
 
 		dispatch(workspacesApi.setNoteIds({ ...workspaceData, noteIds }));
-	}, [activeTag, dispatch, lexemes, notesView, notesRegistry, search, workspaceData]);
+	}, [
+		activeTag,
+		dispatch,
+		notesIndexController,
+		notesRegistry,
+		notesView,
+		search,
+		workspaceData,
+	]);
 };

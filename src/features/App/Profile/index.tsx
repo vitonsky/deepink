@@ -1,8 +1,7 @@
-import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
+import React, { createContext, FC, useEffect, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
-import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -26,15 +25,10 @@ import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
-import { SQLConsole } from './SQLConsole/SQLConsole';
-import { ToggleSQLConsole } from './SQLConsole/ToggleSQLConsole';
 import { useVaultState } from './useVaultState';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
-	api: {
-		lexemes: LexemesRegistry;
-	};
 	close: () => void;
 };
 
@@ -144,7 +138,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		};
 	}, [controls.profile.files, dispatch, getVaultState, profileId, workspacesManager]);
 
-	const [isDBConsoleVisible, setIsDBConsoleVisible] = useState(false);
 	const isDevMode = useIsDeveloper();
 
 	const db = controls.profile.db;
@@ -178,21 +171,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						<StatusBarProvider>
 							<Workspace profile={currentProfile} />
 							<ProfileStatusBar />
-							{isDevMode && (
-								<ToggleSQLConsole
-									isVisible={isDBConsoleVisible}
-									onVisibilityChange={setIsDBConsoleVisible}
-								/>
-							)}
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				) : null,
-			)}
-			{isDevMode && (
-				<SQLConsole
-					isVisible={isDBConsoleVisible}
-					onVisibilityChange={setIsDBConsoleVisible}
-				/>
 			)}
 		</ProfileControlsContext.Provider>
 	);

@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { LexemesRegistry } from '@core/features/notes/controller/LexemesRegistry';
 import { VaultStorage } from '@features/files';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
@@ -24,9 +23,6 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				const profile = profileContainer.getContent();
 				const controls = {
 					profile,
-					api: {
-						lexemes: new LexemesRegistry(profile.db),
-					},
 					close: () => {
 						profilesApi.events.profileClosed(profileContainer);
 

@@ -29,34 +29,33 @@ const loadSQLite = async () => {
 	return sqlite({ locateFile: () => sqliteWasmUrl });
 };
 
-function applyConfig(db: Database) {
-	db.exec('PRAGMA foreign_keys = ON;');
-}
-
 export class SQLiteDatabase implements SQLiteDB {
 	protected db;
 	constructor(data?: ArrayLike<number> | Buffer | null) {
 		this.db = loadSQLite().then((sqlite) => {
 			const db = new sqlite.Database(data);
-
-			// Notify updates
-			db.updateHook((operation, database, table, rowId) => {
-				this.onChangeCallbacks.forEach((callback) =>
-					callback(operation, database, table, rowId),
-				);
-			});
-
-			applyConfig(db);
-
-			// Custom functions
-			db.create_function('gen_random_uuid', () => uuidv4());
-			db.create_function('now', () => new Date().toISOString());
-			db.create_function('timestamp', (date: string) =>
-				(date && date !== 'now' ? new Date(date) : new Date()).getTime(),
-			);
+			this.applyConfig(db);
 
 			return db;
 		});
+	}
+
+	protected applyConfig(db: Database) {
+		db.exec('PRAGMA foreign_keys = ON;');
+
+		// Notify updates
+		db.updateHook((operation, database, table, rowId) => {
+			this.onChangeCallbacks.forEach((callback) =>
+				callback(operation, database, table, rowId),
+			);
+		});
+
+		// Custom functions
+		db.create_function('gen_random_uuid', () => uuidv4());
+		db.create_function('now', () => new Date().toISOString());
+		db.create_function('timestamp', (date: string) =>
+			(date && date !== 'now' ? new Date(date) : new Date()).getTime(),
+		);
 	}
 
 	async export() {
@@ -64,7 +63,7 @@ export class SQLiteDatabase implements SQLiteDB {
 		const data = db.export();
 
 		// Restore config
-		applyConfig(db);
+		this.applyConfig(db);
 
 		return data;
 	}

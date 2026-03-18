@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
+import z from 'zod';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
+import { FileController } from '@core/features/files/FileController';
 import { FilesController } from '@core/features/files/FilesController';
+import { RootedFS } from '@core/features/files/RootedFS';
+import { StateFile } from '@core/features/files/StateFile';
+import { INotesController } from '@core/features/notes/controller';
 import { NotesController } from '@core/features/notes/controller/NotesController';
+import { NotesTextIndex } from '@core/features/notes/controller/NotesTextIndex';
+import { NotesTextIndexScanner } from '@core/features/notes/controller/NotesTextIndexScanner';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { useVaultStorage } from '@features/files';
-import { getWorkspaceFilesPath } from '@features/files/paths';
+import { getWorkspaceFilesPath, getWorkspacePath } from '@features/files/paths';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
@@ -16,8 +23,12 @@ export type WorkspaceContainer = {
 	filesController: IFilesStorage;
 	filesRegistry: FilesController;
 	tagsRegistry: TagsController;
-	notesRegistry: NotesController;
+	notesRegistry: INotesController;
 	notesHistory: NoteVersions;
+	notesIndex: {
+		index: NotesTextIndex;
+		controller: NotesTextIndexScanner;
+	};
 };
 
 export const useWorkspace = (currentProfile: ProfileContainer) => {
@@ -25,19 +36,37 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 
 	const { workspaceId } = useWorkspaceData();
 
-	const files = useVaultStorage(getWorkspaceFilesPath(workspaceId));
+	const files = useVaultStorage();
 	useEffect(() => {
 		const { db } = currentProfile;
+
+		const indexDir = new RootedFS(
+			files,
+			getWorkspacePath(workspaceId) + '/index/notes',
+		);
+		const notesIndex = new NotesTextIndex(indexDir);
+		const notes = new NotesController(db, workspaceId, notesIndex);
 
 		// Setup files
 		// TODO: implement methods to close the objects after use
 		setState({
-			filesController: files,
+			filesController: new RootedFS(files, getWorkspaceFilesPath(workspaceId)),
 			attachmentsController: new AttachmentsController(db, workspaceId),
 			filesRegistry: new FilesController(db, files, workspaceId),
 			tagsRegistry: new TagsController(db, workspaceId),
-			notesRegistry: new NotesController(db, workspaceId),
+			notesRegistry: notes,
 			notesHistory: new NoteVersions(db, workspaceId),
+			notesIndex: {
+				index: notesIndex,
+				controller: new NotesTextIndexScanner(
+					notes,
+					notesIndex,
+					new StateFile(
+						new FileController('state.json', indexDir),
+						z.object({ lastUpdate: z.number().nullable() }),
+					),
+				),
+			},
 		});
 	}, [currentProfile, files, workspaceId]);
 

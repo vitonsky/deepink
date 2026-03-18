@@ -2,16 +2,14 @@ import { useEffect } from 'react';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { joinCallbacks } from '@utils/react/joinCallbacks';
 
-import { useProfileControls } from '../../Profile';
-
-import { useEventBus } from '../WorkspaceProvider';
+import { useEventBus, useWorkspaceContainer } from '../WorkspaceProvider';
 
 // TODO: prune iteratively
 export const useLexemesRegistryPrune = () => {
 	const events = useEventBus();
 	const {
-		api: { lexemes },
-	} = useProfileControls();
+		notesIndex: { controller: notesIndexController },
+	} = useWorkspaceContainer();
 
 	useEffect(() => {
 		const PRUNE_DELAY = 30_000;
@@ -33,9 +31,7 @@ export const useLexemesRegistryPrune = () => {
 				timer = null;
 				cbId = requestIdleCallback(() => {
 					cbId = null;
-					lexemes.prune().then((words) => {
-						console.debug('Lexemes has been pruned', words.length);
-					});
+					console.debug('TODO: prune notes index', notesIndexController);
 				});
 			}, PRUNE_DELAY);
 		};
@@ -50,5 +46,5 @@ export const useLexemesRegistryPrune = () => {
 				}
 			},
 		);
-	}, [events, lexemes]);
+	}, [events, notesIndexController]);
 };
