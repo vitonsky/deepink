@@ -28,7 +28,7 @@ export const getUserDataPath = (...resourcePath: (string | undefined)[]) => {
 	// Docs: https://www.electronjs.org/docs/latest/api/app#appgetpathname
 	const rootPath = isDevMode()
 		? joinPath(app.getAppPath(), 'tmp')
-		: app.getPath('userData');
+		: joinPath(app.getPath('userData'), 'app');
 
 	const pathSegments = resourcePath.filter(Boolean) as string[];
 	return pathSegments.length > 0 ? joinPath(rootPath, ...pathSegments) : rootPath;
