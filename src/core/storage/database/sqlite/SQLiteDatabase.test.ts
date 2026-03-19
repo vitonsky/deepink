@@ -17,7 +17,14 @@ test('Test custom functions', async () => {
 	]);
 	await expect(
 		db.get().query(`SELECT timestamp('10/10/2000') as time`),
-	).resolves.toEqual([{ time: 971128800000 }]);
+	).resolves.toEqual([
+		{
+			// That is good example of a time problem. Time depends on a time zone,
+			// so result will be `971128800000` for Berlin time zone,
+			// or `971136000000` for America time zone
+			time: new Date('10/10/2000').getTime(),
+		},
+	]);
 
 	await expect(db.get().query(`SELECT gen_random_uuid() as uuid`)).resolves.toEqual([
 		{ uuid: expect.any(String) },
