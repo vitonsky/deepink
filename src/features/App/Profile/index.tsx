@@ -56,7 +56,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
-	const { show: showError } = useVaultOpenErrorToast();
+	const { show: showErrorToast } = useVaultOpenErrorToast();
 
 	const getVaultState = useVaultState({
 		sync: Object.keys(workspaces).length > 0,
@@ -115,10 +115,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 				// close vault and show error
 				controls.close();
-				showError(
-					profileId,
-					`Failed to load profile "${currentProfile.profile.name}"`,
-				);
+				showErrorToast(profileId, currentProfile.profile.name);
 			});
 
 		return () => {
@@ -135,7 +132,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		dispatch,
 		getVaultState,
 		profileId,
-		showError,
+		showErrorToast,
 		workspacesManager,
 	]);
 

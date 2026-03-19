@@ -19,10 +19,8 @@ import {
 import { ProfilesForm } from './ProfilesForm';
 import { ProfilesListApi } from './useProfilesList';
 
-type PickProfileResponse = {
-	status: 'ok' | 'error';
-	message?: string;
-};
+type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
+
 export type OnPickProfile = (
 	profile: ProfileObject,
 	password?: string,
@@ -53,7 +51,7 @@ export const VaultEntryScreenManager = ({
 	profilesManager,
 	onChooseProfile,
 }: VaultEntryScreenManagerProps) => {
-	const { show: showError } = useVaultOpenErrorToast();
+	const { show: showErrorToast } = useVaultOpenErrorToast();
 
 	const [isProfileOpening, setIsProfileOpening] = useState(false);
 	const onOpenProfile: OnPickProfile = useCallback(
@@ -86,18 +84,15 @@ export const VaultEntryScreenManager = ({
 					return { status: 'error', message: 'Invalid password' };
 				}
 
-				// The error for an unencrypted message is handled in another place,
-				// here we handle only the error for un encryption
-				if (!profile.encryption) {
-					showError(profile.id, 'Failed to open profile');
-				}
-
-				return { status: 'error', message: 'Unknown error' };
+				return {
+					status: 'error',
+					message: `Error opening ${profile.name}`,
+				};
 			} finally {
 				setIsProfileOpening(false);
 			}
 		},
-		[profiles, showError],
+		[profiles],
 	);
 
 	const currentVaultObject = useMemo(
@@ -129,7 +124,11 @@ export const VaultEntryScreenManager = ({
 				onCreateProfile={(profile) =>
 					profilesManager.createProfile(profile).then((newProfile) => {
 						onOpenProfile(newProfile, profile.password ?? undefined).then(
-							console.warn,
+							(result) => {
+								console.warn(result);
+								if (result.status === 'error')
+									showErrorToast(newProfile.id, newProfile.name);
+							},
 						);
 					})
 				}
@@ -182,7 +181,10 @@ export const VaultEntryScreenManager = ({
 								onChooseProfile(profile.id);
 
 								if (profile.encryption === null) {
-									onOpenProfile(profile);
+									onOpenProfile(profile).then((result) => {
+										if (result.status === 'error')
+											showErrorToast(profile.id, profile.name);
+									});
 								}
 
 								telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_SELECTED);

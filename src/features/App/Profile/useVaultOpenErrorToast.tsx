@@ -4,15 +4,15 @@ import { createStandaloneToast } from '@chakra-ui/react';
 export const { toast } = createStandaloneToast();
 
 export const useVaultOpenErrorToast = () => {
-	const show = useCallback((id: string, message: string) => {
+	const show = useCallback((id: string, profileName: string) => {
 		if (!toast.isActive(id)) {
 			toast({
 				id,
 				status: 'error',
 				title: 'Cannot open profile',
-				description: message,
+				description: `"${profileName}" failed to open`,
 				containerStyle: {
-					maxW: '400px',
+					maxW: '350px',
 				},
 			});
 		}

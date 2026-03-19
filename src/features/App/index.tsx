@@ -23,52 +23,47 @@ export const App: FC = () => {
 
 	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
 
-	// Close error message while changed vault
-	const { close: closeErrorMessage, show: showErrorMessage } = useVaultOpenErrorToast();
-	const prevVaultId = useRef(currentProfileId);
+	// When the active vault changes, close any open error toast that belongs to the previous vault
+	const { close: closeErrorToast, show: showErrorToast } = useVaultOpenErrorToast();
+	const prevProfileId = useRef(currentProfileId);
 	useEffect(() => {
-		if (prevVaultId.current && prevVaultId.current !== currentProfileId) {
-			closeErrorMessage(prevVaultId.current);
+		if (prevProfileId.current && prevProfileId.current !== currentProfileId) {
+			closeErrorToast(prevProfileId.current);
 		}
-		prevVaultId.current = currentProfileId;
-	}, [closeErrorMessage, currentProfileId]);
+		prevProfileId.current = currentProfileId;
+	}, [closeErrorToast, currentProfileId]);
 
 	// Open recent vault
-	const recentVault = useRecentProfile(config);
+	const recentProfile = useRecentProfile(config);
 	const [isProfileOpening, setIsProfileOpening] = useState(true);
 	useEffect(
 		() => {
-			if (!profilesList.isProfilesLoaded || !recentVault.isLoaded) return;
+			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
 
 			// Restore profile id
-			setCurrentProfileId(recentVault.profileId);
+			setCurrentProfileId(recentProfile.profileId);
 
-			const vault = profilesList.profiles.find(
-				(profile) => profile.id === recentVault.profileId,
+			const profile = profilesList.profiles.find(
+				(profile) => profile.id === recentProfile.profileId,
 			);
 
-			if (!vault || vault.encryption) {
+			if (!profile || profile.encryption) {
 				setIsProfileOpening(false);
 				return;
 			}
 
 			// Automatically open vault with no encryption
 			profileContainers
-				.openProfile({ profile: vault }, true)
-				.catch((error) => {
-					console.error(error);
-					showErrorMessage(vault.id, 'Failed to open profile');
-				})
-				.finally(() => {
-					setIsProfileOpening(false);
-				});
+				.openProfile({ profile: profile }, true)
+				.catch(() => showErrorToast(profile.id, profile.name))
+				.finally(() => setIsProfileOpening(false));
 		},
 		// Depends only of loading status and run only once
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[profilesList.isProfilesLoaded, recentVault.isLoaded],
+		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
 	);
 	const isLoading =
-		!profilesList.isProfilesLoaded || !recentVault.isLoaded || isProfileOpening;
+		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileOpening;
 
 	const [isSplashVisible] = useDebounce(isLoading, 500);
 	if (isSplashVisible) {
