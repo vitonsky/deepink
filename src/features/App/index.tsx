@@ -54,7 +54,7 @@ export const App: FC = () => {
 
 			// Automatically open vault with no encryption
 			profileContainers
-				.openProfile({ profile: profile }, true)
+				.openProfile({ profile }, true)
 				.catch(() => showErrorToast(profile.id, profile.name))
 				.finally(() => setIsProfileOpening(false));
 		},

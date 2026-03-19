@@ -1,12 +1,7 @@
 import React, { createContext, FC, PropsWithChildren, useCallback } from 'react';
 import { INote } from '@core/features/notes';
 import { useAppDispatch } from '@state/redux/hooks';
-import {
-	useWorkspaceActions,
-	useWorkspaceData,
-	useWorkspaceSelector,
-} from '@state/redux/profiles/hooks';
-import { workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectWorkspaceLoadingError } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
@@ -61,7 +56,7 @@ export const WorkspaceContainer: FC<PropsWithChildren<WorkspaceContainerProps>> 
 }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
-	const workspaceData = useWorkspaceData();
+	const workspaceActions = useWorkspaceActions();
 
 	const workspaceLoadingError = useWorkspaceSelector(selectWorkspaceLoadingError);
 
@@ -72,11 +67,10 @@ export const WorkspaceContainer: FC<PropsWithChildren<WorkspaceContainerProps>> 
 			{...workspace}
 			notesApi={{
 				openNote: (note: INote, focus = true) => {
-					dispatch(workspacesApi.addOpenedNote({ ...workspaceData, note }));
+					dispatch(workspaceActions.addOpenedNote({ note }));
 					if (focus) {
 						dispatch(
-							workspacesApi.setActiveNote({
-								...workspaceData,
+							workspaceActions.setActiveNote({
 								noteId: note.id,
 							}),
 						);
@@ -84,15 +78,13 @@ export const WorkspaceContainer: FC<PropsWithChildren<WorkspaceContainerProps>> 
 				},
 				noteUpdated: (note: INote) =>
 					dispatch(
-						workspacesApi.updateOpenedNote({
-							...workspaceData,
+						workspaceActions.updateOpenedNote({
 							note,
 						}),
 					),
 				noteClosed: (noteId: string) =>
 					dispatch(
-						workspacesApi.removeOpenedNote({
-							...workspaceData,
+						workspaceActions.removeOpenedNote({
 							noteId,
 						}),
 					),

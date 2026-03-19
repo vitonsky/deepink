@@ -30,8 +30,6 @@ export const useRestoreWorkspace = ({
 	const notesRegistry = useNotesRegistry();
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
-	// const update = useUpdateNotes();
-
 	const isTagsLoaded = useWorkspaceSelector(selectIsTagsLoaded);
 	useEffect(() => {
 		// Must wait for tags to be loaded first,
