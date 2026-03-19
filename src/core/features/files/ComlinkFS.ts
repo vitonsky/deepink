@@ -6,9 +6,7 @@ export class ComlinkHostFS implements IFilesStorage {
 	constructor(protected readonly storage: IFilesStorage) {}
 
 	async write(path: string, buffer: ArrayBuffer) {
-		console.time('ComlinkHostFS: write');
 		await this.storage.write(path, buffer);
-		console.timeEnd('ComlinkHostFS: write');
 	}
 
 	async get(path: string) {
@@ -28,9 +26,7 @@ export class ComlinkWorkerFS implements IFilesStorage {
 	constructor(protected readonly storage: IFilesStorage) {}
 
 	async write(path: string, buffer: ArrayBuffer) {
-		console.time('ComlinkWorkerFS: write');
 		await this.storage.write(path, transfer(buffer, [buffer]));
-		console.timeEnd('ComlinkWorkerFS: write');
 	}
 
 	async get(path: string) {

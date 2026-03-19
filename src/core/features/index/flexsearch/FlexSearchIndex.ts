@@ -1,8 +1,8 @@
 import { proxy, Remote } from 'comlink';
 import { IFilesStorage } from '@core/features/files';
 import { ComlinkHostFS } from '@core/features/files/ComlinkFS';
+import { wrapWorker } from '@utils/workers/comlink';
 
-import { wrapWorker } from './comlink';
 import IndexWorker from './Index.worker';
 import { IndexWorkerApi } from '.';
 

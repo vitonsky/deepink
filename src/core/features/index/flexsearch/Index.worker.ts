@@ -5,8 +5,8 @@ const { Index } = require('flexsearch');
 
 import { IFilesStorage } from '@core/features/files';
 import { ComlinkWorkerFS } from '@core/features/files/ComlinkFS';
+import { exposeWorker } from '@utils/workers/comlink';
 
-import { exposeWorker } from './comlink';
 import { IndexWorkerApi } from '.';
 
 // Export worker stub to keep calm the TypeScript
