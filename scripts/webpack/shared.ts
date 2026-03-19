@@ -31,7 +31,11 @@ export default {
 		// enable tree-shaking
 		usedExports: true,
 		minimize: isProduction,
-		minimizer: [new SwcMinifyWebpackPlugin()],
+		minimizer: [
+			new SwcMinifyWebpackPlugin({
+				module: true, // ← tells SWC the output is ESM, allows import/export
+			}),
+		],
 
 		// Extract runtime into separate chunk for better caching
 		runtimeChunk: isProduction ? 'single' : false,
