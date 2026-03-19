@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
@@ -6,6 +6,7 @@ import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { AppServices } from './AppServices';
+import { useVaultOpenErrorToast } from './Profile/useVaultOpenErrorToast';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
 import { useOpenProfile } from './useOpenProfile';
@@ -22,6 +23,16 @@ export const App: FC = () => {
 	const profileContainers = useProfileContainers();
 
 	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
+
+	// Close error message while changed vault
+	const { close: closeErrorMessage } = useVaultOpenErrorToast();
+	const prevVaultId = useRef(currentProfileId);
+	useEffect(() => {
+		if (prevVaultId.current && prevVaultId.current !== currentProfileId) {
+			closeErrorMessage(prevVaultId.current);
+		}
+		prevVaultId.current = currentProfileId;
+	}, [closeErrorMessage, currentProfileId]);
 
 	// Open recent vault
 	const recentVault = useRecentProfile(config);
