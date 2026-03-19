@@ -1,18 +1,32 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { ProfileObject } from '@core/storage/ProfilesManager';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
+import { useVaultOpenErrorToast } from './Profile/useVaultOpenErrorToast';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
-import { ProfilesApi } from './Profiles/hooks/useProfileContainers';
+import {
+	ProfileOpenError,
+	ProfileOpenErrorCode,
+	ProfilesApi,
+} from './Profiles/hooks/useProfileContainers';
 import { ProfilesForm } from './ProfilesForm';
-import { useOpenProfile } from './useOpenProfile';
 import { ProfilesListApi } from './useProfilesList';
+
+type PickProfileResponse = {
+	status: 'ok' | 'error';
+	message?: string;
+};
+export type OnPickProfile = (
+	profile: ProfileObject,
+	password?: string,
+) => Promise<PickProfileResponse>;
 
 export type VaultEntryScreenManagerProps = {
 	profiles: ProfilesApi;
@@ -39,7 +53,52 @@ export const VaultEntryScreenManager = ({
 	profilesManager,
 	onChooseProfile,
 }: VaultEntryScreenManagerProps) => {
-	const { onOpenProfile, isProfileOpening } = useOpenProfile(profiles);
+	const { show: showError } = useVaultOpenErrorToast();
+
+	const [isProfileOpening, setIsProfileOpening] = useState(false);
+	const onOpenProfile: OnPickProfile = useCallback(
+		async (profile: ProfileObject, password?: string) => {
+			setIsProfileOpening(true);
+
+			try {
+				// Profiles with no password
+				if (!profile.encryption) {
+					await profiles.openProfile({ profile }, true);
+
+					return { status: 'ok' };
+				}
+
+				// Profiles with password
+				if (password === undefined) {
+					return { status: 'error', message: 'Enter password' };
+				}
+
+				await profiles.openProfile({ profile, password }, true);
+
+				return { status: 'ok' };
+			} catch (err) {
+				console.error(err);
+
+				if (
+					err instanceof ProfileOpenError &&
+					err.code === ProfileOpenErrorCode.INCORRECT_PASSWORD
+				) {
+					return { status: 'error', message: 'Invalid password' };
+				}
+
+				// The error for an unencrypted message is handled in another place,
+				// here we handle only the error for un encryption
+				if (!profile.encryption) {
+					showError(profile.id, 'Failed to open profile');
+				}
+
+				return { status: 'error', message: 'Unknown error' };
+			} finally {
+				setIsProfileOpening(false);
+			}
+		},
+		[profiles, showError],
+	);
 
 	const currentVaultObject = useMemo(
 		() =>
