@@ -6,10 +6,10 @@ import { FileController } from '@core/features/files/FileController';
 import { FilesController } from '@core/features/files/FilesController';
 import { RootedFS } from '@core/features/files/RootedFS';
 import { StateFile } from '@core/features/files/StateFile';
+import { FlexSearchIndex } from '@core/features/index/flexsearch/FlexSearchIndex';
 import { INotesController } from '@core/features/notes/controller';
 import { NotesController } from '@core/features/notes/controller/NotesController';
-import { NotesTextIndex } from '@core/features/notes/controller/NotesTextIndex';
-import { NotesTextIndexScanner } from '@core/features/notes/controller/NotesTextIndexScanner';
+import { NotesTextIndexer } from '@core/features/notes/controller/NotesTextIndexer';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { useVaultStorage } from '@features/files';
@@ -26,8 +26,8 @@ export type WorkspaceContainer = {
 	notesRegistry: INotesController;
 	notesHistory: NoteVersions;
 	notesIndex: {
-		index: NotesTextIndex;
-		controller: NotesTextIndexScanner;
+		index: FlexSearchIndex;
+		controller: NotesTextIndexer;
 	};
 };
 
@@ -40,11 +40,12 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 	useEffect(() => {
 		const { db } = currentProfile;
 
+		// TODO: index must be destroyed by unmount a workspace. That is privacy threat
 		const indexDir = new RootedFS(
 			files,
 			getWorkspacePath(workspaceId) + '/index/notes',
 		);
-		const notesIndex = new NotesTextIndex(indexDir);
+		const notesIndex = new FlexSearchIndex(indexDir);
 		const notes = new NotesController(db, workspaceId, notesIndex);
 
 		// Setup files
@@ -58,7 +59,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 			notesHistory: new NoteVersions(db, workspaceId),
 			notesIndex: {
 				index: notesIndex,
-				controller: new NotesTextIndexScanner(
+				controller: new NotesTextIndexer(
 					notes,
 					notesIndex,
 					new StateFile(

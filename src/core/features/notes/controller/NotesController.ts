@@ -6,7 +6,8 @@ import { SQLiteDB } from '@core/storage/database/sqlite';
 import { DBTypes, qb } from '@core/storage/database/sqlite/utils/query-builder';
 import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
 
-import { NotesTextIndex } from './NotesTextIndex';
+import { FlexSearchIndex } from '../../index/flexsearch/FlexSearchIndex';
+
 import { INote, INoteContent, NoteId } from '..';
 import {
 	INotesController,
@@ -214,7 +215,7 @@ export class NotesController implements INotesController {
 	constructor(
 		private readonly db: ManagedDatabase<SQLiteDB>,
 		private readonly workspace: string,
-		private readonly index?: NotesTextIndex,
+		private readonly index?: FlexSearchIndex,
 	) {}
 
 	public async getById(ids: NoteId[]): Promise<INote[]> {

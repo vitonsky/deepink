@@ -1,12 +1,12 @@
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 
-import { NotesTextIndex } from './NotesTextIndex';
+import { FlexSearchIndex } from './FlexSearchIndex';
 
 describe('Persistence', () => {
 	const indexFs = new InMemoryFS();
 
 	test('Fill the index', async () => {
-		const index = new NotesTextIndex(indexFs);
+		const index = new FlexSearchIndex(indexFs);
 		const session = await index.createIndexSession();
 
 		await Promise.all([
@@ -18,7 +18,7 @@ describe('Persistence', () => {
 	});
 
 	test('Search in index in another session', async () => {
-		const index = new NotesTextIndex(indexFs);
+		const index = new FlexSearchIndex(indexFs);
 		await expect(index.query('FOO CONTENT')).resolves.toEqual(['foo']);
 	});
 
@@ -26,7 +26,7 @@ describe('Persistence', () => {
 		await indexFs.delete(await indexFs.list());
 		await expect(indexFs.list()).resolves.toEqual([]);
 
-		const index = new NotesTextIndex(indexFs);
+		const index = new FlexSearchIndex(indexFs);
 		await expect(index.query('FOO CONTENT')).resolves.toEqual([]);
 	});
 });

@@ -41,6 +41,12 @@ export default merge(commonConfig, {
 	externals: {
 		electron: 'global electron',
 	},
+	resolve: {
+		fallback: {
+			// eslint-disable-next-line camelcase
+			worker_threads: false,
+		},
+	},
 	experiments: {
 		asyncWebAssembly: true,
 		outputModule: true,

@@ -1,12 +1,16 @@
 import { AsyncState } from '@core/features/files/AsyncState';
 
-import { NotesTextIndex } from './NotesTextIndex';
+import { FlexSearchIndex } from '../../index/flexsearch/FlexSearchIndex';
+
 import { INotesController } from '.';
 
-export class NotesTextIndexScanner {
+/**
+ * Build and maintain the notes text index
+ */
+export class NotesTextIndexer {
 	constructor(
 		private readonly notes: INotesController,
-		private readonly index: NotesTextIndex,
+		private readonly index: FlexSearchIndex,
 		private readonly state: AsyncState<{ lastUpdate: number | null }>,
 	) {}
 
@@ -25,7 +29,7 @@ export class NotesTextIndexScanner {
 			const notes = await this.notes.get({
 				sort: { by: 'updatedAt', order: 'asc' },
 				updatedAt: { from: startDate ?? undefined },
-				limit: 300,
+				limit: 1000,
 			});
 
 			if (notes.length === 0) break;

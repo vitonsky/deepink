@@ -7,9 +7,10 @@ import { TagsController } from '@core/features/tags/controller/TagsController';
 import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { FlexSearchIndex } from '../../index/flexsearch/FlexSearchIndex';
+
 import { NotesController } from './NotesController';
-import { NotesTextIndex } from './NotesTextIndex';
-import { NotesTextIndexScanner } from './NotesTextIndexScanner';
+import { NotesTextIndexer } from './NotesTextIndexer';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -615,7 +616,7 @@ describe('Notes search', () => {
 	const dbFile = createFileControllerMock();
 	const dbPromise = openSQLite(dbFile);
 
-	const index = new NotesTextIndex(new InMemoryFS());
+	const index = new FlexSearchIndex(new InMemoryFS());
 
 	const texts = [
 		'A fast auburn fox leaped above a sleepy canine',
@@ -672,7 +673,7 @@ describe('Notes search', () => {
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const indexScannerFile = createFileControllerMock();
-		const indexScanner = new NotesTextIndexScanner(
+		const indexScanner = new NotesTextIndexer(
 			registry,
 			index,
 			new StateFile(

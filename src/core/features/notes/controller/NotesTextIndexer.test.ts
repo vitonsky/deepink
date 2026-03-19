@@ -5,9 +5,10 @@ import { StateFile } from '@core/features/files/StateFile';
 import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { FlexSearchIndex } from '../../index/flexsearch/FlexSearchIndex';
+
 import { NotesController } from './NotesController';
-import { NotesTextIndex } from './NotesTextIndex';
-import { NotesTextIndexScanner } from './NotesTextIndexScanner';
+import { NotesTextIndexer } from './NotesTextIndexer';
 
 const FAKE_WORKSPACE_ID = getUUID();
 
@@ -17,11 +18,11 @@ test('incremental index building', async () => {
 	const db = await openSQLite(createFileControllerMock());
 	onTestFinished(db.close);
 
-	const index = new NotesTextIndex(new InMemoryFS());
+	const index = new FlexSearchIndex(new InMemoryFS());
 	const notes = new NotesController(db, FAKE_WORKSPACE_ID, index);
 
 	const indexScannerFile = createFileControllerMock();
-	const indexScanner = new NotesTextIndexScanner(
+	const indexScanner = new NotesTextIndexer(
 		notes,
 		index,
 		new StateFile(indexScannerFile, z.object({ lastUpdate: z.number().nullable() })),
@@ -63,4 +64,4 @@ test('incremental index building', async () => {
 	// Deletion automatically clear cache
 	await notes.delete([note1]);
 	await expect(notes.get({ search: { text: 'updated demo' } })).resolves.toEqual([]);
-});
+}, 3000);

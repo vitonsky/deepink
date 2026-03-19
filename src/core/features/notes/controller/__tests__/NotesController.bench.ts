@@ -7,9 +7,10 @@ import { StateFile } from '@core/features/files/StateFile';
 import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+import { FlexSearchIndex } from '../../../index/flexsearch/FlexSearchIndex';
+
 import { NotesController } from '../NotesController';
-import { NotesTextIndex } from '../NotesTextIndex';
-import { NotesTextIndexScanner } from '../NotesTextIndexScanner';
+import { NotesTextIndexer } from '../NotesTextIndexer';
 
 function getRandomNumber(min: number, max: number) {
 	min = Math.ceil(min);
@@ -32,9 +33,9 @@ describe.sequential('Note ops performance', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openSQLite(dbFile);
 
-	const index = new NotesTextIndex(new InMemoryFS());
+	const index = new FlexSearchIndex(new InMemoryFS());
 	const notes = new NotesController(db, FAKE_WORKSPACE_ID, index);
-	const indexScanner = new NotesTextIndexScanner(
+	const indexScanner = new NotesTextIndexer(
 		notes,
 		index,
 		new StateFile(
