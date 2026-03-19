@@ -54,7 +54,7 @@ const decryptKey = async ({
 };
 
 export const enum ProfileOpenErrorCode {
-	INCORRECT_PASSWORD = 'Incorrect password',
+	INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
 }
 export class ProfileOpenError extends Error {
 	constructor(
@@ -88,57 +88,73 @@ export const useProfileContainers = () => {
 			changeActiveProfile = false,
 		) => {
 			const cleanups: (() => void)[] = [];
-
-			const profileFilesController = new RootedFS(files, `/vaults/${profile.id}`);
-
-			// Setup encryption
-			let encryptionController: EncryptionController;
 			let encryptionCleanup: null | (() => any) = null;
-			if (profile.encryption === null) {
-				encryptionController = new EncryptionController(
-					new PlaceholderEncryptionController(),
-				);
-			} else {
-				if (password === undefined)
-					throw new ProfileOpenError(
-						'Empty password for encrypted profile',
-						ProfileOpenErrorCode.INCORRECT_PASSWORD,
-					);
 
-				const encryptedKeyBuffer = await profileFilesController.get('key');
-				if (!encryptedKeyBuffer) {
-					throw new Error('Key file is not found in profile directory');
+			const runCleanups = async () => {
+				// TODO: remove key of RAM. Set control with callback to remove key
+				for (const cleanup of cleanups) {
+					// TODO: set deadline for awaiting
+
+					await cleanup();
 				}
 
-				let key: ArrayBuffer;
-				let salt: ArrayBuffer;
-				try {
-					salt = new Uint8Array(base64ToBytes(profile.encryption.salt)).buffer;
-					key = await decryptKey({
-						encryptedKey: encryptedKeyBuffer,
-						password,
-						salt,
-						algorithm: profile.encryption.algorithm,
-					});
-				} catch (error) {
-					throw new ProfileOpenError(
-						'Invalid password',
-						ProfileOpenErrorCode.INCORRECT_PASSWORD,
-						{ cause: error },
-					);
+				if (encryptionCleanup) {
+					encryptionCleanup();
 				}
-
-				const encryption = await createEncryption({
-					key,
-					salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
-					algorithm: profile.encryption.algorithm,
-				});
-
-				encryptionCleanup = () => encryption.dispose();
-				encryptionController = encryption.getContent();
-			}
+			};
 
 			try {
+				const profileFilesController = new RootedFS(
+					files,
+					`/vaults/${profile.id}`,
+				);
+
+				// Setup encryption
+				let encryptionController: EncryptionController;
+
+				if (profile.encryption === null) {
+					encryptionController = new EncryptionController(
+						new PlaceholderEncryptionController(),
+					);
+				} else {
+					if (password === undefined)
+						throw new ProfileOpenError(
+							'Empty password for encrypted profile',
+							ProfileOpenErrorCode.INCORRECT_PASSWORD,
+						);
+
+					const encryptedKeyBuffer = await profileFilesController.get('key');
+					if (!encryptedKeyBuffer) {
+						throw new Error('Key file is not found in profile directory');
+					}
+
+					const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
+					let key: ArrayBuffer;
+					try {
+						key = await decryptKey({
+							encryptedKey: encryptedKeyBuffer,
+							password,
+							salt,
+							algorithm: profile.encryption.algorithm,
+						});
+					} catch (error) {
+						throw new ProfileOpenError(
+							'Failed to decrypt the key',
+							ProfileOpenErrorCode.INCORRECT_PASSWORD,
+							{ cause: error },
+						);
+					}
+
+					const encryption = await createEncryption({
+						key,
+						salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
+						algorithm: profile.encryption.algorithm,
+					});
+
+					encryptionCleanup = () => encryption.dispose();
+					encryptionController = encryption.getContent();
+				}
+
 				const encryptedProfileFS = new EncryptedFS(
 					profileFilesController,
 					encryptionController,
@@ -148,6 +164,9 @@ export const useProfileContainers = () => {
 				const db = await openSQLite(
 					new FileController('vault.db', encryptedProfileFS),
 				);
+
+				// TODO: close DB first and close encryption last
+				cleanups.push(() => db.close());
 
 				// Ensure at least one workspace exists
 				const workspaces = new WorkspacesController(db);
@@ -160,9 +179,6 @@ export const useProfileContainers = () => {
 					// Sync to avoid losing the default workspace if the app closes before the automatic sync
 					await db.sync();
 				}
-
-				// TODO: close DB first and close encryption last
-				cleanups.push(() => db.close());
 
 				const profileObject: ProfileEntry = {
 					id: profile.id,
@@ -177,17 +193,7 @@ export const useProfileContainers = () => {
 						encryptionController,
 						files: encryptedProfileFS,
 					} satisfies ProfileContainer,
-					async () => {
-						// TODO: remove key of RAM. Set control with callback to remove key
-						for (const cleanup of cleanups) {
-							// TODO: set deadline for awaiting
-							await cleanup();
-						}
-
-						if (encryptionCleanup) {
-							encryptionCleanup();
-						}
-					},
+					runCleanups,
 				);
 
 				profileOpened(newProfile);
@@ -197,17 +203,11 @@ export const useProfileContainers = () => {
 				}
 
 				return newProfile;
-			} catch (err) {
-				for (const cleanup of cleanups) {
-					// TODO: set deadline for awaiting
-					await cleanup();
-				}
+			} catch (error) {
+				// Close all resources if opening the profile fails
+				await runCleanups();
 
-				if (encryptionCleanup) {
-					encryptionCleanup();
-				}
-
-				throw err;
+				throw error;
 			}
 		},
 		[activeProfileChanged, files, profileOpened],
