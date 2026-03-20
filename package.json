@@ -64,7 +64,7 @@
 		"@types/react-dom": "^19.2.3",
 		"@types/recursive-readdir": "^2.2.4",
 		"@types/semver": "^7.7.1",
-		"@types/sql.js": "^1.4.9",
+		"@types/sql.js": "^1.4.10",
 		"@types/uuid": "^11.0.0",
 		"@types/webpack": "^5.28.5",
 		"@vitest/web-worker": "^4.1.0",
