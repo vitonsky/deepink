@@ -3,6 +3,9 @@ import { createStandaloneToast } from '@chakra-ui/react';
 
 export const { toast } = createStandaloneToast();
 
+/**
+ * Hook for displaying an error toast notification when a profile fails to open
+ */
 export const useVaultOpenErrorToast = () => {
 	const show = useCallback((id: string, profileName: string) => {
 		if (!toast.isActive(id)) {

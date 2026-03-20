@@ -161,7 +161,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const profileLoadError = useAppSelector(
 		selectActiveWorkspaceLoadingError({ profileId }),
 	);
-	const [isProfileReady] = useDebounce(isProfileLoaded && !profileLoadError, 500, {
+	const [isProfileReady] = useDebounce(isProfileLoaded || profileLoadError, 500, {
 		leading: true,
 	});
 

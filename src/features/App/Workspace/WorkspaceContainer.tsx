@@ -23,7 +23,7 @@ export interface WorkspaceContainerProps {
 }
 
 /**
- * Loads tags and restores previous workspace state
+ * Restores workspace state
  */
 const WorkspaceInitializer = () => {
 	useWorkspaceTags();

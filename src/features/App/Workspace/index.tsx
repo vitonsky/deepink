@@ -20,9 +20,10 @@ import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
 export const Workspace = () => {
 	const workspaceData = useWorkspaceData();
-	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
+	const workspaceLoadingError = useWorkspaceSelector(selectWorkspaceLoadingError);
+	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
 
 	const activeWorkspace = useAppSelector(
 		useMemo(
@@ -31,12 +32,11 @@ export const Workspace = () => {
 		),
 		isEqual,
 	);
-	const isVisibleWorkspace =
-		isWorkspaceLoaded &&
+	const isVisibleWorkspace = Boolean(
 		activeWorkspace &&
-		activeWorkspace.id === workspaceData.workspaceId;
-
-	const workspaceLoadingError = useWorkspaceSelector(selectWorkspaceLoadingError);
+		activeWorkspace.id === workspaceData.workspaceId &&
+		(isWorkspaceLoaded || workspaceLoadingError),
+	);
 
 	return (
 		<Box
