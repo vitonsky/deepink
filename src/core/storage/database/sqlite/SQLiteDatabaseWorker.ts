@@ -1,29 +1,46 @@
-import { proxy, wrap } from 'comlink';
+import { proxy, transfer, wrap } from 'comlink';
 import { BindParams, UpdateHookCallback } from 'sql.js';
 
-import SQLWorker from './SQLiteDatabase.worker';
+import SQLWorker from './SQLiteDatabase.worker?worker';
 import { SQLiteDB, SQLiteDBWorker } from '.';
 
 export class SQLiteDatabaseWorker implements SQLiteDB {
 	protected db;
-	constructor(data?: ArrayLike<number> | Buffer | null) {
-		const db = wrap<SQLiteDBWorker>(new SQLWorker());
-		this.db = db.init(data).then(() => db);
+	protected worker;
+	protected isClosed = false;
+	constructor(data?: ArrayBuffer | null) {
+		this.worker = new SQLWorker();
+
+		const db = wrap<SQLiteDBWorker>(this.worker);
+		this.db = db
+			.init(data ? transfer(new Uint8Array(data), [data]) : undefined)
+			.then(() => db);
+	}
+
+	protected async getDb() {
+		if (this.isClosed) throw new Error('Database is closed');
+		return this.db;
 	}
 
 	async query(query: string, params?: BindParams) {
-		const db = await this.db;
+		const db = await this.getDb();
 		return db.query(query, params);
 	}
 
 	async export() {
-		const db = await this.db;
+		const db = await this.getDb();
 		return db.export();
 	}
 
 	async close() {
-		const db = await this.db;
-		return db.close();
+		const db = await this.getDb();
+
+		// Reject new requests
+		this.isClosed = true;
+
+		// Terminate connection
+		await db.close();
+		this.worker.terminate();
 	}
 
 	onChange(callback: UpdateHookCallback): () => void {

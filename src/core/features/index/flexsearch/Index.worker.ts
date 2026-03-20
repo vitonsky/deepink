@@ -9,9 +9,6 @@ import { ComlinkWorkerFS } from '@core/features/files/ComlinkFS';
 
 import { IndexWorkerApi } from '.';
 
-// Export worker stub to keep calm the TypeScript
-export default null as unknown as new () => Worker;
-
 console.debug('Flex search worker is loaded');
 
 let indexPromise: Promise<{

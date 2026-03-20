@@ -3,9 +3,6 @@ import { expose, proxy } from 'comlink';
 import { SQLiteDatabase } from './SQLiteDatabase';
 import { SQLiteDBWorker } from '.';
 
-// Export worker stub to keep calm the TypeScript
-export default null as unknown as new () => Worker;
-
 let db: SQLiteDatabase | null = null;
 
 expose({
@@ -14,6 +11,9 @@ expose({
 		if (db) await db.close();
 
 		db = new SQLiteDatabase(data);
+
+		// Add debug endpoints
+		(self as any).db = db;
 	},
 	query(...args) {
 		if (!db)

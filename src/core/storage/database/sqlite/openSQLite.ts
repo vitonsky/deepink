@@ -6,14 +6,12 @@ import scheme from './scheme.sql';
 import { SQLiteDB } from '.';
 
 export const openSQLite = async (file: IFileController) => {
-	const initBuffer = await file
-		.get()
-		.then((buffer) => (buffer ? new Uint8Array(buffer) : null));
+	const initBuffer = await file.get();
 
 	const isNode = typeof process !== 'undefined';
 	const db = isNode
 		? await import('./SQLiteDatabase').then(async ({ SQLiteDatabase }) => {
-				return new SQLiteDatabase(initBuffer);
+				return new SQLiteDatabase(initBuffer ? new Uint8Array(initBuffer) : null);
 			})
 		: await import('./SQLiteDatabaseWorker').then(
 				async ({ SQLiteDatabaseWorker }) => {
