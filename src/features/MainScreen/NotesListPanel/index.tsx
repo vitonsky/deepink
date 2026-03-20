@@ -14,6 +14,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useWorkspaceContainer } from '@features/App/Workspace/WorkspaceProvider';
 import { NotesList } from '@features/MainScreen/NotesListPanel/NotesList';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
@@ -27,6 +28,10 @@ import {
 } from '@state/redux/profiles/profiles';
 
 export const NotesListPanel = () => {
+	const {
+		notesIndex: { index: notesIndex },
+	} = useWorkspaceContainer();
+
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();
@@ -99,6 +104,8 @@ export const NotesListPanel = () => {
 							onKeyUp={(e) => {
 								if (e.key === 'Escape') clearSearch();
 							}}
+							// Load index by focus on search
+							onFocus={() => notesIndex.load()}
 						/>
 						{searchInput.length > 0 ? (
 							<InputRightElement onClick={clearSearch}>
