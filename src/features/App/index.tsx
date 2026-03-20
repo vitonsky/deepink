@@ -1,10 +1,7 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
-import { FileController } from '@core/features/files/FileController';
-import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
@@ -15,23 +12,6 @@ import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { WorkspaceManager } from './WorkspaceManager';
-
-openSQLite(new FileController('/db', new InMemoryFS())).then((db) => {
-	console.log('Spawned SQLite in worker', db);
-
-	(window as any).db = db.get();
-	(window as any).time = async () => {
-		const time = await db.get().query(`SELECT now() as now`);
-		console.log('Time', time[0]);
-	};
-
-	db.get().onChange((operation, database, table, rowId) => {
-		console.log(`Client side: ${operation} on ${database}.${table} row ${rowId}`);
-	});
-	(window as any).dbInsert = async () => {
-		return db.get().query(`INSERT INTO workspaces(name) VALUES('test')`);
-	};
-});
 
 export const App: FC = () => {
 	const files = useFilesStorage();
