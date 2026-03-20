@@ -1,3 +1,8 @@
+declare module "*?worker" {
+	const module: new () => Worker;
+	export default module;
+}
+
 declare module "*.sql" {
 	const sql: string;
 	export default sql;

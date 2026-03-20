@@ -1,10 +1,9 @@
-import { proxy, Remote } from 'comlink';
+import { proxy, Remote, wrap } from 'comlink';
 import { noop } from 'lodash';
 import { IFilesStorage } from '@core/features/files';
 import { ComlinkHostFS } from '@core/features/files/ComlinkFS';
-import { wrapWorker } from '@utils/workers/comlink';
 
-import IndexWorker from './Index.worker';
+import IndexWorker from './Index.worker?worker';
 import { IndexWorkerApi } from '.';
 
 export class FlexSearchIndex {
@@ -19,7 +18,8 @@ export class FlexSearchIndex {
 	private getState() {
 		if (!this.state) {
 			const worker = new IndexWorker();
-			this.state = wrapWorker<IndexWorkerApi>(worker).then(async (index) => {
+			this.state = Promise.resolve().then(async () => {
+				const index = wrap<IndexWorkerApi>(worker);
 				const fs = proxy(new ComlinkHostFS(this.storage));
 
 				await index.init({ tokenize: 'tolerant' }, fs);

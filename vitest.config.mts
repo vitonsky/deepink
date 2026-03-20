@@ -2,12 +2,10 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defaultExclude, defineConfig } from 'vitest/config';
-import { workerPlugin } from './scripts/tests/worker-plugin'
 
 export default defineConfig({
 	plugins: [
 		tsconfigPaths(),
-		workerPlugin(),
 		{
 			name: 'vite-plugin-sql-import',
 			enforce: 'pre',
@@ -20,8 +18,12 @@ export default defineConfig({
 		},
 	],
 	test: {
+		env: {
+			// TODO: disable once bug will be fixed: https://github.com/vitest-dev/vitest/issues/9927
+			VITEST_WEB_WORKER_CLONE: 'none',
+		},
 		globals: true,
-		setupFiles: ['scripts/vitest.setup.ts'],
+		setupFiles: ['@vitest/web-worker', 'scripts/vitest.setup.ts'],
 		exclude: defaultExclude.concat(['tmp/**', 'dist/**', 'out/**']),
 
 		// DB initialization takes some time at first time,
