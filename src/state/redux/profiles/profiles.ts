@@ -81,7 +81,6 @@ export const createWorkspaceObject = (workspace: {
 	tags: {
 		selected: null,
 		list: [],
-		isTagsLoaded: false,
 	},
 
 	config: {
@@ -139,7 +138,6 @@ export type WorkspaceData = {
 	tags: {
 		selected: string | null;
 		list: IResolvedTag[];
-		isTagsLoaded: boolean;
 	};
 
 	config: z.output<typeof WorkspaceConfigScheme>;
@@ -440,7 +438,6 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.tags.list = tags;
-			workspace.tags.isTagsLoaded = true;
 
 			// Reset selected if no tag exist
 			const isSelectedTagExists = workspace.tags.list.some(

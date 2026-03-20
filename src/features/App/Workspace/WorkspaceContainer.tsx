@@ -1,4 +1,4 @@
-import React, { createContext, FC, PropsWithChildren, useCallback } from 'react';
+import React, { createContext, FC, PropsWithChildren } from 'react';
 import { INote } from '@core/features/notes';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -26,22 +26,8 @@ export interface WorkspaceContainerProps {
  * Loads tags and restores previous workspace state
  */
 const WorkspaceInitializer = () => {
-	const dispatch = useAppDispatch();
-	const workspaceActions = useWorkspaceActions();
-
-	const handleError = useCallback(
-		(errorMessage: string) => {
-			dispatch(
-				workspaceActions.setWorkspaceLoadingError({
-					errorMessage,
-				}),
-			);
-		},
-		[dispatch, workspaceActions],
-	);
-
-	useWorkspaceTags({ onError: handleError });
-	useRestoreWorkspace({ onError: handleError });
+	useWorkspaceTags();
+	useRestoreWorkspace();
 
 	return null;
 };

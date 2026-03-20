@@ -4,38 +4,22 @@ import { StateFile } from '@core/features/files/StateFile';
 import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useAppDispatch } from '@state/redux/hooks';
-import {
-	useWorkspaceActions,
-	useWorkspaceData,
-	useWorkspaceSelector,
-} from '@state/redux/profiles/hooks';
-import {
-	NOTES_VIEW,
-	selectIsTagsLoaded,
-	WorkspaceConfigScheme,
-} from '@state/redux/profiles/profiles';
+import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hooks';
+import { NOTES_VIEW, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
 
 import { WorkspaceStateScheme } from './services/useWorkspaceStateSync';
-import { useNotesRegistry } from './WorkspaceProvider';
+import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
-export const useRestoreWorkspace = ({
-	onError,
-}: {
-	onError: (message: string) => void;
-}) => {
+export const useRestoreWorkspace = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
 
 	const notesRegistry = useNotesRegistry();
+	const tagsRegistry = useTagsRegistry();
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
-	const isTagsLoaded = useWorkspaceSelector(selectIsTagsLoaded);
 	useEffect(() => {
-		// Must wait for tags to be loaded first,
-		// otherwise selectedTagId from state will be ignored
-		if (!isTagsLoaded) return;
-
 		const workspaceConfig = new StateFile(
 			new FileController(`config.json`, workspaceFiles),
 			WorkspaceConfigScheme,
@@ -46,15 +30,24 @@ export const useRestoreWorkspace = ({
 			WorkspaceStateScheme,
 		);
 
-		Promise.all([workspaceState.get(), workspaceConfig.get()])
-			.then(async ([state, config]) => {
+		Promise.all([workspaceState.get(), workspaceConfig.get(), tagsRegistry.getTags()])
+			.then(async ([state, config, tags]) => {
+				// Tags are loaded here because filters depend on them -
+				// selectedTagId must be validated against the tag list before being applied
+				dispatch(workspaceActions.setTags({ tags: tags }));
+
+				const selectedTagId =
+					tags.length > 0 && state?.selectedTagId
+						? tags.find((t) => t.id === state?.selectedTagId)?.id
+						: undefined;
+
 				// Restore filters
 				if (state) {
 					dispatch(
 						workspaceActions.setFilters({
 							search: state.search,
 							view: state.view,
-							selectedTagId: state.selectedTagId || undefined,
+							selectedTagId,
 						}),
 					);
 				}
@@ -70,13 +63,10 @@ export const useRestoreWorkspace = ({
 				}
 
 				// Get opened notes and notes list
-				const tags =
-					state && state.selectedTagId !== null ? [state.selectedTagId] : [];
-				const search = state && state.search ? { text: state.search } : undefined;
 				const [noteIds, openedNotes] = await Promise.all([
 					notesRegistry.query({
-						tags,
-						search,
+						tags: selectedTagId ? [selectedTagId] : [],
+						search: state?.search ? { text: state.search } : undefined,
 						sort: { by: 'updatedAt', order: 'desc' },
 						meta: {
 							isDeleted: state?.view === NOTES_VIEW.BIN,
@@ -96,6 +86,9 @@ export const useRestoreWorkspace = ({
 						: Promise.resolve(null),
 				]);
 
+				// Restore notes list
+				dispatch(workspaceActions.setNoteIds({ noteIds }));
+
 				// Restore opened notes
 				if (openedNotes && openedNotes.length > 0) {
 					dispatch(workspaceActions.setOpenedNotes({ notes: openedNotes }));
@@ -106,9 +99,6 @@ export const useRestoreWorkspace = ({
 						openedNotes[0];
 					dispatch(workspaceActions.setActiveNote({ noteId: activeNote.id }));
 				}
-
-				// Restore notes list
-				dispatch(workspaceActions.setNoteIds({ noteIds }));
 
 				dispatch(
 					workspaceActions.setWorkspaceLoadingStatus({
@@ -121,14 +111,12 @@ export const useRestoreWorkspace = ({
 			})
 			.catch((error) => {
 				console.error(error);
-				onError(error.message);
+
+				dispatch(
+					workspaceActions.setWorkspaceLoadingError({
+						errorMessage: 'Failed to restore workspace',
+					}),
+				);
 			});
-	}, [
-		dispatch,
-		workspaceActions,
-		workspaceFiles,
-		notesRegistry,
-		isTagsLoaded,
-		onError,
-	]);
+	}, [dispatch, workspaceActions, workspaceFiles, notesRegistry, tagsRegistry]);
 };
