@@ -71,5 +71,18 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 		});
 	}, [currentProfile, files, workspaceId]);
 
+	// Free resources by unmount
+	useEffect(() => {
+		if (!state) return;
+
+		return () => {
+			state.notesIndex.index.unload().then(() => {
+				console.debug(
+					`Search index for a workspace ${workspaceId} have been unloaded`,
+				);
+			});
+		};
+	}, [state, workspaceId]);
+
 	return state;
 };
