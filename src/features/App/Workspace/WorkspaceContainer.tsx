@@ -47,8 +47,7 @@ const WorkspaceInitializer = () => {
 };
 
 /**
- * Manage one workspace
- * Sets up providers and services for a workspace
+ * Manages one workspace: sets up providers and handles data initialization
  */
 export const WorkspaceContainer: FC<PropsWithChildren<WorkspaceContainerProps>> = ({
 	profile,
@@ -91,7 +90,7 @@ export const WorkspaceContainer: FC<PropsWithChildren<WorkspaceContainerProps>> 
 			}}
 		>
 			{/* Unmount the component on error to reset all effects.
-            When the error is cleared, it mounts again and retries the restore */}
+			When the error is cleared, it mounts again and retries the initialization of data */}
 			{!workspaceLoadingError && <WorkspaceInitializer />}
 
 			<WorkspaceServices />

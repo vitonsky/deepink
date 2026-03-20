@@ -9,17 +9,18 @@ import {
 	selectActiveWorkspaceInfo,
 	selectWorkspaceName,
 } from '@state/redux/profiles/profiles';
-import { selectWorkspaceLoadingError } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+import {
+	selectIsWorkspaceLoaded,
+	selectWorkspaceLoadingError,
+} from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { WorkspaceLoadError } from './WorkspaceLoadError';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
-/**
- * Renders workspace UI
- */
 export const Workspace = () => {
 	const workspaceData = useWorkspaceData();
+	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
@@ -31,7 +32,9 @@ export const Workspace = () => {
 		isEqual,
 	);
 	const isVisibleWorkspace =
-		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
+		isWorkspaceLoaded &&
+		activeWorkspace &&
+		activeWorkspace.id === workspaceData.workspaceId;
 
 	const workspaceLoadingError = useWorkspaceSelector(selectWorkspaceLoadingError);
 
@@ -39,6 +42,7 @@ export const Workspace = () => {
 		<Box
 			data-workspace={workspaceName}
 			sx={{
+				// Hide inactive workspace
 				display: isVisibleWorkspace ? 'flex' : 'none',
 				flexDirection: 'column',
 				flexGrow: '100',

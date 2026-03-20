@@ -113,7 +113,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			.catch((error) => {
 				console.error(error);
 
-				// close vault and show error
+				// Close vault and show error
 				controls.close();
 				showErrorToast(profileId, currentProfile.profile.name);
 			});
@@ -157,17 +157,17 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
-	const isDataLoaded = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
-	const dataLoadError = useAppSelector(
+	const isProfileLoaded = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
+	const profileLoadError = useAppSelector(
 		selectActiveWorkspaceLoadingError({ profileId }),
 	);
-	const [isSplashVisible] = useDebounce(!isDataLoaded && !dataLoadError, 500, {
+	const [isProfileReady] = useDebounce(isProfileLoaded && !profileLoadError, 500, {
 		leading: true,
 	});
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{isSplashVisible && <SplashScreen />}
+			{!isProfileReady && <SplashScreen />}
 
 			{workspaces.length > 0 && <ProfileServices />}
 			{workspaces.map((workspace) =>
@@ -178,8 +178,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					>
 						<StatusBarProvider>
 							<WorkspaceContainer profile={currentProfile}>
-								{/* Render workspace only after the Splash screen is hidden */}
-								{!isSplashVisible && <Workspace />}
+								{/* Render workspace only after all data is loaded */}
+								{isProfileReady && <Workspace />}
 							</WorkspaceContainer>
 
 							<ProfileStatusBar />
