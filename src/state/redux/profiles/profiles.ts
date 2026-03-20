@@ -65,6 +65,7 @@ export const createWorkspaceObject = (workspace: {
 		isFiltersLoaded: false,
 		isOpenedNotesLoaded: false,
 		isNoteIdsLoaded: false,
+		isTagsLoaded: false,
 	},
 	loadingError: null,
 
@@ -111,6 +112,7 @@ export type LoadingStatus = {
 	isFiltersLoaded: boolean;
 	isOpenedNotesLoaded: boolean;
 	isNoteIdsLoaded: boolean;
+	isTagsLoaded: boolean;
 };
 
 export type WorkspaceData = {

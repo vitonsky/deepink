@@ -86,7 +86,7 @@ export const VaultEntryScreenManager = ({
 
 				return {
 					status: 'error',
-					message: `Error opening ${profile.name}`,
+					message: `Something went wrong`,
 				};
 			} finally {
 				setIsProfileOpening(false);
@@ -125,7 +125,6 @@ export const VaultEntryScreenManager = ({
 					profilesManager.createProfile(profile).then((newProfile) => {
 						onOpenProfile(newProfile, profile.password ?? undefined).then(
 							(result) => {
-								console.warn(result);
 								if (result.status === 'error')
 									showErrorToast(newProfile.id, newProfile.name);
 							},

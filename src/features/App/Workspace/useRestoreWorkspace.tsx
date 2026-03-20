@@ -10,6 +10,9 @@ import { NOTES_VIEW, WorkspaceConfigScheme } from '@state/redux/profiles/profile
 import { WorkspaceStateScheme } from './services/useWorkspaceStateSync';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
+/**
+ * Restores workspace state on startup: tags, filters, config, and opened notes.
+ */
 export const useRestoreWorkspace = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -106,6 +109,7 @@ export const useRestoreWorkspace = () => {
 						isFiltersLoaded: true,
 						isConfigLoaded: true,
 						isNoteIdsLoaded: true,
+						isTagsLoaded: true,
 					}),
 				);
 			})
