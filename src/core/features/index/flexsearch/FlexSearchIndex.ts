@@ -1,4 +1,5 @@
 import { proxy, Remote } from 'comlink';
+import { noop } from 'lodash';
 import { IFilesStorage } from '@core/features/files';
 import { ComlinkHostFS } from '@core/features/files/ComlinkFS';
 import { wrapWorker } from '@utils/workers/comlink';
@@ -7,54 +8,83 @@ import IndexWorker from './Index.worker';
 import { IndexWorkerApi } from '.';
 
 export class FlexSearchIndex {
-	constructor(private readonly storage: IFilesStorage) {
-		this.getIndex();
-	}
+	constructor(private readonly storage: IFilesStorage) {}
 
-	private index: Promise<Remote<IndexWorkerApi>> | null = null;
-	private getIndex() {
-		if (!this.index) {
-			this.index = wrapWorker<IndexWorkerApi>(new IndexWorker()).then(
-				async (index) => {
-					const fs = proxy(new ComlinkHostFS(this.storage));
+	private state: Promise<{
+		index: Remote<IndexWorkerApi>;
+		worker: Worker;
+		abortController: AbortController;
+		onAbortPromise: Promise<void>;
+	}> | null = null;
+	private getState() {
+		if (!this.state) {
+			const worker = new IndexWorker();
+			this.state = wrapWorker<IndexWorkerApi>(worker).then(async (index) => {
+				const fs = proxy(new ComlinkHostFS(this.storage));
 
-					await index.init({ tokenize: 'tolerant' }, fs);
+				await index.init({ tokenize: 'tolerant' }, fs);
 
-					return index;
-				},
-			);
+				const abortController = new AbortController();
+
+				const onAbortPromise = new Promise<void>((_, reject) => {
+					abortController.signal.addEventListener('abort', () => {
+						reject(abortController.signal.reason);
+					});
+				});
+				onAbortPromise.catch(noop);
+
+				return {
+					index,
+					worker,
+					abortController,
+					onAbortPromise,
+				};
+			});
 		}
 
-		return this.index;
+		return this.state;
+	}
+
+	public async load() {
+		await this.getState();
+	}
+
+	public async unload() {
+		if (!this.state) return;
+
+		const { worker, abortController } = await this.state;
+		abortController.abort(new Error('Worker is unloaded'));
+		worker.terminate();
+		this.state = null;
 	}
 
 	private async commit() {
-		const index = await this.getIndex();
+		const { index } = await this.getState();
 		await index.commit();
 	}
 
 	public async createIndexSession() {
-		const index = await this.getIndex();
+		const { index, onAbortPromise } = await this.getState();
 
 		return {
 			async add(id: string, content: string) {
-				await index.add(id, content);
+				await Promise.race([onAbortPromise, index.add(id, content)]);
 			},
 			async update(id: string, content: string) {
-				await index.update(id, content);
+				await Promise.race([onAbortPromise, index.update(id, content)]);
 			},
 			async remove(id: string) {
-				await index.remove(id);
+				await Promise.race([onAbortPromise, index.remove(id)]);
 			},
 			commit: async () => {
 				// TODO: await all async ops
-				await this.commit();
+				await Promise.race([onAbortPromise, this.commit()]);
 			},
 		};
 	}
 
 	public async query(search: string) {
-		const index = await this.getIndex();
+		const { index } = await this.getState();
 		return index.search(search);
 	}
 }
