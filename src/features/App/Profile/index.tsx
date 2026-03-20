@@ -68,6 +68,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		[currentProfile.db],
 	);
 	useEffect(() => {
+		let cancelled = false;
+
 		const vaultConfig = new StateFile(
 			new FileController('config.json', controls.profile.files),
 			ProfileConfigScheme,
@@ -75,6 +77,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 		Promise.all([workspacesManager.getList(), vaultConfig.get(), getVaultState()])
 			.then(async ([workspaces, config, state]) => {
+				if (cancelled) return;
 				const [defaultWorkspace] = workspaces;
 
 				if (!defaultWorkspace) return;
@@ -111,6 +114,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				);
 			})
 			.catch((error) => {
+				if (cancelled) return;
 				console.error(error);
 
 				// Close vault and show error
@@ -119,6 +123,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			});
 
 		return () => {
+			cancelled = true;
 			dispatch(
 				workspacesApi.removeProfile({
 					profileId,

@@ -482,7 +482,7 @@ export const profilesSlice = createSlice({
 					Partial<{
 						view: NOTES_VIEW;
 						search: string;
-						selectedTagId: string;
+						selectedTagId: string | null;
 					}>
 				>
 			>,
@@ -497,8 +497,8 @@ export const profilesSlice = createSlice({
 				workspace.search = search;
 			}
 
-			// Set the selected tag if it exists
-			if (selectedTagId) {
+			// Set the selected tag if it exists in the tags list
+			if (selectedTagId !== undefined) {
 				const isSelectedTagExists = workspace.tags.list.some(
 					({ id }) => id === selectedTagId,
 				);
