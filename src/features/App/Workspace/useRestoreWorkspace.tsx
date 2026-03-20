@@ -48,7 +48,7 @@ export const useRestoreWorkspace = ({
 
 		Promise.all([workspaceState.get(), workspaceConfig.get()])
 			.then(async ([state, config]) => {
-				// Restore workspace state if it exists
+				// Restore filters
 				if (state) {
 					dispatch(
 						workspaceActions.setFilters({
@@ -57,23 +57,6 @@ export const useRestoreWorkspace = ({
 							selectedTagId: state.selectedTagId || undefined,
 						}),
 					);
-
-					// Restore opened notes
-					const { openedNoteIds, activeNoteId } = state;
-					if (openedNoteIds && openedNoteIds.length > 0) {
-						const notes = await notesRegistry.getById(openedNoteIds);
-						if (notes && notes.length > 0) {
-							dispatch(workspaceActions.setOpenedNotes({ notes }));
-
-							const activeNote =
-								(activeNoteId &&
-									notes.find((n) => n.id === activeNoteId)) ||
-								notes[0];
-							dispatch(
-								workspaceActions.setActiveNote({ noteId: activeNote.id }),
-							);
-						}
-					}
 				}
 
 				// Restore config if it exists
@@ -86,26 +69,45 @@ export const useRestoreWorkspace = ({
 					);
 				}
 
-				// Restore notes list
+				// Get opened notes and notes list
 				const tags =
 					state && state.selectedTagId !== null ? [state.selectedTagId] : [];
 				const search = state && state.search ? { text: state.search } : undefined;
-				const noteIds = await notesRegistry.query({
-					tags,
-					search,
-					sort: { by: 'updatedAt', order: 'desc' },
-					meta: {
-						isDeleted: state?.view === NOTES_VIEW.BIN,
-						// show archived notes only in archive view
-						// but do not filter by the archived flag in bin view
-						...(state?.view !== NOTES_VIEW.BIN && {
-							isArchived: state?.view === NOTES_VIEW.ARCHIVE,
-						}),
-						...(state?.view === NOTES_VIEW.BOOKMARK && {
-							isBookmarked: true,
-						}),
-					},
-				});
+				const [noteIds, openedNotes] = await Promise.all([
+					notesRegistry.query({
+						tags,
+						search,
+						sort: { by: 'updatedAt', order: 'desc' },
+						meta: {
+							isDeleted: state?.view === NOTES_VIEW.BIN,
+							// show archived notes only in archive view
+							// but do not filter by the archived flag in bin view
+							...(state?.view !== NOTES_VIEW.BIN && {
+								isArchived: state?.view === NOTES_VIEW.ARCHIVE,
+							}),
+							...(state?.view === NOTES_VIEW.BOOKMARK && {
+								isBookmarked: true,
+							}),
+						},
+					}),
+
+					state?.openedNoteIds && state?.openedNoteIds.length > 0
+						? notesRegistry.getById(state.openedNoteIds)
+						: Promise.resolve(null),
+				]);
+
+				// Restore opened notes
+				if (openedNotes && openedNotes.length > 0) {
+					dispatch(workspaceActions.setOpenedNotes({ notes: openedNotes }));
+
+					const activeNote =
+						(state?.activeNoteId &&
+							openedNotes.find((n) => n.id === state.activeNoteId)) ||
+						openedNotes[0];
+					dispatch(workspaceActions.setActiveNote({ noteId: activeNote.id }));
+				}
+
+				// Restore notes list
 				dispatch(workspaceActions.setNoteIds({ noteIds }));
 
 				dispatch(
