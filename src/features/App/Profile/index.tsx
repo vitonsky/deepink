@@ -187,7 +187,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 								{/* Render workspace only after all data is loaded or error occurs*/}
 								{isLoadingComplete && <Workspace />}
 							</WorkspaceContainer>
-							<ProfileStatusBar />f
+							<ProfileStatusBar />
 							{isDevMode && (
 								<ToggleSQLConsole
 									isVisible={isDBConsoleVisible}
