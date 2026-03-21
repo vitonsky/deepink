@@ -114,8 +114,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				);
 			})
 			.catch((error) => {
-				if (cancelled) return;
 				console.error(error);
+
+				if (cancelled) return;
 
 				// Close vault and show error
 				controls.close();
@@ -166,13 +167,13 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const profileLoadError = useAppSelector(
 		selectActiveWorkspaceLoadingError({ profileId }),
 	);
-	const [isLoadingFinished] = useDebounce(isProfileLoaded || profileLoadError, 500, {
+	const [isLoadingComplete] = useDebounce(isProfileLoaded || profileLoadError, 500, {
 		leading: true,
 	});
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
-			{!isLoadingFinished && <SplashScreen />}
+			{!isLoadingComplete && <SplashScreen />}
 
 			{workspaces.length > 0 && <ProfileServices />}
 			{workspaces.map((workspace) =>
@@ -183,11 +184,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					>
 						<StatusBarProvider>
 							<WorkspaceContainer profile={currentProfile}>
-								{/* Render workspace only after all data is loaded */}
-								{isLoadingFinished && <Workspace />}
+								{/* Render workspace only after all data is loaded or error occurs*/}
+								{isLoadingComplete && <Workspace />}
 							</WorkspaceContainer>
-
-							<ProfileStatusBar />
+							<ProfileStatusBar />f
 							{isDevMode && (
 								<ToggleSQLConsole
 									isVisible={isDBConsoleVisible}

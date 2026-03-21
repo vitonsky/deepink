@@ -7,7 +7,7 @@ import { useTagsRegistry } from './WorkspaceProvider';
 /**
  * Subscribes to tag changes
  */
-export const useWorkspaceTags = () => {
+export const useSubscribeToTagChanges = () => {
 	const workspaceActions = useWorkspaceActions();
 	const dispatch = useAppDispatch();
 	const tagsRegistry = useTagsRegistry();

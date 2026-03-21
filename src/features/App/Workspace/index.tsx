@@ -32,11 +32,12 @@ export const Workspace = () => {
 		),
 		isEqual,
 	);
-	const isVisibleWorkspace = Boolean(
+
+	const isLoadingComplete = isWorkspaceLoaded || Boolean(workspaceLoadingError);
+	const isVisibleWorkspace =
 		activeWorkspace &&
 		activeWorkspace.id === workspaceData.workspaceId &&
-		(isWorkspaceLoaded || workspaceLoadingError),
-	);
+		isLoadingComplete;
 
 	return (
 		<Box

@@ -8,8 +8,8 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { WorkspaceServices } from './services/WorkspaceServices';
 import { useRestoreWorkspace } from './useRestoreWorkspace';
+import { useSubscribeToTagChanges } from './useSubscribeToTagChanges';
 import { useWorkspace } from './useWorkspace';
-import { useWorkspaceTags } from './useWorkspaceTags';
 import { WorkspaceProvider } from './WorkspaceProvider';
 
 export const WorkspaceContext = createContext<{
@@ -26,8 +26,8 @@ export interface WorkspaceContainerProps {
  * Restores workspace state
  */
 const WorkspaceInitializer = () => {
-	useWorkspaceTags();
 	useRestoreWorkspace();
+	useSubscribeToTagChanges();
 
 	return null;
 };
