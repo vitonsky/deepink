@@ -6,8 +6,12 @@ import { WorkspaceCreatePopup } from '@features/MainScreen/WorkspacesPanel/Works
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import {
+	selectWorkspaceName,
+	selectWorkspaces,
+	workspacesApi,
+} from '@state/redux/profiles/profiles';
 
 import { useProfileControls } from '../Profile';
 
@@ -28,6 +32,7 @@ export const WorkspaceLoadError = () => {
 		[profileId],
 	);
 	const workspaces = useAppSelector(selectWorkspacesWithMemo);
+	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
 	const modal = useWorkspaceModal();
 
@@ -35,7 +40,7 @@ export const WorkspaceLoadError = () => {
 		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 			<VStack maxW="400px" minW="350px" gap="2rem">
 				<Text fontSize="1.3rem" fontWeight="bold">
-					Workspace failed to load
+					Workspace "{workspaceName}" failed to load
 				</Text>
 
 				<Text color="typography.base">
