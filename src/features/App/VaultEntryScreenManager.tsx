@@ -105,7 +105,7 @@ export const VaultEntryScreenManager = ({
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
 	const hasNoVaults = profilesManager.profiles.length === 0;
 
-	// SplashScreen is skipped here, login form should remain visible while the vault is opening
+	// Splash screen is skipped here, login form should remain visible while the vault is opening
 	if (currentVaultObject && currentVaultObject.encryption) {
 		return (
 			<ProfileLoginForm
@@ -122,14 +122,14 @@ export const VaultEntryScreenManager = ({
 		return (
 			<ProfileCreator
 				onCreateProfile={(profile) =>
-					profilesManager.createProfile(profile).then((newProfile) => {
+					profilesManager.createProfile(profile).then((newProfile) =>
 						onOpenProfile(newProfile, profile.password ?? undefined).then(
 							(result) => {
 								if (result.status === 'error')
 									showErrorToast(newProfile.id, newProfile.name);
 							},
-						);
-					})
+						),
+					)
 				}
 				onCancel={hasNoVaults ? undefined : () => setScreen('choose')}
 				defaultProfileName={
