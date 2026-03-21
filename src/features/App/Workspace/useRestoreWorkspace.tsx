@@ -35,8 +35,8 @@ export const useRestoreWorkspace = () => {
 
 		Promise.all([workspaceState.get(), workspaceConfig.get(), tagsRegistry.getTags()])
 			.then(async ([state, config, tags]) => {
-				// Tags are loaded here because filters depend on them -
-				// selectedTagId must be validated against the tag list before being applied
+				// Tags are loaded as part of the workspace state (required for it to function)
+				// The selected tag must be validated against the available tag list before restoring filters - invalid tags will be ignored
 				dispatch(workspaceActions.setTags({ tags: tags }));
 
 				const selectedTagId =
@@ -66,7 +66,7 @@ export const useRestoreWorkspace = () => {
 				}
 
 				// Get opened notes and notes list
-				const [noteIds, openedNotes] = await Promise.all([
+				const [noteIdList, openedNoteList] = await Promise.all([
 					notesRegistry.query({
 						tags: selectedTagId ? [selectedTagId] : [],
 						search: state?.search ? { text: state.search } : undefined,
@@ -90,16 +90,16 @@ export const useRestoreWorkspace = () => {
 				]);
 
 				// Restore notes list
-				dispatch(workspaceActions.setNoteIds({ noteIds }));
+				dispatch(workspaceActions.setNoteIds({ noteIds: noteIdList }));
 
 				// Restore opened notes
-				if (openedNotes && openedNotes.length > 0) {
-					dispatch(workspaceActions.setOpenedNotes({ notes: openedNotes }));
+				if (openedNoteList && openedNoteList.length > 0) {
+					dispatch(workspaceActions.setOpenedNotes({ notes: openedNoteList }));
 
 					const activeNote =
 						(state?.activeNoteId &&
-							openedNotes.find((n) => n.id === state.activeNoteId)) ||
-						openedNotes[0];
+							openedNoteList.find((n) => n.id === state.activeNoteId)) ||
+						openedNoteList[0];
 					dispatch(workspaceActions.setActiveNote({ noteId: activeNote.id }));
 				}
 
