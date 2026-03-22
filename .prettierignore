@@ -1,9 +1,11 @@
 # thirdparty
 node_modules
+**/node_modules
 
 # artifacts
 out
 dist
+**/dist
 build
 
 # files
@@ -11,3 +13,6 @@ build
 *.html
 *.md
 package-lock.json
+
+**/.astro
+**/.cache
