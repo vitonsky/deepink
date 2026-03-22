@@ -5,21 +5,6 @@ CREATE TABLE workspaces (
   name  TEXT NOT NULL
 );
 
-CREATE TABLE files (
-  id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  workspace_id TEXT NOT NULL,
-  name         TEXT NOT NULL,
-  mimetype     TEXT NOT NULL,
-  created_at   INTEGER NOT NULL DEFAULT (timestamp('now'))
-);
-
-CREATE TABLE tags (
-  id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
-  workspace_id TEXT NOT NULL,
-  name         TEXT NOT NULL,
-  parent       TEXT REFERENCES tags(id)
-);
-
 CREATE TABLE notes (
   id               TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id     TEXT NOT NULL,
@@ -42,11 +27,12 @@ CREATE TABLE note_versions (
   created_at INTEGER NOT NULL DEFAULT (timestamp('now'))
 );
 
-CREATE TABLE attached_tags (
+CREATE TABLE files (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id TEXT NOT NULL,
-  source       TEXT NOT NULL,
-  target       TEXT NOT NULL
+  name         TEXT NOT NULL,
+  mimetype     TEXT NOT NULL,
+  created_at   INTEGER NOT NULL DEFAULT (timestamp('now'))
 );
 
 CREATE TABLE attachments (
@@ -56,10 +42,18 @@ CREATE TABLE attachments (
   file         TEXT NOT NULL REFERENCES files(id)
 );
 
-CREATE TABLE schema_migrations (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  name        TEXT NOT NULL,
-  executed_at INTEGER NOT NULL DEFAULT (timestamp('now'))
+CREATE TABLE tags (
+  id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
+  workspace_id TEXT NOT NULL,
+  name         TEXT NOT NULL,
+  parent       TEXT REFERENCES tags(id)
+);
+
+CREATE TABLE attached_tags (
+  id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
+  workspace_id TEXT NOT NULL,
+  source       TEXT NOT NULL,
+  target       TEXT NOT NULL
 );
 
 -- Indexes

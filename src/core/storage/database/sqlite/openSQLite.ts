@@ -1,8 +1,10 @@
 import { createEvent } from 'effector';
+import { MigrationRunner } from 'ordinality';
 import { IFileController } from '@core/features/files';
 
 import { ManagedDatabase } from '../ManagedDatabase';
-import scheme from './scheme.sql';
+import { getMigrationsList } from './migrations';
+import { SQLiteMigrationsStorage } from './migrations/SQLiteMigrationsStorage';
 import { SQLiteDB } from '.';
 
 export const openSQLite = async (file: IFileController) => {
@@ -19,10 +21,14 @@ export const openSQLite = async (file: IFileController) => {
 				},
 			);
 
-	// TODO: run migrations
-	if (initBuffer === null) {
-		await db.query(scheme);
-	}
+	// Migrate data
+	const migrations = new MigrationRunner({
+		context: { db },
+		storage: new SQLiteMigrationsStorage(db),
+		migrations: await getMigrationsList(),
+	});
+
+	await migrations.up();
 
 	const onChanged = createEvent();
 	db.onChange(() => onChanged());
