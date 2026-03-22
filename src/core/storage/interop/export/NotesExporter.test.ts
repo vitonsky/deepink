@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { getUUID } from 'src/__tests__/utils/uuid';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { createTextFile } from '@core/features/files/__tests__/mocks/createTextFile';
@@ -10,7 +11,6 @@ import { ZipFS } from '@core/features/files/ZipFS';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesExporter } from '.';

@@ -1,5 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useUnit } from 'effector-react';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
@@ -9,9 +12,6 @@ import { EncryptedFS } from '@core/features/files/EncryptedFS';
 import { FileController } from '@core/features/files/FileController';
 import { RootedFS } from '@core/features/files/RootedFS';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
-import { SQLiteDB } from '@core/storage/database/sqlite';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { useFilesStorage } from '@features/files';
 import { DisposableBox } from '@utils/disposable';

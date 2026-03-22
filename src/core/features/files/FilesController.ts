@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
-import { SQLiteDB } from '@core/storage/database/sqlite';
-import { qb } from '@core/storage/database/sqlite/utils/query-builder';
-import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { qb } from '@core/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/database/sqlite/utils/wrapDB';
 
 import { IFilesStorage } from '.';
 

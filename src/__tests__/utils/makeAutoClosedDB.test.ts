@@ -1,5 +1,5 @@
-import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
-import { SQLiteDB } from '@core/storage/database/sqlite';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
 
 import { makeAutoClosedDB } from './makeAutoClosedDB';
 

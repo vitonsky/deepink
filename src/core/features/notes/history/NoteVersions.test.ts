@@ -1,5 +1,5 @@
 import { getUUID } from 'src/__tests__/utils/uuid';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from '../controller/NotesController';

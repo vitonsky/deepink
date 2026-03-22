@@ -1,4 +1,7 @@
 import { getUUID } from 'src/__tests__/utils/uuid';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
@@ -6,9 +9,6 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
-import { SQLiteDB } from '@core/storage/database/sqlite';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { wait } from '@utils/time';
 

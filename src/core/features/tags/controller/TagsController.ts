@@ -2,10 +2,10 @@
 import { createEvent } from 'effector';
 import { Query } from 'nano-queries';
 import { z } from 'zod';
-import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
-import { SQLiteDB } from '@core/storage/database/sqlite';
-import { DBTypes, qb } from '@core/storage/database/sqlite/utils/query-builder';
-import { wrapSQLite } from '@core/storage/database/sqlite/utils/wrapDB';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { DBTypes, qb } from '@core/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/database/sqlite/utils/wrapDB';
 
 import tagsQuery from './selectTagsWithResolvedNames.sql';
 import { IResolvedTag, ITag } from '..';

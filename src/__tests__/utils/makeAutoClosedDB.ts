@@ -1,7 +1,7 @@
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { IFileController } from '@core/features/files';
-import { ManagedDatabase } from '@core/storage/database/ManagedDatabase';
-import { SQLiteDB } from '@core/storage/database/sqlite';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 export const makeAutoClosedDB = ({

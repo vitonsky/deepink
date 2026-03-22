@@ -1,11 +1,11 @@
 import { getUUID } from 'src/__tests__/utils/uuid';
 import z from 'zod';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { StateFile } from '@core/features/files/StateFile';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { FlexSearchIndex } from '../../index/flexsearch/FlexSearchIndex';
+import { FlexSearchIndex } from '../../../database/flexsearch/FlexSearchIndex';
 
 import { NotesController } from './NotesController';
 import { NotesTextIndexer } from './NotesTextIndexer';

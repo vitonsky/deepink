@@ -1,6 +1,6 @@
 import { AsyncState } from '@core/features/files/AsyncState';
 
-import { FlexSearchIndex } from '../../index/flexsearch/FlexSearchIndex';
+import { FlexSearchIndex } from '../../../database/flexsearch/FlexSearchIndex';
 
 import { INotesController } from '.';
 

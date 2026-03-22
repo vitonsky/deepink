@@ -2,6 +2,7 @@
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { getUUID } from 'src/__tests__/utils/uuid';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
@@ -11,7 +12,6 @@ import { formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { openSQLite } from '@core/storage/database/sqlite/openSQLite';
 import { NoteExportData } from '@core/storage/interop/export';
 import {
 	FilesRegistryContext,

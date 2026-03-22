@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import z from 'zod';
+import { FlexSearchIndex } from '@core/database/flexsearch/FlexSearchIndex';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
 import { FileController } from '@core/features/files/FileController';
 import { FilesController } from '@core/features/files/FilesController';
 import { RootedFS } from '@core/features/files/RootedFS';
 import { StateFile } from '@core/features/files/StateFile';
-import { FlexSearchIndex } from '@core/features/index/flexsearch/FlexSearchIndex';
 import { INotesController } from '@core/features/notes/controller';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NotesTextIndexer } from '@core/features/notes/controller/NotesTextIndexer';
