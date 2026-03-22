@@ -94,7 +94,30 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	}, [parentTagId, tags]);
 
 	return (
-		<>
+		<form
+			onSubmit={async (event) => {
+				event.preventDefault();
+				try {
+					const name = tagName.trim();
+
+					const result = await onSave({
+						name,
+						parent: parentTagId,
+						...(isEditingMode && editedTag.id ? { id: editedTag.id } : {}),
+					});
+
+					if (!result.ok) {
+						setTagNameError(result.error);
+						return;
+					}
+					onCancel();
+				} catch (error) {
+					console.error(error);
+
+					setTagNameError('Unable to save the tag. Please try again.');
+				}
+			}}
+		>
 			<ModalCloseButton />
 			<ModalHeader>{isEditingMode ? 'Edit tag' : 'Add tag'}</ModalHeader>
 
@@ -135,39 +158,12 @@ export const TagEditor: FC<ITagEditorProps> = ({
 
 			<ModalFooter>
 				<HStack w="100%" justifyContent="end">
-					<Button
-						variant="accent"
-						onClick={async () => {
-							try {
-								const name = tagName.trim();
-
-								const result = await onSave({
-									name,
-									parent: parentTagId,
-									...(isEditingMode && editedTag.id
-										? { id: editedTag.id }
-										: {}),
-								});
-
-								if (!result.ok) {
-									setTagNameError(result.error);
-									return;
-								}
-								onCancel();
-							} catch (error) {
-								console.error(error);
-
-								setTagNameError(
-									'Unable to save the tag. Please try again.',
-								);
-							}
-						}}
-					>
+					<Button type="submit" variant="accent">
 						{isEditingMode ? 'Save' : 'Add'}
 					</Button>
 					<Button onClick={onCancel}>Cancel</Button>
 				</HStack>
 			</ModalFooter>
-		</>
+		</form>
 	);
 };
