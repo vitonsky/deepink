@@ -1,5 +1,4 @@
-import { MigrationContext } from 'ordinality/Migration';
-import { MigrationStorage } from 'ordinality/storage/MigrationStorage';
+import type { MigrationContext, MigrationStorage } from 'ordinality';
 import z from 'zod';
 
 import { SQLiteDB } from '..';

@@ -1,5 +1,5 @@
 import { createEvent } from 'effector';
-import { MigrationRunner } from 'ordinality';
+import { MigrationRunner } from 'ordinality/MigrationRunner';
 import { IFileController } from '@core/features/files';
 
 import { ManagedDatabase } from '../ManagedDatabase';
