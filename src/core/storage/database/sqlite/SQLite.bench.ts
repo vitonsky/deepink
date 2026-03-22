@@ -1,11 +1,10 @@
 import { bench } from 'vitest';
-import {
-	openDatabase,
-	PGLiteDatabase,
-} from '@core/storage/database/pglite/PGLiteDatabase';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
-import { ExtendedPGLite } from './ExtendedPGLite';
+import { ManagedDatabase } from '../ManagedDatabase';
+import { openSQLite } from './openSQLite';
+import { SQLiteDatabase } from './SQLiteDatabase';
+import { SQLiteDB } from '.';
 
 const benchConfig = {
 	iterations: 1,
@@ -17,11 +16,11 @@ const benchConfig = {
 describe('Open database', () => {
 	const dbFile = createFileControllerMock();
 
-	let db: PGLiteDatabase;
+	let db: ManagedDatabase<SQLiteDB>;
 	bench(
 		'Open database first time',
 		async () => {
-			db = await openDatabase(dbFile);
+			db = await openSQLite(dbFile);
 		},
 		benchConfig,
 	);
@@ -34,12 +33,12 @@ describe('Open database', () => {
 		benchConfig,
 	);
 
-	let db2: PGLiteDatabase;
+	let db2: ManagedDatabase<SQLiteDB>;
 	bench(
 		'Open database second time',
 		async () => {
 			console.log('Bench');
-			db2 = await openDatabase(dbFile);
+			db2 = await openSQLite(dbFile);
 		},
 		{
 			...benchConfig,
@@ -52,7 +51,7 @@ describe('Open database', () => {
 });
 
 describe('Insert data', async () => {
-	const db = new ExtendedPGLite();
+	const db = new SQLiteDatabase();
 
 	await db.query(
 		`CREATE TABLE notes (id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()), title TEXT NOT NULL, text TEXT NOT NULL)`,
@@ -61,7 +60,7 @@ describe('Insert data', async () => {
 	bench(
 		'Insert note text 10k chars',
 		async () => {
-			db.query(`INSERT INTO notes(title, text) VALUES($1, $2)`, [
+			db.query(`INSERT INTO notes(title, text) VALUES(?, ?)`, [
 				'Title',
 				'A'.repeat(10_000),
 			]);
@@ -77,7 +76,7 @@ describe('Insert data', async () => {
 	bench(
 		'Insert note text 100k chars',
 		async () => {
-			db.query(`INSERT INTO notes(title, text) VALUES($1, $2)`, [
+			db.query(`INSERT INTO notes(title, text) VALUES(?, ?)`, [
 				'Title',
 				'A'.repeat(100_000),
 			]);
