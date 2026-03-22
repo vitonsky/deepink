@@ -85,9 +85,14 @@ export class SQLiteDatabase implements SQLiteDB {
 
 		const db = await this.db;
 
-		const result = db.exec(query, params);
+		try {
+			const result = db.exec(query, params);
 
-		return queryResultsToParams(result);
+			return queryResultsToParams(result);
+		} catch (error) {
+			console.debug(query);
+			throw error;
+		}
 	}
 
 	private readonly onChangeCallbacks = new Set<sqlite.UpdateHookCallback>();

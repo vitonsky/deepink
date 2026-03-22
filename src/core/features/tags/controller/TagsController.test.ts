@@ -1,5 +1,6 @@
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
+import { NotesController } from '@core/features/notes/controller/NotesController';
 
 import { TAG_ERROR_CODE, TagsController } from './TagsController';
 
@@ -438,11 +439,14 @@ describe('manage tags', () => {
 describe('manage attachments', () => {
 	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
 
-	const FAKE_NOTE_ID = getUUID();
-
 	test('set attached tags', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		const FAKE_NOTE_ID = await new NotesController(db, FAKE_WORKSPACE_ID).add({
+			title: '',
+			text: '',
+		});
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
@@ -485,6 +489,11 @@ describe('manage attachments', () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
+		const FAKE_NOTE_ID = await new NotesController(db, FAKE_WORKSPACE_ID).add({
+			title: '',
+			text: '',
+		});
+
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
 
@@ -511,6 +520,11 @@ describe('manage attachments', () => {
 	test('deleted tag will not appears in tags list', async () => {
 		const db = await getDB();
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+
+		const FAKE_NOTE_ID = await new NotesController(db, FAKE_WORKSPACE_ID).add({
+			title: '',
+			text: '',
+		});
 
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);

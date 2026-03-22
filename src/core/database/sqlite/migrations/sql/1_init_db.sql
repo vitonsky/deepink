@@ -22,46 +22,46 @@ CREATE TABLE notes (
 CREATE TABLE note_versions (
   id         TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   note_id    TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+  created_at INTEGER NOT NULL DEFAULT (timestamp('now')),
   title      TEXT NOT NULL,
-  text       TEXT NOT NULL,
-  created_at INTEGER NOT NULL DEFAULT (timestamp('now'))
+  text       TEXT NOT NULL
 );
 
 CREATE TABLE files (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id TEXT NOT NULL,
+  created_at   INTEGER NOT NULL DEFAULT (timestamp('now')),
   name         TEXT NOT NULL,
-  mimetype     TEXT NOT NULL,
-  created_at   INTEGER NOT NULL DEFAULT (timestamp('now'))
+  mimetype     TEXT NOT NULL
 );
 
-CREATE TABLE attachments (
+CREATE TABLE note_files (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id TEXT NOT NULL,
-  note         TEXT NOT NULL REFERENCES notes(id),
-  file         TEXT NOT NULL REFERENCES files(id)
+  note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+  file_id         TEXT NOT NULL REFERENCES files(id) ON DELETE CASCADE
 );
 
 CREATE TABLE tags (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id TEXT NOT NULL,
   name         TEXT NOT NULL,
-  parent       TEXT REFERENCES tags(id)
+  parent_id       TEXT REFERENCES tags(id) ON DELETE CASCADE
 );
 
-CREATE TABLE attached_tags (
+CREATE TABLE note_tags (
   id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id TEXT NOT NULL,
-  source       TEXT NOT NULL,
-  target       TEXT NOT NULL
+  tag_id       TEXT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  note_id       TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE
 );
 
 -- Indexes
-CREATE INDEX idx_notes_workspace        ON notes(workspace_id);
+CREATE INDEX idx_notes_workspace_id        ON notes(workspace_id);
 CREATE INDEX idx_notes_deleted_archived ON notes(deleted_at, archived);
-CREATE INDEX idx_note_versions_note     ON note_versions(note_id);
-CREATE INDEX idx_attachments_note       ON attachments(note);
-CREATE INDEX idx_attached_tags_source   ON attached_tags(source);
-CREATE INDEX idx_attached_tags_target   ON attached_tags(target);
-CREATE INDEX idx_tags_workspace         ON tags(workspace_id);
-CREATE INDEX idx_tags_parent            ON tags(parent);
+CREATE INDEX idx_note_versions_note_id     ON note_versions(note_id);
+CREATE INDEX idx_note_files_note_id       ON note_files(note_id);
+CREATE INDEX idx_note_tags_tag_id   ON note_tags(tag_id);
+CREATE INDEX idx_note_tags_note_id   ON note_tags(note_id);
+CREATE INDEX idx_tags_workspace_id         ON tags(workspace_id);
+CREATE INDEX idx_tags_parent_id            ON tags(parent_id);

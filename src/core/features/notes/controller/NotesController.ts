@@ -122,7 +122,7 @@ function getFetchQuery(
 	// Filtering
 	if (tags.length > 0) {
 		filterQuery.push(
-			qb.sql`id IN (SELECT target FROM attached_tags WHERE source IN (${qb.values(
+			qb.sql`id IN (SELECT note_id FROM note_tags WHERE tag_id IN (${qb.values(
 				tags,
 			)}))`,
 		);

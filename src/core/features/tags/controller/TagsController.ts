@@ -207,11 +207,9 @@ export class TagsController {
 
 			// SQLite 3.35+ supports RETURNING
 			const [newTag] = await db.query(
-				qb.sql`INSERT INTO tags (workspace_id, name, parent) VALUES (${qb.values([
-					this.workspace,
-					segmentName,
-					segmentParent,
-				])}) RETURNING id`,
+				qb.sql`INSERT INTO tags (workspace_id, name, parent_id) VALUES (${qb.values(
+					[this.workspace, segmentName, segmentParent],
+				)}) RETURNING id`,
 				z.object({ id: z.string() }),
 			);
 
@@ -243,7 +241,7 @@ export class TagsController {
 		const db = wrapSQLite(this.db.get());
 
 		await db.query(
-			qb.sql`UPDATE tags SET name=${name}, parent=${parent} WHERE id=${id} AND workspace_id=${this.workspace}`,
+			qb.sql`UPDATE tags SET name=${name}, parent_id=${parent} WHERE id=${id} AND workspace_id=${this.workspace}`,
 		);
 
 		this.onChanged('tags');
@@ -255,13 +253,13 @@ export class TagsController {
 		// Recursive CTE to collect all descendant tag IDs
 		const tagsIdForRemove = await db.query(
 			qb.sql`WITH RECURSIVE tagTree AS (
-				SELECT id, parent, name, id AS root
+				SELECT id, parent_id, name, id AS root
 				FROM tags
 				WHERE id = ${id}
 			  UNION ALL
-				SELECT t.id, t.parent, t.name, t2.root
+				SELECT t.id, t.parent_id, t.name, t2.root
 				FROM tags t
-				INNER JOIN tagTree t2 ON t.parent = t2.id
+				INNER JOIN tagTree t2 ON t.parent_id = t2.id
 			)
 			SELECT id FROM tagTree WHERE root IN (${id}) GROUP BY id`,
 			z.object({ id: z.string() }).transform((row) => row.id),
@@ -273,9 +271,9 @@ export class TagsController {
 			} AND id IN (${qb.values(tagsIdForRemove)})`,
 		);
 		await db.query(
-			qb.sql`DELETE FROM attached_tags WHERE workspace_id=${
+			qb.sql`DELETE FROM note_tags WHERE workspace_id=${
 				this.workspace
-			} AND source IN (${qb.values(tagsIdForRemove)})`,
+			} AND tag_id IN (${qb.values(tagsIdForRemove)})`,
 		);
 
 		this.onChanged('tags');
@@ -284,15 +282,15 @@ export class TagsController {
 	/**
 	 * Returns tags attached to an entity
 	 */
-	public async getAttachedTags(target: string): Promise<IResolvedTag[]> {
+	public async getAttachedTags(noteId: string): Promise<IResolvedTag[]> {
 		const db = wrapSQLite(this.db.get());
 
 		const rows = await db.query(
 			qb.line(
 				qb.raw(tagsQuery),
 				qb.sql`WHERE t.id IN (
-					SELECT source FROM attached_tags
-					WHERE workspace_id=${this.workspace} AND target=${target}
+					SELECT tag_id FROM note_tags
+					WHERE workspace_id=${this.workspace} AND note_id=${noteId}
 				)`,
 			),
 			RowScheme,
@@ -301,21 +299,21 @@ export class TagsController {
 		return rows;
 	}
 
-	public async setAttachedTags(target: string, tags: string[]): Promise<void> {
+	public async setAttachedTags(noteId: string, tags: string[]): Promise<void> {
 		// attach only unique tags
 		const uniqueTags = Array.from(new Set(tags));
 
 		const db = wrapSQLite(this.db.get());
 
 		await db.query(
-			qb.sql`DELETE FROM attached_tags WHERE workspace_id=${this.workspace} AND target=${target}`,
+			qb.sql`DELETE FROM note_tags WHERE workspace_id=${this.workspace} AND note_id=${noteId}`,
 		);
 
 		if (uniqueTags.length > 0) {
 			await db.query(
-				qb.sql`INSERT INTO attached_tags(workspace_id,source,target) VALUES ${qb.set(
+				qb.sql`INSERT INTO note_tags(workspace_id,tag_id,note_id) VALUES ${qb.set(
 					uniqueTags.map((tagId) =>
-						qb.values([this.workspace, tagId, target]).withParenthesis(),
+						qb.values([this.workspace, tagId, noteId]).withParenthesis(),
 					),
 				)}`,
 			);
