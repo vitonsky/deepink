@@ -9,12 +9,12 @@ import { EncryptionConfig, EncryptionWorker } from '.';
  * Transparent proxy an encryption requests to a worker
  * Useful to prevent main thread blocking for a long-term cryptographic operations
  */
-export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
+export class WorkerEncryptionProcessor implements IEncryptionProcessor {
 	private readonly state;
 	constructor(config: EncryptionConfig) {
 		const worker = new Worker(
-			/* webpackChunkName: "Cryptography.worker" */ new URL(
-				'./Cryptography.worker',
+			/* webpackChunkName: "Encryption.worker" */ new URL(
+				'./Encryption.worker',
 				import.meta.url,
 			),
 			{ type: 'module' },
