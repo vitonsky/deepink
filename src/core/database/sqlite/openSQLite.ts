@@ -5,21 +5,12 @@ import { IFileController } from '@core/features/files';
 import { ManagedDatabase } from '../ManagedDatabase';
 import { getMigrationsList } from './migrations';
 import { SQLiteMigrationsStorage } from './migrations/SQLiteMigrationsStorage';
+import { SQLiteDatabaseWorker } from './SQLiteDatabaseWorker';
 import { SQLiteDB } from '.';
 
 export const openSQLite = async (file: IFileController) => {
 	const initBuffer = await file.get();
-
-	const isNode = typeof process !== 'undefined';
-	const db = isNode
-		? await import('./SQLiteDatabase').then(async ({ SQLiteDatabase }) => {
-				return new SQLiteDatabase(initBuffer ? new Uint8Array(initBuffer) : null);
-			})
-		: await import('./SQLiteDatabaseWorker').then(
-				async ({ SQLiteDatabaseWorker }) => {
-					return new SQLiteDatabaseWorker(initBuffer);
-				},
-			);
+	const db = new SQLiteDatabaseWorker(initBuffer);
 
 	// Migrate data
 	const migrations = new MigrationRunner({
