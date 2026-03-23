@@ -1,7 +1,7 @@
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { ManagedDatabase } from '@core/database/ManagedDatabase';
 import { SQLiteDB } from '@core/database/sqlite';
-import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { IFilesStorage } from '@core/features/files';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
@@ -9,7 +9,6 @@ import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { wait } from '@utils/time';
 
 import { NotesImporter, OnProcessedPayload } from '.';
@@ -49,18 +48,11 @@ const createTextBuffer = (text: string): ArrayBuffer =>
 	new TextEncoder().encode(text).buffer;
 
 describe('Base notes import cases', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openSQLite(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
-
+	const { getDB } = makeAutoClosedSQLiteDB();
 	const fileManager = createFileManagerMock();
 
 	test('Import notes', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
@@ -147,7 +139,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Imported notes is in list', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		await expect(
@@ -245,7 +237,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Every note have snapshot', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
 
@@ -259,7 +251,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Attached files is in files list', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const note = await notesRegistry.get().then((notes) => {
@@ -283,7 +275,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Tags is created and reproduces structure in FS', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
 
 		await expect(tagsRegistry.getTags()).resolves.toEqual([
@@ -327,19 +319,13 @@ describe('Base notes import cases', () => {
 });
 
 describe('Invalid imports', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openSQLite(dbFile);
+	const { getDB } = makeAutoClosedSQLiteDB();
 
 	const fileManager = createFileManagerMock();
 	const createAppContext = createAppContextIterator();
 
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
-
 	test('Empty files list imports nothing', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const appContext = createAppContext(db, fileManager);
 
 		await expect(
@@ -353,7 +339,7 @@ describe('Invalid imports', () => {
 	});
 
 	test('If nothing match note paths - imports nothing', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const appContext = createAppContext(db, fileManager);
 
 		await expect(
@@ -371,7 +357,7 @@ describe('Invalid imports', () => {
 	});
 
 	test('Invalid notes must be imported with read bytes as text', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const appContext = createAppContext(db, fileManager);
 
 		await expect(
@@ -399,20 +385,14 @@ describe('Invalid imports', () => {
 });
 
 describe('Import notes with different options', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openSQLite(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
+	const { getDB } = makeAutoClosedSQLiteDB();
 
 	const fileManager = createFileManagerMock();
 	const createAppContext = createAppContextIterator();
 
 	describe('Convert paths to tag', () => {
 		test('always', async () => {
-			const db = await dbPromise;
+			const db = await getDB();
 			const appContext = createAppContext(db, fileManager);
 
 			await new NotesImporter(appContext, {
@@ -457,7 +437,7 @@ describe('Import notes with different options', () => {
 		});
 
 		test('fallback', async () => {
-			const db = await dbPromise;
+			const db = await getDB();
 			const appContext = createAppContext(db, fileManager);
 
 			await new NotesImporter(appContext, {
@@ -492,7 +472,7 @@ describe('Import notes with different options', () => {
 		});
 
 		test('never', async () => {
-			const db = await dbPromise;
+			const db = await getDB();
 			const appContext = createAppContext(db, fileManager);
 
 			await new NotesImporter(appContext, {
@@ -508,7 +488,7 @@ describe('Import notes with different options', () => {
 		});
 
 		test('does not throw when importing note with duplicate tags when convertPathToTag is always', async () => {
-			const db = await dbPromise;
+			const db = await getDB();
 			const appContext = createAppContext(db, fileManager);
 
 			const importer = new NotesImporter(appContext, {
@@ -549,7 +529,7 @@ describe('Import notes with different options', () => {
 		});
 
 		test('does not throw when importing note with duplicate tags when convertPathToTag is fallback', async () => {
-			const db = await dbPromise;
+			const db = await getDB();
 			const appContext = createAppContext(db, fileManager);
 
 			const importer = new NotesImporter(appContext, {
@@ -605,10 +585,10 @@ describe('Import interruptions', () => {
 	};
 
 	describe('Importer throw error by call for abort signal', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openSQLite(dbFile);
+		const { getDB } = makeAutoClosedSQLiteDB();
 
 		const fileManager = createFileManagerMock();
+		const db = await getDB();
 
 		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
@@ -700,8 +680,8 @@ describe('Import interruptions', () => {
 	});
 
 	test('Importer throw error if DB closed while importing', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openSQLite(dbFile);
+		const { getDB } = makeAutoClosedSQLiteDB();
+		const db = await getDB();
 
 		const fileManager = createFileManagerMock();
 

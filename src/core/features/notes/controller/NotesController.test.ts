@@ -1,4 +1,5 @@
 /* eslint-disable @cspell/spellchecker */
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 import z from 'zod';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
@@ -15,16 +16,10 @@ import { NotesTextIndexer } from './NotesTextIndexer';
 const FAKE_WORKSPACE_ID = getUUID();
 
 describe('CRUD operations', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openSQLite(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
+	const { getDB } = makeAutoClosedSQLiteDB();
 
 	test('insertion multiple entries', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const entries = [
@@ -48,7 +43,7 @@ describe('CRUD operations', () => {
 	});
 
 	test('update entry and get by id', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Entries match data
@@ -112,7 +107,7 @@ describe('CRUD operations', () => {
 });
 
 describe('data fetching', () => {
-	const dbFile = createFileControllerMock();
+	const { getDB } = makeAutoClosedSQLiteDB();
 
 	const notesSample = Array(300)
 		.fill(null)
@@ -124,7 +119,7 @@ describe('data fetching', () => {
 		});
 
 	test('insert sample entries', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const ids: string[] = [];
@@ -135,12 +130,10 @@ describe('data fetching', () => {
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 		await tags.setAttachedTags(ids[0], [await tags.add('foo', null)]);
 		await tags.setAttachedTags(ids[1], [await tags.add('bar', null)]);
-
-		await db.close();
 	});
 
 	test('filter by tags', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
@@ -157,12 +150,10 @@ describe('data fetching', () => {
 				tags: [tagsList.find((tag) => tag.resolvedName === 'bar')!.id],
 			}),
 		).resolves.toHaveLength(1);
-
-		await db.close();
 	});
 
 	test('get entries by pages', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		await registry.getLength().then((length) => {
@@ -178,12 +169,10 @@ describe('data fetching', () => {
 
 		const page2 = await registry.get({ limit: 100, page: 2 });
 		expect(page2[0].content).toMatchObject(notesSample[100]);
-
-		await db.close();
 	});
 
 	test('method query consider filters', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
@@ -202,12 +191,10 @@ describe('data fetching', () => {
 				tags: [fooTag!.id],
 			}),
 		).resolves.toHaveLength(1);
-
-		await db.close();
 	});
 
 	test('filter by tags and the deleted status', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
@@ -236,12 +223,10 @@ describe('data fetching', () => {
 				meta: { isDeleted: true },
 			}),
 		).resolves.toHaveLength(0);
-
-		await db.close();
 	});
 
 	test('get entries by deletion status', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notesId = await registry
@@ -323,12 +308,10 @@ describe('data fetching', () => {
 		await expect(registry.get({ meta: { isDeleted: false } })).resolves.toHaveLength(
 			notesSample.length - 10,
 		);
-
-		await db.close();
 	});
 
 	test('filter notes by archived status', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notesId = await registry
@@ -342,11 +325,10 @@ describe('data fetching', () => {
 		await expect(registry.get({ meta: { isArchived: false } })).resolves.toHaveLength(
 			notesSample.length - 30,
 		);
-		await db.close();
 	});
 
 	test('filters notes by bookmarks', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
@@ -361,12 +343,10 @@ describe('data fetching', () => {
 		await expect(
 			registry.get({ meta: { isBookmarked: false } }),
 		).resolves.toHaveLength(notesSample.length - 40);
-
-		await db.close();
 	});
 
 	test('method getLength consider filters', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notesId = await registry
@@ -380,12 +360,10 @@ describe('data fetching', () => {
 		await expect(registry.getLength({ meta: { isVisible: true } })).resolves.toBe(
 			notesSample.length - 10,
 		);
-
-		await db.close();
 	});
 
 	test('method getById returns notes in the requested order', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notes = await registry.get({ limit: 10 });
@@ -394,16 +372,14 @@ describe('data fetching', () => {
 		const shuffledIds = shuffledNotes.map((n) => n.id);
 
 		await expect(registry.getById(shuffledIds)).resolves.toEqual(shuffledNotes);
-
-		await db.close();
 	});
 });
 
 describe('multi instances', () => {
-	const dbFile = createFileControllerMock();
+	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach });
 
 	test('insertion multiple entries and close with sync data', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const notes = [
@@ -413,11 +389,11 @@ describe('multi instances', () => {
 		];
 
 		await Promise.all(notes.map((note) => registry.add(note)));
-		await db.close();
+		await db.sync();
 	});
 
 	test('read entries from previous step', async () => {
-		const db = await openSQLite(dbFile);
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Entries match data
@@ -426,21 +402,14 @@ describe('multi instances', () => {
 		expect(entries).toHaveLength(3);
 		expect(entries[1].content.title.length).toBeGreaterThan(0);
 		expect(entries[1].content.text.length).toBeGreaterThan(0);
-		await db.close();
 	});
 });
 
 describe('Notes meta control', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openSQLite(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
+	const { getDB } = makeAutoClosedSQLiteDB();
 
 	test('toggle note versions control', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Create note
@@ -472,7 +441,7 @@ describe('Notes meta control', () => {
 	});
 
 	test('toggle note visibility', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Create note
@@ -519,7 +488,7 @@ describe('Notes meta control', () => {
 	});
 
 	test('toggle note deletion status', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Create notes
@@ -551,7 +520,7 @@ describe('Notes meta control', () => {
 	});
 
 	test('toggle note archived status', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		// Create notes
@@ -583,7 +552,7 @@ describe('Notes meta control', () => {
 	});
 
 	test('toggle note bookmarked status', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });
@@ -613,8 +582,7 @@ describe('Notes meta control', () => {
 });
 
 describe('Notes search', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openSQLite(dbFile);
+	const { getDB } = makeAutoClosedSQLiteDB();
 
 	const index = new FlexSearchIndex(new InMemoryFS());
 
@@ -631,14 +599,9 @@ describe('Notes search', () => {
 		'Trigram search helps find similar product names quickly',
 	];
 
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
-
 	let tagsMap: Record<string, string>;
 	test('Add notes', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
 
@@ -669,7 +632,7 @@ describe('Notes search', () => {
 	});
 
 	test('Update lexemes', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 
 		const indexScannerFile = createFileControllerMock();
@@ -682,7 +645,7 @@ describe('Notes search', () => {
 	});
 
 	test('Search by text', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID, index);
 
 		await expect(
@@ -737,7 +700,7 @@ describe('Notes search', () => {
 	});
 
 	test('Search by text and filter by tags', async () => {
-		const db = await dbPromise;
+		const db = await getDB();
 		const registry = new NotesController(db, FAKE_WORKSPACE_ID, index);
 
 		await expect(
@@ -803,7 +766,7 @@ describe('Notes search', () => {
 
 	// TODO: add tests for index actuality
 	// test.skip('Lexemes list can be updated after changes', async () => {
-	// 	const db = await dbPromise;
+	// 	const db = await getDB();
 	// 	const registry = new NotesController(db, FAKE_WORKSPACE_ID);
 	// 	const lexemes = new LexemesRegistry(db);
 
