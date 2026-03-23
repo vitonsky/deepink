@@ -54,39 +54,6 @@ export default merge(commonConfig, {
 	module: {
 		rules: [
 			{
-				test: /\.worker\.ts$/i,
-				use: [
-					{
-						loader: 'worker-loader',
-						options: {
-							worker: 'Worker',
-							filename: '[name].[contenthash].js',
-						},
-					},
-					{
-						loader: 'swc-loader',
-						options: {
-							jsc: {
-								parser: {
-									syntax: 'typescript',
-									tsx: true,
-									decorators: true,
-								},
-								transform: {
-									react: {
-										runtime: 'automatic',
-										pragma: 'React.createElement',
-										pragmaFrag: 'React.Fragment',
-									},
-								},
-								target: 'es2022',
-							},
-							sourceMaps: true,
-						},
-					},
-				],
-			},
-			{
 				test: /\.css$/,
 				use: [
 					MiniCssExtractPlugin.loader,

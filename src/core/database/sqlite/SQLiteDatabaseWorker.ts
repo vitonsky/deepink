@@ -1,7 +1,6 @@
 import { proxy, transfer, wrap } from 'comlink';
 import { BindParams, UpdateHookCallback } from 'sql.js';
 
-import SQLWorker from './SQLiteDatabase.worker?worker';
 import { SQLiteDB, SQLiteDBWorker } from '.';
 
 export class SQLiteDatabaseWorker implements SQLiteDB {
@@ -9,7 +8,13 @@ export class SQLiteDatabaseWorker implements SQLiteDB {
 	protected worker;
 	protected isClosed = false;
 	constructor(data?: ArrayBuffer | null) {
-		this.worker = new SQLWorker();
+		this.worker = new Worker(
+			/* webpackChunkName: "SQLiteDatabase.worker" */ new URL(
+				'./SQLiteDatabase.worker',
+				import.meta.url,
+			),
+			{ type: 'module' },
+		);
 
 		const db = wrap<SQLiteDBWorker>(this.worker);
 		this.db = db

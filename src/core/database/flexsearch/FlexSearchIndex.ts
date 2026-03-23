@@ -17,8 +17,8 @@ export class FlexSearchIndex {
 	private getState() {
 		if (!this.state) {
 			const worker = new Worker(
-				/* webpackChunkName: "flexsearch" */ new URL(
-					'./Index.worker',
+				/* webpackChunkName: "FlexSearchIndex.worker" */ new URL(
+					'./FlexSearchIndex.worker',
 					import.meta.url,
 				),
 				{ type: 'module' },

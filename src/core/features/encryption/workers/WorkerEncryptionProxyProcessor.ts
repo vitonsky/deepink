@@ -5,8 +5,6 @@ import { WorkerRPC } from '@utils/workers/WorkerRPC';
 import { IEncryptionProcessor } from '../../../encryption';
 import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
-import EncryptionWorker from './Cryptography.worker';
-
 export type EncryptionConfig = {
 	key: string | ArrayBuffer;
 	salt: ArrayBuffer;
@@ -22,7 +20,13 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 	private readonly messenger;
 	private readonly requests;
 	constructor(config: EncryptionConfig) {
-		const worker = new EncryptionWorker();
+		const worker = new Worker(
+			/* webpackChunkName: "Cryptography.worker" */ new URL(
+				'./Cryptography.worker',
+				import.meta.url,
+			),
+			{ type: 'module' },
+		);
 		this.messenger = new WorkerMessenger(worker);
 		this.requests = new WorkerRPC(this.messenger);
 		this.worker = this.requests.sendRequest('init', config).then(() => worker);

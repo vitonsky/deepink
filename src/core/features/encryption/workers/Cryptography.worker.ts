@@ -13,9 +13,6 @@ import { getRandomBytes } from '../../../encryption/utils/random';
 
 import { parseAlgorithms } from '../utils';
 import { ENCRYPTION_ALGORITHM } from '..';
-import { FakeWorkerObject } from '.';
-
-export default FakeWorkerObject;
 
 console.debug('Encryption worker is started');
 

@@ -1,9 +1,5 @@
-/* eslint-disable @cspell/spellchecker */
-import type * as flexsearch from 'flexsearch';
-
-const { Index } = require('flexsearch');
-
 import { Endpoint, expose } from 'comlink';
+import { Index, IndexOptions } from 'flexsearch';
 import { IFilesStorage } from '@core/features/files';
 import { ComlinkWorkerFS } from '@core/features/files/ComlinkFS';
 
@@ -12,7 +8,7 @@ import { IndexWorkerApi } from '.';
 console.debug('Flex search worker is loaded');
 
 let indexPromise: Promise<{
-	index: flexsearch.Index;
+	index: Index;
 	storage: IFilesStorage;
 }> | null = null;
 const getState = () => {
@@ -22,13 +18,13 @@ const getState = () => {
 
 expose(
 	{
-		init: async function (config: flexsearch.IndexOptions, storage) {
+		init: async function (config: IndexOptions, storage) {
 			storage = new ComlinkWorkerFS(storage);
 			indexPromise = storage.list().then(async (files) => {
 				const index = new Index({
 					...config,
 					priority: 9,
-				} satisfies flexsearch.IndexOptions) as flexsearch.Index;
+				} satisfies IndexOptions);
 
 				// Load the data
 				await Promise.all(

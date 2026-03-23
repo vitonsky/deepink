@@ -103,7 +103,7 @@ export default {
 		rules: [
 			{
 				// compiles TS/TSX excluding workers with SWC (fast)
-				test: /(?<!\.worker)\.tsx?$/,
+				test: /\.tsx?$/,
 				loader: 'swc-loader',
 				options: {
 					jsc: {
