@@ -109,7 +109,7 @@
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.54.0",
 		"vite-tsconfig-paths": "^6.0.5",
-		"vitest": "^4.0.18",
+		"vitest": "^4.1.1",
 		"webpack": "^5.104.1",
 		"webpack-cli": "^6.0.1",
 		"webpack-merge": "^6.0.1"
