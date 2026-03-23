@@ -25,7 +25,7 @@ test('incremental index building', async () => {
 	const indexScanner = new NotesTextIndexer(
 		notes,
 		index,
-		new StateFile(indexScannerFile, z.object({ lastUpdate: z.number().nullable() })),
+		new StateFile(indexScannerFile, z.any()),
 	);
 
 	// Scan for empty notes

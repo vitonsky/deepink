@@ -676,10 +676,7 @@ describe('Notes search', () => {
 		const indexScanner = new NotesTextIndexer(
 			registry,
 			index,
-			new StateFile(
-				indexScannerFile,
-				z.object({ lastUpdate: z.number().nullable() }),
-			),
+			new StateFile(indexScannerFile, z.any()),
 		);
 		await expect(indexScanner.update()).resolves.toBeGreaterThan(0);
 	});

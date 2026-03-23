@@ -64,7 +64,10 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 					notesIndex,
 					new StateFile(
 						new FileController('state.json', indexDir),
-						z.object({ lastUpdate: z.number().nullable() }),
+						z.object({
+							updatedAt: z.number().nullable(),
+							processedIds: z.string().array(),
+						}),
 					),
 				),
 			},

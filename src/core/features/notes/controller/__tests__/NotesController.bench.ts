@@ -38,10 +38,7 @@ describe.sequential('Note ops performance', async () => {
 	const indexScanner = new NotesTextIndexer(
 		notes,
 		index,
-		new StateFile(
-			createFileControllerMock(),
-			z.object({ lastUpdate: z.number().nullable() }),
-		),
+		new StateFile(createFileControllerMock(), z.any()),
 	);
 
 	let noteCounter = 0;
