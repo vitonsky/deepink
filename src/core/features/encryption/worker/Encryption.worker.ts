@@ -15,14 +15,14 @@ import { ENCRYPTION_ALGORITHM } from '..';
 import { EncryptionWorker } from '.';
 
 const workerId = Date.now();
-console.debug('Encryption worker is started', workerId);
-
 let encryptionController: EncryptionController | null = null;
 expose(
 	{
-		async init({ key, salt, algorithm }) {
-			// Ping for debug purposes, to make encryption thread visible
-			self.setInterval(() => console.debug('Worker pulse', workerId), 1000);
+		async init({ key, salt, algorithm, disablePulse }) {
+			if (!disablePulse) {
+				// Ping for debug purposes, to make encryption thread visible
+				self.setInterval(() => console.debug('Worker pulse', workerId), 1000);
+			}
 
 			const derivedKeys = await getMasterKey(key, salt).then((masterKey) =>
 				getDerivedKeysManager(masterKey, new Uint8Array(salt)),

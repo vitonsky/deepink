@@ -3,7 +3,7 @@ import { Terminable } from '@utils/disposable';
 
 import { IEncryptionProcessor } from '../../../encryption';
 
-import { EncryptionConfig, EncryptionWorker } from '.';
+import { EncryptionWorker, EncryptionWorkerConfig } from '.';
 
 /**
  * Transparent proxy an encryption requests to a worker
@@ -11,7 +11,7 @@ import { EncryptionConfig, EncryptionWorker } from '.';
  */
 export class WorkerEncryptionProcessor implements IEncryptionProcessor {
 	private readonly state;
-	constructor(config: EncryptionConfig) {
+	constructor(config: EncryptionWorkerConfig) {
 		const worker = new Worker(
 			/* webpackChunkName: "Encryption.worker" */ new URL(
 				'./Encryption.worker',
@@ -22,6 +22,11 @@ export class WorkerEncryptionProcessor implements IEncryptionProcessor {
 		const api = wrap<EncryptionWorker>(worker);
 
 		this.state = api.init(config).then(() => ({ api, worker }));
+	}
+
+	public async load() {
+		this.terminateStatus.throwErrorIfTerminated();
+		await this.state;
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
@@ -39,10 +44,10 @@ export class WorkerEncryptionProcessor implements IEncryptionProcessor {
 	}
 
 	private readonly terminateStatus = new Terminable();
-	public terminate() {
+	public async terminate() {
 		this.terminateStatus.terminate();
-		this.state.then((state) => {
-			state.worker.terminate();
-		});
+
+		const { worker } = await this.state;
+		worker.terminate();
 	}
 }

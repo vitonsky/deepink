@@ -8,6 +8,7 @@ export type EncryptionConfig = {
 	algorithm: string;
 };
 
+export type EncryptionWorkerConfig = EncryptionConfig & { disablePulse?: boolean };
 export interface EncryptionWorker extends IEncryptionController {
-	init(config: EncryptionConfig): Promise<void>;
+	init(config: EncryptionWorkerConfig): Promise<void>;
 }
