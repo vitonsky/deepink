@@ -3,7 +3,6 @@ import { noop } from 'lodash';
 import { IFilesStorage } from '@core/features/files';
 import { ComlinkHostFS } from '@core/features/files/ComlinkFS';
 
-import IndexWorker from './Index.worker?worker';
 import { IndexWorkerApi } from '.';
 
 export class FlexSearchIndex {
@@ -17,7 +16,13 @@ export class FlexSearchIndex {
 	}> | null = null;
 	private getState() {
 		if (!this.state) {
-			const worker = new IndexWorker();
+			const worker = new Worker(
+				/* webpackChunkName: "flexsearch" */ new URL(
+					'./Index.worker',
+					import.meta.url,
+				),
+				{ type: 'module' },
+			);
 			this.state = Promise.resolve().then(async () => {
 				const index = wrap<IndexWorkerApi>(worker);
 				const fs = proxy(new ComlinkHostFS(this.storage));
