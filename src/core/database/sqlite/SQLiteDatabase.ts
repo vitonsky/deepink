@@ -72,8 +72,8 @@ export class SQLiteDatabase implements SQLiteDB {
 	async close() {
 		if (this.isClosed) return;
 
-		const db = await this.db;
 		this.isClosed = true;
+		const db = await this.db;
 		db.close();
 	}
 
