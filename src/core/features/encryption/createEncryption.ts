@@ -2,10 +2,8 @@ import { DisposableBox } from '@utils/disposable';
 
 import { EncryptionController } from '../../encryption/EncryptionController';
 
-import {
-	EncryptionConfig,
-	WorkerEncryptionProxyProcessor,
-} from './workers/WorkerEncryptionProxyProcessor';
+import { EncryptionConfig } from './workers';
+import { WorkerEncryptionProxyProcessor } from './workers/WorkerEncryptionProxyProcessor';
 
 /**
  * Encryption entrypoint for application

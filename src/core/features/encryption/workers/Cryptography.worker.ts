@@ -1,8 +1,7 @@
+import { Endpoint, expose, transfer } from 'comlink';
 import { IEncryptionProcessor } from '@core/encryption';
 import { AESGCMCipher } from '@core/encryption/ciphers/AES';
 import { TwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
-import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
-import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
 import { EncryptionController } from '../../../encryption/EncryptionController';
 import { BufferIntegrityProcessor } from '../../../encryption/processors/BufferIntegrityProcessor';
@@ -13,66 +12,70 @@ import { getRandomBytes } from '../../../encryption/utils/random';
 
 import { parseAlgorithms } from '../utils';
 import { ENCRYPTION_ALGORITHM } from '..';
+import { EncryptionWorker } from '.';
 
-console.debug('Encryption worker is started');
+const workerId = Date.now();
+console.debug('Encryption worker is started', workerId);
 
 let encryptionController: EncryptionController | null = null;
-const messenger = new WorkerMessenger(self);
-const requests = new WorkerRPC(messenger);
+expose(
+	{
+		async init({ key, salt, algorithm }) {
+			// Ping for debug purposes, to make encryption thread visible
+			self.setInterval(() => console.debug('Worker pulse', workerId), 1000);
 
-const workerId = performance.now();
-requests.addHandler('init', async ({ key, salt, algorithm }) => {
-	self.setInterval(() => console.debug('Worker pulse', workerId), 1000);
+			const derivedKeys = await getMasterKey(key, salt).then((masterKey) =>
+				getDerivedKeysManager(masterKey, new Uint8Array(salt)),
+			);
 
-	// Convert `ArrayBuffer`
-	if (salt instanceof ArrayBuffer) {
-		salt = new Uint8Array(salt);
-	}
+			const cipherMap: Record<
+				ENCRYPTION_ALGORITHM,
+				() => Promise<IEncryptionProcessor>
+			> = {
+				[ENCRYPTION_ALGORITHM.AES]: async () => {
+					const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
+						name: 'AES-GCM',
+						length: 256,
+					});
+					return new AESGCMCipher(key, getRandomBytes);
+				},
+				[ENCRYPTION_ALGORITHM.TWOFISH]: async () => {
+					const key = await derivedKeys.getDerivedBytes(
+						'twofish-ctr-cipher',
+						256,
+					);
+					return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
+				},
+			};
 
-	if (!(salt instanceof Uint8Array))
-		throw new Error('Salt is not instance of Uint8Array');
+			const ciphers = await Promise.all(
+				parseAlgorithms(algorithm).map((name) => cipherMap[name]()),
+			);
 
-	const derivedKeys = await getMasterKey(key, salt.buffer as ArrayBuffer).then(
-		(masterKey) => getDerivedKeysManager(masterKey, salt as Uint8Array<ArrayBuffer>),
-	);
-
-	const cipherMap: Record<ENCRYPTION_ALGORITHM, () => Promise<IEncryptionProcessor>> = {
-		[ENCRYPTION_ALGORITHM.AES]: async () => {
-			const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-				name: 'AES-GCM',
-				length: 256,
-			});
-			return new AESGCMCipher(key, getRandomBytes);
+			encryptionController = new EncryptionController(
+				new PipelineProcessor([
+					new BufferIntegrityProcessor(),
+					new BufferSizeObfuscationProcessor(getRandomBytes),
+					...ciphers,
+				]),
+			);
 		},
-		[ENCRYPTION_ALGORITHM.TWOFISH]: async () => {
-			const key = await derivedKeys.getDerivedBytes('twofish-ctr-cipher', 256);
-			return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
+
+		async encrypt(rawData) {
+			if (!encryptionController)
+				throw new Error('Encryption is not initialized yet');
+
+			const result = await encryptionController.encrypt(rawData);
+			return transfer(result, [result]);
 		},
-	};
 
-	const ciphers = await Promise.all(
-		parseAlgorithms(algorithm).map((name) => cipherMap[name]()),
-	);
+		async decrypt(encryptedData) {
+			if (!encryptionController)
+				throw new Error('Encryption is not initialized yet');
 
-	encryptionController = new EncryptionController(
-		new PipelineProcessor([
-			new BufferIntegrityProcessor(),
-			new BufferSizeObfuscationProcessor(getRandomBytes),
-			...ciphers,
-		]),
-	);
-});
-
-requests.addHandler('encrypt', async (buffer, respond) => {
-	if (!encryptionController) return;
-
-	const result = await encryptionController.encrypt(buffer);
-	respond(result, [result]);
-});
-
-requests.addHandler('decrypt', async (buffer, respond) => {
-	if (!encryptionController) return;
-
-	const result = await encryptionController.decrypt(buffer);
-	respond(result, [result]);
-});
+			const result = await encryptionController.decrypt(encryptedData);
+			return transfer(result, [result]);
+		},
+	} satisfies EncryptionWorker,
+	self as Endpoint,
+);

@@ -1,24 +1,16 @@
+import { transfer, wrap } from 'comlink';
 import { Terminable } from '@utils/disposable';
-import { WorkerMessenger } from '@utils/workers/WorkerMessenger';
-import { WorkerRPC } from '@utils/workers/WorkerRPC';
 
 import { IEncryptionProcessor } from '../../../encryption';
-import { convertBufferToTransferable } from '../../../encryption/utils/buffers';
 
-export type EncryptionConfig = {
-	key: string | ArrayBuffer;
-	salt: ArrayBuffer;
-	algorithm: string;
-};
+import { EncryptionConfig, EncryptionWorker } from '.';
 
 /**
  * Transparent proxy an encryption requests to a worker
  * Useful to prevent main thread blocking for a long-term cryptographic operations
  */
 export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
-	private readonly worker;
-	private readonly messenger;
-	private readonly requests;
+	private readonly state;
 	constructor(config: EncryptionConfig) {
 		const worker = new Worker(
 			/* webpackChunkName: "Cryptography.worker" */ new URL(
@@ -27,38 +19,30 @@ export class WorkerEncryptionProxyProcessor implements IEncryptionProcessor {
 			),
 			{ type: 'module' },
 		);
-		this.messenger = new WorkerMessenger(worker);
-		this.requests = new WorkerRPC(this.messenger);
-		this.worker = this.requests.sendRequest('init', config).then(() => worker);
+		const api = wrap<EncryptionWorker>(worker);
+
+		this.state = api.init(config).then(() => ({ api, worker }));
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
 		this.terminateStatus.throwErrorIfTerminated();
+		const { api } = await this.state;
 
-		await this.worker;
-
-		const [transferableBuffer, convertBufferBack] =
-			convertBufferToTransferable(buffer);
-		return this.requests
-			.sendRequest('encrypt', transferableBuffer, [transferableBuffer])
-			.then(convertBufferBack);
+		return api.encrypt(transfer(buffer, [buffer])) as Promise<ArrayBuffer>;
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
 		this.terminateStatus.throwErrorIfTerminated();
+		const { api } = await this.state;
 
-		await this.worker;
-
-		const [transferableBuffer, convertBufferBack] =
-			convertBufferToTransferable(buffer);
-		return this.requests
-			.sendRequest('decrypt', transferableBuffer, [transferableBuffer])
-			.then(convertBufferBack);
+		return api.decrypt(transfer(buffer, [buffer])) as Promise<ArrayBuffer>;
 	}
 
 	private readonly terminateStatus = new Terminable();
 	public terminate() {
-		this.messenger.destroy();
 		this.terminateStatus.terminate();
+		this.state.then((state) => {
+			state.worker.terminate();
+		});
 	}
 }
