@@ -93,10 +93,14 @@ export const TagEditor: FC<ITagEditorProps> = ({
 		setSelectedParentTag(parentTag ? parentTag : null);
 	}, [parentTagId, tags]);
 
+	const [isPending, setIsPending] = useState(false);
 	return (
 		<form
 			onSubmit={async (event) => {
 				event.preventDefault();
+				if (isPending) return;
+
+				setIsPending(true);
 				try {
 					const name = tagName.trim();
 
@@ -115,6 +119,8 @@ export const TagEditor: FC<ITagEditorProps> = ({
 					console.error(error);
 
 					setTagNameError('Unable to save the tag. Please try again.');
+				} finally {
+					setIsPending(false);
 				}
 			}}
 		>
@@ -158,10 +164,12 @@ export const TagEditor: FC<ITagEditorProps> = ({
 
 			<ModalFooter>
 				<HStack w="100%" justifyContent="end">
-					<Button type="submit" variant="accent">
+					<Button type="submit" variant="accent" isDisabled={isPending}>
 						{isEditingMode ? 'Save' : 'Add'}
 					</Button>
-					<Button onClick={onCancel}>Cancel</Button>
+					<Button onClick={onCancel} isDisabled={isPending}>
+						Cancel
+					</Button>
 				</HStack>
 			</ModalFooter>
 		</form>
