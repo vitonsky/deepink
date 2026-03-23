@@ -67,7 +67,7 @@
 		"@types/sql.js": "^1.4.10",
 		"@types/uuid": "^11.0.0",
 		"@types/webpack": "^5.28.5",
-		"@vitest/web-worker": "^4.1.0",
+		"@vitest/web-worker": "^4.1.1",
 		"blob-polyfill": "^9.0.20240710",
 		"copy-webpack-plugin": "^13.0.1",
 		"cross-env": "^10.1.0",
