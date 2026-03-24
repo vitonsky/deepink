@@ -3,23 +3,23 @@ import { InMemoryFS } from '@core/features/files/InMemoryFS';
 
 import { FlexSearchStorage } from './FlexSearchStorage';
 
-const indexFs = new InMemoryFS();
+test('Reuse storage', async () => {
+	const storage = new InMemoryFS();
 
-test('Fill the index', async () => {
-	const index = new Index();
-	await index.mount(new FlexSearchStorage(indexFs));
+	// Add the data on one instance
+	const index1 = new Index();
+	await index1.mount(new FlexSearchStorage(storage));
 
-	await expect(index.search('foo')).resolves.toEqual([]);
+	await expect(index1.search('foo')).resolves.toEqual([]);
 
-	await index.add('foo', 'The foo content');
-	await index.add('bar', 'The bar content');
-	await index.commit();
-	await expect(index.search('foo')).resolves.toEqual(['foo']);
-});
+	await index1.add('foo', 'The foo content');
+	await index1.add('bar', 'The bar content');
+	await index1.commit();
+	await expect(index1.search('foo')).resolves.toEqual(['foo']);
 
-test('Reuse the index', async () => {
-	const index = new Index();
-	await index.mount(new FlexSearchStorage(indexFs));
+	// Access the storage data in another instance
+	const index2 = new Index();
+	await index2.mount(new FlexSearchStorage(storage));
 
-	await expect(index.search('foo')).resolves.toEqual(['foo']);
+	await expect(index2.search('foo')).resolves.toEqual(['foo']);
 });
