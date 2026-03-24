@@ -3,6 +3,7 @@ import { Index, IndexOptions } from 'flexsearch';
 import { IFilesStorage } from '@core/features/files';
 import { ComlinkWorkerFS } from '@core/features/files/ComlinkFS';
 
+import { FlexSearchStorage } from './FlexSearchStorage';
 import { IndexWorkerApi } from '.';
 
 console.debug('Flex search worker is loaded');
@@ -20,41 +21,22 @@ expose(
 	{
 		init: async function (config: IndexOptions, storage) {
 			storage = new ComlinkWorkerFS(storage);
-			indexPromise = storage.list().then(async (files) => {
-				const index = new Index({
-					...config,
-					priority: 9,
-				} satisfies IndexOptions);
+			const index = new Index({
+				...config,
+				priority: 9,
+			} satisfies IndexOptions);
 
-				// Load the data
-				await Promise.all(
-					files.map(async (file) => {
-						const data = await storage.get(file);
-
-						const key = file
-							.split('/')
-							.find((segment) => segment.trim().length > 0);
-						if (key && data) {
-							console.debug('Import index data...', {
-								key,
-								size: data.byteLength,
-							});
-							await index.import(key, new TextDecoder().decode(data));
-						}
-					}),
-				);
-
-				return { index, storage };
-			});
+			// Load the data
+			indexPromise = index
+				.mount(new FlexSearchStorage(storage))
+				.then(async () => ({ index, storage }));
 
 			await indexPromise;
 		},
 
 		async commit() {
-			const { index, storage } = await getState();
-			await index.export((key, data) => {
-				return storage.write('/' + key, new TextEncoder().encode(data).buffer);
-			});
+			const { index } = await getState();
+			await index.commit();
 		},
 
 		async add(id, content) {
