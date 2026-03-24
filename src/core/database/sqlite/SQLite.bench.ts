@@ -60,7 +60,7 @@ describe('Insert data', async () => {
 	bench(
 		'Insert note text 10k chars',
 		async () => {
-			db.query(`INSERT INTO notes(title, text) VALUES(?, ?)`, [
+			await db.query(`INSERT INTO notes(title, text) VALUES(?, ?)`, [
 				'Title',
 				'A'.repeat(10_000),
 			]);
@@ -76,7 +76,7 @@ describe('Insert data', async () => {
 	bench(
 		'Insert note text 100k chars',
 		async () => {
-			db.query(`INSERT INTO notes(title, text) VALUES(?, ?)`, [
+			await db.query(`INSERT INTO notes(title, text) VALUES(?, ?)`, [
 				'Title',
 				'A'.repeat(100_000),
 			]);
