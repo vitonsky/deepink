@@ -11,6 +11,8 @@
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"forceConsistentCasingInFileNames": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
