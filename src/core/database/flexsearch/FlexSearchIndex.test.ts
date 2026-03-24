@@ -120,3 +120,26 @@ test('Worker life cycle', async () => {
 	).toHaveLength(2);
 	expect(TrackedWorker.instances[1].terminate).toHaveBeenCalled();
 }, 1300);
+
+test('Commit call waits all ops', async () => {
+	const indexFs = new InMemoryFS();
+	const index = new FlexSearchIndex(indexFs);
+	onTestFinished(() => index.unload());
+
+	const session = await index.createIndexSession();
+
+	const resolves: string[] = [];
+	const ops = Array(30)
+		.values()
+		.map((_, index) =>
+			session
+				.add(String(index), `The ${index} content`)
+				.then(() => resolves.push('add')),
+		)
+		.toArray();
+
+	await expect(
+		Promise.all([session.commit().then(() => resolves.push('commit')), ...ops]),
+	).resolves.toHaveLength(31);
+	expect(resolves).toEqual([...Array(30).fill('add'), 'commit']);
+});

@@ -36,6 +36,7 @@ export class FlexSearchIndex {
 						reject(abortController.signal.reason);
 					});
 				});
+				// Prevent "Uncaught error" messages
 				onAbortPromise.catch(noop);
 
 				return {
@@ -71,18 +72,28 @@ export class FlexSearchIndex {
 	public async createIndexSession() {
 		const { index, onAbortPromise } = await this.getState();
 
+		const inFlight = new Set<Promise<void>>();
+		const waitThePromise = (promise: Promise<void>) => {
+			inFlight.add(promise);
+			promise.finally(() => {
+				inFlight.delete(promise);
+			});
+
+			return Promise.race([onAbortPromise, promise]);
+		};
+
 		return {
 			async add(id: string, content: string) {
-				await Promise.race([onAbortPromise, index.add(id, content)]);
+				await waitThePromise(index.add(id, content));
 			},
 			async update(id: string, content: string) {
-				await Promise.race([onAbortPromise, index.update(id, content)]);
+				await waitThePromise(index.update(id, content));
 			},
 			async remove(id: string) {
-				await Promise.race([onAbortPromise, index.remove(id)]);
+				await waitThePromise(index.remove(id));
 			},
 			commit: async () => {
-				// TODO: await all async ops
+				await Promise.all(inFlight);
 				await Promise.race([onAbortPromise, this.commit()]);
 			},
 		};
