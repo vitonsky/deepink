@@ -1,4 +1,4 @@
-import { Endpoint, expose, proxy } from 'comlink';
+import { Endpoint, expose, proxy, transfer } from 'comlink';
 
 import { SQLiteDatabase } from './SQLiteDatabase';
 import { SQLiteDBWorker } from '.';
@@ -23,19 +23,24 @@ expose(
 				);
 			return db.query(...args);
 		},
-		export(...args) {
+		async export() {
 			if (!db)
 				throw new Error(
 					'Database instance is not created yet. Call init() first',
 				);
-			return db.export(...args);
+
+			const dump = await db.export();
+			return transfer(dump, [dump.buffer]);
 		},
-		close(...args) {
+		async close() {
 			if (!db)
 				throw new Error(
 					'Database instance is not created yet. Call init() first',
 				);
-			return db.close(...args);
+
+			const currentDb = db;
+			db = null;
+			await currentDb.close();
 		},
 		onChange(callback) {
 			if (!db)
