@@ -10,15 +10,14 @@ export class ComlinkHostFS implements IFilesStorage {
 	}
 
 	async get(path: string) {
-		const result = this.storage.get(path);
-		return transfer(result, [result]);
+		const result = await this.storage.get(path);
+		return result ? transfer(result, [result]) : null;
 	}
 	async delete(paths: string[]) {
 		await this.storage.delete(paths);
 	}
 	async list() {
-		const result = this.storage.list();
-		return transfer(result, [result]);
+		return this.storage.list();
 	}
 }
 
@@ -33,7 +32,7 @@ export class ComlinkWorkerFS implements IFilesStorage {
 		return this.storage.get(path);
 	}
 	async delete(paths: string[]) {
-		return this.storage.delete(transfer(paths, [paths]));
+		return this.storage.delete(paths);
 	}
 	async list() {
 		return this.storage.list();
