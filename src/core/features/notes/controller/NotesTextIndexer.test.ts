@@ -30,16 +30,16 @@ test('incremental index building', async () => {
 
 	// Scan for empty notes
 	vi.setSystemTime('01/01/2000 12:00');
-	vi.runAllTimersAsync();
+	await vi.runAllTimersAsync();
 	await expect(indexScanner.update(), 'No notes to scan').resolves.toBe(0);
 
 	// Add notes and scan
 	vi.setSystemTime('01/01/2001 12:00');
-	vi.runAllTimersAsync();
+	await vi.runAllTimersAsync();
 	const note1 = await notes.add({ title: '2001', text: 'Dummy text' });
 
 	vi.setSystemTime('01/01/2002 12:00');
-	vi.runAllTimersAsync();
+	await vi.runAllTimersAsync();
 	await notes.add({ title: '2002', text: 'Dummy text' });
 
 	await expect(indexScanner.update(), 'All notes is now in index').resolves.toBe(2);
@@ -50,7 +50,7 @@ test('incremental index building', async () => {
 
 	// Can't find texts that is not in index yet
 	vi.setSystemTime('01/01/2003 12:00');
-	vi.runAllTimersAsync();
+	await vi.runAllTimersAsync();
 	await notes.update(note1, { title: '2005', text: 'Updated demo text' });
 
 	await expect(notes.get({ search: { text: 'updated demo' } })).resolves.toEqual([]);
