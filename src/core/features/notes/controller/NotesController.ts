@@ -274,7 +274,7 @@ export class NotesController implements INotesController {
 			return results.values().drop(offset).take(query.limit).toArray();
 		}
 
-		return Array.from(intersectSets(textMatchCandidates, filtersCandidates));
+		return Array.from(results);
 	}
 
 	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
