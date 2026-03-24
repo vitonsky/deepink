@@ -109,14 +109,14 @@ export class NoteVersions {
 
 	public async delete(versionIds: string[]) {
 		const db = wrapSQLite(this.db.get());
-		db.query(
+		await db.query(
 			qb.sql`DELETE FROM note_versions WHERE id IN (${qb.values(versionIds)})`,
 		);
 	}
 
 	public async purge(noteIds: string[]) {
 		const db = wrapSQLite(this.db.get());
-		db.query(
+		await db.query(
 			qb.sql`DELETE FROM note_versions WHERE note_id IN (${qb.values(noteIds)})`,
 		);
 	}
