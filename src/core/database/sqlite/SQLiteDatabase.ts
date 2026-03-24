@@ -45,9 +45,14 @@ export class SQLiteDatabase implements SQLiteDB {
 
 		// Notify updates
 		db.updateHook((operation, database, table, rowId) => {
-			this.onChangeCallbacks.forEach((callback) =>
-				callback(operation, database, table, rowId),
-			);
+			this.onChangeCallbacks.forEach((callback) => {
+				// Ignore errors in callbacks
+				try {
+					callback(operation, database, table, rowId);
+				} catch (error) {
+					console.error(error);
+				}
+			});
 		});
 
 		// Custom functions

@@ -1,10 +1,11 @@
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { openSQLite } from './openSQLite';
+import { SQLiteDatabase } from './SQLiteDatabase';
 import { qb } from './utils/query-builder';
 import { wrapSQLite } from './utils/wrapDB';
 
-test('Test custom functions', async () => {
+test('Custom functions must survive the export', async () => {
 	const db = await openSQLite(createFileControllerMock());
 	onTestFinished(() => db.close());
 
@@ -29,6 +30,28 @@ test('Test custom functions', async () => {
 	await expect(db.get().query(`SELECT gen_random_uuid() as uuid`)).resolves.toEqual([
 		{ uuid: expect.any(String) },
 	]);
+
+	await db.get().export();
+	await expect(db.get().query(`SELECT gen_random_uuid() as uuid`)).resolves.toEqual([
+		{ uuid: expect.any(String) },
+	]);
+
+	await db.sync();
+	await expect(db.get().query(`SELECT gen_random_uuid() as uuid`)).resolves.toEqual([
+		{ uuid: expect.any(String) },
+	]);
+});
+
+test('Exceptions in callbacks must be ignored', async () => {
+	const db = new SQLiteDatabase();
+	onTestFinished(() => db.close());
+
+	db.onChange(() => {
+		throw new Error('listener failed');
+	});
+
+	await db.query('CREATE TABLE t (id INTEGER)');
+	await expect(db.query('INSERT INTO t (id) VALUES (1)')).resolves.toEqual([]);
 });
 
 describe('SQLite Database persistence', () => {
