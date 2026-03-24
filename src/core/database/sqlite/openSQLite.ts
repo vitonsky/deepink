@@ -32,7 +32,7 @@ export const openSQLite = async (file: IFileController) => {
 			},
 			async getData() {
 				const data = await db.export();
-				return data.buffer as ArrayBuffer;
+				return data.slice().buffer;
 			},
 
 			isOpened() {
