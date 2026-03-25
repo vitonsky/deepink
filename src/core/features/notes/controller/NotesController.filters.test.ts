@@ -334,7 +334,5 @@ describe('data fetching', () => {
 		expect(foundNotes).not.toContainEqual(
 			expect.objectContaining({ id: notExistingNote }),
 		);
-
-		await db.close();
 	});
 });
