@@ -1,5 +1,5 @@
 import { getLongText } from 'src/__tests__/samples';
-import { getUUID } from 'src/__tests__/utils/uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { bench } from 'vitest';
 import z from 'zod';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
@@ -18,7 +18,7 @@ function getRandomNumber(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const FAKE_WORKSPACE_ID = getUUID();
+const FAKE_WORKSPACE_ID = uuidv4();
 
 const textSample = getLongText();
 

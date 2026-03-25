@@ -1,6 +1,6 @@
 import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
-import { getUUID } from 'src/__tests__/utils/uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 
 import { TAG_ERROR_CODE, TagsController } from './TagsController';
@@ -105,7 +105,7 @@ describe('manage tags', () => {
 		const { db, workspaceId } = getAppContext();
 		const tags = new TagsController(db, workspaceId);
 
-		const nonExistentTag = getUUID();
+		const nonExistentTag = uuidv4();
 		await expect(tags.add('foo', nonExistentTag)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST }),
 		);
