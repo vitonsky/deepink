@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 
-import { getUUID } from 'src/__tests__/utils/uuid';
-import { openSQLite } from '@core/database/sqlite/openSQLite';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { createFileManagerMock } from '../files/__tests__/mocks/createFileManagerMock';
@@ -11,26 +10,26 @@ import { FilesController } from '../files/FilesController';
 import { NotesController } from '../notes/controller/NotesController';
 import { FilesIntegrityController } from './FilesIntegrityController';
 
-const FAKE_WORKSPACE_ID = getUUID();
+const { getDB } = makeAutoClosedSQLiteDB();
+const getAppContext = makeAppContext(getDB);
 
 const testFiles = Array(5)
 	.fill(null)
 	.map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
 
 test('Clear orphaned files', async () => {
-	const dbFile = createFileControllerMock();
-	const db = await openSQLite(dbFile);
+	const { db, workspaceId } = getAppContext();
 
 	const fileManager = createFileManagerMock();
-	const attachments = new AttachmentsController(db, FAKE_WORKSPACE_ID);
-	const files = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const attachments = new AttachmentsController(db, workspaceId);
+	const files = new FilesController(db, fileManager, workspaceId);
 
 	const integrityController = new FilesIntegrityController(fileManager, {
 		files,
 		attachments,
 	});
 
-	const notes = new NotesController(db, FAKE_WORKSPACE_ID);
+	const notes = new NotesController(db, workspaceId);
 	const [NOTE_1, NOTE_2] = await Promise.all([
 		notes.add({ title: '', text: '' }),
 		notes.add({ title: '', text: '' }),
@@ -91,6 +90,4 @@ test('Clear orphaned files', async () => {
 	await files.get(attachedFileId).then((file) => {
 		expect(file).toBeNull();
 	});
-
-	await db.close();
 });

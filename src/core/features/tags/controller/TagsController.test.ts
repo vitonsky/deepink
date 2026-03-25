@@ -1,17 +1,17 @@
+import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { getUUID } from 'src/__tests__/utils/uuid';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 
 import { TAG_ERROR_CODE, TagsController } from './TagsController';
 
-const FAKE_WORKSPACE_ID = getUUID();
-
 describe('manage tags', () => {
 	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
+	const getAppContext = makeAppContext(getDB, { hook: beforeEach });
 
 	test('tags can be added', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
 		await expect(tags.add(' foo ', null)).resolves.toBeTypeOf('string');
@@ -42,8 +42,8 @@ describe('manage tags', () => {
 	});
 
 	test('nested tags', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		await tags.add('foo', null);
 		await tags.add('bar', null).then((tagId) => tags.add('baz', tagId));
@@ -71,8 +71,8 @@ describe('manage tags', () => {
 	});
 
 	test('tags with invalid names cannot be added', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		await expect(tags.add('', null)).rejects.toThrow(
 			expect.objectContaining({ code: TAG_ERROR_CODE.INVALID_FORMAT }),
@@ -102,8 +102,8 @@ describe('manage tags', () => {
 	});
 
 	test('cannot create a tag with a non-existing parent', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		const nonExistentTag = getUUID();
 		await expect(tags.add('foo', nonExistentTag)).rejects.toThrow(
@@ -118,8 +118,8 @@ describe('manage tags', () => {
 	});
 
 	test('adds only the missing segments of the tag name without recreating existing ones', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		const fooId = await tags.add('foo', null);
 
@@ -275,8 +275,8 @@ describe('manage tags', () => {
 	});
 
 	test('duplicate tag cannot be added', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		const fooId = await tags.add('foo', null);
 
@@ -325,8 +325,8 @@ describe('manage tags', () => {
 	});
 
 	test('update tags', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		await tags.add('foo', null).then(async (tagId) => {
 			await tags.update({
@@ -369,8 +369,8 @@ describe('manage tags', () => {
 	});
 
 	test('cannot update tag with an invalid name', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		const fooId = await tags.add('foo', null);
 		await expect(
@@ -415,8 +415,8 @@ describe('manage tags', () => {
 	});
 
 	test('delete tags', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
 		await tags.add('foo', null);
 
@@ -438,12 +438,13 @@ describe('manage tags', () => {
 
 describe('manage attachments', () => {
 	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
+	const getAppContext = makeAppContext(getDB, { hook: beforeEach });
 
 	test('set attached tags', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
-		const FAKE_NOTE_ID = await new NotesController(db, FAKE_WORKSPACE_ID).add({
+		const noteId = await new NotesController(db, workspaceId).add({
 			title: '',
 			text: '',
 		});
@@ -452,12 +453,12 @@ describe('manage attachments', () => {
 		const barId = await tags.add('bar', null);
 		const bazId = await tags.add('baz', barId);
 
-		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
+		await tags.getAttachedTags(noteId).then((tags) => {
 			expect(tags).toEqual([]);
 		});
 
-		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
-		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
+		await tags.setAttachedTags(noteId, [fooId, bazId]);
+		await tags.getAttachedTags(noteId).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -472,8 +473,8 @@ describe('manage attachments', () => {
 			);
 		});
 
-		await tags.setAttachedTags(FAKE_NOTE_ID, [barId]);
-		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
+		await tags.setAttachedTags(noteId, [barId]);
+		await tags.getAttachedTags(noteId).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -486,10 +487,10 @@ describe('manage attachments', () => {
 	});
 
 	test('does not throw error when attach duplicate tags', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
-		const FAKE_NOTE_ID = await new NotesController(db, FAKE_WORKSPACE_ID).add({
+		const noteId = await new NotesController(db, workspaceId).add({
 			title: '',
 			text: '',
 		});
@@ -497,13 +498,13 @@ describe('manage attachments', () => {
 		const fooId = await tags.add('foo', null);
 		const barId = await tags.add('bar', null);
 
-		await expect(tags.getAttachedTags(FAKE_NOTE_ID)).resolves.toEqual([]);
+		await expect(tags.getAttachedTags(noteId)).resolves.toEqual([]);
 
 		await expect(
-			tags.setAttachedTags(FAKE_NOTE_ID, [fooId, barId, fooId]),
+			tags.setAttachedTags(noteId, [fooId, barId, fooId]),
 		).resolves.not.toThrow();
 
-		await expect(tags.getAttachedTags(FAKE_NOTE_ID)).resolves.toEqual(
+		await expect(tags.getAttachedTags(noteId)).resolves.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					name: 'foo',
@@ -518,10 +519,10 @@ describe('manage attachments', () => {
 	});
 
 	test('deleted tag will not appears in tags list', async () => {
-		const db = await getDB();
-		const tags = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const tags = new TagsController(db, workspaceId);
 
-		const FAKE_NOTE_ID = await new NotesController(db, FAKE_WORKSPACE_ID).add({
+		const noteId = await new NotesController(db, workspaceId).add({
 			title: '',
 			text: '',
 		});
@@ -530,10 +531,10 @@ describe('manage attachments', () => {
 		const barId = await tags.add('bar', null);
 		const bazId = await tags.add('baz', barId);
 
-		await tags.setAttachedTags(FAKE_NOTE_ID, [fooId, bazId]);
+		await tags.setAttachedTags(noteId, [fooId, bazId]);
 
 		await tags.delete(bazId);
-		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
+		await tags.getAttachedTags(noteId).then((tags) => {
 			expect(tags).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
@@ -545,7 +546,7 @@ describe('manage attachments', () => {
 		});
 
 		await tags.delete(fooId);
-		await tags.getAttachedTags(FAKE_NOTE_ID).then((tags) => {
+		await tags.getAttachedTags(noteId).then((tags) => {
 			expect(tags).toEqual([]);
 		});
 	});

@@ -1,4 +1,4 @@
-import { getUUID } from 'src/__tests__/utils/uuid';
+import { createWorkspaceId } from 'src/__tests__/utils/makeAppContext';
 import z from 'zod';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
@@ -10,8 +10,6 @@ import { FlexSearchIndex } from '../../../database/flexsearch/FlexSearchIndex';
 import { NotesController } from './NotesController';
 import { NotesTextIndexer } from './NotesTextIndexer';
 
-const FAKE_WORKSPACE_ID = getUUID();
-
 vi.useFakeTimers();
 
 test('incremental index building', async () => {
@@ -19,7 +17,9 @@ test('incremental index building', async () => {
 	onTestFinished(db.close);
 
 	const index = new FlexSearchIndex(new InMemoryFS());
-	const notes = new NotesController(db, FAKE_WORKSPACE_ID, index);
+
+	const workspaceId = await createWorkspaceId(db);
+	const notes = new NotesController(db, workspaceId, index);
 
 	const indexScannerFile = createFileControllerMock();
 	const indexScanner = new NotesTextIndexer(

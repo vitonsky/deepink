@@ -4,6 +4,7 @@ import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { IFileController } from '@core/features/files';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
+// TODO: delete and leave only one hook
 export const makeAutoClosedDB = ({
 	file,
 	closeHook = afterAll,

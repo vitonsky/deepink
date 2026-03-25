@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-import { getUUID } from 'src/__tests__/utils/uuid';
-import { openSQLite } from '@core/database/sqlite/openSQLite';
+import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
@@ -21,7 +21,6 @@ import {
 import { TelemetryContext } from '@features/telemetry';
 import { renderHook } from '@testing-library/react';
 import * as fsClientMock from '@utils/fs/__tests__/client.mock';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { configureNoteNameGetter, useNotesExport } from './useNotesExport';
 
@@ -34,23 +33,16 @@ afterEach(() => {
 });
 
 describe('Export notes', async () => {
-	const FAKE_WORKSPACE_ID = getUUID();
-
 	const fileManager = createFileManagerMock();
 
-	const dbFile = createFileControllerMock();
-	const dbPromise = openSQLite(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
+	const { getDB } = makeAutoClosedSQLiteDB();
+	const getAppContext = makeAppContext(getDB);
 
 	test('Add test data', async () => {
-		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
-		const attachments = new AttachmentsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const notesRegistry = new NotesController(db, workspaceId);
+		const filesRegistry = new FilesController(db, fileManager, workspaceId);
+		const attachments = new AttachmentsController(db, workspaceId);
 
 		await notesRegistry.add({
 			title: 'Title 1',
@@ -76,10 +68,10 @@ describe('Export notes', async () => {
 	});
 
 	test('Export all notes via useNotesExport', async () => {
-		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const notesRegistry = new NotesController(db, workspaceId);
+		const tagsRegistry = new TagsController(db, workspaceId);
+		const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 		const trackMock = vi.fn();
 		const { result } = renderHook(useNotesExport, {
@@ -135,10 +127,10 @@ describe('Export notes', async () => {
 	});
 
 	test('Export single note via useNotesExport', async () => {
-		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getAppContext();
+		const notesRegistry = new NotesController(db, workspaceId);
+		const tagsRegistry = new TagsController(db, workspaceId);
+		const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 		const trackMock = vi.fn();
 		const { result } = renderHook(useNotesExport, {

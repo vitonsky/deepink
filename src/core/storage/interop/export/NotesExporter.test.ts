@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { getUUID } from 'src/__tests__/utils/uuid';
-import { openSQLite } from '@core/database/sqlite/openSQLite';
+import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { createTextFile } from '@core/features/files/__tests__/mocks/createTextFile';
@@ -11,29 +11,21 @@ import { ZipFS } from '@core/features/files/ZipFS';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesExporter } from '.';
 
-const FAKE_WORKSPACE_ID = getUUID();
-
-const dbFile = createFileControllerMock();
-const dbPromise = openSQLite(dbFile);
-
-afterAll(async () => {
-	const db = await dbPromise;
-	await db.close();
-});
+const { getDB } = makeAutoClosedSQLiteDB();
+const getAppContext = makeAppContext(getDB);
 
 const fileManager = createFileManagerMock();
 
 test('Create notes', async () => {
-	const db = await dbPromise;
-	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getAppContext();
+	const notesRegistry = new NotesController(db, workspaceId);
+	const tagsRegistry = new TagsController(db, workspaceId);
 
-	const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
-	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const attachmentsRegistry = new AttachmentsController(db, workspaceId);
+	const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 	// Upload files
 	const file1Id = await filesRegistry.add(createTextFile('Text content of attachment'));
@@ -94,11 +86,11 @@ test('Create notes', async () => {
 });
 
 test('Export all notes and attached files', async () => {
-	const db = await dbPromise;
-	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getAppContext();
+	const notesRegistry = new NotesController(db, workspaceId);
+	const tagsRegistry = new TagsController(db, workspaceId);
 
-	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 	const onProcessed = vi.fn();
 	const exporter = new NotesExporter({
@@ -145,11 +137,11 @@ test('Export all notes and attached files', async () => {
 });
 
 test('Export single note and it attachments', async () => {
-	const db = await dbPromise;
-	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getAppContext();
+	const notesRegistry = new NotesController(db, workspaceId);
+	const tagsRegistry = new TagsController(db, workspaceId);
 
-	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 	const exporter = new NotesExporter({
 		filesRegistry,
@@ -196,11 +188,11 @@ test('Export single note and it attachments', async () => {
 });
 
 test('Export all notes and attached files with custom file names', async () => {
-	const db = await dbPromise;
-	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getAppContext();
+	const notesRegistry = new NotesController(db, workspaceId);
+	const tagsRegistry = new TagsController(db, workspaceId);
 
-	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 	const exporter = new NotesExporter(
 		{
@@ -256,11 +248,11 @@ test('Export all notes and attached files with custom file names', async () => {
 });
 
 test('Export all notes and attached files as a zip file', async () => {
-	const db = await dbPromise;
-	const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-	const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getAppContext();
+	const notesRegistry = new NotesController(db, workspaceId);
+	const tagsRegistry = new TagsController(db, workspaceId);
 
-	const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 	const exporter = new NotesExporter(
 		{
