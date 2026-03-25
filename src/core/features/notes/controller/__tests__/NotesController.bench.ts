@@ -1,10 +1,10 @@
 import { getLongText } from 'src/__tests__/samples';
-import { v4 as uuidv4 } from 'uuid';
 import { bench } from 'vitest';
 import z from 'zod';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { StateFile } from '@core/features/files/StateFile';
+import { createWorkspaceId } from '@tests/utils/vaultContext';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { FlexSearchIndex } from '../../../../database/flexsearch/FlexSearchIndex';
@@ -18,8 +18,6 @@ function getRandomNumber(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const FAKE_WORKSPACE_ID = uuidv4();
-
 const textSample = getLongText();
 
 const benchConfig = {
@@ -29,12 +27,13 @@ const benchConfig = {
 	warmupTime: 0,
 };
 
-describe.sequential('Note ops performance', async () => {
+describe('Note ops performance', async () => {
 	const dbFile = createFileControllerMock();
 	const db = await openSQLite(dbFile);
+	const workspaceId = await createWorkspaceId(db);
 
 	const index = new FlexSearchIndex(new InMemoryFS());
-	const notes = new NotesController(db, FAKE_WORKSPACE_ID, index);
+	const notes = new NotesController(db, workspaceId, index);
 	const indexScanner = new NotesTextIndexer(
 		notes,
 		index,
