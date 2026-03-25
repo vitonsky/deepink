@@ -11,6 +11,7 @@ yarn-error.log*
 
 # testing
 coverage
+bench-data
 
 # editors
 .idea

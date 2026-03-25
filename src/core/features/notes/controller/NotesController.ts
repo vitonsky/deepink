@@ -1,11 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-conversion */
-/* eslint-disable @cspell/spellchecker */
 /* eslint-disable camelcase */
 import { Query } from 'nano-queries';
 import { z } from 'zod';
-import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { DBTypes, qb } from '@utils/db/query-builder';
-import { wrapDB } from '@utils/db/wrapDB';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { DBTypes, qb } from '@core/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/database/sqlite/utils/wrapDB';
+
+import { FlexSearchIndex } from '../../../database/flexsearch/FlexSearchIndex';
 
 import { INote, INoteContent, NoteId } from '..';
 import {
@@ -20,13 +21,13 @@ const RowScheme = z
 		id: z.string(),
 		title: z.string(),
 		text: z.string(),
-		created_at: z.date(),
-		updated_at: z.date(),
-		history_disabled: z.boolean(),
-		visible: z.boolean(),
-		deleted_at: z.date().nullable(),
-		archived: z.boolean(),
-		bookmarked: z.boolean(),
+		created_at: z.coerce.date(),
+		updated_at: z.coerce.date(),
+		history_disabled: z.coerce.boolean(),
+		visible: z.coerce.boolean(),
+		deleted_at: z.coerce.date().nullable(),
+		archived: z.coerce.boolean(),
+		bookmarked: z.coerce.boolean(),
 	})
 	.transform(
 		({
@@ -64,19 +65,19 @@ function formatNoteMeta(meta: Partial<NoteMeta>) {
 
 		switch (key) {
 			case 'isSnapshotsDisabled':
-				fields['history_disabled'] = Boolean(value);
+				fields['history_disabled'] = Number(value);
 				break;
 			case 'isVisible':
-				fields['visible'] = Boolean(value);
+				fields['visible'] = Number(value);
 				break;
 			case 'isDeleted':
-				fields['deleted_at'] = value ? new Date() : null;
+				fields['deleted_at'] = value ? new Date().getTime() : null;
 				break;
 			case 'isArchived':
-				fields['archived'] = Boolean(value);
+				fields['archived'] = Number(value);
 				break;
 			case 'isBookmarked':
-				fields['bookmarked'] = Boolean(value);
+				fields['bookmarked'] = Number(value);
 				break;
 		}
 	}
@@ -97,10 +98,10 @@ function getFetchQuery(
 		page,
 		tags = [],
 		meta: { isDeleted, ...meta } = {},
-		search,
 		deletedAt = {},
+		updatedAt = {},
 		sort,
-	}: NotesControllerFetchOptions = {},
+	}: Omit<NotesControllerFetchOptions, 'search'> = {},
 ) {
 	if (page !== undefined && page < 1)
 		throw new TypeError('Page value must not be less than 1');
@@ -118,56 +119,10 @@ function getFetchQuery(
 	const filterQuery: Query<DBTypes>[] = [];
 	const orderQuery: Query<DBTypes>[] = [];
 
-	// Search
-	if (search) {
-		// In case a user input contains typos, tsquery will not match,
-		// so we extends a query and adds a few alternative lexemes to each
-		// Alternative lexemes is extracted from real texts in DB
-		// We find the top N of most similar lexemes via trgm
-		withQuery.push({
-			name: 'user_tokens',
-			query: qb.sql`SELECT regexp_split_to_table(lower(unaccent(${search.text})), '\s+') AS token`,
-		});
-		withQuery.push({
-			name: 'token_alternatives',
-			query: qb.sql`SELECT t.token,
-					l.word AS candidate
-				FROM user_tokens t
-				LEFT JOIN lexemes l
-				ON l.word % t.token
-				LIMIT 5`,
-		});
-		withQuery.push({
-			name: 'grouped_alternatives',
-			query: qb.sql`SELECT
-				plainto_tsquery('simple', string_agg(token, ' ')) AS token,
-				to_tsquery('simple', string_agg(candidate, ' | ')) AS or_group
-				FROM token_alternatives
-				GROUP BY token`,
-		});
-		withQuery.push({
-			name: 'expanded_tsquery',
-			query: qb.sql` SELECT
-				tsquery_and_agg(token) AS original_query,
-				tsquery_and_agg(or_group) AS query
-				FROM grouped_alternatives ga`,
-		});
-
-		// Filter by expanded query to get more results
-		joinQuery.push(qb.sql`CROSS JOIN expanded_tsquery et`);
-		filterQuery.push(qb.sql`text_tsv @@ et.query`);
-
-		// Order by original query match first
-		orderQuery.push(qb.sql`ts_rank_cd(text_tsv, et.original_query) DESC`);
-
-		// Order not matched results by extended query
-		orderQuery.push(qb.sql`ts_rank_cd(text_tsv, et.query) DESC`);
-	}
-
 	// Filtering
 	if (tags.length > 0) {
 		filterQuery.push(
-			qb.sql`id IN (SELECT target FROM attached_tags WHERE source IN (${qb.values(
+			qb.sql`id IN (SELECT note_id FROM note_tags WHERE tag_id IN (${qb.values(
 				tags,
 			)}))`,
 		);
@@ -192,10 +147,17 @@ function getFetchQuery(
 	}
 
 	if (deletedAt.from) {
-		filterQuery.push(qb.sql`deleted_at >= ${deletedAt.from}`);
+		filterQuery.push(qb.sql`deleted_at >= ${deletedAt.from.getTime()}`);
 	}
 	if (deletedAt.to) {
-		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to}`);
+		filterQuery.push(qb.sql`deleted_at <= ${deletedAt.to.getTime()}`);
+	}
+
+	if (updatedAt.from) {
+		filterQuery.push(qb.sql`updated_at >= ${updatedAt.from.getTime()}`);
+	}
+	if (updatedAt.to) {
+		filterQuery.push(qb.sql`updated_at <= ${updatedAt.to.getTime()}`);
 	}
 
 	// Sort
@@ -233,42 +195,99 @@ function getFetchQuery(
 	);
 }
 
+function intersectSets<T>(a: Set<T>, b: Set<T>): Set<T> {
+	// Always iterate over the smaller set for fewer lookups
+	const [smaller, larger] = a.size <= b.size ? [a, b] : [b, a];
+
+	const result = new Set<T>();
+	for (const item of smaller) {
+		if (larger.has(item)) {
+			result.add(item);
+		}
+	}
+	return result;
+}
+
 /**
  * Synced notes registry
  */
 export class NotesController implements INotesController {
-	private readonly db;
-	private readonly workspace;
-	constructor(db: PGLiteDatabase, workspace: string) {
-		this.db = db;
-		this.workspace = workspace;
-	}
+	constructor(
+		private readonly db: ManagedDatabase<SQLiteDB>,
+		private readonly workspace: string,
+		private readonly index?: FlexSearchIndex,
+	) {}
 
 	public async getById(ids: NoteId[]): Promise<INote[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
-			qb.sql`SELECT * FROM notes
-				JOIN unnest(ARRAY[${qb.values(ids)}]::uuid[]) WITH ORDINALITY AS ordering(id, position) ON notes.id = ordering.id
-				WHERE workspace_id = ${this.workspace} ORDER BY ordering.position`,
+		const rows = await db.query(
+			qb.sql`SELECT * FROM notes WHERE workspace_id = ${this.workspace} AND id IN ${qb.values(ids).withParenthesis()}`,
 			RowScheme,
 		);
 
-		if (rows.length !== ids.length) {
+		const rowsMap = new Map(rows.map((note) => [note.id, note]));
+		const sortedNotes = ids
+			.values()
+			.map((id) => rowsMap.get(id))
+			.filter((note) => note !== undefined)
+			.toArray();
+
+		if (sortedNotes.length !== ids.length) {
 			console.warn(
-				`Found notes count does not match the requested count. Expected: ${ids.length}; Found: ${rows.length}`,
+				`Found notes count does not match the requested count. Expected: ${ids.length}; Found: ${sortedNotes.length}`,
 			);
 		}
 
-		return rows;
+		return sortedNotes;
+	}
+
+	protected async searchCandidates(
+		query: NotesControllerFetchOptions,
+	): Promise<string[]> {
+		const db = wrapSQLite(this.db.get());
+
+		// Handle simple case
+		if (!query.search || !this.index) {
+			return [];
+		}
+
+		// Iterative fetching
+		const [textMatchCandidates, filtersCandidates] = await Promise.all([
+			this.index.query(query.search.text).then((results) => new Set(results)),
+			db
+				.query(
+					getFetchQuery(
+						{ select: qb.sql`id`, workspace: this.workspace },
+						{ ...query, limit: undefined, page: undefined },
+					),
+					z.object({ id: z.string() }).transform((row) => row.id),
+				)
+				.then((results) => new Set(results)),
+		]);
+
+		const results = intersectSets(textMatchCandidates, filtersCandidates);
+
+		if (query.limit) {
+			const offset =
+				query.page && query.page > 0 ? (query.page - 1) * query.limit : 0;
+			return results.values().drop(offset).take(query.limit).toArray();
+		}
+
+		return Array.from(results);
 	}
 
 	public async getLength(query: NotesControllerFetchOptions = {}): Promise<number> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const {
-			rows: [{ count }],
-		} = await db.query(
+		if (query.search && this.index)
+			return this.searchCandidates({
+				...query,
+				page: undefined,
+				limit: undefined,
+			}).then((results) => results.length);
+
+		const [{ count }] = await db.query(
 			getFetchQuery(
 				{ select: qb.sql`COUNT(*) as count`, workspace: this.workspace },
 				query,
@@ -280,112 +299,91 @@ export class NotesController implements INotesController {
 	}
 
 	public async query(query: NotesControllerFetchOptions = {}): Promise<NoteId[]> {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { rows } = await db.query(
+		if (query.search && this.index) {
+			return this.searchCandidates(query);
+		}
+
+		return await db.query(
 			getFetchQuery({ select: qb.sql`id`, workspace: this.workspace }, query),
 			z.object({ id: z.string() }).transform((row) => row.id),
 		);
-
-		return rows;
 	}
 
 	public async get(query: NotesControllerFetchOptions = {}): Promise<INote[]> {
-		const db = wrapDB(this.db.get());
-
-		const { rows } = await db.query(
-			getFetchQuery({ select: qb.sql`*`, workspace: this.workspace }, query),
-			RowScheme,
-		);
-
-		return rows;
+		const ids = await this.query(query);
+		return this.getById(ids);
 	}
 
 	public async add(note: INoteContent, meta?: Partial<NoteMeta>): Promise<NoteId> {
-		const creationTime = new Date();
+		const creationTime = Date.now();
 
 		// Insert data
 		const metaEntries = Object.entries(formatNoteMeta(meta ?? {}));
 
-		return this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
+		const db = wrapSQLite(this.db.get());
 
-			const {
-				rows: [id],
-			} = await db.query(
-				qb.sql`INSERT INTO notes (${qb.set([
-					qb.sql`"workspace_id","title","text","created_at","updated_at"`,
-					...(metaEntries ? metaEntries.map(([key]) => key) : []),
-				])}) VALUES (${qb.values([
-					this.workspace,
-					note.title,
-					note.text,
-					creationTime,
-					creationTime,
-					...metaEntries.map(([_key, value]) => value),
-				])}) RETURNING id`,
-				z.object({ id: z.string() }).transform(({ id }) => id),
-			);
+		const [id] = await db.query(
+			qb.sql`INSERT INTO notes (${qb.set([
+				qb.sql`"workspace_id","title","text","created_at","updated_at"`,
+				...(metaEntries ? metaEntries.map(([key]) => key) : []),
+			])}) VALUES (${qb.values([
+				this.workspace,
+				note.title,
+				note.text,
+				creationTime,
+				creationTime,
+				...metaEntries.map(([_key, value]) => value),
+			])}) RETURNING id`,
+			z.object({ id: z.string() }).transform(({ id }) => id),
+		);
 
-			return id;
-		});
+		return id;
 	}
 
 	public async update(id: string, updatedNote: INoteContent) {
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
+		const db = wrapSQLite(this.db.get());
 
-			const result = await db.query(
-				qb.line(
-					'UPDATE notes SET',
-					qb.values({
-						title: updatedNote.title,
-						text: updatedNote.text,
-						updated_at: new Date(),
-					}),
-					qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
-				),
-			);
-
-			if (!result.affectedRows || result.affectedRows < 1) {
-				throw new Error('Note did not updated');
-			}
-		});
+		await db.query(
+			qb.line(
+				'UPDATE notes SET',
+				qb.values({
+					title: updatedNote.title,
+					text: updatedNote.text,
+					updated_at: Date.now(),
+				}),
+				qb.sql`WHERE id=${id} AND workspace_id=${this.workspace}`,
+			),
+		);
 	}
 
 	public async delete(ids: NoteId[]): Promise<void> {
 		if (!ids.length) return;
-		await this.db.get().transaction(async (tx) => {
-			const db = wrapDB(tx);
 
-			const { affectedRows = 0 } = await db.query(
-				qb.sql`DELETE FROM notes WHERE workspace_id=${
-					this.workspace
-				} AND id IN (${qb.values(ids)})`,
-			);
+		const db = wrapSQLite(this.db.get());
 
-			if (affectedRows !== ids.length) {
-				console.warn(
-					`Not match deleted entries length. Expected: ${ids.length}; Deleted: ${affectedRows}`,
-				);
-			}
-		});
+		await db.query(
+			qb.sql`DELETE FROM notes WHERE workspace_id=${
+				this.workspace
+			} AND id IN (${qb.values(ids)})`,
+		);
+
+		if (this.index) {
+			const index = await this.index.createIndexSession();
+			await Promise.all(ids.map((id) => index.remove(id)));
+			await index.commit();
+		}
 	}
 
 	public async updateMeta(ids: NoteId[], meta: Partial<NoteMeta>): Promise<void> {
 		if (ids.length === 0) return;
 
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		const { affectedRows = 0 } = await db.query(
+		await db.query(
 			qb.sql`UPDATE notes SET ${qb.values(formatNoteMeta(meta))}
 				WHERE workspace_id=${this.workspace} AND id IN (${qb.values(ids)})`,
 		);
-
-		if (affectedRows !== ids.length) {
-			console.warn(
-				`Not match updated entries length. Expected: ${ids.length}; Updated: ${affectedRows}`,
-			);
-		}
 	}
 }

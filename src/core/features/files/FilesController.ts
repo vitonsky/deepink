@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { PGLiteDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { qb } from '@utils/db/query-builder';
-import { wrapDB } from '@utils/db/wrapDB';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { qb } from '@core/database/sqlite/utils/query-builder';
+import { wrapSQLite } from '@core/database/sqlite/utils/wrapDB';
 
 import { IFilesStorage } from '.';
 
@@ -13,18 +14,16 @@ import { IFilesStorage } from '.';
  */
 export class FilesController {
 	constructor(
-		protected readonly db: PGLiteDatabase,
+		protected readonly db: ManagedDatabase<SQLiteDB>,
 		protected readonly filesStorage: IFilesStorage,
 		protected readonly workspace: string,
 	) {}
 
 	public async add(file: File) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
 		// Insert in DB
-		const {
-			rows: [{ id: fileId }],
-		} = await db.query(
+		const [{ id: fileId }] = await db.query(
 			qb.sql`INSERT INTO files (workspace_id,name,mimetype) VALUES (${this.workspace},${file.name},${file.type}) RETURNING id`,
 			z.object({ id: z.string() }),
 		);
@@ -38,20 +37,17 @@ export class FilesController {
 	}
 
 	public async get(fileId: string) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
 		// Insert in DB
-		const [fileEntry] = await db
-			.query(
-				qb.sql`SELECT * FROM files WHERE workspace_id=${this.workspace} AND id=${fileId}`,
+		const [fileEntry] = await db.query(
+			qb.sql`SELECT * FROM files WHERE workspace_id=${this.workspace} AND id=${fileId}`,
 
-				z.object({
-					name: z.string(),
-					mimetype: z.string(),
-				}),
-			)
-			.then((result) => result.rows);
-
+			z.object({
+				name: z.string(),
+				mimetype: z.string(),
+			}),
+		);
 		if (!fileEntry) return null;
 
 		const { name, mimetype } = fileEntry;
@@ -64,7 +60,7 @@ export class FilesController {
 
 	// TODO: remove attached files
 	public async delete(filesId: string[]) {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
 		if (filesId.length === 0) return;
 
@@ -80,17 +76,15 @@ export class FilesController {
 	}
 
 	public async query() {
-		const db = wrapDB(this.db.get());
+		const db = wrapSQLite(this.db.get());
 
-		return await db
-			.query(
-				qb.sql`SELECT id, name, mimetype FROM files WHERE workspace_id=${this.workspace}`,
-				z.object({
-					id: z.string(),
-					name: z.string(),
-					mimetype: z.string(),
-				}),
-			)
-			.then(({ rows }) => rows);
+		return await db.query(
+			qb.sql`SELECT id, name, mimetype FROM files WHERE workspace_id=${this.workspace}`,
+			z.object({
+				id: z.string(),
+				name: z.string(),
+				mimetype: z.string(),
+			}),
+		);
 	}
 }

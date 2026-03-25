@@ -18,8 +18,12 @@ export default defineConfig({
 		},
 	],
 	test: {
+		env: {
+			// TODO: disable once bug will be fixed: https://github.com/vitest-dev/vitest/issues/9927
+			VITEST_WEB_WORKER_CLONE: 'none',
+		},
 		globals: true,
-		setupFiles: ['scripts/vitest.setup.ts'],
+		setupFiles: ['@vitest/web-worker', 'scripts/vitest.setup.ts'],
 		exclude: defaultExclude.concat(['tmp/**', 'dist/**', 'out/**']),
 
 		// DB initialization takes some time at first time,

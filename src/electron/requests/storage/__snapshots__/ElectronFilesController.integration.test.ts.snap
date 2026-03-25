@@ -22,14 +22,15 @@ exports[`Write files > Controller files list after writing 1`] = `
 
 exports[`Write files > FS structure after writing 1`] = `
 [
+  "/home/userData/appDir/app",
   "/home/userData/appDir",
-  "/home/userData/appDir/profileDir/foo/bar",
-  "/home/userData/appDir/profileDir/foo/bar/baz",
-  "/home/userData/appDir/profileDir/foo",
+  "/home/userData/appDir/app/profileDir/foo/bar",
+  "/home/userData/appDir/app/profileDir/foo/bar/baz",
+  "/home/userData/appDir/app/profileDir/foo",
   "/home",
-  "/home/userData/appDir/profileDir",
-  "/home/userData/appDir/profileDir/test.txt",
-  "/home/userData/appDir/profileDir/foo/bar/baz/test.txt",
+  "/home/userData/appDir/app/profileDir",
+  "/home/userData/appDir/app/profileDir/test.txt",
+  "/home/userData/appDir/app/profileDir/foo/bar/baz/test.txt",
   "/home/userData",
 ]
 `;

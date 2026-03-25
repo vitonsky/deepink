@@ -11,6 +11,8 @@ import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
+import { WorkspaceContainer } from './useWorkspace';
+
 export type NotesApi = {
 	openNote: (note: INote, focus?: boolean) => void;
 	noteUpdated: (note: INote) => void;
@@ -46,26 +48,27 @@ export const useFilesRegistry = createContextGetterHook(FilesRegistryContext);
 export const FilesControllerContext = createContext<IFilesStorage | null>(null);
 export const useFilesController = createContextGetterHook(FilesControllerContext);
 
-export interface WorkspaceProviderProps extends PropsWithChildren {
+export const WorkspaceContainerContext = createContext<WorkspaceContainer | null>(null);
+export const useWorkspaceContainer = createContextGetterHook(WorkspaceContainerContext);
+
+export interface WorkspaceProviderProps extends PropsWithChildren, WorkspaceContainer {
 	notesApi: NotesApi;
-	filesController: IFilesStorage;
-	filesRegistry: FilesController;
-	attachmentsController: AttachmentsController;
-	tagsRegistry: TagsController;
-	notesRegistry: INotesController;
-	notesHistory: NoteVersions;
 }
 
 export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
-	notesApi,
-	filesRegistry,
-	filesController,
-	attachmentsController,
-	tagsRegistry,
-	notesRegistry,
-	notesHistory,
 	children,
+	notesApi,
+	...workspaceContainer
 }) => {
+	const {
+		filesRegistry,
+		filesController,
+		attachmentsController,
+		tagsRegistry,
+		notesRegistry,
+		notesHistory,
+	} = workspaceContainer;
+
 	const [eventBus] = useState(() => {
 		const event = createEvent<{
 			name: string;
@@ -86,24 +89,28 @@ export const WorkspaceProvider: FC<WorkspaceProviderProps> = ({
 	});
 
 	return (
-		<EventBusContext.Provider value={eventBus}>
-			<NotesContext.Provider value={notesApi}>
-				<FilesRegistryContext.Provider value={filesRegistry}>
-					<FilesControllerContext.Provider value={filesController}>
-						<AttachmentsControllerContext.Provider
-							value={attachmentsController}
-						>
-							<TagsRegistryContext.Provider value={tagsRegistry}>
-								<NotesRegistryContext.Provider value={notesRegistry}>
-									<NotesHistoryContext.Provider value={notesHistory}>
-										{children}
-									</NotesHistoryContext.Provider>
-								</NotesRegistryContext.Provider>
-							</TagsRegistryContext.Provider>
-						</AttachmentsControllerContext.Provider>
-					</FilesControllerContext.Provider>
-				</FilesRegistryContext.Provider>
-			</NotesContext.Provider>
-		</EventBusContext.Provider>
+		<WorkspaceContainerContext value={workspaceContainer}>
+			<EventBusContext.Provider value={eventBus}>
+				<NotesContext.Provider value={notesApi}>
+					<FilesRegistryContext.Provider value={filesRegistry}>
+						<FilesControllerContext.Provider value={filesController}>
+							<AttachmentsControllerContext.Provider
+								value={attachmentsController}
+							>
+								<TagsRegistryContext.Provider value={tagsRegistry}>
+									<NotesRegistryContext.Provider value={notesRegistry}>
+										<NotesHistoryContext.Provider
+											value={notesHistory}
+										>
+											{children}
+										</NotesHistoryContext.Provider>
+									</NotesRegistryContext.Provider>
+								</TagsRegistryContext.Provider>
+							</AttachmentsControllerContext.Provider>
+						</FilesControllerContext.Provider>
+					</FilesRegistryContext.Provider>
+				</NotesContext.Provider>
+			</EventBusContext.Provider>
+		</WorkspaceContainerContext>
 	);
 };

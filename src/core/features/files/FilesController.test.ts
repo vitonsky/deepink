@@ -1,19 +1,16 @@
 // @vitest-environment jsdom
 
-import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
-import { getUUID } from 'src/__tests__/utils/uuid';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { createFileManagerMock } from './__tests__/mocks/createFileManagerMock';
 import { FilesController } from './FilesController';
 
-const FAKE_WORKSPACE_ID = getUUID();
-
-const { getDB } = makeAutoClosedDB();
+const getWorkspaceContext = createWorkspaceContext();
 const fileManager = createFileManagerMock();
 
 test('Upload files', async () => {
-	const db = await getDB();
-	const files = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getWorkspaceContext();
+	const files = new FilesController(db, fileManager, workspaceId);
 
 	await files.add(new File(['Hello world'], 'hello.md', { type: 'text/markdown' }));
 	await files.add(new File(['foo'], 'foo.txt', { type: 'text/plain' }));
@@ -24,8 +21,8 @@ test('Upload files', async () => {
 });
 
 test('Fetch files', async () => {
-	const db = await getDB();
-	const files = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getWorkspaceContext();
+	const files = new FilesController(db, fileManager, workspaceId);
 
 	const filesList = await files.query();
 	expect(filesList).toEqual([
@@ -59,8 +56,8 @@ test('Fetch files', async () => {
 });
 
 test('Delete files', async () => {
-	const db = await getDB();
-	const files = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getWorkspaceContext();
+	const files = new FilesController(db, fileManager, workspaceId);
 
 	const filesList = await files.query();
 	expect(filesList).toHaveLength(4);
@@ -72,8 +69,8 @@ test('Delete files', async () => {
 });
 
 test('Fetch for non exists file in FS returns null', async () => {
-	const db = await getDB();
-	const files = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const { db, workspaceId } = getWorkspaceContext();
+	const files = new FilesController(db, fileManager, workspaceId);
 
 	const filesList = await files.query();
 

@@ -11,6 +11,8 @@
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"forceConsistentCasingInFileNames": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
@@ -34,6 +36,7 @@
 		"types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
 		"paths": {
 			"@assets/*": ["assets/*"],
+			"@tests/*": ["src/__tests__/*"],
 			"@core/*": ["src/core/*"],
 			"@electron/*": ["src/electron/*"],
 			"@components/*": ["src/components/*"],

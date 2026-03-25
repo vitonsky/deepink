@@ -31,7 +31,11 @@ export default {
 		// enable tree-shaking
 		usedExports: true,
 		minimize: isProduction,
-		minimizer: [new SwcMinifyWebpackPlugin()],
+		minimizer: [
+			new SwcMinifyWebpackPlugin({
+				module: true, // ← tells SWC the output is ESM, allows import/export
+			}),
+		],
 
 		// Extract runtime into separate chunk for better caching
 		runtimeChunk: isProduction ? 'single' : false,
@@ -77,7 +81,7 @@ export default {
 	},
 	output: {
 		path: outputPath,
-		publicPath: '',
+		publicPath: './',
 
 		// Better chunk naming for caching
 		chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].js',
@@ -99,7 +103,7 @@ export default {
 		rules: [
 			{
 				// compiles TS/TSX excluding workers with SWC (fast)
-				test: /(?<!\.worker)\.tsx?$/,
+				test: /\.tsx?$/,
 				loader: 'swc-loader',
 				options: {
 					jsc: {

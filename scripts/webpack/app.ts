@@ -21,6 +21,9 @@ export default merge(commonConfig, {
 			]),
 		),
 	},
+	output: {
+		module: true,
+	},
 	plugins: [
 		...windows.map(
 			({ name }) =>
@@ -29,6 +32,7 @@ export default merge(commonConfig, {
 					filename: `window-${name}.html`,
 					chunks: [`window-${name}`],
 					template: path.join(projectRoot, 'src/templates/window.html'),
+					scriptLoading: 'module',
 				}),
 		),
 		new MiniCssExtractPlugin({}),
@@ -37,41 +41,18 @@ export default merge(commonConfig, {
 	externals: {
 		electron: 'global electron',
 	},
+	resolve: {
+		fallback: {
+			// eslint-disable-next-line camelcase
+			worker_threads: false,
+		},
+	},
+	experiments: {
+		asyncWebAssembly: true,
+		outputModule: true,
+	},
 	module: {
 		rules: [
-			{
-				test: /\.worker\.ts$/i,
-				use: [
-					{
-						loader: 'worker-loader',
-						options: {
-							worker: 'Worker',
-							filename: '[name].[contenthash].js',
-						},
-					},
-					{
-						loader: 'swc-loader',
-						options: {
-							jsc: {
-								parser: {
-									syntax: 'typescript',
-									tsx: true,
-									decorators: true,
-								},
-								transform: {
-									react: {
-										runtime: 'automatic',
-										pragma: 'React.createElement',
-										pragmaFrag: 'React.Fragment',
-									},
-								},
-								target: 'es2022',
-							},
-							sourceMaps: true,
-						},
-					},
-				],
-			},
 			{
 				test: /\.css$/,
 				use: [
@@ -92,6 +73,10 @@ export default merge(commonConfig, {
 			},
 			{
 				test: /\.ttf$/,
+				type: 'asset/resource',
+			},
+			{
+				test: /\.wasm$/,
 				type: 'asset/resource',
 			},
 			{

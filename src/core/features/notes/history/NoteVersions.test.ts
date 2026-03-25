@@ -1,25 +1,15 @@
-import { getUUID } from 'src/__tests__/utils/uuid';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { NotesController } from '../controller/NotesController';
 import { NoteVersions } from './NoteVersions';
 
-const FAKE_WORKSPACE_ID = getUUID();
-
 describe('Note version control', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
+	const getWorkspaceContext = createWorkspaceContext();
 
 	test('snapshot must be created only if latest version have changes with latest note data', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const history = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
+		const history = new NoteVersions(db, workspaceId);
 
 		// Fetch note
 		const dataV1 = { title: 'Title', text: 'Text' };
@@ -58,9 +48,9 @@ describe('Note version control', () => {
 	});
 
 	test('snapshot must always be created when parameter `force` is set', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const history = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
+		const history = new NoteVersions(db, workspaceId);
 
 		// Fetch note
 		const noteId = await registry.add({ title: 'Title 1', text: 'Text 1' });
@@ -103,9 +93,9 @@ describe('Note version control', () => {
 	});
 
 	test('when note is deleted, all versions must be deleted too', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const history = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
+		const history = new NoteVersions(db, workspaceId);
 
 		// Fetch note
 		const noteId = await registry.add({ title: 'Title 1', text: 'Text 1' });
@@ -127,9 +117,9 @@ describe('Note version control', () => {
 	});
 
 	test('snapshot may be created with empty text', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const history = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
+		const history = new NoteVersions(db, workspaceId);
 
 		// Fetch note
 		const dataV1 = { title: '', text: '' };
@@ -173,17 +163,11 @@ describe('Note version control', () => {
 });
 
 describe('Delete note versions', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
+	const getWorkspaceContext = createWorkspaceContext();
 
 	test('create few notes', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
 
 		await Promise.all(
 			[
@@ -195,9 +179,9 @@ describe('Delete note versions', () => {
 	});
 
 	test('purge all versions for note', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const history = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
+		const history = new NoteVersions(db, workspaceId);
 
 		// Fetch any note
 		const notes = await registry.get();
@@ -219,9 +203,9 @@ describe('Delete note versions', () => {
 	});
 
 	test('delete specific versions for note', async () => {
-		const db = await dbPromise;
-		const registry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const history = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
+		const history = new NoteVersions(db, workspaceId);
 
 		// Fetch any note
 		const notes = await registry.get();

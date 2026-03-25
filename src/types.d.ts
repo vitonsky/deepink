@@ -3,6 +3,11 @@ declare module "*.sql" {
 	export default sql;
 }
 
+declare module "*.wasm" {
+	const wasm: string;
+	export default wasm;
+}
+
 declare module "*.module.css" {
 	const css: Record<string, string>;
 	export default css;

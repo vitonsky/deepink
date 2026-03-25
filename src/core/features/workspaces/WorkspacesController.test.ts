@@ -1,8 +1,8 @@
-import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 
 import { WorkspacesController } from './WorkspacesController';
 
-const { getDB } = makeAutoClosedDB();
+const { getDB } = makeAutoClosedSQLiteDB();
 
 test('basic usage', async () => {
 	const db = await getDB();

@@ -22,10 +22,7 @@ export class DeletedNotesController {
 	public async empty() {
 		const { notes } = this.controllers;
 
-		// TODO: use `query` method to fetch only ids
-		const noteIds = await notes
-			.get({ meta: { isDeleted: true } })
-			.then((notes) => notes.map((note) => note.id));
+		const noteIds = await notes.query({ meta: { isDeleted: true } });
 
 		await notes.delete(noteIds);
 
@@ -39,29 +36,15 @@ export class DeletedNotesController {
 		const { notes } = this.controllers;
 		const { retentionTime, considerModificationTime } = this.config;
 
-		// TODO: use `query` method to fetch only ids
 		const validityDate = Date.now() - retentionTime;
-		const noteIds = await notes
-			.get({
-				deletedAt: {
-					to: new Date(validityDate),
-				},
-			})
-			.then((notes) =>
-				notes
-					.values()
-					.filter((note) => {
-						if (
-							considerModificationTime &&
-							note.updatedTimestamp !== undefined &&
-							note.updatedTimestamp > validityDate
-						)
-							return false;
-						return true;
-					})
-					.map((note) => note.id)
-					.toArray(),
-			);
+		const noteIds = await notes.query({
+			deletedAt: {
+				to: new Date(validityDate),
+			},
+			updatedAt: {
+				to: considerModificationTime ? new Date(validityDate) : undefined,
+			},
+		});
 
 		await notes.delete(noteIds);
 

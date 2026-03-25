@@ -1,16 +1,11 @@
-import { getUUID } from 'src/__tests__/utils/uuid';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
-import { IFilesStorage } from '@core/features/files';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { NoteVersions } from '@core/features/notes/history/NoteVersions';
 import { TagsController } from '@core/features/tags/controller/TagsController';
-import {
-	openDatabase,
-	PGLiteDatabase,
-} from '@core/storage/database/pglite/PGLiteDatabase';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { createTestContext } from '@tests/utils/createTestContext';
+import { createWorkspaceContext, createWorkspaceId } from '@tests/utils/vaultContext';
 import { wait } from '@utils/time';
 
 import { NotesImporter, OnProcessedPayload } from '.';
@@ -23,51 +18,21 @@ globalThis.requestAnimationFrame = (callback) => {
 	return 0;
 };
 
-const FAKE_WORKSPACE_ID = getUUID();
-
-const createAppContextIterator = () => {
-	return (db: PGLiteDatabase, fileManager: IFilesStorage) => {
-		const namespace = getUUID();
-
-		const notesRegistry = new NotesController(db, namespace);
-		const noteVersions = new NoteVersions(db, namespace);
-		const tagsRegistry = new TagsController(db, namespace);
-
-		const attachmentsRegistry = new AttachmentsController(db, namespace);
-		const filesRegistry = new FilesController(db, fileManager, namespace);
-
-		return {
-			filesRegistry,
-			notesRegistry,
-			noteVersions,
-			attachmentsRegistry,
-			tagsRegistry,
-		};
-	};
-};
-
 const createTextBuffer = (text: string): ArrayBuffer =>
 	new TextEncoder().encode(text).buffer;
 
 describe('Base notes import cases', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
-
+	const getWorkspaceContext = createWorkspaceContext();
 	const fileManager = createFileManagerMock();
 
 	test('Import notes', async () => {
-		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const notesRegistry = new NotesController(db, workspaceId);
+		const noteVersions = new NoteVersions(db, workspaceId);
+		const tagsRegistry = new TagsController(db, workspaceId);
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+		const attachmentsRegistry = new AttachmentsController(db, workspaceId);
+		const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 		const importer = new NotesImporter(
 			{
@@ -148,8 +113,8 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Imported notes is in list', async () => {
-		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const notesRegistry = new NotesController(db, workspaceId);
 
 		await expect(
 			notesRegistry.get({ sort: { by: 'createdAt', order: 'asc' } }),
@@ -246,9 +211,9 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Every note have snapshot', async () => {
-		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const notesRegistry = new NotesController(db, workspaceId);
+		const noteVersions = new NoteVersions(db, workspaceId);
 
 		const notes = await notesRegistry.get();
 
@@ -260,8 +225,8 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Attached files is in files list', async () => {
-		const db = await dbPromise;
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const notesRegistry = new NotesController(db, workspaceId);
 
 		const note = await notesRegistry.get().then((notes) => {
 			const note = notes.find((note) => note.content.title === 'note-4');
@@ -270,8 +235,8 @@ describe('Base notes import cases', () => {
 			return note;
 		});
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+		const attachmentsRegistry = new AttachmentsController(db, workspaceId);
+		const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 		const attachmentIds = await attachmentsRegistry.get(note.id);
 		expect(attachmentIds).toHaveLength(1);
@@ -284,8 +249,8 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Tags is created and reproduces structure in FS', async () => {
-		const db = await dbPromise;
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+		const { db, workspaceId } = getWorkspaceContext();
+		const tagsRegistry = new TagsController(db, workspaceId);
 
 		await expect(tagsRegistry.getTags()).resolves.toEqual([
 			expect.objectContaining({
@@ -328,37 +293,42 @@ describe('Base notes import cases', () => {
 });
 
 describe('Invalid imports', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	const fileManager = createFileManagerMock();
-	const createAppContext = createAppContextIterator();
+	const getImportDeps = createTestContext(() => {
+		const { db, workspaceId } = getWorkspaceContext();
 
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
+		const notesRegistry = new NotesController(db, workspaceId);
+		const noteVersions = new NoteVersions(db, workspaceId);
+		const tagsRegistry = new TagsController(db, workspaceId);
+
+		const attachmentsRegistry = new AttachmentsController(db, workspaceId);
+		const filesRegistry = new FilesController(db, fileManager, workspaceId);
+
+		return {
+			filesRegistry,
+			notesRegistry,
+			noteVersions,
+			attachmentsRegistry,
+			tagsRegistry,
+		};
 	});
 
 	test('Empty files list imports nothing', async () => {
-		const db = await dbPromise;
-		const appContext = createAppContext(db, fileManager);
-
 		await expect(
-			new NotesImporter(appContext, {
+			new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'always',
 			}).import(createFileManagerMock({})),
 		).resolves.not.toThrow();
 
-		await expect(appContext.notesRegistry.get()).resolves.toEqual([]);
+		await expect(getImportDeps().notesRegistry.get()).resolves.toEqual([]);
 	});
 
 	test('If nothing match note paths - imports nothing', async () => {
-		const db = await dbPromise;
-		const appContext = createAppContext(db, fileManager);
-
 		await expect(
-			new NotesImporter(appContext, {
+			new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'always',
 			}).import(
@@ -368,15 +338,12 @@ describe('Invalid imports', () => {
 			),
 		).resolves.not.toThrow();
 
-		await expect(appContext.notesRegistry.get()).resolves.toEqual([]);
+		await expect(getImportDeps().notesRegistry.get()).resolves.toEqual([]);
 	});
 
 	test('Invalid notes must be imported with read bytes as text', async () => {
-		const db = await dbPromise;
-		const appContext = createAppContext(db, fileManager);
-
 		await expect(
-			new NotesImporter(appContext, {
+			new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'always',
 			}).import(
@@ -386,7 +353,7 @@ describe('Invalid imports', () => {
 			),
 		).resolves.not.toThrow();
 
-		await expect(appContext.notesRegistry.get()).resolves.toEqual([
+		await expect(getImportDeps().notesRegistry.get()).resolves.toEqual([
 			expect.objectContaining({
 				content: {
 					title: 'invalid',
@@ -395,28 +362,41 @@ describe('Invalid imports', () => {
 			}),
 		]);
 
-		await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([]);
+		await expect(getImportDeps().tagsRegistry.getTags()).resolves.toEqual([]);
 	});
 });
 
 describe('Import notes with different options', () => {
-	const dbFile = createFileControllerMock();
-	const dbPromise = openDatabase(dbFile);
-
-	afterAll(async () => {
-		const db = await dbPromise;
-		await db.close();
-	});
+	const getWorkspaceContext = createWorkspaceContext();
 
 	const fileManager = createFileManagerMock();
-	const createAppContext = createAppContextIterator();
+	const getImportDeps = createTestContext(
+		async () => {
+			const { db } = getWorkspaceContext();
+
+			const workspaceId = await createWorkspaceId(db);
+
+			const notesRegistry = new NotesController(db, workspaceId);
+			const noteVersions = new NoteVersions(db, workspaceId);
+			const tagsRegistry = new TagsController(db, workspaceId);
+
+			const attachmentsRegistry = new AttachmentsController(db, workspaceId);
+			const filesRegistry = new FilesController(db, fileManager, workspaceId);
+
+			return {
+				filesRegistry,
+				notesRegistry,
+				noteVersions,
+				attachmentsRegistry,
+				tagsRegistry,
+			};
+		},
+		{ hook: beforeEach },
+	);
 
 	describe('Convert paths to tag', () => {
 		test('always', async () => {
-			const db = await dbPromise;
-			const appContext = createAppContext(db, fileManager);
-
-			await new NotesImporter(appContext, {
+			await new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'always',
 			}).import(
@@ -428,7 +408,7 @@ describe('Import notes with different options', () => {
 				}),
 			);
 
-			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+			await expect(getImportDeps().tagsRegistry.getTags()).resolves.toEqual([
 				expect.objectContaining({
 					name: 'another tag',
 					parent: null,
@@ -458,10 +438,7 @@ describe('Import notes with different options', () => {
 		});
 
 		test('fallback', async () => {
-			const db = await dbPromise;
-			const appContext = createAppContext(db, fileManager);
-
-			await new NotesImporter(appContext, {
+			await new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'fallback',
 			}).import(
@@ -473,7 +450,7 @@ describe('Import notes with different options', () => {
 				}),
 			);
 
-			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+			await expect(getImportDeps().tagsRegistry.getTags()).resolves.toEqual([
 				expect.objectContaining({
 					name: 'another tag',
 					parent: null,
@@ -493,10 +470,7 @@ describe('Import notes with different options', () => {
 		});
 
 		test('never', async () => {
-			const db = await dbPromise;
-			const appContext = createAppContext(db, fileManager);
-
-			await new NotesImporter(appContext, {
+			await new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'never',
 			}).import(
@@ -505,14 +479,11 @@ describe('Import notes with different options', () => {
 				}),
 			);
 
-			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([]);
+			await expect(getImportDeps().tagsRegistry.getTags()).resolves.toEqual([]);
 		});
 
 		test('does not throw when importing note with duplicate tags when convertPathToTag is always', async () => {
-			const db = await dbPromise;
-			const appContext = createAppContext(db, fileManager);
-
-			const importer = new NotesImporter(appContext, {
+			const importer = new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'always',
 			});
@@ -529,7 +500,7 @@ describe('Import notes with different options', () => {
 				),
 			).resolves.not.toThrow();
 
-			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+			await expect(getImportDeps().tagsRegistry.getTags()).resolves.toEqual([
 				expect.objectContaining({
 					name: 'dev',
 					resolvedName: 'dev',
@@ -550,10 +521,7 @@ describe('Import notes with different options', () => {
 		});
 
 		test('does not throw when importing note with duplicate tags when convertPathToTag is fallback', async () => {
-			const db = await dbPromise;
-			const appContext = createAppContext(db, fileManager);
-
-			const importer = new NotesImporter(appContext, {
+			const importer = new NotesImporter(getImportDeps(), {
 				noteExtensions: ['.md'],
 				convertPathToTag: 'fallback',
 			});
@@ -571,7 +539,7 @@ describe('Import notes with different options', () => {
 				),
 			).resolves.not.toThrow();
 
-			await expect(appContext.tagsRegistry.getTags()).resolves.toEqual([
+			await expect(getImportDeps().tagsRegistry.getTags()).resolves.toEqual([
 				expect.objectContaining({
 					name: 'dev',
 					resolvedName: 'dev',
@@ -606,31 +574,37 @@ describe('Import interruptions', () => {
 	};
 
 	describe('Importer throw error by call for abort signal', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
-
 		const fileManager = createFileManagerMock();
+		const getWorkspaceContext = createWorkspaceContext();
+		const getImporter = createTestContext(
+			async () => {
+				const { db } = getWorkspaceContext();
 
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+				const workspaceId = await createWorkspaceId(db);
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+				const notesRegistry = new NotesController(db, workspaceId);
+				const noteVersions = new NoteVersions(db, workspaceId);
+				const tagsRegistry = new TagsController(db, workspaceId);
 
-		const importer = new NotesImporter(
-			{
-				filesRegistry,
-				notesRegistry,
-				noteVersions,
-				attachmentsRegistry,
-				tagsRegistry,
+				const attachmentsRegistry = new AttachmentsController(db, workspaceId);
+				const filesRegistry = new FilesController(db, fileManager, workspaceId);
+
+				return new NotesImporter(
+					{
+						filesRegistry,
+						notesRegistry,
+						noteVersions,
+						attachmentsRegistry,
+						tagsRegistry,
+					},
+					{
+						ignorePaths: ['/_resources'],
+						noteExtensions: ['.md', '.mdx'],
+						convertPathToTag: 'always',
+					},
+				);
 			},
-			{
-				ignorePaths: ['/_resources'],
-				noteExtensions: ['.md', '.mdx'],
-				convertPathToTag: 'always',
-			},
+			{ hook: beforeEach },
 		);
 
 		test('Throw on parsing stage', async () => {
@@ -642,7 +616,7 @@ describe('Import interruptions', () => {
 			});
 
 			await expect(
-				importer.import(createFileManagerMock(filesSample), {
+				getImporter().import(createFileManagerMock(filesSample), {
 					abortSignal: abortController.signal,
 					onProcessed,
 				}),
@@ -664,7 +638,7 @@ describe('Import interruptions', () => {
 			});
 
 			await expect(
-				importer.import(createFileManagerMock(filesSample), {
+				getImporter().import(createFileManagerMock(filesSample), {
 					abortSignal: abortController.signal,
 					onProcessed,
 				}),
@@ -686,7 +660,7 @@ describe('Import interruptions', () => {
 			});
 
 			await expect(
-				importer.import(createFileManagerMock(filesSample), {
+				getImporter().import(createFileManagerMock(filesSample), {
 					abortSignal: abortController.signal,
 					onProcessed,
 				}),
@@ -700,18 +674,18 @@ describe('Import interruptions', () => {
 		});
 	});
 
+	const getWorkspaceContext = createWorkspaceContext();
 	test('Importer throw error if DB closed while importing', async () => {
-		const dbFile = createFileControllerMock();
-		const db = await openDatabase(dbFile);
+		const { db, workspaceId } = getWorkspaceContext();
 
 		const fileManager = createFileManagerMock();
 
-		const notesRegistry = new NotesController(db, FAKE_WORKSPACE_ID);
-		const noteVersions = new NoteVersions(db, FAKE_WORKSPACE_ID);
-		const tagsRegistry = new TagsController(db, FAKE_WORKSPACE_ID);
+		const notesRegistry = new NotesController(db, workspaceId);
+		const noteVersions = new NoteVersions(db, workspaceId);
+		const tagsRegistry = new TagsController(db, workspaceId);
 
-		const attachmentsRegistry = new AttachmentsController(db, FAKE_WORKSPACE_ID);
-		const filesRegistry = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+		const attachmentsRegistry = new AttachmentsController(db, workspaceId);
+		const filesRegistry = new FilesController(db, fileManager, workspaceId);
 
 		const importer = new NotesImporter(
 			{
@@ -727,8 +701,8 @@ describe('Import interruptions', () => {
 				convertPathToTag: 'always',
 				// Slow down the processing
 				async throttle(callback) {
-					if (!db.get().closed) {
-						await db.close();
+					if (db.dbContainer.isOpened()) {
+						await db.dbContainer.close();
 					}
 
 					callback();
@@ -738,6 +712,6 @@ describe('Import interruptions', () => {
 
 		await expect(
 			importer.import(createFileManagerMock(filesSample)),
-		).rejects.toThrowError('PGlite is closed');
+		).rejects.toThrowError('Database is closed');
 	});
 });

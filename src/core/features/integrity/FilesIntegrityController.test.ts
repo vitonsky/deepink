@@ -1,36 +1,37 @@
 // @vitest-environment jsdom
 
-import { getUUID } from 'src/__tests__/utils/uuid';
-import { openDatabase } from '@core/storage/database/pglite/PGLiteDatabase';
-import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { createFileManagerMock } from '../files/__tests__/mocks/createFileManagerMock';
 import { createTextFile } from '../files/__tests__/mocks/createTextFile';
 import { FilesController } from '../files/FilesController';
+import { NotesController } from '../notes/controller/NotesController';
 import { FilesIntegrityController } from './FilesIntegrityController';
 
-const FAKE_WORKSPACE_ID = getUUID();
+const getWorkspaceContext = createWorkspaceContext();
 
 const testFiles = Array(5)
 	.fill(null)
 	.map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
 
 test('Clear orphaned files', async () => {
-	const dbFile = createFileControllerMock();
-	const db = await openDatabase(dbFile);
+	const { db, workspaceId } = getWorkspaceContext();
 
 	const fileManager = createFileManagerMock();
-	const attachments = new AttachmentsController(db, FAKE_WORKSPACE_ID);
-	const files = new FilesController(db, fileManager, FAKE_WORKSPACE_ID);
+	const attachments = new AttachmentsController(db, workspaceId);
+	const files = new FilesController(db, fileManager, workspaceId);
 
 	const integrityController = new FilesIntegrityController(fileManager, {
 		files,
 		attachments,
 	});
 
-	const NOTE_1 = getUUID();
-	const NOTE_2 = getUUID();
+	const notes = new NotesController(db, workspaceId);
+	const [NOTE_1, NOTE_2] = await Promise.all([
+		notes.add({ title: '', text: '' }),
+		notes.add({ title: '', text: '' }),
+	]);
 
 	// Upload file and attach
 	const fileToAttach = createTextFile('Attached file');
@@ -87,6 +88,4 @@ test('Clear orphaned files', async () => {
 	await files.get(attachedFileId).then((file) => {
 		expect(file).toBeNull();
 	});
-
-	await db.close();
 });
