@@ -60,9 +60,8 @@ export class AttachmentsController {
 		const db = wrapSQLite(this.db.get());
 
 		return await db.query(
-			qb.sql`SELECT id, file_id as file, note_id as note FROM note_files WHERE workspace_id=${this.workspace}`,
+			qb.sql`SELECT file_id as file, note_id as note FROM note_files WHERE workspace_id=${this.workspace}`,
 			z.object({
-				id: z.string(),
 				file: z.string(),
 				note: z.string(),
 			}),

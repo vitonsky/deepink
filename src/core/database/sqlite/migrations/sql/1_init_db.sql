@@ -35,10 +35,10 @@ CREATE TABLE files (
 );
 
 CREATE TABLE note_files (
-  id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
   note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
-  file_id         TEXT NOT NULL REFERENCES files(id) ON DELETE CASCADE
+  file_id         TEXT NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  PRIMARY KEY (workspace_id, note_id, file_id)
 );
 
 CREATE TABLE tags (
@@ -49,18 +49,37 @@ CREATE TABLE tags (
 );
 
 CREATE TABLE note_tags (
-  id           TEXT PRIMARY KEY DEFAULT (gen_random_uuid()),
   workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
   tag_id       TEXT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-  note_id       TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE
+  note_id       TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+  PRIMARY KEY (workspace_id, note_id, tag_id)
 );
 
 -- Indexes
-CREATE INDEX idx_notes_workspace_id        ON notes(workspace_id);
-CREATE INDEX idx_notes_deleted_archived ON notes(deleted_at, archived);
-CREATE INDEX idx_note_versions_note_id     ON note_versions(note_id);
-CREATE INDEX idx_note_files_note_id       ON note_files(note_id);
-CREATE INDEX idx_note_tags_tag_id   ON note_tags(tag_id);
-CREATE INDEX idx_note_tags_note_id   ON note_tags(note_id);
-CREATE INDEX idx_tags_workspace_id         ON tags(workspace_id);
-CREATE INDEX idx_tags_parent_id            ON tags(parent_id);
+CREATE INDEX idx_notes_workspace_status
+  ON notes(workspace_id, deleted_at, archived, bookmarked, visible, updated_at DESC);
+
+CREATE INDEX idx_note_versions_note_id
+  ON note_versions(note_id, created_at DESC);
+
+CREATE INDEX idx_files_workspace_id
+  ON files(workspace_id);
+
+-- PK covers: WHERE workspace_id = ? AND note_id = ?
+CREATE INDEX idx_note_files_workspace_file
+  ON note_files(workspace_id, file_id);
+
+CREATE UNIQUE INDEX uq_tags_root_name
+  ON tags(workspace_id, name)
+  WHERE parent_id IS NULL;
+
+CREATE UNIQUE INDEX uq_tags_child_name
+  ON tags(workspace_id, parent_id, name)
+  WHERE parent_id IS NOT NULL;
+
+CREATE INDEX idx_tags_workspace_parent
+  ON tags(workspace_id, parent_id);
+
+-- PK covers: WHERE workspace_id = ? AND note_id = ?
+CREATE INDEX idx_note_tags_workspace_tag
+  ON note_tags(workspace_id, tag_id);
