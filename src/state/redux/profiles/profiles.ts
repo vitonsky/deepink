@@ -499,10 +499,11 @@ export const profilesSlice = createSlice({
 
 			// Set the selected tag if it exists in the tags list
 			if (selectedTagId !== undefined) {
-				const isSelectedTagExists = workspace.tags.list.some(
-					({ id }) => id === selectedTagId,
-				);
-				if (isSelectedTagExists) workspace.tags.selected = selectedTagId;
+				workspace.tags.selected =
+					selectedTagId !== null &&
+					workspace.tags.list.some(({ id }) => id === selectedTagId)
+						? selectedTagId
+						: null;
 			}
 		},
 
