@@ -1,18 +1,18 @@
 /* eslint-disable @cspell/spellchecker */
-import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import z from 'zod';
 import { FlexSearchIndex } from '@core/database/flexsearch/FlexSearchIndex';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { StateFile } from '@core/features/files/StateFile';
 import { TagsController } from '@core/features/tags/controller/TagsController';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from './NotesController';
 import { NotesTextIndexer } from './NotesTextIndexer';
 
 const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = makeAppContext(getDB);
+const getAppContext = createWorkspaceContext(getDB);
 
 const index = new FlexSearchIndex(new InMemoryFS());
 

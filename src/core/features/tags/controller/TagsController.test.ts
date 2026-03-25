@@ -1,13 +1,13 @@
-import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { v4 as uuidv4 } from 'uuid';
 import { NotesController } from '@core/features/notes/controller/NotesController';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { TAG_ERROR_CODE, TagsController } from './TagsController';
 
 describe('manage tags', () => {
 	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
-	const getAppContext = makeAppContext(getDB, { hook: beforeEach });
+	const getAppContext = createWorkspaceContext(getDB, { hook: beforeEach });
 
 	test('tags can be added', async () => {
 		const { db, workspaceId } = getAppContext();
@@ -438,7 +438,7 @@ describe('manage tags', () => {
 
 describe('manage attachments', () => {
 	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
-	const getAppContext = makeAppContext(getDB, { hook: beforeEach });
+	const getAppContext = createWorkspaceContext(getDB, { hook: beforeEach });
 
 	test('set attached tags', async () => {
 		const { db, workspaceId } = getAppContext();

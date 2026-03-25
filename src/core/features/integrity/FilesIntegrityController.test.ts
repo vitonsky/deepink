@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
 import { createFileManagerMock } from '../files/__tests__/mocks/createFileManagerMock';
@@ -11,7 +11,7 @@ import { NotesController } from '../notes/controller/NotesController';
 import { FilesIntegrityController } from './FilesIntegrityController';
 
 const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = makeAppContext(getDB);
+const getAppContext = createWorkspaceContext(getDB);
 
 const testFiles = Array(5)
 	.fill(null)

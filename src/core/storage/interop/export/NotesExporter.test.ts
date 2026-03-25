@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
@@ -11,11 +10,12 @@ import { ZipFS } from '@core/features/files/ZipFS';
 import { formatNoteLink, formatResourceLink } from '@core/features/links';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { TagsController } from '@core/features/tags/controller/TagsController';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { NotesExporter } from '.';
 
 const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = makeAppContext(getDB);
+const getAppContext = createWorkspaceContext(getDB);
 
 const fileManager = createFileManagerMock();
 

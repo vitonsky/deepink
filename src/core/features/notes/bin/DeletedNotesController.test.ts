@@ -1,8 +1,8 @@
 import ms from 'ms';
-import { createWorkspaceId, makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { Mock } from 'vitest';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
+import { createWorkspaceContext, createWorkspaceId } from '@tests/utils/vaultContext';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from '../controller/NotesController';
@@ -10,7 +10,7 @@ import { DeletedNotesController } from './DeletedNotesController';
 
 const dbFile = createFileControllerMock();
 const { getDB } = makeAutoClosedSQLiteDB({ file: dbFile });
-const getAppContext = makeAppContext(getDB);
+const getAppContext = createWorkspaceContext(getDB);
 
 vi.useFakeTimers();
 

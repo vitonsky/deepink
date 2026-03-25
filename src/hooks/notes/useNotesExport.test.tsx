@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
@@ -20,6 +19,7 @@ import {
 } from '@features/App/Workspace/WorkspaceProvider';
 import { TelemetryContext } from '@features/telemetry';
 import { renderHook } from '@testing-library/react';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 import * as fsClientMock from '@utils/fs/__tests__/client.mock';
 
 import { configureNoteNameGetter, useNotesExport } from './useNotesExport';
@@ -36,7 +36,7 @@ describe('Export notes', async () => {
 	const fileManager = createFileManagerMock();
 
 	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = makeAppContext(getDB);
+	const getAppContext = createWorkspaceContext(getDB);
 
 	test('Add test data', async () => {
 		const { db, workspaceId } = getAppContext();

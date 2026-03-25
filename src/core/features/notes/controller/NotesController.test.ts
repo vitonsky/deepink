@@ -1,14 +1,14 @@
-import { createWorkspaceId, makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { TagsController } from '@core/features/tags/controller/TagsController';
+import { createWorkspaceContext, createWorkspaceId } from '@tests/utils/vaultContext';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from './NotesController';
 
 describe('CRUD operations', () => {
 	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = makeAppContext(getDB);
+	const getAppContext = createWorkspaceContext(getDB);
 
 	test('create few notes', async () => {
 		const { db, workspaceId } = getAppContext();
@@ -171,7 +171,7 @@ test('Get notes by pages', async () => {
 
 describe('Meta data control', () => {
 	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = makeAppContext(getDB);
+	const getAppContext = createWorkspaceContext(getDB);
 
 	test('toggle note versions control', async () => {
 		const { db, workspaceId } = getAppContext();

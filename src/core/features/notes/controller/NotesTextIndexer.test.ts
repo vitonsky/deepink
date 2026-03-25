@@ -1,8 +1,8 @@
-import { createWorkspaceId } from 'src/__tests__/utils/makeAppContext';
 import z from 'zod';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
 import { StateFile } from '@core/features/files/StateFile';
+import { createWorkspaceId } from '@tests/utils/vaultContext';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { FlexSearchIndex } from '../../../database/flexsearch/FlexSearchIndex';

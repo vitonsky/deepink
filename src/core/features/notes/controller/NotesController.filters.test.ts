@@ -1,7 +1,7 @@
-import { createWorkspaceId, makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { TagsController } from '@core/features/tags/controller/TagsController';
+import { createWorkspaceContext, createWorkspaceId } from '@tests/utils/vaultContext';
 import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 
 import { NotesController } from './NotesController';
@@ -63,7 +63,7 @@ test('filter by update time', async () => {
 
 describe('data fetching', () => {
 	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = makeAppContext(getDB);
+	const getAppContext = createWorkspaceContext(getDB);
 
 	const notesSample = Array(300)
 		.fill(null)

@@ -1,12 +1,12 @@
-import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
 import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { NotesController } from '../controller/NotesController';
 import { NoteVersions } from './NoteVersions';
 
 describe('Note version control', () => {
 	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = makeAppContext(getDB);
+	const getAppContext = createWorkspaceContext(getDB);
 
 	test('snapshot must be created only if latest version have changes with latest note data', async () => {
 		const { db, workspaceId } = getAppContext();
@@ -166,7 +166,7 @@ describe('Note version control', () => {
 
 describe('Delete note versions', () => {
 	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = makeAppContext(getDB);
+	const getAppContext = createWorkspaceContext(getDB);
 
 	test('create few notes', async () => {
 		const { db, workspaceId } = getAppContext();

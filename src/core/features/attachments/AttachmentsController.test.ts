@@ -1,5 +1,5 @@
-import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
+import { makeAutoClosedSQLiteDB } from '@tests/utils/makeAutoClosedSQLiteDB';
+import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { FilesController } from '../files/FilesController';
 import { InMemoryFS } from '../files/InMemoryFS';
@@ -7,7 +7,7 @@ import { NotesController } from '../notes/controller/NotesController';
 import { AttachmentsController } from './AttachmentsController';
 
 const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = makeAppContext(getDB);
+const getAppContext = createWorkspaceContext(getDB);
 
 test('basic usage', async () => {
 	const { db, workspaceId } = getAppContext();
