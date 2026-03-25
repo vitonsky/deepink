@@ -1,4 +1,3 @@
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createWorkspaceContext, createWorkspaceId } from '@tests/utils/vaultContext';
@@ -7,11 +6,10 @@ import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { NotesController } from './NotesController';
 
 describe('CRUD operations', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	test('create few notes', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		const entries = [
@@ -36,7 +34,7 @@ describe('CRUD operations', () => {
 	});
 
 	test('update entry and get by id', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		// Entries match data
@@ -170,11 +168,10 @@ test('Get notes by pages', async () => {
 });
 
 describe('Meta data control', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	test('toggle note versions control', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		// Create note
@@ -206,7 +203,7 @@ describe('Meta data control', () => {
 	});
 
 	test('toggle note visibility', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		// Create note
@@ -253,7 +250,7 @@ describe('Meta data control', () => {
 	});
 
 	test('toggle note deletion status', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		// Create notes
@@ -285,7 +282,7 @@ describe('Meta data control', () => {
 	});
 
 	test('toggle note archived status', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		// Create notes
@@ -317,7 +314,7 @@ describe('Meta data control', () => {
 	});
 
 	test('toggle note bookmarked status', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		const noteId = await registry.add({ title: 'Title', text: 'Text' });

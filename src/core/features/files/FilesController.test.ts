@@ -1,17 +1,15 @@
 // @vitest-environment jsdom
 
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { createFileManagerMock } from './__tests__/mocks/createFileManagerMock';
 import { FilesController } from './FilesController';
 
-const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = createWorkspaceContext(getDB);
+const getWorkspaceContext = createWorkspaceContext();
 const fileManager = createFileManagerMock();
 
 test('Upload files', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const files = new FilesController(db, fileManager, workspaceId);
 
 	await files.add(new File(['Hello world'], 'hello.md', { type: 'text/markdown' }));
@@ -23,7 +21,7 @@ test('Upload files', async () => {
 });
 
 test('Fetch files', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const files = new FilesController(db, fileManager, workspaceId);
 
 	const filesList = await files.query();
@@ -58,7 +56,7 @@ test('Fetch files', async () => {
 });
 
 test('Delete files', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const files = new FilesController(db, fileManager, workspaceId);
 
 	const filesList = await files.query();
@@ -71,7 +69,7 @@ test('Delete files', async () => {
 });
 
 test('Fetch for non exists file in FS returns null', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const files = new FilesController(db, fileManager, workspaceId);
 
 	const filesList = await files.query();

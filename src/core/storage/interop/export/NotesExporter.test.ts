@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { createTextFile } from '@core/features/files/__tests__/mocks/createTextFile';
@@ -14,13 +13,11 @@ import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { NotesExporter } from '.';
 
-const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = createWorkspaceContext(getDB);
-
+const getWorkspaceContext = createWorkspaceContext();
 const fileManager = createFileManagerMock();
 
 test('Create notes', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const notesRegistry = new NotesController(db, workspaceId);
 	const tagsRegistry = new TagsController(db, workspaceId);
 
@@ -86,7 +83,7 @@ test('Create notes', async () => {
 });
 
 test('Export all notes and attached files', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const notesRegistry = new NotesController(db, workspaceId);
 	const tagsRegistry = new TagsController(db, workspaceId);
 
@@ -137,7 +134,7 @@ test('Export all notes and attached files', async () => {
 });
 
 test('Export single note and it attachments', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const notesRegistry = new NotesController(db, workspaceId);
 	const tagsRegistry = new TagsController(db, workspaceId);
 
@@ -188,7 +185,7 @@ test('Export single note and it attachments', async () => {
 });
 
 test('Export all notes and attached files with custom file names', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const notesRegistry = new NotesController(db, workspaceId);
 	const tagsRegistry = new TagsController(db, workspaceId);
 
@@ -248,7 +245,7 @@ test('Export all notes and attached files with custom file names', async () => {
 });
 
 test('Export all notes and attached files as a zip file', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const notesRegistry = new NotesController(db, workspaceId);
 	const tagsRegistry = new TagsController(db, workspaceId);
 

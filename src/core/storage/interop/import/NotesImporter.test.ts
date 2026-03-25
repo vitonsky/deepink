@@ -1,4 +1,3 @@
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
@@ -23,12 +22,11 @@ const createTextBuffer = (text: string): ArrayBuffer =>
 	new TextEncoder().encode(text).buffer;
 
 describe('Base notes import cases', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 	const fileManager = createFileManagerMock();
 
 	test('Import notes', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesRegistry = new NotesController(db, workspaceId);
 		const noteVersions = new NoteVersions(db, workspaceId);
 		const tagsRegistry = new TagsController(db, workspaceId);
@@ -115,7 +113,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Imported notes is in list', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesRegistry = new NotesController(db, workspaceId);
 
 		await expect(
@@ -213,7 +211,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Every note have snapshot', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesRegistry = new NotesController(db, workspaceId);
 		const noteVersions = new NoteVersions(db, workspaceId);
 
@@ -227,7 +225,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Attached files is in files list', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesRegistry = new NotesController(db, workspaceId);
 
 		const note = await notesRegistry.get().then((notes) => {
@@ -251,7 +249,7 @@ describe('Base notes import cases', () => {
 	});
 
 	test('Tags is created and reproduces structure in FS', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tagsRegistry = new TagsController(db, workspaceId);
 
 		await expect(tagsRegistry.getTags()).resolves.toEqual([
@@ -295,12 +293,11 @@ describe('Base notes import cases', () => {
 });
 
 describe('Invalid imports', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	const fileManager = createFileManagerMock();
 	const getImportDeps = createTestContext(() => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 
 		const notesRegistry = new NotesController(db, workspaceId);
 		const noteVersions = new NoteVersions(db, workspaceId);
@@ -370,13 +367,12 @@ describe('Invalid imports', () => {
 });
 
 describe('Import notes with different options', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	const fileManager = createFileManagerMock();
 	const getImportDeps = createTestContext(
 		async () => {
-			const { db } = getAppContext();
+			const { db } = getWorkspaceContext();
 
 			const workspaceId = await createWorkspaceId(db);
 
@@ -578,14 +574,11 @@ describe('Import interruptions', () => {
 	};
 
 	describe('Importer throw error by call for abort signal', async () => {
-		const { getDB } = makeAutoClosedSQLiteDB();
-
 		const fileManager = createFileManagerMock();
-
-		const getAppContext = createWorkspaceContext(getDB);
+		const getWorkspaceContext = createWorkspaceContext();
 		const getImporter = createTestContext(
 			async () => {
-				const { db } = getAppContext();
+				const { db } = getWorkspaceContext();
 
 				const workspaceId = await createWorkspaceId(db);
 
@@ -681,10 +674,9 @@ describe('Import interruptions', () => {
 		});
 	});
 
-	test.skip('Importer throw error if DB closed while importing', async () => {
-		const { getDB } = makeAutoClosedSQLiteDB();
-		const getAppContext = createWorkspaceContext(getDB);
-		const { db, workspaceId } = getAppContext();
+	const getWorkspaceContext = createWorkspaceContext();
+	test('Importer throw error if DB closed while importing', async () => {
+		const { db, workspaceId } = getWorkspaceContext();
 
 		const fileManager = createFileManagerMock();
 

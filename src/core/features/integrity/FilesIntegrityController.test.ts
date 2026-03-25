@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { AttachmentsController } from '../attachments/AttachmentsController';
@@ -10,15 +9,14 @@ import { FilesController } from '../files/FilesController';
 import { NotesController } from '../notes/controller/NotesController';
 import { FilesIntegrityController } from './FilesIntegrityController';
 
-const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = createWorkspaceContext(getDB);
+const getWorkspaceContext = createWorkspaceContext();
 
 const testFiles = Array(5)
 	.fill(null)
 	.map((_, idx) => createTextFile(`Demo text #${idx + 1}`));
 
 test('Clear orphaned files', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 
 	const fileManager = createFileManagerMock();
 	const attachments = new AttachmentsController(db, workspaceId);

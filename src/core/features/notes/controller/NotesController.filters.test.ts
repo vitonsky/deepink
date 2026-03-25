@@ -1,4 +1,3 @@
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { TagsController } from '@core/features/tags/controller/TagsController';
 import { createWorkspaceContext, createWorkspaceId } from '@tests/utils/vaultContext';
@@ -62,8 +61,7 @@ test('filter by update time', async () => {
 });
 
 describe('data fetching', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	const notesSample = Array(300)
 		.fill(null)
@@ -75,7 +73,7 @@ describe('data fetching', () => {
 		});
 
 	test('insert sample entries', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		const ids: string[] = [];
@@ -89,7 +87,7 @@ describe('data fetching', () => {
 	});
 
 	test('filter by tags', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const tags = new TagsController(db, workspaceId);
 
@@ -109,7 +107,7 @@ describe('data fetching', () => {
 	});
 
 	test('method query consider filters', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const tags = new TagsController(db, workspaceId);
 
@@ -131,7 +129,7 @@ describe('data fetching', () => {
 	});
 
 	test('filter by tags and the deleted status', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const tags = new TagsController(db, workspaceId);
 
@@ -163,7 +161,7 @@ describe('data fetching', () => {
 	});
 
 	test('get entries by deletion status', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		const notesId = await registry
@@ -248,7 +246,7 @@ describe('data fetching', () => {
 	});
 
 	test('filter notes by archived status', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		const notesId = await registry
@@ -265,7 +263,7 @@ describe('data fetching', () => {
 	});
 
 	test('filters notes by bookmarks', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 
 		const registry = new NotesController(db, workspaceId);
 
@@ -283,7 +281,7 @@ describe('data fetching', () => {
 	});
 
 	test('method getLength consider filters', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		const notesId = await registry
@@ -300,7 +298,7 @@ describe('data fetching', () => {
 	});
 
 	test('method getById returns notes in the requested order', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		const notes = await registry.get({ limit: 10 });

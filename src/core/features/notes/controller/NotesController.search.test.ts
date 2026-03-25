@@ -1,5 +1,4 @@
 /* eslint-disable @cspell/spellchecker */
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import z from 'zod';
 import { FlexSearchIndex } from '@core/database/flexsearch/FlexSearchIndex';
 import { InMemoryFS } from '@core/features/files/InMemoryFS';
@@ -11,8 +10,7 @@ import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { NotesController } from './NotesController';
 import { NotesTextIndexer } from './NotesTextIndexer';
 
-const { getDB } = makeAutoClosedSQLiteDB();
-const getAppContext = createWorkspaceContext(getDB);
+const getWorkspaceContext = createWorkspaceContext();
 
 const index = new FlexSearchIndex(new InMemoryFS());
 
@@ -31,7 +29,7 @@ const texts = [
 
 let tagsMap: Record<string, string>;
 beforeAll(async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const registry = new NotesController(db, workspaceId);
 	const tags = new TagsController(db, workspaceId);
 
@@ -62,7 +60,7 @@ beforeAll(async () => {
 });
 
 test('Update index', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const registry = new NotesController(db, workspaceId);
 
 	const indexScanner = new NotesTextIndexer(
@@ -74,7 +72,7 @@ test('Update index', async () => {
 });
 
 test('Search by text', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const registry = new NotesController(db, workspaceId, index);
 
 	await expect(
@@ -129,7 +127,7 @@ test('Search by text', async () => {
 });
 
 test('Search by text and filter by tags', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const registry = new NotesController(db, workspaceId, index);
 
 	await expect(

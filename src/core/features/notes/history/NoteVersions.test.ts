@@ -1,15 +1,13 @@
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { createWorkspaceContext } from '@tests/utils/vaultContext';
 
 import { NotesController } from '../controller/NotesController';
 import { NoteVersions } from './NoteVersions';
 
 describe('Note version control', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	test('snapshot must be created only if latest version have changes with latest note data', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const history = new NoteVersions(db, workspaceId);
 
@@ -50,7 +48,7 @@ describe('Note version control', () => {
 	});
 
 	test('snapshot must always be created when parameter `force` is set', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const history = new NoteVersions(db, workspaceId);
 
@@ -95,7 +93,7 @@ describe('Note version control', () => {
 	});
 
 	test('when note is deleted, all versions must be deleted too', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const history = new NoteVersions(db, workspaceId);
 
@@ -119,7 +117,7 @@ describe('Note version control', () => {
 	});
 
 	test('snapshot may be created with empty text', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const history = new NoteVersions(db, workspaceId);
 
@@ -165,11 +163,10 @@ describe('Note version control', () => {
 });
 
 describe('Delete note versions', () => {
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	test('create few notes', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 
 		await Promise.all(
@@ -182,7 +179,7 @@ describe('Delete note versions', () => {
 	});
 
 	test('purge all versions for note', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const history = new NoteVersions(db, workspaceId);
 
@@ -206,7 +203,7 @@ describe('Delete note versions', () => {
 	});
 
 	test('delete specific versions for note', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const registry = new NotesController(db, workspaceId);
 		const history = new NoteVersions(db, workspaceId);
 

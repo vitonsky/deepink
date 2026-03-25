@@ -7,10 +7,10 @@ import { TAG_ERROR_CODE, TagsController } from './TagsController';
 
 describe('manage tags', () => {
 	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
-	const getAppContext = createWorkspaceContext(getDB, { hook: beforeEach });
+	const getWorkspaceContext = createWorkspaceContext({ getDB, hook: beforeEach });
 
 	test('tags can be added', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		await expect(tags.add('foo', null)).resolves.toBeTypeOf('string');
@@ -42,7 +42,7 @@ describe('manage tags', () => {
 	});
 
 	test('nested tags', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		await tags.add('foo', null);
@@ -71,7 +71,7 @@ describe('manage tags', () => {
 	});
 
 	test('tags with invalid names cannot be added', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		await expect(tags.add('', null)).rejects.toThrow(
@@ -102,7 +102,7 @@ describe('manage tags', () => {
 	});
 
 	test('cannot create a tag with a non-existing parent', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		const nonExistentTag = uuidv4();
@@ -118,7 +118,7 @@ describe('manage tags', () => {
 	});
 
 	test('adds only the missing segments of the tag name without recreating existing ones', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		const fooId = await tags.add('foo', null);
@@ -275,7 +275,7 @@ describe('manage tags', () => {
 	});
 
 	test('duplicate tag cannot be added', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		const fooId = await tags.add('foo', null);
@@ -325,7 +325,7 @@ describe('manage tags', () => {
 	});
 
 	test('update tags', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		await tags.add('foo', null).then(async (tagId) => {
@@ -369,7 +369,7 @@ describe('manage tags', () => {
 	});
 
 	test('cannot update tag with an invalid name', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		const fooId = await tags.add('foo', null);
@@ -415,7 +415,7 @@ describe('manage tags', () => {
 	});
 
 	test('delete tags', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		await tags.add('foo', null);
@@ -438,10 +438,10 @@ describe('manage tags', () => {
 
 describe('manage attachments', () => {
 	const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach, clearFS: true });
-	const getAppContext = createWorkspaceContext(getDB, { hook: beforeEach });
+	const getWorkspaceContext = createWorkspaceContext({ getDB, hook: beforeEach });
 
 	test('set attached tags', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		const noteId = await new NotesController(db, workspaceId).add({
@@ -487,7 +487,7 @@ describe('manage attachments', () => {
 	});
 
 	test('does not throw error when attach duplicate tags', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		const noteId = await new NotesController(db, workspaceId).add({
@@ -519,7 +519,7 @@ describe('manage attachments', () => {
 	});
 
 	test('deleted tag will not appears in tags list', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);
 
 		const noteId = await new NotesController(db, workspaceId).add({

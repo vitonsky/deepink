@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { AttachmentsController } from '@core/features/attachments/AttachmentsController';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { FilesController } from '@core/features/files/FilesController';
@@ -34,12 +33,10 @@ afterEach(() => {
 
 describe('Export notes', async () => {
 	const fileManager = createFileManagerMock();
-
-	const { getDB } = makeAutoClosedSQLiteDB();
-	const getAppContext = createWorkspaceContext(getDB);
+	const getWorkspaceContext = createWorkspaceContext();
 
 	test('Add test data', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesRegistry = new NotesController(db, workspaceId);
 		const filesRegistry = new FilesController(db, fileManager, workspaceId);
 		const attachments = new AttachmentsController(db, workspaceId);
@@ -68,7 +65,7 @@ describe('Export notes', async () => {
 	});
 
 	test('Export all notes via useNotesExport', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesRegistry = new NotesController(db, workspaceId);
 		const tagsRegistry = new TagsController(db, workspaceId);
 		const filesRegistry = new FilesController(db, fileManager, workspaceId);
@@ -127,7 +124,7 @@ describe('Export notes', async () => {
 	});
 
 	test('Export single note via useNotesExport', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesRegistry = new NotesController(db, workspaceId);
 		const tagsRegistry = new TagsController(db, workspaceId);
 		const filesRegistry = new FilesController(db, fileManager, workspaceId);

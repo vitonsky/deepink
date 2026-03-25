@@ -1,5 +1,4 @@
 import ms from 'ms';
-import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 import { Mock } from 'vitest';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { createWorkspaceContext, createWorkspaceId } from '@tests/utils/vaultContext';
@@ -8,9 +7,7 @@ import { createFileControllerMock } from '@utils/mocks/fileControllerMock';
 import { NotesController } from '../controller/NotesController';
 import { DeletedNotesController } from './DeletedNotesController';
 
-const dbFile = createFileControllerMock();
-const { getDB } = makeAutoClosedSQLiteDB({ file: dbFile });
-const getAppContext = createWorkspaceContext(getDB);
+const getWorkspaceContext = createWorkspaceContext();
 
 vi.useFakeTimers();
 
@@ -26,7 +23,7 @@ const getNoteIds = async (notes: NotesController) =>
 
 describe('Purge expired notes', () => {
 	test('Purge notes in bin that is deleted longer than retention time', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesController = new NotesController(db, workspaceId);
 		const bin = new DeletedNotesController(
 			{ notes: notesController },
@@ -79,7 +76,7 @@ describe('Purge expired notes', () => {
 	});
 
 	test('Modification time is considered when required', async () => {
-		const { db, workspaceId } = getAppContext();
+		const { db, workspaceId } = getWorkspaceContext();
 		const notesController = new NotesController(db, workspaceId);
 		const bin = new DeletedNotesController(
 			{ notes: notesController },
@@ -127,7 +124,7 @@ describe('Purge expired notes', () => {
 });
 
 test('Empty bin', async () => {
-	const { db, workspaceId } = getAppContext();
+	const { db, workspaceId } = getWorkspaceContext();
 	const notesController = new NotesController(db, workspaceId);
 	const bin = new DeletedNotesController(
 		{ notes: notesController },
