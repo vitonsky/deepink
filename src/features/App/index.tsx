@@ -52,7 +52,7 @@ export const App: FC = () => {
 				return;
 			}
 
-			// Automatically open vault with no encryption
+			// Automatically open profile with no encryption
 			profileContainers
 				.openProfile({ profile }, true)
 				.catch(() => showErrorToast(profile.id, profile.name))
@@ -70,32 +70,33 @@ export const App: FC = () => {
 		return <SplashScreen />;
 	}
 
-	// Main vault screen
-	if (profileContainers.profiles.length > 0 && profileContainers.activeProfile) {
+	// Vault entry screen: login form, vault creation, or vault picker
+	if (profileContainers.profiles.length === 0) {
 		return (
-			<Box
-				sx={{
-					display: 'flex',
-					width: '100%',
-					height: '100vh',
-				}}
-			>
-				<Profiles profilesApi={profileContainers} />
-				<AppServices />
+			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
+				<Box maxW="500px" minW="350px" padding="1rem">
+					<VaultEntryScreenManager
+						currentProfile={currentProfileId}
+						onChooseProfile={setCurrentProfileId}
+						profiles={profileContainers}
+						profilesManager={profilesList}
+					/>
+				</Box>
 			</Box>
 		);
 	}
 
+	// Main vault screen
 	return (
-		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
-			<Box maxW="500px" minW="350px" padding="1rem">
-				<VaultEntryScreenManager
-					currentProfile={currentProfileId}
-					onChooseProfile={setCurrentProfileId}
-					profiles={profileContainers}
-					profilesManager={profilesList}
-				/>
-			</Box>
+		<Box
+			sx={{
+				display: 'flex',
+				width: '100%',
+				height: '100vh',
+			}}
+		>
+			<Profiles profilesApi={profileContainers} />
+			<AppServices />
 		</Box>
 	);
 };
