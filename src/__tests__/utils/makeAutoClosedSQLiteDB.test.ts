@@ -1,14 +1,14 @@
 import { ManagedDatabase } from '@core/database/ManagedDatabase';
 import { SQLiteDB } from '@core/database/sqlite';
 
-import { makeAutoClosedDB } from './makeAutoClosedDB';
+import { makeAutoClosedSQLiteDB } from './makeAutoClosedSQLiteDB';
 
 describe('DB is closed at hook time', () => {
 	describe('afterAll (default)', () => {
 		let dbFromFirstTest: ManagedDatabase<SQLiteDB>;
 
 		describe('DB is available for all tests inside describe block', () => {
-			const { getDB } = makeAutoClosedDB();
+			const { getDB } = makeAutoClosedSQLiteDB();
 
 			test('DB is available when test in run', async () => {
 				const db = await getDB();
@@ -50,7 +50,7 @@ describe('DB is closed at hook time', () => {
 	});
 
 	describe('afterEach', () => {
-		const { getDB } = makeAutoClosedDB({ closeHook: afterEach });
+		const { getDB } = makeAutoClosedSQLiteDB({ closeHook: afterEach });
 
 		let dbFromFirstTest: ManagedDatabase<SQLiteDB>;
 		test('DB is available when test in run', async () => {

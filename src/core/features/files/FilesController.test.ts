@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
 
 import { makeAppContext } from 'src/__tests__/utils/makeAppContext';
-import { makeAutoClosedDB } from 'src/__tests__/utils/makeAutoClosedDB';
+import { makeAutoClosedSQLiteDB } from 'src/__tests__/utils/makeAutoClosedSQLiteDB';
 
 import { createFileManagerMock } from './__tests__/mocks/createFileManagerMock';
 import { FilesController } from './FilesController';
 
-const { getDB } = makeAutoClosedDB();
+const { getDB } = makeAutoClosedSQLiteDB();
 const getAppContext = makeAppContext(getDB);
 const fileManager = createFileManagerMock();
 
