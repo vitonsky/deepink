@@ -188,21 +188,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 								{isLoadingComplete && <Workspace />}
 							</WorkspaceContainer>
 							<ProfileStatusBar />
-							{isDevMode && (
-								<ToggleSQLConsole
-									isVisible={isDBConsoleVisible}
-									onVisibilityChange={setIsDBConsoleVisible}
-								/>
-							)}
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				) : null,
-			)}
-			{isDevMode && (
-				<SQLConsole
-					isVisible={isDBConsoleVisible}
-					onVisibilityChange={setIsDBConsoleVisible}
-				/>
 			)}
 		</ProfileControlsContext.Provider>
 	);
