@@ -16,14 +16,6 @@ WITH RECURSIVE tagtree AS (
         tt.tag_tree_id
     FROM tags t
     JOIN tagtree tt ON t.id = tt.parent_id
-),
-sorted_tagtree AS (
-    SELECT
-        tag_tree_id,
-        name,
-        segment_id
-    FROM tagtree
-    ORDER BY tag_tree_id, segment_id DESC
 )
 SELECT
     t.id,
@@ -35,7 +27,7 @@ FROM tags t
 JOIN (
     SELECT
         tag_tree_id AS id,
-        group_concat(name, '/') AS resolved_name
-    FROM sorted_tagtree
+        group_concat(name, '/' ORDER BY segment_id DESC) AS resolved_name
+    FROM tagtree
     GROUP BY tag_tree_id
 ) x ON t.id = x.id
