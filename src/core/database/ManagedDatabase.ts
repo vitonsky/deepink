@@ -87,6 +87,8 @@ export class ManagedDatabase<T> implements IManagedDatabase<T> {
 	};
 
 	public close = async () => {
+		if (!this.dbContainer.isOpened()) return;
+
 		// Cleanup any listeners
 		for (const cleanup of this.cleanups) {
 			cleanup();
