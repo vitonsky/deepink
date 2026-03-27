@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { createSelector } from 'reselect';
-import { Box, Button, Divider, Select, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Divider, Input, Select, Text, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { WorkspaceCreatePopup } from '@features/MainScreen/WorkspacesPanel/WorkspaceCreatePopup';
+import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	selectActiveWorkspaceInfo,
@@ -34,11 +33,16 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 	const workspaces = useAppSelector(selectWorkspacesWithMemo);
 	const currentWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
 
-	const modal = useWorkspaceModal();
+	const [workspaceName, setWorkspaceName] = useState('');
+	const {
+		profile: { db },
+	} = useProfileControls();
+	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
+
+	const [isPending, setIsPending] = useState(false);
 
 	return (
 		<Box
-			data-workspace={currentWorkspace?.name}
 			sx={{
 				flexDirection: 'column',
 				flexGrow: '100',
@@ -52,68 +56,109 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<VStack maxW="400px" minW="350px" gap="2rem">
 					<Text fontSize="1.3rem" fontWeight="bold">
-						Workspace {currentWorkspace?.name} failed to load
+						Workspace "{currentWorkspace?.name}" failed to load
 					</Text>
 
 					<Text color="typography.base">
 						Something went wrong while loading workspace. The workspace data
-						may be corrupted. Try opening a different workspace or create a
-						new one to continue.
+						may be corrupted. Switch to another workspace or create a new one
+						to continue.
 					</Text>
 
 					<VStack
 						alignItems="start"
-						color="typography.additional"
 						w="100%"
-						gap="1.5rem"
+						color="typography.additional"
+						gap="0.5rem"
 					>
-						<VStack alignItems="start" w="100%" gap="0.5rem">
-							<Text>Choose another workspace</Text>
+						<Text>Choose another workspace</Text>
 
-							<Select
-								size="sm"
-								marginTop="auto"
-								borderRadius="6px"
-								value={currentWorkspace?.id}
-								onChange={(evt) => {
-									resetError();
+						<Select
+							size="sm"
+							marginTop="auto"
+							borderRadius="6px"
+							value={currentWorkspace?.id}
+							onChange={(evt) => {
+								resetError();
 
-									const workspaceId = evt.target.value;
+								const workspaceId = evt.target.value;
 
-									dispatch(
-										workspacesApi.setActiveWorkspace({
-											profileId,
-											workspaceId,
-										}),
-									);
+								dispatch(
+									workspacesApi.setActiveWorkspace({
+										profileId,
+										workspaceId,
+									}),
+								);
 
-									telemetry.track(
-										TELEMETRY_EVENT_NAME.WORKSPACE_SELECTED,
-										{
-											totalWorkspacesCount: workspaces.length,
-										},
-									);
-								}}
-							>
-								{workspaces.map((workspace) => (
-									<option key={workspace.id} value={workspace.id}>
-										{workspace.content}
-									</option>
-								))}
-							</Select>
-						</VStack>
+								telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_SELECTED, {
+									totalWorkspacesCount: workspaces.length,
+								});
+							}}
+						>
+							{workspaces.map((workspace) => (
+								<option key={workspace.id} value={workspace.id}>
+									{workspace.content}
+								</option>
+							))}
+						</Select>
+					</VStack>
 
-						<VStack alignItems="start" w="100%" gap="0.5rem">
-							<Text>Create a new workspace</Text>
+					<Divider />
+
+					<VStack
+						alignItems="start"
+						w="100%"
+						color="typography.additional"
+						gap="0.5rem"
+					>
+						<Text>Create a new workspace</Text>
+						<VStack w="100%">
+							<Input
+								placeholder="e.g., Personal"
+								value={workspaceName}
+								onChange={(e) => setWorkspaceName(e.target.value)}
+							/>
 							<Button
 								w="100%"
+								isLoading={isPending}
 								onClick={() => {
-									modal.show({
-										content: () => <WorkspaceCreatePopup />,
-									});
+									if (isPending || !workspaceName.trim()) return;
+
+									resetError();
+
+									setIsPending(true);
+
+									workspacesManager
+										.create({ name: workspaceName })
+										.then(async (workspaceId) => {
+											await db.sync();
+
+											const updatedWorkspaces =
+												await workspacesManager.getList();
+											dispatch(
+												workspacesApi.updateWorkspacesList({
+													profileId,
+													workspaces: updatedWorkspaces,
+												}),
+											);
+
+											dispatch(
+												workspacesApi.setActiveWorkspace({
+													workspaceId,
+													profileId,
+												}),
+											);
+
+											telemetry.track(
+												TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
+											);
+										})
+										.finally(() => {
+											setIsPending(false);
+										});
 								}}
 							>
-								<Text>Create workspace</Text>
+								Create workspace
 							</Button>
 						</VStack>
 					</VStack>
@@ -126,9 +171,8 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 						gap="0.5rem"
 						color="typography.additional"
 					>
-						<Text>Close current vault</Text>
 						<Button w="100%" onClick={() => profileControls.close()}>
-							<Text>Close vault</Text>
+							<Text>Close current vault</Text>
 						</Button>
 					</VStack>
 				</VStack>
