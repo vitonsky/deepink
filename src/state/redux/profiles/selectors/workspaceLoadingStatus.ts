@@ -10,21 +10,9 @@ export const selectIsActiveWorkspaceLoaded = (scope: ProfileScoped) =>
 		return Object.values(workspace.loadingStatus).every(Boolean);
 	});
 
-export const selectActiveWorkspaceLoadingError = (scope: ProfileScoped) =>
-	createAppSelector(selectActiveWorkspace(scope), (workspace) => {
-		if (!workspace) return null;
-
-		return workspace.loadingError;
-	});
-
 export const selectIsWorkspaceLoaded = createWorkspaceSelector(
 	[selectWorkspaceRootSafe],
 	({ loadingStatus }) => {
 		return Object.values(loadingStatus).every(Boolean);
 	},
-);
-
-export const selectWorkspaceLoadingError = createWorkspaceSelector(
-	[selectWorkspaceRootSafe],
-	({ loadingError }) => loadingError,
 );

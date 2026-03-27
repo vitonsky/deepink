@@ -1,4 +1,4 @@
-import React, { createContext, FC, useEffect, useMemo } from 'react';
+import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
 import { useDebounce } from 'use-debounce';
 import { FileController } from '@core/features/files/FileController';
@@ -7,6 +7,7 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
+import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
@@ -19,15 +20,12 @@ import {
 	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
-import {
-	selectActiveWorkspaceLoadingError,
-	selectIsActiveWorkspaceLoaded,
-} from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
-import { Workspace } from '../Workspace';
-import { WorkspaceContainer, WorkspaceContext } from '../Workspace/WorkspaceContainer';
+import { Workspace, WorkspaceContext, WorkspaceErrorHandlerProvider } from '../Workspace';
+import { WorkspaceError } from '../Workspace/WorkspaceError';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { useVaultOpenErrorToast } from './useVaultOpenErrorToast';
@@ -163,34 +161,47 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
-	const isProfileLoaded = useAppSelector(selectIsActiveWorkspaceLoaded({ profileId }));
-	const profileLoadError = useAppSelector(
-		selectActiveWorkspaceLoadingError({ profileId }),
+	const isActiveWorkspaceLoaded = useAppSelector(
+		selectIsActiveWorkspaceLoaded({ profileId }),
 	);
-	const [isLoadingComplete] = useDebounce(isProfileLoaded || profileLoadError, 500, {
-		leading: true,
-	});
+	const [workspaceLoadError, setWorkspaceLoadError] = useState<Error | null>(null);
+	const [isLoadingComplete] = useDebounce(
+		isActiveWorkspaceLoaded || workspaceLoadError,
+		500,
+		{
+			leading: true,
+		},
+	);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{!isLoadingComplete && <SplashScreen />}
-
 			{workspaces.length > 0 && <ProfileServices />}
-			{workspaces.map((workspace) =>
-				workspace.touched ? (
-					<WorkspaceContext.Provider
-						key={workspace.id}
-						value={{ profileId: profileId, workspaceId: workspace.id }}
-					>
-						<StatusBarProvider>
-							<WorkspaceContainer profile={currentProfile}>
-								{/* Render workspace only after all data is loaded or error occurs*/}
-								{isLoadingComplete && <Workspace />}
-							</WorkspaceContainer>
-							<ProfileStatusBar />
-						</StatusBarProvider>
-					</WorkspaceContext.Provider>
-				) : null,
+
+			{workspaceLoadError ? (
+				<WorkspaceModalProvider>
+					<WorkspaceError resetError={() => setWorkspaceLoadError(null)} />
+				</WorkspaceModalProvider>
+			) : (
+				<>
+					{workspaces.map((workspace) =>
+						workspace.touched ? (
+							<WorkspaceContext.Provider
+								key={workspace.id}
+								value={{ profileId, workspaceId: workspace.id }}
+							>
+								<StatusBarProvider>
+									<WorkspaceErrorHandlerProvider
+										onError={setWorkspaceLoadError}
+									>
+										<Workspace profile={currentProfile} />
+									</WorkspaceErrorHandlerProvider>
+									<ProfileStatusBar />
+								</StatusBarProvider>
+							</WorkspaceContext.Provider>
+						) : null,
+					)}
+				</>
 			)}
 		</ProfileControlsContext.Provider>
 	);

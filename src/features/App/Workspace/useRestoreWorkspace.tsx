@@ -9,6 +9,7 @@ import { NOTES_VIEW, WorkspaceConfigScheme } from '@state/redux/profiles/profile
 
 import { WorkspaceStateScheme } from './services/useWorkspaceStateSync';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
+import { useWorkspaceErrorHandlerContext } from '.';
 
 /**
  * Restores workspace state on startup: tags, filters, config, and opened notes.
@@ -17,6 +18,8 @@ export const useRestoreWorkspace = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
+
+	const { handleError } = useWorkspaceErrorHandlerContext();
 
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
@@ -114,13 +117,14 @@ export const useRestoreWorkspace = () => {
 				);
 			})
 			.catch((error) => {
-				console.error(error);
-
-				dispatch(
-					workspaceActions.setWorkspaceLoadingError({
-						errorMessage: 'Failed to restore workspace',
-					}),
-				);
+				handleError(error);
 			});
-	}, [dispatch, workspaceActions, workspaceFiles, notesRegistry, tagsRegistry]);
+	}, [
+		dispatch,
+		workspaceActions,
+		workspaceFiles,
+		notesRegistry,
+		tagsRegistry,
+		handleError,
+	]);
 };
