@@ -7,7 +7,6 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
-import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
@@ -181,9 +180,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			{workspaces.length > 0 && <ProfileServices />}
 
 			{workspaceLoadError ? (
-				<WorkspaceModalProvider>
-					<WorkspaceError resetError={() => setWorkspaceLoadError(null)} />
-				</WorkspaceModalProvider>
+				<WorkspaceError resetError={() => setWorkspaceLoadError(null)} />
 			) : (
 				<>
 					{workspaces.map((workspace) =>
