@@ -1,4 +1,4 @@
-import { xor } from '../utils/xor';
+import { xor16 } from '../utils/xor';
 
 /**
  * Stream cipher with counter implementation
@@ -8,15 +8,12 @@ import { xor } from '../utils/xor';
 export class CTRCipherMode {
 	private readonly encryptBuffer;
 	private readonly blockSize;
-	constructor(
-		encryptBuffer: (buffer: ArrayBuffer) => Promise<ArrayBuffer>,
-		blockSize = 16,
-	) {
+	constructor(encryptBuffer: (buffer: Uint8Array) => Uint8Array, blockSize = 16) {
 		this.encryptBuffer = encryptBuffer;
 		this.blockSize = blockSize;
 	}
 
-	public async encrypt(buffer: ArrayBuffer, iv: ArrayBuffer) {
+	public async encrypt(buffer: Uint8Array, iv: Uint8Array) {
 		if (buffer.byteLength % this.blockSize !== 0)
 			throw new TypeError(`Buffer size is not multiple to ${this.blockSize}`);
 		if (iv.byteLength % this.blockSize !== 0)
@@ -26,26 +23,33 @@ export class CTRCipherMode {
 
 		const counterBuffer = new Uint8Array(this.blockSize);
 		const counterView = new DataView(counterBuffer.buffer);
-		const ivView = new Uint8Array(iv);
 
 		const out = new Uint8Array(buffer.byteLength);
+
+		// We preallocate the RAM and re-use it,
+		// since only one XOR buffer is used at once
+		const xorBuffer = new Uint8Array(16);
+
+		console.time('Encrypt loop');
 		for (let offset = 0; offset < buffer.byteLength; offset += this.blockSize) {
 			// XOR a Nonce and Counter
-			const ivOffset = offset % ivView.byteLength;
-			const uniqueSequence = xor(
-				ivView.slice(ivOffset, ivOffset + this.blockSize),
+			const ivOffset = offset % iv.byteLength;
+			// TODO: provide an efficient xor function as dependency
+			const uniqueSequence = xor16(
+				xorBuffer,
+				iv.subarray(ivOffset, ivOffset + this.blockSize),
 				counterBuffer,
 			);
 
 			// Encrypt unique sequence
-			const encryptedSequence = await this.encryptBuffer(uniqueSequence.buffer);
+			const encryptedSequence = this.encryptBuffer(uniqueSequence);
 
 			// XOR unique sequence and block data,
 			// a data is a plain text for encryption and cipher text for decryption
-			const dataSlice = buffer.slice(offset, offset + this.blockSize);
-			const dataBlock = xor(
+			const dataBlock = xor16(
+				xorBuffer,
 				new Uint8Array(encryptedSequence),
-				new Uint8Array(dataSlice),
+				buffer.subarray(offset, offset + this.blockSize),
 			);
 
 			// Write block to a out buffer
@@ -55,11 +59,12 @@ export class CTRCipherMode {
 			const nextCounter = counterView.getUint32(0) + 1;
 			counterView.setUint32(0, nextCounter);
 		}
+		console.timeEnd('Encrypt loop');
 
-		return out.buffer;
+		return out;
 	}
 
-	public async decrypt(buffer: ArrayBuffer, iv: ArrayBuffer) {
+	public async decrypt(buffer: Uint8Array, iv: Uint8Array) {
 		// CTR mode do the same operation for decryption as for encryption,
 		// but instead of plain text it handles cipher text
 		return this.encrypt(buffer, iv);
