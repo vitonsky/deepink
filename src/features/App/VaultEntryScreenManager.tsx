@@ -84,6 +84,7 @@ export const VaultEntryScreenManager = ({
 					return { status: 'error', message: 'Invalid password' };
 				}
 
+				onChooseProfile(null);
 				return {
 					status: 'error',
 					message: `Something went wrong`,
@@ -92,7 +93,7 @@ export const VaultEntryScreenManager = ({
 				setIsProfileOpening(false);
 			}
 		},
-		[profiles],
+		[onChooseProfile, profiles],
 	);
 
 	const currentVaultObject = useMemo(

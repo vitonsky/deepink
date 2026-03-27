@@ -66,7 +66,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		[currentProfile.db],
 	);
 	useEffect(() => {
-		let cancelled = false;
+		let isProfileLoadCancelled = false;
 
 		const vaultConfig = new StateFile(
 			new FileController('config.json', controls.profile.files),
@@ -75,10 +75,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 		Promise.all([workspacesManager.getList(), vaultConfig.get(), getVaultState()])
 			.then(async ([workspaces, config, state]) => {
-				if (cancelled) return;
+				if (isProfileLoadCancelled) return;
 				const [defaultWorkspace] = workspaces;
 
-				if (!defaultWorkspace) return;
+				if (!defaultWorkspace) throw new Error('No workspaces found in vault');
 
 				dispatch(
 					workspacesApi.addProfile({
@@ -100,10 +100,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				);
 				dispatch(workspacesApi.setActiveProfile(profileId));
 
-				const selectedWorkspace =
-					(state?.activeWorkspace &&
-						workspaces.find((w) => w.id === state.activeWorkspace)) ||
-					defaultWorkspace;
+				let selectedWorkspace = defaultWorkspace;
+				if (state?.activeWorkspace) {
+					selectedWorkspace =
+						workspaces.find((w) => w.id === state.activeWorkspace) ??
+						defaultWorkspace;
+				}
 				dispatch(
 					workspacesApi.setActiveWorkspace({
 						profileId,
@@ -114,7 +116,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			.catch((error) => {
 				console.error(error);
 
-				if (cancelled) return;
+				if (isProfileLoadCancelled) return;
 
 				// Close vault and show error
 				controls.close();
@@ -122,7 +124,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			});
 
 		return () => {
-			cancelled = true;
+			isProfileLoadCancelled = true;
 			dispatch(
 				workspacesApi.removeProfile({
 					profileId,

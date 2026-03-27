@@ -88,7 +88,6 @@ export const useProfileContainers = () => {
 			changeActiveProfile = false,
 		) => {
 			const cleanups: (() => void)[] = [];
-			let encryptionCleanup: null | (() => any) = null;
 
 			const runCleanups = async () => {
 				// TODO: remove key of RAM. Set control with callback to remove key
@@ -96,10 +95,6 @@ export const useProfileContainers = () => {
 					// TODO: set deadline for awaiting
 
 					await cleanup();
-				}
-
-				if (encryptionCleanup) {
-					encryptionCleanup();
 				}
 			};
 
@@ -151,7 +146,7 @@ export const useProfileContainers = () => {
 						algorithm: profile.encryption.algorithm,
 					});
 
-					encryptionCleanup = () => encryption.dispose();
+					cleanups.push(() => encryption.dispose());
 					encryptionController = encryption.getContent();
 				}
 
@@ -166,7 +161,7 @@ export const useProfileContainers = () => {
 				);
 
 				// TODO: close DB first and close encryption last
-				cleanups.push(() => db.close());
+				cleanups.unshift(() => db.close());
 
 				// Ensure at least one workspace exists
 				const workspaces = new WorkspacesController(db);

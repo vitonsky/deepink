@@ -23,16 +23,16 @@ export const useRestoreWorkspace = () => {
 
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
-	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
+	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
 	useEffect(() => {
 		const workspaceConfig = new StateFile(
-			new FileController(`config.json`, workspaceFiles),
+			new FileController(`config.json`, workspaceStorage),
 			WorkspaceConfigScheme,
 		);
 
 		const workspaceState = new StateFile(
-			new FileController(`state.json`, workspaceFiles),
+			new FileController(`state.json`, workspaceStorage),
 			WorkspaceStateScheme,
 		);
 
@@ -42,10 +42,11 @@ export const useRestoreWorkspace = () => {
 				// The selected tag must be validated against the available tag list before restoring filters - invalid tags will be ignored
 				dispatch(workspaceActions.setTags({ tags: tags }));
 
-				const selectedTagId =
-					tags.length > 0 && state?.selectedTagId
-						? tags.find((t) => t.id === state?.selectedTagId)?.id
-						: undefined;
+				let selectedTagId;
+				if (tags.length > 0 && state?.selectedTagId) {
+					selectedTagId =
+						tags.find((t) => t.id === state?.selectedTagId)?.id ?? undefined;
+				}
 
 				// Restore filters
 				if (state) {
@@ -122,7 +123,7 @@ export const useRestoreWorkspace = () => {
 	}, [
 		dispatch,
 		workspaceActions,
-		workspaceFiles,
+		workspaceStorage,
 		notesRegistry,
 		tagsRegistry,
 		handleError,
