@@ -1,16 +1,12 @@
-import React, { createContext, FC, PropsWithChildren, useCallback } from 'react';
+import React, { createContext, FC } from 'react';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
 import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useAppDispatch } from '@state/redux/hooks';
-import {
-	useWorkspaceActions,
-	useWorkspaceData,
-	useWorkspaceSelector,
-} from '@state/redux/profiles/hooks';
-import { selectWorkspaceName, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectWorkspaceName } from '@state/redux/profiles/profiles';
 import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
@@ -28,36 +24,6 @@ export const WorkspaceContext = createContext<{
 	profileId: string;
 } | null>(null);
 export const useWorkspaceContext = createContextGetterHook(WorkspaceContext);
-
-export const WorkspaceErrorHandlerContext = createContext<{
-	handleError: (error: Error) => void;
-} | null>(null);
-export const useWorkspaceErrorHandlerContext = createContextGetterHook(
-	WorkspaceErrorHandlerContext,
-);
-
-export const WorkspaceErrorHandlerProvider: FC<
-	PropsWithChildren<{ onError: (error: Error) => void }>
-> = ({ children, onError }) => {
-	const dispatch = useAppDispatch();
-	const workspaceData = useWorkspaceData();
-
-	const handleError = useCallback(
-		(error: Error) => {
-			console.error(error);
-			onError(error);
-
-			dispatch(workspacesApi.resetWorkspace(workspaceData));
-		},
-		[dispatch, onError, workspaceData],
-	);
-
-	return (
-		<WorkspaceErrorHandlerContext.Provider value={{ handleError }}>
-			{children}
-		</WorkspaceErrorHandlerContext.Provider>
-	);
-};
 
 export interface WorkspaceProps {
 	profile: ProfileContainer;

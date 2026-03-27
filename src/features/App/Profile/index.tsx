@@ -23,8 +23,9 @@ import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/w
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
-import { Workspace, WorkspaceContext, WorkspaceErrorHandlerProvider } from '../Workspace';
+import { Workspace, WorkspaceContext } from '../Workspace';
 import { WorkspaceError } from '../Workspace/WorkspaceError';
+import { WorkspaceErrorHandlerProvider } from '../Workspace/WorkspaceErrorHandlerContext';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { useVaultOpenErrorToast } from './useVaultOpenErrorToast';
