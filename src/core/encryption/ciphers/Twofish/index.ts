@@ -109,10 +109,8 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 
 		const iv = this.randomBytesGenerator(this.ivSize);
 
-		console.time('Buffer processing');
 		const cipher = await this.getCipher();
 		const encryptedBuffer = await cipher.encrypt(bufferView, iv);
-		console.timeEnd('Buffer processing');
 
 		const header = this.header.createBuffer({ padding, iv: iv.buffer });
 		return joinBuffers([header, encryptedBuffer]);
@@ -177,10 +175,8 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 
 		const iv = this.randomBytesGenerator(this.ivSize);
 
-		console.time('Buffer processing');
 		const cipher = await this.getCipher();
 		const encryptedBuffer = await cipher.encrypt(bufferView, iv);
-		console.timeEnd('Buffer processing');
 
 		const header = this.header.createBuffer({ padding, iv: iv.buffer });
 		return joinBuffers([header, encryptedBuffer]);

@@ -1,7 +1,7 @@
 /**
  * Fill buffer with cryptographically strong random values and return the same buffer
  */
-export function fillBufferWithRandomBytes<T extends ArrayBufferView>(buffer: T): T {
+export function fillBufferWithRandomBytes(buffer: Uint8Array): Uint8Array {
 	const bytesLimit = 65535;
 
 	// Fill if quote is not exceeded
@@ -11,7 +11,6 @@ export function fillBufferWithRandomBytes<T extends ArrayBufferView>(buffer: T):
 	}
 
 	// Fill buffer by blocks
-	const bufferView = new Uint8Array(buffer.buffer);
 	for (let offset = 0; offset < buffer.byteLength; offset += bytesLimit) {
 		// Generate block
 		const bytesToFill = buffer.byteLength - offset;
@@ -20,7 +19,7 @@ export function fillBufferWithRandomBytes<T extends ArrayBufferView>(buffer: T):
 		self.crypto.getRandomValues(blockBuffer);
 
 		// Fill with offset
-		bufferView.set(blockBuffer, offset);
+		buffer.set(blockBuffer, offset);
 	}
 
 	return buffer;
@@ -31,7 +30,8 @@ export function fillBufferWithRandomBytes<T extends ArrayBufferView>(buffer: T):
  *
  * @param bytesLength buffer size in bytes
  */
-export function getRandomBytes(bytesLength = 16): ArrayBuffer {
-	const typedArray = new Uint8Array(bytesLength);
-	return fillBufferWithRandomBytes(typedArray).buffer;
+export function getRandomBytes(bytesLength = 16) {
+	return fillBufferWithRandomBytes(
+		new Uint8Array(bytesLength),
+	) as Uint8Array<ArrayBuffer>;
 }

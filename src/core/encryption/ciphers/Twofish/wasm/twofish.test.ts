@@ -45,13 +45,19 @@ test.skip('Demo', async () => {
 
 test('Encrypted text may be decrypted', async () => {
 	const key = getRandomBytes(32);
-	const cipher = new WasmTwofishCTRCipher(new Uint8Array(key), getRandomBytes);
+	const cipher = new WasmTwofishCTRCipher(key, getRandomBytes);
 
-	const originalData = getRandomBytes(1024 * 1024);
+	const originalData = getRandomBytes(1024 * 1024).buffer;
+	const encryptionSubject = getRandomBytes(1024 * 1024).buffer.slice();
 
-	await cipher.encrypt(originalData);
-	const ct = await cipher.encrypt(originalData);
+	console.time('Buffer processing');
+	await cipher.encrypt(encryptionSubject);
+	console.timeEnd('Buffer processing');
+
+	console.time('Buffer processing');
+	const ct = await cipher.encrypt(encryptionSubject);
+	console.timeEnd('Buffer processing');
+
 	expect(ct).toBeInstanceOf(ArrayBuffer);
-
 	await expect(cipher.decrypt(ct)).resolves.toEqual(originalData);
 });

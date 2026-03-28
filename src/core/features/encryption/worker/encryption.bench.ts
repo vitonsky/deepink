@@ -14,6 +14,7 @@ describe(`Encrypt 1k chars`, () => {
 				);
 			},
 			{
+				throws: true,
 				async setup() {
 					processor = new WorkerEncryptionProcessor({
 						key: 'secret password',
@@ -101,6 +102,7 @@ describe(`Encrypt 1m chars`, () => {
 				);
 			},
 			{
+				throws: true,
 				async setup() {
 					processor = new WorkerEncryptionProcessor({
 						key: 'secret password',
