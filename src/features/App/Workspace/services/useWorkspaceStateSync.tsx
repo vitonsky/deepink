@@ -6,7 +6,8 @@ import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { NOTES_VIEW, selectWorkspace } from '@state/redux/profiles/profiles';
+import { NOTES_VIEW } from '@state/redux/profiles/profiles';
+import { selectWorkspaceState } from '@state/redux/profiles/selectors/selectWorkspaceState';
 import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createAppSelector } from '@state/redux/utils';
 
@@ -33,13 +34,13 @@ export const useWorkspaceStateSync = () => {
 		);
 
 		return watchSelector({
-			selector: createAppSelector(selectWorkspace(workspaceData), (state) => {
+			selector: createAppSelector(selectWorkspaceState(workspaceData), (state) => {
 				if (!state) return null;
 
 				return {
-					openedNoteIds: state.openedNotes.map((n) => n.id),
-					activeNoteId: state.activeNote,
-					selectedTagId: state.tags.selected,
+					openedNoteIds: state.openedNoteIds,
+					activeNoteId: state.activeNoteId,
+					selectedTagId: state.selectedTagId,
 					view: state.view,
 					search: state.search,
 				};
