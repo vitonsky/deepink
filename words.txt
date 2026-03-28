@@ -5,6 +5,8 @@ opentag
 ciphertext
 Initialisation
 initialise
+testvectors
+keysize
 cmd
 Comlink
 embeddings

@@ -4,8 +4,9 @@ import { resolve } from 'node:path';
 
 import { getRandomBytes } from '@core/encryption/utils/random';
 
+import testvectors from './testvectors';
 import { TwofishModule } from './twofish';
-import { WasmTwofishCTRCipher } from '..';
+import { TwofishCTRCipher, WasmTwofishCTRCipher } from '..';
 
 const tf = await TwofishModule.load(readFileSync(resolve(__dirname, './twofish.wasm')));
 
@@ -48,7 +49,7 @@ test('Encrypted text may be decrypted', async () => {
 	const cipher = new WasmTwofishCTRCipher(key, getRandomBytes);
 
 	const originalData = getRandomBytes(1024 * 1024).buffer;
-	const encryptionSubject = getRandomBytes(1024 * 1024).buffer.slice();
+	const encryptionSubject = originalData.slice();
 
 	console.time('Buffer processing');
 	await cipher.encrypt(encryptionSubject);
@@ -60,4 +61,59 @@ test('Encrypted text may be decrypted', async () => {
 
 	expect(ct).toBeInstanceOf(ArrayBuffer);
 	await expect(cipher.decrypt(ct)).resolves.toEqual(originalData);
+});
+
+test('Equality test', async () => {
+	const key = getRandomBytes(32);
+
+	const data1 = getRandomBytes(1024 * 1024).buffer.slice();
+	const data2 = data1.slice();
+
+	const cipher1 = new WasmTwofishCTRCipher(key, getRandomBytes);
+	const cipher2 = new TwofishCTRCipher(key, getRandomBytes);
+
+	const ct1 = await cipher1.encrypt(data1);
+	const ct2 = await cipher2.encrypt(data2);
+
+	expect(ct1).toEqual(ct2);
+});
+
+function fromHex(str: string) {
+	const l = str.length / 2;
+	const out = new Uint8Array(l);
+	for (let i = 0; i < l; i++) {
+		out[i] = parseInt(str.substr(2 * i, 2), 16);
+	}
+	return out;
+}
+
+function toHex(buf: Uint8Array) {
+	return [...buf]
+		.map((n) => {
+			const h = n.toString(16);
+			return h.length === 1 ? '0' + h : h;
+		})
+		.join('')
+		.toUpperCase();
+}
+
+describe('Test vectors', () => {
+	let tf: TwofishModule;
+	beforeAll(async () => {
+		tf = await TwofishModule.load(readFileSync(resolve(__dirname, './twofish.wasm')));
+	});
+
+	testvectors.forEach(({ keysize, tests }) =>
+		describe(`Key size ${keysize}`, () => {
+			tests.forEach((data) =>
+				test(`Encrypt pt=${data.pt} with key=${data.key}`, () => {
+					const session = tf.createSession(fromHex(data.key));
+					onTestFinished(() => tf.destroySession(session));
+
+					const result = tf.encrypt(session, fromHex(data.pt));
+					expect(toHex(result)).toBe(data.ct);
+				}),
+			);
+		}),
+	);
 });
