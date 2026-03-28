@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { encrypt, makeSession } from 'twofish-ts';
+
 import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
 import { BufferView, fillBuffer, joinBuffers } from '../../utils/buffers';
 
-import { HeaderView, IEncryptionProcessor, RandomBytesGenerator } from '../..';
+import { HeaderView, IEncryptionProcessor } from '../..';
 import { TwofishModule } from './wasm/twofish';
 
 export type TwofishBufferHeaderStruct = {
@@ -70,39 +72,32 @@ export function transformBuffer(
 /**
  * Twofish cipher implementation
  */
-export class WasmTwofishCTRCipher implements IEncryptionProcessor {
+export class TwofishCTRCipher implements IEncryptionProcessor {
 	private readonly ivSize = 96;
 
-	private readonly randomBytesGenerator: RandomBytesGenerator;
 	private readonly header;
 	constructor(
-		private readonly cipher: Uint8Array,
-		randomBytesGenerator: RandomBytesGenerator,
+		private readonly key: Uint8Array,
+		private readonly randomBytesGenerator: (
+			byteLength: number,
+		) => Uint8Array<ArrayBuffer>,
 	) {
-		this.randomBytesGenerator = randomBytesGenerator;
-
 		this.header = new TwofishBufferHeader(this.ivSize);
 	}
 
-	private module: Promise<CTRCipherMode> | null = null;
+	private cipher: Promise<CTRCipherMode> | null = null;
 	private getCipher() {
-		if (!this.module) {
-			this.module = TwofishModule.load(
-				readFileSync(resolve(__dirname, './wasm/twofish.wasm')),
-			).then((tf) => {
-				const session = tf.createSession(this.cipher);
-
-				return new CTRCipherMode((buffer: Uint8Array) => {
-					// console.log("Buffer size", buffer.byteLength)
-
-					const result = tf.encrypt(session, buffer);
-
-					return result;
-				});
-			});
+		if (!this.cipher) {
+			const session = makeSession(this.key);
+			this.cipher = Promise.resolve(
+				new CTRCipherMode((buffer: Uint8Array) => {
+					encrypt(buffer, 0, buffer, 0, session);
+					return buffer;
+				}),
+			);
 		}
 
-		return this.module;
+		return this.cipher;
 	}
 
 	public async load() {
@@ -114,12 +109,80 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 
 		const iv = this.randomBytesGenerator(this.ivSize);
 
-		// console.time("Buffer processing");
+		console.time('Buffer processing');
 		const cipher = await this.getCipher();
-		const encryptedBuffer = await cipher.encrypt(bufferView, new Uint8Array(iv));
-		// console.timeEnd("Buffer processing");
+		const encryptedBuffer = await cipher.encrypt(bufferView, iv);
+		console.timeEnd('Buffer processing');
 
-		const header = this.header.createBuffer({ padding, iv });
+		const header = this.header.createBuffer({ padding, iv: iv.buffer });
+		return joinBuffers([header, encryptedBuffer]);
+	}
+
+	public async decrypt(buffer: ArrayBuffer) {
+		const { padding, iv } = this.header.readBuffer(buffer);
+
+		const encryptedBuffer = new Uint8Array(buffer.slice(this.header.bufferSize));
+
+		const cipher = await this.getCipher();
+		const decryptedBufferWithPaddings = await cipher.decrypt(
+			encryptedBuffer,
+			new Uint8Array(iv),
+		);
+
+		const endOfDataOffset = decryptedBufferWithPaddings.byteLength - padding;
+		return decryptedBufferWithPaddings.subarray(0, endOfDataOffset).buffer;
+	}
+}
+
+// TODO: implement GCM mode https://en.wikipedia.org/wiki/Galois/Counter_Mode
+/**
+ * Twofish cipher implementation
+ */
+export class WasmTwofishCTRCipher implements IEncryptionProcessor {
+	private readonly ivSize = 96;
+
+	private readonly header;
+	constructor(
+		private readonly key: Uint8Array,
+		private readonly randomBytesGenerator: (
+			byteLength: number,
+		) => Uint8Array<ArrayBuffer>,
+	) {
+		this.header = new TwofishBufferHeader(this.ivSize);
+	}
+
+	private cipher: Promise<CTRCipherMode> | null = null;
+	private getCipher() {
+		if (!this.cipher) {
+			this.cipher = TwofishModule.load(
+				readFileSync(resolve(__dirname, './wasm/twofish.wasm')),
+			).then((tf) => {
+				const session = tf.createSession(this.key);
+
+				return new CTRCipherMode((buffer: Uint8Array) =>
+					tf.encrypt(session, buffer),
+				);
+			});
+		}
+
+		return this.cipher;
+	}
+
+	public async load() {
+		await this.getCipher();
+	}
+
+	public async encrypt(buffer: ArrayBuffer) {
+		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
+
+		const iv = this.randomBytesGenerator(this.ivSize);
+
+		console.time('Buffer processing');
+		const cipher = await this.getCipher();
+		const encryptedBuffer = await cipher.encrypt(bufferView, iv);
+		console.timeEnd('Buffer processing');
+
+		const header = this.header.createBuffer({ padding, iv: iv.buffer });
 		return joinBuffers([header, encryptedBuffer]);
 	}
 
