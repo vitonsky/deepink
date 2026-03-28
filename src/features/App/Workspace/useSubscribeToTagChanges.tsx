@@ -5,14 +5,14 @@ import { useWorkspaceActions } from '@state/redux/profiles/hooks';
 import { useTagsRegistry } from './WorkspaceProvider';
 
 /**
- * Subscribes to tag changes
+ * Keeps the tags list up to date.
+ * Subscribes to tag changes in the database and syncs updates to Redux
  */
-export const useSubscribeToTagChanges = () => {
+export const useSyncTagsFromRegistry = () => {
 	const workspaceActions = useWorkspaceActions();
 	const dispatch = useAppDispatch();
 	const tagsRegistry = useTagsRegistry();
 
-	// Load tags
 	useEffect(() => {
 		let isCanceled = false;
 

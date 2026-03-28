@@ -14,7 +14,7 @@ import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { WorkspaceServices } from './services/WorkspaceServices';
 import { useRestoreWorkspace } from './useRestoreWorkspace';
-import { useSubscribeToTagChanges } from './useSubscribeToTagChanges';
+import { useSyncTagsFromRegistry } from './useSubscribeToTagChanges';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
@@ -31,7 +31,7 @@ export interface WorkspaceProps {
 
 const WorkspaceInitializer = () => {
 	useRestoreWorkspace();
-	useSubscribeToTagChanges();
+	useSyncTagsFromRegistry();
 
 	return null;
 };
