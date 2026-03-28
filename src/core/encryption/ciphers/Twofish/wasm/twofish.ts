@@ -43,10 +43,12 @@ export class TwofishModule {
 	private readonly mem: WebAssembly.Memory;
 	private readonly ioOffset: number; // byte offset of io_buffer in WASM memory
 
+	private readonly memView;
 	private constructor(exports: TwofishWasmExports) {
 		this.exports = exports;
 		this.mem = exports.memory;
 		this.ioOffset = exports.twofish_get_io_buffer();
+		this.memView = new Uint8Array(this.mem.buffer);
 	}
 
 	// -----------------------------------------------------------------------
@@ -139,8 +141,14 @@ export class TwofishModule {
 		return handle as SessionHandle;
 	}
 
+	// TODO: add method to encrypt and decrypt the same buffer
+	// It would remain a performance high, but prevent unexpected mutations
 	/**
 	 * Encrypt a single 16-byte block.
+	 *
+	 * **WARNING**: returned buffer is view of WASM memory by performance reasons,
+	 * so buffer may be changed anytime.
+	 * Copy buffer immediately after return via `.slice()` to prevent mutations
 	 *
 	 * @param handle     Session handle from createSession().
 	 * @param plaintext  Exactly 16 bytes.
@@ -151,8 +159,7 @@ export class TwofishModule {
 		this.validateBlock(plaintext, 'plaintext');
 
 		/* Write plaintext into io_buffer[0..15]. */
-		const memView = new Uint8Array(this.mem.buffer);
-		memView.set(plaintext, this.ioOffset);
+		this.memView.set(plaintext, this.ioOffset);
 
 		const rc = this.exports.twofish_encrypt(handle);
 		if (rc !== 0) {
@@ -164,7 +171,7 @@ export class TwofishModule {
 		 * We slice() to get an independent copy — if the WASM memory
 		 * ever grows (re-allocated), the view would be detached.
 		 */
-		return new Uint8Array(this.mem.buffer, this.ioOffset + 16, 16).slice();
+		return new Uint8Array(this.mem.buffer, this.ioOffset + 16, 16);
 	}
 
 	/**

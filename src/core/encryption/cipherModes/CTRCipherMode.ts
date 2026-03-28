@@ -30,7 +30,6 @@ export class CTRCipherMode {
 		// since only one XOR buffer is used at once
 		const xorBuffer = new Uint8Array(16);
 
-		console.time('Encrypt loop');
 		for (let offset = 0; offset < buffer.byteLength; offset += this.blockSize) {
 			// XOR a Nonce and Counter
 			const ivOffset = offset % iv.byteLength;
@@ -48,7 +47,7 @@ export class CTRCipherMode {
 			// a data is a plain text for encryption and cipher text for decryption
 			const dataBlock = xor16(
 				xorBuffer,
-				new Uint8Array(encryptedSequence),
+				encryptedSequence,
 				buffer.subarray(offset, offset + this.blockSize),
 			);
 
@@ -59,7 +58,6 @@ export class CTRCipherMode {
 			const nextCounter = counterView.getUint32(0) + 1;
 			counterView.setUint32(0, nextCounter);
 		}
-		console.timeEnd('Encrypt loop');
 
 		return out;
 	}
