@@ -53,6 +53,9 @@ export const VaultEntryScreenManager = ({
 }: VaultEntryScreenManagerProps) => {
 	const { show: showErrorToast } = useVaultOpenErrorToast();
 
+	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
+	const hasNoVaults = profilesManager.profiles.length === 0;
+
 	const [isProfileOpening, setIsProfileOpening] = useState(false);
 	const onOpenProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
@@ -84,7 +87,9 @@ export const VaultEntryScreenManager = ({
 					return { status: 'error', message: 'Invalid password' };
 				}
 
-				onChooseProfile(null);
+				// Show vault choose screen
+				setScreen('choose');
+
 				return {
 					status: 'error',
 					message: `Something went wrong`,
@@ -93,7 +98,7 @@ export const VaultEntryScreenManager = ({
 				setIsProfileOpening(false);
 			}
 		},
-		[onChooseProfile, profiles],
+		[profiles],
 	);
 
 	const currentVaultObject = useMemo(
@@ -102,9 +107,6 @@ export const VaultEntryScreenManager = ({
 			null,
 		[currentProfile, profilesManager.profiles],
 	);
-
-	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
-	const hasNoVaults = profilesManager.profiles.length === 0;
 
 	// Splash screen is skipped here, login form should remain visible while the vault is opening
 	if (currentVaultObject && currentVaultObject.encryption) {

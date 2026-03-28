@@ -35,7 +35,7 @@ export const App: FC = () => {
 
 	// Open recent vault
 	const recentProfile = useRecentProfile(config);
-	const [isProfileOpening, setIsProfileOpening] = useState(true);
+	const [isProfileOpening, setIsProfileOpening] = useState(false);
 	useEffect(
 		() => {
 			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
@@ -53,6 +53,7 @@ export const App: FC = () => {
 			}
 
 			// Automatically open profile with no encryption
+			setIsProfileOpening(true);
 			profileContainers
 				.openProfile({ profile }, true)
 				.catch(() => showErrorToast(profile.id, profile.name))
