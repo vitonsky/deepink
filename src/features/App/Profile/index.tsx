@@ -28,8 +28,8 @@ import { WorkspaceError } from '../Workspace/WorkspaceError';
 import { WorkspaceErrorHandlerProvider } from '../Workspace/WorkspaceErrorHandlerContext';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
-import { useVaultOpenErrorToast } from './useVaultOpenErrorToast';
 import { useVaultState } from './useVaultState';
+import { useVaultError } from './VaultErrorHandler';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
@@ -54,7 +54,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
-	const { show: showErrorToast } = useVaultOpenErrorToast();
+	const { handleError } = useVaultError();
 
 	const getVaultState = useVaultState({
 		sync: Object.keys(workspaces).length > 0,
@@ -114,13 +114,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				);
 			})
 			.catch((error) => {
-				console.error(error);
-
 				if (isProfileLoadCancelled) return;
 
 				// Close vault and show error
-				controls.close();
-				showErrorToast(profileId, currentProfile.profile.name);
+				handleError(error);
 			});
 
 		return () => {
@@ -132,13 +129,11 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			);
 		};
 	}, [
-		controls,
 		controls.profile.files,
-		currentProfile.profile.name,
 		dispatch,
 		getVaultState,
+		handleError,
 		profileId,
-		showErrorToast,
 		workspacesManager,
 	]);
 
@@ -166,9 +161,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const isActiveWorkspaceLoaded = useAppSelector(
 		selectIsActiveWorkspaceLoaded({ profileId }),
 	);
-	const [workspaceLoadError, setWorkspaceLoadError] = useState<Error | null>(null);
+	const [workspaceError, setWorkspaceError] = useState<Error | null>(null);
 	const [isLoadingComplete] = useDebounce(
-		isActiveWorkspaceLoaded || workspaceLoadError,
+		isActiveWorkspaceLoaded || workspaceError,
 		500,
 		{
 			leading: true,
@@ -180,8 +175,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			{!isLoadingComplete && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
 
-			{workspaceLoadError ? (
-				<WorkspaceError resetError={() => setWorkspaceLoadError(null)} />
+			{workspaceError ? (
+				<WorkspaceError resetError={() => setWorkspaceError(null)} />
 			) : (
 				<>
 					{workspaces.map((workspace) =>
@@ -192,7 +187,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 							>
 								<StatusBarProvider>
 									<WorkspaceErrorHandlerProvider
-										onError={setWorkspaceLoadError}
+										onError={setWorkspaceError}
 									>
 										<Workspace profile={currentProfile} />
 									</WorkspaceErrorHandlerProvider>

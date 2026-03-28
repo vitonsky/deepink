@@ -4,6 +4,7 @@ import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { Profile, ProfileControls, ProfileControlsContext } from '../Profile';
+import { VaultErrorHandlerProvider } from '../Profile/VaultErrorHandler';
 import { ProfilesApi } from './hooks/useProfileContainers';
 
 export type ProfilesProps = {
@@ -39,9 +40,11 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 						value={controls}
 						key={profile.profile.id}
 					>
-						<VaultStorage value={profile.files}>
-							<Profile profile={profile} controls={controls} />
-						</VaultStorage>
+						<VaultErrorHandlerProvider>
+							<VaultStorage value={profile.files}>
+								<Profile profile={profile} controls={controls} />
+							</VaultStorage>
+						</VaultErrorHandlerProvider>
 					</ProfileControlsContext.Provider>
 				);
 			})}
