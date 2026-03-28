@@ -2,13 +2,13 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
+import { useErrorToast } from '@components/useErrorToast';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
-import { useVaultOpenErrorToast } from './Profile/useVaultOpenErrorToast';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 import {
@@ -51,7 +51,7 @@ export const VaultEntryScreenManager = ({
 	profilesManager,
 	onChooseProfile,
 }: VaultEntryScreenManagerProps) => {
-	const { show: showErrorToast } = useVaultOpenErrorToast();
+	const { show: showErrorToast } = useErrorToast();
 
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
 	const hasNoVaults = profilesManager.profiles.length === 0;
@@ -129,7 +129,10 @@ export const VaultEntryScreenManager = ({
 						onOpenProfile(newProfile, profile.password ?? undefined).then(
 							(result) => {
 								if (result.status === 'error')
-									showErrorToast(newProfile.id, newProfile.name);
+									showErrorToast({
+										title: 'Failed to open vault',
+										description: `"${profile.name}" appears to be corrupted.`,
+									});
 							},
 						),
 					)
@@ -185,7 +188,10 @@ export const VaultEntryScreenManager = ({
 								if (profile.encryption === null) {
 									onOpenProfile(profile).then((result) => {
 										if (result.status === 'error')
-											showErrorToast(profile.id, profile.name);
+											showErrorToast({
+												title: 'Failed to open vault',
+												description: `"${profile.name}" appears to be corrupted.`,
+											});
 									});
 								}
 

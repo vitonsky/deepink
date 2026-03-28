@@ -1,12 +1,12 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
+import { useErrorToast } from '@components/useErrorToast';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 
 import { AppServices } from './AppServices';
-import { useVaultOpenErrorToast } from './Profile/useVaultOpenErrorToast';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
 import { useProfileSelector } from './useProfileSelector';
@@ -23,15 +23,11 @@ export const App: FC = () => {
 
 	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
 
-	// When the active vault changes, close any open error toast that belongs to the previous vault
-	const { close: closeErrorToast, show: showErrorToast } = useVaultOpenErrorToast();
-	const prevProfileId = useRef(currentProfileId);
+	// When the active vault changes, close any open error toast
+	const { closeAll, show: showErrorToast } = useErrorToast();
 	useEffect(() => {
-		if (prevProfileId.current && prevProfileId.current !== currentProfileId) {
-			closeErrorToast(prevProfileId.current);
-		}
-		prevProfileId.current = currentProfileId;
-	}, [closeErrorToast, currentProfileId]);
+		closeAll();
+	}, [closeAll, currentProfileId]);
 
 	// Open recent vault
 	const recentProfile = useRecentProfile(config);
@@ -56,7 +52,14 @@ export const App: FC = () => {
 			setIsProfileOpening(true);
 			profileContainers
 				.openProfile({ profile }, true)
-				.catch(() => showErrorToast(profile.id, profile.name))
+				.catch((error) => {
+					console.error(error);
+					console.log('show error');
+					showErrorToast({
+						title: 'Failed to open vault',
+						description: `"${profile.name}" appears to be corrupted.`,
+					});
+				})
 				.finally(() => setIsProfileOpening(false));
 		},
 		// Depends only of loading status and run only once
