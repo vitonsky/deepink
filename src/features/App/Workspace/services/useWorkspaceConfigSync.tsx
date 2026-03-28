@@ -6,17 +6,17 @@ import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectWorkspace, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
-import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+import { selectIsWorkspaceConfigLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createAppSelector } from '@state/redux/utils';
 
 export const useWorkspaceConfigSync = () => {
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
-	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
+	const isWorkspaceConfigRestored = useWorkspaceSelector(selectIsWorkspaceConfigLoaded);
 
 	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
-		if (!isWorkspaceLoaded) return;
+		if (!isWorkspaceConfigRestored) return;
 
 		const workspaceConfig = new StateFile(
 			new FileController(`config.json`, workspaceFiles),
@@ -36,5 +36,5 @@ export const useWorkspaceConfigSync = () => {
 				});
 			},
 		});
-	}, [workspaceFiles, watchSelector, workspaceData, isWorkspaceLoaded]);
+	}, [workspaceFiles, watchSelector, workspaceData, isWorkspaceConfigRestored]);
 };

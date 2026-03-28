@@ -16,3 +16,10 @@ export const selectIsWorkspaceLoaded = createWorkspaceSelector(
 		return Object.values(loadingStatus).every(Boolean);
 	},
 );
+
+export const selectIsWorkspaceConfigLoaded = createWorkspaceSelector(
+	[selectWorkspaceRootSafe],
+	({ loadingStatus }) => {
+		return loadingStatus.isConfigLoaded;
+	},
+);
