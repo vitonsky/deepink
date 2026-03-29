@@ -175,28 +175,24 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			{!isLoadingComplete && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
 
-			{workspaceError ? (
+			{workspaceError && (
 				<WorkspaceError resetError={() => setWorkspaceError(null)} />
-			) : (
-				<>
-					{workspaces.map((workspace) =>
-						workspace.touched ? (
-							<WorkspaceContext.Provider
-								key={workspace.id}
-								value={{ profileId, workspaceId: workspace.id }}
-							>
-								<StatusBarProvider>
-									<WorkspaceErrorHandlerProvider
-										onError={setWorkspaceError}
-									>
-										<Workspace profile={currentProfile} />
-									</WorkspaceErrorHandlerProvider>
-									<ProfileStatusBar />
-								</StatusBarProvider>
-							</WorkspaceContext.Provider>
-						) : null,
-					)}
-				</>
+			)}
+
+			{workspaces.map((workspace) =>
+				workspace.touched ? (
+					<WorkspaceContext.Provider
+						key={workspace.id}
+						value={{ profileId, workspaceId: workspace.id }}
+					>
+						<StatusBarProvider>
+							<WorkspaceErrorHandlerProvider onError={setWorkspaceError}>
+								<Workspace profile={currentProfile} />
+							</WorkspaceErrorHandlerProvider>
+							<ProfileStatusBar />
+						</StatusBarProvider>
+					</WorkspaceContext.Provider>
+				) : null,
 			)}
 		</ProfileControlsContext.Provider>
 	);
