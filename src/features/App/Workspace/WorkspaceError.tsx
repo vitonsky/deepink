@@ -112,55 +112,56 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 						gap="0.5rem"
 					>
 						<Text>Create a new workspace</Text>
-						<VStack w="100%">
-							<Input
-								placeholder="e.g., Personal"
-								value={workspaceName}
-								onChange={(e) => setWorkspaceName(e.target.value)}
-							/>
-							<Button
-								w="100%"
-								isLoading={isPending}
-								onClick={() => {
-									if (isPending || !workspaceName.trim()) return;
+						<form
+							style={{ width: '100%' }}
+							onSubmit={() => {
+								if (isPending || !workspaceName.trim()) return;
 
-									resetError();
+								resetError();
 
-									setIsPending(true);
+								setIsPending(true);
 
-									workspacesManager
-										.create({ name: workspaceName })
-										.then(async (workspaceId) => {
-											await db.sync();
+								workspacesManager
+									.create({ name: workspaceName })
+									.then(async (workspaceId) => {
+										await db.sync();
 
-											const updatedWorkspaces =
-												await workspacesManager.getList();
-											dispatch(
-												workspacesApi.updateWorkspacesList({
-													profileId,
-													workspaces: updatedWorkspaces,
-												}),
-											);
+										const updatedWorkspaces =
+											await workspacesManager.getList();
+										dispatch(
+											workspacesApi.updateWorkspacesList({
+												profileId,
+												workspaces: updatedWorkspaces,
+											}),
+										);
 
-											dispatch(
-												workspacesApi.setActiveWorkspace({
-													workspaceId,
-													profileId,
-												}),
-											);
+										dispatch(
+											workspacesApi.setActiveWorkspace({
+												workspaceId,
+												profileId,
+											}),
+										);
 
-											telemetry.track(
-												TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
-											);
-										})
-										.finally(() => {
-											setIsPending(false);
-										});
-								}}
-							>
-								Create workspace
-							</Button>
-						</VStack>
+										telemetry.track(
+											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
+										);
+									})
+									.finally(() => {
+										setIsPending(false);
+									});
+							}}
+						>
+							<VStack w="100%">
+								<Input
+									placeholder="e.g., Personal"
+									value={workspaceName}
+									onChange={(e) => setWorkspaceName(e.target.value)}
+								/>
+								<Button w="100%" isLoading={isPending} type="submit">
+									Create workspace
+								</Button>
+							</VStack>
+						</form>
 					</VStack>
 
 					<Divider />
