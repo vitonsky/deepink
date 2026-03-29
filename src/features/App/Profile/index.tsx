@@ -1,4 +1,11 @@
-import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
+import React, {
+	createContext,
+	FC,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 import { isEqual } from 'lodash';
 import { useDebounce } from 'use-debounce';
 import { FileController } from '@core/features/files/FileController';
@@ -24,7 +31,7 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
-import { WorkspaceError } from '../Workspace/WorkspaceError';
+import { ActiveWorkspaceError } from '../Workspace/ActiveWorkspaceError';
 import { WorkspaceErrorHandlerProvider } from '../Workspace/WorkspaceErrorHandlerContext';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
@@ -161,7 +168,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const isActiveWorkspaceLoaded = useAppSelector(
 		selectIsActiveWorkspaceLoaded({ profileId }),
 	);
-	const [workspaceError, setWorkspaceError] = useState<Error | null>(null);
+	const [workspaceError, setWorkspaceError] = useState<{
+		error: Error | null;
+		workspaceId: string;
+	} | null>(null);
 	const [isLoadingComplete] = useDebounce(
 		isActiveWorkspaceLoaded || workspaceError,
 		500,
@@ -170,14 +180,20 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		},
 	);
 
+	const handleWorkspaceError = useCallback((error: Error, workspaceId: string) => {
+		setWorkspaceError({ error, workspaceId });
+	}, []);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{!isLoadingComplete && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
 
-			{workspaceError && (
-				<WorkspaceError resetError={() => setWorkspaceError(null)} />
-			)}
+			<ActiveWorkspaceError
+				profileId={profileId}
+				error={workspaceError}
+				onReset={() => setWorkspaceError(null)}
+			/>
 
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
@@ -186,7 +202,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<WorkspaceErrorHandlerProvider onError={setWorkspaceError}>
+							<WorkspaceErrorHandlerProvider onError={handleWorkspaceError}>
 								<Workspace profile={currentProfile} />
 							</WorkspaceErrorHandlerProvider>
 							<ProfileStatusBar />

@@ -12,7 +12,7 @@ export const useWorkspaceErrorHandlerContext = createContextGetterHook(
 );
 
 export const WorkspaceErrorHandlerProvider: FC<
-	PropsWithChildren<{ onError: (error: Error) => void }>
+	PropsWithChildren<{ onError: (error: Error, workspaceId: string) => void }>
 > = ({ children, onError }) => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -20,8 +20,9 @@ export const WorkspaceErrorHandlerProvider: FC<
 	const handleError = useCallback(
 		(error: Error) => {
 			console.error(error);
-			onError(error);
+			onError(error, workspaceData.workspaceId);
 
+			// Reset the workspace to default
 			dispatch(workspacesApi.resetWorkspace(workspaceData));
 		},
 		[dispatch, onError, workspaceData],
