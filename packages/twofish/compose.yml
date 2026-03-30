@@ -15,3 +15,4 @@ services:
       - .:/src
     working_dir: /src
     command: bash build.sh
+    user: 1000:1000

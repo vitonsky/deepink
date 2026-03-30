@@ -68,6 +68,30 @@ export class TwofishModule {
 	static async load(source: string | URL | BufferSource): Promise<TwofishModule> {
 		let wasmInstance: WebAssembly.Instance;
 
+		console.log(
+			'Path to WASM is',
+			new URL('./twofish.wasm', import.meta.url).toString(),
+		);
+
+		// Load as files
+		if (
+			typeof process !== 'undefined' &&
+			typeof process.versions.node !== 'undefined'
+		) {
+			const { readFile } = await import('fs/promises');
+
+			let pathToRead: string | null = null;
+			if (typeof source === 'string' && source.startsWith('file://')) {
+				pathToRead = new URL(source).pathname;
+			} else if (source instanceof URL && source.protocol === 'file:') {
+				pathToRead = source.pathname;
+			}
+
+			if (pathToRead) {
+				source = await readFile(pathToRead);
+			}
+		}
+
 		if (source instanceof ArrayBuffer || ArrayBuffer.isView(source)) {
 			/* We already have the bytes — use the synchronous path. */
 			const result = await WebAssembly.instantiate(source as BufferSource);
