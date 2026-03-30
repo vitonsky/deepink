@@ -55,7 +55,9 @@ export const useProfilesList = (): ProfilesListApi => {
 				});
 			} else {
 				// Create encrypted profile
-				const salt = getRandomBytes(96);
+				const salt = getRandomBytes(96).buffer;
+
+				console.log('Create profile with encryption', profile.algorithm);
 
 				const encryption = await createEncryption({
 					key: profile.password,
@@ -63,7 +65,7 @@ export const useProfilesList = (): ProfilesListApi => {
 					algorithm: profile.algorithm,
 				});
 
-				const key = getRandomBytes(32);
+				const key = getRandomBytes(32).buffer;
 				const encryptedKey = await encryption
 					.getContent()
 					.encrypt(key)
