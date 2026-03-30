@@ -13,12 +13,20 @@ import {
 
 import { useProfileControls } from '../Profile';
 
-export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
+export const WorkspaceError = ({
+	resetError,
+}: {
+	resetError: (workspaceId: string) => void;
+}) => {
 	const dispatch = useAppDispatch();
 	const telemetry = useTelemetryTracker();
-	const profileControls = useProfileControls();
-
-	const profileId = profileControls.profile.profile.id;
+	const {
+		close: profileClose,
+		profile: {
+			db,
+			profile: { id: profileId },
+		},
+	} = useProfileControls();
 
 	const selectWorkspacesWithMemo = useMemo(
 		() =>
@@ -33,13 +41,11 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 	const workspaces = useAppSelector(selectWorkspacesWithMemo);
 	const currentWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
 
-	const [workspaceName, setWorkspaceName] = useState('');
-	const {
-		profile: { db },
-	} = useProfileControls();
+	const [newWorkspaceName, setNewWorkspaceName] = useState('');
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
-
 	const [isPending, setIsPending] = useState(false);
+
+	if (!currentWorkspace) return;
 
 	return (
 		<Box
@@ -56,7 +62,7 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<VStack maxW="400px" minW="350px" gap="2rem">
 					<Text fontSize="1.3rem" fontWeight="bold">
-						Workspace "{currentWorkspace?.name}" failed to load
+						Workspace "{currentWorkspace.name}" failed to load
 					</Text>
 
 					<Text color="typography.base">
@@ -77,9 +83,9 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 							size="sm"
 							marginTop="auto"
 							borderRadius="6px"
-							value={currentWorkspace?.id}
+							value={currentWorkspace.id}
 							onChange={(evt) => {
-								resetError();
+								resetError(currentWorkspace.id);
 
 								const workspaceId = evt.target.value;
 
@@ -115,14 +121,12 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 						<form
 							style={{ width: '100%' }}
 							onSubmit={() => {
-								if (isPending || !workspaceName.trim()) return;
-
-								resetError();
+								if (isPending || !newWorkspaceName.trim()) return;
 
 								setIsPending(true);
 
 								workspacesManager
-									.create({ name: workspaceName })
+									.create({ name: newWorkspaceName })
 									.then(async (workspaceId) => {
 										await db.sync();
 
@@ -142,6 +146,8 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 											}),
 										);
 
+										resetError(currentWorkspace.id);
+
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
 										);
@@ -154,10 +160,11 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 							<VStack w="100%">
 								<Input
 									placeholder="e.g., Personal"
-									value={workspaceName}
-									onChange={(e) => setWorkspaceName(e.target.value)}
+									isDisabled={isPending}
+									value={newWorkspaceName}
+									onChange={(e) => setNewWorkspaceName(e.target.value)}
 								/>
-								<Button w="100%" isLoading={isPending} type="submit">
+								<Button w="100%" isDisabled={isPending} type="submit">
 									Create workspace
 								</Button>
 							</VStack>
@@ -172,7 +179,7 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 						gap="0.5rem"
 						color="typography.additional"
 					>
-						<Button w="100%" onClick={() => profileControls.close()}>
+						<Button w="100%" onClick={() => profileClose()}>
 							<Text>Close current vault</Text>
 						</Button>
 					</VStack>

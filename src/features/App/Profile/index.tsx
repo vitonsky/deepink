@@ -23,6 +23,7 @@ import {
 	createWorkspaceObject,
 	defaultVaultConfig,
 	ProfileConfigScheme,
+	selectActiveWorkspaceInfo,
 	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
@@ -31,7 +32,7 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
-import { ActiveWorkspaceError } from '../Workspace/ActiveWorkspaceError';
+import { WorkspaceError } from '../Workspace/WorkspaceError';
 import { WorkspaceErrorHandlerProvider } from '../Workspace/WorkspaceErrorHandlerContext';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
@@ -168,12 +169,14 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const isActiveWorkspaceLoaded = useAppSelector(
 		selectIsActiveWorkspaceLoaded({ profileId }),
 	);
-	const [workspaceError, setWorkspaceError] = useState<{
-		error: Error | null;
-		workspaceId: string;
-	} | null>(null);
+
+	const [workspaceErrors, setWorkspaceErrors] = useState<Record<string, Error>>({});
+	const activeWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
+	const activeWorkspaceError = activeWorkspace
+		? (workspaceErrors[activeWorkspace.id] ?? null)
+		: null;
 	const [isLoadingComplete] = useDebounce(
-		isActiveWorkspaceLoaded || workspaceError,
+		isActiveWorkspaceLoaded || activeWorkspaceError,
 		500,
 		{
 			leading: true,
@@ -181,7 +184,14 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	);
 
 	const handleWorkspaceError = useCallback((error: Error, workspaceId: string) => {
-		setWorkspaceError({ error, workspaceId });
+		setWorkspaceErrors((prev) => ({ ...prev, [workspaceId]: error }));
+	}, []);
+	const handleResetWorkspaceError = useCallback((workspaceId: string) => {
+		setWorkspaceErrors((prev) => {
+			const next = { ...prev };
+			delete next[workspaceId];
+			return next;
+		});
 	}, []);
 
 	return (
@@ -189,11 +199,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			{!isLoadingComplete && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
 
-			<ActiveWorkspaceError
-				profileId={profileId}
-				error={workspaceError}
-				onReset={() => setWorkspaceError(null)}
-			/>
+			{activeWorkspaceError && (
+				<WorkspaceError resetError={handleResetWorkspaceError} />
+			)}
 
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
