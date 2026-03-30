@@ -14,6 +14,9 @@ export default defineConfig({
 					const sqlContent = readFileSync(resolve(id), 'utf-8');
 					return `export default ${JSON.stringify(sqlContent)};`;
 				}
+				if (id.endsWith('.wasm')) {
+					return `export default ${JSON.stringify(new URL(resolve(id), import.meta.url))};`;
+				}
 			},
 		},
 	],
