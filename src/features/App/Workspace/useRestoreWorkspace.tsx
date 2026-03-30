@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
-import { FileController } from '@core/features/files/FileController';
-import { StateFile } from '@core/features/files/StateFile';
 import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hooks';
-import { NOTES_VIEW, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
+import { NOTES_VIEW } from '@state/redux/profiles/profiles';
 
-import { WorkspaceStateScheme } from './services/useWorkspaceStateSync';
+import { createWorkspaceStateFiles } from './utils/createWorkspaceStateFiles';
 import { useWorkspaceErrorHandlerContext } from './WorkspaceErrorHandlerContext';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
@@ -26,15 +24,8 @@ export const useRestoreWorkspace = () => {
 	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
 	useEffect(() => {
-		const workspaceConfig = new StateFile(
-			new FileController(`config.json`, workspaceStorage),
-			WorkspaceConfigScheme,
-		);
-
-		const workspaceState = new StateFile(
-			new FileController(`state.json`, workspaceStorage),
-			WorkspaceStateScheme,
-		);
+		const { workspaceConfig, workspaceState } =
+			createWorkspaceStateFiles(workspaceStorage);
 
 		Promise.all([workspaceState.get(), workspaceConfig.get(), tagsRegistry.getTags()])
 			.then(async ([state, config, tags]) => {
