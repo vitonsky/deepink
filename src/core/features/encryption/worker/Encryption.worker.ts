@@ -1,7 +1,8 @@
 import { Endpoint, expose, transfer } from 'comlink';
 import { IEncryptionProcessor } from '@core/encryption';
 import { AESGCMCipher } from '@core/encryption/ciphers/AES';
-import { TwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
+import { ensureWasmIsLoaded, SeprentCipher } from '@core/encryption/ciphers/Serpent';
+import { WasmTwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
 
 import { EncryptionController } from '../../../encryption/EncryptionController';
 import { BufferIntegrityProcessor } from '../../../encryption/processors/BufferIntegrityProcessor';
@@ -44,7 +45,23 @@ expose(
 						'twofish-ctr-cipher',
 						256,
 					);
-					return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
+					const cipher = new WasmTwofishCTRCipher(
+						new Uint8Array(key),
+						getRandomBytes,
+					);
+					await cipher.load();
+					return cipher;
+				},
+				[ENCRYPTION_ALGORITHM.SERPENT]: async () => {
+					const key = await derivedKeys.getDerivedBytes(
+						'serpent-cbc-cipher',
+						// 32 bytes encryption + 32 bytes MAC
+						32 * 8,
+					);
+
+					await ensureWasmIsLoaded();
+
+					return new SeprentCipher(new Uint8Array(key));
 				},
 			};
 
