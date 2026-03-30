@@ -1,7 +1,6 @@
 import { init, SerpentCtr, SerpentStreamPool } from 'leviathan-crypto';
-import { IEncryptionProcessor } from '@core/encryption';
+import { IEncryptionProcessor, RandomBytesGenerator } from '@core/encryption';
 import { fillBuffer, joinBuffers } from '@core/encryption/utils/buffers';
-import { getRandomBytes } from '@core/encryption/utils/random';
 
 import { transformBuffer, TwofishBufferHeader } from '../Twofish';
 
@@ -23,14 +22,17 @@ const binHeader = new TwofishBufferHeader(16);
 const chunkSize = 65536;
 
 export class SeprentCipher implements IEncryptionProcessor {
-	constructor(private readonly key: Uint8Array) {}
+	constructor(
+		private readonly key: Uint8Array,
+		private readonly getRandomBytes: RandomBytesGenerator,
+	) {}
 
 	public async encrypt(buffer: ArrayBuffer) {
 		await ensureWasmIsLoaded();
 
 		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
 
-		const nonce = getRandomBytes(16).buffer;
+		const nonce = this.getRandomBytes(16).buffer;
 
 		const cipher = new SerpentCtr({ dangerUnauthenticated: true });
 		cipher.beginEncrypt(this.key, new Uint8Array(nonce));
@@ -73,7 +75,7 @@ export class SeprentCipher implements IEncryptionProcessor {
 		);
 		cipher.dispose();
 
-		return decryptedBuffer.slice(padding, decryptedBuffer.length - padding).buffer;
+		return decryptedBuffer.slice(0, decryptedBuffer.length - padding).buffer;
 	}
 }
 

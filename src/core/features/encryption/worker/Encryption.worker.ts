@@ -61,7 +61,7 @@ expose(
 
 					await ensureWasmIsLoaded();
 
-					return new SeprentCipher(new Uint8Array(key));
+					return new SeprentCipher(new Uint8Array(key), getRandomBytes);
 				},
 			};
 
