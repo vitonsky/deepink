@@ -1,13 +1,11 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-
+import { TwofishModule } from 'twofish';
+import twofishModule from 'twofish/twofish.wasm';
 import { encrypt, makeSession } from 'twofish-ts';
 
 import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
 import { BufferView, fillBuffer, joinBuffers } from '../../utils/buffers';
 
 import { HeaderView, IEncryptionProcessor } from '../..';
-import { TwofishModule } from './wasm/twofish';
 
 export type TwofishBufferHeaderStruct = {
 	padding: number;
@@ -128,7 +126,7 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 		);
 
 		const endOfDataOffset = decryptedBufferWithPaddings.byteLength - padding;
-		return decryptedBufferWithPaddings.subarray(0, endOfDataOffset).buffer;
+		return decryptedBufferWithPaddings.slice(0, endOfDataOffset).buffer;
 	}
 }
 
@@ -152,9 +150,7 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 	private cipher: Promise<CTRCipherMode> | null = null;
 	private getCipher() {
 		if (!this.cipher) {
-			this.cipher = TwofishModule.load(
-				readFileSync(resolve(__dirname, './wasm/twofish.wasm')),
-			).then((tf) => {
+			this.cipher = TwofishModule.load(twofishModule).then((tf) => {
 				const session = tf.createSession(this.key);
 
 				return new CTRCipherMode((buffer: Uint8Array) =>
@@ -194,6 +190,6 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 		);
 
 		const endOfDataOffset = decryptedBufferWithPaddings.byteLength - padding;
-		return decryptedBufferWithPaddings.subarray(0, endOfDataOffset).buffer;
+		return decryptedBufferWithPaddings.slice(0, endOfDataOffset).buffer;
 	}
 }
