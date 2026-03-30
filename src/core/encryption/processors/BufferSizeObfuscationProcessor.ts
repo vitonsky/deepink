@@ -62,7 +62,7 @@ export class BufferSizeObfuscationProcessor implements IEncryptionProcessor {
 		// Generate random padding size
 		// Here we create a buffer with random 4 byte which is 32 bits,
 		// then creates a typed array from a buffer and takes a first number
-		const [randomNumber] = new Uint32Array(this.randomBytesGenerator(4));
+		const [randomNumber] = new Uint32Array(this.randomBytesGenerator(4).buffer);
 
 		// Clamp padding size to a limit
 		const paddingSizeLimitForBuffer = this.getPaddingSizeLimit(buffer.byteLength);

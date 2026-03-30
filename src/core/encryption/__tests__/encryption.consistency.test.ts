@@ -13,7 +13,7 @@ import { getDerivedKeysManager, getMasterKey } from '../utils/keys';
 const getRandomBytesMock = (length = 16) =>
 	new Uint8Array(length).map(
 		(_, idx) => idx + Math.max(0, idx + ((length + idx) % 255)),
-	).buffer;
+	);
 
 const getKeys = async (parameters: { password: string; salt: string }) => {
 	const password = new TextEncoder().encode(parameters.password);
@@ -80,6 +80,6 @@ test('composed processors returns idempotent result', async () => {
 	expect(new Uint32Array(encryptedBytes)).not.toEqual(new Uint32Array(encryptedBytes3));
 
 	// Random bytes decryption must throw exception, because integrity check error
-	const randomBytes = getRandomBytesMock(800);
+	const randomBytes = getRandomBytesMock(800).buffer;
 	await expect(cipher.decrypt(randomBytes)).rejects.toThrow();
 });
