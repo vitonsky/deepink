@@ -1,4 +1,4 @@
-import { init, SerpentCtr, SerpentStreamPool } from 'leviathan-crypto';
+import { init, SerpentCtr } from 'leviathan-crypto';
 import { IEncryptionProcessor, RandomBytesGenerator } from '@core/encryption';
 import { fillBuffer, joinBuffers } from '@core/encryption/utils/buffers';
 
@@ -76,36 +76,5 @@ export class SeprentCipher implements IEncryptionProcessor {
 		cipher.dispose();
 
 		return decryptedBuffer.slice(0, decryptedBuffer.length - padding).buffer;
-	}
-}
-
-export class SeprentStream implements IEncryptionProcessor {
-	constructor(private readonly key: Uint8Array) {}
-
-	private pool: Promise<SerpentStreamPool> | null = null;
-	private getPool() {
-		if (!this.pool) {
-			this.pool = ensureWasmIsLoaded().then(async () => {
-				return SerpentStreamPool.create({
-					workers: navigator.hardwareConcurrency,
-				});
-			});
-		}
-
-		return this.pool;
-	}
-
-	public async encrypt(buffer: ArrayBuffer) {
-		const pool = await this.getPool();
-
-		const result = await pool.seal(this.key, new Uint8Array(buffer), chunkSize);
-		return result.slice().buffer;
-	}
-
-	public async decrypt(buffer: ArrayBuffer) {
-		const pool = await this.getPool();
-
-		const result = await pool.open(this.key, new Uint8Array(buffer));
-		return result.slice().buffer;
 	}
 }
