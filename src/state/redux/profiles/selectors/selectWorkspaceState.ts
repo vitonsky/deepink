@@ -1,13 +1,17 @@
 import { shallowEqual } from 'react-redux';
+import z from 'zod';
+import { WorkspaceStateScheme } from '@features/App/Workspace/utils/createWorkspaceStateFiles';
 
 import { createAppSelector } from '../../utils';
 
 import { profilesSlice, WorkspaceScoped } from '../profiles';
 
+type WorkspaceStateData = z.infer<typeof WorkspaceStateScheme>;
+
 export const selectWorkspaceState = ({ profileId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(
 		[profilesSlice.selectSlice],
-		(state) => {
+		(state): WorkspaceStateData | null => {
 			const workspace = state.profiles[profileId]?.workspaces[workspaceId];
 			if (!workspace) return null;
 
