@@ -14,8 +14,8 @@ export type OnPickProfile = (
 	password?: string,
 ) => Promise<PickProfileResponse>;
 
-export const useProfileOpener = (profiles: ProfilesApi) => {
-	const onOpenProfile: OnPickProfile = useCallback(
+export const useOpenProfile = (profiles: ProfilesApi) => {
+	const openProfile: OnPickProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
 			try {
 				// Profiles with no password
@@ -47,5 +47,5 @@ export const useProfileOpener = (profiles: ProfilesApi) => {
 		[profiles],
 	);
 
-	return onOpenProfile;
+	return openProfile;
 };

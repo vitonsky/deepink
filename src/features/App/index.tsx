@@ -18,7 +18,7 @@ import { ProfileLoginForm } from './ProfileLoginForm';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
 import { ProfilesForm } from './ProfilesForm';
-import { useProfileOpener } from './useProfileOpener';
+import { useOpenProfile } from './useOpenProfile';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
@@ -53,7 +53,7 @@ export const App: FC = () => {
 		closeAll();
 	}, [closeAll, currentProfileId]);
 
-	const openProfile = useProfileOpener(profileContainers);
+	const openProfile = useOpenProfile(profileContainers);
 
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
 	const [isProfileOpening, setIsProfileOpening] = useState(false);
