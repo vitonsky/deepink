@@ -1,5 +1,5 @@
 import React, { createContext, FC, PropsWithChildren, useCallback } from 'react';
-import { useErrorToast } from '@components/useErrorToast';
+import { useToastNotification } from '@components/useToastNotification';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { useProfileControls } from '.';
@@ -10,9 +10,9 @@ export const VaultErrorContext = createContext<{
 
 export const useVaultError = createContextGetterHook(VaultErrorContext);
 
-export const VaultErrorHandlerProvider: FC<PropsWithChildren> = ({ children }) => {
+export const VaultErrorProvider: FC<PropsWithChildren> = ({ children }) => {
 	const vaultControls = useProfileControls();
-	const { show: showErrorToast } = useErrorToast();
+	const { show: showErrorToast } = useToastNotification();
 
 	const handleError = useCallback(
 		(error: Error) => {

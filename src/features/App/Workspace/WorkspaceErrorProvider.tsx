@@ -4,14 +4,12 @@ import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export const WorkspaceErrorHandlerContext = createContext<{
+export const WorkspaceErrorContext = createContext<{
 	handleError: (error: Error) => void;
 } | null>(null);
-export const useWorkspaceErrorHandlerContext = createContextGetterHook(
-	WorkspaceErrorHandlerContext,
-);
+export const useWorkspaceError = createContextGetterHook(WorkspaceErrorContext);
 
-export const WorkspaceErrorHandlerProvider: FC<
+export const WorkspaceErrorProvider: FC<
 	PropsWithChildren<{ onError: (error: Error, workspaceId: string) => void }>
 > = ({ children, onError }) => {
 	const dispatch = useAppDispatch();
@@ -29,8 +27,8 @@ export const WorkspaceErrorHandlerProvider: FC<
 	);
 
 	return (
-		<WorkspaceErrorHandlerContext.Provider value={{ handleError }}>
+		<WorkspaceErrorContext.Provider value={{ handleError }}>
 			{children}
-		</WorkspaceErrorHandlerContext.Provider>
+		</WorkspaceErrorContext.Provider>
 	);
 };

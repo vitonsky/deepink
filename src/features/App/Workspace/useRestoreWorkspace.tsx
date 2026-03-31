@@ -6,7 +6,7 @@ import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hooks';
 
 import { createWorkspaceStateFiles } from './utils/createWorkspaceStateFiles';
-import { useWorkspaceErrorHandlerContext } from './WorkspaceErrorHandlerContext';
+import { useWorkspaceError } from './WorkspaceErrorProvider';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
 /**
@@ -17,7 +17,7 @@ export const useRestoreWorkspace = () => {
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
 
-	const { handleError } = useWorkspaceErrorHandlerContext();
+	const { handleError } = useWorkspaceError();
 
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();

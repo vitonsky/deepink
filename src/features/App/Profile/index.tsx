@@ -33,11 +33,11 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
 import { WorkspaceError } from '../Workspace/WorkspaceError';
-import { WorkspaceErrorHandlerProvider } from '../Workspace/WorkspaceErrorHandlerContext';
+import { WorkspaceErrorProvider } from '../Workspace/WorkspaceErrorProvider';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { useVaultState } from './useVaultState';
-import { useVaultError } from './VaultErrorHandler';
+import { useVaultError } from './VaultErrorProvider';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
@@ -209,9 +209,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<WorkspaceErrorHandlerProvider onError={handleWorkspaceError}>
+							<WorkspaceErrorProvider onError={handleWorkspaceError}>
 								<Workspace profile={currentProfile} />
-							</WorkspaceErrorHandlerProvider>
+							</WorkspaceErrorProvider>
 							<ProfileStatusBar />
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>

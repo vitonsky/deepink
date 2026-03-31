@@ -3,7 +3,7 @@ import { FaUser } from 'react-icons/fa6';
 import { useDebounce } from 'use-debounce';
 import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
-import { useErrorToast } from '@components/useErrorToast';
+import { useToastNotification } from '@components/useToastNotification';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
@@ -48,7 +48,7 @@ export const App: FC = () => {
 	);
 
 	// When the active vault changes, close any open error toast
-	const { closeAll, show: showErrorToast } = useErrorToast();
+	const { closeAll, show: showErrorToast } = useToastNotification();
 	useEffect(() => {
 		closeAll();
 	}, [closeAll, currentProfileId]);
