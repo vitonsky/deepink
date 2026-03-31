@@ -29,7 +29,7 @@ export interface WorkspaceProps {
 	profile: ProfileContainer;
 }
 
-const WorkspaceInitializer = () => {
+const WorkspaceSetup = () => {
 	useRestoreWorkspace();
 	useSyncTagsFromRegistry();
 
@@ -67,7 +67,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 					dispatch(workspaceActions.removeOpenedNote({ noteId })),
 			}}
 		>
-			<WorkspaceInitializer />
+			<WorkspaceSetup />
 			<WorkspaceServices />
 
 			{isWorkspaceLoaded ? (
