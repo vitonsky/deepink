@@ -12,11 +12,11 @@ import { createWorkspaceStateFiles } from '../utils/createWorkspaceStateFiles';
 export const useWorkspaceConfigSync = () => {
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
-	const isWorkspaceConfigRestored = useWorkspaceSelector(selectIsWorkspaceConfigLoaded);
+	const isWorkspaceConfigLoaded = useWorkspaceSelector(selectIsWorkspaceConfigLoaded);
 
 	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
-		if (!isWorkspaceConfigRestored) return;
+		if (!isWorkspaceConfigLoaded) return;
 
 		const { workspaceConfig } = createWorkspaceStateFiles(workspaceStorage);
 
@@ -33,5 +33,5 @@ export const useWorkspaceConfigSync = () => {
 				});
 			},
 		});
-	}, [workspaceStorage, watchSelector, workspaceData, isWorkspaceConfigRestored]);
+	}, [workspaceStorage, watchSelector, workspaceData, isWorkspaceConfigLoaded]);
 };

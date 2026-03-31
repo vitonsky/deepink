@@ -1,18 +1,10 @@
-import z from 'zod';
+import { IFilesStorage } from '@core/features/files';
 import { FileController } from '@core/features/files/FileController';
-import { RootedFS } from '@core/features/files/RootedFS';
 import { StateFile } from '@core/features/files/StateFile';
-import { NOTES_VIEW, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
+import { WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
+import { WorkspaceStateScheme } from '@state/redux/profiles/selectors/selectWorkspaceState';
 
-export const WorkspaceStateScheme = z.object({
-	openedNoteIds: z.array(z.string()).nullable(),
-	activeNoteId: z.string().nullable(),
-	selectedTagId: z.string().nullable(),
-	view: z.enum(NOTES_VIEW),
-	search: z.string(),
-});
-
-export const createWorkspaceStateFiles = (storage: RootedFS) => ({
+export const createWorkspaceStateFiles = (storage: IFilesStorage) => ({
 	workspaceConfig: new StateFile(
 		new FileController(`config.json`, storage),
 		WorkspaceConfigScheme,

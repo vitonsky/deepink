@@ -13,10 +13,10 @@ export const useWorkspaceStateSync = () => {
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
 
-	const isWorkspaceRestored = useWorkspaceSelector(selectIsWorkspaceLoaded);
+	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
 	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
-		if (!isWorkspaceRestored) return;
+		if (!isWorkspaceLoaded) return;
 
 		const { workspaceState } = createWorkspaceStateFiles(workspaceStorage);
 
@@ -32,5 +32,5 @@ export const useWorkspaceStateSync = () => {
 				workspaceState.set(state);
 			},
 		});
-	}, [isWorkspaceRestored, watchSelector, workspaceData, workspaceStorage]);
+	}, [isWorkspaceLoaded, watchSelector, workspaceData, workspaceStorage]);
 };

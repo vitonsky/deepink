@@ -1,12 +1,19 @@
 import { shallowEqual } from 'react-redux';
 import z from 'zod';
-import { WorkspaceStateScheme } from '@features/App/Workspace/utils/createWorkspaceStateFiles';
 
 import { createAppSelector } from '../../utils';
 
-import { profilesSlice, WorkspaceScoped } from '../profiles';
+import { NOTES_VIEW, profilesSlice, WorkspaceScoped } from '../profiles';
 
-type WorkspaceStateData = z.infer<typeof WorkspaceStateScheme>;
+export const WorkspaceStateScheme = z.object({
+	openedNoteIds: z.array(z.string()).nullable(),
+	activeNoteId: z.string().nullable(),
+	selectedTagId: z.string().nullable(),
+	view: z.enum(NOTES_VIEW),
+	search: z.string(),
+});
+
+export type WorkspaceStateData = z.output<typeof WorkspaceStateScheme>;
 
 export const selectWorkspaceState = ({ profileId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(
