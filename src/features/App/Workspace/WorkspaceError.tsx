@@ -34,15 +34,11 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 
 	return (
 		<Box
-			sx={{
-				flexDirection: 'column',
-				flexGrow: '100',
-				width: '100%',
-				height: '100vh',
-				maxWidth: '100%',
-				maxHeight: '100%',
-				backgroundColor: 'surface.background',
-			}}
+			flexDirection="column"
+			flexGrow="100"
+			width="100%"
+			height="100vh"
+			backgroundColor="surface.background"
 		>
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<VStack maxW="400px" minW="350px" gap="2rem">
