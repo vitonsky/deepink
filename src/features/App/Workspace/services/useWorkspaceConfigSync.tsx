@@ -12,10 +12,11 @@ import { createWorkspaceStateFiles } from '../utils/createWorkspaceStateFiles';
 export const useWorkspaceConfigSync = () => {
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
-	const isWorkspaceConfigLoaded = useWorkspaceSelector(selectIsWorkspaceConfigLoaded);
-
 	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
+
+	const isWorkspaceConfigLoaded = useWorkspaceSelector(selectIsWorkspaceConfigLoaded);
 	useEffect(() => {
+		// Config must be loaded before syncing to persistent store to avoid overwriting it with default values
 		if (!isWorkspaceConfigLoaded) return;
 
 		const { workspaceConfig } = createWorkspaceStateFiles(workspaceStorage);

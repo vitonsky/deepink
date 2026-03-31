@@ -12,10 +12,11 @@ import { createWorkspaceStateFiles } from '../utils/createWorkspaceStateFiles';
 export const useWorkspaceStateSync = () => {
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
+	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
 	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
-	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
+		// Workspace data must be loaded before syncing to persistent store to avoid overwriting it with default values
 		if (!isWorkspaceLoaded) return;
 
 		const { workspaceState } = createWorkspaceStateFiles(workspaceStorage);

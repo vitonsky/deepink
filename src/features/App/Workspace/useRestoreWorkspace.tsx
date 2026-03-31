@@ -34,15 +34,15 @@ export const useRestoreWorkspace = () => {
 		Promise.all([workspaceState.get(), tagsRegistry.getTags(), workspaceConfig.get()])
 			.then(async ([state, tags, config]) => {
 				// Tags are loaded as part of the workspace state
-				dispatch(workspaceActions.setTags({ tags: tags }));
+				dispatch(workspaceActions.setTags({ tags }));
 
 				// Restore filters
 				if (state) {
 					// Validate selected tags against the tags list - invalid tags will be ignored
-					let selectedTagId;
+					let selectedTag;
 					if (tags.length > 0 && state.selectedTagId) {
-						selectedTagId =
-							tags.find((tag) => tag.id === state.selectedTagId)?.id ??
+						selectedTag =
+							tags.find((tag) => tag.id === state.selectedTagId) ||
 							undefined;
 					}
 
@@ -50,7 +50,17 @@ export const useRestoreWorkspace = () => {
 						workspaceActions.setFilters({
 							search: state.search,
 							view: state.view,
-							selectedTagId,
+							selectedTagId: selectedTag ? selectedTag.id : undefined,
+						}),
+					);
+				}
+
+				// Restore config if it exists
+				if (config) {
+					dispatch(
+						workspaceActions.setWorkspaceNoteTemplateConfig({
+							title: config.newNote.title,
+							tags: config.newNote.tags,
 						}),
 					);
 				}
@@ -80,16 +90,6 @@ export const useRestoreWorkspace = () => {
 
 				// Restore notes list
 				await restoreNoteIdsRef.current();
-
-				// Restore config if it exists
-				if (config) {
-					dispatch(
-						workspaceActions.setWorkspaceNoteTemplateConfig({
-							title: config.newNote.title,
-							tags: config.newNote.tags,
-						}),
-					);
-				}
 
 				dispatch(
 					workspaceActions.setWorkspaceLoadingStatus({
