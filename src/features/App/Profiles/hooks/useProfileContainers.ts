@@ -55,6 +55,7 @@ const decryptKey = async ({
 
 export const enum ProfileOpenErrorCode {
 	INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
+	KEY_FILE_NOT_FOUND = 'KEY_FILE_NOT_FOUND',
 }
 export class ProfileOpenError extends Error {
 	constructor(
@@ -120,7 +121,10 @@ export const useProfileContainers = () => {
 
 					const encryptedKeyBuffer = await profileFilesController.get('key');
 					if (!encryptedKeyBuffer) {
-						throw new Error('Key file is not found in profile directory');
+						throw new ProfileOpenError(
+							'Key file is not found in profile directory',
+							ProfileOpenErrorCode.KEY_FILE_NOT_FOUND,
+						);
 					}
 
 					const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));

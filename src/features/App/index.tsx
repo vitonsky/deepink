@@ -55,7 +55,9 @@ export const App: FC = () => {
 
 	const openProfile = useOpenProfile(profileContainers);
 
-	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
+	const [screen, setScreen] = useState<'createProfile' | 'chooseProfile'>(
+		'chooseProfile',
+	);
 	const [isProfileOpening, setIsProfileOpening] = useState(false);
 	const handleOpenProfile = useCallback(
 		async (profile: ProfileObject, password?: string) => {
@@ -63,7 +65,7 @@ export const App: FC = () => {
 			try {
 				return await openProfile(profile, password);
 			} catch (error) {
-				setScreen('choose');
+				setScreen('chooseProfile');
 				showErrorToast({
 					title: 'Failed to open vault',
 					description: `"${profile.name}" appears to be corrupted.`,
@@ -111,29 +113,27 @@ export const App: FC = () => {
 		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
 	);
 
-	// Show splash screen until app is ready to render
-	const isLoading =
+	// Show splash screen while app is loading
+	const isAppLoading =
 		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileAutoOpening;
-	const [isSplashVisible] = useDebounce(isLoading, 500);
+	const [isSplashVisible] = useDebounce(isAppLoading, 500);
 	if (isSplashVisible) return <SplashScreen />;
 
 	// Main vault screen
-	if (profileContainers.profiles.length > 0 && profileContainers.activeProfile) {
-		return (
-			<Box
-				sx={{
-					display: 'flex',
-					width: '100%',
-					height: '100vh',
-				}}
-			>
-				<Profiles profilesApi={profileContainers} />
-				<AppServices />
-			</Box>
-		);
-	}
-
-	const hasNoVaults = profilesList.profiles.length === 0;
+	// if (profileContainers.profiles.length > 0 && profileContainers.activeProfile) {
+	// 	return (
+	// 		<Box
+	// 			sx={{
+	// 				display: 'flex',
+	// 				width: '100%',
+	// 				height: '100vh',
+	// 			}}
+	// 		>
+	// 			<Profiles profilesApi={profileContainers} />
+	// 			<AppServices />
+	// 		</Box>
+	// 	);
+	// }
 
 	// Login form stays visible while vault is opening — splash is skipped
 	if (currentProfileObject && currentProfileObject.encryption) {
@@ -152,7 +152,8 @@ export const App: FC = () => {
 
 	if (isProfileOpening) return <SplashScreen />;
 
-	if (screen === 'create' || hasNoVaults) {
+	const hasNoVaults = profilesList.profiles.length === 0;
+	if (screen === 'createProfile' || hasNoVaults) {
 		return (
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<Box maxW="500px" minW="350px" padding="1rem">
@@ -167,7 +168,9 @@ export const App: FC = () => {
 									).then(console.warn),
 								)
 						}
-						onCancel={hasNoVaults ? undefined : () => setScreen('choose')}
+						onCancel={
+							hasNoVaults ? undefined : () => setScreen('chooseProfile')
+						}
 						defaultProfileName={
 							hasNoVaults ? getRandomItem(defaultVaultNames) : undefined
 						}
@@ -177,63 +180,78 @@ export const App: FC = () => {
 		);
 	}
 
-	return (
-		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
-			<Box maxW="500px" minW="350px" padding="1rem">
-				<ProfilesForm
-					title="Choose the profile"
-					controls={
-						<Button
-							variant="accent"
-							size="lg"
-							w="100%"
-							onClick={() => setScreen('create')}
-						>
-							Create new profile
-						</Button>
-					}
-				>
-					<NestedList
-						divider={<Divider margin="0px !important" />}
-						sx={{
-							w: '100%',
-							borderRadius: '4px',
-							maxHeight: '230px',
-							overflow: 'auto',
-							border: '1px solid',
-						}}
-						items={(profilesList.profiles ?? []).map((profile) => ({
-							id: profile.id,
-							content: (
-								<HStack
-									as="button"
-									key={profile.id}
-									sx={{
-										padding: '.8rem 1rem',
-										w: '100%',
-										cursor: 'pointer',
-										gap: '.8rem',
-									}}
-									onClick={() => {
-										setCurrentProfileId(profile.id);
+	if (screen === 'chooseProfile') {
+		return (
+			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
+				<Box maxW="500px" minW="350px" padding="1rem">
+					<ProfilesForm
+						title="Choose the profile"
+						controls={
+							<Button
+								variant="accent"
+								size="lg"
+								w="100%"
+								onClick={() => setScreen('createProfile')}
+							>
+								Create new profile
+							</Button>
+						}
+					>
+						<NestedList
+							divider={<Divider margin="0px !important" />}
+							sx={{
+								w: '100%',
+								borderRadius: '4px',
+								maxHeight: '230px',
+								overflow: 'auto',
+								border: '1px solid',
+							}}
+							items={(profilesList.profiles ?? []).map((profile) => ({
+								id: profile.id,
+								content: (
+									<HStack
+										as="button"
+										key={profile.id}
+										sx={{
+											padding: '.8rem 1rem',
+											w: '100%',
+											cursor: 'pointer',
+											gap: '.8rem',
+										}}
+										onClick={() => {
+											setCurrentProfileId(profile.id);
 
-										if (profile.encryption === null) {
-											handleOpenProfile(profile);
-										}
+											if (profile.encryption === null) {
+												handleOpenProfile(profile);
+											}
 
-										telemetry.track(
-											TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
-										);
-									}}
-								>
-									<FaUser />
-									<Text>{profile.name}</Text>
-								</HStack>
-							),
-						}))}
-					/>
-				</ProfilesForm>
+											telemetry.track(
+												TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
+											);
+										}}
+									>
+										<FaUser />
+										<Text>{profile.name}</Text>
+									</HStack>
+								),
+							}))}
+						/>
+					</ProfilesForm>
+				</Box>
 			</Box>
+		);
+	}
+
+	return (
+		<Box
+			sx={{
+				display: 'flex',
+				width: '100%',
+				height: '100vh',
+			}}
+		>
+			<Profiles profilesApi={profileContainers} />
+			<AppServices />
 		</Box>
 	);
 };
