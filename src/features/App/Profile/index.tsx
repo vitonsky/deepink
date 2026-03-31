@@ -124,7 +124,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			.catch((error) => {
 				if (isProfileLoadCancelled) return;
 
-				// Close vault and show error
 				handleError(error);
 			});
 

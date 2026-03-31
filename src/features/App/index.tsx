@@ -183,16 +183,14 @@ export const App: FC = () => {
 				<ProfilesForm
 					title="Choose the profile"
 					controls={
-						<>
-							<Button
-								variant="accent"
-								size="lg"
-								w="100%"
-								onClick={() => setScreen('create')}
-							>
-								Create new profile
-							</Button>
-						</>
+						<Button
+							variant="accent"
+							size="lg"
+							w="100%"
+							onClick={() => setScreen('create')}
+						>
+							Create new profile
+						</Button>
 					}
 				>
 					<NestedList

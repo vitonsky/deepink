@@ -10,7 +10,7 @@ import { useWorkspaceErrorHandlerContext } from './WorkspaceErrorHandlerContext'
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
 /**
- * Restores workspace state on startup: tags, filters, config, and opened notes.
+ * Restores workspace state on startup: tags, filters, config, and opened notes
  */
 export const useRestoreWorkspace = () => {
 	const dispatch = useAppDispatch();
@@ -23,43 +23,34 @@ export const useRestoreWorkspace = () => {
 	const tagsRegistry = useTagsRegistry();
 	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
-	const loadNotes = useUpdateNotes();
-	const loadNotesRef = useRef(loadNotes);
-	loadNotesRef.current = loadNotes;
+	const restoreNoteIds = useUpdateNotes();
+	const restoreNoteIdsRef = useRef(restoreNoteIds);
+	restoreNoteIdsRef.current = restoreNoteIds;
 
 	useEffect(() => {
 		const { workspaceConfig, workspaceState } =
 			createWorkspaceStateFiles(workspaceStorage);
 
-		Promise.all([workspaceState.get(), workspaceConfig.get(), tagsRegistry.getTags()])
-			.then(async ([state, config, tags]) => {
-				// Tags are loaded as part of the workspace state (required for it to function)
-				// The selected tag must be validated against the available tag list before restoring filters - invalid tags will be ignored
+		Promise.all([workspaceState.get(), tagsRegistry.getTags(), workspaceConfig.get()])
+			.then(async ([state, tags, config]) => {
+				// Tags are loaded as part of the workspace state
 				dispatch(workspaceActions.setTags({ tags: tags }));
-
-				let selectedTagId;
-				if (tags.length > 0 && state?.selectedTagId) {
-					selectedTagId =
-						tags.find((t) => t.id === state?.selectedTagId)?.id ?? undefined;
-				}
 
 				// Restore filters
 				if (state) {
+					// Validate selected tags against the tags list - invalid tags will be ignored
+					let selectedTagId;
+					if (tags.length > 0 && state.selectedTagId) {
+						selectedTagId =
+							tags.find((tag) => tag.id === state.selectedTagId)?.id ??
+							undefined;
+					}
+
 					dispatch(
 						workspaceActions.setFilters({
 							search: state.search,
 							view: state.view,
 							selectedTagId,
-						}),
-					);
-				}
-
-				// Restore config if it exists
-				if (config) {
-					dispatch(
-						workspaceActions.setWorkspaceNoteTemplateConfig({
-							title: config.newNote.title,
-							tags: config.newNote.tags,
 						}),
 					);
 				}
@@ -88,7 +79,17 @@ export const useRestoreWorkspace = () => {
 				}
 
 				// Restore notes list
-				await loadNotesRef.current();
+				await restoreNoteIdsRef.current();
+
+				// Restore config if it exists
+				if (config) {
+					dispatch(
+						workspaceActions.setWorkspaceNoteTemplateConfig({
+							title: config.newNote.title,
+							tags: config.newNote.tags,
+						}),
+					);
+				}
 
 				dispatch(
 					workspaceActions.setWorkspaceLoadingStatus({
