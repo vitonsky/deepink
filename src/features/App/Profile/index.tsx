@@ -185,13 +185,14 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const handleWorkspaceError = useCallback((error: Error, workspaceId: string) => {
 		setWorkspaceErrors((prev) => ({ ...prev, [workspaceId]: error }));
 	}, []);
-	const handleResetWorkspaceError = useCallback((workspaceId: string) => {
+	const handleResetWorkspaceError = useCallback(() => {
+		if (!activeWorkspace) return;
 		setWorkspaceErrors((prev) => {
 			const next = { ...prev };
-			delete next[workspaceId];
+			delete next[activeWorkspace.id];
 			return next;
 		});
-	}, []);
+	}, [activeWorkspace]);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

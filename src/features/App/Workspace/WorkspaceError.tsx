@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { createSelector } from 'reselect';
 import { Box, Button, Divider, Input, Select, Text, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
@@ -7,17 +6,13 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	selectActiveWorkspaceInfo,
-	selectWorkspaces,
+	selectWorkspacesInfo,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 
 import { useProfileControls } from '../Profile';
 
-export const WorkspaceError = ({
-	resetError,
-}: {
-	resetError: (workspaceId: string) => void;
-}) => {
+export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 	const dispatch = useAppDispatch();
 	const telemetry = useTelemetryTracker();
 	const {
@@ -28,17 +23,7 @@ export const WorkspaceError = ({
 		},
 	} = useProfileControls();
 
-	const selectWorkspacesWithMemo = useMemo(
-		() =>
-			createSelector([selectWorkspaces({ profileId })], (workspaces) =>
-				workspaces.map((workspace) => ({
-					id: workspace.id,
-					content: workspace.name,
-				})),
-			),
-		[profileId],
-	);
-	const workspaces = useAppSelector(selectWorkspacesWithMemo);
+	const workspaces = useAppSelector(selectWorkspacesInfo({ profileId }));
 	const currentWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
 
 	const [newWorkspaceName, setNewWorkspaceName] = useState('');
@@ -85,10 +70,9 @@ export const WorkspaceError = ({
 							borderRadius="6px"
 							value={currentWorkspace.id}
 							onChange={(evt) => {
-								resetError(currentWorkspace.id);
+								resetError();
 
 								const workspaceId = evt.target.value;
-
 								dispatch(
 									workspacesApi.setActiveWorkspace({
 										profileId,
@@ -103,7 +87,7 @@ export const WorkspaceError = ({
 						>
 							{workspaces.map((workspace) => (
 								<option key={workspace.id} value={workspace.id}>
-									{workspace.content}
+									{workspace.name}
 								</option>
 							))}
 						</Select>
@@ -139,14 +123,14 @@ export const WorkspaceError = ({
 											}),
 										);
 
+										resetError();
+
 										dispatch(
 											workspacesApi.setActiveWorkspace({
 												workspaceId,
 												profileId,
 											}),
 										);
-
-										resetError(currentWorkspace.id);
 
 										telemetry.track(
 											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,

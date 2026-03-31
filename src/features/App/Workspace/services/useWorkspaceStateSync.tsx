@@ -22,11 +22,10 @@ export const useWorkspaceStateSync = () => {
 		const { workspaceState } = createWorkspaceStateFiles(workspaceStorage);
 
 		return watchSelector({
-			selector: createAppSelector(selectWorkspaceState(workspaceData), (state) => {
-				if (!state) return null;
-
-				return state;
-			}),
+			selector: createAppSelector(
+				selectWorkspaceState(workspaceData),
+				(state) => state,
+			),
 			onChange(state) {
 				if (!state) return;
 

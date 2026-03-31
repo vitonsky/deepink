@@ -10,22 +10,22 @@ import { useWorkspaceError } from './WorkspaceErrorProvider';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
 /**
- * Restores workspace state on startup: tags, filters, config, and opened notes
+ * Restores workspace state: tags, filters, config, and opened notes
  */
 export const useRestoreWorkspace = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
-
-	const { handleError } = useWorkspaceError();
-
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
+
 	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 
-	const restoreNoteIds = useUpdateNotes();
-	const restoreNoteIdsRef = useRef(restoreNoteIds);
-	restoreNoteIdsRef.current = restoreNoteIds;
+	const updateNoteList = useUpdateNotes();
+	const updateNoteListRef = useRef(updateNoteList);
+	updateNoteListRef.current = updateNoteList;
+
+	const { handleError } = useWorkspaceError();
 
 	useEffect(() => {
 		const { workspaceConfig, workspaceState } =
@@ -89,7 +89,7 @@ export const useRestoreWorkspace = () => {
 				}
 
 				// Restore notes list
-				await restoreNoteIdsRef.current();
+				await updateNoteListRef.current();
 
 				dispatch(
 					workspaceActions.setWorkspaceLoadingStatus({

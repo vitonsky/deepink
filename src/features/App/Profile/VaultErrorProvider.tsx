@@ -1,5 +1,7 @@
 import React, { createContext, FC, PropsWithChildren, useCallback } from 'react';
 import { useToastNotification } from '@components/useToastNotification';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { useTelemetryTracker } from '@features/telemetry';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { useProfileControls } from '.';
@@ -11,6 +13,8 @@ export const VaultErrorContext = createContext<{
 export const useVaultError = createContextGetterHook(VaultErrorContext);
 
 export const VaultErrorProvider: FC<PropsWithChildren> = ({ children }) => {
+	const telemetry = useTelemetryTracker();
+
 	const vaultControls = useProfileControls();
 	const { show: showErrorToast } = useToastNotification();
 
@@ -23,8 +27,10 @@ export const VaultErrorProvider: FC<PropsWithChildren> = ({ children }) => {
 				title: 'Failed to open vault',
 				description: `"${vaultControls.profile.profile.name}" appears to be corrupted.`,
 			});
+
+			telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_OPEN_FAILED);
 		},
-		[showErrorToast, vaultControls],
+		[showErrorToast, telemetry, vaultControls],
 	);
 
 	return (
