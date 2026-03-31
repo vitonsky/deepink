@@ -1,27 +1,24 @@
 import { useEffect } from 'react';
-import { FileController } from '@core/features/files/FileController';
-import { StateFile } from '@core/features/files/StateFile';
 import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectWorkspace, WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
+import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectIsWorkspaceConfigLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createAppSelector } from '@state/redux/utils';
+
+import { createWorkspaceStateFiles } from '../utils/createWorkspaceStateFiles';
 
 export const useWorkspaceConfigSync = () => {
 	const workspaceData = useWorkspaceData();
 	const watchSelector = useWatchSelector();
 	const isWorkspaceConfigRestored = useWorkspaceSelector(selectIsWorkspaceConfigLoaded);
 
-	const workspaceFiles = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
+	const workspaceStorage = useVaultStorage(getWorkspacePath(workspaceData.workspaceId));
 	useEffect(() => {
 		if (!isWorkspaceConfigRestored) return;
 
-		const workspaceConfig = new StateFile(
-			new FileController(`config.json`, workspaceFiles),
-			WorkspaceConfigScheme,
-		);
+		const { workspaceConfig } = createWorkspaceStateFiles(workspaceStorage);
 
 		return watchSelector({
 			selector: createAppSelector(
@@ -36,5 +33,5 @@ export const useWorkspaceConfigSync = () => {
 				});
 			},
 		});
-	}, [workspaceFiles, watchSelector, workspaceData, isWorkspaceConfigRestored]);
+	}, [workspaceStorage, watchSelector, workspaceData, isWorkspaceConfigRestored]);
 };
