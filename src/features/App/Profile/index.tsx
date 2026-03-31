@@ -62,7 +62,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
-	const { handleError } = useVaultError();
+	const { handleError: handleVaultError } = useVaultError();
 
 	const getVaultState = useVaultState({
 		sync: Object.keys(workspaces).length > 0,
@@ -86,7 +86,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				if (isProfileLoadCancelled) return;
 				const [defaultWorkspace] = workspaces;
 
-				if (!defaultWorkspace) throw new Error('No workspaces found in vault');
+				if (!defaultWorkspace)
+					throw new Error(
+						'No workspaces found in vault, at least one is required',
+					);
 
 				dispatch(
 					workspacesApi.addProfile({
@@ -124,7 +127,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			.catch((error) => {
 				if (isProfileLoadCancelled) return;
 
-				handleError(error);
+				handleVaultError(error);
 			});
 
 		return () => {
@@ -139,7 +142,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		controls.profile.files,
 		dispatch,
 		getVaultState,
-		handleError,
+		handleVaultError,
 		profileId,
 		workspacesManager,
 	]);
@@ -165,15 +168,15 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
-	const isActiveWorkspaceLoaded = useAppSelector(
-		selectIsActiveWorkspaceLoaded({ profileId }),
-	);
-
 	const [workspaceErrors, setWorkspaceErrors] = useState<Record<string, Error>>({});
 	const activeWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
 	const activeWorkspaceError = activeWorkspace
 		? (workspaceErrors[activeWorkspace.id] ?? null)
 		: null;
+
+	const isActiveWorkspaceLoaded = useAppSelector(
+		selectIsActiveWorkspaceLoaded({ profileId }),
+	);
 	const [isLoadingComplete] = useDebounce(
 		isActiveWorkspaceLoaded || activeWorkspaceError,
 		500,
