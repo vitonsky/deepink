@@ -2,33 +2,22 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
-import { useErrorToast } from '@components/useErrorToast';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { SplashScreen } from '@features/SplashScreen';
+import { useTelemetryTracker } from '@features/telemetry';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
-import {
-	ProfileOpenError,
-	ProfileOpenErrorCode,
-	ProfilesApi,
-} from './Profiles/hooks/useProfileContainers';
 import { ProfilesForm } from './ProfilesForm';
+import { OnPickProfile } from './useProfileOpener';
 import { ProfilesListApi } from './useProfilesList';
 
-type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
-
-export type OnPickProfile = (
-	profile: ProfileObject,
-	password?: string,
-) => Promise<PickProfileResponse>;
-
 export type VaultEntryScreenManagerProps = {
-	profiles: ProfilesApi;
+	onOpenProfile: OnPickProfile;
 	profilesManager: ProfilesListApi;
+	onOpenProfileError: (text: string) => void;
 	currentProfile: string | null;
 	onChooseProfile: (id: string | null) => void;
 };
@@ -46,59 +35,31 @@ export const defaultVaultNames = [
  * Controls which vault entry screen is shown: login form, vault creation, or vault picker
  */
 export const VaultEntryScreenManager = ({
+	onOpenProfile,
+	onOpenProfileError,
 	currentProfile,
-	profiles,
 	profilesManager,
 	onChooseProfile,
 }: VaultEntryScreenManagerProps) => {
-	const { show: showErrorToast } = useErrorToast();
+	const telemetry = useTelemetryTracker();
 
 	const [screen, setScreen] = useState<'create' | 'choose'>('choose');
 	const hasNoVaults = profilesManager.profiles.length === 0;
 
 	const [isProfileOpening, setIsProfileOpening] = useState(false);
-	const onOpenProfile: OnPickProfile = useCallback(
-		async (profile: ProfileObject, password?: string) => {
+
+	const openProfile = useCallback(
+		(profile: ProfileObject, password?: string) => {
 			setIsProfileOpening(true);
-
-			try {
-				// Profiles with no password
-				if (!profile.encryption) {
-					await profiles.openProfile({ profile }, true);
-
-					return { status: 'ok' };
-				}
-
-				// Profiles with password
-				if (password === undefined) {
-					return { status: 'error', message: 'Enter password' };
-				}
-
-				await profiles.openProfile({ profile, password }, true);
-
-				return { status: 'ok' };
-			} catch (err) {
-				console.error(err);
-
-				if (
-					err instanceof ProfileOpenError &&
-					err.code === ProfileOpenErrorCode.INCORRECT_PASSWORD
-				) {
-					return { status: 'error', message: 'Invalid password' };
-				}
-
-				// Show vault choose screen
-				setScreen('choose');
-
-				return {
-					status: 'error',
-					message: `Something went wrong`,
-				};
-			} finally {
-				setIsProfileOpening(false);
-			}
+			return onOpenProfile(profile, password)
+				.catch((error) => {
+					setScreen('choose');
+					onOpenProfileError(profile.name);
+					throw error;
+				})
+				.finally(() => setIsProfileOpening(false));
 		},
-		[profiles],
+		[onOpenProfileError, onOpenProfile],
 	);
 
 	const currentVaultObject = useMemo(
@@ -113,7 +74,7 @@ export const VaultEntryScreenManager = ({
 		return (
 			<ProfileLoginForm
 				profile={currentVaultObject}
-				onLogin={onOpenProfile}
+				onLogin={openProfile}
 				onPickAnotherProfile={() => onChooseProfile(null)}
 			/>
 		);
@@ -125,17 +86,13 @@ export const VaultEntryScreenManager = ({
 		return (
 			<ProfileCreator
 				onCreateProfile={(profile) =>
-					profilesManager.createProfile(profile).then((newProfile) =>
-						onOpenProfile(newProfile, profile.password ?? undefined).then(
-							(result) => {
-								if (result.status === 'error')
-									showErrorToast({
-										title: 'Failed to open vault',
-										description: `"${profile.name}" appears to be corrupted.`,
-									});
-							},
-						),
-					)
+					profilesManager
+						.createProfile(profile)
+						.then((newProfile) =>
+							openProfile(newProfile, profile.password ?? undefined).then(
+								console.warn,
+							),
+						)
 				}
 				onCancel={hasNoVaults ? undefined : () => setScreen('choose')}
 				defaultProfileName={
@@ -186,13 +143,7 @@ export const VaultEntryScreenManager = ({
 								onChooseProfile(profile.id);
 
 								if (profile.encryption === null) {
-									onOpenProfile(profile).then((result) => {
-										if (result.status === 'error')
-											showErrorToast({
-												title: 'Failed to open vault',
-												description: `"${profile.name}" appears to be corrupted.`,
-											});
-									});
+									openProfile(profile);
 								}
 
 								telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_SELECTED);

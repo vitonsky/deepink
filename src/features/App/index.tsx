@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { useErrorToast } from '@components/useErrorToast';
@@ -9,6 +9,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { AppServices } from './AppServices';
 import { Profiles } from './Profiles';
 import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { useProfileOpener } from './useProfileOpener';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
@@ -29,6 +30,17 @@ export const App: FC = () => {
 		closeAll();
 	}, [closeAll, currentProfileId]);
 
+	const handleProfileOpenError = useCallback(
+		(name: string) => {
+			showErrorToast({
+				title: 'Failed to open vault',
+				description: `"${name}" appears to be corrupted.`,
+			});
+		},
+		[showErrorToast],
+	);
+	const onOpenProfile = useProfileOpener(profileContainers);
+
 	// Open recent vault
 	const recentProfile = useRecentProfile(config);
 	const [isProfileOpening, setIsProfileOpening] = useState(false);
@@ -44,21 +56,14 @@ export const App: FC = () => {
 			);
 
 			if (!profile || profile.encryption) {
-				setIsProfileOpening(false);
 				return;
 			}
 
 			// Automatically open profile with no encryption
 			setIsProfileOpening(true);
-			profileContainers
-				.openProfile({ profile }, true)
-				.catch((error) => {
-					console.error(error);
-					console.log('show error');
-					showErrorToast({
-						title: 'Failed to open vault',
-						description: `"${profile.name}" appears to be corrupted.`,
-					});
+			onOpenProfile(profile)
+				.catch(() => {
+					handleProfileOpenError(profile.name);
 				})
 				.finally(() => setIsProfileOpening(false));
 		},
@@ -82,7 +87,8 @@ export const App: FC = () => {
 					<VaultEntryScreenManager
 						currentProfile={currentProfileId}
 						onChooseProfile={setCurrentProfileId}
-						profiles={profileContainers}
+						onOpenProfile={onOpenProfile}
+						onOpenProfileError={handleProfileOpenError}
 						profilesManager={profilesList}
 					/>
 				</Box>
