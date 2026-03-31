@@ -3,6 +3,7 @@ import { webcrypto } from 'node:crypto';
 import { AESGCMCipher } from '../ciphers/AES';
 import { SeprentCipher } from '../ciphers/Serpent';
 import { WasmTwofishCTRCipher } from '../ciphers/Twofish';
+import { XChaCha20Cipher } from '../ciphers/XChaCha20';
 import { BufferIntegrityProcessor } from '../processors/BufferIntegrityProcessor';
 import { PipelineProcessor } from '../processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from '../utils/keys';
@@ -42,6 +43,12 @@ const ciphers: {
 		name: 'Serpent',
 		async create(key, randomBytes) {
 			return new SeprentCipher(key, randomBytes);
+		},
+	},
+	{
+		name: 'XChaCha20',
+		async create(key) {
+			return new XChaCha20Cipher(key);
 		},
 	},
 	{
@@ -139,7 +146,7 @@ ciphers.map((cipher) =>
 		});
 
 		// Verify vectors only for ciphers, not its combinations
-		if (!cipher.name.includes('-')) {
+		if (['AES', 'Twofish', 'Serpent'].includes(cipher.name)) {
 			test('Matches reference test vectors', async () => {
 				// We disable any random factor for that test
 				const randomBytesMock = (len: number) => new Uint8Array(len);

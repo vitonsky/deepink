@@ -8,6 +8,7 @@ initialise
 testvectors
 keysize
 Seprent
+binstruct
 cmd
 Comlink
 embeddings
