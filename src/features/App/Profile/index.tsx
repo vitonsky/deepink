@@ -171,7 +171,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const [workspaceErrors, setWorkspaceErrors] = useState<Record<string, Error>>({});
 	const activeWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
 	const activeWorkspaceError = activeWorkspace
-		? (workspaceErrors[activeWorkspace.id] ?? null)
+		? workspaceErrors[activeWorkspace.id]
 		: null;
 
 	const isActiveWorkspaceLoaded = useAppSelector(
@@ -191,9 +191,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	const handleResetWorkspaceError = useCallback(() => {
 		if (!activeWorkspace) return;
 		setWorkspaceErrors((prev) => {
-			const next = { ...prev };
-			delete next[activeWorkspace.id];
-			return next;
+			const updated = { ...prev };
+			delete updated[activeWorkspace.id];
+			return updated;
 		});
 	}, [activeWorkspace]);
 
