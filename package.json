@@ -156,6 +156,7 @@
 		"leviathan-crypto": "^1.1.0",
 		"lexical": "^0.39.0",
 		"libsodium-wrappers": "^0.8.2",
+		"libsodium-wrappers-sumo": "^0.8.2",
 		"lodash": "^4.17.23",
 		"lru-cache": "^11.2.7",
 		"monaco-editor-core": "^0.55.1",
