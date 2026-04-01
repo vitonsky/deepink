@@ -128,20 +128,23 @@ ciphers.map((cipher) =>
 			const originalData = getRandomBytes(1024).buffer;
 
 			// All cipher text is unique
-			const cipherTexts = new Set<ArrayBuffer>();
+			const cipherTexts = new Set<string>();
 			for (let i = 0; i < 100; i++) {
 				const ct = await codec.encrypt(originalData);
-				expect(cipherTexts.has(ct), 'Each cipher text are unique').toBe(false);
+				const ctHex = toHex(new Uint8Array(ct));
+				expect(cipherTexts.has(ctHex), 'Each cipher text are unique').toBe(false);
 
-				cipherTexts.add(ct);
-				expect(cipherTexts.has(ct), 'Ensure the cipher text is recorded').toBe(
+				cipherTexts.add(ctHex);
+				expect(cipherTexts.has(ctHex), 'Ensure the cipher text is recorded').toBe(
 					true,
 				);
 			}
 
 			// All cipher texts must be decrypted to a buffer equal to original
 			for (const ct of cipherTexts) {
-				await expect(codec.decrypt(ct)).resolves.toStrictEqual(originalData);
+				await expect(codec.decrypt(fromHex(ct).buffer)).resolves.toStrictEqual(
+					originalData,
+				);
 			}
 		});
 
