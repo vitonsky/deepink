@@ -8,7 +8,7 @@ const { toast } = createStandaloneToast();
  */
 export const useToastNotification = () => {
 	/**
-	 * Displays an toast and returns its generated id
+	 * Displays a toast and returns its generated id
 	 */
 	const show = useCallback(({ status = 'error', ...options }: UseToastOptions) => {
 		const id = crypto.randomUUID();

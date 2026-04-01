@@ -94,7 +94,7 @@ export const App: FC = () => {
 		async (profile: ProfileObject, password?: string) => {
 			setIsProfileOpening(true);
 			try {
-				return openProfile(profile, password);
+				return await openProfile(profile, password);
 			} catch (error) {
 				setProfileScreen('chooseProfile');
 				showErrorToast({

@@ -100,7 +100,8 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 						<Text>Create a new workspace</Text>
 						<form
 							style={{ width: '100%' }}
-							onSubmit={() => {
+							onSubmit={(event) => {
+								event.preventDefault();
 								if (isPending || !newWorkspaceName.trim()) return;
 
 								setIsPending(true);
