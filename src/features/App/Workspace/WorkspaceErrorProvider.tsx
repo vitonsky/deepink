@@ -6,9 +6,7 @@ import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-export const WorkspaceErrorContext = createContext<{
-	handleError: (error: Error) => void;
-} | null>(null);
+export const WorkspaceErrorContext = createContext<((error: Error) => void) | null>(null);
 export const useWorkspaceError = createContextGetterHook(WorkspaceErrorContext);
 
 export const WorkspaceErrorProvider: FC<
@@ -32,7 +30,7 @@ export const WorkspaceErrorProvider: FC<
 	);
 
 	return (
-		<WorkspaceErrorContext.Provider value={{ handleError }}>
+		<WorkspaceErrorContext.Provider value={handleError}>
 			{children}
 		</WorkspaceErrorContext.Provider>
 	);

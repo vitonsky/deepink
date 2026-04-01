@@ -12,7 +12,11 @@ import {
 
 import { useProfileControls } from '../Profile';
 
-export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
+export const WorkspaceError = ({
+	resetError,
+}: {
+	resetError: (workspaceId: string) => void;
+}) => {
 	const dispatch = useAppDispatch();
 	const telemetry = useTelemetryTracker();
 	const {
@@ -66,7 +70,7 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 							borderRadius="6px"
 							value={currentWorkspace.id}
 							onChange={(evt) => {
-								resetError();
+								resetError(currentWorkspace.id);
 
 								const workspaceId = evt.target.value;
 								dispatch(
@@ -120,7 +124,7 @@ export const WorkspaceError = ({ resetError }: { resetError: () => void }) => {
 											}),
 										);
 
-										resetError();
+										resetError(currentWorkspace.id);
 
 										dispatch(
 											workspacesApi.setActiveWorkspace({

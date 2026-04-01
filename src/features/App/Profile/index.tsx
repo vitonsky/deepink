@@ -184,18 +184,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			leading: true,
 		},
 	);
-
-	const handleWorkspaceError = useCallback((error: Error, workspaceId: string) => {
+	const onError = useCallback((error: Error, workspaceId: string) => {
 		setWorkspaceErrors((prev) => ({ ...prev, [workspaceId]: error }));
 	}, []);
-	const handleResetWorkspaceError = useCallback(() => {
-		if (!activeWorkspace) return;
-		setWorkspaceErrors((prev) => {
-			const updated = { ...prev };
-			delete updated[activeWorkspace.id];
-			return updated;
-		});
-	}, [activeWorkspace]);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>
@@ -203,7 +194,15 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			{workspaces.length > 0 && <ProfileServices />}
 
 			{activeWorkspaceError && (
-				<WorkspaceError resetError={handleResetWorkspaceError} />
+				<WorkspaceError
+					resetError={(workspaceId: string) => {
+						setWorkspaceErrors((prev) => {
+							const updated = { ...prev };
+							delete updated[workspaceId];
+							return updated;
+						});
+					}}
+				/>
 			)}
 
 			{workspaces.map((workspace) =>
@@ -213,7 +212,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<WorkspaceErrorProvider onError={handleWorkspaceError}>
+							<WorkspaceErrorProvider onError={onError}>
 								<Workspace profile={currentProfile} />
 							</WorkspaceErrorProvider>
 							<ProfileStatusBar />

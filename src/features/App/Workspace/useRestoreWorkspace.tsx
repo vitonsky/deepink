@@ -25,7 +25,7 @@ export const useRestoreWorkspace = () => {
 	const updateNoteListRef = useRef(updateNoteList);
 	updateNoteListRef.current = updateNoteList;
 
-	const { handleError } = useWorkspaceError();
+	const handleError = useWorkspaceError();
 
 	useEffect(() => {
 		const { workspaceConfig, workspaceState } =
