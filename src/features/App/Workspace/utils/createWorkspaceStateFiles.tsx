@@ -4,13 +4,8 @@ import { StateFile } from '@core/features/files/StateFile';
 import { WorkspaceConfigScheme } from '@state/redux/profiles/profiles';
 import { WorkspaceStateScheme } from '@state/redux/profiles/selectors/selectWorkspaceState';
 
-export const createWorkspaceStateFiles = (storage: IFilesStorage) => ({
-	workspaceConfig: new StateFile(
-		new FileController(`config.json`, storage),
-		WorkspaceConfigScheme,
-	),
-	workspaceState: new StateFile(
-		new FileController(`state.json`, storage),
-		WorkspaceStateScheme,
-	),
-});
+export const createWorkspaceStateFile = (storage: IFilesStorage) =>
+	new StateFile(new FileController(`state.json`, storage), WorkspaceStateScheme);
+
+export const createWorkspaceConfigFile = (storage: IFilesStorage) =>
+	new StateFile(new FileController(`config.json`, storage), WorkspaceConfigScheme);

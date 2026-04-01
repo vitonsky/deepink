@@ -5,7 +5,10 @@ import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hooks';
 
-import { createWorkspaceStateFiles } from './utils/createWorkspaceStateFiles';
+import {
+	createWorkspaceConfigFile,
+	createWorkspaceStateFile,
+} from './utils/createWorkspaceStateFiles';
 import { useWorkspaceError } from './WorkspaceErrorProvider';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
@@ -28,8 +31,8 @@ export const useRestoreWorkspace = () => {
 	const handleError = useWorkspaceError();
 
 	useEffect(() => {
-		const { workspaceConfig, workspaceState } =
-			createWorkspaceStateFiles(workspaceStorage);
+		const workspaceState = createWorkspaceStateFile(workspaceStorage);
+		const workspaceConfig = createWorkspaceConfigFile(workspaceStorage);
 
 		Promise.all([workspaceState.get(), tagsRegistry.getTags(), workspaceConfig.get()])
 			.then(async ([state, tags, config]) => {

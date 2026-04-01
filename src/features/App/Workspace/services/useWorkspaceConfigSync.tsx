@@ -7,7 +7,7 @@ import { selectWorkspace } from '@state/redux/profiles/profiles';
 import { selectIsWorkspaceConfigLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createAppSelector } from '@state/redux/utils';
 
-import { createWorkspaceStateFiles } from '../utils/createWorkspaceStateFiles';
+import { createWorkspaceConfigFile } from '../utils/createWorkspaceStateFiles';
 
 export const useWorkspaceConfigSync = () => {
 	const workspaceData = useWorkspaceData();
@@ -19,7 +19,7 @@ export const useWorkspaceConfigSync = () => {
 		// Config must be loaded before syncing to persistent store to avoid overwriting it with default values
 		if (!isWorkspaceConfigLoaded) return;
 
-		const { workspaceConfig } = createWorkspaceStateFiles(workspaceStorage);
+		const workspaceConfig = createWorkspaceConfigFile(workspaceStorage);
 
 		return watchSelector({
 			selector: createAppSelector(
