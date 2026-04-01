@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 
 import {
-	ProfileOpenError,
-	ProfileOpenErrorCode,
 	ProfilesApi,
+	VaultOpenError,
+	VaultOpenErrorCode,
 } from './Profiles/hooks/useProfileContainers';
 
 type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
@@ -14,8 +14,8 @@ export type OnPickProfile = (
 	password?: string,
 ) => Promise<PickProfileResponse>;
 
-export const useOpenProfile = (profiles: ProfilesApi) => {
-	const openProfile: OnPickProfile = useCallback(
+export const useOpenProfile = (profiles: ProfilesApi): OnPickProfile => {
+	return useCallback(
 		async (profile: ProfileObject, password?: string) => {
 			try {
 				// Profiles with no password
@@ -35,8 +35,8 @@ export const useOpenProfile = (profiles: ProfilesApi) => {
 				return { status: 'ok' };
 			} catch (err) {
 				if (
-					err instanceof ProfileOpenError &&
-					err.code === ProfileOpenErrorCode.INCORRECT_PASSWORD
+					err instanceof VaultOpenError &&
+					err.code === VaultOpenErrorCode.INCORRECT_PASSWORD
 				) {
 					return { status: 'error', message: 'Invalid password' };
 				}
@@ -46,6 +46,4 @@ export const useOpenProfile = (profiles: ProfilesApi) => {
 		},
 		[profiles],
 	);
-
-	return openProfile;
 };

@@ -53,18 +53,18 @@ const decryptKey = async ({
 		.then((buffer) => new Uint8Array(buffer));
 };
 
-export const enum ProfileOpenErrorCode {
+export const enum VaultOpenErrorCode {
 	INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
 	KEY_FILE_NOT_FOUND = 'KEY_FILE_NOT_FOUND',
 }
-export class ProfileOpenError extends Error {
+export class VaultOpenError extends Error {
 	constructor(
+		public readonly code: VaultOpenErrorCode,
 		message: string,
-		public readonly code: ProfileOpenErrorCode,
 		options?: ErrorOptions,
 	) {
 		super(message, options);
-		this.name = 'ProfileOpenError';
+		this.name = 'VaultOpenError';
 	}
 }
 
@@ -93,9 +93,12 @@ export const useProfileContainers = () => {
 			const runCleanups = async () => {
 				// TODO: remove key of RAM. Set control with callback to remove key
 				for (const cleanup of cleanups) {
-					// TODO: set deadline for awaiting
-
-					await cleanup();
+					try {
+						// TODO: set deadline for awaiting
+						await cleanup();
+					} catch (error) {
+						console.error(error);
+					}
 				}
 			};
 
@@ -114,16 +117,16 @@ export const useProfileContainers = () => {
 					);
 				} else {
 					if (password === undefined)
-						throw new ProfileOpenError(
+						throw new VaultOpenError(
+							VaultOpenErrorCode.INCORRECT_PASSWORD,
 							'Empty password for encrypted profile',
-							ProfileOpenErrorCode.INCORRECT_PASSWORD,
 						);
 
 					const encryptedKeyBuffer = await profileFilesController.get('key');
 					if (!encryptedKeyBuffer) {
-						throw new ProfileOpenError(
+						throw new VaultOpenError(
+							VaultOpenErrorCode.KEY_FILE_NOT_FOUND,
 							'Key file is not found in profile directory',
-							ProfileOpenErrorCode.KEY_FILE_NOT_FOUND,
 						);
 					}
 
@@ -137,9 +140,9 @@ export const useProfileContainers = () => {
 							algorithm: profile.encryption.algorithm,
 						});
 					} catch (error) {
-						throw new ProfileOpenError(
+						throw new VaultOpenError(
+							VaultOpenErrorCode.INCORRECT_PASSWORD,
 							'Failed to decrypt the key',
-							ProfileOpenErrorCode.INCORRECT_PASSWORD,
 							{ cause: error },
 						);
 					}
