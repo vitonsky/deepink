@@ -1,9 +1,8 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { useDebounce } from 'use-debounce';
-import { Box, Button, Divider, HStack, Text } from '@chakra-ui/react';
+import { Box, Button, Divider, HStack, Text, useToast } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
-import { useToastNotification } from '@components/useToastNotification';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
@@ -46,11 +45,23 @@ export const App: FC = () => {
 		return profilesList.profiles.find((p) => p.id === currentProfileId) ?? null;
 	}, [currentProfileId, profilesList.profiles]);
 
+	const toast = useToast();
+	const showErrorToast = useCallback(
+		(name: string) => {
+			toast({
+				status: 'error',
+				isClosable: true,
+				title: 'Failed to open vault',
+				description: `"${name}" appears to be corrupted.`,
+				containerStyle: { maxW: '400px' },
+			});
+		},
+		[toast],
+	);
 	// When the active vault changes, close any open error toast
-	const { closeAll, show: showErrorToast } = useToastNotification();
 	useEffect(() => {
-		closeAll();
-	}, [closeAll, currentProfileId]);
+		toast.closeAll();
+	}, [currentProfileId, toast]);
 
 	// Restore and auto-open recent profile
 	const recentProfile = useRecentProfile(config);
@@ -72,12 +83,7 @@ export const App: FC = () => {
 			setIsProfileAutoOpening(true);
 
 			openProfile(profile)
-				.catch(() =>
-					showErrorToast({
-						title: 'Failed to open vault',
-						description: `"${profile.name}" appears to be corrupted.`,
-					}),
-				)
+				.catch(() => showErrorToast(profile.name))
 				.finally(() => setIsProfileAutoOpening(false));
 		},
 		// Depends only of loading status and run only once
@@ -97,10 +103,7 @@ export const App: FC = () => {
 				return await openProfile(profile, password);
 			} catch (error) {
 				setProfileScreen('chooseProfile');
-				showErrorToast({
-					title: 'Failed to open vault',
-					description: `"${profile.name}" appears to be corrupted.`,
-				});
+				showErrorToast(profile.name);
 
 				throw error;
 			} finally {
