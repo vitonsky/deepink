@@ -3,6 +3,7 @@ import { IEncryptionProcessor } from '@core/encryption';
 import { AESGCMCipher } from '@core/encryption/ciphers/AES';
 import { ensureWasmIsLoaded, SeprentCipher } from '@core/encryption/ciphers/Serpent';
 import { WasmTwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
+import { XChaCha20Cipher } from '@core/encryption/ciphers/XChaCha20';
 
 import { EncryptionController } from '../../../encryption/EncryptionController';
 import { BufferIntegrityProcessor } from '../../../encryption/processors/BufferIntegrityProcessor';
@@ -62,6 +63,15 @@ expose(
 					await ensureWasmIsLoaded();
 
 					return new SeprentCipher(new Uint8Array(key), getRandomBytes);
+				},
+				[ENCRYPTION_ALGORITHM.XChaCha20]: async () => {
+					const key = await derivedKeys.getDerivedBytes(
+						'xchacha20',
+						// 32 bytes encryption + 32 bytes MAC
+						32 * 8,
+					);
+
+					return new XChaCha20Cipher(new Uint8Array(key));
 				},
 			};
 
