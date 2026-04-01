@@ -1,4 +1,4 @@
-import React, { createContext, FC } from 'react';
+import React, { createContext, FC, useEffect } from 'react';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
@@ -14,7 +14,6 @@ import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { WorkspaceServices } from './services/WorkspaceServices';
 import { useRestoreWorkspace } from './useRestoreWorkspace';
-import { useSyncTagsFromRegistry } from './useSubscribeToTagChanges';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
@@ -31,8 +30,6 @@ export interface WorkspaceProps {
 
 const WorkspaceSetup = () => {
 	useRestoreWorkspace();
-	useSyncTagsFromRegistry();
-
 	return null;
 };
 
@@ -44,53 +41,75 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const dispatch = useAppDispatch();
 	const workspaceActions = useWorkspaceActions();
 
-	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
-	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
+	// TODO: replace to hook
+	// Keeps the tags list up to date: subscribes to tag changes in the database and syncs updates to Redux
+	useEffect(() => {
+		if (!workspace) return;
+		const { tagsRegistry } = workspace;
 
+		let isCanceled = false;
+
+		const updateTags = () =>
+			tagsRegistry.getTags().then((tags) => {
+				if (isCanceled) return;
+				dispatch(workspaceActions.setTags({ tags }));
+			});
+
+		const cleanup = tagsRegistry.onChange(updateTags);
+		return () => {
+			isCanceled = true;
+			cleanup();
+		};
+	}, [dispatch, workspace, workspaceActions]);
+
+	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
+
+	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
 	const isVisibleWorkspace = useIsActiveWorkspace();
 
 	if (!workspace) return null;
 
 	return (
-		<WorkspaceProvider
-			{...workspace}
-			notesApi={{
-				openNote: (note: INote, focus = true) => {
-					dispatch(workspaceActions.addOpenedNote({ note }));
-					if (focus) {
-						dispatch(workspaceActions.setActiveNote({ noteId: note.id }));
-					}
-				},
-				noteUpdated: (note: INote) =>
-					dispatch(workspaceActions.updateOpenedNote({ note })),
-				noteClosed: (noteId: string) =>
-					dispatch(workspaceActions.removeOpenedNote({ noteId })),
+		<Box
+			data-workspace={workspaceName}
+			sx={{
+				display: isVisibleWorkspace ? 'flex' : 'none',
+				flexDirection: 'column',
+				flexGrow: '100',
+				width: '100%',
+				height: '100vh',
+				maxWidth: '100%',
+				maxHeight: '100%',
+				backgroundColor: 'surface.background',
 			}}
 		>
-			<WorkspaceSetup />
-			<WorkspaceServices />
+			<WorkspaceProvider
+				{...workspace}
+				notesApi={{
+					openNote: (note: INote, focus = true) => {
+						dispatch(workspaceActions.addOpenedNote({ note }));
+						if (focus) {
+							dispatch(workspaceActions.setActiveNote({ noteId: note.id }));
+						}
+					},
+					noteUpdated: (note: INote) =>
+						dispatch(workspaceActions.updateOpenedNote({ note })),
+					noteClosed: (noteId: string) =>
+						dispatch(workspaceActions.removeOpenedNote({ noteId })),
+				}}
+			>
+				<WorkspaceServices />
 
-			{isWorkspaceLoaded ? (
-				<Box
-					data-workspace={workspaceName}
-					sx={{
-						display: isVisibleWorkspace ? 'flex' : 'none',
-						flexDirection: 'column',
-						flexGrow: '100',
-						width: '100%',
-						height: '100vh',
-						maxWidth: '100%',
-						maxHeight: '100%',
-						backgroundColor: 'surface.background',
-					}}
-				>
+				{isWorkspaceLoaded ? (
 					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
 						<MainScreen />
 						<WorkspaceStatusBarItems />
 						<SettingsWindow />
 					</WorkspaceModalProvider>
-				</Box>
-			) : null}
-		</WorkspaceProvider>
+				) : (
+					<WorkspaceSetup />
+				)}
+			</WorkspaceProvider>
+		</Box>
 	);
 };
