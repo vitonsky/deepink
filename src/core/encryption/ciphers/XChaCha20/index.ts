@@ -1,7 +1,6 @@
-/* eslint-disable camelcase */
 import sodium from 'libsodium-wrappers-sumo';
-import { IEncryptionProcessor } from '@core/encryption';
-import { struct, u32, u64 } from '@core/encryption/utils/bytes/binstruct';
+import { IEncryptionProcessor, RandomBytesGenerator } from '@core/encryption';
+import { bytes, struct, u32, u64 } from '@core/encryption/utils/bytes/binstruct';
 import { BufferCursor } from '@core/encryption/utils/bytes/BufferCursor';
 
 const emptyCounter = new Uint8Array(4);
@@ -69,75 +68,88 @@ export class XChaCha20Poly1305 {
 }
 
 const ChaChaHeader = struct({
+	nonce: bytes(24),
 	chunkSize: u32(),
 	length: u64(),
 });
 
-// TODO: provide custom random generator
+const createCounter = () => {
+	const buffer = new Uint8Array(4);
+	const view = new DataView(buffer.buffer);
+	const increment = () => {
+		view.setUint32(0, view.getUint32(0) + 1);
+	};
+
+	return { buffer, view, increment };
+};
+
+const TAG_SIZE = 16;
+
 export class XChaCha20Cipher implements IEncryptionProcessor {
 	private readonly chunkSize;
 	constructor(
 		private readonly key: Uint8Array,
+		private readonly randomBytes: RandomBytesGenerator,
 		readonly config: { chunkSize?: number } = {},
 	) {
 		this.chunkSize = config.chunkSize ?? 4096;
 	}
 
 	public async encrypt(buffer: ArrayBuffer) {
-		await sodium.ready;
+		const nonce = this.randomBytes(24);
+		const cipher = new XChaCha20Poly1305(this.key, nonce);
 
-		// Allocate output buffer as buffer size + chunks overhead + header size
-		const chunksCount = Math.ceil(buffer.byteLength / this.chunkSize);
-		const outBuffer = new Uint8Array(
-			ChaChaHeader.size +
-				buffer.byteLength +
-				chunksCount * sodium.crypto_secretstream_xchacha20poly1305_ABYTES +
-				sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES,
-		);
+		try {
+			await cipher.load();
 
-		const input = new BufferCursor(buffer);
-		const output = new BufferCursor(outBuffer.buffer);
-
-		output.writeBytes(
-			ChaChaHeader.encode({
-				length: BigInt(buffer.byteLength),
-				chunkSize: this.chunkSize,
-			}),
-		);
-
-		// Start encryption
-		const { state: state_out, header } =
-			sodium.crypto_secretstream_xchacha20poly1305_init_push(this.key);
-
-		output.writeBytes(header);
-		while (true) {
-			const chunkBytes = input.readBytes(this.chunkSize);
-
-			// We break the loop below, when no more bytes remains in reader
-			// So if we can't read bytes here, it is unexpected and it is critical situation
-			if (chunkBytes === null) throw new Error('Unexpected end of input buffer');
-
-			const isLastChunk = input.getRemainingBytes() === 0;
-			const encryptedBytes = sodium.crypto_secretstream_xchacha20poly1305_push(
-				state_out,
-				chunkBytes,
-				null,
-				isLastChunk
-					? sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL
-					: sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
+			// Allocate output buffer as buffer size + chunks overhead + header size
+			const chunksCount = Math.ceil(buffer.byteLength / this.chunkSize);
+			const outBuffer = new Uint8Array(
+				ChaChaHeader.size + buffer.byteLength + chunksCount * TAG_SIZE,
 			);
 
-			output.writeBytes(encryptedBytes);
+			const input = new BufferCursor(buffer);
+			const output = new BufferCursor(outBuffer.buffer);
 
-			if (isLastChunk) break;
+			output.writeBytes(
+				ChaChaHeader.encode({
+					nonce,
+					length: BigInt(buffer.byteLength),
+					chunkSize: this.chunkSize,
+				}),
+			);
+
+			// Start encryption
+			const counter = createCounter();
+			while (true) {
+				const chunkBytes = input.readBytes(this.chunkSize);
+
+				// We break the loop below, when no more bytes remains in reader
+				// So if we can't read bytes here, it is unexpected and it is critical situation
+				if (chunkBytes === null)
+					throw new Error('Unexpected end of input buffer');
+
+				const isLastChunk = input.getRemainingBytes() === 0;
+
+				// TODO: add final tag (aad)
+				const { ciphertext, mac } = cipher.encrypt(chunkBytes, {
+					counter: counter.buffer,
+				});
+				output.writeBytes(ciphertext);
+				output.writeBytes(mac);
+
+				if (isLastChunk) break;
+				counter.increment();
+			}
+
+			return outBuffer.buffer;
+		} catch (error) {
+			cipher.dispose();
+			throw error;
 		}
-
-		return outBuffer.buffer;
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
-		await sodium.ready;
-
 		const input = new BufferCursor(buffer);
 
 		const metaHeader = input.readBytes(ChaChaHeader.size);
@@ -148,39 +160,25 @@ export class XChaCha20Cipher implements IEncryptionProcessor {
 		const outBuffer = new Uint8Array(Number(meta.length)).buffer;
 		const output = new BufferCursor(outBuffer);
 
-		const cipherHeader = input.readBytes(
-			sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES,
-		);
-		if (
-			!cipherHeader ||
-			cipherHeader.byteLength !==
-				sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES
-		)
-			throw new Error('Cannot read sodium header');
-
 		// Decrypt data
-		const state_in = sodium.crypto_secretstream_xchacha20poly1305_init_pull(
-			cipherHeader,
-			this.key,
-		);
-
+		const cipher = new XChaCha20Poly1305(this.key, meta.nonce);
+		const counter = createCounter();
 		while (true) {
-			const bytes = input.readBytes(
-				meta.chunkSize + sodium.crypto_secretstream_xchacha20poly1305_ABYTES,
-			);
+			const bytes = input.readBytes(meta.chunkSize + TAG_SIZE);
 
 			// End of data
 			if (bytes === null) break;
 
-			const r = sodium.crypto_secretstream_xchacha20poly1305_pull(
-				state_in,
-				bytes,
-				null,
-			);
+			const dataBytesLen = bytes.byteLength - TAG_SIZE;
+			if (0 > dataBytesLen) throw new RangeError('Too short chunk');
 
-			if (!r) throw new Error('Unexpected response from sodium');
+			const data = bytes.subarray(0, dataBytesLen);
+			const mac = bytes.subarray(dataBytesLen);
 
-			output.writeBytes(r.message);
+			const plaintext = cipher.decrypt(data, mac, { counter: counter.buffer });
+			counter.increment();
+
+			output.writeBytes(plaintext);
 		}
 
 		return outBuffer.slice(0);
