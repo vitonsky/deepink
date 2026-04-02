@@ -1,8 +1,72 @@
 /* eslint-disable camelcase */
-import sodium from 'libsodium-wrappers';
+import sodium from 'libsodium-wrappers-sumo';
 import { IEncryptionProcessor } from '@core/encryption';
 import { struct, u32, u64 } from '@core/encryption/utils/bytes/binstruct';
 import { BufferCursor } from '@core/encryption/utils/bytes/BufferCursor';
+
+const emptyCounter = new Uint8Array(4);
+
+export class XChaCha20Poly1305 {
+	private readonly key;
+	private readonly nonce;
+	constructor(key: Uint8Array, iv: Uint8Array, hChaCha20Const?: Uint8Array) {
+		// Derive a key
+		this.key = sodium.crypto_core_hchacha20(
+			new Uint8Array(iv).slice(0, 16),
+			key,
+			hChaCha20Const ?? null,
+		);
+
+		this.nonce = new Uint8Array(12);
+		this.nonce.set(new Uint8Array(iv).slice(16), 4);
+	}
+
+	/**
+	 * Load WASM module
+	 */
+	public load() {
+		return sodium.ready;
+	}
+
+	public dispose() {
+		sodium.memzero(this.key);
+		sodium.memzero(this.nonce);
+	}
+
+	public encrypt(
+		plaintext: Uint8Array,
+		{ aad, counter }: { aad?: Uint8Array; counter?: Uint8Array } = {},
+	) {
+		const nonce = this.nonce;
+		nonce.set(counter ? counter : emptyCounter);
+
+		return sodium.crypto_aead_chacha20poly1305_ietf_encrypt_detached(
+			plaintext,
+			aad ?? null,
+			null,
+			nonce,
+			this.key,
+		);
+	}
+
+	public decrypt(
+		ciphertext: Uint8Array,
+		mac: Uint8Array,
+		{ aad, counter }: { aad?: Uint8Array; counter?: Uint8Array } = {},
+	) {
+		const nonce = this.nonce;
+		nonce.set(counter ? counter : emptyCounter);
+
+		return sodium.crypto_aead_chacha20poly1305_ietf_decrypt_detached(
+			null,
+			ciphertext,
+			mac,
+			aad ?? null,
+			nonce,
+			this.key,
+		);
+	}
+}
 
 const ChaChaHeader = struct({
 	chunkSize: u32(),

@@ -1,6 +1,8 @@
 /* eslint-disable @cspell/spellchecker */
 import sodium from 'libsodium-wrappers-sumo';
 
+import { XChaCha20Poly1305 } from '.';
+
 describe('draft-arciszewski-xchacha-01', () => {
 	// Source: https://www.potaroo.net/ietf/all-ids/draft-arciszewski-xchacha-01.html
 
@@ -117,28 +119,22 @@ describe('draft-arciszewski-xchacha-01', () => {
 			).toStrictEqual(new Uint8Array(poly1305Key));
 		});
 
-		test('XChaCha20-Poly1305 may be implemented from ChaCha20 AEAD + HChaCha20 primitives', async () => {
-			await sodium.ready;
+		test('XChaCha20-Poly1305 wrapper', async () => {
+			const cipher = new XChaCha20Poly1305(key, iv);
 
-			const nonce = new Uint8Array(
-				Buffer.concat([new Uint8Array(4), new Uint8Array(iv).slice(16)]),
-			);
-			expect(
-				sodium.crypto_aead_chacha20poly1305_ietf_encrypt_detached(
-					plaintext,
-					aad,
-					null,
-					nonce,
-					sodium.crypto_core_hchacha20(
-						new Uint8Array(iv).slice(0, 16),
-						key,
-						null,
-					),
-				),
-			).toStrictEqual({
+			await cipher.load();
+
+			const encryptionResult = cipher.encrypt(plaintext, { aad });
+			expect(encryptionResult).toStrictEqual({
 				ciphertext: new Uint8Array(expectedCt),
 				mac: new Uint8Array(tag),
 			});
+
+			expect(
+				cipher.decrypt(encryptionResult.ciphertext, encryptionResult.mac, {
+					aad,
+				}),
+			).toStrictEqual(new Uint8Array(plaintext));
 		});
 
 		test('XChaCha20-Poly1305 detached mode', async () => {
