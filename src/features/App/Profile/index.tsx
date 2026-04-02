@@ -62,7 +62,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
-	const { handleError: handleVaultError } = useVaultError();
+	const handleVaultError = useVaultError();
 
 	const getVaultState = useVaultState({
 		sync: Object.keys(workspaces).length > 0,
@@ -132,6 +132,10 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 		return () => {
 			isProfileLoadCancelled = true;
+
+			// close vault while unmount
+			controls.close();
+
 			dispatch(
 				workspacesApi.removeProfile({
 					profileId,
@@ -139,6 +143,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			);
 		};
 	}, [
+		controls,
 		controls.profile.files,
 		dispatch,
 		getVaultState,

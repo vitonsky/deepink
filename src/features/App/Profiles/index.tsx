@@ -40,7 +40,7 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 						value={controls}
 						key={profile.profile.id}
 					>
-						<VaultErrorProvider>
+						<VaultErrorProvider controls={controls}>
 							<VaultStorage value={profile.files}>
 								<Profile profile={profile} controls={controls} />
 							</VaultStorage>
