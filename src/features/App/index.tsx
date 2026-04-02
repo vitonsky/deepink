@@ -38,19 +38,24 @@ export const App: FC = () => {
 	const profilesList = useProfilesList();
 	const profileContainers = useProfileContainers();
 	const openProfile = useOpenProfile(profileContainers);
+	const recentProfile = useRecentProfile(config);
 
-	const [currentProfileId, setCurrentProfileId] = useProfileSelector(config);
-	const currentProfileObject = useMemo(() => {
-		if (!currentProfileId) return null;
-		return profilesList.profiles.find((p) => p.id === currentProfileId) ?? null;
-	}, [currentProfileId, profilesList.profiles]);
+	const [currentVaultId, setCurrentVaultId] = useProfileSelector(config);
+	const [isVaultOpening, setIsVaultOpening] = useState(false);
+	const [screenName, setScreenName] = useState<'createVault' | 'chooseVault'>(
+		'chooseVault',
+	);
+
+	const currentVault = useMemo(
+		() => profilesList.profiles.find((p) => p.id === currentVaultId) ?? null,
+		[currentVaultId, profilesList.profiles],
+	);
 
 	const toast = useToast();
 	const showErrorToast = useCallback(
 		(name: string) => {
 			toast({
 				status: 'error',
-				isClosable: true,
 				title: 'Failed to open vault',
 				description: `"${name}" appears to be corrupted.`,
 				containerStyle: { maxW: '400px' },
@@ -58,20 +63,38 @@ export const App: FC = () => {
 		},
 		[toast],
 	);
+
+	const onOpenVault = useCallback(
+		async (profile: ProfileObject, password?: string) => {
+			setIsVaultOpening(true);
+			try {
+				setCurrentVaultId(profile.id);
+				return await openProfile(profile, password);
+			} catch (error) {
+				setScreenName('chooseVault');
+				showErrorToast(profile.name);
+
+				throw error;
+			} finally {
+				setIsVaultOpening(false);
+			}
+		},
+		[openProfile, setCurrentVaultId, showErrorToast],
+	);
+
 	// When the active vault changes, close any open error toast
 	useEffect(() => {
 		toast.closeAll();
-	}, [currentProfileId, toast]);
+	}, [currentVaultId, toast]);
 
 	// Restore and auto-open recent profile
-	const recentProfile = useRecentProfile(config);
 	const [isProfileAutoOpening, setIsProfileAutoOpening] = useState(false);
 	useEffect(
 		() => {
 			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
 
 			// Restore profile id
-			setCurrentProfileId(recentProfile.profileId);
+			setCurrentVaultId(recentProfile.profileId);
 
 			const profile = profilesList.profiles.find(
 				(profile) => profile.id === recentProfile.profileId,
@@ -81,7 +104,6 @@ export const App: FC = () => {
 
 			// Automatically open profile with no encryption
 			setIsProfileAutoOpening(true);
-
 			openProfile(profile)
 				.catch(() => showErrorToast(profile.name))
 				.finally(() => setIsProfileAutoOpening(false));
@@ -91,28 +113,6 @@ export const App: FC = () => {
 		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
 	);
 
-	const hasNoVaults = profilesList.profiles.length === 0;
-	const [profileScreen, setProfileScreen] = useState<'createProfile' | 'chooseProfile'>(
-		'chooseProfile',
-	);
-	const [isProfileOpening, setIsProfileOpening] = useState(false);
-	const handleOpenProfile = useCallback(
-		async (profile: ProfileObject, password?: string) => {
-			setIsProfileOpening(true);
-			try {
-				return await openProfile(profile, password);
-			} catch (error) {
-				setProfileScreen('chooseProfile');
-				showErrorToast(profile.name);
-
-				throw error;
-			} finally {
-				setIsProfileOpening(false);
-			}
-		},
-		[openProfile, showErrorToast],
-	);
-
 	// Show splash screen while app is loading
 	const isAppLoading =
 		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileAutoOpening;
@@ -120,7 +120,7 @@ export const App: FC = () => {
 	if (isSplashVisible) return <SplashScreen />;
 
 	// Main vault screen
-	if (profileContainers.activeProfile && !isProfileOpening) {
+	if (profileContainers.activeProfile && !isVaultOpening) {
 		return (
 			<Box
 				sx={{
@@ -136,14 +136,14 @@ export const App: FC = () => {
 	}
 
 	// Login form stays visible while vault is opening — splash is skipped
-	if (currentProfileObject?.encryption) {
+	if (currentVault?.encryption) {
 		return (
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<Box maxW="500px" minW="350px" padding="1rem">
 					<ProfileLoginForm
-						profile={currentProfileObject}
-						onLogin={handleOpenProfile}
-						onPickAnotherProfile={() => setCurrentProfileId(null)}
+						profile={currentVault}
+						onLogin={onOpenVault}
+						onPickAnotherProfile={() => setCurrentVaultId(null)}
 					/>
 				</Box>
 			</Box>
@@ -151,40 +151,32 @@ export const App: FC = () => {
 	}
 
 	// Show splash while profile is opening
-	if (isProfileOpening) return <SplashScreen />;
+	if (isVaultOpening) return <SplashScreen />;
 
-	if (profileScreen === 'createProfile' || hasNoVaults) {
+	if (screenName === 'createVault' || profilesList.profiles.length === 0) {
 		return (
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<Box maxW="500px" minW="350px" padding="1rem">
 					<ProfileCreator
 						onCreateProfile={async (profile) => {
-							setIsProfileOpening(true);
-
+							setIsVaultOpening(true);
 							try {
-								const newProfile =
-									await profilesList.createProfile(profile);
-								await openProfile(
-									newProfile,
-									profile.password ?? undefined,
-								);
-
-								setCurrentProfileId(newProfile.id);
-							} catch (error) {
-								setProfileScreen('chooseProfile');
-								showErrorToast(profile.name);
-								throw error;
+								const created = await profilesList.createProfile(profile);
+								await onOpenVault(created, profile.password ?? undefined);
+								setScreenName('chooseVault');
 							} finally {
-								setIsProfileOpening(false);
+								setIsVaultOpening(false);
 							}
 						}}
 						onCancel={
-							hasNoVaults
+							profilesList.profiles.length === 0
 								? undefined
-								: () => setProfileScreen('chooseProfile')
+								: () => setScreenName('chooseVault')
 						}
 						defaultProfileName={
-							hasNoVaults ? getRandomItem(defaultVaultNames) : undefined
+							profilesList.profiles.length === 0
+								? getRandomItem(defaultVaultNames)
+								: undefined
 						}
 					/>
 				</Box>
@@ -202,7 +194,7 @@ export const App: FC = () => {
 							variant="accent"
 							size="lg"
 							w="100%"
-							onClick={() => setProfileScreen('createProfile')}
+							onClick={() => setScreenName('createVault')}
 						>
 							Create new profile
 						</Button>
@@ -230,10 +222,10 @@ export const App: FC = () => {
 										gap: '.8rem',
 									}}
 									onClick={() => {
-										setCurrentProfileId(profile.id);
+										setCurrentVaultId(profile.id);
 
 										if (profile.encryption === null) {
-											handleOpenProfile(profile);
+											onOpenVault(profile);
 										}
 
 										telemetry.track(
