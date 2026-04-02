@@ -47,8 +47,8 @@ const ciphers: {
 	},
 	{
 		name: 'XChaCha20',
-		async create(key) {
-			return new XChaCha20Cipher(key);
+		async create(key, randomBytes) {
+			return new XChaCha20Cipher(key, randomBytes);
 		},
 	},
 	{
@@ -146,6 +146,35 @@ ciphers.map((cipher) =>
 					originalData,
 				);
 			}
+		});
+
+		test('Must not leak patterns', async () => {
+			const key = getRandomBytes(32);
+			const codec = await cipher.create(key, getRandomBytes);
+
+			// 1. highly repetitive input
+			const input = new Uint8Array(10_000).fill(0x41);
+
+			const ct = await codec.encrypt(input.buffer).then(
+				(buffer) =>
+					// TODO: do not use null bytes. Make all ciphertext are unique
+					// Cut the headers with null bytes
+					new Uint8Array(buffer, 1000),
+			);
+
+			// 2. sliding window duplicate detection
+			const window = 8; // small, mode-agnostic
+			const seen = new Set<string>();
+
+			for (let i = 0; i <= ct.length - window; i++) {
+				const slice = ct.subarray(i, i + window);
+				const key = Buffer.from(slice).toString('hex');
+
+				expect(seen.has(key), key).toBe(false);
+				seen.add(key);
+			}
+
+			expect(true).toBe(true);
 		});
 
 		// Verify vectors only for ciphers, not its combinations
