@@ -29,9 +29,7 @@ export const useWorkspaceConfigSync = () => {
 			onChange(config) {
 				if (!config) return;
 
-				workspaceConfig.set(config).then(() => {
-					console.debug('Workspace config is saved');
-				});
+				workspaceConfig.set(config);
 			},
 		});
 	}, [workspaceStorage, watchSelector, workspaceData, isWorkspaceConfigLoaded]);

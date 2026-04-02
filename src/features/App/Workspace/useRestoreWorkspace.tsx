@@ -28,7 +28,7 @@ export const useRestoreWorkspace = () => {
 	const updateNoteListRef = useRef(updateNoteList);
 	updateNoteListRef.current = updateNoteList;
 
-	const handleError = useWorkspaceError();
+	const handleWorkspaceError = useWorkspaceError();
 
 	useEffect(() => {
 		const workspaceState = createWorkspaceStateFile(workspaceStorage);
@@ -105,7 +105,7 @@ export const useRestoreWorkspace = () => {
 				);
 			})
 			.catch((error) => {
-				handleError(error);
+				handleWorkspaceError(error);
 			});
 	}, [
 		dispatch,
@@ -113,6 +113,6 @@ export const useRestoreWorkspace = () => {
 		workspaceStorage,
 		notesRegistry,
 		tagsRegistry,
-		handleError,
+		handleWorkspaceError,
 	]);
 };

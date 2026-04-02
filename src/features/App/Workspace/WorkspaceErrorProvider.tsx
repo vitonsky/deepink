@@ -21,7 +21,7 @@ export const WorkspaceErrorProvider: FC<
 			console.error(error);
 			onError(error, workspaceData.workspaceId);
 
-			// Reset the workspace to default
+			// Reset corrupted workspace to default state
 			dispatch(workspacesApi.resetWorkspace(workspaceData));
 
 			telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_OPEN_FAILED);
