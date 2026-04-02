@@ -68,7 +68,6 @@ export const App: FC = () => {
 		async (profile: ProfileObject, password?: string) => {
 			setIsVaultOpening(true);
 			try {
-				setCurrentVaultId(profile.id);
 				return await openProfile(profile, password);
 			} catch (error) {
 				setScreenName('chooseVault');
@@ -79,7 +78,7 @@ export const App: FC = () => {
 				setIsVaultOpening(false);
 			}
 		},
-		[openProfile, setCurrentVaultId, showErrorToast],
+		[openProfile, showErrorToast],
 	);
 
 	// When the active vault changes, close any open error toast
@@ -153,7 +152,8 @@ export const App: FC = () => {
 	// Show splash while profile is opening
 	if (isVaultOpening) return <SplashScreen />;
 
-	if (screenName === 'createVault' || profilesList.profiles.length === 0) {
+	const hasNoProfiles = profilesList.profiles.length === 0;
+	if (screenName === 'createVault' || hasNoProfiles) {
 		return (
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<Box maxW="500px" minW="350px" padding="1rem">
@@ -161,22 +161,29 @@ export const App: FC = () => {
 						onCreateProfile={async (profile) => {
 							setIsVaultOpening(true);
 							try {
-								const created = await profilesList.createProfile(profile);
-								await onOpenVault(created, profile.password ?? undefined);
-								setScreenName('chooseVault');
+								const newProfile =
+									await profilesList.createProfile(profile);
+								try {
+									await openProfile(
+										newProfile,
+										profile.password || undefined,
+									);
+
+									setCurrentVaultId(newProfile.id);
+								} catch (error) {
+									showErrorToast(profile.name);
+									throw error;
+								}
 							} finally {
+								setScreenName('chooseVault');
 								setIsVaultOpening(false);
 							}
 						}}
 						onCancel={
-							profilesList.profiles.length === 0
-								? undefined
-								: () => setScreenName('chooseVault')
+							hasNoProfiles ? undefined : () => setScreenName('chooseVault')
 						}
 						defaultProfileName={
-							profilesList.profiles.length === 0
-								? getRandomItem(defaultVaultNames)
-								: undefined
+							hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
 						}
 					/>
 				</Box>
