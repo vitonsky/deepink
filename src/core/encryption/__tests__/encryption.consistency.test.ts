@@ -2,7 +2,7 @@ import crc32 from 'crc/calculators/crc32';
 import { webcrypto } from 'crypto';
 
 import { AESGCMCipher } from '../ciphers/AES';
-import { TwofishCTRCipher } from '../ciphers/Twofish';
+import { WasmTwofishCTRCipher } from '../ciphers/Twofish';
 import { BufferIntegrityProcessor } from '../processors/BufferIntegrityProcessor';
 import { BufferSizeObfuscationProcessor } from '../processors/BufferSizeObfuscationProcessor';
 import { PipelineProcessor } from '../processors/PipelineProcessor';
@@ -52,7 +52,7 @@ test('composed processors returns idempotent result', async () => {
 	const cipher = new PipelineProcessor([
 		new BufferIntegrityProcessor(),
 		new BufferSizeObfuscationProcessor(getRandomBytesMock),
-		new TwofishCTRCipher(keys.twofish, getRandomBytesMock),
+		new WasmTwofishCTRCipher(keys.twofish, getRandomBytesMock),
 		new AESGCMCipher(keys.aes, getRandomBytesMock),
 	]);
 
@@ -69,15 +69,13 @@ test('composed processors returns idempotent result', async () => {
 	const encryptedBytes2 = await cipher.encrypt(
 		new TextEncoder().encode(textSample).buffer,
 	);
-	expect(new Uint32Array(encryptedBytes)).toStrictEqual(
-		new Uint32Array(encryptedBytes2),
-	);
+	expect(new Uint8Array(encryptedBytes)).toStrictEqual(new Uint8Array(encryptedBytes2));
 
 	// Encryption for 2 different texts must not be equal
 	const encryptedBytes3 = await cipher.encrypt(
 		new TextEncoder().encode('Another text').buffer,
 	);
-	expect(new Uint32Array(encryptedBytes)).not.toEqual(new Uint32Array(encryptedBytes3));
+	expect(new Uint8Array(encryptedBytes)).not.toEqual(new Uint8Array(encryptedBytes3));
 
 	// Random bytes decryption must throw exception, because integrity check error
 	const randomBytes = getRandomBytesMock(800).buffer;

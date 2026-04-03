@@ -2,6 +2,7 @@
 /* eslint-disable no-bitwise */
 import { describe, expect, it } from 'vitest';
 
+import { xor16 } from '../utils/xor';
 import { CTRCipherMode } from './CTRCipherMode';
 
 const makeXorEncrypt =
@@ -9,9 +10,15 @@ const makeXorEncrypt =
 	(buffer: Uint8Array): Uint8Array =>
 		new Uint8Array(buffer.map((b) => b ^ key));
 
+// We preallocate the RAM and re-use it,
+// since only one XOR buffer is used at once,
+// and we synchronously read the result before run next XOR
+const xorBuffer = new Uint8Array(16);
+const xor = (a: Uint8Array, b: Uint8Array) => xor16(xorBuffer, a, b);
+
 describe('CTRCipherMode', () => {
 	it('output length equals input length', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0xab));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0xab), xor);
 		const iv = new Uint8Array(16).fill(0x00);
 		const plaintext = new Uint8Array(32).fill(0x42);
 		const ciphertext = await ctr.encrypt(plaintext, iv);
@@ -19,7 +26,7 @@ describe('CTRCipherMode', () => {
 	});
 
 	it('encrypt is its own inverse (decrypt = encrypt)', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0xab));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0xab), xor);
 		const iv = new Uint8Array(16).fill(0x00);
 		const plaintext = new Uint8Array(32).fill(0x42);
 		const ciphertext = await ctr.encrypt(plaintext, iv);
@@ -28,7 +35,7 @@ describe('CTRCipherMode', () => {
 	});
 
 	it('different IVs produce different ciphertexts', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0xab));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0xab), xor);
 		const plaintext = new Uint8Array(16).fill(0x42);
 		const ct1 = await ctr.encrypt(plaintext, new Uint8Array(16).fill(0x00));
 		const ct2 = await ctr.encrypt(plaintext, new Uint8Array(16).fill(0x01));
@@ -36,7 +43,7 @@ describe('CTRCipherMode', () => {
 	});
 
 	it('does not mutate the IV', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0xab));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0xab), xor);
 		const iv = new Uint8Array(16).fill(0x00);
 		const ivCopy = new Uint8Array(iv);
 		await ctr.encrypt(new Uint8Array(48).fill(0x42), iv);
@@ -44,7 +51,7 @@ describe('CTRCipherMode', () => {
 	});
 
 	it('does not mutate the plaintext', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0xab));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0xab), xor);
 		const iv = new Uint8Array(16).fill(0x00);
 		const plaintext = new Uint8Array(48).fill(0x42);
 		const snapshot = new Uint8Array(plaintext);
@@ -53,7 +60,7 @@ describe('CTRCipherMode', () => {
 	});
 
 	it('handles empty input', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0xab));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0xab), xor);
 		const iv = new Uint8Array(16).fill(0x00);
 		const result = await ctr.encrypt(new Uint8Array(0), iv);
 		expect(result.length).toBe(0);
@@ -69,7 +76,7 @@ const identityEncrypt = (buffer: Uint8Array): Uint8Array => new Uint8Array(buffe
 
 describe('CTRCipherMode – cryptographic correctness', () => {
 	it('ciphertext equals plaintext XOR keystream', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0xab));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0xab), xor);
 		const iv = new Uint8Array(16).fill(0x00);
 
 		// encrypting zeros gives raw keystream (0 XOR KS = KS)
@@ -82,7 +89,7 @@ describe('CTRCipherMode – cryptographic correctness', () => {
 	});
 
 	it('each block is encrypted with a unique counter', async () => {
-		const ctr = new CTRCipherMode(identityEncrypt);
+		const ctr = new CTRCipherMode(identityEncrypt, xor);
 		const iv = new Uint8Array(16).fill(0x00);
 
 		const ciphertext = await ctr.encrypt(new Uint8Array(48).fill(0x00), iv);
@@ -95,7 +102,7 @@ describe('CTRCipherMode – cryptographic correctness', () => {
 	});
 
 	it('counter increments consistently between blocks', async () => {
-		const ctr = new CTRCipherMode(identityEncrypt);
+		const ctr = new CTRCipherMode(identityEncrypt, xor);
 		const iv = new Uint8Array(16).fill(0x00);
 
 		const ciphertext = await ctr.encrypt(new Uint8Array(48).fill(0x00), iv);
@@ -112,7 +119,7 @@ describe('CTRCipherMode – cryptographic correctness', () => {
 	});
 
 	it.todo('partial last block uses only the required keystream bytes', async () => {
-		const ctr = new CTRCipherMode(identityEncrypt);
+		const ctr = new CTRCipherMode(identityEncrypt, xor);
 		const iv = new Uint8Array(16).fill(0x00);
 
 		const partial = await ctr.encrypt(new Uint8Array(19).fill(0x00), iv);
@@ -124,7 +131,7 @@ describe('CTRCipherMode – cryptographic correctness', () => {
 	});
 
 	it('keystream is consistent regardless of message length', async () => {
-		const ctr = new CTRCipherMode(makeXorEncrypt(0x42));
+		const ctr = new CTRCipherMode(makeXorEncrypt(0x42), xor);
 		const iv = new Uint8Array(16).fill(0x00);
 		const plaintext = new Uint8Array(48).fill(0xaa);
 
