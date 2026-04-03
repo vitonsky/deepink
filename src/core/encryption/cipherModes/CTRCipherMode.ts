@@ -15,6 +15,15 @@ export class CTRCipherMode {
 			throw new TypeError(
 				`Buffer size is not multiple to ${this.blockSize}. Did you missed to add padding?`,
 			);
+
+		// (2**(8*4) * 16) / (1024 ** 3) = 64Gb is a total size may be encrypted with block size = 16
+		// Next blocks would repeat the sequence, so we cannot allow to continue
+		const maxBytesLength = 2 ** 32 * this.blockSize;
+		if (buffer.byteLength > maxBytesLength)
+			throw new RangeError(
+				`Buffer size ${buffer.byteLength} is out of bytes length that may be encrypted safely via 4bytes counter (${maxBytesLength})`,
+			);
+
 		if (iv.byteLength + 4 < this.blockSize)
 			throw new TypeError(
 				`Initialization vector have only ${iv.byteLength} bytes. It is too small and must be at least ${this.blockSize - 4}`,
