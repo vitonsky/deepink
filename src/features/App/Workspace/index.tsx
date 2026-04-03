@@ -28,7 +28,7 @@ export interface WorkspaceProps {
 	profile: ProfileContainer;
 }
 
-const WorkspaceSetup = () => {
+const WorkspaceLoader = () => {
 	useRestoreWorkspace();
 	return null;
 };
@@ -100,14 +100,13 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 			>
 				<WorkspaceServices />
 
-				{isWorkspaceLoaded ? (
+				{!isWorkspaceLoaded && <WorkspaceLoader />}
+				{isWorkspaceLoaded && (
 					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
 						<MainScreen />
 						<WorkspaceStatusBarItems />
 						<SettingsWindow />
 					</WorkspaceModalProvider>
-				) : (
-					<WorkspaceSetup />
 				)}
 			</WorkspaceProvider>
 		</Box>

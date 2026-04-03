@@ -133,7 +133,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		return () => {
 			isProfileLoadCancelled = true;
 
-			// close vault while unmount
+			// Close vault on unmount
 			controls.close();
 
 			dispatch(
@@ -189,8 +189,15 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			leading: true,
 		},
 	);
-	const onError = useCallback((error: Error, workspaceId: string) => {
+	const onWorkspaceError = useCallback((error: Error, workspaceId: string) => {
 		setWorkspaceErrors((prev) => ({ ...prev, [workspaceId]: error }));
+	}, []);
+	const onWorkspaceErrorReset = useCallback((workspaceId: string) => {
+		setWorkspaceErrors((prev) => {
+			const updated = { ...prev };
+			delete updated[workspaceId];
+			return updated;
+		});
 	}, []);
 
 	return (
@@ -199,15 +206,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			{workspaces.length > 0 && <ProfileServices />}
 
 			{activeWorkspaceError && (
-				<WorkspaceError
-					resetError={(workspaceId: string) => {
-						setWorkspaceErrors((prev) => {
-							const updated = { ...prev };
-							delete updated[workspaceId];
-							return updated;
-						});
-					}}
-				/>
+				<WorkspaceError onWorkspaceErrorReset={onWorkspaceErrorReset} />
 			)}
 
 			{workspaces.map((workspace) =>
@@ -217,7 +216,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						value={{ profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<WorkspaceErrorProvider onError={onError}>
+							<WorkspaceErrorProvider onError={onWorkspaceError}>
 								<Workspace profile={currentProfile} />
 							</WorkspaceErrorProvider>
 							<ProfileStatusBar />
