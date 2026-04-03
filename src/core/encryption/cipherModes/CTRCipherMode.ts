@@ -1,5 +1,3 @@
-import { xor16 } from '../utils/xor';
-
 /**
  * Stream cipher with counter implementation
  * Read more on https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR)
@@ -8,6 +6,7 @@ import { xor16 } from '../utils/xor';
 export class CTRCipherMode {
 	constructor(
 		private readonly encryptBuffer: (buffer: Uint8Array) => Uint8Array,
+		private readonly xor: (a: Uint8Array, b: Uint8Array) => Uint8Array,
 		private readonly blockSize = 16,
 	) {}
 
@@ -16,20 +15,16 @@ export class CTRCipherMode {
 			throw new TypeError(
 				`Buffer size is not multiple to ${this.blockSize}. Did you missed to add padding?`,
 			);
-		if (iv.byteLength + 4 !== this.blockSize)
+		if (iv.byteLength + 4 < this.blockSize)
 			throw new TypeError(
-				`Initialization vector have size ${iv.byteLength} bytes + 4 byte for 32bit counter = ${iv.byteLength + 4} byte. It does not match a block size`,
+				`Initialization vector have only ${iv.byteLength} bytes. It is too small and must be at least ${this.blockSize - 4}`,
 			);
 
 		const out = new Uint8Array(buffer.byteLength);
 
-		// We preallocate the RAM and re-use it,
-		// since only one XOR buffer is used at once
-		const xorBuffer = new Uint8Array(16);
-
 		// Layout is `nonce || counter`
 		const input = new Uint8Array(this.blockSize);
-		input.set(iv);
+		input.set(iv.slice(0, this.blockSize - 4));
 
 		const counterView = new DataView(input.buffer, this.blockSize - 4);
 
@@ -43,8 +38,7 @@ export class CTRCipherMode {
 			// TODO: provide an efficient xor function as dependency
 			// XOR unique sequence and block data,
 			// a data is a plain text for encryption and cipher text for decryption
-			const dataBlock = xor16(
-				xorBuffer,
+			const dataBlock = this.xor(
 				encryptedSequence,
 				buffer.subarray(offset, offset + this.blockSize),
 			);
