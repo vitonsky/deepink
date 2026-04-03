@@ -71,7 +71,7 @@ expose(
 						32 * 8,
 					);
 
-					return new XChaCha20Cipher(new Uint8Array(key));
+					return new XChaCha20Cipher(new Uint8Array(key), getRandomBytes);
 				},
 			};
 
