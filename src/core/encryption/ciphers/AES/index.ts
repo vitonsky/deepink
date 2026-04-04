@@ -1,4 +1,3 @@
-/* eslint-disable @cspell/spellchecker */
 import { bytes, struct } from '@core/encryption/utils/bytes/binstruct';
 import { HKDFDerivedKeys } from '@core/encryption/utils/HKDFDerivedKeys';
 
@@ -16,7 +15,7 @@ const AESHeader = struct({
  * MDN: https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams
  * Algorithm recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
  */
-export class AESGCMCipher implements IEncryptionProcessor {
+export class AESCipher implements IEncryptionProcessor {
 	constructor(
 		private readonly key: Uint8Array<ArrayBuffer>,
 		private readonly randomBytesGenerator: RandomBytesGenerator,

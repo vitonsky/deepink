@@ -3,7 +3,7 @@ import { webcrypto } from 'node:crypto';
 import { ENCRYPTION_ALGORITHM } from '@core/features/encryption';
 import { formatAlgorithms } from '@core/features/encryption/utils';
 
-import { AESGCMCipher } from '../ciphers/AES';
+import { AESCipher } from '../ciphers/AES';
 import { SeprentCipher } from '../ciphers/Serpent';
 import { WasmTwofishCTRCipher } from '../ciphers/Twofish';
 import { XChaCha20Cipher } from '../ciphers/XChaCha20';
@@ -24,7 +24,7 @@ const ciphers: {
 	{
 		name: ENCRYPTION_ALGORITHM.AES,
 		async create(key, randomBytes) {
-			return new AESGCMCipher(key, randomBytes);
+			return new AESCipher(key, randomBytes);
 		},
 	},
 	{
@@ -62,9 +62,7 @@ const ciphers: {
 				...(await Promise.all([
 					derivedKeys
 						.getDerivedBits('AES', 32 * 8)
-						.then(
-							(key) => new AESGCMCipher(new Uint8Array(key), randomBytes),
-						),
+						.then((key) => new AESCipher(new Uint8Array(key), randomBytes)),
 					derivedKeys
 						.getDerivedBits('Twofish', 32 * 8)
 						.then(

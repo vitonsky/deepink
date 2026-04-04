@@ -1,7 +1,7 @@
 import crc32 from 'crc/calculators/crc32';
 import { webcrypto } from 'crypto';
 
-import { AESGCMCipher } from '../ciphers/AES';
+import { AESCipher } from '../ciphers/AES';
 import { WasmTwofishCTRCipher } from '../ciphers/Twofish';
 import { BufferIntegrityProcessor } from '../processors/BufferIntegrityProcessor';
 import { BufferSizeObfuscationProcessor } from '../processors/BufferSizeObfuscationProcessor';
@@ -53,7 +53,7 @@ test('composed processors returns idempotent result', async () => {
 		new BufferIntegrityProcessor(),
 		new BufferSizeObfuscationProcessor(getRandomBytesMock),
 		new WasmTwofishCTRCipher(keys.twofish, getRandomBytesMock),
-		new AESGCMCipher(keys.aes, getRandomBytesMock),
+		new AESCipher(keys.aes, getRandomBytesMock),
 	]);
 
 	const textSample = 'Hello world! This is encryption example text';

@@ -1,6 +1,6 @@
 import { Endpoint, expose, transfer } from 'comlink';
 import { IEncryptionProcessor } from '@core/encryption';
-import { AESGCMCipher } from '@core/encryption/ciphers/AES';
+import { AESCipher } from '@core/encryption/ciphers/AES';
 import { ensureWasmIsLoaded, SeprentCipher } from '@core/encryption/ciphers/Serpent';
 import { WasmTwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
 import { XChaCha20Cipher } from '@core/encryption/ciphers/XChaCha20';
@@ -36,7 +36,7 @@ expose(
 			> = {
 				[ENCRYPTION_ALGORITHM.AES]: async () => {
 					const key = await derivedKeys.getDerivedBits('aes-gcm', 256);
-					return new AESGCMCipher(new Uint8Array(key), getRandomBytes);
+					return new AESCipher(new Uint8Array(key), getRandomBytes);
 				},
 				[ENCRYPTION_ALGORITHM.TWOFISH]: async () => {
 					const key = await derivedKeys.getDerivedBits(

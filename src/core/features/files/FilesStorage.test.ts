@@ -1,5 +1,5 @@
 import { webcrypto } from 'crypto';
-import { AESGCMCipher } from '@core/encryption/ciphers/AES';
+import { AESCipher } from '@core/encryption/ciphers/AES';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { getDerivedKeysManager, getMasterKey } from '@core/encryption/utils/keys';
 
@@ -60,7 +60,7 @@ const systems: { name: string; init(): Promise<IFilesStorage> }[] = [
 			const fs = new InMemoryFS();
 			return new EncryptedFS(
 				fs,
-				new EncryptionController(new AESGCMCipher(aes, getRandomBytesMock)),
+				new EncryptionController(new AESCipher(aes, getRandomBytesMock)),
 			);
 		},
 	},
