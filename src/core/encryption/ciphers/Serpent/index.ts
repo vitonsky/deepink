@@ -1,24 +1,8 @@
 import { init, SerpentCtr } from 'leviathan-crypto';
 import { IEncryptionProcessor, RandomBytesGenerator } from '@core/encryption';
-import { fillBuffer, joinBuffers } from '@core/encryption/utils/buffers';
+import { getBlockPadding } from '@core/encryption/utils/buffers';
 import { bytes, struct, u8 } from '@core/encryption/utils/bytes/binstruct';
-
-/**
- * Inner util to transform block with cipher
- * Util creates a new buffer instead of mutate original buffer.
- */
-export function transformBuffer(
-	buffer: Uint8Array,
-	transformBlock: (offset: number, input: Uint8Array, output: Uint8Array) => void,
-	blockSize = 16,
-) {
-	const out = new Uint8Array(buffer.length);
-	for (let offset = 0; offset < buffer.length; offset += blockSize) {
-		transformBlock(offset, buffer, out);
-	}
-
-	return out;
-}
+import { BufferCursor } from '@core/encryption/utils/bytes/BufferCursor';
 
 let initStatus: boolean | Promise<void>;
 export async function ensureWasmIsLoaded() {
@@ -49,49 +33,77 @@ export class SeprentCipher implements IEncryptionProcessor {
 
 	public async encrypt(buffer: ArrayBuffer) {
 		await ensureWasmIsLoaded();
+		const inputReader = new BufferCursor(buffer);
 
+		const padding = getBlockPadding(buffer.byteLength, 16);
 		const iv = this.getRandomBytes(SERPENT_IV_SIZE);
-		const [bufferView, padding] = fillBuffer(new Uint8Array(buffer));
+
+		const output = new ArrayBuffer(SERPENT_HEADER.size + buffer.byteLength + padding);
+		const outputWriter = new BufferCursor(output);
+
+		outputWriter.writeBytes(SERPENT_HEADER.encode({ padding, iv }));
 
 		const cipher = new SerpentCtr({ dangerUnauthenticated: true });
 		cipher.beginEncrypt(this.key, iv);
-		const encryptedBuffer = transformBuffer(
-			bufferView,
-			(offset, input, output) => {
-				output.set(
-					cipher.encryptChunk(input.slice(offset, offset + chunkSize)),
-					offset,
-				);
-			},
-			chunkSize,
-		);
+
+		let chunk;
+		while ((chunk = inputReader.readBytes(chunkSize))) {
+			// Align the chunk
+			const requiredPadding = chunkSize % 16;
+			if (requiredPadding !== 0) {
+				if (requiredPadding !== padding)
+					new RangeError(
+						`Unexpected chunk size ${chunk.byteLength}. Expected padding is ${padding}, required padding is ${requiredPadding}`,
+					);
+
+				const chunkContent = chunk;
+				chunk = new Uint8Array(chunkContent.byteLength + padding);
+				chunk.set(new Uint8Array(chunkContent), 0);
+			}
+
+			outputWriter.writeBytes(cipher.encryptChunk(chunk));
+		}
+
 		cipher.dispose();
 
-		return joinBuffers([SERPENT_HEADER.encode({ padding, iv }), encryptedBuffer]);
+		return output;
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
 		await ensureWasmIsLoaded();
 
-		const bufferView = new Uint8Array(buffer);
-		const { padding, iv } = SERPENT_HEADER.decode(
-			bufferView.subarray(0, SERPENT_HEADER.size),
-		);
+		const inputReader = new BufferCursor(buffer);
+		const header = inputReader.readBytes(SERPENT_HEADER.size);
+		if (!header || header.byteLength !== SERPENT_HEADER.size)
+			throw new RangeError('Cannot read header');
+
+		const { padding, iv } = SERPENT_HEADER.decode(header);
+
+		if (inputReader.getRemainingBytes() % 16 !== 0)
+			throw new RangeError(
+				`Buffer payload is not aligned to 16 bytes. The actual size is ${inputReader.getRemainingBytes()}`,
+			);
+
+		const output = new ArrayBuffer(buffer.byteLength - padding - SERPENT_HEADER.size);
+		const outputWriter = new BufferCursor(output);
 
 		const cipher = new SerpentCtr({ dangerUnauthenticated: true });
-		cipher.beginEncrypt(this.key, iv);
-		const decryptedBuffer = transformBuffer(
-			bufferView.subarray(SERPENT_HEADER.size),
-			(offset, input, output) => {
-				output.set(
-					cipher.decryptChunk(input.slice(offset, offset + chunkSize)),
-					offset,
-				);
-			},
-			chunkSize,
-		);
+		cipher.beginDecrypt(this.key, iv);
+
+		let chunk;
+		while ((chunk = inputReader.readBytes(chunkSize))) {
+			const pt = cipher.encryptChunk(chunk);
+
+			const isLastChunk = inputReader.getRemainingBytes() === 0;
+			if (isLastChunk) {
+				outputWriter.writeBytes(pt.subarray(0, pt.length - padding));
+			} else {
+				outputWriter.writeBytes(pt);
+			}
+		}
+
 		cipher.dispose();
 
-		return decryptedBuffer.slice(0, decryptedBuffer.length - padding).buffer;
+		return output;
 	}
 }

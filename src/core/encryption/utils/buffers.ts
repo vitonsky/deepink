@@ -31,6 +31,10 @@ export function fillBuffer(buffer: Uint8Array, blockSize = 16): [Uint8Array, num
 	return [out, padding];
 }
 
+export function getBlockPadding(totalSize: number, blockSize = 16) {
+	return Math.ceil(totalSize / blockSize) * blockSize - totalSize;
+}
+
 /**
  * Buffer view to manipulate buffer slices
  */
