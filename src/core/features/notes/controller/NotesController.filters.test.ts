@@ -323,16 +323,16 @@ describe('data fetching', () => {
 			.get({ limit: 10 })
 			.then((notes) => notes.map((note) => note.id));
 
-		const notExistingNote = crypto.randomUUID();
+		const notExistingNoteId = crypto.randomUUID();
 
-		const shuffledNotes = [...notesId, notExistingNote].sort(
+		const shuffledIds = [...notesId, notExistingNoteId].sort(
 			() => Math.random() - 0.5,
 		);
 
-		const foundNotes = await registry.getById(shuffledNotes);
+		const foundNotes = await registry.getById(shuffledIds);
 		expect(foundNotes).toHaveLength(10);
 		expect(foundNotes).not.toContainEqual(
-			expect.objectContaining({ id: notExistingNote }),
+			expect.objectContaining({ id: notExistingNoteId }),
 		);
 	});
 });

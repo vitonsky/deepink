@@ -16,7 +16,7 @@ export const SplashScreen = () => {
 			<Text
 				sx={{
 					display: 'flex',
-					height: '100vh',
+					height: '100%',
 					width: '100%',
 					margin: 'auto',
 					justifyContent: 'center',

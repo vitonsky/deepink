@@ -70,12 +70,11 @@ export const App: FC = () => {
 			try {
 				return await openProfile(profile, password);
 			} catch (error) {
-				setScreenName('chooseVault');
 				showErrorToast(profile.name);
-
 				throw error;
 			} finally {
 				setIsVaultOpening(false);
+				setScreenName('chooseVault');
 			}
 		},
 		[openProfile, showErrorToast],
@@ -171,8 +170,8 @@ export const App: FC = () => {
 
 									setCurrentVaultId(newProfile.id);
 								} catch (error) {
+									console.error(error);
 									showErrorToast(profile.name);
-									throw error;
 								}
 							} finally {
 								setScreenName('chooseVault');
