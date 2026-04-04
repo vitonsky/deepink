@@ -10,18 +10,28 @@ export class CTRCipherMode {
 		private readonly blockSize = 16,
 	) {}
 
+	public static getEncryptionLimits(blockSize: number) {
+		// We use 4 bytes counter that is 32 bits
+		const counterStates = 2 ** 32;
+		return {
+			maxBlocks: counterStates,
+			maxBytes: counterStates * blockSize,
+		};
+	}
+
 	public async encrypt(buffer: Uint8Array, iv: Uint8Array) {
 		if (buffer.byteLength % this.blockSize !== 0)
 			throw new TypeError(
-				`Buffer size is not multiple to ${this.blockSize}. Did you missed to add padding?`,
+				`Buffer size ${buffer.byteLength} bytes is not multiple to ${this.blockSize}. Did you mean to add padding?`,
 			);
 
-		// (2**(8*4) * 16) / (1024 ** 3) = 64Gb is a total size may be encrypted with block size = 16
+		const limits = CTRCipherMode.getEncryptionLimits(this.blockSize);
+
+		// (2**32 * 16) / (1024 ** 3) = 64Gb is a total size may be encrypted with block size = 16
 		// Next blocks would repeat the sequence, so we cannot allow to continue
-		const maxBytesLength = 2 ** 32 * this.blockSize;
-		if (buffer.byteLength > maxBytesLength)
+		if (buffer.byteLength > limits.maxBytes)
 			throw new RangeError(
-				`Buffer size ${buffer.byteLength} is out of bytes length that may be encrypted safely via 4bytes counter (${maxBytesLength})`,
+				`Buffer size ${buffer.byteLength} is out of bytes length that may be encrypted safely via 4bytes counter (${limits.maxBytes})`,
 			);
 
 		if (iv.byteLength + 4 < this.blockSize)
