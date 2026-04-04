@@ -23,7 +23,6 @@ const ProfileProvider = ({
 
 	const profile = profileContainer.getContent();
 	const controls = useMemo(() => {
-		const profile = profileContainer.getContent();
 		return {
 			profile,
 			close: () => {
@@ -36,7 +35,7 @@ const ProfileProvider = ({
 				);
 			},
 		} satisfies ProfileControls;
-	}, [dispatch, profileContainer, profilesApi.events]);
+	}, [dispatch, profile, profileContainer, profilesApi.events]);
 
 	return (
 		<ProfileControlsContext.Provider value={controls}>

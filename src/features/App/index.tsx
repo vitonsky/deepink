@@ -118,7 +118,7 @@ export const App: FC = () => {
 	if (isSplashVisible) return <SplashScreen />;
 
 	// Main vault screen
-	if (profileContainers.activeProfile) {
+	if (profileContainers.activeProfile && !isVaultOpening) {
 		return (
 			<Box
 				sx={{
