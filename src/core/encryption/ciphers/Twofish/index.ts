@@ -68,7 +68,7 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 		const derivedKey = await hkdf.deriveBytes(16, `key`);
 		const chunksCount = Math.ceil(alignedInputLength / this.chunkSize);
 		const inputReader = new BufferCursor(buffer);
-		for (let i = 0; i < chunksCount; i++) {
+		for (let i = 1; i <= chunksCount; i++) {
 			const derivedNonce = await hkdf.deriveBytes(TWOFISH_IV_SIZE, `nonce${i}`);
 
 			const session = tf.createSession(derivedKey);
@@ -95,9 +95,12 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
-		const { padding, iv, chunkSize } = TWOFISH_HEADER.decode(
-			new Uint8Array(buffer, 0, TWOFISH_HEADER.size),
-		);
+		const inputReader = new BufferCursor(buffer);
+
+		const header = inputReader.readBytes(TWOFISH_HEADER.size);
+		if (!header || header.byteLength !== TWOFISH_HEADER.size)
+			throw new RangeError('Cannot read header');
+		const { padding, iv, chunkSize } = TWOFISH_HEADER.decode(header);
 
 		const tf = await this.getTwofishModule();
 
@@ -108,11 +111,13 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 
 		const hkdf = new HKDFDerivedKeys(this.key, new Uint8Array(iv));
 
-		const input = new Uint8Array(buffer, TWOFISH_HEADER.size);
-		const output = new Uint8Array(input.length - padding);
+		const payloadSize = inputReader.getRemainingBytes();
+		const output = new ArrayBuffer(payloadSize - padding);
+		const outputWriter = new BufferCursor(output);
+
 		const derivedKey = await hkdf.deriveBytes(16, `key`);
-		const chunksCount = Math.ceil(input.byteLength / chunkSize);
-		for (let i = 0; i < chunksCount; i++) {
+		const chunksCount = Math.ceil(payloadSize / chunkSize);
+		for (let i = 1; i <= chunksCount; i++) {
 			const derivedNonce = await hkdf.deriveBytes(TWOFISH_IV_SIZE, `nonce${i}`);
 
 			const session = tf.createSession(derivedKey);
@@ -122,26 +127,24 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 					(a, b) => xor16(xorBuffer, a, b),
 				);
 
-				const offset = chunkSize * i;
-				const decryptedChunk = await cipher.decrypt(
-					input.subarray(offset, offset + chunkSize),
-					derivedNonce,
-				);
+				const chunkBytes = inputReader.readBytes(chunkSize * i);
+				if (!chunkBytes) throw new RangeError(`Chunk #${i} is not found`);
 
-				const isLastChunk = i === chunksCount - 1;
+				const decryptedChunk = await cipher.decrypt(chunkBytes, derivedNonce);
+
+				const isLastChunk = i === chunksCount;
 				if (isLastChunk) {
-					output.set(
+					outputWriter.writeBytes(
 						decryptedChunk.slice(0, decryptedChunk.length - padding),
-						offset,
 					);
 				} else {
-					output.set(decryptedChunk, offset);
+					outputWriter.writeBytes(decryptedChunk);
 				}
 			} finally {
 				tf.destroySession(session);
 			}
 		}
 
-		return output.buffer;
+		return output;
 	}
 }
