@@ -150,13 +150,16 @@ function toHex(buf: Uint8Array) {
 ciphers.map((cipher) =>
 	describe(cipher.name, () => {
 		test('Encrypted text may be decrypted', async () => {
+			const getRandomBytes = createFakeRandomBytesGenerator(0);
 			const key = getRandomBytes(32);
 			const codec = await cipher.create(key, getRandomBytes);
 
 			const originalData = getRandomBytes(1024 * 1024);
 
 			const ct = await codec.encrypt(originalData.buffer.slice());
-			await expect(codec.decrypt(ct)).resolves.toStrictEqual(originalData.buffer);
+			await expect(
+				codec.decrypt(ct).then((buffer) => toHex(new Uint8Array(buffer))),
+			).resolves.toBe(toHex(new Uint8Array(originalData.buffer)));
 		});
 
 		test('Encrypted text may be decrypted by another instance', async () => {
