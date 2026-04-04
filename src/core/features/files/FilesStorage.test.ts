@@ -55,7 +55,7 @@ const systems: { name: string; init(): Promise<IFilesStorage> }[] = [
 			const getRandomBytesMock = (length = 16) =>
 				new Uint8Array(length).map(
 					(_, idx) => idx + Math.max(0, idx + ((length + idx) % 255)),
-				).buffer;
+				);
 
 			const fs = new InMemoryFS();
 			return new EncryptedFS(
