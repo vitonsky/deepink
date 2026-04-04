@@ -1,10 +1,11 @@
 import { TwofishModule } from 'twofish';
 import twofishModule from 'twofish/twofish.wasm';
 import { bytes, struct, u8, u32 } from '@core/encryption/utils/bytes/binstruct';
+import { BufferCursor } from '@core/encryption/utils/bytes/BufferCursor';
 import { xor16 } from '@core/encryption/utils/xor';
 
 import { CTRCipherMode } from '../../cipherModes/CTRCipherMode';
-import { fillBuffer } from '../../utils/buffers';
+import { alignBuffer, getBlockPadding } from '../../utils/buffers';
 import { HKDFDerivedKeys } from '../../utils/HKDFDerivedKeys';
 
 import { IEncryptionProcessor } from '../..';
@@ -54,16 +55,19 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 		const iv = this.randomBytesGenerator(MASTER_IV_SIZE);
 		const hkdf = new HKDFDerivedKeys(this.key, iv);
 
-		const [input, padding] = fillBuffer(new Uint8Array(buffer));
+		const padding = getBlockPadding(buffer.byteLength, 16);
+		const alignedInputLength = buffer.byteLength + padding;
 
-		const output = new Uint8Array(
-			new ArrayBuffer(TWOFISH_HEADER.size + input.length),
+		const output = new ArrayBuffer(TWOFISH_HEADER.size + alignedInputLength);
+		const outputWriter = new BufferCursor(output);
+
+		outputWriter.writeBytes(
+			TWOFISH_HEADER.encode({ padding, iv, chunkSize: this.chunkSize }),
 		);
-		output.set(TWOFISH_HEADER.encode({ padding, iv, chunkSize: this.chunkSize }), 0);
-		const encryptedData = output.subarray(TWOFISH_HEADER.size);
 
 		const derivedKey = await hkdf.deriveBytes(16, `key`);
-		const chunksCount = Math.ceil(input.byteLength / this.chunkSize);
+		const chunksCount = Math.ceil(alignedInputLength / this.chunkSize);
+		const inputReader = new BufferCursor(buffer);
 		for (let i = 0; i < chunksCount; i++) {
 			const derivedNonce = await hkdf.deriveBytes(TWOFISH_IV_SIZE, `nonce${i}`);
 
@@ -74,18 +78,20 @@ export class WasmTwofishCTRCipher implements IEncryptionProcessor {
 					(a, b) => xor16(xorBuffer, a, b),
 				);
 
-				const offset = this.chunkSize * i;
+				const chunk = inputReader.readBytes(this.chunkSize);
+				if (!chunk) throw new RangeError(`Chunk #${i} is not found`);
+
 				const encryptedChunk = await cipher.encrypt(
-					input.subarray(offset, offset + this.chunkSize),
+					alignBuffer(chunk, 16),
 					derivedNonce,
 				);
-				encryptedData.set(encryptedChunk, offset);
+				outputWriter.writeBytes(encryptedChunk);
 			} finally {
 				tf.destroySession(session);
 			}
 		}
 
-		return output.buffer;
+		return output;
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {

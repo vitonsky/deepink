@@ -17,18 +17,20 @@ export const joinBuffers = (buffers: (ArrayBufferLike | Buffer | TypedArray)[]) 
 };
 
 /**
- * Fill buffer with paddings to ensure buffer size multiple 16
- * Before use original data you have to remove padding
+ * Ensure correct buffer size and adds padding if needed.
+ *
+ * In case the buffer have correct size, the same buffer will be returned.
+ * Otherwise will be returned new buffer.
  */
-export function fillBuffer(buffer: Uint8Array, blockSize = 16): [Uint8Array, number] {
-	const padding = Math.ceil(buffer.length / blockSize) * blockSize - buffer.length;
-	if (padding === 0) return [buffer, 0];
+export function alignBuffer(buffer: Uint8Array, boxSize: number) {
+	const remainingBytes = buffer.length % boxSize;
+	if (remainingBytes === 0) return buffer;
 
-	// Create new buffer with padding
-	const out = new Uint8Array(buffer.length + padding);
-	out.set(buffer);
+	const padding = boxSize - remainingBytes;
+	const alignedBuffer = new Uint8Array(buffer.length + padding);
+	alignedBuffer.set(new Uint8Array(buffer), 0);
 
-	return [out, padding];
+	return alignedBuffer;
 }
 
 export function getBlockPadding(totalSize: number, blockSize = 16) {
