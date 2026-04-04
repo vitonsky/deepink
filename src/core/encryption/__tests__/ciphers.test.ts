@@ -24,17 +24,7 @@ const ciphers: {
 	{
 		name: ENCRYPTION_ALGORITHM.AES,
 		async create(key, randomBytes) {
-			const cryptoKey = await self.crypto.subtle.importKey(
-				'raw',
-				key,
-				{
-					name: 'AES-GCM',
-					length: 256,
-				},
-				false,
-				['encrypt', 'decrypt'],
-			);
-			return new AESGCMCipher(cryptoKey, randomBytes);
+			return new AESGCMCipher(key, randomBytes);
 		},
 	},
 	{
@@ -71,13 +61,12 @@ const ciphers: {
 				new BufferIntegrityProcessor(),
 				...(await Promise.all([
 					derivedKeys
-						.getDerivedKey('AES', {
-							name: 'AES-GCM',
-							length: 256,
-						})
-						.then((key) => new AESGCMCipher(key, randomBytes)),
+						.getDerivedBits('AES', 32 * 8)
+						.then(
+							(key) => new AESGCMCipher(new Uint8Array(key), randomBytes),
+						),
 					derivedKeys
-						.getDerivedBytes('Twofish', 32 * 8)
+						.getDerivedBits('Twofish', 32 * 8)
 						.then(
 							(key) =>
 								new WasmTwofishCTRCipher(
@@ -86,7 +75,7 @@ const ciphers: {
 								),
 						),
 					derivedKeys
-						.getDerivedBytes('Serpent', 32 * 8)
+						.getDerivedBits('Serpent', 32 * 8)
 						.then(
 							(key) => new SeprentCipher(new Uint8Array(key), randomBytes),
 						),

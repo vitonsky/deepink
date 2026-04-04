@@ -1,64 +1,82 @@
 /* eslint-disable @cspell/spellchecker */
+import { bytes, struct } from '@core/encryption/utils/bytes/binstruct';
+import { HKDFDerivedKeys } from '@core/encryption/utils/HKDFDerivedKeys';
+
 import { IntegrityError } from '../../processors/BufferIntegrityProcessor';
 import { joinBuffers } from '../../utils/buffers';
 
 import { IEncryptionProcessor, RandomBytesGenerator } from '../..';
 
+const AESHeader = struct({
+	iv: bytes(32),
+});
+
 /**
- * AES-GCM cipher
- * MDN: https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams
+ * AES-CTR cipher
+ * MDN: https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams
  * Algorithm recommendations: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
  */
 export class AESGCMCipher implements IEncryptionProcessor {
-	private readonly ivSize = 96;
-
-	private readonly key;
-	private readonly randomBytesGenerator: RandomBytesGenerator;
-	constructor(key: CryptoKey, randomBytesGenerator: RandomBytesGenerator) {
-		this.key = key;
-		this.randomBytesGenerator = randomBytesGenerator;
-	}
+	constructor(
+		private readonly key: Uint8Array<ArrayBuffer>,
+		private readonly randomBytesGenerator: RandomBytesGenerator,
+	) {}
 
 	public async encrypt(buffer: ArrayBuffer) {
-		const iv = this.randomBytesGenerator(this.ivSize);
+		const iv = this.randomBytesGenerator(32);
+
+		const hkdf = new HKDFDerivedKeys(this.key, iv);
+		const [key, messageIV] = await Promise.all([
+			hkdf
+				.deriveBytes(32, 'msg')
+				.then((key) =>
+					crypto.subtle.importKey('raw', key, 'AES-CTR', false, [
+						'encrypt',
+						'decrypt',
+					]),
+				),
+			hkdf.deriveBytes(16, 'iv'),
+		]);
+
 		const encryptedBuffer = await self.crypto.subtle.encrypt(
 			{
-				name: 'AES-GCM',
-
-				// Don't re-use initialization vectors!
-				// Always generate a new iv every time your encrypt!
-				// Recommended to use 96 bytes length
-				iv,
-
-				// Tag length (optional)
-				// can be 32, 64, 96, 104, 112, 120 or 128 (default)
-				tagLength: 128,
+				name: 'AES-CTR',
+				counter: messageIV,
+				length: 64,
 			},
-			this.key,
+			key,
 			buffer,
 		);
 
 		// Include public parameters to a cipher-buffer
-		return joinBuffers([iv, encryptedBuffer]);
+		return joinBuffers([AESHeader.encode({ iv }), encryptedBuffer]);
 	}
 
 	public async decrypt(buffer: ArrayBuffer) {
-		// Extract data of cipher-buffer
-		const iv = buffer.slice(0, this.ivSize);
-		const encryptedBuffer = buffer.slice(this.ivSize);
+		const { iv } = AESHeader.decode(new Uint8Array(buffer, 0, AESHeader.size));
+
+		const hkdf = new HKDFDerivedKeys(this.key, new Uint8Array(iv));
+		const [key, messageIV] = await Promise.all([
+			hkdf
+				.deriveBytes(32, 'msg')
+				.then((key) =>
+					crypto.subtle.importKey('raw', key, 'AES-CTR', false, [
+						'encrypt',
+						'decrypt',
+					]),
+				),
+			hkdf.deriveBytes(16, 'iv'),
+		]);
 
 		return self.crypto.subtle
 			.decrypt(
 				{
-					name: 'AES-GCM',
-					//The initialization vector been used to encrypt
-					iv,
-
-					//The tagLength you used to encrypt (if any)
-					tagLength: 128,
+					name: 'AES-CTR',
+					counter: messageIV,
+					length: 64,
 				},
-				this.key,
-				encryptedBuffer,
+				key,
+				new Uint8Array(buffer, AESHeader.size),
 			)
 			.catch((err) => {
 				if (

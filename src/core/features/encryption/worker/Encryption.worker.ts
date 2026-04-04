@@ -35,14 +35,11 @@ expose(
 				() => Promise<IEncryptionProcessor>
 			> = {
 				[ENCRYPTION_ALGORITHM.AES]: async () => {
-					const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-						name: 'AES-GCM',
-						length: 256,
-					});
-					return new AESGCMCipher(key, getRandomBytes);
+					const key = await derivedKeys.getDerivedBits('aes-gcm', 256);
+					return new AESGCMCipher(new Uint8Array(key), getRandomBytes);
 				},
 				[ENCRYPTION_ALGORITHM.TWOFISH]: async () => {
-					const key = await derivedKeys.getDerivedBytes(
+					const key = await derivedKeys.getDerivedBits(
 						'twofish-ctr-cipher',
 						256,
 					);
@@ -54,7 +51,7 @@ expose(
 					return cipher;
 				},
 				[ENCRYPTION_ALGORITHM.SERPENT]: async () => {
-					const key = await derivedKeys.getDerivedBytes(
+					const key = await derivedKeys.getDerivedBits(
 						'serpent-cbc-cipher',
 						// 32 bytes encryption + 32 bytes MAC
 						32 * 8,
@@ -65,7 +62,7 @@ expose(
 					return new SeprentCipher(new Uint8Array(key), getRandomBytes);
 				},
 				[ENCRYPTION_ALGORITHM.XChaCha20]: async () => {
-					const key = await derivedKeys.getDerivedBytes(
+					const key = await derivedKeys.getDerivedBits(
 						'xchacha20',
 						// 32 bytes encryption + 32 bytes MAC
 						32 * 8,

@@ -29,7 +29,7 @@ const getKeys = async (parameters: { password: string; salt: string }) => {
 	});
 
 	const twofish = await derivedKeys
-		.getDerivedBytes('twofish-ctr-cipher', 256)
+		.getDerivedBits('twofish-ctr-cipher', 256)
 		.then((buffer) => new Uint8Array(buffer));
 
 	return { aes, twofish };

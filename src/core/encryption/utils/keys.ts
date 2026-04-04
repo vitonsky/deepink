@@ -90,7 +90,7 @@ export async function getDerivedKeysManager(
 			);
 		},
 
-		async getDerivedBytes(context: string, length: number) {
+		async getDerivedBits(context: string, length: number) {
 			if (length % 8 !== 0) throw new TypeError('Length is not multiple to 8');
 
 			return self.crypto.subtle.deriveBits(
