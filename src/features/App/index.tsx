@@ -118,7 +118,7 @@ export const App: FC = () => {
 	if (isSplashVisible) return <SplashScreen />;
 
 	// Main vault screen
-	if (profileContainers.activeProfile && !isVaultOpening) {
+	if (profileContainers.activeProfile) {
 		return (
 			<Box
 				sx={{
@@ -158,25 +158,8 @@ export const App: FC = () => {
 				<Box maxW="500px" minW="350px" padding="1rem">
 					<ProfileCreator
 						onCreateProfile={async (profile) => {
-							setIsVaultOpening(true);
-							try {
-								const newProfile =
-									await profilesList.createProfile(profile);
-								try {
-									await openProfile(
-										newProfile,
-										profile.password || undefined,
-									);
-
-									setCurrentVaultId(newProfile.id);
-								} catch (error) {
-									console.error(error);
-									showErrorToast(profile.name);
-								}
-							} finally {
-								setScreenName('chooseVault');
-								setIsVaultOpening(false);
-							}
+							const newProfile = await profilesList.createProfile(profile);
+							await onOpenVault(newProfile, profile.password || undefined);
 						}}
 						onCancel={
 							hasNoProfiles ? undefined : () => setScreenName('chooseVault')

@@ -133,14 +133,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		return () => {
 			isProfileLoadCancelled = true;
 
-			// Close vault on unmount
+			// Close the vault on unmount and clean up redux
 			controls.close();
-
-			dispatch(
-				workspacesApi.removeProfile({
-					profileId,
-				}),
-			);
 		};
 	}, [
 		controls,
