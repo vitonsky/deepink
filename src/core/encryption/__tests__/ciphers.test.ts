@@ -1,5 +1,7 @@
-/* eslint-disable no-bitwise */
 import { webcrypto } from 'node:crypto';
+
+import { ENCRYPTION_ALGORITHM } from '@core/features/encryption';
+import { formatAlgorithms } from '@core/features/encryption/utils';
 
 import { AESGCMCipher } from '../ciphers/AES';
 import { SeprentCipher } from '../ciphers/Serpent';
@@ -9,54 +11,8 @@ import { BufferIntegrityProcessor } from '../processors/BufferIntegrityProcessor
 import { PipelineProcessor } from '../processors/PipelineProcessor';
 import { getDerivedKeysManager, getMasterKey } from '../utils/keys';
 import { getRandomBytes } from '../utils/random';
+import { createFakeRandomBytesGenerator } from './random';
 import { IEncryptionProcessor, RandomBytesGenerator } from '..';
-
-function mulberry32(seed: number): () => number {
-	let t = seed >>> 0;
-	return () => {
-		t += 0x6d2b79f5;
-		let r = Math.imul(t ^ (t >>> 15), 1 | t);
-		r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-		return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-	};
-}
-
-const createFakeRandomBytesGenerator = (seed: number) => {
-	const getNextNumber = mulberry32(seed);
-	return (length: number) => new Uint8Array(length).map(() => getNextNumber() * 100);
-};
-
-describe('Fake random', () => {
-	test('mulberry32 sequence', () => {
-		const seq1 = mulberry32(0);
-		expect(
-			Array(10)
-				.values()
-				.map(() => seq1())
-				.toArray(),
-		).toMatchSnapshot('Seed 0');
-
-		const seq2 = mulberry32(1);
-		expect(
-			Array(10)
-				.values()
-				.map(() => seq2())
-				.toArray(),
-		).toMatchSnapshot('Seed 1');
-	});
-
-	test('random bytes sequence', () => {
-		expect(
-			Buffer.from(createFakeRandomBytesGenerator(0)(10)).toString('hex'),
-		).toMatchSnapshot('Seed 0');
-		expect(
-			Buffer.from(createFakeRandomBytesGenerator(1)(10)).toString('hex'),
-		).toMatchSnapshot('Seed 1');
-		expect(
-			Buffer.from(createFakeRandomBytesGenerator(100)(10)).toString('hex'),
-		).toMatchSnapshot('Seed 100');
-	});
-});
 
 const ciphers: {
 	name: string;
@@ -66,7 +22,7 @@ const ciphers: {
 	): Promise<IEncryptionProcessor>;
 }[] = [
 	{
-		name: 'AES',
+		name: ENCRYPTION_ALGORITHM.AES,
 		async create(key, randomBytes) {
 			const cryptoKey = await self.crypto.subtle.importKey(
 				'raw',
@@ -82,25 +38,29 @@ const ciphers: {
 		},
 	},
 	{
-		name: 'Twofish',
+		name: ENCRYPTION_ALGORITHM.TWOFISH,
 		async create(key, randomBytes) {
 			return new WasmTwofishCTRCipher(key, randomBytes);
 		},
 	},
 	{
-		name: 'Serpent',
+		name: ENCRYPTION_ALGORITHM.SERPENT,
 		async create(key, randomBytes) {
 			return new SeprentCipher(key, randomBytes);
 		},
 	},
 	{
-		name: 'XChaCha20',
+		name: ENCRYPTION_ALGORITHM.XChaCha20,
 		async create(key, randomBytes) {
 			return new XChaCha20Cipher(key, randomBytes);
 		},
 	},
 	{
-		name: 'AES-Twofish-Serpent',
+		name: formatAlgorithms([
+			ENCRYPTION_ALGORITHM.AES,
+			ENCRYPTION_ALGORITHM.TWOFISH,
+			ENCRYPTION_ALGORITHM.SERPENT,
+		]),
 		async create(key, randomBytes) {
 			const salt = new Uint8Array(32);
 			const derivedKeys = await getMasterKey(key.buffer, salt.buffer).then(
@@ -170,7 +130,9 @@ ciphers.map((cipher) =>
 			const ct = await cipher1.encrypt(pt.slice().buffer);
 
 			const cipher2 = await cipher.create(key, getRandomBytes);
-			await expect(cipher2.decrypt(ct)).resolves.toStrictEqual(pt.buffer);
+			await expect(
+				cipher2.decrypt(ct).then((buffer) => Buffer.from(buffer).toString('hex')),
+			).resolves.toStrictEqual(Buffer.from(pt.buffer).toString('hex'));
 		});
 
 		test('Messages is not equal to each other', async () => {
@@ -233,7 +195,15 @@ ciphers.map((cipher) =>
 		});
 
 		// Verify vectors only for ciphers, not its combinations
-		if (['AES', 'Twofish', 'Serpent'].includes(cipher.name)) {
+		if (
+			(
+				[
+					ENCRYPTION_ALGORITHM.AES,
+					ENCRYPTION_ALGORITHM.TWOFISH,
+					ENCRYPTION_ALGORITHM.SERPENT,
+				] as string[]
+			).includes(cipher.name)
+		) {
 			test.skip('Matches reference test vectors', async () => {
 				// We disable any random factor for that test
 				const randomBytesMock = (len: number) => new Uint8Array(len);
