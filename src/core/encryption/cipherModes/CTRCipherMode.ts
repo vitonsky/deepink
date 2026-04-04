@@ -15,7 +15,7 @@ export class CTRCipherMode {
 		const counterStates = 2 ** 32;
 		return {
 			maxBlocks: counterStates,
-			maxBytes: counterStates * blockSize,
+			maxBytes: counterStates * blockSize - 1,
 		};
 	}
 
