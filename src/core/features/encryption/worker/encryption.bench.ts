@@ -1,4 +1,5 @@
 import { bench } from 'vitest';
+import { getRandomBytes } from '@core/encryption/utils/random';
 
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '../algorithms';
 import { WorkerEncryptionProcessor } from './WorkerEncryptionProcessor';
@@ -17,8 +18,8 @@ describe(`Encrypt 1k chars`, () => {
 				throws: true,
 				async setup() {
 					processor = new WorkerEncryptionProcessor({
-						key: 'secret password',
-						salt: new ArrayBuffer(100),
+						key: getRandomBytes(32),
+						salt: getRandomBytes(100),
 						algorithm,
 						disablePulse: true,
 					});
@@ -46,8 +47,8 @@ describe(`Encrypt 10k chars`, () => {
 			{
 				async setup() {
 					processor = new WorkerEncryptionProcessor({
-						key: 'secret password',
-						salt: new ArrayBuffer(100),
+						key: getRandomBytes(32),
+						salt: getRandomBytes(100),
 						algorithm,
 						disablePulse: true,
 					});
@@ -75,8 +76,8 @@ describe(`Encrypt 100k chars`, () => {
 			{
 				async setup() {
 					processor = new WorkerEncryptionProcessor({
-						key: 'secret password',
-						salt: new ArrayBuffer(100),
+						key: getRandomBytes(32),
+						salt: getRandomBytes(100),
 						algorithm,
 						disablePulse: true,
 					});
@@ -105,8 +106,8 @@ describe(`Encrypt 1m chars`, () => {
 				throws: true,
 				async setup() {
 					processor = new WorkerEncryptionProcessor({
-						key: 'secret password',
-						salt: new ArrayBuffer(100),
+						key: getRandomBytes(32),
+						salt: getRandomBytes(100),
 						algorithm,
 						disablePulse: true,
 					});

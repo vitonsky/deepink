@@ -6,7 +6,7 @@ export function fillBufferWithRandomBytes(buffer: Uint8Array): Uint8Array {
 
 	// Fill if quote is not exceeded
 	if (buffer.byteLength <= bytesLimit) {
-		self.crypto.getRandomValues(buffer);
+		globalThis.crypto.getRandomValues(buffer);
 		return buffer;
 	}
 
@@ -16,7 +16,7 @@ export function fillBufferWithRandomBytes(buffer: Uint8Array): Uint8Array {
 		const bytesToFill = buffer.byteLength - offset;
 		const bytesToAdd = Math.min(bytesLimit, bytesToFill);
 		const blockBuffer = new Uint8Array(bytesToAdd);
-		self.crypto.getRandomValues(blockBuffer);
+		globalThis.crypto.getRandomValues(blockBuffer);
 
 		// Fill with offset
 		buffer.set(blockBuffer, offset);

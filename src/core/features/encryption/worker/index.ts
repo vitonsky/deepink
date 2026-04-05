@@ -1,11 +1,9 @@
 import { IEncryptionController } from '@core/encryption';
 
 export type EncryptionConfig = {
-	// TODO: make API stronger, accept only `ArrayBuffer`
-	// and rewrite its content after a key derivation
-	key: string | ArrayBuffer;
-	salt: ArrayBuffer;
 	algorithm: string;
+	key: Uint8Array<ArrayBuffer>;
+	salt: Uint8Array<ArrayBuffer>;
 };
 
 export type EncryptionWorkerConfig = EncryptionConfig & { disablePulse?: boolean };
