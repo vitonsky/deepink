@@ -1,7 +1,7 @@
 import { webcrypto } from 'crypto';
+import { createFakeRandomBytesGenerator } from '@core/encryption/__tests__/random';
 import { AESCipher } from '@core/encryption/ciphers/AES';
 import { EncryptionController } from '@core/encryption/EncryptionController';
-import { getDerivedKeysManager, getMasterKey } from '@core/encryption/utils/keys';
 
 import { EncryptedFS } from './EncryptedFS';
 import { InMemoryFS } from './InMemoryFS';
@@ -37,29 +37,14 @@ const systems: { name: string; init(): Promise<IFilesStorage> }[] = [
 	{
 		name: 'EncryptedFS',
 		async init() {
-			const derivedKeys = await getMasterKey(
-				webcrypto.getRandomValues(new Uint8Array(new ArrayBuffer(300))).buffer,
-				webcrypto.getRandomValues(new Uint8Array(new ArrayBuffer(300))).buffer,
-			).then((masterKey) =>
-				getDerivedKeysManager(
-					masterKey,
-					webcrypto.getRandomValues(new Uint8Array(new ArrayBuffer(300))),
-				),
-			);
-
-			const aes = await derivedKeys
-				.getDerivedBits('hmac', 256)
-				.then((buffer) => new Uint8Array(buffer));
-
-			const getRandomBytesMock = (length = 16) =>
-				new Uint8Array(length).map(
-					(_, idx) => idx + Math.max(0, idx + ((length + idx) % 255)),
-				);
+			const seededRandomBytes = createFakeRandomBytesGenerator(0);
 
 			const fs = new InMemoryFS();
 			return new EncryptedFS(
 				fs,
-				new EncryptionController(new AESCipher(aes, getRandomBytesMock)),
+				new EncryptionController(
+					new AESCipher(seededRandomBytes(32), seededRandomBytes),
+				),
 			);
 		},
 	},

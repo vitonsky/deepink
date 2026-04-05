@@ -7,7 +7,7 @@ import { WasmTwofishCTRCipher } from '../ciphers/Twofish';
 import { XChaCha20Cipher } from '../ciphers/XChaCha20';
 import { BufferIntegrityProcessor } from '../processors/BufferIntegrityProcessor';
 import { PipelineProcessor } from '../processors/PipelineProcessor';
-import { getDerivedKeysManager, getMasterKey } from '../utils/keys';
+import { HKDFDerivedKeys } from '../utils/HKDFDerivedKeys';
 import { IEncryptionProcessor, RandomBytesGenerator } from '..';
 
 export const ciphers: {
@@ -48,36 +48,20 @@ export const ciphers: {
 			ENCRYPTION_ALGORITHM.SERPENT,
 		]),
 		async create(key, randomBytes) {
-			const salt = new Uint8Array(32);
-			const derivedKeys = await getMasterKey(key.buffer, salt.buffer).then(
-				(masterKey) => getDerivedKeysManager(masterKey, salt),
-			);
+			const hkdf = new HKDFDerivedKeys(key, new Uint8Array(32));
+
+			const [hmac, aes, twofish, serpent] = await Promise.all([
+				hkdf.deriveBytes(32, 'hmac'),
+				hkdf.deriveBytes(32, 'aes'),
+				hkdf.deriveBytes(32, 'twofish'),
+				hkdf.deriveBytes(32, 'serpent'),
+			]);
 
 			return new PipelineProcessor([
-				new BufferIntegrityProcessor(
-					await derivedKeys
-						.getDerivedBits('hmac', 256)
-						.then((buffer) => new Uint8Array(buffer)),
-				),
-				...(await Promise.all([
-					derivedKeys
-						.getDerivedBits('AES', 32 * 8)
-						.then((key) => new AESCipher(new Uint8Array(key), randomBytes)),
-					derivedKeys
-						.getDerivedBits('Twofish', 32 * 8)
-						.then(
-							(key) =>
-								new WasmTwofishCTRCipher(
-									new Uint8Array(key),
-									randomBytes,
-								),
-						),
-					derivedKeys
-						.getDerivedBits('Serpent', 32 * 8)
-						.then(
-							(key) => new SeprentCipher(new Uint8Array(key), randomBytes),
-						),
-				])),
+				new BufferIntegrityProcessor(hmac),
+				new AESCipher(aes, randomBytes),
+				new WasmTwofishCTRCipher(twofish, randomBytes),
+				new SeprentCipher(serpent, randomBytes),
 			]);
 		},
 	},

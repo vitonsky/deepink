@@ -6,6 +6,7 @@ import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
+import { deriveBitsFromPassword } from '@core/encryption/utils/keys';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { IFilesStorage } from '@core/features/files';
 import { EncryptedFS } from '@core/features/files/EncryptedFS';
@@ -33,16 +34,19 @@ const decryptKey = async ({
 }: {
 	encryptedKey: ArrayBuffer;
 	password: string;
-	salt: ArrayBuffer;
+	salt: Uint8Array<ArrayBuffer>;
 	algorithm: string;
 }) => {
-	const encryption = await createEncryption({ key: password, salt, algorithm });
+	const keyPassword = await deriveBitsFromPassword(password, 'MK_PWD', salt);
+
+	const encryption = await createEncryption({ key: keyPassword, salt, algorithm });
 	return encryption
 		.getContent()
 		.decrypt(encryptedKey)
 		.finally(() => {
 			encryption.dispose();
-		});
+		})
+		.then((buffer) => new Uint8Array(buffer));
 };
 
 /**
@@ -84,8 +88,7 @@ export const useProfileContainers = () => {
 					throw new Error('Key file is not found in profile directory');
 				}
 
-				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt))
-					.buffer;
+				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
 				const key = await decryptKey({
 					encryptedKey: encryptedKeyBuffer,
 					password: password,
