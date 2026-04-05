@@ -58,7 +58,11 @@ const ciphers: {
 			);
 
 			return new PipelineProcessor([
-				new BufferIntegrityProcessor(),
+				new BufferIntegrityProcessor(
+					await derivedKeys
+						.getDerivedBits('hmac', 256)
+						.then((buffer) => new Uint8Array(buffer)),
+				),
 				...(await Promise.all([
 					derivedKeys
 						.getDerivedBits('AES', 32 * 8)

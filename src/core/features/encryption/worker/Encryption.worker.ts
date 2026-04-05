@@ -76,9 +76,12 @@ expose(
 				parseAlgorithms(algorithm).map((name) => cipherMap[name]()),
 			);
 
+			const hmacKey = await derivedKeys
+				.getDerivedBits('hmac', 256)
+				.then((buffer) => new Uint8Array(buffer));
 			encryptionController = new EncryptionController(
 				new PipelineProcessor([
-					new BufferIntegrityProcessor(),
+					new BufferIntegrityProcessor(hmacKey),
 					new BufferSizeObfuscationProcessor(getRandomBytes),
 					...ciphers,
 				]),

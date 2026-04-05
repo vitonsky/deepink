@@ -47,10 +47,9 @@ const systems: { name: string; init(): Promise<IFilesStorage> }[] = [
 				),
 			);
 
-			const aes = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-				name: 'AES-GCM',
-				length: 256,
-			});
+			const aes = await derivedKeys
+				.getDerivedBits('hmac', 256)
+				.then((buffer) => new Uint8Array(buffer));
 
 			const getRandomBytesMock = (length = 16) =>
 				new Uint8Array(length).map(

@@ -23,16 +23,19 @@ const getKeys = async (parameters: { password: string; salt: string }) => {
 		(masterKey) => getDerivedKeysManager(masterKey, salt),
 	);
 
-	const aes = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-		name: 'AES-GCM',
-		length: 256,
-	});
-
-	const twofish = await derivedKeys
-		.getDerivedBits('twofish-ctr-cipher', 256)
+	const hmac = await derivedKeys
+		.getDerivedBits('hmac', 256)
 		.then((buffer) => new Uint8Array(buffer));
 
-	return { aes, twofish };
+	const aes = await derivedKeys
+		.getDerivedBits('aes', 256)
+		.then((buffer) => new Uint8Array(buffer));
+
+	const twofish = await derivedKeys
+		.getDerivedBits('twofish', 256)
+		.then((buffer) => new Uint8Array(buffer));
+
+	return { hmac, aes, twofish };
 };
 
 // Mock for `crypto` for jest context
@@ -50,7 +53,7 @@ test('composed processors returns idempotent result', async () => {
 	});
 
 	const cipher = new PipelineProcessor([
-		new BufferIntegrityProcessor(),
+		new BufferIntegrityProcessor(keys.hmac),
 		new BufferSizeObfuscationProcessor(getRandomBytesMock),
 		new WasmTwofishCTRCipher(keys.twofish, getRandomBytesMock),
 		new AESCipher(keys.aes, getRandomBytesMock),

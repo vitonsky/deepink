@@ -1,7 +1,6 @@
 import { bytes, struct } from '@core/encryption/utils/bytes/binstruct';
 import { HKDFDerivedKeys } from '@core/encryption/utils/HKDFDerivedKeys';
 
-import { IntegrityError } from '../../processors/BufferIntegrityProcessor';
 import { joinBuffers } from '../../utils/buffers';
 
 import { IEncryptionProcessor, RandomBytesGenerator } from '../..';
@@ -67,26 +66,14 @@ export class AESCipher implements IEncryptionProcessor {
 			hkdf.deriveBytes(16, 'iv'),
 		]);
 
-		return self.crypto.subtle
-			.decrypt(
-				{
-					name: 'AES-CTR',
-					counter: messageIV,
-					length: 64,
-				},
-				key,
-				new Uint8Array(buffer, AESHeader.size),
-			)
-			.catch((err) => {
-				if (
-					err instanceof Error &&
-					err.name === 'OperationError' &&
-					err.message === ''
-				) {
-					throw new IntegrityError('Decryption error. Integrity checks fails');
-				}
-
-				throw err;
-			});
+		return self.crypto.subtle.decrypt(
+			{
+				name: 'AES-CTR',
+				counter: messageIV,
+				length: 64,
+			},
+			key,
+			new Uint8Array(buffer, AESHeader.size),
+		);
 	}
 }
