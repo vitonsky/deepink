@@ -15,9 +15,12 @@ import { AppServices } from './AppServices';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 import { Profiles } from './Profiles';
-import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import {
+	useProfileContainers,
+	VaultOpenError,
+	VaultOpenErrorCode,
+} from './Profiles/hooks/useProfileContainers';
 import { ProfilesForm } from './ProfilesForm';
-import { useOpenProfile } from './useOpenProfile';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
@@ -31,13 +34,19 @@ export const defaultVaultNames = [
 	'Idea lab',
 ];
 
+type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
+
+export type OnPickProfile = (
+	profile: ProfileObject,
+	password?: string,
+) => Promise<PickProfileResponse>;
+
 export const App: FC = () => {
 	const files = useFilesStorage();
 	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
 
 	const profilesList = useProfilesList();
 	const profileContainers = useProfileContainers();
-	const openProfile = useOpenProfile(profileContainers);
 	const recentProfile = useRecentProfile(config);
 
 	const [currentVaultId, setCurrentVaultId] = useProfileSelector(config);
@@ -65,19 +74,43 @@ export const App: FC = () => {
 	);
 
 	const onOpenVault = useCallback(
-		async (profile: ProfileObject, password?: string) => {
+		async (
+			profile: ProfileObject,
+			password?: string,
+		): Promise<PickProfileResponse> => {
 			setIsVaultOpening(true);
+
 			try {
-				return await openProfile(profile, password);
-			} catch (error) {
+				// Profiles with no password
+				if (profile.encryption === null) {
+					await profileContainers.openProfile({ profile }, true);
+					return { status: 'ok' };
+				}
+
+				// Profiles with password
+				if (password === undefined) {
+					return { status: 'error', message: 'Enter password' };
+				}
+
+				await profileContainers.openProfile({ profile, password }, true);
+				return { status: 'ok' };
+			} catch (err) {
+				if (
+					err instanceof VaultOpenError &&
+					err.code === VaultOpenErrorCode.INCORRECT_PASSWORD
+				) {
+					return { status: 'error', message: 'Invalid password' };
+				}
+
 				showErrorToast(profile.name);
-				throw error;
+
+				throw err;
 			} finally {
 				setIsVaultOpening(false);
 				setScreenName('chooseVault');
 			}
 		},
-		[openProfile, showErrorToast],
+		[profileContainers, showErrorToast],
 	);
 
 	// When the active vault changes, close any open error toast
@@ -102,7 +135,8 @@ export const App: FC = () => {
 
 			// Automatically open profile with no encryption
 			setIsProfileAutoOpening(true);
-			openProfile(profile)
+			profileContainers
+				.openProfile({ profile })
 				.catch(() => showErrorToast(profile.name))
 				.finally(() => setIsProfileAutoOpening(false));
 		},
