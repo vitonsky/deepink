@@ -7,7 +7,7 @@ import { selectWorkspaceState } from '@state/redux/profiles/selectors/selectWork
 import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createAppSelector } from '@state/redux/utils';
 
-import { createWorkspaceStateFile } from '../utils/createWorkspaceStateFiles';
+import { createWorkspaceStateFile } from '../utils/workspaceFiles.ts';
 
 export const useWorkspaceStateSync = () => {
 	const workspaceData = useWorkspaceData();
