@@ -10,3 +10,11 @@ export type EncryptionWorkerConfig = EncryptionConfig & { disablePulse?: boolean
 export interface EncryptionWorker extends IEncryptionController {
 	init(config: EncryptionWorkerConfig): Promise<void>;
 }
+
+export interface CryptographyUtilsWorker {
+	deriveBits(
+		input: Uint8Array<ArrayBuffer>,
+		salt: Uint8Array<ArrayBuffer>,
+		length: number,
+	): Promise<Uint8Array<ArrayBuffer>>;
+}

@@ -1,0 +1,51 @@
+import { Remote, transfer, wrap } from 'comlink';
+
+import { CryptographyUtilsWorker } from '.';
+
+export class CryptographyUtils implements CryptographyUtilsWorker {
+	private state: {
+		api: Remote<CryptographyUtilsWorker>;
+		worker: Worker;
+	} | null = null;
+	constructor() {
+		const worker = new Worker(
+			/* webpackChunkName: "CryptographyUtils.worker" */ new URL(
+				'./CryptographyUtils.worker',
+				import.meta.url,
+			),
+			{ type: 'module' },
+		);
+		const api = wrap<CryptographyUtilsWorker>(worker);
+
+		this.state = { api, worker };
+	}
+
+	private isDisposed = false;
+	public async dispose() {
+		if (!this.state) return;
+
+		this.state.worker.terminate();
+		this.isDisposed = true;
+
+		this.state = null;
+	}
+
+	private getState() {
+		if (this.isDisposed) throw new Error('Instance is disposed');
+		if (!this.state) throw new Error('State is not set yet');
+
+		return this.state;
+	}
+
+	public async deriveBits(
+		input: Uint8Array<ArrayBuffer>,
+		salt: Uint8Array<ArrayBuffer>,
+		length: number,
+	) {
+		return this.getState().api.deriveBits(
+			transfer(input, [input.buffer]),
+			transfer(salt, [salt.buffer]),
+			length,
+		);
+	}
+}
