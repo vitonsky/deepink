@@ -108,6 +108,8 @@ export const WorkspaceConfigScheme = z.object({
 
 export type LoadingStatus = {
 	isConfigLoaded: boolean;
+
+	/** Filters are selected tags, note view, and search */
 	isFiltersLoaded: boolean;
 	isOpenedNotesLoaded: boolean;
 	isNoteIdsLoaded: boolean;

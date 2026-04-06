@@ -95,6 +95,7 @@ export const App: FC = () => {
 				await profileContainers.openProfile({ profile, password }, true);
 				return { status: 'ok' };
 			} catch (err) {
+				// Only unexpected errors show a toast — wrong password is handled by the form
 				if (
 					err instanceof VaultOpenError &&
 					err.code === VaultOpenErrorCode.INCORRECT_PASSWORD
@@ -103,7 +104,6 @@ export const App: FC = () => {
 				}
 
 				showErrorToast(profile.name);
-
 				throw err;
 			} finally {
 				setIsVaultOpening(false);
@@ -136,7 +136,7 @@ export const App: FC = () => {
 			// Automatically open profile with no encryption
 			setIsProfileAutoOpening(true);
 			profileContainers
-				.openProfile({ profile })
+				.openProfile({ profile }, true)
 				.catch(() => showErrorToast(profile.name))
 				.finally(() => setIsProfileAutoOpening(false));
 		},

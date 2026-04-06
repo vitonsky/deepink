@@ -19,7 +19,10 @@ export const selectWorkspaceState = ({ profileId, workspaceId }: WorkspaceScoped
 	createAppSelector(
 		[profilesSlice.selectSlice],
 		(state): WorkspaceStateData | null => {
-			const workspace = state.profiles[profileId]?.workspaces[workspaceId];
+			const profile = state.profiles[profileId];
+			if (!profile) return null;
+
+			const workspace = profile.workspaces[workspaceId];
 			if (!workspace) return null;
 
 			return {
