@@ -45,6 +45,7 @@ export default merge(commonConfig, {
 		fallback: {
 			// eslint-disable-next-line camelcase
 			worker_threads: false,
+			'fs/promises': false,
 		},
 	},
 	experiments: {
