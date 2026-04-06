@@ -37,9 +37,13 @@ const decryptKey = async ({
 	salt: Uint8Array<ArrayBuffer>;
 	algorithm: string;
 }) => {
-	const keyPassword = await deriveBitsFromPassword(password, 'MK_PWD', salt);
+	const keyPassword = await deriveBitsFromPassword(password, salt.slice(0, 16));
+	const encryption = await createEncryption({
+		key: keyPassword,
+		salt: salt.slice(16),
+		algorithm,
+	});
 
-	const encryption = await createEncryption({ key: keyPassword, salt, algorithm });
 	return encryption
 		.getContent()
 		.decrypt(encryptedKey)
@@ -98,7 +102,7 @@ export const useProfileContainers = () => {
 
 				const encryption = await createEncryption({
 					key,
-					salt,
+					salt: salt.slice(16),
 					algorithm: profile.encryption.algorithm,
 				});
 

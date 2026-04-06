@@ -58,17 +58,16 @@ export const useProfilesList = (): ProfilesListApi => {
 				// Create encrypted profile
 				console.log('Create profile with encryption', profile.algorithm);
 
-				const salt = getRandomBytes(64);
+				const salt = getRandomBytes(16 + 32);
 				const keyPassword = await deriveBitsFromPassword(
 					profile.password,
-					'MK_PWD',
-					salt,
+					salt.slice(0, 16),
 				);
 				const key = getRandomBytes(32);
 
 				const encryption = await createEncryption({
 					key: keyPassword,
-					salt,
+					salt: salt.slice(16),
 					algorithm: profile.algorithm,
 				});
 

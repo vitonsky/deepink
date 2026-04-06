@@ -1,4 +1,4 @@
-import { joinBuffers } from './buffers';
+import { CryptographyUtils } from '@core/features/encryption/worker/CryptographyUtils';
 
 /**
  * Encodes a string password into a CryptoKey suitable for PBKDF2 derivation.
@@ -14,28 +14,24 @@ export async function importPasswordKey(password: string): Promise<CryptoKey> {
 }
 
 /**
- * We must never use an user password anywhere, because of low entropy.
- * Instead, we derive bits via PBKDF2 to increase the entropy.
+ * We must never use an user password anywhere, because of potentially low entropy.
+ * We use Argon2id algorithm to derive bits and make a password brute force difficult
  */
 export const deriveBitsFromPassword = async (
 	password: string,
-	context: string,
-	salt?: Uint8Array<ArrayBuffer>,
+	salt: Uint8Array<ArrayBuffer>,
 ) => {
-	const keyMaterial = await importPasswordKey(password);
+	console.time('Key derivation');
 
-	const domain = new TextEncoder().encode(context);
+	const utils = new CryptographyUtils();
+	const result = await utils
+		// Explicitly copy salt buffer to allow re-use buffer
+		.deriveBits(new TextEncoder().encode(password), salt.slice(), 256)
+		.finally(async () => {
+			await utils.dispose();
+		});
 
-	return await crypto.subtle
-		.deriveBits(
-			{
-				name: 'PBKDF2',
-				hash: 'SHA-256',
-				salt: salt ? joinBuffers([domain, salt]) : domain,
-				iterations: 600_000,
-			},
-			keyMaterial,
-			256,
-		)
-		.then((buffer) => new Uint8Array(buffer));
+	console.timeEnd('Key derivation');
+
+	return result;
 };
