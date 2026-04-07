@@ -15,7 +15,7 @@ import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 /**
  * Restores workspace state: tags, filters, config, and opened notes
  */
-export const useRestoreWorkspace = () => {
+export const WorkspaceLoader = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();
@@ -115,4 +115,6 @@ export const useRestoreWorkspace = () => {
 		tagsRegistry,
 		handleWorkspaceError,
 	]);
+
+	return null;
 };
