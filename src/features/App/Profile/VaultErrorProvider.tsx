@@ -29,7 +29,7 @@ export const VaultErrorProvider: FC<PropsWithChildren<{ controls: ProfileControl
 				containerStyle: { maxW: '400px' },
 			});
 
-			telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_OPEN_FAILED);
+			telemetry.track(TELEMETRY_EVENT_NAME.VAULT_OPEN_FAILED);
 		},
 		[controls, telemetry, toast],
 	);

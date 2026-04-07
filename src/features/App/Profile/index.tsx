@@ -183,6 +183,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			leading: true,
 		},
 	);
+
+	// Memoize the function so it can be used as a dependency in child effects
+	// Without memoization, a new function is created on every render
 	const onWorkspaceError = useCallback((error: Error, workspaceId: string) => {
 		setWorkspaceErrors((prev) => ({ ...prev, [workspaceId]: error }));
 	}, []);
