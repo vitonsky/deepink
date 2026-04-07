@@ -45,10 +45,7 @@ jobs:
 
       - name: Build Twofish WASM
         working-directory: packages/twofish
-        run: |
-          export UID=$(id -u)
-          export GID=$(id -g)
-          npm run build
+        run: npm run build
 
       - name: Linter
         run: npm run lint
