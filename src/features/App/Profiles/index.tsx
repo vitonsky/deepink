@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { VaultStorage } from '@features/files';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
@@ -12,7 +12,7 @@ export type ProfilesProps = {
 	profilesApi: ProfilesApi;
 };
 
-const ProfileItem = ({
+const VaultProviders = ({
 	profileContainer,
 	profilesApi,
 }: {
@@ -37,6 +37,11 @@ const ProfileItem = ({
 		} satisfies ProfileControls;
 	}, [dispatch, profile, profileContainer, profilesApi.events]);
 
+	// Close the vault on unmount and clean up all resources
+	useEffect(() => {
+		return () => controls.close();
+	}, [controls]);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			<VaultErrorProvider controls={controls}>
@@ -60,7 +65,7 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				const profile = profileContainer.getContent();
 
 				return (
-					<ProfileItem
+					<VaultProviders
 						key={profile.profile.id}
 						profileContainer={profileContainer}
 						profilesApi={profilesApi}

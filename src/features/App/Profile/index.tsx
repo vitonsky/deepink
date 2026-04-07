@@ -74,7 +74,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		[currentProfile.db],
 	);
 	useEffect(() => {
-		let isProfileLoadCancelled = false;
+		let isVaultLoadCancelled = false;
 
 		const vaultConfig = new StateFile(
 			new FileController('config.json', controls.profile.files),
@@ -83,7 +83,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 		Promise.all([workspacesManager.getList(), vaultConfig.get(), getVaultState()])
 			.then(async ([workspaces, config, state]) => {
-				if (isProfileLoadCancelled) return;
+				if (isVaultLoadCancelled) return;
 				const [defaultWorkspace] = workspaces;
 
 				if (!defaultWorkspace)
@@ -125,13 +125,19 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				);
 			})
 			.catch((error) => {
-				if (isProfileLoadCancelled) return;
+				if (isVaultLoadCancelled) return;
 
 				handleVaultError(error);
 			});
 
 		return () => {
-			isProfileLoadCancelled = true;
+			isVaultLoadCancelled = true;
+
+			dispatch(
+				workspacesApi.removeProfile({
+					profileId,
+				}),
+			);
 		};
 	}, [
 		controls.profile.files,
@@ -141,11 +147,6 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		profileId,
 		workspacesManager,
 	]);
-
-	// Close the vault on unmount and clean up all resources
-	useEffect(() => {
-		return () => controls.close();
-	}, [controls]);
 
 	const isDevMode = useIsDeveloper();
 
