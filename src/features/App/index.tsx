@@ -1,12 +1,8 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { FaUser } from 'react-icons/fa6';
 import { useDebounce } from 'use-debounce';
-import { Box, Button, Divider, HStack, Text, useToast } from '@chakra-ui/react';
-import { NestedList } from '@components/NestedList';
-import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { Box, Center, useToast } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
-import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
@@ -20,19 +16,10 @@ import {
 	VaultOpenError,
 	VaultOpenErrorCode,
 } from './Profiles/hooks/useProfileContainers';
-import { ProfilesForm } from './ProfilesForm';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-
-export const defaultVaultNames = [
-	'Creative drafts',
-	'Second brain',
-	'Digital garden',
-	'Creative space',
-	'Mind space',
-	'Idea lab',
-];
+import { ChooseVaultScreen } from './VaultChooseScreen';
 
 type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
 
@@ -41,54 +28,46 @@ export type OnPickProfile = (
 	password?: string,
 ) => Promise<PickProfileResponse>;
 
+const defaultVaultNames = [
+	'Creative drafts',
+	'Second brain',
+	'Digital garden',
+	'Creative space',
+	'Mind space',
+	'Idea lab',
+];
+
 export const App: FC = () => {
 	const files = useFilesStorage();
 	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
 
 	const profilesList = useProfilesList();
 	const profileContainers = useProfileContainers();
-	const recentProfile = useRecentProfile(config);
 
 	const [currentVaultId, setCurrentVaultId] = useProfileSelector(config);
-	const [isVaultOpening, setIsVaultOpening] = useState(false);
-	const [screenName, setScreenName] = useState<'createVault' | 'chooseVault'>(
-		'chooseVault',
-	);
-
 	const currentVault = useMemo(
 		() => profilesList.profiles.find((p) => p.id === currentVaultId) ?? null,
 		[currentVaultId, profilesList.profiles],
 	);
 
+	// When the active vault changes, close any open error toast
 	const toast = useToast();
-	const showErrorToast = useCallback(
-		(name: string) => {
-			toast({
-				status: 'error',
-				title: 'Failed to open vault',
-				description: `"${name}" appears to be corrupted.`,
-				containerStyle: { maxW: '400px' },
-			});
-		},
-		[toast],
-	);
+	useEffect(() => {
+		toast.closeAll();
+	}, [currentVaultId, toast]);
 
+	const [screenName, setScreenName] = useState<'create' | 'choose' | 'loading'>(
+		'choose',
+	);
 	const onOpenVault = useCallback(
 		async (
 			profile: ProfileObject,
 			password?: string,
 		): Promise<PickProfileResponse> => {
-			setIsVaultOpening(true);
+			setScreenName('loading');
 
 			try {
-				// Profiles with no password
-				if (profile.encryption === null) {
-					await profileContainers.openProfile({ profile }, true);
-					return { status: 'ok' };
-				}
-
-				// Profiles with password
-				if (password === undefined) {
+				if (profile.encryption !== null && password === undefined) {
 					return { status: 'error', message: 'Enter password' };
 				}
 
@@ -103,23 +82,23 @@ export const App: FC = () => {
 					return { status: 'error', message: 'Invalid password' };
 				}
 
-				showErrorToast(profile.name);
+				toast({
+					status: 'error',
+					title: 'Failed to open vault',
+					description: `"${profile.name}" appears to be corrupted.`,
+					containerStyle: { maxW: '400px' },
+				});
+
 				throw err;
 			} finally {
-				setIsVaultOpening(false);
-				setScreenName('chooseVault');
+				setScreenName('choose');
 			}
 		},
-		[profileContainers, showErrorToast],
+		[profileContainers, toast],
 	);
 
-	// When the active vault changes, close any open error toast
-	useEffect(() => {
-		toast.closeAll();
-	}, [currentVaultId, toast]);
-
 	// Restore and auto-open recent profile
-	const [isProfileAutoOpening, setIsProfileAutoOpening] = useState(false);
+	const recentProfile = useRecentProfile(config);
 	useEffect(
 		() => {
 			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
@@ -134,25 +113,24 @@ export const App: FC = () => {
 			if (!profile || profile.encryption) return;
 
 			// Automatically open profile with no encryption
-			setIsProfileAutoOpening(true);
-			profileContainers
-				.openProfile({ profile }, true)
-				.catch(() => showErrorToast(profile.name))
-				.finally(() => setIsProfileAutoOpening(false));
+			onOpenVault(profile);
 		},
 		// Depends only of loading status and run only once
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
 	);
 
-	// Show splash screen while app is loading
-	const isAppLoading =
-		!profilesList.isProfilesLoaded || !recentProfile.isLoaded || isProfileAutoOpening;
-	const [isSplashVisible] = useDebounce(isAppLoading, 500);
-	if (isSplashVisible) return <SplashScreen />;
+	const [isInitialLoading] = useDebounce(
+		!profilesList.isProfilesLoaded || !recentProfile.isLoaded,
+		500,
+	);
+
+	// Skip splash while encrypted vault is opening
+	const isVaultLoading = screenName === 'loading' && !currentVault?.encryption;
+	if (isInitialLoading || isVaultLoading) return <SplashScreen />;
 
 	// Main vault screen
-	if (profileContainers.activeProfile && !isVaultOpening) {
+	if (profileContainers.activeProfile && screenName !== 'loading') {
 		return (
 			<Box
 				sx={{
@@ -167,103 +145,51 @@ export const App: FC = () => {
 		);
 	}
 
-	// Login form stays visible while vault is opening — splash is skipped
-	if (currentVault?.encryption) {
+	if (currentVault && currentVault.encryption) {
 		return (
-			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
-				<Box maxW="500px" minW="350px" padding="1rem">
+			<Center minH="100vh">
+				<Box maxW="500px" minW="350px">
 					<ProfileLoginForm
 						profile={currentVault}
 						onLogin={onOpenVault}
 						onPickAnotherProfile={() => setCurrentVaultId(null)}
 					/>
 				</Box>
-			</Box>
+			</Center>
 		);
 	}
 
-	// Show splash while profile is opening
-	if (isVaultOpening) return <SplashScreen />;
-
 	const hasNoProfiles = profilesList.profiles.length === 0;
-	if (screenName === 'createVault' || hasNoProfiles) {
+	if (screenName === 'create' || hasNoProfiles) {
 		return (
-			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
-				<Box maxW="500px" minW="350px" padding="1rem">
+			<Center minH="100vh">
+				<Box maxW="500px" minW="350px">
 					<ProfileCreator
 						onCreateProfile={async (profile) => {
 							const newProfile = await profilesList.createProfile(profile);
 							await onOpenVault(newProfile, profile.password || undefined);
 						}}
 						onCancel={
-							hasNoProfiles ? undefined : () => setScreenName('chooseVault')
+							hasNoProfiles ? undefined : () => setScreenName('choose')
 						}
 						defaultProfileName={
 							hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
 						}
 					/>
 				</Box>
-			</Box>
+			</Center>
 		);
 	}
 
 	return (
-		<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
-			<Box maxW="500px" minW="350px" padding="1rem">
-				<ProfilesForm
-					title="Choose the profile"
-					controls={
-						<Button
-							variant="accent"
-							size="lg"
-							w="100%"
-							onClick={() => setScreenName('createVault')}
-						>
-							Create new profile
-						</Button>
-					}
-				>
-					<NestedList
-						divider={<Divider margin="0px !important" />}
-						sx={{
-							w: '100%',
-							borderRadius: '4px',
-							maxHeight: '230px',
-							overflow: 'auto',
-							border: '1px solid',
-						}}
-						items={(profilesList.profiles ?? []).map((profile) => ({
-							id: profile.id,
-							content: (
-								<HStack
-									as="button"
-									key={profile.id}
-									sx={{
-										padding: '.8rem 1rem',
-										w: '100%',
-										cursor: 'pointer',
-										gap: '.8rem',
-									}}
-									onClick={() => {
-										setCurrentVaultId(profile.id);
-
-										if (profile.encryption === null) {
-											onOpenVault(profile);
-										}
-
-										telemetry.track(
-											TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
-										);
-									}}
-								>
-									<FaUser />
-									<Text>{profile.name}</Text>
-								</HStack>
-							),
-						}))}
-					/>
-				</ProfilesForm>
+		<Center minH="100vh">
+			<Box maxW="500px" minW="350px">
+				<ChooseVaultScreen
+					vaults={profilesList.profiles}
+					onOpenVault={onOpenVault}
+					onCreateVault={() => setScreenName('create')}
+				/>
 			</Box>
-		</Box>
+		</Center>
 	);
 };
