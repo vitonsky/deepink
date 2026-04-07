@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { Box, Center, useToast } from '@chakra-ui/react';
+import { Box, useToast } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { useFilesStorage } from '@features/files';
@@ -8,6 +8,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { AppServices } from './AppServices';
+import { CenterBox } from './CenterBox';
 import { ChooseVaultScreen } from './ChooseVaultScreen';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
@@ -130,7 +131,7 @@ export const App: FC = () => {
 	if (isInitialLoading || isVaultLoading) return <SplashScreen />;
 
 	// Main vault screen
-	if (profileContainers.activeProfile && screenName !== 'loading') {
+	if (profileContainers.activeProfile) {
 		return (
 			<Box
 				sx={{
@@ -147,50 +148,39 @@ export const App: FC = () => {
 
 	if (currentVault && currentVault.encryption) {
 		return (
-			<Center h="100vh">
-				<Box maxW="500px" minW="350px">
-					<ProfileLoginForm
-						profile={currentVault}
-						onLogin={onOpenVault}
-						onPickAnotherProfile={() => setCurrentVaultId(null)}
-					/>
-				</Box>
-			</Center>
+			<CenterBox>
+				<ProfileLoginForm
+					profile={currentVault}
+					onLogin={onOpenVault}
+					onPickAnotherProfile={() => setCurrentVaultId(null)}
+				/>
+			</CenterBox>
 		);
 	}
 
 	const hasNoProfiles = profilesList.profiles.length === 0;
 	if (screenName === 'create' || hasNoProfiles) {
 		return (
-			<Center h="100vh">
-				<Box maxW="500px" minW="350px">
-					<ProfileCreator
-						onCreateProfile={async (profile) => {
-							setScreenName('loading');
-							const newProfile = await profilesList.createProfile(profile);
-							await onOpenVault(newProfile, profile.password || undefined);
-						}}
-						onCancel={
-							hasNoProfiles ? undefined : () => setScreenName('choose')
-						}
-						defaultProfileName={
-							hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
-						}
-					/>
-				</Box>
-			</Center>
+			<CenterBox>
+				<ProfileCreator
+					onCreateProfile={async (profile) => {
+						const newProfile = await profilesList.createProfile(profile);
+						await onOpenVault(newProfile, profile.password || undefined);
+					}}
+					onCancel={hasNoProfiles ? undefined : () => setScreenName('choose')}
+					defaultProfileName={
+						hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
+					}
+				/>
+			</CenterBox>
 		);
 	}
 
 	return (
-		<Center h="100vh">
-			<Box maxW="500px" minW="350px">
-				<ChooseVaultScreen
-					vaults={profilesList.profiles}
-					onOpenVault={onOpenVault}
-					onCreateVault={() => setScreenName('create')}
-				/>
-			</Box>
-		</Center>
+		<ChooseVaultScreen
+			vaults={profilesList.profiles}
+			onOpenVault={onOpenVault}
+			onCreateVault={() => setScreenName('create')}
+		/>
 	);
 };
