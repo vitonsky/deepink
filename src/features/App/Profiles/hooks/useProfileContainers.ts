@@ -92,7 +92,8 @@ export const useProfileContainers = () => {
 
 			const runCleanups = async () => {
 				// TODO: remove key of RAM. Set control with callback to remove key
-				for (const cleanup of cleanups) {
+				// LIFO cleanup: last added cleanup runs first
+				for (const cleanup of [...cleanups].reverse()) {
 					try {
 						// TODO: set deadline for awaiting
 						await cleanup();
@@ -168,7 +169,7 @@ export const useProfileContainers = () => {
 				);
 
 				// TODO: close DB first and close encryption last
-				cleanups.unshift(() => db.close());
+				cleanups.push(() => db.close());
 
 				// Ensure at least one workspace exists
 				const workspaces = new WorkspacesController(db);
