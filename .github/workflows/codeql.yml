@@ -45,7 +45,12 @@ jobs:
 
       - name: Build Twofish WASM
         working-directory: packages/twofish
-        run: npm run build
+        run: |
+          echo "Runner UID: $(id -u)"
+          echo "Runner GID: $(id -g)"
+          echo "UID var: $UID"
+
+          npm run build
 
       - name: Linter
         run: npm run lint
