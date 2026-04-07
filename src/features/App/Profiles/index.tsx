@@ -12,7 +12,7 @@ export type ProfilesProps = {
 	profilesApi: ProfilesApi;
 };
 
-const ProfileProvider = ({
+const ProfileItem = ({
 	profileContainer,
 	profilesApi,
 }: {
@@ -60,7 +60,7 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				const profile = profileContainer.getContent();
 
 				return (
-					<ProfileProvider
+					<ProfileItem
 						key={profile.profile.id}
 						profileContainer={profileContainer}
 						profilesApi={profilesApi}

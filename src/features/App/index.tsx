@@ -166,6 +166,7 @@ export const App: FC = () => {
 				<Box maxW="500px" minW="350px">
 					<ProfileCreator
 						onCreateProfile={async (profile) => {
+							setScreenName('loading');
 							const newProfile = await profilesList.createProfile(profile);
 							await onOpenVault(newProfile, profile.password || undefined);
 						}}

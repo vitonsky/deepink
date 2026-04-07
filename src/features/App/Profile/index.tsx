@@ -132,12 +132,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 		return () => {
 			isProfileLoadCancelled = true;
-
-			// Close the vault on unmount and clean up redux
-			controls.close();
 		};
 	}, [
-		controls,
 		controls.profile.files,
 		dispatch,
 		getVaultState,
@@ -145,6 +141,11 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		profileId,
 		workspacesManager,
 	]);
+
+	// Close the vault on unmount and clean up all resources
+	useEffect(() => {
+		return () => controls.close();
+	}, [controls]);
 
 	const isDevMode = useIsDeveloper();
 
