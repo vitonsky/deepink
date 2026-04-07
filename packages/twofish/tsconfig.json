@@ -25,12 +25,12 @@
 		"preserveConstEnums": true,
 		"removeComments": false,
 		"sourceMap": true,
-		"rootDir": "src",
+		"rootDir": ".",
 		"allowJs": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"baseUrl": ".",
 		"types": ["vitest/globals", "node"]
 	},
-	"include": ["*.ts", "src/**/*.ts"]
+	"include": ["*.ts", "**/*.ts"]
 }

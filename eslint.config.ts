@@ -275,4 +275,16 @@ export default tseslint.config(
 			],
 		},
 	},
+
+	// Nested packages
+	{
+		files: ['packages/twofish/**/*.ts'],
+		languageOptions: {
+			parserOptions: {
+				projectService: {
+					defaultProject: 'packages/twofish/tsconfig.json',
+				},
+			},
+		},
+	},
 );
