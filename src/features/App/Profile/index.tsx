@@ -4,6 +4,7 @@ import React, {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import { isEqual } from 'lodash';
@@ -73,7 +74,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		() => new WorkspacesController(currentProfile.db),
 		[currentProfile.db],
 	);
+	const isVaultLoaded = useRef<boolean>(false);
 	useEffect(() => {
+		// Load vault only one time
+		if (isVaultLoaded.current) return;
+		isVaultLoaded.current = true;
+
 		let isVaultLoadCancelled = false;
 
 		const vaultConfig = new StateFile(
@@ -126,6 +132,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			})
 			.catch((error) => {
 				if (isVaultLoadCancelled) return;
+				isVaultLoaded.current = false;
 
 				handleVaultError(error);
 			});
