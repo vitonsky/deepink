@@ -14,8 +14,8 @@ import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { WorkspaceServices } from './services/WorkspaceServices';
 import { useWorkspace } from './useWorkspace';
-import { WorkspaceLoader } from './WorkspaceLoader';
 import { WorkspaceProvider } from './WorkspaceProvider';
+import { WorkspaceStateInitializer } from './WorkspaceStateInitializer';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
 export const WorkspaceContext = createContext<{
@@ -95,7 +95,7 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 			>
 				<WorkspaceServices />
 
-				{!isWorkspaceLoaded && <WorkspaceLoader />}
+				{!isWorkspaceLoaded && <WorkspaceStateInitializer />}
 				{isWorkspaceLoaded && (
 					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
 						<MainScreen />

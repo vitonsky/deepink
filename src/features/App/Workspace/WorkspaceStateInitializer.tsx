@@ -8,14 +8,14 @@ import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hoo
 import {
 	createWorkspaceConfigFile,
 	createWorkspaceStateFile,
-} from './utils/workspaceFiles.ts';
-import { useWorkspaceError } from './WorkspaceErrorProvider';
-import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
+} from './utils/workspaceFiles.ts.tsx';
+import { useWorkspaceError } from './WorkspaceErrorProvider.tsx';
+import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider.tsx';
 
 /**
  * Restores workspace state: tags, filters, config, and opened notes
  */
-export const WorkspaceLoader = () => {
+export const WorkspaceStateInitializer = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
 	const workspaceActions = useWorkspaceActions();

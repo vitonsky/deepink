@@ -8,6 +8,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { AppServices } from './AppServices';
+import { ChooseVaultScreen } from './ChooseVaultScreen';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
 import { Profiles } from './Profiles';
@@ -19,7 +20,6 @@ import {
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { ChooseVaultScreen } from './VaultChooseScreen';
 
 type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
 
@@ -147,7 +147,7 @@ export const App: FC = () => {
 
 	if (currentVault && currentVault.encryption) {
 		return (
-			<Center minH="100vh">
+			<Center h="100vh">
 				<Box maxW="500px" minW="350px">
 					<ProfileLoginForm
 						profile={currentVault}
@@ -162,7 +162,7 @@ export const App: FC = () => {
 	const hasNoProfiles = profilesList.profiles.length === 0;
 	if (screenName === 'create' || hasNoProfiles) {
 		return (
-			<Center minH="100vh">
+			<Center h="100vh">
 				<Box maxW="500px" minW="350px">
 					<ProfileCreator
 						onCreateProfile={async (profile) => {
@@ -182,7 +182,7 @@ export const App: FC = () => {
 	}
 
 	return (
-		<Center minH="100vh">
+		<Center h="100vh">
 			<Box maxW="500px" minW="350px">
 				<ChooseVaultScreen
 					vaults={profilesList.profiles}
