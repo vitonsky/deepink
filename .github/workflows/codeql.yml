@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Twofish WASM
         working-directory: packages/twofish
-        run: npm build
+        run: npm run build
 
       - name: Linter
         run: npm run lint
