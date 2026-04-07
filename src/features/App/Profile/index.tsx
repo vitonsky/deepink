@@ -32,8 +32,8 @@ import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
-import { WorkspaceError } from '../Workspace/WorkspaceError';
 import { WorkspaceErrorProvider } from '../Workspace/WorkspaceErrorProvider';
+import { WorkspaceErrorScreen } from '../Workspace/WorkspaceErrorScreen';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { useVaultState } from './useVaultState';
@@ -200,7 +200,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			{workspaces.length > 0 && <ProfileServices />}
 
 			{activeWorkspaceError && (
-				<WorkspaceError onWorkspaceErrorReset={onWorkspaceErrorReset} />
+				<WorkspaceErrorScreen onWorkspaceErrorReset={onWorkspaceErrorReset} />
 			)}
 
 			{workspaces.map((workspace) =>

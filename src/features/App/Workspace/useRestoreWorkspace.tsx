@@ -42,18 +42,18 @@ export const useRestoreWorkspace = () => {
 				// Restore filters
 				if (state) {
 					// Validate selected tags against the tags list - invalid tags will be ignored
-					let selectedTag;
+					let selectedTagId;
 					if (tags.length > 0 && state.selectedTagId) {
-						selectedTag =
-							tags.find((tag) => tag.id === state.selectedTagId) ||
+						selectedTagId =
+							tags.find((tag) => tag.id === state.selectedTagId)?.id ||
 							undefined;
 					}
 
 					dispatch(
-						workspaceActions.setFilters({
+						workspaceActions.updateFilters({
 							search: state.search,
 							view: state.view,
-							selectedTagId: selectedTag ? selectedTag.id : undefined,
+							selectedTagId,
 						}),
 					);
 				}
@@ -95,7 +95,7 @@ export const useRestoreWorkspace = () => {
 				await updateNoteListRef.current();
 
 				dispatch(
-					workspaceActions.setWorkspaceLoadingStatus({
+					workspaceActions.updateWorkspaceLoadingStatus({
 						isOpenedNotesLoaded: true,
 						isFiltersLoaded: true,
 						isConfigLoaded: true,

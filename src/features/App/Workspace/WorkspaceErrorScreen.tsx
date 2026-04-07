@@ -12,7 +12,7 @@ import {
 
 import { useProfileControls } from '../Profile';
 
-export const WorkspaceError = ({
+export const WorkspaceErrorScreen = ({
 	onWorkspaceErrorReset,
 }: {
 	onWorkspaceErrorReset: (workspaceId: string) => void;

@@ -266,6 +266,10 @@ export const profilesSlice = createSlice({
 			profile.activeWorkspace = workspaceId;
 		},
 
+		/**
+		 * Reset all values to default, set the touched property to false so the workspace does not render,
+		 * This allows us not to keep data in memory for a corrupted workspace.
+		 */
 		resetWorkspace: (
 			state,
 			{
@@ -285,7 +289,7 @@ export const profilesSlice = createSlice({
 			});
 		},
 
-		setWorkspaceLoadingStatus: (
+		updateWorkspaceLoadingStatus: (
 			state,
 			{
 				payload: { profileId, workspaceId, ...status },
@@ -477,7 +481,7 @@ export const profilesSlice = createSlice({
 			workspace.view = view;
 		},
 
-		setFilters: (
+		updateFilters: (
 			state,
 			{
 				payload: { profileId, workspaceId, view, search, selectedTagId },
