@@ -43,6 +43,10 @@ jobs:
       - name: Install deps
         run: npm install
 
+      - name: Build Twofish WASM
+        working-directory: packages/twofish
+        run: npm build
+
       - name: Linter
         run: npm run lint
 
