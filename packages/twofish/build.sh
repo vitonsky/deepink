@@ -28,4 +28,4 @@ $CLANG \
   -o dist/twofish.wasm \
   $(find src -name '*.c')
 
-echo "✓ Done — $(wc -c < twofish.wasm | tr -d ' ') bytes → twofish.wasm"
+echo "✓ Done — $(wc -c < dist/twofish.wasm | tr -d ' ') bytes → dist/twofish.wasm"
