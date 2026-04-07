@@ -54,11 +54,5 @@
 			"module": "CommonJS"
 		}
 	},
-	"include": [
-		"*.ts",
-		"scripts/**/*.ts",
-		"packages/twofish/**/*.ts",
-		"src/**/*.ts",
-		"src/**/*.tsx"
-	]
+	"include": ["*.ts", "scripts/**/*.ts", "src/**/*.ts", "src/**/*.tsx"]
 }
