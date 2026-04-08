@@ -3,7 +3,7 @@ import { webcrypto } from 'node:crypto';
 
 import { createFakeRandomBytesGenerator } from '../__tests__/random';
 import { getRandomBytes } from '../utils/random';
-import { BufferIntegrityProcessor, IntegrityError } from './BufferIntegrityProcessor';
+import { BufferIntegrityProcessor } from './BufferIntegrityProcessor';
 
 vi.stubGlobal('crypto', webcrypto);
 vi.stubGlobal('self', globalThis);
@@ -30,9 +30,10 @@ test('Modified data must throw error', async () => {
 	const blobView = new Uint8Array(blob);
 	blobView[blobView.length - 1] = blobView.at(-1)! ^ 1;
 
-	const assert = expect(integrity.decrypt(blob));
-	assert.rejects.toThrow(IntegrityError);
-	assert.rejects.toThrow('Integrity violation');
+	await expect(integrity.decrypt(blob)).rejects.toMatchObject({
+		name: 'IntegrityError',
+		message: expect.stringContaining('Integrity violation'),
+	});
 });
 
 test('Valid data must throw error with invalid key', async () => {
@@ -42,9 +43,10 @@ test('Valid data must throw error with invalid key', async () => {
 	const data = getRandomBytes(1024);
 	const blob = await new BufferIntegrityProcessor(key1).encrypt(data.buffer);
 
-	const assert = expect(new BufferIntegrityProcessor(key2).decrypt(blob));
-	assert.rejects.toThrow(IntegrityError);
-	assert.rejects.toThrow('Integrity violation');
+	await expect(new BufferIntegrityProcessor(key2).decrypt(blob)).rejects.toMatchObject({
+		name: 'IntegrityError',
+		message: expect.stringContaining('Integrity violation'),
+	});
 });
 
 test('Error must be thrown when key of invalid size is provided', async () => {
