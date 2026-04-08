@@ -30,4 +30,10 @@ describe('Fake random', () => {
 			Buffer.from(createFakeRandomBytesGenerator(100)(10)).toString('hex'),
 		).toMatchSnapshot('Seed 100');
 	});
+
+	test('fake random bytes can reach the bounds', () => {
+		const sample = createFakeRandomBytesGenerator(1)(4096);
+		expect(Math.max(...sample)).toBe(255);
+		expect(Math.min(...sample)).toBe(0);
+	});
 });

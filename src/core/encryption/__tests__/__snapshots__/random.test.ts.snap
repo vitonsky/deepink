@@ -30,8 +30,8 @@ exports[`Fake random > mulberry32 sequence > Seed 1 1`] = `
 ]
 `;
 
-exports[`Fake random > random bytes sequence > Seed 0 1`] = `"1a00160e2e363d402d3a"`;
+exports[`Fake random > random bytes sequence > Seed 0 1`] = `"44003925778b9da67494"`;
 
-exports[`Fake random > random bytes sequence > Seed 1 1`] = `"3e003462601c3d482a63"`;
+exports[`Fake random > random bytes sequence > Seed 1 1`] = `"a00087fbf7479cb86dfe"`;
 
-exports[`Fake random > random bytes sequence > Seed 100 1`] = `"141f3558374401341632"`;
+exports[`Fake random > random bytes sequence > Seed 100 1`] = `"345088e38daf03853a80"`;

@@ -11,5 +11,5 @@ export function mulberry32(seed: number): () => number {
 
 export const createFakeRandomBytesGenerator = (seed: number) => {
 	const getNextNumber = mulberry32(seed);
-	return (length: number) => new Uint8Array(length).map(() => getNextNumber() * 100);
+	return (length: number) => new Uint8Array(length).map(() => getNextNumber() * 256);
 };
