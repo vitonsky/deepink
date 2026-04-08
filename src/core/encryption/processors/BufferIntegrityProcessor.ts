@@ -30,6 +30,9 @@ export class BufferIntegrityProcessor implements IEncryptionProcessor {
 	 * @throws `IntegrityError` when check sum do not match
 	 */
 	public decrypt = async (buffer: ArrayBuffer) => {
+		if (buffer.byteLength < 32)
+			throw new IntegrityError('Integrity violation. Too short buffer');
+
 		const key = await crypto.subtle.importKey(
 			'raw',
 			this.key,

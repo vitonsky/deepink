@@ -36,6 +36,14 @@ test('Modified data must throw error', async () => {
 	});
 });
 
+test('Too small buffer must be rejected immediately', async () => {
+	const integrity = new BufferIntegrityProcessor(getRandomBytes(32));
+	await expect(integrity.decrypt(getRandomBytes(2).buffer)).rejects.toMatchObject({
+		name: 'IntegrityError',
+		message: expect.stringContaining('short buffer'),
+	});
+});
+
 test('Valid data must throw error with invalid key', async () => {
 	const key1 = getRandomBytes(32);
 	const key2 = getRandomBytes(32);
