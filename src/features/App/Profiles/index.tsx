@@ -21,21 +21,21 @@ const VaultProviders = ({
 }) => {
 	const dispatch = useAppDispatch();
 
-	const profile = profileContainer.getContent();
+	const vault = profileContainer.getContent();
 	const controls = useMemo(() => {
 		return {
-			profile,
+			profile: vault,
 			close: () => {
 				profilesApi.events.profileClosed(profileContainer);
 
 				dispatch(
 					workspacesApi.removeProfile({
-						profileId: profile.profile.id,
+						profileId: vault.profile.id,
 					}),
 				);
 			},
 		} satisfies ProfileControls;
-	}, [dispatch, profile, profileContainer, profilesApi.events]);
+	}, [dispatch, vault, profileContainer, profilesApi.events]);
 
 	// Close the vault on unmount and clean up all resources
 	useEffect(() => {
@@ -45,8 +45,8 @@ const VaultProviders = ({
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			<VaultErrorProvider controls={controls}>
-				<VaultStorage value={profile.files}>
-					<Profile profile={profile} controls={controls} />
+				<VaultStorage value={vault.files}>
+					<Profile profile={vault} controls={controls} />
 				</VaultStorage>
 			</VaultErrorProvider>
 		</ProfileControlsContext.Provider>

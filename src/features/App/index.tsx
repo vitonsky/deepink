@@ -117,6 +117,7 @@ export const App: FC = () => {
 
 	// Skip splash while encrypted vault is opening
 	const isVaultLoading = screenName === 'loading' && !currentVault?.encryption;
+
 	if (isInitialLoading || isVaultLoading) {
 		return <SplashScreen />;
 	}
