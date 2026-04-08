@@ -1,18 +1,16 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { Box, useToast } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { ProfileObject } from '@core/storage/ProfilesManager';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
 
-import { AppServices } from './AppServices';
 import { CenterBox } from './CenterBox';
 import { ChooseVaultScreen } from './ChooseVaultScreen';
 import { ProfileCreator } from './ProfileCreator';
 import { ProfileLoginForm } from './ProfileLoginForm';
-import { Profiles } from './Profiles';
 import {
 	useProfileContainers,
 	VaultOpenError,
@@ -21,6 +19,7 @@ import {
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
+import { VaultScreen } from './VaultScreen';
 
 type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
 
@@ -128,22 +127,12 @@ export const App: FC = () => {
 
 	// Skip splash while encrypted vault is opening
 	const isVaultLoading = screenName === 'loading' && !currentVault?.encryption;
-	if (isInitialLoading || isVaultLoading) return <SplashScreen />;
+	if (isInitialLoading || isVaultLoading) {
+		return <SplashScreen />;
+	}
 
-	// Main vault screen
 	if (profileContainers.activeProfile) {
-		return (
-			<Box
-				sx={{
-					display: 'flex',
-					width: '100%',
-					height: '100vh',
-				}}
-			>
-				<Profiles profilesApi={profileContainers} />
-				<AppServices />
-			</Box>
-		);
+		return <VaultScreen vaultContainers={profileContainers} />;
 	}
 
 	if (currentVault && currentVault.encryption) {
