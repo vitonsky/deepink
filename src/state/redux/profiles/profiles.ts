@@ -267,8 +267,7 @@ export const profilesSlice = createSlice({
 		},
 
 		/**
-		 * Reset all values to default, set the touched property to false so the workspace does not render,
-		 * This allows us not to keep data in memory for a corrupted workspace.
+		 * Saves the workspace in the workspace list and resets all data to default
 		 */
 		resetWorkspace: (
 			state,

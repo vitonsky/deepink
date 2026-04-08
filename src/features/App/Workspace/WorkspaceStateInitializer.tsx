@@ -12,9 +12,6 @@ import {
 import { useWorkspaceError } from './WorkspaceErrorProvider.tsx';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider.tsx';
 
-/**
- * Restores workspace state: tags, filters, config, and opened notes
- */
 export const WorkspaceStateInitializer = () => {
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -30,6 +27,7 @@ export const WorkspaceStateInitializer = () => {
 
 	const handleWorkspaceError = useWorkspaceError();
 
+	// Restores workspace state: tags, filters, config, and opened notes
 	useEffect(() => {
 		const workspaceState = createWorkspaceStateFile(workspaceStorage);
 		const workspaceConfig = createWorkspaceConfigFile(workspaceStorage);
