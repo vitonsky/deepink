@@ -3,7 +3,7 @@ import { formatAlgorithms } from '@core/features/encryption/utils';
 
 import { AESCipher } from '../ciphers/AES';
 import { SerpentCipher } from '../ciphers/Serpent';
-import { WasmTwofishCTRCipher } from '../ciphers/Twofish';
+import { TwofishCTRCipher } from '../ciphers/Twofish';
 import { XChaCha20Cipher } from '../ciphers/XChaCha20';
 import { BufferIntegrityProcessor } from '../processors/BufferIntegrityProcessor';
 import { PipelineProcessor } from '../processors/PipelineProcessor';
@@ -26,7 +26,7 @@ export const ciphers: {
 	{
 		name: ENCRYPTION_ALGORITHM.TWOFISH,
 		async create(key, randomBytes) {
-			return new WasmTwofishCTRCipher(key, randomBytes);
+			return new TwofishCTRCipher(key, randomBytes);
 		},
 	},
 	{
@@ -60,7 +60,7 @@ export const ciphers: {
 			return new PipelineProcessor([
 				new BufferIntegrityProcessor(hmac),
 				new AESCipher(aes, randomBytes),
-				new WasmTwofishCTRCipher(twofish, randomBytes),
+				new TwofishCTRCipher(twofish, randomBytes),
 				new SerpentCipher(serpent, randomBytes),
 			]);
 		},

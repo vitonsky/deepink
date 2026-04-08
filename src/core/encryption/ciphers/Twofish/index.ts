@@ -18,11 +18,10 @@ export const TWOFISH_HEADER = struct({
 	iv: bytes(MASTER_IV_SIZE),
 });
 
-// TODO: implement GCM mode https://en.wikipedia.org/wiki/Galois/Counter_Mode
 /**
  * Twofish cipher implementation
  */
-export class WasmTwofishCTRCipher implements IEncryptionProcessor {
+export class TwofishCTRCipher implements IEncryptionProcessor {
 	private readonly chunkSize = CTRCipherMode.getEncryptionLimits(16).maxBytes;
 	constructor(
 		private readonly key: Uint8Array<ArrayBuffer>,

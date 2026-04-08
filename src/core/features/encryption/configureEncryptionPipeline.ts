@@ -1,7 +1,7 @@
 import z from 'zod';
 import { AESCipher } from '@core/encryption/ciphers/AES';
 import { ensureWasmIsLoaded, SerpentCipher } from '@core/encryption/ciphers/Serpent';
-import { WasmTwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
+import { TwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
 import { XChaCha20Cipher } from '@core/encryption/ciphers/XChaCha20';
 import { HKDFDerivedKeys } from '@core/encryption/utils/HKDFDerivedKeys';
 
@@ -41,7 +41,7 @@ export const configureEncryptionPipeline = async (
 				case ENCRYPTION_ALGORITHM.TWOFISH: {
 					const key = await hkdf.deriveBits(256, String(index));
 
-					const cipher = new WasmTwofishCTRCipher(
+					const cipher = new TwofishCTRCipher(
 						new Uint8Array(key),
 						getRandomBytes,
 					);
