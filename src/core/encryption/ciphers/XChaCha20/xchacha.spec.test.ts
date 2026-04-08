@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 /* eslint-disable @cspell/spellchecker */
 import sodium from 'libsodium-wrappers-sumo';
 
@@ -133,6 +134,13 @@ describe('draft-arciszewski-xchacha-01', () => {
 					aad,
 				}),
 			).resolves.toStrictEqual(new Uint8Array(plaintext));
+
+			// Cannot decrypt with incorrect mac
+			const tamperedMac = new Uint8Array(encryptionResult.mac);
+			tamperedMac[0] ^= 0x01;
+			await expect(
+				cipher.decrypt(encryptionResult.ciphertext, tamperedMac, { aad }),
+			).rejects.toThrow();
 		});
 
 		test('XChaCha20-Poly1305 detached mode', async () => {
