@@ -122,8 +122,6 @@ describe('draft-arciszewski-xchacha-01', () => {
 		test('XChaCha20-Poly1305 wrapper', async () => {
 			const cipher = new XChaCha20Poly1305(key, iv);
 
-			await cipher.load();
-
 			const encryptionResult = await cipher.encrypt(plaintext, { aad });
 			expect(encryptionResult).toStrictEqual({
 				ciphertext: new Uint8Array(expectedCt),

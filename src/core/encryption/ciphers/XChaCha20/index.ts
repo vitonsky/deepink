@@ -23,13 +23,6 @@ export class XChaCha20Poly1305 {
 		});
 	}
 
-	/**
-	 * Load WASM module
-	 */
-	public async load() {
-		await sodium.ready;
-	}
-
 	public async dispose() {
 		const state = await this.state;
 
@@ -105,8 +98,6 @@ export class XChaCha20Cipher implements IEncryptionProcessor {
 		const cipher = new XChaCha20Poly1305(this.key, nonce);
 
 		try {
-			await cipher.load();
-
 			// Allocate output buffer as buffer size + chunks overhead + header size
 			const chunksCount = Math.ceil(buffer.byteLength / this.chunkSize);
 			const outBuffer = new Uint8Array(
