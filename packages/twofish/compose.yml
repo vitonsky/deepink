@@ -1,11 +1,3 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# Twofish WASM builder — Docker Compose
-#
-# Usage:
-#   docker compose run --rm builder        ← compile once
-#   docker compose run --rm builder watch  ← recompile on file changes (optional)
-# ─────────────────────────────────────────────────────────────────────────────
-
 services:
   builder:
     build:
