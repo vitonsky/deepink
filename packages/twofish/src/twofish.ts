@@ -68,11 +68,6 @@ export class TwofishModule {
 	static async load(source: string | URL | BufferSource): Promise<TwofishModule> {
 		let wasmInstance: WebAssembly.Instance;
 
-		console.log(
-			'Path to WASM is',
-			new URL('./twofish.wasm', import.meta.url).toString(),
-		);
-
 		// Load as files
 		if (
 			typeof process !== 'undefined' &&
