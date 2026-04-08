@@ -153,7 +153,7 @@
 		"fuzzysort": "^3.1.0",
 		"hotkeys-js": "^4.0.0",
 		"humanize-duration": "^3.33.2",
-		"leviathan-crypto": "^1.1.0",
+		"leviathan-crypto": "^1.4.0",
 		"lexical": "^0.39.0",
 		"libsodium-wrappers": "^0.8.2",
 		"libsodium-wrappers-sumo": "^0.8.2",
