@@ -180,6 +180,6 @@ export class XChaCha20Cipher implements IEncryptionProcessor {
 			output.writeBytes(plaintext);
 		}
 
-		return outBuffer.slice(0);
+		return outBuffer;
 	}
 }
