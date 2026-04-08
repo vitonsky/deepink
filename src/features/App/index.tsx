@@ -2,7 +2,6 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useToast } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
-import { ProfileObject } from '@core/storage/ProfilesManager';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
 import { getRandomItem } from '@utils/collections/getRandomItem';
@@ -16,17 +15,11 @@ import {
 	VaultOpenError,
 	VaultOpenErrorCode,
 } from './Profiles/hooks/useProfileContainers';
+import { OnPickProfile } from './types';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { VaultScreen } from './VaultScreen';
-
-type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
-
-export type OnPickProfile = (
-	profile: ProfileObject,
-	password?: string,
-) => Promise<PickProfileResponse>;
 
 const defaultVaultNames = [
 	'Creative drafts',
@@ -59,11 +52,8 @@ export const App: FC = () => {
 	const [screenName, setScreenName] = useState<'create' | 'choose' | 'loading'>(
 		'choose',
 	);
-	const onOpenVault = useCallback(
-		async (
-			profile: ProfileObject,
-			password?: string,
-		): Promise<PickProfileResponse> => {
+	const onOpenVault: OnPickProfile = useCallback(
+		async (profile, password) => {
 			setScreenName('loading');
 
 			try {

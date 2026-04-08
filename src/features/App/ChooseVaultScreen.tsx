@@ -10,7 +10,7 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { CenterBox } from './CenterBox';
 import { ProfilesForm } from './ProfilesForm';
-import { OnPickProfile } from '.';
+import { OnPickProfile } from './types';
 
 export const ChooseVaultScreen: FC<{
 	vaults: ProfileObject[];
