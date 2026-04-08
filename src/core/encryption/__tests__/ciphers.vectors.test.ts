@@ -23,7 +23,9 @@ ciphers
 				const randomBytesMock = (len: number) => new Uint8Array(len);
 
 				const keySize = 32;
-				let key = fromHex('00000000000000000000000000000000');
+				let key = fromHex(
+					'0000000000000000000000000000000000000000000000000000000000000000',
+				);
 				let pt = fromHex('00000000000000000000000000000000').buffer;
 
 				for (let i = 1; i <= 10; i++) {
