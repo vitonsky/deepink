@@ -2,7 +2,7 @@ import { ENCRYPTION_ALGORITHM } from '@core/features/encryption';
 import { formatAlgorithms } from '@core/features/encryption/utils';
 
 import { AESCipher } from '../ciphers/AES';
-import { SeprentCipher } from '../ciphers/Serpent';
+import { SerpentCipher } from '../ciphers/Serpent';
 import { WasmTwofishCTRCipher } from '../ciphers/Twofish';
 import { XChaCha20Cipher } from '../ciphers/XChaCha20';
 import { BufferIntegrityProcessor } from '../processors/BufferIntegrityProcessor';
@@ -32,7 +32,7 @@ export const ciphers: {
 	{
 		name: ENCRYPTION_ALGORITHM.SERPENT,
 		async create(key, randomBytes) {
-			return new SeprentCipher(key, randomBytes);
+			return new SerpentCipher(key, randomBytes);
 		},
 	},
 	{
@@ -61,7 +61,7 @@ export const ciphers: {
 				new BufferIntegrityProcessor(hmac),
 				new AESCipher(aes, randomBytes),
 				new WasmTwofishCTRCipher(twofish, randomBytes),
-				new SeprentCipher(serpent, randomBytes),
+				new SerpentCipher(serpent, randomBytes),
 			]);
 		},
 	},

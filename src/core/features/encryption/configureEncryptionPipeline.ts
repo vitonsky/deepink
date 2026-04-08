@@ -1,6 +1,6 @@
 import z from 'zod';
 import { AESCipher } from '@core/encryption/ciphers/AES';
-import { ensureWasmIsLoaded, SeprentCipher } from '@core/encryption/ciphers/Serpent';
+import { ensureWasmIsLoaded, SerpentCipher } from '@core/encryption/ciphers/Serpent';
 import { WasmTwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
 import { XChaCha20Cipher } from '@core/encryption/ciphers/XChaCha20';
 import { HKDFDerivedKeys } from '@core/encryption/utils/HKDFDerivedKeys';
@@ -52,7 +52,7 @@ export const configureEncryptionPipeline = async (
 					const key = await hkdf.deriveBits(256, String(index));
 
 					await ensureWasmIsLoaded();
-					return new SeprentCipher(new Uint8Array(key), getRandomBytes);
+					return new SerpentCipher(new Uint8Array(key), getRandomBytes);
 				}
 				case ENCRYPTION_ALGORITHM.XChaCha20: {
 					const key = await hkdf.deriveBits(256, String(index));

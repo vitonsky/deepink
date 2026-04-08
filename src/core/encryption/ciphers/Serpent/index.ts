@@ -25,7 +25,7 @@ export const SERPENT_HEADER = struct({
 
 const chunkSize = 65536;
 
-export class SeprentCipher implements IEncryptionProcessor {
+export class SerpentCipher implements IEncryptionProcessor {
 	constructor(
 		private readonly key: Uint8Array,
 		private readonly getRandomBytes: RandomBytesGenerator,
