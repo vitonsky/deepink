@@ -49,15 +49,15 @@ export class SerpentCipher implements IEncryptionProcessor {
 		let chunk;
 		while ((chunk = inputReader.readBytes(chunkSize))) {
 			// Align the chunk
-			const requiredPadding = chunkSize % 16;
+			const requiredPadding = getBlockPadding(chunk.byteLength, 16);
 			if (requiredPadding !== 0) {
 				if (requiredPadding !== padding)
-					new RangeError(
+					throw new RangeError(
 						`Unexpected chunk size ${chunk.byteLength}. Expected padding is ${padding}, required padding is ${requiredPadding}`,
 					);
 
 				const chunkContent = chunk;
-				chunk = new Uint8Array(chunkContent.byteLength + padding);
+				chunk = new Uint8Array(chunkContent.byteLength + requiredPadding);
 				chunk.set(new Uint8Array(chunkContent), 0);
 			}
 
