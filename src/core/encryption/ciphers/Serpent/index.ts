@@ -7,7 +7,9 @@ import { BufferCursor } from '@core/encryption/utils/bytes/BufferCursor';
 let initStatus: boolean | Promise<void>;
 export async function ensureWasmIsLoaded() {
 	if (!initStatus) {
-		initStatus = init(['serpent', 'sha2']);
+		initStatus = init(['serpent', 'sha2']).then(() => {
+			initStatus = true;
+		});
 	}
 
 	// Done
