@@ -22,13 +22,23 @@ export const TWOFISH_HEADER = struct({
  * Twofish cipher implementation
  */
 export class TwofishCTRCipher implements IEncryptionProcessor {
-	private readonly chunkSize = CTRCipherMode.getEncryptionLimits(16).maxBytes;
+	private readonly chunkSize;
 	constructor(
 		private readonly key: Uint8Array<ArrayBuffer>,
 		private readonly randomBytesGenerator: (
 			byteLength: number,
 		) => Uint8Array<ArrayBuffer>,
-	) {}
+		{ chunkSize }: { chunkSize?: number } = {},
+	) {
+		const maxChunkSize = CTRCipherMode.getEncryptionLimits(16).maxBytes;
+		if (chunkSize === undefined) {
+			this.chunkSize = maxChunkSize;
+		} else if (chunkSize > maxChunkSize) {
+			throw new RangeError(`Chunk size is out of limit ${maxChunkSize}`);
+		} else {
+			this.chunkSize = chunkSize;
+		}
+	}
 
 	private tfModule: Promise<TwofishModule> | null = null;
 	private getTwofishModule() {
@@ -126,7 +136,7 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 					(a, b) => xor16(xorBuffer, a, b),
 				);
 
-				const chunkBytes = inputReader.readBytes(chunkSize * i);
+				const chunkBytes = inputReader.readBytes(chunkSize);
 				if (!chunkBytes) throw new RangeError(`Chunk #${i} is not found`);
 
 				const decryptedChunk = await cipher.decrypt(chunkBytes, derivedNonce);
