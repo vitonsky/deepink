@@ -75,7 +75,8 @@ const createCounter = () => {
 	const buffer = new Uint8Array(4);
 	const view = new DataView(buffer.buffer);
 	const increment = () => {
-		view.setUint32(0, view.getUint32(0) + 1);
+		// use little endian bytes order to comply RFC 8439 Section 2.3
+		view.setUint32(0, view.getUint32(0, true) + 1, true);
 	};
 
 	return { buffer, view, increment };
