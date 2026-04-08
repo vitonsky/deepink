@@ -6,37 +6,42 @@ import { BufferCursor } from '@core/encryption/utils/bytes/BufferCursor';
 const emptyCounter = new Uint8Array(4);
 
 export class XChaCha20Poly1305 {
-	private readonly key;
-	private readonly nonce;
-	constructor(key: Uint8Array, iv: Uint8Array, hChaCha20Const?: Uint8Array) {
+	private readonly state;
+	constructor(masterKey: Uint8Array, iv: Uint8Array, hChaCha20Const?: Uint8Array) {
 		// Derive a key
-		this.key = sodium.crypto_core_hchacha20(
-			new Uint8Array(iv).slice(0, 16),
-			key,
-			hChaCha20Const ?? null,
-		);
+		this.state = sodium.ready.then(async () => {
+			const key = await sodium.crypto_core_hchacha20(
+				new Uint8Array(iv).slice(0, 16),
+				masterKey,
+				hChaCha20Const ?? null,
+			);
 
-		this.nonce = new Uint8Array(12);
-		this.nonce.set(new Uint8Array(iv).slice(16), 4);
+			const nonce = new Uint8Array(12);
+			nonce.set(new Uint8Array(iv).slice(16), 4);
+
+			return { key, nonce };
+		});
 	}
 
 	/**
 	 * Load WASM module
 	 */
-	public load() {
-		return sodium.ready;
+	public async load() {
+		await sodium.ready;
 	}
 
-	public dispose() {
-		sodium.memzero(this.key);
-		sodium.memzero(this.nonce);
+	public async dispose() {
+		const state = await this.state;
+
+		sodium.memzero(state.nonce);
+		sodium.memzero(state.key);
 	}
 
-	public encrypt(
+	public async encrypt(
 		plaintext: Uint8Array,
 		{ aad, counter }: { aad?: Uint8Array; counter?: Uint8Array } = {},
 	) {
-		const nonce = this.nonce;
+		const { key, nonce } = await this.state;
 		nonce.set(counter ? counter : emptyCounter);
 
 		return sodium.crypto_aead_chacha20poly1305_ietf_encrypt_detached(
@@ -44,16 +49,16 @@ export class XChaCha20Poly1305 {
 			aad ?? null,
 			null,
 			nonce,
-			this.key,
+			key,
 		);
 	}
 
-	public decrypt(
+	public async decrypt(
 		ciphertext: Uint8Array,
 		mac: Uint8Array,
 		{ aad, counter }: { aad?: Uint8Array; counter?: Uint8Array } = {},
 	) {
-		const nonce = this.nonce;
+		const { key, nonce } = await this.state;
 		nonce.set(counter ? counter : emptyCounter);
 
 		return sodium.crypto_aead_chacha20poly1305_ietf_decrypt_detached(
@@ -62,7 +67,7 @@ export class XChaCha20Poly1305 {
 			mac,
 			aad ?? null,
 			nonce,
-			this.key,
+			key,
 		);
 	}
 }
@@ -132,7 +137,7 @@ export class XChaCha20Cipher implements IEncryptionProcessor {
 				const isLastChunk = input.getRemainingBytes() === 0;
 
 				// TODO: add final tag (aad)
-				const { ciphertext, mac } = cipher.encrypt(chunkBytes, {
+				const { ciphertext, mac } = await cipher.encrypt(chunkBytes, {
 					counter: counter.buffer,
 				});
 				output.writeBytes(ciphertext);
@@ -175,7 +180,9 @@ export class XChaCha20Cipher implements IEncryptionProcessor {
 			const data = bytes.subarray(0, dataBytesLen);
 			const mac = bytes.subarray(dataBytesLen);
 
-			const plaintext = cipher.decrypt(data, mac, { counter: counter.buffer });
+			const plaintext = await cipher.decrypt(data, mac, {
+				counter: counter.buffer,
+			});
 			counter.increment();
 
 			output.writeBytes(plaintext);

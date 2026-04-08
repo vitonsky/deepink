@@ -124,17 +124,17 @@ describe('draft-arciszewski-xchacha-01', () => {
 
 			await cipher.load();
 
-			const encryptionResult = cipher.encrypt(plaintext, { aad });
+			const encryptionResult = await cipher.encrypt(plaintext, { aad });
 			expect(encryptionResult).toStrictEqual({
 				ciphertext: new Uint8Array(expectedCt),
 				mac: new Uint8Array(tag),
 			});
 
-			expect(
+			await expect(
 				cipher.decrypt(encryptionResult.ciphertext, encryptionResult.mac, {
 					aad,
 				}),
-			).toStrictEqual(new Uint8Array(plaintext));
+			).resolves.toStrictEqual(new Uint8Array(plaintext));
 		});
 
 		test('XChaCha20-Poly1305 detached mode', async () => {
