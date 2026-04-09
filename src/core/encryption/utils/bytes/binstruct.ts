@@ -44,10 +44,13 @@ export const u64 = (e: Endian = 'LE'): Field<bigint> => ({
 
 export const bytes = (length: number): Field<Uint8Array> => ({
 	size: length,
-	encode: (val, view, off) =>
-		new Uint8Array(view.buffer, view.byteOffset + off, length).set(
-			val.subarray(0, length),
-		),
+	encode: (val, view, off) => {
+		if (val.length !== length) {
+			throw new RangeError(`Expected ${length} bytes, got ${val.length}`);
+		}
+
+		return new Uint8Array(view.buffer, view.byteOffset + off, length).set(val);
+	},
 	decode: (view, off) => new Uint8Array(view.buffer, view.byteOffset + off, length),
 });
 

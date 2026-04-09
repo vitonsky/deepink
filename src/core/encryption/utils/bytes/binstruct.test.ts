@@ -50,6 +50,13 @@ describe('binstruct', () => {
 				payload,
 			});
 		});
+
+		it('rejects malformed fixed-size byte fields', () => {
+			const Header = struct({ iv: bytes(16) });
+
+			expect(() => Header.encode({ iv: new Uint8Array(15) })).toThrow(/16/);
+			expect(() => Header.encode({ iv: new Uint8Array(17) })).toThrow(/16/);
+		});
 	});
 
 	describe('transform', () => {
