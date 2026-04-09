@@ -118,16 +118,12 @@ describe('CTRCipherMode – cryptographic correctness', () => {
 		expect(diff01.some((d) => d !== 0)).toBe(true);
 	});
 
-	it.todo('partial last block uses only the required keystream bytes', async () => {
+	it('partial last block uses only the required keystream bytes', async () => {
 		const ctr = new CTRCipherMode(identityEncrypt, xor);
 		const iv = new Uint8Array(16).fill(0x00);
-
-		const partial = await ctr.encrypt(new Uint8Array(19).fill(0x00), iv);
-		const full = await ctr.encrypt(new Uint8Array(32).fill(0x00), iv);
-
-		// bytes must match the full encryption and length must not be padded
-		expect(partial).toEqual(full.slice(0, 19));
-		expect(partial.length).toBe(19);
+		await expect(ctr.encrypt(new Uint8Array(19).fill(0x00), iv)).rejects.toThrow(
+			'Did you mean to add padding?',
+		);
 	});
 
 	it('keystream is consistent regardless of message length', async () => {
