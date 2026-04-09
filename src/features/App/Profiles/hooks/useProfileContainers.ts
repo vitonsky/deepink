@@ -6,7 +6,7 @@ import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
-import { deriveBitsFromPassword, VaultSaltStruct } from '@core/encryption/utils/keys';
+import { deriveBitsFromPassword, KEY_SALT_BYTES } from '@core/encryption/utils/keys';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { IFilesStorage } from '@core/features/files';
 import { EncryptedFS } from '@core/features/files/EncryptedFS';
@@ -37,24 +37,23 @@ const decryptKey = async ({
 	salt: Uint8Array<ArrayBuffer>;
 	algorithm: string;
 }) => {
-	const { passwordSalt, keySalt } = VaultSaltStruct.decode(salt);
-
-	const keyPassword = await deriveBitsFromPassword(password, passwordSalt);
+	const keyPassword = await deriveBitsFromPassword(password, salt);
 	const encryption = await createEncryption({
 		key: keyPassword,
-		salt: keySalt,
+		salt: new Uint8Array(encryptedKey).slice(0, KEY_SALT_BYTES),
 		algorithm,
 	});
 
 	return encryption
 		.getContent()
-		.decrypt(encryptedKey)
+		.decrypt(encryptedKey.slice(KEY_SALT_BYTES))
 		.finally(() => {
 			encryption.dispose();
 		})
 		.then((buffer) => new Uint8Array(buffer));
 };
 
+// TODO: cover with tests to ensure we can decrypt exists vault
 /**
  * Hook to manage active and opened profiles
  */

@@ -1,11 +1,6 @@
 import { CryptographyUtils } from '@core/features/encryption/worker/CryptographyUtils';
 
-import { bytes, struct } from './bytes/binstruct';
-
-export const VaultSaltStruct = struct({
-	passwordSalt: bytes(16),
-	keySalt: bytes(32),
-});
+export const KEY_SALT_BYTES = 32;
 
 /**
  * We must never use an user password anywhere, because of potentially low entropy.
