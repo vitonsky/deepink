@@ -168,7 +168,6 @@ export const useProfileContainers = () => {
 					new FileController('vault.db', encryptedProfileFS),
 				);
 
-				// TODO: close DB first and close encryption last
 				cleanups.push(() => db.close());
 
 				// Ensure at least one workspace exists
