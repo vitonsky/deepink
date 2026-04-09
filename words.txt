@@ -7,7 +7,7 @@ Initialisation
 initialise
 testvectors
 keysize
-Seprent
+Serpent
 binstruct
 xchacha
 cmd
