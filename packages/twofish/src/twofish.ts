@@ -196,6 +196,10 @@ export class TwofishModule {
 	/**
 	 * Decrypt a single 16-byte block.
 	 *
+	 * **WARNING**: returned buffer is view of WASM memory by performance reasons,
+	 * so buffer may be changed anytime.
+	 * Copy buffer immediately after return via `.slice()` to prevent mutations
+	 *
 	 * @param handle      Session handle from createSession().
 	 * @param ciphertext  Exactly 16 bytes.
 	 * @returns           16-byte plaintext as a new Uint8Array.
@@ -214,7 +218,7 @@ export class TwofishModule {
 		}
 
 		/* Read plaintext from io_buffer[16..31]. */
-		return new Uint8Array(this.mem.buffer, this.ioOffset + 16, 16).slice();
+		return new Uint8Array(this.mem.buffer, this.ioOffset + 16, 16);
 	}
 
 	/**
@@ -354,6 +358,6 @@ export class TwofishModule {
 		/* Node.js fallback using fs/promises */
 		const fs = await import('fs/promises');
 		const buf = await fs.readFile(source instanceof URL ? source.pathname : source);
-		return buf.buffer;
+		return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
 	}
 }
