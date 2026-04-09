@@ -56,8 +56,9 @@ int memcmp(const void *a, const void *b, unsigned long n) {
  * We use __builtin_trap() which emits the WASM `unreachable` instruction.
  * This raises a RuntimeError on the JS side that can be caught normally.
  * ------------------------------------------------------------------------- */
-#undef  Twofish_fatal
-#define Twofish_fatal(msg) __builtin_trap()
+__attribute__((noreturn)) void Twofish_fatal( const char *msg ) {
+    __builtin_trap();
+}
 
 
 /* -------------------------------------------------------------------------

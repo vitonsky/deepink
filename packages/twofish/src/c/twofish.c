@@ -214,7 +214,7 @@
  * header file could easily break it. Maybe the best solution is to use
  * a separate extern statement for your fatal function.
  */
-#define Twofish_fatal( msg )      {for(;;);}
+__attribute__((noreturn)) extern void Twofish_fatal( const char *msg );
 
 
 /*
