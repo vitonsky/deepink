@@ -8,9 +8,9 @@ import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hoo
 import {
 	createWorkspaceConfigFile,
 	createWorkspaceStateFile,
-} from './utils/workspaceFiles.ts';
-import { useWorkspaceError } from './WorkspaceErrorProvider.tsx';
-import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider.tsx';
+} from './utils/workspaceFiles';
+import { useWorkspaceError } from './WorkspaceErrorProvider';
+import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider';
 
 export const WorkspaceStateInitializer = () => {
 	const dispatch = useAppDispatch();

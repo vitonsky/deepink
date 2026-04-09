@@ -1,5 +1,5 @@
 import { shallowEqual } from 'react-redux';
-import { WorkspaceStateData } from '@features/App/Workspace/services/workspaceState.ts';
+import { WorkspaceStateData } from '@features/App/Workspace/services/workspaceState';
 
 import { createAppSelector } from '../../utils';
 
