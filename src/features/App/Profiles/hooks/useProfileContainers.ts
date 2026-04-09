@@ -103,7 +103,7 @@ export const useProfileContainers = () => {
 
 				const encryption = await createEncryption({
 					key,
-					salt: salt.slice(16),
+					salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
 					algorithm: profile.encryption.algorithm,
 				});
 
