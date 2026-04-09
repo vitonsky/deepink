@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { bytesToBase64 } from '@core/encryption/utils/encoding';
-import { deriveBitsFromPassword } from '@core/encryption/utils/keys';
+import { deriveBitsFromPassword, VaultSaltStruct } from '@core/encryption/utils/keys';
 import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { RootedFS } from '@core/features/files/RootedFS';
@@ -58,16 +58,17 @@ export const useProfilesList = (): ProfilesListApi => {
 				// Create encrypted profile
 				console.log('Create profile with encryption', profile.algorithm);
 
-				const salt = getRandomBytes(16 + 32);
+				const salt = getRandomBytes(VaultSaltStruct.size);
+				const { passwordSalt, keySalt } = VaultSaltStruct.decode(salt);
 				const keyPassword = await deriveBitsFromPassword(
 					profile.password,
-					salt.slice(0, 16),
+					passwordSalt,
 				);
 				const key = getRandomBytes(32);
 
 				const encryption = await createEncryption({
 					key: keyPassword,
-					salt: salt.slice(16),
+					salt: keySalt,
 					algorithm: profile.algorithm,
 				});
 

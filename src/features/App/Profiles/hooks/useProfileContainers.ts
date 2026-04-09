@@ -6,7 +6,7 @@ import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
-import { deriveBitsFromPassword } from '@core/encryption/utils/keys';
+import { deriveBitsFromPassword, VaultSaltStruct } from '@core/encryption/utils/keys';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { IFilesStorage } from '@core/features/files';
 import { EncryptedFS } from '@core/features/files/EncryptedFS';
@@ -37,10 +37,12 @@ const decryptKey = async ({
 	salt: Uint8Array<ArrayBuffer>;
 	algorithm: string;
 }) => {
-	const keyPassword = await deriveBitsFromPassword(password, salt.slice(0, 16));
+	const { passwordSalt, keySalt } = VaultSaltStruct.decode(salt);
+
+	const keyPassword = await deriveBitsFromPassword(password, passwordSalt);
 	const encryption = await createEncryption({
 		key: keyPassword,
-		salt: salt.slice(16),
+		salt: keySalt,
 		algorithm,
 	});
 

@@ -42,7 +42,7 @@ export const u64 = (e: Endian = 'LE'): Field<bigint> => ({
 	decode: (view, off) => view.getBigUint64(off, e === 'LE'),
 });
 
-export const bytes = (length: number): Field<Uint8Array> => ({
+export const bytes = (length: number): Field<Uint8Array<ArrayBuffer>> => ({
 	size: length,
 	encode: (val, view, off) => {
 		if (val.length !== length) {
@@ -51,7 +51,11 @@ export const bytes = (length: number): Field<Uint8Array> => ({
 
 		return new Uint8Array(view.buffer, view.byteOffset + off, length).set(val);
 	},
-	decode: (view, off) => new Uint8Array(view.buffer, view.byteOffset + off, length),
+	decode: (view, off) =>
+		new Uint8Array(view.buffer).slice(
+			view.byteOffset + off,
+			view.byteOffset + off + length,
+		),
 });
 
 // ── Transform ─────────────────────────────────────────────────
