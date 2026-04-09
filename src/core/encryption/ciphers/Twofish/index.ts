@@ -109,7 +109,11 @@ export class TwofishCTRCipher implements IEncryptionProcessor {
 		const header = inputReader.readBytes(TWOFISH_HEADER.size);
 		if (!header || header.byteLength !== TWOFISH_HEADER.size)
 			throw new RangeError('Cannot read header');
+
 		const { padding, iv, chunkSize } = TWOFISH_HEADER.decode(header);
+		if (chunkSize === 0) {
+			throw new RangeError('Invalid chunk size in header');
+		}
 
 		const tf = await this.getTwofishModule();
 
