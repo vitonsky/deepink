@@ -9,12 +9,9 @@ export const deriveBitsFromPassword = async (
 	salt: Uint8Array<ArrayBuffer>,
 ) => {
 	const utils = new CryptographyUtils();
-	return (
-		utils
-			// Explicitly copy salt buffer to allow re-use buffer
-			.deriveBits(new TextEncoder().encode(password), salt.slice(), 256)
-			.finally(async () => {
-				await utils.dispose();
-			})
-	);
+	return utils
+		.deriveBits(new TextEncoder().encode(password), salt, 256)
+		.finally(async () => {
+			await utils.dispose();
+		});
 };

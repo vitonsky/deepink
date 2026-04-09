@@ -1,4 +1,4 @@
-import { Remote, transfer, wrap } from 'comlink';
+import { Remote, wrap } from 'comlink';
 
 import { CryptographyUtilsWorker } from '.';
 
@@ -42,10 +42,6 @@ export class CryptographyUtils implements CryptographyUtilsWorker {
 		salt: Uint8Array<ArrayBuffer>,
 		length: number,
 	) {
-		return this.getState().api.deriveBits(
-			transfer(input, [input.buffer]),
-			transfer(salt, [salt.buffer]),
-			length,
-		);
+		return this.getState().api.deriveBits(input, salt, length);
 	}
 }
