@@ -35,7 +35,6 @@
 		"baseUrl": ".",
 		"types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
 		"paths": {
-			"@twofish/*": ["packages/twofish/*"],
 			"@assets/*": ["assets/*"],
 			"@tests/*": ["src/__tests__/*"],
 			"@core/*": ["src/core/*"],
@@ -54,5 +53,5 @@
 			"module": "CommonJS"
 		}
 	},
-	"include": ["*.ts", "scripts/**/*.ts", "src/**/*.ts", "src/**/*.tsx"]
+	"include": ["*.ts", "*.mts", "scripts/**/*.ts", "src/**/*.ts", "src/**/*.tsx"]
 }
