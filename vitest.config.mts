@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { pathToFileURL } from 'url';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defaultExclude, defineConfig } from 'vitest/config';
 
@@ -18,7 +19,8 @@ export default defineConfig({
 
 				// Return `file://` urls on `.wasm` files
 				if (id.endsWith('.wasm')) {
-					return `export default ${JSON.stringify(new URL(resolve(id), import.meta.url))};`;
+					const wasmFileUrl = pathToFileURL(resolve(id)).href;
+					return `export default ${JSON.stringify(wasmFileUrl)};`;
 				}
 			},
 		},
