@@ -8,7 +8,7 @@ import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hoo
 import {
 	createWorkspaceConfigFile,
 	createWorkspaceStateFile,
-} from './utils/workspaceFiles.ts.tsx';
+} from './utils/workspaceFiles.ts';
 import { useWorkspaceError } from './WorkspaceErrorProvider.tsx';
 import { useNotesRegistry, useTagsRegistry } from './WorkspaceProvider.tsx';
 
