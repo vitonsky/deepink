@@ -22,6 +22,8 @@ export default defineConfig({
 					const wasmFileUrl = pathToFileURL(resolve(id)).href;
 					return `export default ${JSON.stringify(wasmFileUrl)};`;
 				}
+
+				return;
 			},
 		},
 	],
