@@ -121,3 +121,35 @@ describe(`Encrypt 1m chars`, () => {
 		);
 	});
 });
+
+describe(`Decrypt 1mb data`, () => {
+	const testData = getRandomBytes(1024 ** 2).buffer;
+	ENCRYPTION_ALGORITHM_OPTIONS.map((algorithm) => {
+		let processor: WorkerEncryptionProcessor;
+		let data: ArrayBuffer;
+
+		bench(
+			algorithm,
+			async () => {
+				await processor.decrypt(data);
+			},
+			{
+				throws: true,
+				async setup() {
+					processor = new WorkerEncryptionProcessor({
+						key: getRandomBytes(32),
+						salt: getRandomBytes(100),
+						algorithm,
+						disablePulse: true,
+					});
+					await processor.load();
+					data = await processor.encrypt(testData.slice());
+				},
+				async teardown() {
+					await processor.terminate();
+				},
+				iterations: 10,
+			},
+		);
+	});
+});
