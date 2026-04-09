@@ -1,0 +1,30 @@
+{
+	"name": "twofish",
+	"version": "0.0.0",
+	"description": "The Twofish encryption built via WASM",
+	"scripts": {
+		"build": "rm -rf dist && npm run build:wasm && npm run build:ts",
+		"build:wasm": "docker compose run --rm builder",
+		"build:ts": "tsdown --format esm --format cjs",
+		"dev": "tsdown --watch"
+	},
+	"author": "Vitonsky <robert@vitonsky.net>",
+	"license": "MIT",
+	"types": "./dist/index.d.cts",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"files": ["dist"],
+	"devDependencies": {
+		"@types/node": "^25.5.0",
+		"tsdown": "^0.21.6",
+		"typescript": "^6.0.2"
+	},
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs"
+		},
+		"./package.json": "./package.json",
+		"./twofish.wasm": "./dist/twofish.wasm"
+	}
+}

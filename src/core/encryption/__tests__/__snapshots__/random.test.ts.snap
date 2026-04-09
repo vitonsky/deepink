@@ -1,0 +1,37 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Fake random > mulberry32 sequence > Seed 0 1`] = `
+[
+  0.26642920868471265,
+  0.0003297457005828619,
+  0.2232720274478197,
+  0.1462021479383111,
+  0.46732782293111086,
+  0.5450490827206522,
+  0.6152513844426721,
+  0.6489853798411787,
+  0.45600721263326705,
+  0.581218967679888,
+]
+`;
+
+exports[`Fake random > mulberry32 sequence > Seed 1 1`] = `
+[
+  0.6270739405881613,
+  0.002735721180215478,
+  0.5274470399599522,
+  0.9810509674716741,
+  0.9683778982143849,
+  0.281103502959013,
+  0.6128388606011868,
+  0.7207431411370635,
+  0.425796952098608,
+  0.9948229456786066,
+]
+`;
+
+exports[`Fake random > random bytes sequence > Seed 0 1`] = `"44003925778b9da67494"`;
+
+exports[`Fake random > random bytes sequence > Seed 1 1`] = `"a00087fbf7479cb86dfe"`;
+
+exports[`Fake random > random bytes sequence > Seed 100 1`] = `"345088e38daf03853a80"`;

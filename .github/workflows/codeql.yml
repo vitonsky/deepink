@@ -43,6 +43,15 @@ jobs:
       - name: Install deps
         run: npm install
 
+      - name: Build Twofish WASM
+        working-directory: packages/twofish
+        run: |
+          DOCKER_UID=$(id -u)
+          DOCKER_GID=$(id -g)
+          export DOCKER_UID
+          export DOCKER_GID
+          npm run build
+
       - name: Linter
         run: npm run lint
 

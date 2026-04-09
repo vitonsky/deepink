@@ -2,6 +2,14 @@ AUTOINCREMENT
 Aes
 flexsearch
 opentag
+ciphertext
+Initialisation
+initialise
+testvectors
+keysize
+Serpent
+binstruct
+xchacha
 cmd
 Comlink
 embeddings

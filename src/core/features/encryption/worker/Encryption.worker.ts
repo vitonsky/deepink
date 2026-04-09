@@ -1,17 +1,9 @@
 import { Endpoint, expose, transfer } from 'comlink';
-import { IEncryptionProcessor } from '@core/encryption';
-import { AESGCMCipher } from '@core/encryption/ciphers/AES';
-import { TwofishCTRCipher } from '@core/encryption/ciphers/Twofish';
+import { HKDFDerivedKeys } from '@core/encryption/utils/HKDFDerivedKeys';
 
 import { EncryptionController } from '../../../encryption/EncryptionController';
-import { BufferIntegrityProcessor } from '../../../encryption/processors/BufferIntegrityProcessor';
-import { BufferSizeObfuscationProcessor } from '../../../encryption/processors/BufferSizeObfuscationProcessor';
-import { PipelineProcessor } from '../../../encryption/processors/PipelineProcessor';
-import { getDerivedKeysManager, getMasterKey } from '../../../encryption/utils/keys';
-import { getRandomBytes } from '../../../encryption/utils/random';
 
-import { parseAlgorithms } from '../utils';
-import { ENCRYPTION_ALGORITHM } from '..';
+import { configureEncryptionPipeline } from '../configureEncryptionPipeline';
 import { EncryptionWorker } from '.';
 
 const workerId = Date.now();
@@ -24,40 +16,9 @@ expose(
 				self.setInterval(() => console.debug('Worker pulse', workerId), 1000);
 			}
 
-			const derivedKeys = await getMasterKey(key, salt).then((masterKey) =>
-				getDerivedKeysManager(masterKey, new Uint8Array(salt)),
-			);
-
-			const cipherMap: Record<
-				ENCRYPTION_ALGORITHM,
-				() => Promise<IEncryptionProcessor>
-			> = {
-				[ENCRYPTION_ALGORITHM.AES]: async () => {
-					const key = await derivedKeys.getDerivedKey('aes-gcm-cipher', {
-						name: 'AES-GCM',
-						length: 256,
-					});
-					return new AESGCMCipher(key, getRandomBytes);
-				},
-				[ENCRYPTION_ALGORITHM.TWOFISH]: async () => {
-					const key = await derivedKeys.getDerivedBytes(
-						'twofish-ctr-cipher',
-						256,
-					);
-					return new TwofishCTRCipher(new Uint8Array(key), getRandomBytes);
-				},
-			};
-
-			const ciphers = await Promise.all(
-				parseAlgorithms(algorithm).map((name) => cipherMap[name]()),
-			);
-
-			encryptionController = new EncryptionController(
-				new PipelineProcessor([
-					new BufferIntegrityProcessor(),
-					new BufferSizeObfuscationProcessor(getRandomBytes),
-					...ciphers,
-				]),
+			encryptionController = await configureEncryptionPipeline(
+				new HKDFDerivedKeys(key, salt),
+				algorithm,
 			);
 		},
 

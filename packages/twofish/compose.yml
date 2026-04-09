@@ -1,0 +1,13 @@
+services:
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: bash build.sh
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"

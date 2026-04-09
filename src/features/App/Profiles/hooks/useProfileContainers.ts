@@ -6,6 +6,7 @@ import { openSQLite } from '@core/database/sqlite/openSQLite';
 import { EncryptionController } from '@core/encryption/EncryptionController';
 import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
 import { base64ToBytes } from '@core/encryption/utils/encoding';
+import { deriveBitsFromPassword, KEY_SALT_BYTES } from '@core/encryption/utils/keys';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { IFilesStorage } from '@core/features/files';
 import { EncryptedFS } from '@core/features/files/EncryptedFS';
@@ -33,18 +34,26 @@ const decryptKey = async ({
 }: {
 	encryptedKey: ArrayBuffer;
 	password: string;
-	salt: ArrayBuffer;
+	salt: Uint8Array<ArrayBuffer>;
 	algorithm: string;
 }) => {
-	const encryption = await createEncryption({ key: password, salt, algorithm });
+	const keyPassword = await deriveBitsFromPassword(password, salt);
+	const encryption = await createEncryption({
+		key: keyPassword,
+		salt: new Uint8Array(encryptedKey).slice(0, KEY_SALT_BYTES),
+		algorithm,
+	});
+
 	return encryption
 		.getContent()
-		.decrypt(encryptedKey)
+		.decrypt(encryptedKey.slice(KEY_SALT_BYTES))
 		.finally(() => {
 			encryption.dispose();
-		});
+		})
+		.then((buffer) => new Uint8Array(buffer));
 };
 
+// TODO: cover with tests to ensure we can decrypt exists vault
 /**
  * Hook to manage active and opened profiles
  */
@@ -84,8 +93,7 @@ export const useProfileContainers = () => {
 					throw new Error('Key file is not found in profile directory');
 				}
 
-				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt))
-					.buffer;
+				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
 				const key = await decryptKey({
 					encryptedKey: encryptedKeyBuffer,
 					password: password,
@@ -95,7 +103,7 @@ export const useProfileContainers = () => {
 
 				const encryption = await createEncryption({
 					key,
-					salt,
+					salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
 					algorithm: profile.encryption.algorithm,
 				});
 

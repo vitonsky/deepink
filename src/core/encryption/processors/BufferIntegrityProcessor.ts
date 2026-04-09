@@ -1,35 +1,5 @@
-import crc32 from 'crc/calculators/crc32';
-
 import { joinBuffers } from '../utils/buffers';
-import { HeaderView, IEncryptionProcessor } from '..';
-
-export type IntegrityHeaderStruct = {
-	crc32: number;
-};
-
-export class IntegrityHeader implements HeaderView<IntegrityHeaderStruct> {
-	public readonly bufferSize = 8;
-
-	public createBuffer(data: IntegrityHeaderStruct): ArrayBuffer {
-		const buffer = new ArrayBuffer(this.bufferSize);
-		const view = new DataView(buffer, 0);
-
-		view.setInt32(0, data.crc32);
-
-		return buffer;
-	}
-
-	public readBuffer(buffer: ArrayBuffer): IntegrityHeaderStruct {
-		if (buffer.byteLength < this.bufferSize)
-			throw new TypeError('Header buffer have too small size');
-
-		const view = new DataView(buffer, 0, this.bufferSize);
-
-		return {
-			crc32: view.getInt32(0),
-		};
-	}
-}
+import { IEncryptionProcessor } from '..';
 
 export class IntegrityError extends TypeError {
 	public readonly name = 'IntegrityError';
@@ -40,31 +10,46 @@ export class IntegrityError extends TypeError {
  * and check the sum with actual buffer checksum during decryption.
  */
 export class BufferIntegrityProcessor implements IEncryptionProcessor {
-	private readonly integrityHeader;
-	constructor() {
-		this.integrityHeader = new IntegrityHeader();
-	}
+	constructor(private readonly key: Uint8Array<ArrayBuffer>) {}
 
 	public encrypt = async (buffer: ArrayBuffer) => {
-		const bufferSum = crc32(new Uint8Array(buffer));
-		const header = this.integrityHeader.createBuffer({
-			crc32: bufferSum,
-		});
+		const key = await crypto.subtle.importKey(
+			'raw',
+			this.key,
+			{ name: 'HMAC', hash: 'SHA-256', length: 256 },
+			false,
+			['sign', 'verify'],
+		);
 
-		return joinBuffers([header, buffer]);
+		const signature = await crypto.subtle.sign('HMAC', key, buffer);
+
+		return joinBuffers([signature, buffer]);
 	};
 
 	/**
 	 * @throws `IntegrityError` when check sum do not match
 	 */
 	public decrypt = async (buffer: ArrayBuffer) => {
-		const header = this.integrityHeader.readBuffer(buffer);
-		const slicedBuffer = buffer.slice(this.integrityHeader.bufferSize);
+		if (buffer.byteLength < 32)
+			throw new IntegrityError('Integrity violation. Too short buffer');
 
-		const bufferSum = crc32(new Uint8Array(slicedBuffer));
-		if (bufferSum !== header.crc32)
-			throw new IntegrityError('Decryption error. Check sum does not match');
+		const key = await crypto.subtle.importKey(
+			'raw',
+			this.key,
+			{ name: 'HMAC', hash: 'SHA-256', length: 256 },
+			false,
+			['sign', 'verify'],
+		);
+		const signature = new Uint8Array(buffer, 0, 32);
+		const data = new Uint8Array(buffer, 32);
 
-		return slicedBuffer;
+		const isValidSignature = await crypto.subtle.verify('HMAC', key, signature, data);
+
+		if (!isValidSignature)
+			throw new IntegrityError(
+				'Integrity violation. HMAC signature check is failed',
+			);
+
+		return data.slice().buffer;
 	};
 }

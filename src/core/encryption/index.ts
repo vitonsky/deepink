@@ -20,4 +20,4 @@ export interface HeaderView<T> {
 /**
  * Creates buffer with random values
  */
-export type RandomBytesGenerator = (bufferSize: number) => ArrayBuffer;
+export type RandomBytesGenerator = (bufferSize: number) => Uint8Array<ArrayBuffer>;

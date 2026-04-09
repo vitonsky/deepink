@@ -16,6 +16,7 @@ import {
 	useDisclosure,
 	VStack,
 } from '@chakra-ui/react';
+import { ENCRYPTION_ALGORITHM } from '@core/features/encryption';
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
@@ -232,7 +233,9 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					<Select
 						size="md"
 						value={algorithm}
-						onChange={(evt) => setAlgorithm(evt.target.value)}
+						onChange={(evt) =>
+							setAlgorithm(evt.target.value as ENCRYPTION_ALGORITHM)
+						}
 						disabled={isPending}
 					>
 						{ENCRYPTION_ALGORITHM_OPTIONS.map((algorithm) => (

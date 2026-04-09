@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Matches a derived bits snapshot 1`] = `
+Uint8Array [
+  113,
+  157,
+  213,
+  169,
+  126,
+  189,
+  88,
+  205,
+  140,
+  34,
+  75,
+  212,
+  192,
+  190,
+  108,
+  96,
+]
+`;
