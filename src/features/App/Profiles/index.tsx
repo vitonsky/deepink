@@ -12,7 +12,7 @@ export type ProfilesProps = {
 	profilesApi: ProfilesApi;
 };
 
-const VaultProviders = ({
+const VaultProvider = ({
 	profileContainer,
 	profilesApi,
 }: {
@@ -65,7 +65,7 @@ export const Profiles: FC<ProfilesProps> = ({ profilesApi }) => {
 				const profile = profileContainer.getContent();
 
 				return (
-					<VaultProviders
+					<VaultProvider
 						key={profile.profile.id}
 						profileContainer={profileContainer}
 						profilesApi={profilesApi}
