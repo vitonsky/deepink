@@ -60,6 +60,13 @@ export const createWorkspaceObject = (workspace: {
 }): WorkspaceData => ({
 	...workspace,
 	touched: false,
+	loadingStatus: {
+		isConfigLoaded: false,
+		isFiltersLoaded: false,
+		isOpenedNotesLoaded: false,
+		isNoteIdsLoaded: false,
+		isTagsLoaded: false,
+	},
 
 	activeNote: null,
 	recentlyClosedNotes: [],
@@ -99,9 +106,20 @@ export const WorkspaceConfigScheme = z.object({
 	}),
 });
 
+export type LoadingStatus = {
+	isConfigLoaded: boolean;
+
+	/** Filters are selected tags, note view, and search */
+	isFiltersLoaded: boolean;
+	isOpenedNotesLoaded: boolean;
+	isNoteIdsLoaded: boolean;
+	isTagsLoaded: boolean;
+};
+
 export type WorkspaceData = {
 	id: string;
 	name: string;
+	loadingStatus: LoadingStatus;
 
 	/**
 	 * Defines were workspace opened by user or not
@@ -246,6 +264,40 @@ export const profilesSlice = createSlice({
 			workspace.touched = true;
 
 			profile.activeWorkspace = workspaceId;
+		},
+
+		/**
+		 * Saves the workspace in the workspace list and resets all data to default
+		 */
+		resetWorkspace: (
+			state,
+			{
+				payload: { profileId, workspaceId },
+			}: PayloadAction<ProfileScoped<{ workspaceId: string }>>,
+		) => {
+			const profile = state.profiles[profileId];
+			if (!profile) return;
+
+			const workspace = profile.workspaces[workspaceId];
+			if (!workspace) return;
+
+			// Reset all values to defaults
+			profile.workspaces[workspaceId] = createWorkspaceObject({
+				id: workspace.id,
+				name: workspace.name,
+			});
+		},
+
+		updateWorkspaceLoadingStatus: (
+			state,
+			{
+				payload: { profileId, workspaceId, ...status },
+			}: PayloadAction<WorkspaceScoped<Partial<LoadingStatus>>>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			workspace.loadingStatus = { ...workspace.loadingStatus, ...status };
 		},
 
 		setActiveNote: (
@@ -426,6 +478,40 @@ export const profilesSlice = createSlice({
 			if (!workspace) return;
 
 			workspace.view = view;
+		},
+
+		updateFilters: (
+			state,
+			{
+				payload: { profileId, workspaceId, view, search, selectedTagId },
+			}: PayloadAction<
+				WorkspaceScoped<
+					Partial<{
+						view: NOTES_VIEW;
+						search: string;
+						selectedTagId: string | null;
+					}>
+				>
+			>,
+		) => {
+			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			if (!workspace) return;
+
+			if (view !== undefined) {
+				workspace.view = view;
+			}
+			if (search !== undefined) {
+				workspace.search = search;
+			}
+
+			// Set the selected tag if it exists in the tags list
+			if (selectedTagId !== undefined) {
+				const isSelectedTagExists =
+					selectedTagId !== null &&
+					workspace.tags.list.some(({ id }) => id === selectedTagId);
+
+				workspace.tags.selected = isSelectedTagExists ? selectedTagId : null;
+			}
 		},
 
 		setWorkspaceNoteTemplateConfig: (

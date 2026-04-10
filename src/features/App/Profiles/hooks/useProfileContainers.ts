@@ -53,6 +53,21 @@ const decryptKey = async ({
 		.then((buffer) => new Uint8Array(buffer));
 };
 
+export const enum VaultOpenErrorCode {
+	INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
+	KEY_FILE_NOT_FOUND = 'KEY_FILE_NOT_FOUND',
+}
+export class VaultOpenError extends Error {
+	constructor(
+		public readonly code: VaultOpenErrorCode,
+		message: string,
+		options?: ErrorOptions,
+	) {
+		super(message, options);
+		this.name = 'VaultOpenError';
+	}
+}
+
 // TODO: cover with tests to ensure we can decrypt exists vault
 /**
  * Hook to manage active and opened profiles
@@ -75,100 +90,127 @@ export const useProfileContainers = () => {
 		) => {
 			const cleanups: (() => void)[] = [];
 
-			const profileFilesController = new RootedFS(files, `/vaults/${profile.id}`);
-
-			// Setup encryption
-			let encryptionController: EncryptionController;
-			let encryptionCleanup: null | (() => any) = null;
-			if (profile.encryption === null) {
-				encryptionController = new EncryptionController(
-					new PlaceholderEncryptionController(),
-				);
-			} else {
-				if (password === undefined)
-					throw new TypeError('Empty password for encrypted profile');
-
-				const encryptedKeyBuffer = await profileFilesController.get('key');
-				if (!encryptedKeyBuffer) {
-					throw new Error('Key file is not found in profile directory');
-				}
-
-				const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
-				const key = await decryptKey({
-					encryptedKey: encryptedKeyBuffer,
-					password: password,
-					salt,
-					algorithm: profile.encryption.algorithm,
-				});
-
-				const encryption = await createEncryption({
-					key,
-					salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
-					algorithm: profile.encryption.algorithm,
-				});
-
-				encryptionCleanup = () => encryption.dispose();
-				encryptionController = encryption.getContent();
-			}
-
-			const encryptedProfileFS = new EncryptedFS(
-				profileFilesController,
-				encryptionController,
-			);
-
-			// Setup DB
-			const db = await openSQLite(
-				new FileController('vault.db', encryptedProfileFS),
-			);
-
-			// Ensure at least one workspace exists
-			const workspaces = new WorkspacesController(db);
-			const isWorkspacesExists = await workspaces
-				.getList()
-				.then((workspaces) => workspaces.length > 0);
-			if (!isWorkspacesExists) {
-				await workspaces.create({ name: 'Notes' });
-
-				// Sync to avoid losing the default workspace if the app closes before the automatic sync
-				await db.sync();
-			}
-
-			// TODO: close DB first and close encryption last
-			cleanups.push(() => db.close());
-
-			const profileObject: ProfileEntry = {
-				id: profile.id,
-				name: profile.name,
-				isEncrypted: profile.encryption !== null,
-			};
-
-			const newProfile = new DisposableBox(
-				{
-					db,
-					profile: profileObject,
-					encryptionController,
-					files: encryptedProfileFS,
-				} satisfies ProfileContainer,
-				async () => {
-					// TODO: remove key of RAM. Set control with callback to remove key
-					for (const cleanup of cleanups) {
+			const runCleanups = async () => {
+				// TODO: remove key of RAM. Set control with callback to remove key
+				// LIFO cleanup: last added cleanup runs first
+				for (const cleanup of [...cleanups].reverse()) {
+					try {
 						// TODO: set deadline for awaiting
 						await cleanup();
+					} catch (error) {
+						console.error(error);
+					}
+				}
+			};
+
+			try {
+				const profileFilesController = new RootedFS(
+					files,
+					`/vaults/${profile.id}`,
+				);
+
+				// Setup encryption
+				let encryptionController: EncryptionController;
+
+				if (profile.encryption === null) {
+					encryptionController = new EncryptionController(
+						new PlaceholderEncryptionController(),
+					);
+				} else {
+					if (password === undefined)
+						throw new VaultOpenError(
+							VaultOpenErrorCode.INCORRECT_PASSWORD,
+							'Empty password for encrypted profile',
+						);
+
+					const encryptedKeyBuffer = await profileFilesController.get('key');
+					if (!encryptedKeyBuffer) {
+						throw new VaultOpenError(
+							VaultOpenErrorCode.KEY_FILE_NOT_FOUND,
+							'Key file is not found in profile directory',
+						);
 					}
 
-					if (encryptionCleanup) {
-						encryptionCleanup();
+					const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
+					let key;
+					try {
+						key = await decryptKey({
+							encryptedKey: encryptedKeyBuffer,
+							password,
+							salt,
+							algorithm: profile.encryption.algorithm,
+						});
+					} catch (error) {
+						throw new VaultOpenError(
+							VaultOpenErrorCode.INCORRECT_PASSWORD,
+							'Failed to decrypt the key',
+							{ cause: error },
+						);
 					}
-				},
-			);
 
-			profileOpened(newProfile);
+					const encryption = await createEncryption({
+						key,
+						salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
+						algorithm: profile.encryption.algorithm,
+					});
 
-			if (changeActiveProfile) {
-				activeProfileChanged(newProfile);
+					cleanups.push(() => encryption.dispose());
+					encryptionController = encryption.getContent();
+				}
+
+				const encryptedProfileFS = new EncryptedFS(
+					profileFilesController,
+					encryptionController,
+				);
+
+				// Setup DB
+				const db = await openSQLite(
+					new FileController('vault.db', encryptedProfileFS),
+				);
+
+				cleanups.push(() => db.close());
+
+				// Ensure at least one workspace exists
+				const workspaces = new WorkspacesController(db);
+				const isWorkspacesExists = await workspaces
+					.getList()
+					.then((workspaces) => workspaces.length > 0);
+				if (!isWorkspacesExists) {
+					await workspaces.create({ name: 'Notes' });
+
+					// Sync to avoid losing the default workspace if the app closes before the automatic sync
+					await db.sync();
+				}
+
+				const profileObject: ProfileEntry = {
+					id: profile.id,
+					name: profile.name,
+					isEncrypted: profile.encryption !== null,
+				};
+
+				const newProfile = new DisposableBox(
+					{
+						db,
+						profile: profileObject,
+						encryptionController,
+						files: encryptedProfileFS,
+					} satisfies ProfileContainer,
+					runCleanups,
+				);
+
+				profileOpened(newProfile);
+
+				if (changeActiveProfile) {
+					activeProfileChanged(newProfile);
+				}
+
+				return newProfile;
+			} catch (error) {
+				// Close all resources if opening the profile fails
+				await runCleanups();
+
+				throw error;
 			}
-
-			return newProfile;
 		},
 		[activeProfileChanged, files, profileOpened],
 	);

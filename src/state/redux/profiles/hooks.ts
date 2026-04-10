@@ -88,3 +88,23 @@ export const useVaultActions = () => {
 		>;
 	}, [profileId]);
 };
+
+export const useWorkspaceActions = () => {
+	const workspaceData = useWorkspaceData();
+
+	return useMemo(() => {
+		return Object.fromEntries(
+			Object.entries(workspacesApi).map(([key, action]) => [
+				key,
+				(props: Record<any, any>) =>
+					action({ ...props, ...workspaceData } as any),
+			]),
+		) as unknown as StripPropsInActionCreator<
+			typeof workspacesApi,
+			{
+				profileId: string;
+				workspaceId: string;
+			}
+		>;
+	}, [workspaceData]);
+};

@@ -1,17 +1,34 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { Box } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { useFilesStorage } from '@features/files';
 import { SplashScreen } from '@features/SplashScreen';
+import { getRandomItem } from '@utils/collections/getRandomItem';
 
-import { AppServices } from './AppServices';
-import { Profiles } from './Profiles';
-import { useProfileContainers } from './Profiles/hooks/useProfileContainers';
+import { CenterBox } from './CenterBox';
+import { ChooseVaultScreen } from './ChooseVaultScreen';
+import { ProfileCreator } from './ProfileCreator';
+import { ProfileLoginForm } from './ProfileLoginForm';
+import {
+	useProfileContainers,
+	VaultOpenError,
+	VaultOpenErrorCode,
+} from './Profiles/hooks/useProfileContainers';
+import { OnPickProfile } from './types';
 import { useProfileSelector } from './useProfileSelector';
 import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
-import { WorkspaceManager } from './WorkspaceManager';
+import { VaultScreen } from './VaultScreen';
+
+const defaultVaultNames = [
+	'Creative drafts',
+	'Second brain',
+	'Digital garden',
+	'Creative space',
+	'Mind space',
+	'Idea lab',
+];
 
 export const App: FC = () => {
 	const files = useFilesStorage();
@@ -20,79 +37,130 @@ export const App: FC = () => {
 	const profilesList = useProfilesList();
 	const profileContainers = useProfileContainers();
 
-	const [loadingState, setLoadingState] = useState<{
-		isProfilesLoading: boolean;
-		isProfileLoading: boolean;
-	}>({
-		isProfilesLoading: true,
-		isProfileLoading: false,
-	});
-	const [currentProfile, setCurrentProfile] = useProfileSelector(config);
+	const [currentVaultId, setCurrentVaultId] = useProfileSelector(config);
+	const currentVault = useMemo(
+		() => profilesList.profiles.find((p) => p.id === currentVaultId) ?? null,
+		[currentVaultId, profilesList.profiles],
+	);
 
-	// Open recent profile
+	// When the active vault changes, close any open error toast
+	const toast = useToast();
+	useEffect(() => {
+		toast.closeAll();
+	}, [currentVaultId, toast]);
+
+	const [screenName, setScreenName] = useState<'create' | 'choose' | 'loading'>(
+		'choose',
+	);
+	const onOpenVault: OnPickProfile = useCallback(
+		async (profile, password) => {
+			setScreenName('loading');
+
+			try {
+				if (profile.encryption !== null && password === undefined) {
+					return { status: 'error', message: 'Enter password' };
+				}
+
+				await profileContainers.openProfile({ profile, password }, true);
+				return { status: 'ok' };
+			} catch (err) {
+				// Only unexpected errors show a toast — wrong password is handled by the form
+				if (
+					err instanceof VaultOpenError &&
+					err.code === VaultOpenErrorCode.INCORRECT_PASSWORD
+				) {
+					return { status: 'error', message: 'Invalid password' };
+				}
+
+				toast({
+					status: 'error',
+					title: 'Failed to open vault',
+					description: `"${profile.name}" appears to be corrupted.`,
+					containerStyle: { maxW: '400px' },
+				});
+
+				throw err;
+			} finally {
+				setScreenName('choose');
+			}
+		},
+		[profileContainers, toast],
+	);
+
+	// Restore and auto-open recent profile
 	const recentProfile = useRecentProfile(config);
 	useEffect(
 		() => {
 			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
 
 			// Restore profile id
-			setCurrentProfile(recentProfile.profileId);
+			setCurrentVaultId(recentProfile.profileId);
 
 			const profile = profilesList.profiles.find(
 				(profile) => profile.id === recentProfile.profileId,
 			);
-			if (!profile || profile.encryption) {
-				setLoadingState((state) => ({ ...state, isProfilesLoading: false }));
-				return;
-			}
+
+			if (!profile || profile.encryption) return;
 
 			// Automatically open profile with no encryption
-			profileContainers.openProfile({ profile }, true);
-			setLoadingState({
-				isProfilesLoading: false,
-				isProfileLoading: true,
-			});
+			onOpenVault(profile);
 		},
-
 		// Depends only of loading status and run only once
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
 	);
 
-	// Handle case with auto open profile. Wait the end of loading
-	useEffect(() => {
-		if (profileContainers.profiles.length > 0) {
-			setLoadingState((state) => ({ ...state, isProfileLoading: false }));
-		}
-	}, [profileContainers.profiles.length]);
+	const [isInitialLoading] = useDebounce(
+		!profilesList.isProfilesLoaded || !recentProfile.isLoaded,
+		500,
+	);
 
-	const isLoadingState = Object.values(loadingState).some(Boolean);
-	const [isShowSplash] = useDebounce(isLoadingState, 500);
-	if (isShowSplash) {
+	// Skip splash while encrypted vault is opening
+	const isVaultLoading = screenName === 'loading' && !currentVault?.encryption;
+
+	if (isInitialLoading || isVaultLoading) {
 		return <SplashScreen />;
 	}
 
-	if (profileContainers.profiles.length === 0) {
+	if (profileContainers.activeProfile) {
+		return <VaultScreen vaultContainers={profileContainers} />;
+	}
+
+	if (currentVault && currentVault.encryption) {
 		return (
-			<WorkspaceManager
-				profiles={profileContainers}
-				profilesManager={profilesList}
-				currentProfile={currentProfile}
-				onChooseProfile={setCurrentProfile}
-			/>
+			<CenterBox>
+				<ProfileLoginForm
+					profile={currentVault}
+					onLogin={onOpenVault}
+					onPickAnotherProfile={() => setCurrentVaultId(null)}
+				/>
+			</CenterBox>
+		);
+	}
+
+	const hasNoProfiles = profilesList.profiles.length === 0;
+	if (screenName === 'create' || hasNoProfiles) {
+		return (
+			<CenterBox>
+				<ProfileCreator
+					onCreateProfile={async (profile) => {
+						const newProfile = await profilesList.createProfile(profile);
+						await onOpenVault(newProfile, profile.password || undefined);
+					}}
+					onCancel={hasNoProfiles ? undefined : () => setScreenName('choose')}
+					defaultProfileName={
+						hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
+					}
+				/>
+			</CenterBox>
 		);
 	}
 
 	return (
-		<Box
-			sx={{
-				display: 'flex',
-				width: '100%',
-				height: '100vh',
-			}}
-		>
-			<Profiles profilesApi={profileContainers} />
-			<AppServices />
-		</Box>
+		<ChooseVaultScreen
+			vaults={profilesList.profiles}
+			onOpenVault={onOpenVault}
+			onCreateVault={() => setScreenName('create')}
+		/>
 	);
 };

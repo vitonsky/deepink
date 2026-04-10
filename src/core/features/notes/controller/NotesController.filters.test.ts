@@ -314,4 +314,25 @@ describe('data fetching', () => {
 
 		await expect(registry.getById(shuffledIds)).resolves.toEqual(shuffledNotes);
 	});
+
+	test('method getById skips non-existent ids', async () => {
+		const { db, workspaceId } = getWorkspaceContext();
+		const registry = new NotesController(db, workspaceId);
+
+		const notesId = await registry
+			.get({ limit: 10 })
+			.then((notes) => notes.map((note) => note.id));
+
+		const notExistingNoteId = crypto.randomUUID();
+
+		const shuffledIds = [...notesId, notExistingNoteId].sort(
+			() => Math.random() - 0.5,
+		);
+
+		const foundNotes = await registry.getById(shuffledIds);
+		expect(foundNotes).toHaveLength(10);
+		expect(foundNotes).not.toContainEqual(
+			expect.objectContaining({ id: notExistingNoteId }),
+		);
+	});
 });

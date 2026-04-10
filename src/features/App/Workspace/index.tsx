@@ -1,23 +1,21 @@
-import React, { createContext, FC, useEffect, useMemo } from 'react';
-import { isEqual } from 'lodash';
+import React, { createContext, FC, useEffect } from 'react';
 import { Box } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { MainScreen } from '@features/MainScreen';
-import { SplashScreen } from '@features/SplashScreen';
 import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
-import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import {
-	selectActiveWorkspaceInfo,
-	selectWorkspaceName,
-	workspacesApi,
-} from '@state/redux/profiles/profiles';
+import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
+import { useAppDispatch } from '@state/redux/hooks';
+import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { selectWorkspaceName } from '@state/redux/profiles/profiles';
+import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
+import { WorkspaceServices } from './services/WorkspaceServices';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
+import { WorkspaceStateInitializer } from './WorkspaceStateInitializer';
 import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
 export const WorkspaceContext = createContext<{
@@ -36,45 +34,35 @@ export interface WorkspaceProps {
 export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 	const workspace = useWorkspace(profile);
 	const dispatch = useAppDispatch();
-	const workspaceData = useWorkspaceData();
+	const workspaceActions = useWorkspaceActions();
+
+	// TODO: replace to hook
+	// Keeps the tags list up to date: subscribes to tag changes in the database and syncs updates to Redux
+	useEffect(() => {
+		if (!workspace) return;
+		const { tagsRegistry } = workspace;
+
+		let isCanceled = false;
+
+		const updateTags = () =>
+			tagsRegistry.getTags().then((tags) => {
+				if (isCanceled) return;
+				dispatch(workspaceActions.setTags({ tags }));
+			});
+
+		const cleanup = tagsRegistry.onChange(updateTags);
+		return () => {
+			isCanceled = true;
+			cleanup();
+		};
+	}, [dispatch, workspace, workspaceActions]);
 
 	const { name: workspaceName } = useWorkspaceSelector(selectWorkspaceName);
 
-	// Close notes by unmount
-	useEffect(() => {
-		return () => {
-			// TODO: use actual workspace id once will be implemented
-			dispatch(workspacesApi.setActiveNote({ ...workspaceData, noteId: null }));
-			dispatch(workspacesApi.setOpenedNotes({ ...workspaceData, notes: [] }));
-			dispatch(workspacesApi.setNoteIds({ ...workspaceData, noteIds: [] }));
-		};
-	}, [dispatch, workspaceData]);
+	const isWorkspaceLoaded = useWorkspaceSelector(selectIsWorkspaceLoaded);
+	const isVisibleWorkspace = useIsActiveWorkspace();
 
-	// TODO: replace to hook
-	// Load tags
-	useEffect(() => {
-		if (!workspace) return;
-
-		const { tagsRegistry } = workspace;
-		const updateTags = () =>
-			tagsRegistry.getTags().then((tags) => {
-				dispatch(workspacesApi.setTags({ ...workspaceData, tags }));
-			});
-
-		updateTags();
-
-		const cleanup = tagsRegistry.onChange(updateTags);
-		return cleanup;
-	}, [dispatch, workspace, workspaceData]);
-
-	const { profileId } = useWorkspaceData();
-
-	const activeWorkspace = useAppSelector(
-		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
-		isEqual,
-	);
-	const isVisibleWorkspace =
-		activeWorkspace && activeWorkspace.id === workspaceData.workspaceId;
+	if (!workspace) return null;
 
 	return (
 		<Box
@@ -90,49 +78,32 @@ export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
 				backgroundColor: 'surface.background',
 			}}
 		>
-			{workspace ? (
-				<WorkspaceProvider
-					{...workspace}
-					notesApi={{
-						openNote: (note: INote, focus = true) => {
-							dispatch(
-								workspacesApi.addOpenedNote({ ...workspaceData, note }),
-							);
+			<WorkspaceProvider
+				{...workspace}
+				notesApi={{
+					openNote: (note: INote, focus = true) => {
+						dispatch(workspaceActions.addOpenedNote({ note }));
+						if (focus) {
+							dispatch(workspaceActions.setActiveNote({ noteId: note.id }));
+						}
+					},
+					noteUpdated: (note: INote) =>
+						dispatch(workspaceActions.updateOpenedNote({ note })),
+					noteClosed: (noteId: string) =>
+						dispatch(workspaceActions.removeOpenedNote({ noteId })),
+				}}
+			>
+				<WorkspaceServices />
 
-							if (focus) {
-								dispatch(
-									workspacesApi.setActiveNote({
-										...workspaceData,
-										noteId: note.id,
-									}),
-								);
-							}
-						},
-						noteUpdated: (note: INote) =>
-							dispatch(
-								workspacesApi.updateOpenedNote({
-									...workspaceData,
-									note,
-								}),
-							),
-						noteClosed: (noteId: string) =>
-							dispatch(
-								workspacesApi.removeOpenedNote({
-									...workspaceData,
-									noteId,
-								}),
-							),
-					}}
-				>
+				{!isWorkspaceLoaded && <WorkspaceStateInitializer />}
+				{isWorkspaceLoaded && (
 					<WorkspaceModalProvider isVisible={isVisibleWorkspace ?? false}>
 						<MainScreen />
 						<WorkspaceStatusBarItems />
 						<SettingsWindow />
 					</WorkspaceModalProvider>
-				</WorkspaceProvider>
-			) : (
-				<SplashScreen />
-			)}
+				)}
+			</WorkspaceProvider>
 		</Box>
 	);
 };

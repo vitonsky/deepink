@@ -1,22 +1,32 @@
 import React from 'react';
-import { Text } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 
 // TODO: implement splash screen
 export const SplashScreen = () => {
 	return (
-		<Text
-			sx={{
-				display: 'flex',
-				height: '100vh',
-				width: '100%',
-				margin: 'auto',
-				justifyContent: 'center',
-				alignItems: 'center',
-				fontSize: '2rem',
-				fontWeight: 'bold',
-			}}
+		<Box
+			position="fixed"
+			top={0}
+			left={0}
+			height="100vh"
+			width="100%"
+			backgroundColor="surface.background"
+			zIndex={9999}
 		>
-			Loading...
-		</Text>
+			<Text
+				sx={{
+					display: 'flex',
+					height: '100%',
+					width: '100%',
+					margin: 'auto',
+					justifyContent: 'center',
+					alignItems: 'center',
+					fontSize: '2rem',
+					fontWeight: 'bold',
+				}}
+			>
+				Loading...
+			</Text>
+		</Box>
 	);
 };

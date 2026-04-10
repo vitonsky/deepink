@@ -1,10 +1,19 @@
-import React, { createContext, FC, useEffect, useMemo } from 'react';
+import React, {
+	createContext,
+	FC,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 import { isEqual } from 'lodash';
+import { useDebounce } from 'use-debounce';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
+import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
@@ -14,18 +23,21 @@ import {
 	createWorkspaceObject,
 	defaultVaultConfig,
 	ProfileConfigScheme,
+	selectActiveWorkspaceInfo,
 	selectWorkspacesInfo,
-	WorkspaceConfigScheme,
-	WorkspaceData,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
+import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
+import { WorkspaceErrorProvider } from '../Workspace/WorkspaceErrorProvider';
+import { WorkspaceErrorScreen } from '../Workspace/WorkspaceErrorScreen';
 import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
 import { ProfileServices } from './services';
 import { useVaultState } from './useVaultState';
+import { useVaultError } from './VaultErrorProvider';
 
 export type ProfileControls = {
 	profile: ProfileContainer;
@@ -50,6 +62,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		isEqual,
 	);
 
+	const handleVaultError = useVaultError();
+
 	const getVaultState = useVaultState({
 		sync: Object.keys(workspaces).length > 0,
 		controls,
@@ -60,83 +74,74 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		[currentProfile.db],
 	);
 	useEffect(() => {
+		let isVaultLoadCancelled = false;
+
 		const vaultConfig = new StateFile(
 			new FileController('config.json', controls.profile.files),
 			ProfileConfigScheme,
 		);
 
-		Promise.all([
-			workspacesManager.getList(),
-			vaultConfig.get(),
-			getVaultState(),
-		]).then(async ([workspaces, config, state]) => {
-			const [defaultWorkspace] = workspaces;
+		Promise.all([workspacesManager.getList(), vaultConfig.get(), getVaultState()])
+			.then(async ([workspaces, config, state]) => {
+				if (isVaultLoadCancelled) return;
+				const [defaultWorkspace] = workspaces;
 
-			const workspaceConfigs = await Promise.all(
-				workspaces.map(async (workspace) => {
-					const config = await new StateFile(
-						new FileController(
-							`workspaces/${workspace.id}/config.json`,
-							controls.profile.files,
-						),
-						WorkspaceConfigScheme,
-					).get();
+				if (!defaultWorkspace)
+					throw new Error(
+						'No workspaces found in vault, at least one is required',
+					);
 
-					return [workspace.id, config] as const;
-				}),
-			).then((entries) => Object.fromEntries(entries));
-
-			if (!defaultWorkspace) return;
-
-			dispatch(
-				workspacesApi.addProfile({
-					profileId,
-					profile: {
-						activeWorkspace: null,
-						workspaces: Object.fromEntries(
-							workspaces.map((workspace) => {
-								const workspaceObject = createWorkspaceObject(workspace);
-								return [
+				dispatch(
+					workspacesApi.addProfile({
+						profileId,
+						profile: {
+							activeWorkspace: null,
+							workspaces: Object.fromEntries(
+								workspaces.map((workspace) => [
 									workspace.id,
-									{
-										...workspaceObject,
-										config: {
-											...workspaceObject.config,
-											...workspaceConfigs[workspace.id],
-										},
-									} satisfies WorkspaceData,
-								];
-							}),
-						),
-						config: {
-							...defaultVaultConfig,
-							...config,
+									createWorkspaceObject(workspace),
+								]),
+							),
+							config: {
+								...defaultVaultConfig,
+								...config,
+							},
 						},
-					},
-				}),
-			);
-			dispatch(workspacesApi.setActiveProfile(profileId));
+					}),
+				);
+				dispatch(workspacesApi.setActiveProfile(profileId));
 
-			const selectedWorkspace =
-				(state?.activeWorkspace &&
-					workspaces.find((w) => w.id === state.activeWorkspace)) ||
-				defaultWorkspace;
-			dispatch(
-				workspacesApi.setActiveWorkspace({
-					profileId,
-					workspaceId: selectedWorkspace.id,
-				}),
-			);
-		});
+				let selectedWorkspace = defaultWorkspace;
+				if (state?.activeWorkspace) {
+					selectedWorkspace =
+						workspaces.find((w) => w.id === state.activeWorkspace) ??
+						defaultWorkspace;
+				}
+				dispatch(
+					workspacesApi.setActiveWorkspace({
+						profileId,
+						workspaceId: selectedWorkspace.id,
+					}),
+				);
+			})
+			.catch((error) => {
+				if (isVaultLoadCancelled) return;
+
+				handleVaultError(error);
+			});
 
 		return () => {
+			isVaultLoadCancelled = true;
+
 			dispatch(
 				workspacesApi.removeProfile({
 					profileId,
 				}),
 			);
 		};
-	}, [controls.profile.files, dispatch, getVaultState, profileId, workspacesManager]);
+		// Load vault data only once to initialize the component
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const isDevMode = useIsDeveloper();
 
@@ -159,17 +164,54 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
+	const [workspaceErrors, setWorkspaceErrors] = useState<Record<string, Error>>({});
+	const activeWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
+	const activeWorkspaceError = activeWorkspace
+		? workspaceErrors[activeWorkspace.id]
+		: null;
+
+	const isActiveWorkspaceLoaded = useAppSelector(
+		selectIsActiveWorkspaceLoaded({ profileId }),
+	);
+	const [isLoadingComplete] = useDebounce(
+		isActiveWorkspaceLoaded || activeWorkspaceError,
+		500,
+		{
+			leading: true,
+		},
+	);
+
+	// Memoize to keep the function stable across renders so it can be used as a dependency in child effects
+	const onWorkspaceError = useCallback((error: Error, workspaceId: string) => {
+		setWorkspaceErrors((prev) => ({ ...prev, [workspaceId]: error }));
+	}, []);
+	const onWorkspaceErrorReset = useCallback((workspaceId: string) => {
+		setWorkspaceErrors((prev) => {
+			const updated = { ...prev };
+			delete updated[workspaceId];
+			return updated;
+		});
+	}, []);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
+			{!isLoadingComplete && <SplashScreen />}
 			{workspaces.length > 0 && <ProfileServices />}
+
+			{activeWorkspaceError && (
+				<WorkspaceErrorScreen onWorkspaceErrorReset={onWorkspaceErrorReset} />
+			)}
+
 			{workspaces.map((workspace) =>
 				workspace.touched ? (
 					<WorkspaceContext.Provider
 						key={workspace.id}
-						value={{ profileId: profileId, workspaceId: workspace.id }}
+						value={{ profileId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
-							<Workspace profile={currentProfile} />
+							<WorkspaceErrorProvider onError={onWorkspaceError}>
+								<Workspace profile={currentProfile} />
+							</WorkspaceErrorProvider>
 							<ProfileStatusBar />
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
