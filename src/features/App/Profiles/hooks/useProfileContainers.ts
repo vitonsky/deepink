@@ -132,7 +132,7 @@ export const useProfileContainers = () => {
 					}
 
 					const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
-					let key: ArrayBuffer;
+					let key;
 					try {
 						key = await decryptKey({
 							encryptedKey: encryptedKeyBuffer,
