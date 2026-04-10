@@ -1,4 +1,4 @@
-import { shallowEqual } from 'react-redux';
+import isEqual from 'lodash/isEqual';
 import { WorkspaceStateData } from '@features/App/Workspace/services/workspaceState';
 
 import { createAppSelector } from '../../utils';
@@ -25,18 +25,7 @@ export const selectWorkspaceState = ({ profileId, workspaceId }: WorkspaceScoped
 		},
 		{
 			memoizeOptions: {
-				resultEqualityCheck: (prev, next) => {
-					if (prev === next) return true;
-					if (!prev || !next) return false;
-
-					return (
-						shallowEqual(prev.openedNoteIds, next.openedNoteIds) &&
-						prev.activeNoteId === next.activeNoteId &&
-						prev.selectedTagId === next.selectedTagId &&
-						prev.view === next.view &&
-						prev.search === next.search
-					);
-				},
+				resultEqualityCheck: isEqual,
 			},
 		},
 	);
