@@ -1,0 +1,57 @@
+{
+	"compilerOptions": {
+		"jsx": "react",
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"target": "esnext",
+		"esModuleInterop": true,
+		"strict": true,
+		"alwaysStrict": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": true,
+		"forceConsistentCasingInFileNames": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"declaration": false,
+		"downlevelIteration": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"pretty": true,
+		"preserveConstEnums": true,
+		"removeComments": false,
+		"sourceMap": true,
+		"lib": ["ESNext", "dom"],
+		"rootDir": ".",
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
+		"paths": {
+			"@assets/*": ["assets/*"],
+			"@tests/*": ["src/__tests__/*"],
+			"@core/*": ["src/core/*"],
+			"@electron/*": ["src/electron/*"],
+			"@components/*": ["src/components/*"],
+			"@features/*": ["src/features/*"],
+			"@hooks/*": ["src/hooks/*"],
+			"@api/*": ["src/api/*"],
+			"@state/*": ["src/state/*"],
+			"@mocks/*": ["src/__tests__/__mocks__/*"],
+			"@utils/*": ["src/utils/*"]
+		}
+	},
+	"ts-node": {
+		"compilerOptions": {
+			"module": "CommonJS"
+		}
+	},
+	"include": ["*.ts", "*.mts", "scripts/**/*.ts", "src/**/*.ts", "src/**/*.tsx"]
+}
