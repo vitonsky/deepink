@@ -1,4 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Button,
 	FormControl,
@@ -46,6 +48,9 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	onSave,
 	onCancel,
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+	const { t: tCommon } = useTranslation(LOCALE_NAMESPACE.common);
+
 	const isEditingMode = editedTag !== undefined;
 
 	const [parentTagId, setParentTagId] = useState<string | null>(
@@ -118,21 +123,27 @@ export const TagEditor: FC<ITagEditorProps> = ({
 				} catch (error) {
 					console.error(error);
 
-					setTagNameError('Unable to save the tag. Please try again.');
+					setTagNameError(
+						t('tag.editor.messages.unknownSubmitError'),
+					);
 				} finally {
 					setIsPending(false);
 				}
 			}}
 		>
 			<ModalCloseButton />
-			<ModalHeader>{isEditingMode ? 'Edit tag' : 'Add tag'}</ModalHeader>
+			<ModalHeader>
+				{isEditingMode
+					? t('tag.editor.mode.edit.title')
+					: t('tag.editor.mode.add.title')}
+			</ModalHeader>
 
 			<ModalBody>
 				<VStack align="start" gap="1rem">
 					<VStack w="100%" align="start" gap="0.5rem">
-						<Text>Parent tag</Text>
+						<Text>{t('tag.editor.field.parent.name')}</Text>
 						<SuggestedTagsList
-							placeholder="e.g., brainstorm"
+							placeholder={t('tag.editor.field.parent.placeholder')}
 							tags={tags}
 							selectedTag={selectedParentTag ?? undefined}
 							onPick={(tag) => {
@@ -144,9 +155,9 @@ export const TagEditor: FC<ITagEditorProps> = ({
 
 					<FormControl isInvalid={tagNameError !== null}>
 						<VStack w="100%" align="start" gap="0.5rem">
-							<Text>Tag name</Text>
+							<Text>{t('tag.editor.field.name.name')}</Text>
 							<Input
-								placeholder="e.g., brainstorm/work"
+								placeholder={t('tag.editor.field.name.placeholder')}
 								value={tagName}
 								onChange={(evt) => {
 									setTagName(evt.target.value);
@@ -165,9 +176,11 @@ export const TagEditor: FC<ITagEditorProps> = ({
 			<ModalFooter>
 				<HStack w="100%" justifyContent="end">
 					<Button type="submit" variant="accent" isDisabled={isPending}>
-						{isEditingMode ? 'Save' : 'Add'}
+						{isEditingMode
+							? t('tag.editor.mode.edit.action')
+							: t('tag.editor.mode.add.action')}
 					</Button>
-					<Button onClick={onCancel}>Cancel</Button>
+					<Button onClick={onCancel}>{tCommon('actions.cancel')}</Button>
 				</HStack>
 			</ModalFooter>
 		</form>

@@ -1,0 +1,53 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Add tag",
+					"action": "Add"
+				},
+				"edit": {
+					"title": "Edit tag",
+					"action": "Save"
+				}
+			},
+			"field": {
+				"name": {
+					"name": "Tag name",
+					"placeholder": "e.g., brainstorm"
+				},
+				"parent": {
+					"name": "Parent tag",
+					"placeholder": "e.g., brainstorm/work"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Cannot save changes due to unknown error. You can try again.",
+				"unknownError": "Name of tag for editing cannot create sub tags or be empty",
+				"format": "Tag cannot be empty, start or end with \"/\", or contain \"//\"",
+				"duplicate": "Tag with such name is already exists",
+				"parentTagNotFound": "Parent tag not found, please select another tag"
+			}
+		}
+	},
+	"workspace": {
+		"creator": {
+			"title": "Add new workspace",
+			"description": "Create a new workspace to manage your notes even better. Separate your notes by scope.",
+			"action": {
+				"add": "Add",
+				"cancel": "Cancel"
+			},
+			"field": {
+				"name": {
+					"label": "Workspace name",
+					"placeholder": "e.g., Personal"
+				}
+			},
+			"error": {
+				"unknown": "Unknown error occurs. Try again.",
+				"format": "Workspace name cannot be empty."
+			}
+		}
+	}
+}

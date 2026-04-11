@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"title": "Tags",
+			"empty": "Add tags in this workspace to organize notes",
+			"actions": {
+				"add": "Add tag"
+			}
+		},
+		"workspaces": {
+			"title": "Workspaces",
+			"actions": {
+				"add": "Add workspace"
+			}
+		}
+	}
+}

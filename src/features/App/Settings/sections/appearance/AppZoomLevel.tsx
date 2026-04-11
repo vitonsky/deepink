@@ -39,7 +39,7 @@ export const AppZoomLevel = () => {
 	const form = useForm({
 		delayError: 500,
 		defaultValues: {
-			zoom: zoomFactorToPercents(getZoomFactor()),
+			zoom: String(zoomFactorToPercents(getZoomFactor())),
 		},
 		resolver: zodResolver(zoomScheme),
 		shouldFocusError: true,
@@ -81,7 +81,7 @@ export const AppZoomLevel = () => {
 
 						setZoomFactor(defaultZoom);
 						form.reset({
-							zoom: zoomFactorToPercents(defaultZoom),
+							zoom: String(zoomFactorToPercents(defaultZoom)),
 						});
 					}}
 				>

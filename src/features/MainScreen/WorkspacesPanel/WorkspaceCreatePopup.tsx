@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { z } from 'zod';
 import {
 	Box,
@@ -15,17 +17,28 @@ import { WorkspacesController } from '@core/features/workspaces/WorkspacesContro
 import { useProfileControls } from '@features/App/Profile';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
+import { useStandaloneToast } from '@hooks/useStandaloneToast';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useWorkspacesList } from './useWorkspacesList';
 
-export const workspacePropsValidator = z.object({
-	name: z.string().trim().min(1, 'Name must not be empty'),
-});
-
 export const WorkspaceCreatePopup = () => {
+	const { t: tFeatures } = useTranslation(LOCALE_NAMESPACE.features, {
+		keyPrefix: 'workspace.creator',
+	});
+
+	const workspacePropsValidator = useMemo(
+		() =>
+			z.object({
+				name: z.string().trim().min(1, tFeatures('error.format')),
+			}),
+		[tFeatures],
+	);
+
+	const toast = useStandaloneToast('workspace-creator');
+
 	const telemetry = useTelemetryTracker();
 	const dispatch = useAppDispatch();
 
@@ -47,14 +60,11 @@ export const WorkspaceCreatePopup = () => {
 		<>
 			<ModalCloseButton />
 			<ModalHeader>
-				<Text>Add new workspace</Text>
+				<Text>{tFeatures('title')}</Text>
 			</ModalHeader>
 			<ModalBody paddingBottom="1rem">
 				<VStack w="100%" gap="2rem" align="start">
-					<Text color="typography.secondary">
-						Create a new workspace to manage your notes even better. Separate
-						your notes by scope.
-					</Text>
+					<Text color="typography.secondary">{tFeatures('description')}</Text>
 
 					<Box as={AutoFocusInside} w="100%">
 						<PropertiesForm
@@ -62,8 +72,8 @@ export const WorkspaceCreatePopup = () => {
 								{
 									id: 'name',
 									value: '',
-									label: 'Workspace name',
-									placeholder: 'e.g., Personal',
+									label: tFeatures('field.name.label'),
+									placeholder: tFeatures('field.name.placeholder'),
 								},
 							]}
 							validatorScheme={workspacePropsValidator}
@@ -93,12 +103,18 @@ export const WorkspaceCreatePopup = () => {
 
 										onClose();
 									})
+									.catch((error) => {
+										console.error(error);
+										toast.show({
+											description: tFeatures('error.unknown'),
+										});
+									})
 									.finally(() => {
 										setIsPending(false);
 									});
 							}}
-							submitButtonText="Add"
-							cancelButtonText="Cancel"
+							submitButtonText={tFeatures('action.add')}
+							cancelButtonText={tFeatures('action.cancel')}
 							onCancel={onClose}
 							isPending={isPending}
 						/>

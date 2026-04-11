@@ -1,3 +1,4 @@
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
@@ -36,6 +37,14 @@ export default merge(commonConfig, {
 				}),
 		),
 		new MiniCssExtractPlugin({}),
+		new CopyWebpackPlugin({
+			patterns: [
+				{
+					from: path.resolve(projectRoot, 'src/locales'),
+					to: 'locales',
+				},
+			],
+		}),
 	] as unknown as WebpackPluginInstance[],
 	// We explicitly define external imports instead of use `electron-renderer` target
 	externals: {

@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaPlus } from 'react-icons/fa6';
 import { createSelector } from 'reselect';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Divider, HStack, Select, StackProps, Text, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -13,6 +15,8 @@ import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles'
 import { WorkspaceCreatePopup } from './WorkspaceCreatePopup';
 
 export const WorkspacesPanel = (props: StackProps) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.workspace);
+
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();
@@ -43,7 +47,7 @@ export const WorkspacesPanel = (props: StackProps) => {
 					gap=".4rem"
 					color="typography.secondary"
 				>
-					Workspaces
+					{t('panel.workspaces.title')}
 				</Text>
 
 				<IconButton
@@ -56,7 +60,7 @@ export const WorkspacesPanel = (props: StackProps) => {
 						});
 					}}
 					icon={<FaPlus />}
-					title="Add workspace"
+					title={t('panel.workspaces.actions.add')}
 				/>
 			</HStack>
 

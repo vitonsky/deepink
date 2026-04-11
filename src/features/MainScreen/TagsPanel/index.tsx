@@ -1,5 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaPlus } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Box, Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TagEditor, TagEditorData } from '@components/TagEditor';
@@ -24,6 +26,8 @@ import {
 import { TagsList } from './TagsList';
 
 export const TagsPanel = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.workspace);
+	const { t: tFeatures } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
 
 	const dispatch = useAppDispatch();
@@ -71,7 +75,7 @@ export const TagsPanel = () => {
 							if (error instanceof TagControllerError) {
 								return {
 									ok: false,
-									error: 'Name of tag for editing cannot create sub tags or be empty',
+									error: tFeatures('tag.editor.messages.unknownError'),
 								};
 							}
 
@@ -103,15 +107,15 @@ export const TagsPanel = () => {
 							let message: string;
 							switch (error.code) {
 								case TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST:
-									message =
-										'Parent tag not found, please select another tag';
+									message = tFeatures(
+										'tag.editor.messages.parentTagNotFound',
+									);
 									break;
 								case TAG_ERROR_CODE.DUPLICATE:
-									message = 'Tag already exists';
+									message = tFeatures('tag.editor.messages.duplicate');
 									break;
 								default:
-									message =
-										'Tag cannot be empty, start or end with "/", or contain "//"';
+									message = tFeatures('tag.editor.messages.format');
 							}
 
 							return { ok: false, error: message };
@@ -135,7 +139,7 @@ export const TagsPanel = () => {
 						fontWeight="600"
 						color="typography.secondary"
 					>
-						Tags
+						{t('panel.tags.title')}
 					</Text>
 
 					<IconButton
@@ -148,7 +152,7 @@ export const TagsPanel = () => {
 						size="xs"
 						marginLeft="auto"
 						icon={<FaPlus />}
-						title="Add tag"
+						title={t('panel.tags.actions.add')}
 					/>
 				</HStack>
 
@@ -214,7 +218,7 @@ export const TagsPanel = () => {
 						/>
 					) : (
 						<Text color="typography.secondary" fontSize="sm">
-							Add tags in this workspace to organize notes
+							{t('panel.tags.empty')}
 						</Text>
 					)}
 				</Box>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { DefaultValues, Path, useForm } from 'react-hook-form';
 import { isEqual } from 'lodash';
 import z from 'zod';
 import { Button, HStack, Input, StackProps, Text, VStack } from '@chakra-ui/react';
@@ -11,11 +11,22 @@ export type OptionObject = {
 	value: string;
 	label: string;
 	placeholder?: string;
+	error?: string;
 };
+
+type SchemaFromOptions<T extends OptionObject[]> = z.ZodObject<
+	Record<T[number]['value'], z.ZodString>
+>;
+
+// Change FormValues to represent INPUT (what the form fields hold)
+type FormValues<T extends OptionObject[]> = z.input<SchemaFromOptions<T>>;
+
+// Add a separate type for OUTPUT (what the resolver returns after parsing)
+type FormOutput<T extends OptionObject[]> = z.output<SchemaFromOptions<T>>;
 
 export type PropertiesFormProps<T extends OptionObject[]> = StackProps & {
 	options: T;
-	validatorScheme?: z.ZodType;
+	validatorScheme?: SchemaFromOptions<T>;
 	onUpdate: (values: Record<T[number]['value'], string>) => void;
 	onCancel?: () => void;
 	submitButtonText?: string;
@@ -34,9 +45,15 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	...props
 }: PropertiesFormProps<T>) => {
 	const optionsValues = useMemo(
-		() => Object.fromEntries(options.map(({ id, value }) => [id, value])),
+		() =>
+			Object.fromEntries(
+				options.map(({ id, value }) => [id, value]),
+				// Cast to DefaultValues<FormValues<T>> — safe because we know
+				// all keys are strings matching the schema shape
+			) as DefaultValues<FormValues<T>>,
 		[options],
 	);
+
 	const {
 		register,
 		getValues,
@@ -44,7 +61,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 		reset,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({
+	} = useForm<FormValues<T>, unknown, FormOutput<T>>({
 		defaultValues: optionsValues,
 		resolver: validatorScheme ? zodResolver(validatorScheme) : undefined,
 	});
@@ -63,22 +80,32 @@ export const PropertiesForm = <T extends OptionObject[]>({
 			w="100%"
 			minW="350px"
 			{...props}
-			onSubmit={handleSubmit((values) => {
-				onUpdate(values as any);
+			onSubmit={handleSubmit((values: FormOutput<T>) => {
+				onUpdate(values as Record<T[number]['value'], string>);
 			})}
 		>
 			<VStack align="start" w="100%" gap="1rem">
-				{options.map(({ id, label, placeholder }) => {
-					const error = errors[id];
+				{options.map(({ id, label, placeholder, error }) => {
+					const fieldErrors = errors as Record<
+						string,
+						{ message?: string } | undefined
+					>;
+					const errorMessage = error || fieldErrors[id]?.message;
+
 					return (
 						<VStack key={id} as="label" align="start" w="100%" gap="0.3rem">
 							<Text paddingBottom=".2rem">{label}</Text>
 							<Input
-								{...register(id)}
+								{...register(
+									// Cast id to Path<FormValues<T>> — safe because options are always derived from the same schema shape
+									id as Path<FormValues<T>>,
+								)}
 								placeholder={placeholder}
 								isDisabled={isPending}
 							/>
-							{error && <Text color="message.error">{error.message}</Text>}
+							{errorMessage && (
+								<Text color="message.error">{errorMessage}</Text>
+							)}
 						</VStack>
 					);
 				})}
