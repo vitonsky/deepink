@@ -47,7 +47,7 @@ export const WorkspacesPanel = (props: StackProps) => {
 					gap=".4rem"
 					color="typography.secondary"
 				>
-					{t('panel.workspaces.title')}
+					{t('panel.workspaces.label')}
 				</Text>
 
 				<IconButton

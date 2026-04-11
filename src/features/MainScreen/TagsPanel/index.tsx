@@ -139,7 +139,7 @@ export const TagsPanel = () => {
 						fontWeight="600"
 						color="typography.secondary"
 					>
-						{t('panel.tags.title')}
+						{t('panel.tags.label')}
 					</Text>
 
 					<IconButton

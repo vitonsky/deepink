@@ -141,7 +141,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 			<ModalBody>
 				<VStack align="start" gap="1rem">
 					<VStack w="100%" align="start" gap="0.5rem">
-						<Text>{t('tag.editor.field.parent.name')}</Text>
+						<Text>{t('tag.editor.field.parent.label')}</Text>
 						<SuggestedTagsList
 							placeholder={t('tag.editor.field.parent.placeholder')}
 							tags={tags}
@@ -155,7 +155,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 
 					<FormControl isInvalid={tagNameError !== null}>
 						<VStack w="100%" align="start" gap="0.5rem">
-							<Text>{t('tag.editor.field.name.name')}</Text>
+							<Text>{t('tag.editor.field.name.label')}</Text>
 							<Input
 								placeholder={t('tag.editor.field.name.placeholder')}
 								value={tagName}

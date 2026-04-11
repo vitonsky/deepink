@@ -13,11 +13,11 @@
 			},
 			"field": {
 				"name": {
-					"name": "Tag name",
+					"label": "Tag name",
 					"placeholder": "e.g., brainstorm"
 				},
 				"parent": {
-					"name": "Parent tag",
+					"label": "Parent tag",
 					"placeholder": "e.g., brainstorm/work"
 				}
 			},
