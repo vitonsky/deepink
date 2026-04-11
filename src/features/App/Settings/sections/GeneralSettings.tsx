@@ -2,7 +2,7 @@ import React, { useReducer } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import ms from 'ms';
 import { getAbout } from 'src/about';
-import { LOCALE_NAMESPACE } from 'src/i18n';
+import { LOCALE_NAMESPACE, supportedLanguages } from 'src/i18n';
 import z from 'zod';
 import Logo from '@assets/icons/app.svg';
 import {
@@ -23,11 +23,14 @@ import { AppVersionInfo } from '@electron/updates/AppUpdatesChecker';
 import { useGetAppUpdates } from '@features/App/useGetAppUpdates';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
+	selectAppLanguage,
 	selectIsCheckForUpdatesEnabled,
 	selectVaultLockConfig,
 } from '@state/redux/settings/selectors/preferences';
 import { settingsApi } from '@state/redux/settings/settings';
 import { wait } from '@utils/time';
+
+import languageNames from './language-names.json';
 
 type UpdateState = {
 	state: 'pending' | 'result' | null;
@@ -40,6 +43,7 @@ export const GeneralSettings = () => {
 
 	const vaultLockConfig = useAppSelector(selectVaultLockConfig);
 	const isCheckForUpdatesEnabled = useAppSelector(selectIsCheckForUpdatesEnabled);
+	const language = useAppSelector(selectAppLanguage);
 
 	const getAppUpdates = useGetAppUpdates();
 	const [appUpdatesState, updateAppUpdatesState] = useReducer<
@@ -135,10 +139,26 @@ export const GeneralSettings = () => {
 					title={t('general.language.title')}
 					description={t('general.language.description')}
 				>
-					<Select size="sm" width="auto">
-						<option>English</option>
-						<option>Japanese</option>
-						<option>Portuguese</option>
+					<Select
+						size="sm"
+						width="auto"
+						value={language}
+						onChange={(evt) => {
+							dispatch(settingsApi.setLanguage(evt.target.value));
+						}}
+						textTransform="capitalize"
+					>
+						{supportedLanguages.map((code) => {
+							return (
+								<option key={code} value={code}>
+									{code in languageNames
+										? languageNames[
+												code as keyof typeof languageNames
+											]
+										: code}
+								</option>
+							);
+						})}
 					</Select>
 				</FeaturesOption>
 

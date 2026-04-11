@@ -7,6 +7,7 @@ import { createAppSelector } from '../utils';
 export type EditorMode = 'plaintext' | 'richtext' | 'split-screen';
 
 export const settingsScheme = z.object({
+	language: z.string(),
 	checkForUpdates: z.boolean(),
 	theme: z.object({
 		name: z.union([
@@ -41,6 +42,7 @@ export const settingsScheme = z.object({
 export type GlobalSettings = z.output<typeof settingsScheme>;
 
 export const defaultSettings = {
+	language: 'en',
 	checkForUpdates: true,
 	theme: {
 		name: 'zen',
@@ -67,6 +69,10 @@ export const settingsSlice = createSlice({
 	reducers: {
 		setSettings: (state, { payload }: PayloadAction<Partial<GlobalSettings>>) => {
 			return { ...state, ...payload } as GlobalSettings;
+		},
+
+		setLanguage: (state, { payload }: PayloadAction<GlobalSettings['language']>) => {
+			state.language = payload;
 		},
 
 		setEditorMode: (

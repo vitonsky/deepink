@@ -57,7 +57,7 @@ reactRoot.render(
 				<FilesStorageContext value={filesController}>
 					<CommandEventProvider>
 						<ThemeProvider>
-							<LocalesProvider language="en">
+							<LocalesProvider>
 								<App />
 							</LocalesProvider>
 						</ThemeProvider>

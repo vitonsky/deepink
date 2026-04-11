@@ -41,3 +41,8 @@ export const selectIsCheckForUpdatesEnabled = createAppSelector(
 	selectSettings,
 	(settings) => settings.checkForUpdates,
 );
+
+export const selectAppLanguage = createAppSelector(
+	selectSettings,
+	(settings) => settings.language,
+);
