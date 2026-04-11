@@ -287,4 +287,27 @@ export default tseslint.config(
 			},
 		},
 	},
+	{
+		files: [
+			'packages/app/**/*.ts',
+			'packages/app/**/*.tsx',
+			'packages/app/*.ts',
+			'packages/app/*.mts',
+		],
+		settings: {
+			'import/resolver': {
+				typescript: {
+					alwaysTryTypes: true,
+					project: 'packages/app/tsconfig.json',
+				},
+			},
+		},
+		languageOptions: {
+			parserOptions: {
+				projectService: {
+					defaultProject: 'packages/app/tsconfig.json',
+				},
+			},
+		},
+	},
 );
