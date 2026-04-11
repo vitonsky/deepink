@@ -4,49 +4,49 @@ export default {
 	styles: {
 		global: {
 			...getScrollBarStyles({
-				trackColor: '#ede5da',
-				scrollColor: '#c4ae97',
-				scrollHoverColor: '#a8917a',
+				trackColor: '#e7e0d9',
+				scrollColor: '#bbac9d',
+				scrollHoverColor: '#a99a8c',
 			}),
 		},
 	},
 	shadows: {
-		input: '0 0 0 3px #e8c49a',
-		outline: '0 0 0 3px #e8c49a',
+		input: '0 0 0 3px #ffd5b2',
+		outline: '0 0 0 3px #ffd5b2',
 	},
 	colors: {
 		accent: {
-			100: '#f5ede2',
-			200: '#ecd5b8',
-			300: '#d9b48a',
-			500: '#a0622e',
-			700: '#7a4520',
+			100: '#ddccbd',
+			200: '#ffd5b2',
+			300: '#f9caa2',
+			500: '#94481c',
+			700: '#ae7f5f',
 		},
 		typography: {
-			base: '#1a1008',
-			secondary: '#7a5c3a',
+			base: '#000',
+			secondary: '#4e3a0c',
 			inverted: '#fff',
 		},
 		selection: {
-			foreground: '#1a1008',
-			background: '#f0c98a',
+			foreground: '#000',
+			background: '#ffca9b',
 		},
 		highlight: {
-			foreground: '#1a1008',
-			background: '#e8b870',
+			foreground: '#000',
+			background: '#ffba7d',
 		},
 		surface: {
-			background: '#fdf8f0',
-			invertedBackground: '#1a1008',
-			panel: '#f5ede0',
-			border: '#ddd0bc',
+			background: '#fffaf3',
+			invertedBackground: '#000',
+			panel: '#f8f2e9',
+			border: '#e0d6c7',
 		},
 		dim: {
-			50: '#c8955010',
-			100: '#c8955018',
-			200: '#c8955028',
-			400: '#c895503a',
-			500: '#c895504f',
+			50: '#d6ab7d10',
+			100: '#d6ab7d17',
+			200: '#d6ab7d25',
+			400: '#d6ab7d3c',
+			500: '#d6ab7d3c',
 		},
 		overlay: {
 			500: '#00000075',
@@ -86,7 +86,7 @@ export default {
 				},
 
 				input: {
-					background: 'dim.100',
+					background: 'dim.200',
 					border: 'transparent',
 
 					active: {
@@ -136,14 +136,14 @@ export default {
 			},
 			code: {
 				token: {
-					comment: '#9e7355',
-					punctuation: '#8a5c2a',
-					property: '#a04010',
-					selector: '#a04010',
-					operator: '#c44010',
-					attr: '#b03808',
-					variable: '#c07010',
-					function: '#c07010',
+					comment: '#a5674e',
+					punctuation: '#9c5f1c',
+					property: '#ac4e04',
+					selector: '#ac4e04',
+					operator: '#e14e12',
+					attr: '#bf3903',
+					variable: '#d46f0f',
+					function: '#d46f0f',
 				},
 			},
 		},
