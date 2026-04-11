@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
+import { useTranslation } from 'react-i18next';
 import { FaImage } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Box,
 	Button,
@@ -21,6 +23,7 @@ export const ImageButton: FC<
 		onPick: (payload: InsertingPayloadMap['image']) => void;
 	}
 > = ({ onPick }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const { show } = useWorkspaceModal();
 
 	return (
@@ -28,19 +31,19 @@ export const ImageButton: FC<
 			<Button
 				size="sm"
 				variant="ghost"
-				title="Insert image"
+				title={t('editorPanel.image.buttonTitle')}
 				onClick={() => {
 					show({
 						content: ({ onClose }) => (
 							<>
 								<ModalCloseButton />
 								<ModalHeader>
-									<Text>Add image</Text>
+									<Text>{t('editorPanel.image.dialogTitle')}</Text>
 								</ModalHeader>
 								<ModalBody paddingBottom="1rem">
 									<VStack w="100%" gap="2rem" align="start">
 										<Text color="typography.secondary">
-											Image will be inserted at cursor position.
+											{t('editorPanel.image.dialogDescription')}
 										</Text>
 
 										<Box as={AutoFocusInside} w="100%">
@@ -49,16 +52,22 @@ export const ImageButton: FC<
 													{
 														id: 'url',
 														value: '',
-														label: 'Image url',
-														placeholder:
-															'e.g., https://example.com/image.png',
+														label: t(
+															'editorPanel.image.field.url.label',
+														),
+														placeholder: t(
+															'editorPanel.image.field.url.placeholder',
+														),
 													},
 													{
 														id: 'altText',
 														value: '',
-														label: 'Image alt text (optional)',
-														placeholder:
-															'Brief description of the image',
+														label: t(
+															'editorPanel.image.field.altText.label',
+														),
+														placeholder: t(
+															'editorPanel.image.field.altText.placeholder',
+														),
 													},
 												]}
 												onUpdate={({ url, altText }) => {
@@ -68,8 +77,12 @@ export const ImageButton: FC<
 														onPick({ url, altText });
 													}
 												}}
-												submitButtonText="Add"
-												cancelButtonText="Cancel"
+												submitButtonText={t(
+													'editorPanel.image.actions.add',
+												)}
+												cancelButtonText={t(
+													'editorPanel.image.actions.cancel',
+												)}
 												onCancel={onClose}
 											/>
 										</Box>

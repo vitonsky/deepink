@@ -1,5 +1,7 @@
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Divider, Link, Select, Switch, Text, VStack } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
@@ -21,6 +23,7 @@ import {
 import { FontFamilyInput } from './FontFamilyInput';
 
 export const EditorConfig = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
 	const dispatch = useAppDispatch();
 	const editorMode = useAppSelector(selectEditorMode);
 	const editorConfig = useAppSelector(selectEditorConfig);
@@ -28,8 +31,8 @@ export const EditorConfig = () => {
 
 	return (
 		<>
-			<FeaturesGroup title="Editor">
-				<FeaturesOption title="Editor mode">
+			<FeaturesGroup title={t('editor.groupTitle')}>
+				<FeaturesOption title={t('editor.mode.title')}>
 					<Select
 						value={editorMode}
 						size="sm"
@@ -49,13 +52,13 @@ export const EditorConfig = () => {
 				</FeaturesOption>
 
 				<FeaturesOption
-					title="Font family"
-					description="Set a font family to use in all editors, or leave empty to use defaults."
+					title={t('editor.fontFamily.title')}
+					description={t('editor.fontFamily.description')}
 				>
 					<FontFamilyInput
 						inputProps={{
 							size: 'sm',
-							placeholder: 'Enter font family name',
+							placeholder: t('editor.fontFamily.placeholder'),
 							fontFamily: editorFontFamily,
 						}}
 						fontSize={editorConfig.fontSize}
@@ -66,7 +69,7 @@ export const EditorConfig = () => {
 					/>
 				</FeaturesOption>
 
-				<FeaturesOption title="Font size">
+				<FeaturesOption title={t('editor.fontSize.title')}>
 					<RelaxedSlider
 						min={10}
 						max={30}
@@ -78,7 +81,7 @@ export const EditorConfig = () => {
 					/>
 				</FeaturesOption>
 
-				<FeaturesOption title="Line height">
+				<FeaturesOption title={t('editor.lineHeight.title')}>
 					<RelaxedSlider
 						min={1.2}
 						max={2}
@@ -94,18 +97,19 @@ export const EditorConfig = () => {
 				<Divider />
 
 				<FeaturesOption
-					title="Date format"
+					title={t('editor.dateFormat.title')}
 					description={
-						<>
-							Configure a format of date to insert. You may use standard
-							syntax DD/MM/YYYY HH:mm:ss.
-							<br />
-							For more syntax, refer to{' '}
-							<Link href="https://day.js.org/docs/en/display/format">
-								date format reference
-							</Link>
-							.
-						</>
+						<Trans
+							i18nKey="editor.dateFormat.description"
+							ns={LOCALE_NAMESPACE.settings}
+							components={{
+								formatLink: (
+									<Link href="https://day.js.org/docs/en/display/format">
+										{t('editor.dateFormat.formatReference')}
+									</Link>
+								),
+							}}
+						/>
 					}
 				>
 					<RelaxedInput
@@ -123,7 +127,7 @@ export const EditorConfig = () => {
 
 					{editorConfig.dateFormat.trim().length > 0 && (
 						<VStack align="start" gap={0} maxWidth="100%">
-							<Text fontSize=".8rem">Example</Text>
+							<Text fontSize=".8rem">{t('editor.dateFormat.example')}</Text>
 							<Text fontWeight="bold" maxWidth="100%">
 								{dayjs().format(editorConfig.dateFormat)}
 							</Text>
@@ -132,7 +136,7 @@ export const EditorConfig = () => {
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Plain text editor">
+			<FeaturesGroup title={t('editor.plainText.groupTitle')}>
 				<FeaturesOption>
 					<Switch
 						size="sm"
@@ -145,7 +149,7 @@ export const EditorConfig = () => {
 							);
 						}}
 					>
-						Show line numbers
+						{t('editor.plainText.lineNumbers')}
 					</Switch>
 				</FeaturesOption>
 
@@ -161,7 +165,7 @@ export const EditorConfig = () => {
 							);
 						}}
 					>
-						Enable mini map
+						{t('editor.plainText.miniMap')}
 					</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>

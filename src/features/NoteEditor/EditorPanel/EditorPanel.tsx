@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	FaBold,
 	FaCalendarDay,
@@ -13,6 +14,7 @@ import {
 	FaStrikethrough,
 } from 'react-icons/fa6';
 import dayjs from 'dayjs';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Button, HStack } from '@chakra-ui/react';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorDateFormat } from '@state/redux/settings/selectors/preferences';
@@ -25,6 +27,7 @@ import { useEditorPanelContext } from '.';
 // TODO: add hotkeys to trigger panel commands
 // TODO: implement notifications from editor to panel, to render current state for formatting buttons
 export const EditorPanel = memo(() => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const { onInserting, onFormatting } = useEditorPanelContext();
 	const dateFormat = useAppSelector(selectEditorDateFormat);
 
@@ -48,7 +51,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Toggle bold text style"
+					title={t('editorPanel.bold')}
 					onClick={() => {
 						onFormatting('bold');
 					}}
@@ -58,7 +61,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Toggle italic text style"
+					title={t('editorPanel.italic')}
 					onClick={() => {
 						onFormatting('italic');
 					}}
@@ -68,7 +71,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Toggle strikethrough text style"
+					title={t('editorPanel.strikethrough')}
 					onClick={() => {
 						onFormatting('strikethrough');
 					}}
@@ -81,7 +84,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert or toggle unordered list"
+					title={t('editorPanel.unorderedList')}
 					onClick={() => {
 						onInserting({ type: 'list', data: { type: 'unordered' } });
 					}}
@@ -91,7 +94,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert or toggle checkbox list"
+					title={t('editorPanel.checkboxList')}
 					onClick={() => {
 						onInserting({ type: 'list', data: { type: 'checkbox' } });
 					}}
@@ -101,7 +104,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert or toggle ordered list"
+					title={t('editorPanel.orderedList')}
 					onClick={() => {
 						onInserting({ type: 'list', data: { type: 'ordered' } });
 					}}
@@ -130,7 +133,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert or wrap text with code block"
+					title={t('editorPanel.codeBlock')}
 					onClick={() => {
 						onInserting({ type: 'code' });
 					}}
@@ -140,7 +143,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert or wrap text with quote block"
+					title={t('editorPanel.quoteBlock')}
 					onClick={() => {
 						onInserting({ type: 'quote' });
 					}}
@@ -150,7 +153,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert date"
+					title={t('editorPanel.insertDate')}
 					onClick={() => {
 						onInserting({
 							type: 'date',
@@ -163,7 +166,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert page break"
+					title={t('editorPanel.insertPageBreak')}
 					onClick={() => {
 						onInserting({ type: 'horizontalRule' });
 					}}
@@ -173,7 +176,7 @@ export const EditorPanel = memo(() => {
 				<Button
 					size="sm"
 					variant="ghost"
-					title="Insert file"
+					title={t('editorPanel.insertFile')}
 					onClick={() => {
 						const input = document.createElement('input');
 						input.type = 'file';

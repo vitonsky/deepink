@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Box, Button, Divider, Input, Select, Text, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
@@ -17,6 +19,7 @@ export const WorkspaceErrorScreen = ({
 }: {
 	onWorkspaceErrorReset: (workspaceId: string) => void;
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const dispatch = useAppDispatch();
 	const telemetry = useTelemetryTracker();
 	const {
@@ -47,13 +50,11 @@ export const WorkspaceErrorScreen = ({
 			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
 				<VStack maxW="400px" minW="350px" gap="2rem">
 					<Text fontSize="1.3rem" fontWeight="bold">
-						Workspace "{currentWorkspace.name}" failed to load
+						{t('workspace.error.title', { name: currentWorkspace.name })}
 					</Text>
 
 					<Text color="typography.base">
-						Something went wrong while loading workspace. The workspace data
-						may be corrupted. Switch to another workspace or create a new one
-						to continue.
+						{t('workspace.error.description')}
 					</Text>
 
 					<VStack
@@ -62,7 +63,7 @@ export const WorkspaceErrorScreen = ({
 						color="typography.additional"
 						gap="0.5rem"
 					>
-						<Text>Choose another workspace</Text>
+						<Text>{t('workspace.error.chooseAnother')}</Text>
 
 						<Select
 							size="sm"
@@ -101,7 +102,7 @@ export const WorkspaceErrorScreen = ({
 						color="typography.additional"
 						gap="0.5rem"
 					>
-						<Text>Create a new workspace</Text>
+						<Text>{t('workspace.error.createNew')}</Text>
 						<form
 							style={{ width: '100%' }}
 							onSubmit={(event) => {
@@ -150,7 +151,7 @@ export const WorkspaceErrorScreen = ({
 									onChange={(e) => setNewWorkspaceName(e.target.value)}
 								/>
 								<Button w="100%" isDisabled={isPending} type="submit">
-									Create workspace
+									{t('workspace.error.createWorkspace')}
 								</Button>
 							</VStack>
 						</form>
@@ -165,7 +166,7 @@ export const WorkspaceErrorScreen = ({
 						color="typography.additional"
 					>
 						<Button w="100%" onClick={() => profileClose()}>
-							<Text>Close current vault</Text>
+							<Text>{t('workspace.error.closeVault')}</Text>
 						</Button>
 					</VStack>
 				</VStack>

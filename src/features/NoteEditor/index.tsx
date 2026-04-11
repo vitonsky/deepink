@@ -7,6 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	FaArrowLeft,
 	FaBoxArchive,
@@ -18,6 +19,7 @@ import {
 } from 'react-icons/fa6';
 import { Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { debounce } from 'lodash';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, Divider, HStack, Input, Tag, Text, VStack } from '@chakra-ui/react';
 import { SuggestedTagsList } from '@components/SuggestedTagsList';
@@ -71,6 +73,7 @@ export type NoteEditorProps = {
  */
 export const Note: FC<NoteEditorProps> = memo(
 	({ note, updateNote, updateMeta, isActive }) => {
+		const { t } = useTranslation(LOCALE_NAMESPACE.features);
 		const telemetry = useTelemetryTracker();
 		const dispatch = useAppDispatch();
 		const workspaceData = useWorkspaceData();
@@ -229,7 +232,7 @@ export const Note: FC<NoteEditorProps> = memo(
 				<HStack w="100%" align="start">
 					<HStack w="100%" align="start">
 						<Input
-							placeholder="Untitled"
+							placeholder={t('note.title.placeholder')}
 							variant="flushed"
 							size="sm"
 							fontSize="22px"
@@ -253,8 +256,8 @@ export const Note: FC<NoteEditorProps> = memo(
 							variant="ghost"
 							title={
 								note.isBookmarked
-									? 'Remove from favorites'
-									: 'Add to favorites'
+									? t('note.actions.removeFromFavorites')
+									: t('note.actions.addToFavorites')
 							}
 							size="xs"
 							onClick={() =>
@@ -273,8 +276,8 @@ export const Note: FC<NoteEditorProps> = memo(
 							variant="ghost"
 							title={
 								note.isArchived
-									? 'Remove from archive'
-									: 'Move to archive'
+									? t('note.actions.removeFromArchive')
+									: t('note.actions.moveToArchive')
 							}
 							size="xs"
 							onClick={() =>
@@ -364,7 +367,7 @@ export const Note: FC<NoteEditorProps> = memo(
 							maxW: '150px',
 						}}
 						inputProps={{
-							placeholder: 'Add some tags...',
+							placeholder: t('note.tags.addPlaceholder'),
 							// size: 'sm',
 							size: 'xs',
 							variant: 'flushed',
@@ -443,7 +446,7 @@ export const Note: FC<NoteEditorProps> = memo(
 							<Button
 								variant="ghost"
 								size="xs"
-								title="Go back to editing"
+								title={t('note.versionPreview.backToEditing')}
 								onClick={() => {
 									setVersionPreview(null);
 								}}
@@ -452,8 +455,11 @@ export const Note: FC<NoteEditorProps> = memo(
 							</Button>
 
 							<Text color="typography.secondary">
-								Version at{' '}
-								{new Date(versionPreview.createdAt).toLocaleString()}
+								{t('note.versionPreview.versionAt', {
+									date: new Date(
+										versionPreview.createdAt,
+									).toLocaleString(),
+								})}
 							</Text>
 						</HStack>
 					</HStack>
@@ -494,7 +500,7 @@ export const Note: FC<NoteEditorProps> = memo(
 									tabs={[
 										{
 											id: NoteSidebarTabs.HISTORY,
-											title: 'Note versions',
+											title: t('note.sidebar.tabs.history'),
 											content() {
 												return (
 													<NoteVersions
@@ -565,14 +571,14 @@ export const Note: FC<NoteEditorProps> = memo(
 										},
 										{
 											id: NoteSidebarTabs.BACK_LINKS,
-											title: 'Back links',
+											title: t('note.sidebar.tabs.backLinks'),
 											content() {
 												return <div>TODO: Note back links</div>;
 											},
 										},
 										{
 											id: 'files',
-											title: 'Attached files',
+											title: t('note.sidebar.tabs.files'),
 											content() {
 												return (
 													<div>

@@ -1,8 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaFeather, FaInbox, FaRegClock, FaRegFolder } from 'react-icons/fa6';
 import { GrSettingsOption } from 'react-icons/gr';
 import { IoCloudUploadOutline, IoExtensionPuzzleOutline } from 'react-icons/io5';
 import { MdLockOutline } from 'react-icons/md';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useDebouncedCallback } from 'use-debounce';
 import { ButtonGroup, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
@@ -14,6 +16,7 @@ import { useCommand } from '@hooks/commands/useCommand';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 
 export const ActivityBar = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
 
 	const profileControls = useProfileControls();
@@ -49,7 +52,7 @@ export const ActivityBar = () => {
 				<IconButton
 					icon={<FaFeather />}
 					tooltipPlacement="right"
-					title="New note"
+					title={t('activityBar.newNote')}
 					variant="accent"
 					onClick={debouncedCreateNote}
 				/>
@@ -57,34 +60,34 @@ export const ActivityBar = () => {
 				<IconButton
 					icon={<FaRegFolder />}
 					tooltipPlacement="right"
-					title="Files"
+					title={t('activityBar.files')}
 					data-no-animation
 				/>
 
 				<IconButton
 					icon={<FaRegClock />}
 					tooltipPlacement="right"
-					title="Reminders"
+					title={t('activityBar.reminders')}
 					data-no-animation
 				/>
 				<IconButton
 					icon={<IoExtensionPuzzleOutline style={{ scale: 1.3 }} />}
 					tooltipPlacement="right"
-					title="Extensions"
+					title={t('activityBar.extensions')}
 					data-no-animation
 				/>
 
 				<IconButton
 					icon={<FaInbox />}
 					tooltipPlacement="right"
-					title="Inbox"
+					title={t('activityBar.inbox')}
 					data-no-animation
 				/>
 
 				<IconButton
 					icon={<IoCloudUploadOutline />}
 					tooltipPlacement="right"
-					title="Publish notes"
+					title={t('activityBar.publishNotes')}
 					data-no-animation
 				/>
 			</ButtonGroup>
@@ -99,7 +102,7 @@ export const ActivityBar = () => {
 					// Only encrypted profiles can be locked
 					<IconButton
 						icon={<MdLockOutline style={{ scale: 1.3 }} />}
-						title="Lock profile"
+						title={t('activityBar.lockProfile')}
 						tooltipPlacement="right"
 						data-no-animation
 						onClick={() => profileControls.close()}
@@ -107,7 +110,7 @@ export const ActivityBar = () => {
 				)}
 				<IconButton
 					icon={<GrSettingsOption style={{ scale: 1.2 }} />}
-					title="Global settings"
+					title={t('activityBar.globalSettings')}
 					tooltipPlacement="right"
 					data-no-animation
 					onClick={() => {

@@ -28,6 +28,9 @@
 				"duplicate": "Tag with such name is already exists",
 				"parentTagNotFound": "Parent tag not found, please select another tag"
 			}
+		},
+		"deletion": {
+			"confirm": "Really want to delete tag \"{{name}}\" and all sub tags?"
 		}
 	},
 	"workspace": {
@@ -48,6 +51,222 @@
 				"unknown": "Unknown error occurs. Try again.",
 				"format": "Workspace name cannot be empty."
 			}
+		},
+		"error": {
+			"title": "Workspace \"{{name}}\" failed to load",
+			"description": "Something went wrong while loading workspace. The workspace data may be corrupted. Switch to another workspace or create a new one to continue.",
+			"chooseAnother": "Choose another workspace",
+			"createNew": "Create a new workspace",
+			"createWorkspace": "Create workspace",
+			"closeVault": "Close current vault"
 		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Untitled"
+		},
+		"editor": {
+			"placeholder": "Write your thoughts here...",
+			"modes": {
+				"plaintext": "Plain text",
+				"richtext": "Rich text",
+				"split-screen": "Split screen"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Add to favorites",
+			"removeFromFavorites": "Remove from favorites",
+			"moveToArchive": "Move to archive",
+			"removeFromArchive": "Remove from archive"
+		},
+		"tags": {
+			"addPlaceholder": "Add some tags..."
+		},
+		"versionPreview": {
+			"versionAt": "Version at {{date}}",
+			"backToEditing": "Go back to editing"
+		},
+		"menu": {
+			"title": "Note options",
+			"copyReference": "Copy reference on note",
+			"remindMe": "Remind me",
+			"history": "History",
+			"historyDisabled": "(Disabled)",
+			"backLinks": "Back links",
+			"readonlyMode": "Readonly mode",
+			"downloadMedia": "Download and convert a network media",
+			"spellcheck": "Spellcheck",
+			"export": "Export...",
+			"passwordProtection": "Password protection...",
+			"disableSync": "Disable sync",
+			"moveToArchive": "Move to archive",
+			"removeFromArchive": "Remove from archive",
+			"deleteToBin": "Delete to bin",
+			"deletePermanently": "Delete permanently",
+			"restoreFromBin": "Restore from bin"
+		},
+		"versions": {
+			"saveVersion": "Save version",
+			"saveVersionTitle": "Save the current state of this note as a new version in history",
+			"deleteAll": "Delete all",
+			"deleteAllTitle": "Remove all saved versions of this note permanently",
+			"dontRecord": "Don't record changes for this note",
+			"empty": "This note has no recorded versions",
+			"loading": "Loading...",
+			"chars": "{{count}} chars",
+			"applyVersionTitle": "Apply version",
+			"applyVersionReadonlyTitle": "Version cannot be applied for a read-only note",
+			"openVersionTitle": "Open version",
+			"deleteVersionTitle": "Delete version",
+			"confirmDeleteAll": {
+				"title": "Delete all note versions",
+				"description": "This action will permanently delete all note versions.",
+				"confirm": "Are you sure about it?",
+				"action": "Apply"
+			},
+			"confirmApply": {
+				"title": "Apply note version",
+				"description": "You are about to apply note version {{version}}.",
+				"warning": "This action will replace current note data with text of a selected snapshot. Are you sure?",
+				"apply": "Apply",
+				"preview": "Preview"
+			},
+			"confirmDelete": {
+				"title": "Delete note version",
+				"description": "You are about to delete note version {{version}}.",
+				"warning": "This action will delete note version irreversibly. Are you sure?",
+				"delete": "Delete",
+				"preview": "Preview"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Close panel",
+			"tabs": {
+				"history": "Note versions",
+				"backLinks": "Back links",
+				"files": "Attached files"
+			}
+		}
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Search..."
+		},
+		"filterBy": "Filter by"
+	},
+	"notesView": {
+		"allNotes": "All notes",
+		"favorites": "Favorite notes",
+		"archived": "Archived notes",
+		"deleted": "Deleted notes"
+	},
+	"notesContainer": {
+		"empty": {
+			"selectNotes": "Select notes to read",
+			"addNote": "Add note",
+			"orSearch": "or use search to find anything"
+		}
+	},
+	"activityBar": {
+		"newNote": "New note",
+		"files": "Files",
+		"reminders": "Reminders",
+		"extensions": "Extensions",
+		"inbox": "Inbox",
+		"publishNotes": "Publish notes",
+		"lockProfile": "Lock profile",
+		"globalSettings": "Global settings"
+	},
+	"tabBar": {
+		"closeTab": "Close tab"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Click to insert header with level {{level}}. Open context menu to choose another option",
+			"level": "Level {{level}}"
+		},
+		"bold": "Toggle bold text style",
+		"italic": "Toggle italic text style",
+		"strikethrough": "Toggle strikethrough text style",
+		"unorderedList": "Insert or toggle unordered list",
+		"checkboxList": "Insert or toggle checkbox list",
+		"orderedList": "Insert or toggle ordered list",
+		"codeBlock": "Insert or wrap text with code block",
+		"quoteBlock": "Insert or wrap text with quote block",
+		"insertDate": "Insert date",
+		"insertPageBreak": "Insert page break",
+		"insertFile": "Insert file",
+		"image": {
+			"buttonTitle": "Insert image",
+			"dialogTitle": "Add image",
+			"dialogDescription": "Image will be inserted at cursor position.",
+			"field": {
+				"url": {
+					"label": "Image url",
+					"placeholder": "e.g., https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Image alt text (optional)",
+					"placeholder": "Brief description of the image"
+				}
+			},
+			"actions": {
+				"add": "Add",
+				"cancel": "Cancel"
+			}
+		},
+		"link": {
+			"buttonTitle": "Insert link",
+			"dialogTitle": "Add link",
+			"dialogDescription": "Selected text becomes a link, or link will be added at cursor position if nothing selected.",
+			"field": {
+				"url": {
+					"label": "Link url",
+					"placeholder": "e.g., https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Add",
+				"cancel": "Cancel"
+			}
+		}
+	},
+	"image": {
+		"loading": "Image loading"
+	},
+	"notifications": {
+		"title": "Notifications"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "App update",
+			"reminderLater": "The reminder will be shown week later"
+		},
+		"newVersion": {
+			"title": "New version is available",
+			"body": "Update app to a latest version to get new features and improvements",
+			"download": "Download new version",
+			"ignore": "Ignore"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Image properties",
+			"urlLabel": "Image url",
+			"altLabel": "Image alt text"
+		},
+		"linkProperties": {
+			"title": "Link properties",
+			"urlLabel": "Link url"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Click to force save changes on disk",
+			"saving": "Saving changes"
+		},
+		"changeProfile": "Change profile",
+		"history": "History",
+		"notifications": "Notifications"
 	}
 }

@@ -1,1 +1,63 @@
-{}
+{
+	"chooseProfile": {
+		"title": "Choose the profile",
+		"actions": {
+			"createNew": "Create new profile"
+		}
+	},
+	"creator": {
+		"title": "Create Vault",
+		"field": {
+			"name": {
+				"label": "Vault name",
+				"placeholder": "e.g., Notes"
+			},
+			"password": {
+				"label": "Encryption password",
+				"recommended": "(recommended)",
+				"placeholder": "Enter a strong password here"
+			},
+			"algorithm": {
+				"label": "Encryption algorithm"
+			}
+		},
+		"actions": {
+			"create": "Create vault",
+			"continueNoPassword": "Continue with no password",
+			"cancel": "Cancel"
+		},
+		"noEncryptionDialog": {
+			"title": "Create vault with no encryption",
+			"description": "All your data and notes will be stored with no encryption.",
+			"actions": {
+				"confirm": "Continue with no encryption",
+				"cancel": "Cancel"
+			}
+		},
+		"errors": {
+			"nameRequired": "Enter profile name",
+			"passwordRequired": "Enter the password"
+		}
+	},
+	"login": {
+		"title": "Unlock profile",
+		"field": {
+			"password": {
+				"placeholder": "Enter password"
+			}
+		},
+		"actions": {
+			"unlock": "Unlock",
+			"changeProfile": "Change profile"
+		},
+		"errors": {
+			"cannotOpen": "Cannot open profile",
+			"invalidPassword": "Invalid password",
+			"passwordRequired": "Enter password"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Failed to open vault",
+		"corrupted": "\"{{name}}\" appears to be corrupted."
+	}
+}

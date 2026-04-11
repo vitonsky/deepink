@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaFeather } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Divider, Text, VStack } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { Popper } from '@components/Popper';
@@ -16,13 +18,18 @@ import {
 
 import { useStatusBarManager } from '../../MainScreen/StatusBar/StatusBarProvider';
 
-export const editorModes = {
+/**
+ * Editor mode IDs mapped to their i18n keys in the features namespace.
+ * Used by EditorConfig settings to display mode names.
+ */
+export const editorModes: Record<EditorMode, string> = {
 	plaintext: 'Plain text',
 	richtext: 'Rich text',
 	'split-screen': 'Split screen',
-} satisfies Record<EditorMode, string>;
+};
 
 export const EditorModePicker = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
 
 	const { controls } = useStatusBarManager();
@@ -36,6 +43,8 @@ export const EditorModePicker = () => {
 	const openedNotes = useWorkspaceSelector(selectOpenedNotes);
 	const isNotesOpened = openedNotes.length > 0;
 
+	const editorModeLabel = t(`note.editor.modes.${editorMode}`);
+
 	useEffect(() => {
 		// Update state by close notes
 		setIsVisible((state) => (isNotesOpened ? state : false));
@@ -44,8 +53,8 @@ export const EditorModePicker = () => {
 			'editor-mode',
 			{
 				visible: isNotesOpened,
-				title: 'Editor mode',
-				text: editorModes[editorMode],
+				title: t('editor.mode.title', { ns: LOCALE_NAMESPACE.settings }),
+				text: editorModeLabel,
 				icon: <FaFeather />,
 				onClick: () => setIsVisible((state) => !state),
 				ref: setReferenceRef,
@@ -55,7 +64,7 @@ export const EditorModePicker = () => {
 				priority: 99_000,
 			},
 		);
-	}, [controls, editorMode, isNotesOpened]);
+	}, [controls, editorMode, editorModeLabel, isNotesOpened, t]);
 
 	useEffect(() => {
 		return () => {
@@ -78,7 +87,7 @@ export const EditorModePicker = () => {
 		>
 			<VStack gap={0} align="start">
 				<Text padding=".5rem" fontWeight="bold">
-					Editor mode
+					{t('editor.mode.title', { ns: LOCALE_NAMESPACE.settings })}
 				</Text>
 				<Divider />
 				<NestedList
@@ -86,7 +95,7 @@ export const EditorModePicker = () => {
 						['plaintext', 'richtext', 'split-screen'] as EditorMode[]
 					).map((id) => ({
 						id,
-						content: <Text p=".5rem">{editorModes[id]}</Text>,
+						content: <Text p=".5rem">{t(`note.editor.modes.${id}`)}</Text>,
 					}))}
 					onPick={(id) => {
 						dispatch(settingsApi.setEditorMode(id as EditorMode));

@@ -1,5 +1,7 @@
 import React, { FC, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaXmark } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
@@ -24,6 +26,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 	onClose,
 	onPick,
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const openNoteContextMenu = useNoteContextMenu();
 
 	const existsTabs = useMemo(
@@ -122,7 +125,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 									{title}
 								</Text>
 								<Box
-									title="Close tab"
+									title={t('tabBar.closeTab')}
 									sx={{
 										'&:not(:hover)': {
 											opacity: '0.7',

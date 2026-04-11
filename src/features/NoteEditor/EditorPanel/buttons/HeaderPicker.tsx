@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaHeading } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Button,
 	HStack,
@@ -21,6 +23,7 @@ export const HeaderPicker = ({
 	onPick: (level: HeaderLevel) => void;
 	defaultLevel?: HeaderLevel;
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const [level, setLevel] = useState<HeaderLevel>(defaultLevel ?? 1);
 	useEffect(() => {
 		if (!defaultLevel) return;
@@ -43,7 +46,7 @@ export const HeaderPicker = ({
 				as={Button}
 				size="sm"
 				variant="ghost"
-				title={`Click to insert header with level ${level}. Open context menu to choose another option`}
+				title={t('editorPanel.header.insertTitle', { level })}
 				onMouseUp={(evt) => {
 					const isAltButton = [1, 2].includes(evt.button);
 					if (isAltButton) {
@@ -86,7 +89,7 @@ export const HeaderPicker = ({
 					>
 						<HStack>
 							<FaHeading />
-							<Text>Level {level}</Text>
+							<Text>{t('editorPanel.header.level', { level })}</Text>
 						</HStack>
 					</MenuItem>
 				))}

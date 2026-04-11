@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Box, Divider, HStack } from '@chakra-ui/react';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppSelector } from '@state/redux/hooks';
@@ -24,6 +26,7 @@ export const NoteEditor = ({
 	isReadOnly?: boolean;
 	isActive?: boolean;
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const editorMode = useAppSelector(selectEditorMode);
 	const search = useWorkspaceSelector(selectSearch);
 
@@ -90,7 +93,7 @@ export const NoteEditor = ({
 				{editorMode === 'split-screen' && <Divider orientation="vertical" />}
 				{(editorMode === 'richtext' || editorMode === 'split-screen') && (
 					<RichEditor
-						placeholder="Write your thoughts here..."
+						placeholder={t('note.editor.placeholder')}
 						value={text}
 						onChanged={setText}
 						isReadOnly={isReadOnly}

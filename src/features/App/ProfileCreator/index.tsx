@@ -1,5 +1,7 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Button,
 	HStack,
@@ -40,6 +42,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	onCancel,
 	defaultProfileName,
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
 	const telemetry = useTelemetryTracker();
 
 	const profileNameInputRef = useRef<HTMLInputElement | null>(null);
@@ -65,13 +68,13 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const onPressCreate = useCallback(
 		async (usePassword = true) => {
 			if (!profileName) {
-				setProfileNameError('Enter profile name');
+				setProfileNameError(t('creator.errors.nameRequired'));
 				profileNameInputRef.current?.focus();
 				return;
 			}
 
 			if (usePassword && !password) {
-				setPasswordError('Enter the password');
+				setPasswordError(t('creator.errors.passwordRequired'));
 				passwordInputRef.current?.focus();
 				return;
 			}
@@ -103,6 +106,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			algorithm,
 			profileNameInputRef,
 			passwordInputRef,
+			t,
 			telemetry,
 		],
 	);
@@ -122,7 +126,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	return (
 		<ProfilesForm
-			title="Create Vault"
+			title={t('creator.title')}
 			controls={
 				<>
 					<Button
@@ -131,18 +135,18 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						onClick={() => onPressCreate(true)}
 						disabled={isPending}
 					>
-						Create vault
+						{t('creator.actions.create')}
 					</Button>
 					<Button
 						w="100%"
 						onClick={noPasswordDialogState.onOpen}
 						disabled={isPending}
 					>
-						Continue with no password
+						{t('creator.actions.continueNoPassword')}
 					</Button>
 					{onCancel && (
 						<Button w="100%" onClick={onCancel} disabled={isPending}>
-							Cancel
+							{t('creator.actions.cancel')}
 						</Button>
 					)}
 
@@ -154,11 +158,12 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						<ModalOverlay />
 						<ModalContent>
 							<ModalCloseButton />
-							<ModalHeader>Create vault with no encryption</ModalHeader>
+							<ModalHeader>
+								{t('creator.noEncryptionDialog.title')}
+							</ModalHeader>
 							<ModalBody>
 								<Text color="typography.secondary">
-									All your data and notes will be stored with no
-									encryption.
+									{t('creator.noEncryptionDialog.description')}
 								</Text>
 							</ModalBody>
 							<ModalFooter>
@@ -174,10 +179,10 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 											noPasswordDialogState.onClose();
 										}}
 									>
-										Continue with no encryption
+										{t('creator.noEncryptionDialog.actions.confirm')}
 									</Button>
 									<Button onClick={noPasswordDialogState.onClose}>
-										Cancel
+										{t('creator.noEncryptionDialog.actions.cancel')}
 									</Button>
 								</HStack>
 							</ModalFooter>
@@ -194,11 +199,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				color="typography.additional"
 			>
 				<VStack w="100%" alignItems="start">
-					<Text>Vault name</Text>
+					<Text>{t('creator.field.name.label')}</Text>
 					<Input
 						ref={profileNameInputRef}
 						size="md"
-						placeholder="e.g., Notes"
+						placeholder={t('creator.field.name.placeholder')}
 						value={profileName}
 						onChange={(evt) => setProfileName(evt.target.value)}
 						focusBorderColor={profileNameError ? 'red.500' : undefined}
@@ -209,14 +214,16 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 				</VStack>
 				<VStack w="100%" alignItems="start">
 					<HStack>
-						<Text>Encryption password</Text>
-						<Text variant="secondary">(recommended)</Text>
+						<Text>{t('creator.field.password.label')}</Text>
+						<Text variant="secondary">
+							{t('creator.field.password.recommended')}
+						</Text>
 					</HStack>
 					<Input
 						ref={passwordInputRef}
 						size="md"
 						type="password"
-						placeholder="Enter a strong password here"
+						placeholder={t('creator.field.password.placeholder')}
 						value={password}
 						onChange={(evt) => setPassword(evt.target.value)}
 						focusBorderColor={passwordError ? 'red.500' : undefined}
@@ -228,7 +235,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 				<VStack w="100%" gap="0.1rem">
 					<Text fontSize="18px" alignSelf="start">
-						Encryption algorithm
+						{t('creator.field.algorithm.label')}
 					</Text>
 					<Select
 						size="md"

@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Preferences"
+	},
+	"tabs": {
+		"general": "General",
+		"appearance": "Appearance",
+		"hotkeys": "Hotkeys",
+		"vault": "Vault",
+		"workspace": "Workspace",
+		"importExport": "Import & Export",
+		"vaultSettingsGroup": "Vault Settings"
+	},
+	"general": {
+		"title": "General settings",
+		"subtitle": "Manage your overall preferences in app.",
+		"version": {
+			"title": "Version",
+			"checkForUpdates": "Check for updates",
+			"upToDate": "You use latest version",
+			"newVersionAvailable": "New version <bold>{{version}}</bold> is available.",
+			"downloadLatest": "Download",
+			"downloadDescription": "latest version to get new features and improvements."
+		},
+		"autoCheckUpdates": {
+			"label": "Automatic check for updates",
+			"description": "App will periodically check for updates and notify if new version is available."
+		},
+		"language": {
+			"title": "Language",
+			"description": "Change the display language."
+		},
+		"notifications": {
+			"title": "Notifications",
+			"description": "System notifications will be used only for reminders. When disabled, reminders will appear only in app notifications list.",
+			"useSystem": "Use system notifications"
+		},
+		"vaultLock": {
+			"groupTitle": "Vault lock",
+			"lockOnSystemLock": {
+				"label": "Lock vault when system locks",
+				"description": "Vault will be locked when a screen saver starts, or a device sleeps."
+			},
+			"lockAfterIdle": {
+				"title": "Lock vault after idle",
+				"description": "Vault will be locked after selected idle time.",
+				"never": "Do not lock",
+				"minutes5": "for 5 minutes",
+				"minutes10": "for 10 minutes",
+				"minutes15": "for 15 minutes",
+				"minutes30": "for 30 minutes",
+				"hour1": "for 1 hour",
+				"hours2": "for 2 hours",
+				"hours3": "for 3 hours",
+				"hours5": "for 5 hours"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Theme",
+			"auto": "Auto",
+			"dark": "Dark",
+			"light": "Light",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Accent color",
+			"zenNotApplicable": "Accent color is not applicable to selected theme."
+		},
+		"zoomLevel": {
+			"title": "Zoom level",
+			"description": "Adjust the default zoom level for all windows.\nIn case your system does not scale apps automatically, you may change the zoom to make it fit the actual display pixel ratio (DPR). Detected DPR is {{dpr}}.",
+			"apply": "Apply",
+			"reset": "Reset",
+			"errors": {
+				"enterNumber": "Enter a number to set zoom",
+				"tooSmall": "Zoom cannot be less than {{min}}%",
+				"tooBig": "Zoom cannot be more than {{max}}%"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editor",
+		"mode": {
+			"title": "Editor mode"
+		},
+		"fontFamily": {
+			"title": "Font family",
+			"description": "Set a font family to use in all editors, or leave empty to use defaults.",
+			"placeholder": "Enter font family name"
+		},
+		"fontSize": {
+			"title": "Font size"
+		},
+		"lineHeight": {
+			"title": "Line height"
+		},
+		"dateFormat": {
+			"title": "Date format",
+			"description": "Configure a format of date to insert. You may use standard syntax DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "date format reference",
+			"example": "Example"
+		},
+		"plainText": {
+			"groupTitle": "Plain text editor",
+			"lineNumbers": "Show line numbers",
+			"miniMap": "Enable mini map"
+		}
+	},
+	"hotkeys": {
+		"blank": "Blank",
+		"shortcuts": {
+			"createNote": "Create a new note",
+			"closeCurrentNote": "Close active note",
+			"restoreClosedNote": "Restore recently closed note",
+			"focusNextNote": "Go to next opened note",
+			"focusPreviousNote": "Go to previous opened note",
+			"toggleArchive": "Move active note in/out of archive",
+			"toggleBookmark": "Move active note in/out of bookmark",
+			"deleteNote": "Delete active note",
+			"restoreFromBin": "Restore active note from bin",
+			"toggleHistory": "Show or hide history of active note",
+			"focusSearch": "Search notes",
+			"syncDatabase": "Sync vault to disk",
+			"lockProfile": "Lock vault",
+			"openSettings": "Open preferences"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Vault name"
+		},
+		"rememberPasswords": {
+			"label": "Remember workspaces passwords",
+			"description": "Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces without entering a password."
+		},
+		"filesAndData": {
+			"groupTitle": "Files and data",
+			"imagesCompression": {
+				"title": "Images compression",
+				"compress": "Compress images",
+				"doNotCompress": "Do not compress images",
+				"alwaysAsk": "Always ask"
+			},
+			"deleteOrphaned": {
+				"label": "Delete orphaned files",
+				"description": "Delete files that are not used anymore."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Encryption",
+			"algorithm": {
+				"title": "Encryption algorithm",
+				"none": "None"
+			},
+			"password": {
+				"title": "Password",
+				"update": "Update password"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Synchronization",
+			"enable": {
+				"label": "Enable synchronization",
+				"description": "Sync all data in database between your devices, to not lose it. All data is encrypted."
+			},
+			"method": {
+				"title": "Synchronization method",
+				"fileSystem": "File system",
+				"server": "Server"
+			},
+			"directory": {
+				"title": "Synchronization directory",
+				"placeholder": "Enter path to directory"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Snapshots",
+			"record": {
+				"label": "Record note snapshots",
+				"description": "When enabled, snapshots of note content will be created when a note is changed. You may control snapshot recording per note in the note history panel."
+			},
+			"delay": {
+				"title": "Delay for snapshot",
+				"description": "Time in seconds to wait since recent note changes, before creating a new snapshot. The lower the time, the more snapshots will be created, and the larger the vault size."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Trash bin",
+			"confirmDeletion": {
+				"label": "Confirm deletion",
+				"description": "Ask before deleting a note."
+			},
+			"moveToBin": {
+				"label": "Move notes to bin",
+				"description": "Move notes to a trash bin instead of permanent deletion so you can restore them later."
+			},
+			"autoPurge": {
+				"label": "Permanently delete old notes in bin",
+				"description": "Notes moved to bin will be permanently deleted after some time."
+			},
+			"purgeDelay": {
+				"title": "Permanent deletion delay",
+				"description": "Time interval in days to delete a note from bin. Time counts from the moment you move the note to bin.",
+				"unit": "days"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Workspace name",
+			"update": "Update"
+		},
+		"newNoteTitle": {
+			"title": "New note title",
+			"description": "Set title for new notes. You may use date via syntax {date} or {date:FORMAT} like {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "format reference",
+			"placeholder": "e.g., Note {date:DD/MM/YYYY HH:mm}",
+			"example": "Example"
+		},
+		"tagsForNewNote": {
+			"title": "Tags for new note",
+			"none": "Do not set any tags",
+			"selected": "Same as selected tag"
+		},
+		"dangerousZone": {
+			"groupTitle": "Dangerous zone",
+			"delete": {
+				"label": "Delete workspace and all related data, including notes, tags and files",
+				"action": "Delete workspace",
+				"cannotDeleteLast": "It is not possible to delete the last workspace in a profile.",
+				"createAnother": "Create",
+				"createAnotherSuffix": "another workspace first."
+			},
+			"confirmDelete": "You are about to delete workspace \"{{name}}\". Are you sure you want to do it?\n\nIf you continue, all data related to this workspace will be deleted, including notes, tags and files."
+		}
+	},
+	"importExport": {
+		"importNotes": "Import notes",
+		"exportNotes": "Export notes",
+		"importFromZip": "Import notes from .zip archive",
+		"importFromDirectory": "Import directory with Markdown files",
+		"dropzone": {
+			"title": "Drop Markdown files or .zip archive to import",
+			"description": "Drag & Drop some files here, or click to select files"
+		},
+		"progress": "Notes import is in progress. Stage: {{stage}} {{processed}}/{{total}}"
+	}
+}

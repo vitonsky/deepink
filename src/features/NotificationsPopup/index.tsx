@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaBell } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Notifications } from '@components/Notifications/Notifications';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
 export const NotificationsPopup = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const { controls } = useStatusBarManager();
 
 	const [isVisible, setIsVisible] = useState(false);
@@ -13,7 +16,7 @@ export const NotificationsPopup = () => {
 			'notifications',
 			{
 				visible: true,
-				title: 'Notifications',
+				title: t('notifications.title'),
 				icon: <FaBell />,
 				onClick: () => setIsVisible((state) => !state),
 			},
@@ -26,7 +29,7 @@ export const NotificationsPopup = () => {
 		return () => {
 			controls.unregister('notifications');
 		};
-	}, [controls]);
+	}, [controls, t]);
 
 	const onClose = () => setIsVisible(false);
 
@@ -34,7 +37,7 @@ export const NotificationsPopup = () => {
 		<Notifications
 			isVisible={isVisible}
 			onClose={onClose}
-			title="Notifications"
+			title={t('notifications.title')}
 			items={[
 				'Demo message for notification',
 				'One more message in notifications container',

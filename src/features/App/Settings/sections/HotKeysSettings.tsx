@@ -1,11 +1,15 @@
 import React, { Fragment, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Box, Divider, HStack, Text } from '@chakra-ui/react';
 import { Features } from '@components/Features/Features';
 import { FeaturesPanel } from '@components/Features/Group';
-import { SHORTCUT_NAMES, SHORTCUTS_MAP } from '@hooks/shortcuts';
+import { SHORTCUT_I18N_KEYS, SHORTCUTS_MAP } from '@hooks/shortcuts';
 
 // TODO: implement recording view
 export const KeyboardShortcut = ({ shortcut }: { shortcut?: string }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
+
 	const keys = useMemo(() => {
 		if (!shortcut) return [];
 
@@ -26,12 +30,14 @@ export const KeyboardShortcut = ({ shortcut }: { shortcut?: string }) => {
 			cursor="default"
 			userSelect="none"
 		>
-			{keys.length > 0 ? keys.join(' + ') : 'Blank'}
+			{keys.length > 0 ? keys.join(' + ') : t('hotkeys.blank')}
 		</Box>
 	);
 };
 
 export const HotKeysSettings = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
+
 	return (
 		<Features>
 			<FeaturesPanel padding="1rem">
@@ -40,7 +46,7 @@ export const HotKeysSettings = () => {
 						<Fragment key={command}>
 							{index > 0 && <Divider />}
 							<HStack w="100%">
-								<Text>{SHORTCUT_NAMES[command]}</Text>
+								<Text>{t(SHORTCUT_I18N_KEYS[command])}</Text>
 								<Box marginInlineStart="auto">
 									<KeyboardShortcut shortcut={shortcuts} />
 								</Box>

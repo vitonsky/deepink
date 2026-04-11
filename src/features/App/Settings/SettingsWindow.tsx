@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	FaFileImport,
 	FaGear,
@@ -7,6 +8,7 @@ import {
 	FaPalette,
 	FaVault,
 } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Modal,
 	ModalBody,
@@ -35,55 +37,57 @@ import { WorkspaceSettings } from './sections/WorkspaceSettings';
 // TODO: add icons
 type SettingsSection = {
 	id: string;
-	title: string;
+	titleKey: string;
 	component: React.ComponentType;
 	icon?: React.ComponentType;
 };
 
-const tabs: SettingsSection[] = [
-	{
-		id: 'general',
-		title: 'General',
-		component: GeneralSettings,
-		icon: FaGear,
-	},
-	{
-		id: 'appearance',
-		title: 'Appearance',
-		component: AppearanceSettings,
-		icon: FaPalette,
-	},
-	{
-		id: 'hotkeys',
-		title: 'Hotkeys',
-		component: HotKeysSettings,
-		icon: FaKeyboard,
-	},
-];
-
-const vaultTabs: SettingsSection[] = [
-	{
-		id: 'vault',
-		title: 'Vault',
-		component: VaultSettings,
-		icon: FaVault,
-	},
-	{
-		id: 'workspace',
-		title: 'Workspace',
-		component: WorkspaceSettings,
-		icon: FaInbox,
-	},
-	{
-		id: 'import-and-export',
-		title: 'Import & Export',
-		component: ImportAndExport,
-		icon: FaFileImport,
-	},
-];
-
 // TODO: add help section with links
 export const SettingsWindow = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
+
+	const tabs: SettingsSection[] = [
+		{
+			id: 'general',
+			titleKey: 'tabs.general',
+			component: GeneralSettings,
+			icon: FaGear,
+		},
+		{
+			id: 'appearance',
+			titleKey: 'tabs.appearance',
+			component: AppearanceSettings,
+			icon: FaPalette,
+		},
+		{
+			id: 'hotkeys',
+			titleKey: 'tabs.hotkeys',
+			component: HotKeysSettings,
+			icon: FaKeyboard,
+		},
+	];
+
+	const vaultTabs: SettingsSection[] = [
+		{
+			id: 'vault',
+			titleKey: 'tabs.vault',
+			component: VaultSettings,
+			icon: FaVault,
+		},
+		{
+			id: 'workspace',
+			titleKey: 'tabs.workspace',
+			component: WorkspaceSettings,
+			icon: FaInbox,
+		},
+		{
+			id: 'import-and-export',
+			titleKey: 'tabs.importExport',
+			component: ImportAndExport,
+			icon: FaFileImport,
+		},
+	];
+
 	const [isOpen, setIsOpen] = useState(false);
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.OPEN_GLOBAL_SETTINGS, () => {
@@ -99,7 +103,7 @@ export const SettingsWindow = () => {
 		>
 			<ModalOverlay />
 			<ModalContent maxWidth="800px" minHeight="500px">
-				<ModalHeader paddingInline="1rem">Preferences</ModalHeader>
+				<ModalHeader paddingInline="1rem">{t('window.title')}</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody paddingInline="1rem" paddingBlockEnd="2rem">
 					<Tabs
@@ -124,14 +128,14 @@ export const SettingsWindow = () => {
 										padding=".3rem .5rem"
 									>
 										<TextWithIcon icon={tab.icon && <tab.icon />}>
-											{tab.title}
+											{t(tab.titleKey)}
 										</TextWithIcon>
 									</Tab>
 								);
 							})}
 
 							<Text fontWeight="bold" marginTop="2rem">
-								Vault Settings
+								{t('tabs.vaultSettingsGroup')}
 							</Text>
 							{vaultTabs.map((tab) => {
 								return (
@@ -142,7 +146,7 @@ export const SettingsWindow = () => {
 										padding=".3rem .5rem"
 									>
 										<TextWithIcon icon={tab.icon && <tab.icon />}>
-											{tab.title}
+											{t(tab.titleKey)}
 										</TextWithIcon>
 									</Tab>
 								);
@@ -159,7 +163,7 @@ export const SettingsWindow = () => {
 												lineHeight="1"
 												marginBottom="1rem"
 											>
-												{tab.title}
+												{t(tab.titleKey)}
 											</Text>
 										)}
 										<tab.component />
@@ -175,7 +179,7 @@ export const SettingsWindow = () => {
 											lineHeight="1"
 											marginBottom="1rem"
 										>
-											{tab.title}
+											{t(tab.titleKey)}
 										</Text>
 										<tab.component />
 									</TabPanel>

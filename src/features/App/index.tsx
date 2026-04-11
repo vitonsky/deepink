@@ -1,4 +1,6 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useDebounce } from 'use-debounce';
 import { useToast } from '@chakra-ui/react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
@@ -31,6 +33,8 @@ const defaultVaultNames = [
 ];
 
 export const App: FC = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
+
 	const files = useFilesStorage();
 	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
 
@@ -58,7 +62,10 @@ export const App: FC = () => {
 
 			try {
 				if (profile.encryption !== null && password === undefined) {
-					return { status: 'error', message: 'Enter password' };
+					return {
+						status: 'error',
+						message: t('login.errors.passwordRequired'),
+					};
 				}
 
 				await profileContainers.openProfile({ profile, password }, true);
@@ -69,13 +76,16 @@ export const App: FC = () => {
 					err instanceof VaultOpenError &&
 					err.code === VaultOpenErrorCode.INCORRECT_PASSWORD
 				) {
-					return { status: 'error', message: 'Invalid password' };
+					return {
+						status: 'error',
+						message: t('login.errors.invalidPassword'),
+					};
 				}
 
 				toast({
 					status: 'error',
-					title: 'Failed to open vault',
-					description: `"${profile.name}" appears to be corrupted.`,
+					title: t('errors.failedToOpen'),
+					description: t('errors.corrupted', { name: profile.name }),
 					containerStyle: { maxW: '400px' },
 				});
 
@@ -84,7 +94,7 @@ export const App: FC = () => {
 				setScreenName('choose');
 			}
 		},
-		[profileContainers, toast],
+		[profileContainers, t, toast],
 	);
 
 	// Restore and auto-open recent profile

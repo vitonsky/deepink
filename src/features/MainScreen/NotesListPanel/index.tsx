@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaMagnifyingGlass, FaXmark } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useDebouncedCallback } from 'use-debounce';
 import {
 	Box,
@@ -28,6 +30,7 @@ import {
 } from '@state/redux/profiles/profiles';
 
 export const NotesListPanel = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const {
 		notesIndex: { index: notesIndex },
 	} = useWorkspaceContainer();
@@ -98,7 +101,7 @@ export const NotesListPanel = () => {
 						<Input
 							ref={searchInputRef}
 							borderRadius="6px"
-							placeholder="Search..."
+							placeholder={t('notesList.search.placeholder')}
 							value={searchInput}
 							onChange={(e) => setSearchInput(e.target.value)}
 							onKeyUp={(e) => {
@@ -122,7 +125,7 @@ export const NotesListPanel = () => {
 							flexShrink={0}
 							alignSelf="center"
 						>
-							Filter by
+							{t('notesList.filterBy')}
 						</Text>
 						<HStack maxW="100%" align="start" overflow="hidden">
 							<Tag

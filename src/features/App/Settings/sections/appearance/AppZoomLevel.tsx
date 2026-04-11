@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import z from 'zod';
 import {
 	Button,
@@ -18,24 +20,40 @@ const zoomLimits = {
 	max: 500,
 };
 
-const zoomScheme = z.object({
-	zoom: z
-		.string()
-		.trim()
-		.min(1, { message: 'Enter a number to set zoom' })
-		.transform((v) => Number(v))
-		.pipe(
-			z
-				.number()
-				.min(zoomLimits.min, `Zoom cannot be less than ${zoomLimits.min}%`)
-				.max(zoomLimits.max, `Zoom cannot be more than ${zoomLimits.max}%`)
-				.transform((v) => Number((v / 100).toFixed(3))),
-		),
-});
-
 const zoomFactorToPercents = (factor: number) => Math.round(factor * 100);
 
 export const AppZoomLevel = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
+
+	const zoomScheme = useMemo(
+		() =>
+			z.object({
+				zoom: z
+					.string()
+					.trim()
+					.min(1, { message: t('appearance.zoomLevel.errors.enterNumber') })
+					.transform((v) => Number(v))
+					.pipe(
+						z
+							.number()
+							.min(
+								zoomLimits.min,
+								t('appearance.zoomLevel.errors.tooSmall', {
+									min: zoomLimits.min,
+								}),
+							)
+							.max(
+								zoomLimits.max,
+								t('appearance.zoomLevel.errors.tooBig', {
+									max: zoomLimits.max,
+								}),
+							)
+							.transform((v) => Number((v / 100).toFixed(3))),
+					),
+			}),
+		[t],
+	);
+
 	const form = useForm({
 		delayError: 500,
 		defaultValues: {
@@ -71,7 +89,7 @@ export const AppZoomLevel = () => {
 					</InputRightElement>
 				</InputGroup>
 				<Button size="sm" type="submit">
-					Apply
+					{t('appearance.zoomLevel.apply')}
 				</Button>
 				<Button
 					size="sm"
@@ -85,7 +103,7 @@ export const AppZoomLevel = () => {
 						});
 					}}
 				>
-					Reset
+					{t('appearance.zoomLevel.reset')}
 				</Button>
 			</HStack>
 			{Object.entries(form.formState.errors).map(([id, error]) => {

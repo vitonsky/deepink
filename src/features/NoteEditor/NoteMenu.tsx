@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	FaBell,
 	FaBoxArchive,
@@ -15,6 +16,7 @@ import {
 	FaTrashCan,
 	FaTrashCanArrowUp,
 } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Button,
 	HStack,
@@ -31,13 +33,19 @@ import { useVaultSelector } from '@state/redux/profiles/hooks';
 import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
 
 export const NoteMenu = memo(({ note }: { note: INote }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const runCommand = useCommand();
 
 	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
 	return (
 		<Menu>
-			<MenuButton as={Button} variant="ghost" size="sm" title="Note options">
+			<MenuButton
+				as={Button}
+				variant="ghost"
+				size="sm"
+				title={t('note.menu.title')}
+			>
 				<FaEllipsis />
 			</MenuButton>
 			<MenuList>
@@ -50,13 +58,13 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				>
 					<HStack>
 						<FaCopy />
-						<Text>Copy reference on note</Text>
+						<Text>{t('note.menu.copyReference')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>
 					<HStack>
 						<FaBell />
-						<Text>Remind me</Text>
+						<Text>{t('note.menu.remindMe')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem
@@ -68,34 +76,36 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				>
 					<HStack>
 						<FaClock />
-						<Text>History</Text>
+						<Text>{t('note.menu.history')}</Text>
 						{note.isSnapshotsDisabled && (
-							<Text color="typography.secondary">(Disabled)</Text>
+							<Text color="typography.secondary">
+								{t('note.menu.historyDisabled')}
+							</Text>
 						)}
 					</HStack>
 				</MenuItem>
 				<MenuItem>
 					<HStack>
 						<FaLink />
-						<Text>Back links</Text>
+						<Text>{t('note.menu.backLinks')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>
 					<HStack>
 						<FaEye />
-						<Text>Readonly mode</Text>
+						<Text>{t('note.menu.readonlyMode')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>
 					<HStack>
 						<FaDownload />
-						<Text>Download and convert a network media</Text>
+						<Text>{t('note.menu.downloadMedia')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>
 					<HStack>
 						<FaSpellCheck />
-						<Text>Spellcheck</Text>
+						<Text>{t('note.menu.spellcheck')}</Text>
 					</HStack>
 				</MenuItem>
 
@@ -106,19 +116,19 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 				>
 					<HStack>
 						<FaFileExport />
-						<Text>Export...</Text>
+						<Text>{t('note.menu.export')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>
 					<HStack>
 						<FaShield />
-						<Text>Password protection...</Text>
+						<Text>{t('note.menu.passwordProtection')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>
 					<HStack>
 						<FaRotate />
-						<Text>Disable sync</Text>
+						<Text>{t('note.menu.disableSync')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem
@@ -131,7 +141,9 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					<HStack>
 						<FaBoxArchive />
 						<Text>
-							{note.isArchived ? 'Remove from archive' : 'Move to archive'}
+							{note.isArchived
+								? t('note.menu.removeFromArchive')
+								: t('note.menu.moveToArchive')}
 						</Text>
 					</HStack>
 				</MenuItem>
@@ -153,8 +165,8 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 						<FaTrashCan />
 						<Text>
 							{deletionConfig.permanentDeletion || note.isDeleted
-								? 'Delete permanently'
-								: 'Delete to bin'}
+								? t('note.menu.deletePermanently')
+								: t('note.menu.deleteToBin')}
 						</Text>
 					</HStack>
 				</MenuItem>
@@ -168,7 +180,7 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					>
 						<HStack>
 							<FaTrashCanArrowUp />
-							<Text>Restore from bin</Text>
+							<Text>{t('note.menu.restoreFromBin')}</Text>
 						</HStack>
 					</MenuItem>
 				)}

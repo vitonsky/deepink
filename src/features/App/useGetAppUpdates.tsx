@@ -1,12 +1,15 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import ms from 'ms';
 import { getAbout } from 'src/about';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Button, useToast, UseToastOptions } from '@chakra-ui/react';
 import { AppToast } from '@components/AppToast';
 import { AppUpdatesChecker, AppVersionInfo } from '@electron/updates/AppUpdatesChecker';
 import { getDevFlag } from '@utils/dev';
 
 export const useGetAppUpdates = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const ignoreFlagKey = 'ignoreUpdate';
 
 	const toast = useToast();
@@ -36,13 +39,13 @@ export const useGetAppUpdates = () => {
 			render() {
 				return (
 					<AppToast
-						title="App update"
-						body="The reminder will be shown week later"
+						title={t('updates.appUpdate.title')}
+						body={t('updates.appUpdate.reminderLater')}
 					/>
 				);
 			},
 		});
-	}, [showToast]);
+	}, [showToast, t]);
 
 	return useCallback(
 		async (forceCheck = false) => {
@@ -80,8 +83,8 @@ export const useGetAppUpdates = () => {
 						render(props) {
 							return (
 								<AppToast
-									title="New version is available"
-									body="Update app to a latest version to get new features and improvements"
+									title={t('updates.newVersion.title')}
+									body={t('updates.newVersion.body')}
 									actions={
 										<>
 											<Button
@@ -95,7 +98,7 @@ export const useGetAppUpdates = () => {
 													props.onClose();
 												}}
 											>
-												Download new version
+												{t('updates.newVersion.download')}
 											</Button>
 											<Button
 												size="sm"
@@ -104,7 +107,7 @@ export const useGetAppUpdates = () => {
 													ignoreUpdate();
 												}}
 											>
-												Ignore
+												{t('updates.newVersion.ignore')}
 											</Button>
 										</>
 									}
@@ -119,6 +122,6 @@ export const useGetAppUpdates = () => {
 					} satisfies AppVersionInfo;
 				});
 		},
-		[ignoreUpdate, showToast],
+		[ignoreUpdate, showToast, t],
 	);
 };

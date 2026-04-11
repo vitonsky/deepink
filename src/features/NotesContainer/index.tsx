@@ -1,5 +1,7 @@
 import React, { FC, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaPenToSquare } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, StackProps, Text, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
@@ -28,6 +30,7 @@ import { EditorModePicker } from './EditorModePicker/EditorModePicker';
 export type NotesContainerProps = Partial<StackProps>;
 
 export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
 
 	const createNote = useCreateNote();
@@ -150,7 +153,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 			) : (
 				<Box margin="auto">
 					<VStack fontSize="1.2rem" color="typography.secondary">
-						<Text>Select notes to read</Text>
+						<Text>{t('notesContainer.empty.selectNotes')}</Text>
 						<Text fontSize="1rem">
 							<Button
 								onClick={async () => {
@@ -165,9 +168,9 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 								leftIcon={<FaPenToSquare />}
 								iconSpacing=".2rem"
 							>
-								Add note
+								{t('notesContainer.empty.addNote')}
 							</Button>{' '}
-							or use search to find anything
+							{t('notesContainer.empty.orSearch')}
 						</Text>
 					</VStack>
 				</Box>

@@ -188,7 +188,9 @@ export const TagsPanel = () => {
 									if (!tag) return;
 
 									const isConfirmed = confirm(
-										`Really want to delete tag "${tag.resolvedName}" and all sub tags?`,
+										tFeatures('tag.deletion.confirm', {
+											name: tag.resolvedName,
+										}),
 									);
 									if (!isConfirmed) return;
 

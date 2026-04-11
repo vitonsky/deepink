@@ -1,5 +1,7 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaXmark } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Box, Button, HStack, Tab, TabList, Tabs, Text, VStack } from '@chakra-ui/react';
 
 // TODO: let user change size
@@ -19,6 +21,8 @@ export const NoteSidebar = ({
 		content: () => ReactNode;
 	}[];
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
 	// Tabs to render
 	const [openedTabs, setOpenedTabs] = useState([activeTab]);
 	useEffect(() => {
@@ -103,7 +107,7 @@ export const NoteSidebar = ({
 					<Button
 						variant="ghost"
 						size="xs"
-						title="Close panel"
+						title={t('note.sidebar.closePanel')}
 						onClick={onClose}
 					>
 						<FaXmark />

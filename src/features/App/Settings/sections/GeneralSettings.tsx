@@ -1,6 +1,8 @@
 import React, { useReducer } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import ms from 'ms';
 import { getAbout } from 'src/about';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import z from 'zod';
 import Logo from '@assets/icons/app.svg';
 import {
@@ -33,6 +35,7 @@ type UpdateState = {
 };
 
 export const GeneralSettings = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
 	const dispatch = useAppDispatch();
 
 	const vaultLockConfig = useAppSelector(selectVaultLockConfig);
@@ -51,16 +54,14 @@ export const GeneralSettings = () => {
 
 				<VStack gap=".3rem">
 					<Text fontSize="1.5rem" lineHeight="1">
-						General settings
+						{t('general.title')}
 					</Text>
-					<Text variant="secondary">
-						Manage your overall preferences in app.
-					</Text>
+					<Text variant="secondary">{t('general.subtitle')}</Text>
 				</VStack>
 
 				<Divider />
 
-				<FeaturesOption title="Version">
+				<FeaturesOption title={t('general.version.title')}>
 					<VStack gap=".3rem" align="start" width="100%">
 						<HStack gap="1rem" align="center">
 							<Text fontWeight="bold">{getAbout().version}</Text>
@@ -84,7 +85,7 @@ export const GeneralSettings = () => {
 										);
 								}}
 							>
-								Check for updates
+								{t('general.version.checkForUpdates')}
 							</Button>
 						</HStack>
 
@@ -92,19 +93,23 @@ export const GeneralSettings = () => {
 							<>
 								{appUpdatesState.newVersion === null ? (
 									<Text variant="secondary">
-										You use latest version
+										{t('general.version.upToDate')}
 									</Text>
 								) : (
 									<Text variant="secondary">
-										New version{' '}
-										<b>{appUpdatesState.newVersion.version}</b> is
-										available.
-										<br />
+										<Trans
+											i18nKey="general.version.newVersionAvailable"
+											ns={LOCALE_NAMESPACE.settings}
+											values={{
+												version:
+													appUpdatesState.newVersion.version,
+											}}
+											components={{ bold: <b /> }}
+										/>{' '}
 										<Link href={appUpdatesState.newVersion.url}>
-											Download
+											{t('general.version.downloadLatest')}
 										</Link>{' '}
-										latest version to get new features and
-										improvements.
+										{t('general.version.downloadDescription')}
 									</Text>
 								)}
 							</>
@@ -112,7 +117,7 @@ export const GeneralSettings = () => {
 					</VStack>
 				</FeaturesOption>
 
-				<FeaturesOption description="App will periodically check for updates and notify if new version is available">
+				<FeaturesOption description={t('general.autoCheckUpdates.description')}>
 					<Switch
 						size="sm"
 						isChecked={isCheckForUpdatesEnabled}
@@ -120,15 +125,15 @@ export const GeneralSettings = () => {
 							dispatch(settingsApi.setCheckForUpdates(evt.target.checked));
 						}}
 					>
-						Automatic check for updates
+						{t('general.autoCheckUpdates.label')}
 					</Switch>
 				</FeaturesOption>
 			</FeaturesPanel>
 
 			<FeaturesGroup>
 				<FeaturesOption
-					title="Language"
-					description="Change the display language."
+					title={t('general.language.title')}
+					description={t('general.language.description')}
 				>
 					<Select size="sm" width="auto">
 						<option>English</option>
@@ -138,17 +143,19 @@ export const GeneralSettings = () => {
 				</FeaturesOption>
 
 				<FeaturesOption
-					title="Notifications"
-					description="System notifications will be used only for reminders. When disabled, a reminders will appear only in app notifications list."
+					title={t('general.notifications.title')}
+					description={t('general.notifications.description')}
 				>
 					<Switch size="sm" defaultChecked>
-						Use system notifications
+						{t('general.notifications.useSystem')}
 					</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Vault lock">
-				<FeaturesOption description="Vault will be locked when a screen saver will start, or a device will sleep">
+			<FeaturesGroup title={t('general.vaultLock.groupTitle')}>
+				<FeaturesOption
+					description={t('general.vaultLock.lockOnSystemLock.description')}
+				>
 					<Switch
 						size="sm"
 						isChecked={vaultLockConfig.lockOnSystemLock}
@@ -160,12 +167,12 @@ export const GeneralSettings = () => {
 							);
 						}}
 					>
-						Lock vault when system locks
+						{t('general.vaultLock.lockOnSystemLock.label')}
 					</Switch>
 				</FeaturesOption>
 				<FeaturesOption
-					title="Lock Vault after idle"
-					description="Vault will be locked after selected idle time."
+					title={t('general.vaultLock.lockAfterIdle.title')}
+					description={t('general.vaultLock.lockAfterIdle.description')}
 				>
 					<Select
 						size="sm"
@@ -185,15 +192,33 @@ export const GeneralSettings = () => {
 							);
 						}}
 					>
-						<option value="never">Do not lock</option>
-						<option value={ms('5m')}>for 5 minutes</option>
-						<option value={ms('10m')}>for 10 minutes</option>
-						<option value={ms('15m')}>for 15 minutes</option>
-						<option value={ms('30m')}>for 30 minutes</option>
-						<option value={ms('1h')}>for 1 hour</option>
-						<option value={ms('2h')}>for 2 hours</option>
-						<option value={ms('3h')}>for 3 hours</option>
-						<option value={ms('5h')}>for 5 hours</option>
+						<option value="never">
+							{t('general.vaultLock.lockAfterIdle.never')}
+						</option>
+						<option value={ms('5m')}>
+							{t('general.vaultLock.lockAfterIdle.minutes5')}
+						</option>
+						<option value={ms('10m')}>
+							{t('general.vaultLock.lockAfterIdle.minutes10')}
+						</option>
+						<option value={ms('15m')}>
+							{t('general.vaultLock.lockAfterIdle.minutes15')}
+						</option>
+						<option value={ms('30m')}>
+							{t('general.vaultLock.lockAfterIdle.minutes30')}
+						</option>
+						<option value={ms('1h')}>
+							{t('general.vaultLock.lockAfterIdle.hour1')}
+						</option>
+						<option value={ms('2h')}>
+							{t('general.vaultLock.lockAfterIdle.hours2')}
+						</option>
+						<option value={ms('3h')}>
+							{t('general.vaultLock.lockAfterIdle.hours3')}
+						</option>
+						<option value={ms('5h')}>
+							{t('general.vaultLock.lockAfterIdle.hours5')}
+						</option>
 					</Select>
 				</FeaturesOption>
 			</FeaturesGroup>

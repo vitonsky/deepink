@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
+import { useTranslation } from 'react-i18next';
 import { FaLink } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Box,
 	Button,
@@ -21,6 +23,7 @@ export const LinkButton: FC<
 		onPick: (payload: InsertingPayloadMap['link']) => void;
 	}
 > = ({ onPick }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const { show } = useWorkspaceModal();
 
 	return (
@@ -28,20 +31,19 @@ export const LinkButton: FC<
 			<Button
 				size="sm"
 				variant="ghost"
-				title="Insert link"
+				title={t('editorPanel.link.buttonTitle')}
 				onClick={() => {
 					show({
 						content: ({ onClose }) => (
 							<>
 								<ModalCloseButton />
 								<ModalHeader>
-									<Text>Add link</Text>
+									<Text>{t('editorPanel.link.dialogTitle')}</Text>
 								</ModalHeader>
 								<ModalBody paddingBottom="1rem">
 									<VStack w="100%" gap="2rem" align="start">
 										<Text color="typography.secondary">
-											Selected text become a link, or link will be
-											added at cursor position if nothing selected.
+											{t('editorPanel.link.dialogDescription')}
 										</Text>
 
 										<Box as={AutoFocusInside} w="100%">
@@ -50,9 +52,12 @@ export const LinkButton: FC<
 													{
 														id: 'url',
 														value: '',
-														label: 'Link url',
-														placeholder:
-															'e.g., https://example.com',
+														label: t(
+															'editorPanel.link.field.url.label',
+														),
+														placeholder: t(
+															'editorPanel.link.field.url.placeholder',
+														),
 													},
 												]}
 												onUpdate={({ url }) => {
@@ -62,8 +67,12 @@ export const LinkButton: FC<
 														onPick({ url });
 													}
 												}}
-												submitButtonText="Add"
-												cancelButtonText="Cancel"
+												submitButtonText={t(
+													'editorPanel.link.actions.add',
+												)}
+												cancelButtonText={t(
+													'editorPanel.link.actions.cancel',
+												)}
 												onCancel={onClose}
 											/>
 										</Box>

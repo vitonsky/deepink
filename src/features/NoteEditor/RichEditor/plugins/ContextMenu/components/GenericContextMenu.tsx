@@ -1,4 +1,6 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { $isLinkNode } from '@lexical/link';
 import { $findMatchingParent } from '@lexical/utils';
 
@@ -11,23 +13,25 @@ export const GenericContextMenu: FC<ContextMenuRendererProps> = ({
 	node,
 	editor,
 	close,
-}) =>
-	editor.read(() => {
+}) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
+	return editor.read(() => {
 		if ($isImageNode(node)) {
 			return (
 				<ObjectPropertiesEditor
-					title="Image properties"
+					title={t('contextMenu.imageProperties.title')}
 					onClose={close}
 					options={[
 						{
 							id: 'url',
 							value: node.getSrc(),
-							label: 'Image url',
+							label: t('contextMenu.imageProperties.urlLabel'),
 						},
 						{
 							id: 'alt',
 							value: node.getAltText() ?? '',
-							label: 'Image alt text',
+							label: t('contextMenu.imageProperties.altLabel'),
 						},
 					]}
 					onUpdate={(update) => {
@@ -48,13 +52,13 @@ export const GenericContextMenu: FC<ContextMenuRendererProps> = ({
 		if ($isLinkNode(linkNode)) {
 			return (
 				<ObjectPropertiesEditor
-					title="Link properties"
+					title={t('contextMenu.linkProperties.title')}
 					onClose={close}
 					options={[
 						{
 							id: 'url',
 							value: linkNode.getURL(),
-							label: 'Link url',
+							label: t('contextMenu.linkProperties.urlLabel'),
 						},
 					]}
 					onUpdate={({ url, alt }) => {
@@ -70,3 +74,4 @@ export const GenericContextMenu: FC<ContextMenuRendererProps> = ({
 
 		return null;
 	});
+};

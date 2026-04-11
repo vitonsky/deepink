@@ -1,4 +1,6 @@
 import React, { createContext, FC, PropsWithChildren, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useToast } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
@@ -13,6 +15,7 @@ export const VaultErrorProvider: FC<PropsWithChildren<{ controls: ProfileControl
 	controls,
 	children,
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
 	const telemetry = useTelemetryTracker();
 	const toast = useToast();
 
@@ -24,14 +27,16 @@ export const VaultErrorProvider: FC<PropsWithChildren<{ controls: ProfileControl
 			toast({
 				status: 'error',
 				isClosable: true,
-				title: 'Failed to open vault',
-				description: `"${controls.profile.profile.name}" appears to be corrupted.`,
+				title: t('errors.failedToOpen'),
+				description: t('errors.corrupted', {
+					name: controls.profile.profile.name,
+				}),
 				containerStyle: { maxW: '400px' },
 			});
 
 			telemetry.track(TELEMETRY_EVENT_NAME.VAULT_OPEN_FAILED);
 		},
-		[controls, telemetry, toast],
+		[controls, t, telemetry, toast],
 	);
 
 	return (

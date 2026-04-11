@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Divider, Select } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
 import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
@@ -10,12 +12,13 @@ import { AppZoomLevel } from './AppZoomLevel';
 import { ColorPicker } from './ColorPicker';
 
 export const Appearance = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
 	const dispatch = useAppDispatch();
 	const theme = useAppSelector(selectTheme);
 
 	return (
 		<FeaturesGroup>
-			<FeaturesOption title="Theme">
+			<FeaturesOption title={t('appearance.theme.title')}>
 				<Select
 					value={theme.name}
 					size="sm"
@@ -28,20 +31,18 @@ export const Appearance = () => {
 						);
 					}}
 				>
-					<option value="auto" title="Follow the system styles">
-						Auto
-					</option>
-					<option value="dark">Dark</option>
-					<option value="light">Light</option>
-					<option value="zen">Zen</option>
+					<option value="auto">{t('appearance.theme.auto')}</option>
+					<option value="dark">{t('appearance.theme.dark')}</option>
+					<option value="light">{t('appearance.theme.light')}</option>
+					<option value="zen">{t('appearance.theme.zen')}</option>
 				</Select>
 			</FeaturesOption>
 
 			<FeaturesOption
-				title="Accent color"
+				title={t('appearance.accentColor.title')}
 				description={
 					theme.name === 'zen'
-						? 'Accent color is not applicable to selected theme.'
+						? t('appearance.accentColor.zenNotApplicable')
 						: undefined
 				}
 			>
@@ -61,8 +62,10 @@ export const Appearance = () => {
 			<Divider />
 
 			<FeaturesOption
-				title="Zoom level"
-				description={`Adjust the default zoom level for all windows.\nIn case your system does not scale an apps automatically, you may change a zoom to make it fit an actual display pixel ratio (DPR). Detected DPR is ${getDevicePixelRatio()}.`}
+				title={t('appearance.zoomLevel.title')}
+				description={t('appearance.zoomLevel.description', {
+					dpr: getDevicePixelRatio(),
+				})}
 			>
 				<AppZoomLevel />
 			</FeaturesOption>

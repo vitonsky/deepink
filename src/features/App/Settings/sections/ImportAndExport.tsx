@@ -1,5 +1,7 @@
 import React, { useCallback } from 'react';
 import Dropzone from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Button,
 	HStack,
@@ -14,17 +16,14 @@ import {
 import { CalmButton } from '@components/CalmButton';
 import { useDirectoryPicker } from '@hooks/files/useDirectoryPicker';
 import { useFilesPicker } from '@hooks/files/useFilesPicker';
-import {
-	importOptions,
-	ImportTypes,
-	useImportNotesPreset,
-} from '@hooks/notes/useImportNotesPreset';
+import { ImportTypes, useImportNotesPreset } from '@hooks/notes/useImportNotesPreset';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { selectWorkspace } from '@state/redux/profiles/profiles';
 
 export const ImportAndExport = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
 	const { importFiles, progress: importProgress } = useImportNotesPreset();
 	const notesExport = useNotesExport();
 
@@ -59,6 +58,11 @@ export const ImportAndExport = () => {
 	const currentWorkspace = useWorkspaceData();
 	const workspaceData = useAppSelector(selectWorkspace(currentWorkspace));
 
+	const importOptions = [
+		{ type: 'zip' as const, text: t('importExport.importFromZip') },
+		{ type: 'directory' as const, text: t('importExport.importFromDirectory') },
+	];
+
 	return (
 		<VStack width="100%" align="start">
 			<HStack>
@@ -68,7 +72,7 @@ export const ImportAndExport = () => {
 						as={CalmButton}
 						isDisabled={importProgress !== null}
 					>
-						Import notes
+						{t('importExport.importNotes')}
 					</MenuButton>
 					<MenuList>
 						{importOptions.map((option) => (
@@ -91,7 +95,7 @@ export const ImportAndExport = () => {
 						);
 					}}
 				>
-					Export notes
+					{t('importExport.exportNotes')}
 				</Button>
 			</HStack>
 
@@ -131,9 +135,9 @@ export const ImportAndExport = () => {
 								})}
 					>
 						<input {...getInputProps()} />
-						<Text>Drop Markdown files or .zip archive to import</Text>
+						<Text>{t('importExport.dropzone.title')}</Text>
 						<Text color="typography.secondary">
-							Drag & Drop some files here, or click to select files
+							{t('importExport.dropzone.description')}
 						</Text>
 					</VStack>
 				)}
@@ -143,8 +147,11 @@ export const ImportAndExport = () => {
 				<HStack w="100%" align="center">
 					<Spinner size="sm" />
 					<Text>
-						Notes import is in progress. Stage: {importProgress.stage}{' '}
-						{importProgress.processed}/{importProgress.total}
+						{t('importExport.progress', {
+							stage: importProgress.stage,
+							processed: importProgress.processed,
+							total: importProgress.total,
+						})}
 					</Text>
 				</HStack>
 			)}

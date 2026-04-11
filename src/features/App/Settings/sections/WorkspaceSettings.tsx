@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { Trans, useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Button,
 	Divider,
@@ -48,6 +50,7 @@ import {
 } from '../../Workspace/WorkspaceProvider';
 
 export const WorkspaceSettings = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
 	const newNoteConfig = useWorkspaceSelector(selectNewNoteTemplate);
 
 	const telemetry = useTelemetryTracker();
@@ -92,7 +95,7 @@ export const WorkspaceSettings = () => {
 		if (!nextWorkspace) return;
 
 		const isConfirmed = confirm(
-			`You are about to delete workspace "${workspaceInfo.name}". Are you sure you want to do it?\n\nIf you will continue, all data related to this workspace will be deleted, including notes, tags and files.`,
+			t('workspace.dangerousZone.confirmDelete', { name: workspaceInfo.name }),
 		);
 
 		telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_DELETE_CLICK, {
@@ -135,6 +138,7 @@ export const WorkspaceSettings = () => {
 	}, [
 		workspaces,
 		workspaceInfo.name,
+		t,
 		telemetry,
 		abortImport,
 		tags,
@@ -154,7 +158,7 @@ export const WorkspaceSettings = () => {
 	return (
 		<Features>
 			<FeaturesGroup>
-				<FeaturesOption title="Workspace name">
+				<FeaturesOption title={t('workspace.name.title')}>
 					<HStack
 						as="form"
 						onSubmit={workspaceNameForm.handleSubmit(async ({ name }) => {
@@ -174,7 +178,7 @@ export const WorkspaceSettings = () => {
 							size="sm"
 						/>
 						<Button variant="accent" type="submit" size="sm">
-							Update
+							{t('workspace.name.update')}
 						</Button>
 					</HStack>
 					{workspaceNameForm.formState.errors.name && (
@@ -187,24 +191,24 @@ export const WorkspaceSettings = () => {
 				<Divider />
 
 				<FeaturesOption
-					title="New note title"
+					title={t('workspace.newNoteTitle.title')}
 					description={
-						<>
-							{
-								'Set title for a new notes. You may use date via syntax {date} or {date:FORMAT} like that {date:DD/MM/YYYY HH:mm}.'
-							}
-							<br />
-							For more syntax, refer to{' '}
-							<Link href="https://day.js.org/docs/en/display/format">
-								format reference
-							</Link>
-							.
-						</>
+						<Trans
+							i18nKey="workspace.newNoteTitle.description"
+							ns={LOCALE_NAMESPACE.settings}
+							components={{
+								formatLink: (
+									<Link href="https://day.js.org/docs/en/display/format">
+										{t('workspace.newNoteTitle.formatReference')}
+									</Link>
+								),
+							}}
+						/>
 					}
 				>
 					<RelaxedInput
 						size="sm"
-						placeholder="e.g., Note {date:DD/MM/YYYY HH:mm}"
+						placeholder={t('workspace.newNoteTitle.placeholder')}
 						value={newNoteConfig.title}
 						onValueChange={(value) => {
 							dispatch(
@@ -218,7 +222,9 @@ export const WorkspaceSettings = () => {
 
 					{newNoteConfig.title.trim().length > 0 && (
 						<VStack align="start" gap={0} maxWidth="100%">
-							<Text fontSize=".8rem">Example</Text>
+							<Text fontSize=".8rem">
+								{t('workspace.newNoteTitle.example')}
+							</Text>
 							<Text fontWeight="bold" maxWidth="100%">
 								{new TemplateProcessor({
 									ignoreParsingErrors: true,
@@ -227,7 +233,7 @@ export const WorkspaceSettings = () => {
 						</VStack>
 					)}
 				</FeaturesOption>
-				<FeaturesOption title="Tags for new note">
+				<FeaturesOption title={t('workspace.tagsForNewNote.title')}>
 					<Select
 						size="sm"
 						width="auto"
@@ -244,14 +250,16 @@ export const WorkspaceSettings = () => {
 							}
 						}}
 					>
-						<option value="none">Do not set any tags</option>
-						<option value="selected">Same as selected tag</option>
+						<option value="none">{t('workspace.tagsForNewNote.none')}</option>
+						<option value="selected">
+							{t('workspace.tagsForNewNote.selected')}
+						</option>
 					</Select>
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Dangerous zone">
-				<FeaturesOption description="Delete workspace and all related data, including notes, tags and files">
+			<FeaturesGroup title={t('workspace.dangerousZone.groupTitle')}>
+				<FeaturesOption description={t('workspace.dangerousZone.delete.label')}>
 					<Button
 						size="sm"
 						variant="accent"
@@ -259,12 +267,12 @@ export const WorkspaceSettings = () => {
 						onClick={onDelete}
 						isDisabled={!isOtherWorkspacesExists}
 					>
-						Delete workspace
+						{t('workspace.dangerousZone.delete.action')}
 					</Button>
 
 					{!isOtherWorkspacesExists && (
 						<Text>
-							It is not possible to delete last workspace in profile.{' '}
+							{t('workspace.dangerousZone.delete.cannotDeleteLast')}{' '}
 							<Link
 								href="#"
 								onClick={() => {
@@ -273,9 +281,9 @@ export const WorkspaceSettings = () => {
 									});
 								}}
 							>
-								Create
+								{t('workspace.dangerousZone.delete.createAnother')}
 							</Link>{' '}
-							another workspace first.
+							{t('workspace.dangerousZone.delete.createAnotherSuffix')}
 						</Text>
 					)}
 				</FeaturesOption>

@@ -1,5 +1,13 @@
 {
 	"actions": {
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"apply": "Apply",
+		"save": "Save",
+		"delete": "Delete",
+		"reset": "Reset",
+		"update": "Update",
+		"add": "Add",
+		"create": "Create",
+		"close": "Close"
 	}
 }

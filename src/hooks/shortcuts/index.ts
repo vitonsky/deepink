@@ -43,24 +43,27 @@ export const SHORTCUTS_MAP = {
 	'CmdOrCtrl+.': Shortcuts.OPEN_GLOBAL_SETTINGS,
 };
 
-export const SHORTCUT_NAMES = {
-	[Shortcuts.CREATE_NOTE]: 'Create a new note',
-	[Shortcuts.CLOSE_CURRENT_NOTE]: 'Close active note',
-	[Shortcuts.RESTORE_CLOSED_NOTE]: 'Restore recently closed note',
-	[Shortcuts.FOCUS_NEXT_NOTE]: 'Go to next opened note',
-	[Shortcuts.FOCUS_PREVIOUS_NOTE]: 'Go to previous opened note',
+/**
+ * Maps shortcut enum values to i18n keys in the settings namespace (hotkeys.shortcuts.*)
+ */
+export const SHORTCUT_I18N_KEYS: Record<Shortcuts, string> = {
+	[Shortcuts.CREATE_NOTE]: 'hotkeys.shortcuts.createNote',
+	[Shortcuts.CLOSE_CURRENT_NOTE]: 'hotkeys.shortcuts.closeCurrentNote',
+	[Shortcuts.RESTORE_CLOSED_NOTE]: 'hotkeys.shortcuts.restoreClosedNote',
+	[Shortcuts.FOCUS_NEXT_NOTE]: 'hotkeys.shortcuts.focusNextNote',
+	[Shortcuts.FOCUS_PREVIOUS_NOTE]: 'hotkeys.shortcuts.focusPreviousNote',
 
-	[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: 'Move active note in/out of archive',
-	[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]: 'Move active note in/out of bookmark',
+	[Shortcuts.TOGGLE_CURRENT_NOTE_ARCHIVE]: 'hotkeys.shortcuts.toggleArchive',
+	[Shortcuts.TOGGLE_CURRENT_NOTE_BOOKMARK]: 'hotkeys.shortcuts.toggleBookmark',
 
-	[Shortcuts.DELETE_CURRENT_NOTE]: 'Delete active note',
-	[Shortcuts.RESTORE_CURRENT_NOTE_FROM_BIN]: 'Restore active note from bin',
+	[Shortcuts.DELETE_CURRENT_NOTE]: 'hotkeys.shortcuts.deleteNote',
+	[Shortcuts.RESTORE_CURRENT_NOTE_FROM_BIN]: 'hotkeys.shortcuts.restoreFromBin',
 
-	[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: 'Show or hide history of active note',
+	[Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL]: 'hotkeys.shortcuts.toggleHistory',
 
-	[Shortcuts.FOCUS_SEARCH]: 'Search notes',
-	[Shortcuts.SYNC_DATABASE]: 'Sync vault to disk',
+	[Shortcuts.FOCUS_SEARCH]: 'hotkeys.shortcuts.focusSearch',
+	[Shortcuts.SYNC_DATABASE]: 'hotkeys.shortcuts.syncDatabase',
 
-	[Shortcuts.LOCK_CURRENT_PROFILE]: 'Lock vault',
-	[Shortcuts.OPEN_GLOBAL_SETTINGS]: 'Open preferences',
+	[Shortcuts.LOCK_CURRENT_PROFILE]: 'hotkeys.shortcuts.lockProfile',
+	[Shortcuts.OPEN_GLOBAL_SETTINGS]: 'hotkeys.shortcuts.openSettings',
 };

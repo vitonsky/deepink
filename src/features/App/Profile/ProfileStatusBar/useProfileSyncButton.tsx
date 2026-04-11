@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaHardDrive } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
@@ -9,6 +11,7 @@ import { useProfileControls } from '..';
 import styles from './ProfileStatusBar.module.css';
 
 export const useProfileSyncButton = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const { controls } = useStatusBarManager();
 
 	const {
@@ -32,8 +35,8 @@ export const useProfileSyncButton = () => {
 			'sync',
 			{
 				visible: true,
-				title: 'Click to force save changes on disk',
-				text: isPending ? 'Saving changes' : undefined,
+				title: t('statusBar.sync.title'),
+				text: isPending ? t('statusBar.sync.saving') : undefined,
 				icon: (
 					<Box
 						sx={{
@@ -54,5 +57,5 @@ export const useProfileSyncButton = () => {
 				priority: 100000,
 			},
 		);
-	}, [controls, db, isPending]);
+	}, [controls, db, isPending, t]);
 };

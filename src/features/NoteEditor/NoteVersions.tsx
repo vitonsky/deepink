@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { FaCheck, FaEraser, FaFloppyDisk, FaGlasses, FaTrashCan } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { Box, Button, HStack, Switch, Text, VStack } from '@chakra-ui/react';
 import { BoxWithCenteredContent } from '@components/BoxWithCenteredContent';
@@ -38,6 +40,7 @@ export const NoteVersions = ({
 	};
 	isReadOnly?: boolean;
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
 	const noteHistory = useNotesHistory();
 
@@ -68,27 +71,32 @@ export const NoteVersions = ({
 			<HStack w="100%">
 				<Button
 					size="sm"
-					title="Save the current state of this note as a new version in history"
+					title={t('note.versions.saveVersionTitle')}
 					onClick={onSnapshot}
 				>
-					<TextWithIcon icon={<FaFloppyDisk />}>Save version</TextWithIcon>
+					<TextWithIcon icon={<FaFloppyDisk />}>
+						{t('note.versions.saveVersion')}
+					</TextWithIcon>
 				</Button>
 				<Button
 					size="sm"
-					title="Remove all saved versions of this note permanently"
+					title={t('note.versions.deleteAllTitle')}
 					onClick={(evt) => {
 						if (evt.ctrlKey || evt.metaKey) {
 							onDeleteAll();
 						} else {
 							confirm(({ onClose }) => ({
-								title: 'Delete all note versions',
+								title: t('note.versions.confirmDeleteAll.title'),
 								content: (
 									<Box>
 										<Text>
-											This action will permanently delete all note
-											versions.
+											{t(
+												'note.versions.confirmDeleteAll.description',
+											)}
 										</Text>
-										<Text>Are you sure about it?</Text>
+										<Text>
+											{t('note.versions.confirmDeleteAll.confirm')}
+										</Text>
 									</Box>
 								),
 								action: (
@@ -100,16 +108,20 @@ export const NoteVersions = ({
 												onClose();
 											}}
 										>
-											Apply
+											{t('note.versions.confirmDeleteAll.action')}
 										</Button>
-										<Button onClick={onClose}>Cancel</Button>
+										<Button onClick={onClose}>
+											{t('common:actions.cancel')}
+										</Button>
 									</>
 								),
 							}));
 						}
 					}}
 				>
-					<TextWithIcon icon={<FaEraser />}>Delete all</TextWithIcon>
+					<TextWithIcon icon={<FaEraser />}>
+						{t('note.versions.deleteAll')}
+					</TextWithIcon>
 				</Button>
 
 				<HStack as="label">
@@ -118,19 +130,24 @@ export const NoteVersions = ({
 						isChecked={recordControl.isDisabled}
 						onChange={(event) => recordControl.onChange(event.target.checked)}
 					/>{' '}
-					<Text>Don't record changes for this note</Text>
+					<Text>
+						{
+							// eslint-disable-next-line @cspell/spellchecker
+							t('note.versions.dontRecord')
+						}
+					</Text>
 				</HStack>
 			</HStack>
 
 			<Box w="100%" overflow="auto" display="flex" flex={1} flexFlow="column">
 				{versions && versions.length === 0 && (
 					<BoxWithCenteredContent>
-						<Text fontSize="1.3rem">This note have no recorded versions</Text>
+						<Text fontSize="1.3rem">{t('note.versions.empty')}</Text>
 					</BoxWithCenteredContent>
 				)}
 				{versions === null && (
 					<BoxWithCenteredContent>
-						<Text fontSize="1.3rem">Loading...</Text>
+						<Text fontSize="1.3rem">{t('note.versions.loading')}</Text>
 					</BoxWithCenteredContent>
 				)}
 				{versions !== null && versions.length > 0 && (
@@ -149,7 +166,9 @@ export const NoteVersions = ({
 										{new Date(version.createdAt).toLocaleString()}
 									</Text>
 									<Text color="typography.secondary">
-										{version.text.length} chars
+										{t('note.versions.chars', {
+											count: version.text.length,
+										})}
 									</Text>
 								</HStack>
 								<HStack marginLeft="auto">
@@ -158,8 +177,10 @@ export const NoteVersions = ({
 										size="sm"
 										title={
 											isReadOnly
-												? 'Version cannot be applied for a read-only note'
-												: 'Apply version'
+												? t(
+														'note.versions.applyVersionReadonlyTitle',
+													)
+												: t('note.versions.applyVersionTitle')
 										}
 										onClick={(evt) => {
 											const applyVersion = () => {
@@ -182,27 +203,37 @@ export const NoteVersions = ({
 											}
 
 											confirm(({ onClose }) => ({
-												title: 'Apply note version',
+												title: t(
+													'note.versions.confirmApply.title',
+												),
 												content: (
 													<VStack gap="1rem" align="start">
 														<Text>
-															You are about to apply note
-															version{' '}
-															<Text
-																as="span"
-																color="typography.secondary"
-															>
-																{formatNoteVersionPreview(
-																	version,
-																)}
-															</Text>
-															.
+															<Trans
+																i18nKey="note.versions.confirmApply.description"
+																ns={
+																	LOCALE_NAMESPACE.features
+																}
+																values={{
+																	version:
+																		formatNoteVersionPreview(
+																			version,
+																		),
+																}}
+																components={{
+																	secondary: (
+																		<Text
+																			as="span"
+																			color="typography.secondary"
+																		/>
+																	),
+																}}
+															/>
 														</Text>
 														<Text>
-															This action will replace
-															current note data with text of
-															a selected snapshot. Are you
-															sure?
+															{t(
+																'note.versions.confirmApply.warning',
+															)}
 														</Text>
 													</VStack>
 												),
@@ -215,7 +246,9 @@ export const NoteVersions = ({
 																onClose();
 															}}
 														>
-															Apply
+															{t(
+																'note.versions.confirmApply.apply',
+															)}
 														</Button>
 														<Button
 															variant="accent"
@@ -224,10 +257,12 @@ export const NoteVersions = ({
 																onClose();
 															}}
 														>
-															Preview
+															{t(
+																'note.versions.confirmApply.preview',
+															)}
 														</Button>
 														<Button onClick={onClose}>
-															Cancel
+															{t('common:actions.cancel')}
 														</Button>
 													</>
 												),
@@ -239,7 +274,7 @@ export const NoteVersions = ({
 
 									<Button
 										size="sm"
-										title="Open version"
+										title={t('note.versions.openVersionTitle')}
 										onClick={() => {
 											onShowVersion(version);
 
@@ -258,7 +293,7 @@ export const NoteVersions = ({
 									</Button>
 									<Button
 										size="sm"
-										title="Delete version"
+										title={t('note.versions.deleteVersionTitle')}
 										onClick={(evt) => {
 											const deleteVersion = async () => {
 												await noteHistory.delete([version.id]);
@@ -285,26 +320,37 @@ export const NoteVersions = ({
 											}
 
 											confirm(({ onClose }) => ({
-												title: 'Delete note version',
+												title: t(
+													'note.versions.confirmDelete.title',
+												),
 												content: (
 													<VStack gap="1rem" align="start">
 														<Text>
-															You are about to delete note
-															version{' '}
-															<Text
-																as="span"
-																color="typography.secondary"
-															>
-																{formatNoteVersionPreview(
-																	version,
-																)}
-															</Text>
-															.
+															<Trans
+																i18nKey="note.versions.confirmDelete.description"
+																ns={
+																	LOCALE_NAMESPACE.features
+																}
+																values={{
+																	version:
+																		formatNoteVersionPreview(
+																			version,
+																		),
+																}}
+																components={{
+																	secondary: (
+																		<Text
+																			as="span"
+																			color="typography.secondary"
+																		/>
+																	),
+																}}
+															/>
 														</Text>
 														<Text>
-															This action will delete note
-															version irreversibly. Are you
-															sure?
+															{t(
+																'note.versions.confirmDelete.warning',
+															)}
 														</Text>
 													</VStack>
 												),
@@ -317,7 +363,9 @@ export const NoteVersions = ({
 																onClose();
 															}}
 														>
-															Delete
+															{t(
+																'note.versions.confirmDelete.delete',
+															)}
 														</Button>
 														<Button
 															variant="accent"
@@ -326,10 +374,12 @@ export const NoteVersions = ({
 																onClose();
 															}}
 														>
-															Preview
+															{t(
+																'note.versions.confirmDelete.preview',
+															)}
 														</Button>
 														<Button onClick={onClose}>
-															Cancel
+															{t('common:actions.cancel')}
 														</Button>
 													</>
 												),

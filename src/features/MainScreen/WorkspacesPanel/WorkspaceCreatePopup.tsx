@@ -24,12 +24,20 @@ import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { useWorkspacesList } from './useWorkspacesList';
 
+/**
+ * Base schema shape for workspace name validation (without localized messages).
+ * Used by WorkspaceSettings to validate the workspace rename form.
+ */
+export const workspacePropsValidator = z.object({
+	name: z.string().trim().min(1),
+});
+
 export const WorkspaceCreatePopup = () => {
 	const { t: tFeatures } = useTranslation(LOCALE_NAMESPACE.features, {
 		keyPrefix: 'workspace.creator',
 	});
 
-	const workspacePropsValidator = useMemo(
+	const localizedWorkspacePropsValidator = useMemo(
 		() =>
 			z.object({
 				name: z.string().trim().min(1, tFeatures('error.format')),
@@ -76,7 +84,7 @@ export const WorkspaceCreatePopup = () => {
 									placeholder: tFeatures('field.name.placeholder'),
 								},
 							]}
-							validatorScheme={workspacePropsValidator}
+							validatorScheme={localizedWorkspacePropsValidator}
 							onUpdate={({ name }) => {
 								if (isPending) return;
 								setIsPending(true);

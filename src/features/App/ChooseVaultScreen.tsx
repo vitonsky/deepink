@@ -1,5 +1,7 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaUser } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -17,12 +19,13 @@ export const ChooseVaultScreen: FC<{
 	onOpenVault: OnPickProfile;
 	onCreateVault: () => void;
 }> = ({ vaults, onOpenVault, onCreateVault }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
 	const dispatch = useAppDispatch();
 
 	return (
 		<CenterBox>
 			<ProfilesForm
-				title="Choose the profile"
+				title={t('chooseProfile.title')}
 				controls={
 					<Button
 						variant="accent"
@@ -30,7 +33,7 @@ export const ChooseVaultScreen: FC<{
 						w="100%"
 						onClick={() => onCreateVault()}
 					>
-						Create new profile
+						{t('chooseProfile.actions.createNew')}
 					</Button>
 				}
 			>

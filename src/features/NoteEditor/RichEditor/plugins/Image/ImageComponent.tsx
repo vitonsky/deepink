@@ -8,6 +8,7 @@
 
 import * as React from 'react';
 import { JSX, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	$getNodeByKey,
 	$getSelection,
@@ -19,6 +20,7 @@ import {
 	LexicalCommand,
 	NodeKey,
 } from 'lexical';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { HStack, Spinner, Text } from '@chakra-ui/react';
 import { getAppResourceDataInUrl } from '@core/features/links';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
@@ -120,6 +122,15 @@ export const LazyImage = React.forwardRef<
 
 function BrokenImage(): JSX.Element {
 	return <div>Broken image</div>;
+}
+
+function ImageLoadingFallback(): JSX.Element {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+	return (
+		<HStack>
+			<Text>{t('image.loading')}</Text> <Spinner />
+		</HStack>
+	);
 }
 
 export default function ImageComponent({
@@ -240,13 +251,7 @@ export default function ImageComponent({
 				});
 			}}
 		>
-			<Suspense
-				fallback={
-					<HStack>
-						<Text>Image loading</Text> <Spinner />
-					</HStack>
-				}
-			>
+			<Suspense fallback={<ImageLoadingFallback />}>
 				{isLoadError ? (
 					<BrokenImage />
 				) : (

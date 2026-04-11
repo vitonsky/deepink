@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import humanizeDuration from 'humanize-duration';
 import ms from 'ms';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import z from 'zod';
 import {
 	Button,
@@ -27,6 +29,7 @@ import {
 } from '@state/redux/profiles/selectors/vault';
 
 export const VaultSettings = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
 	const dispatch = useAppDispatch();
 	const vaultActions = useVaultActions();
 
@@ -37,25 +40,33 @@ export const VaultSettings = () => {
 	return (
 		<Features>
 			<FeaturesGroup>
-				<FeaturesOption title="Vault name">
+				<FeaturesOption title={t('vault.name.title')}>
 					<Input defaultValue="Personal notes" size="sm" />
 				</FeaturesOption>
 
-				<FeaturesOption description="Workspaces passwords will be encrypted with master key and saved in database, to automatically open encrypted workspaces with no enter password.">
-					<Switch size="sm">Remember workspaces passwords</Switch>
+				<FeaturesOption description={t('vault.rememberPasswords.description')}>
+					<Switch size="sm">{t('vault.rememberPasswords.label')}</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Files and data">
-				<FeaturesOption title="Images compression">
+			<FeaturesGroup title={t('vault.filesAndData.groupTitle')}>
+				<FeaturesOption title={t('vault.filesAndData.imagesCompression.title')}>
 					<Select size="sm" width="auto">
-						<option>Compress images</option>
-						<option>Do not compress images</option>
-						<option selected>Always ask</option>
+						<option>
+							{t('vault.filesAndData.imagesCompression.compress')}
+						</option>
+						<option>
+							{t('vault.filesAndData.imagesCompression.doNotCompress')}
+						</option>
+						<option selected>
+							{t('vault.filesAndData.imagesCompression.alwaysAsk')}
+						</option>
 					</Select>
 				</FeaturesOption>
 
-				<FeaturesOption description="Delete files that is not used anymore.">
+				<FeaturesOption
+					description={t('vault.filesAndData.deleteOrphaned.description')}
+				>
 					<Switch
 						size="sm"
 						isChecked={filesIntegrityConfig.enabled}
@@ -67,18 +78,18 @@ export const VaultSettings = () => {
 							);
 						}}
 					>
-						Delete orphaned files
+						{t('vault.filesAndData.deleteOrphaned.label')}
 					</Switch>
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Encryption">
-				<FeaturesOption title="Encryption algorithm">
+			<FeaturesGroup title={t('vault.encryption.groupTitle')}>
+				<FeaturesOption title={t('vault.encryption.algorithm.title')}>
 					<Select defaultValue="aes" size="sm">
 						{[
 							{
 								value: 'none',
-								text: 'None',
+								text: t('vault.encryption.algorithm.none'),
 							},
 							{
 								value: 'aes',
@@ -96,25 +107,27 @@ export const VaultSettings = () => {
 					</Select>
 				</FeaturesOption>
 
-				<FeaturesOption title="Password">
-					<Button size="sm">Update password</Button>
+				<FeaturesOption title={t('vault.encryption.password.title')}>
+					<Button size="sm">{t('vault.encryption.password.update')}</Button>
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Synchronization">
-				<FeaturesOption description="Sync all data in database between your devices, to not loose it. All data are encrypted.">
-					<Switch size="sm">Enable synchronization</Switch>
+			<FeaturesGroup title={t('vault.synchronization.groupTitle')}>
+				<FeaturesOption
+					description={t('vault.synchronization.enable.description')}
+				>
+					<Switch size="sm">{t('vault.synchronization.enable.label')}</Switch>
 				</FeaturesOption>
-				<FeaturesOption title="Synchronization method">
+				<FeaturesOption title={t('vault.synchronization.method.title')}>
 					<Select defaultValue="fs" size="sm">
 						{[
 							{
 								value: 'fs',
-								text: 'File system',
+								text: t('vault.synchronization.method.fileSystem'),
 							},
 							{
 								value: 'server',
-								text: 'Server',
+								text: t('vault.synchronization.method.server'),
 							},
 						].map(({ value, text }) => (
 							<option key={value} value={value}>
@@ -123,18 +136,18 @@ export const VaultSettings = () => {
 						))}
 					</Select>
 				</FeaturesOption>
-				<FeaturesOption title="Synchronization directory">
+				<FeaturesOption title={t('vault.synchronization.directory.title')}>
 					<Input
 						size="sm"
-						placeholder="Enter path on directory"
+						placeholder={t('vault.synchronization.directory.placeholder')}
 						defaultValue="/foo/bar"
 						disabled
 					/>
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Snapshots">
-				<FeaturesOption description="When enabled, a snapshots of note content will be created when note is changed. You may control snapshots recording per note level in note history panel.">
+			<FeaturesGroup title={t('vault.snapshots.groupTitle')}>
+				<FeaturesOption description={t('vault.snapshots.record.description')}>
 					<Switch
 						size="sm"
 						isChecked={snapshotsConfig.enabled}
@@ -146,13 +159,13 @@ export const VaultSettings = () => {
 							);
 						}}
 					>
-						Record note snapshots
+						{t('vault.snapshots.record.label')}
 					</Switch>
 				</FeaturesOption>
 
 				<FeaturesOption
-					title="Delay for snapshot"
-					description="Time in seconds to wait since recent note changes, before create a new snapshot. The lower time the more snapshots will be created, the large a vault size."
+					title={t('vault.snapshots.delay.title')}
+					description={t('vault.snapshots.delay.description')}
 				>
 					<RelaxedSlider
 						min={ms('10s')}
@@ -174,8 +187,10 @@ export const VaultSettings = () => {
 				</FeaturesOption>
 			</FeaturesGroup>
 
-			<FeaturesGroup title="Trash bin">
-				<FeaturesOption description="Ask before deleting a note.">
+			<FeaturesGroup title={t('vault.trashBin.groupTitle')}>
+				<FeaturesOption
+					description={t('vault.trashBin.confirmDeletion.description')}
+				>
 					<Switch
 						size="sm"
 						isChecked={deletionConfig.confirm}
@@ -187,11 +202,11 @@ export const VaultSettings = () => {
 							);
 						}}
 					>
-						Confirm deletion
+						{t('vault.trashBin.confirmDeletion.label')}
 					</Switch>
 				</FeaturesOption>
 
-				<FeaturesOption description="Move notes to a trash bin instead of permanent deletion so you can restore it later.">
+				<FeaturesOption description={t('vault.trashBin.moveToBin.description')}>
 					<Switch
 						size="sm"
 						isChecked={!deletionConfig.permanentDeletion}
@@ -203,13 +218,13 @@ export const VaultSettings = () => {
 							);
 						}}
 					>
-						Move notes to bin
+						{t('vault.trashBin.moveToBin.label')}
 					</Switch>
 				</FeaturesOption>
 
 				<Divider />
 
-				<FeaturesOption description="Note moved to bin will be permanently deleted after some time.">
+				<FeaturesOption description={t('vault.trashBin.autoPurge.description')}>
 					<Switch
 						size="sm"
 						isChecked={deletionConfig.bin.autoClean}
@@ -221,13 +236,13 @@ export const VaultSettings = () => {
 							);
 						}}
 					>
-						Permanently delete old notes in bin
+						{t('vault.trashBin.autoPurge.label')}
 					</Switch>
 				</FeaturesOption>
 
 				<FeaturesOption
-					title="Permanent deletion delay"
-					description="Time interval in days to delete note from bin. Time counts from a moment you move note to bin."
+					title={t('vault.trashBin.purgeDelay.title')}
+					description={t('vault.trashBin.purgeDelay.description')}
 				>
 					<InputGroup size="sm" width="auto">
 						<RelaxedInput
@@ -252,7 +267,9 @@ export const VaultSettings = () => {
 							}}
 						/>
 						<InputRightElement w="3rem" pointerEvents="none">
-							<Text variant="secondary">days</Text>
+							<Text variant="secondary">
+								{t('vault.trashBin.purgeDelay.unit')}
+							</Text>
 						</InputRightElement>
 					</InputGroup>
 				</FeaturesOption>

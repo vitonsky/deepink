@@ -1,4 +1,6 @@
 import React, { FC, useCallback, useEffect, useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Button, Input, useToast, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { ProfileObject } from '@core/storage/ProfilesManager';
@@ -19,6 +21,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 	onLogin,
 	onPickAnotherProfile,
 }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
 	const telemetry = useTelemetryTracker();
 
 	const toast = useToast();
@@ -47,14 +50,14 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		});
 
 		if (response.status === 'error') {
-			setErrorMessage(response.message ?? 'Unknown error');
+			setErrorMessage(response.message ?? t('login.errors.cannotOpen'));
 
 			toast.close(toastId);
 			requestAnimationFrame(() => {
 				toast({
 					id: toastId,
 					status: 'error',
-					title: 'Cannot open profile',
+					title: t('login.errors.cannotOpen'),
 					description: response.message,
 				});
 			});
@@ -63,7 +66,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_LOGIN, {
 			status: response.status === 'error' ? 'error' : 'ok',
 		});
-	}, [onLogin, profile, secret, telemetry, toast, toastId]);
+	}, [onLogin, profile, secret, t, telemetry, toast, toastId]);
 
 	const firstInputRef = useFocusableRef<HTMLInputElement>();
 	useEffect(() => {
@@ -74,7 +77,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 
 	return (
 		<ProfilesForm
-			title="Unlock profile"
+			title={t('login.title')}
 			controls={
 				<>
 					<Button
@@ -83,10 +86,10 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 						onClick={onPressLogin}
 						disabled={isPending}
 					>
-						Unlock
+						{t('login.actions.unlock')}
 					</Button>
 					<Button w="100%" onClick={onPickAnotherProfile}>
-						Change profile
+						{t('login.actions.changeProfile')}
 					</Button>
 				</>
 			}
@@ -96,7 +99,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 					ref={firstInputRef}
 					size="lg"
 					type="password"
-					placeholder="Enter password"
+					placeholder={t('login.field.password.placeholder')}
 					value={secret}
 					onChange={(evt) => setSecret(evt.target.value)}
 					focusBorderColor={errorMessage ? 'red.500' : undefined}

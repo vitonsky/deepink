@@ -9,6 +9,7 @@ export enum LOCALE_NAMESPACE {
 	vault = 'vault',
 	workspace = 'workspace',
 	features = 'features',
+	settings = 'settings',
 }
 
 export const NAMESPACES = Object.values(LOCALE_NAMESPACE);
