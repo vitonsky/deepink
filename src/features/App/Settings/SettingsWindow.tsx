@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa6';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
+	Box,
 	Modal,
 	ModalBody,
 	ModalCloseButton,
@@ -126,8 +127,23 @@ export const SettingsWindow = () => {
 										justifyContent="start"
 										borderRadius="4px"
 										padding=".3rem .5rem"
+										maxWidth="100%"
 									>
-										<TextWithIcon icon={tab.icon && <tab.icon />}>
+										<TextWithIcon
+											icon={
+												tab.icon && (
+													<Box as={tab.icon} flexShrink={0} />
+												)
+											}
+											overflow="hidden"
+											textProps={{
+												css: {
+													whiteSpace: 'nowrap',
+													textOverflow: 'ellipsis',
+													overflow: 'hidden',
+												},
+											}}
+										>
 											{t(tab.titleKey)}
 										</TextWithIcon>
 									</Tab>
@@ -144,8 +160,23 @@ export const SettingsWindow = () => {
 										justifyContent="start"
 										borderRadius="4px"
 										padding=".3rem .5rem"
+										maxWidth="100%"
 									>
-										<TextWithIcon icon={tab.icon && <tab.icon />}>
+										<TextWithIcon
+											icon={
+												tab.icon && (
+													<Box as={tab.icon} flexShrink={0} />
+												)
+											}
+											overflow="hidden"
+											textProps={{
+												css: {
+													whiteSpace: 'nowrap',
+													textOverflow: 'ellipsis',
+													overflow: 'hidden',
+												},
+											}}
+										>
 											{t(tab.titleKey)}
 										</TextWithIcon>
 									</Tab>
