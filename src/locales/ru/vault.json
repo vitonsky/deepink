@@ -1,0 +1,63 @@
+{
+	"chooseProfile": {
+		"title": "Выберите профиль",
+		"actions": {
+			"createNew": "Создать новый профиль"
+		}
+	},
+	"creator": {
+		"title": "Создание хранилища",
+		"field": {
+			"name": {
+				"label": "Название хранилища",
+				"placeholder": "например, Заметки"
+			},
+			"password": {
+				"label": "Пароль шифрования",
+				"recommended": "(рекомендуется)",
+				"placeholder": "Введите надёжный пароль"
+			},
+			"algorithm": {
+				"label": "Алгоритм шифрования"
+			}
+		},
+		"actions": {
+			"create": "Создать хранилище",
+			"continueNoPassword": "Продолжить без пароля",
+			"cancel": "Отмена"
+		},
+		"noEncryptionDialog": {
+			"title": "Создать хранилище без шифрования",
+			"description": "Все ваши данные и заметки будут храниться без шифрования.",
+			"actions": {
+				"confirm": "Продолжить без шифрования",
+				"cancel": "Отмена"
+			}
+		},
+		"errors": {
+			"nameRequired": "Введите название профиля",
+			"passwordRequired": "Введите пароль"
+		}
+	},
+	"login": {
+		"title": "Разблокировка профиля",
+		"field": {
+			"password": {
+				"placeholder": "Введите пароль"
+			}
+		},
+		"actions": {
+			"unlock": "Разблокировать",
+			"changeProfile": "Сменить профиль"
+		},
+		"errors": {
+			"cannotOpen": "Не удалось открыть профиль",
+			"invalidPassword": "Неверный пароль",
+			"passwordRequired": "Введите пароль"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Не удалось открыть хранилище",
+		"corrupted": "«{{name}}» повреждено."
+	}
+}
