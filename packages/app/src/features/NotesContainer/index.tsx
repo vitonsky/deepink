@@ -1,9 +1,8 @@
 import React, { FC, useEffect, useRef } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import { FaPenToSquare } from 'react-icons/fa6';
+import { useTranslation } from 'react-i18next';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import { WorkspaceEvents } from '@api/events/workspace';
-import { Box, Button, StackProps, Text, VStack } from '@chakra-ui/react';
+import { Box, StackProps, Text, VStack } from '@chakra-ui/react';
 import { INote } from '@core/features/notes';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import {
@@ -15,7 +14,6 @@ import {
 import { Notes } from '@features/NotesContainer/Notes';
 import { OpenedNotesPanel } from '@features/NotesContainer/OpenedNotesPanel';
 import { useTelemetryTracker } from '@features/telemetry';
-import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
@@ -32,8 +30,6 @@ export type NotesContainerProps = Partial<StackProps>;
 export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
-
-	const createNote = useCreateNote();
 
 	const updateNotes = useUpdateNotes();
 	const noteActions = useNoteActions();
@@ -160,32 +156,6 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					>
 						<Text variant="secondary">
 							{t('notesContainer.empty.placeholder')}
-						</Text>
-						<Text>
-							<Trans
-								t={t}
-								i18nKey="notesContainer.empty.cta"
-								components={{
-									create: (
-										<Button
-											onClick={async () => {
-												await createNote();
-
-												telemetry.track(
-													TELEMETRY_EVENT_NAME.NOTE_CREATED,
-													{
-														context: 'empty notes container',
-													},
-												);
-											}}
-											size="sm"
-											variant="link"
-											leftIcon={<FaPenToSquare />}
-											iconSpacing=".2rem"
-										></Button>
-									),
-								}}
-							/>
 						</Text>
 					</VStack>
 				</Box>
