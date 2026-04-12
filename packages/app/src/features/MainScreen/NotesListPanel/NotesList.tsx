@@ -20,6 +20,8 @@ import {
 } from '@state/redux/profiles/profiles';
 import { ScrollToOptions, useVirtualizer } from '@tanstack/react-virtual';
 
+import { useLocalizedDate } from '../../../hooks/useLocalizedDate';
+
 import { useNotesData } from './useNotesData';
 import { useScrollToActiveNote } from './useScrollToActiveNote';
 
@@ -29,6 +31,7 @@ export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+	const localizedDate = useLocalizedDate();
 	const telemetry = useTelemetryTracker();
 
 	const createNote = useCreateNote();
@@ -176,7 +179,7 @@ export const NotesList: FC<NotesListProps> = () => {
 									text={note.content.text}
 									meta={
 										date && (
-											<Text>{new Date(date).toDateString()}</Text>
+											<Text>{localizedDate(new Date(date))}</Text>
 										)
 									}
 									onContextMenu={(evt) => {
