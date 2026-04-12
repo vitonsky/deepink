@@ -56,7 +56,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: npm test --workspaces
+        run: npm test --workspaces --if-present
 
       - name: Build
         run: npm run build --workspace=app
