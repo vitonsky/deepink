@@ -12,6 +12,7 @@ export enum LOCALE_NAMESPACE {
 	workspace = 'workspace',
 	features = 'features',
 	settings = 'settings',
+	contextMenu = 'contextMenu',
 }
 
 export const NAMESPACES = Object.values(LOCALE_NAMESPACE);

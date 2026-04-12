@@ -1,0 +1,10 @@
+{
+	"note": {
+		"duplicate": "Duplicate",
+		"export": "Export...",
+		"copyMarkdownLink": "Copy Markdown link",
+		"deletePermanently": "Delete permanently",
+		"restoreFromBin": "Restore from bin",
+		"deleteToBin": "Move to bin"
+	}
+}

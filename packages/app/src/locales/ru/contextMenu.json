@@ -1,0 +1,10 @@
+{
+	"note": {
+		"duplicate": "Дублировать",
+		"export": "Экспортировать...",
+		"copyMarkdownLink": "Копировать Markdown ссылку",
+		"deletePermanently": "Удалить безвозвратно",
+		"restoreFromBin": "Восстановить из корзины",
+		"deleteToBin": "Удалить в корзину"
+	}
+}
