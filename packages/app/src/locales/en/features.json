@@ -162,9 +162,8 @@
 	},
 	"notesContainer": {
 		"empty": {
-			"selectNotes": "Select notes to read",
-			"addNote": "Add note",
-			"orSearch": "or use search to find anything"
+			"placeholder": "Notes content will be shown here",
+			"cta": "Write down your ideas in <CreateNote>new note</CreateNote> or select anything in list"
 		}
 	},
 	"activityBar": {

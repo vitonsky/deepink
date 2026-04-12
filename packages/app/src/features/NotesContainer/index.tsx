@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { FaPenToSquare } from 'react-icons/fa6';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import { WorkspaceEvents } from '@api/events/workspace';
@@ -151,26 +151,41 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 					<EditorModePicker />
 				</>
 			) : (
-				<Box margin="auto">
-					<VStack fontSize="1.2rem" color="typography.secondary">
-						<Text>{t('notesContainer.empty.selectNotes')}</Text>
-						<Text fontSize="1rem">
-							<Button
-								onClick={async () => {
-									await createNote();
+				<Box margin="auto" maxWidth="500px">
+					<VStack
+						fontSize="1.1rem"
+						color="typography.secondary"
+						gap="1rem"
+						textAlign="center"
+					>
+						<Text variant="secondary">
+							{t('notesContainer.empty.placeholder')}
+						</Text>
+						<Text>
+							<Trans
+								t={t}
+								i18nKey="notesContainer.empty.cta"
+								components={{
+									CreateNote: (
+										<Button
+											onClick={async () => {
+												await createNote();
 
-									telemetry.track(TELEMETRY_EVENT_NAME.NOTE_CREATED, {
-										context: 'empty notes container',
-									});
+												telemetry.track(
+													TELEMETRY_EVENT_NAME.NOTE_CREATED,
+													{
+														context: 'empty notes container',
+													},
+												);
+											}}
+											size="sm"
+											variant="link"
+											leftIcon={<FaPenToSquare />}
+											iconSpacing=".2rem"
+										></Button>
+									),
 								}}
-								size="sm"
-								variant="link"
-								leftIcon={<FaPenToSquare />}
-								iconSpacing=".2rem"
-							>
-								{t('notesContainer.empty.addNote')}
-							</Button>{' '}
-							{t('notesContainer.empty.orSearch')}
+							/>
 						</Text>
 					</VStack>
 				</Box>
