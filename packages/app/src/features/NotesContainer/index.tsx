@@ -166,7 +166,7 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 								t={t}
 								i18nKey="notesContainer.empty.cta"
 								components={{
-									CreateNote: (
+									create: (
 										<Button
 											onClick={async () => {
 												await createNote();

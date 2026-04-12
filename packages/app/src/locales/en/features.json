@@ -152,7 +152,8 @@
 		"search": {
 			"placeholder": "Search..."
 		},
-		"filterBy": "Filter by"
+		"filterBy": "Filter by",
+		"empty": "Nothing added yet. <create>Add something</create>"
 	},
 	"notesView": {
 		"allNotes": "All notes",
@@ -163,7 +164,7 @@
 	"notesContainer": {
 		"empty": {
 			"placeholder": "Notes content will be shown here",
-			"cta": "Write down your ideas in <CreateNote>new note</CreateNote> or select anything in list"
+			"cta": "Write down your ideas in <create>new note</create> or select anything in list"
 		}
 	},
 	"activityBar": {

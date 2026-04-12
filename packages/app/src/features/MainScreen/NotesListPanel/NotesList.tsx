@@ -1,11 +1,15 @@
 import React, { FC, useRef } from 'react';
-import { Box, Skeleton, Text, VStack } from '@chakra-ui/react';
+import { Trans, useTranslation } from 'react-i18next';
+import { FaPenToSquare } from 'react-icons/fa6';
+import { LOCALE_NAMESPACE } from 'src/i18n';
+import { Box, Button, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { NotePreview } from '@components/NotePreview/NotePreview';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
 import { useNoteContextMenu } from '@features/NotesContainer/NoteContextMenu/useNoteContextMenu';
 import { useTelemetryTracker } from '@features/telemetry';
+import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
@@ -24,7 +28,10 @@ export const scrollAlignment: ScrollToOptions['align'] = 'start';
 export type NotesListProps = {};
 
 export const NotesList: FC<NotesListProps> = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
+
+	const createNote = useCreateNote();
 
 	const noteActions = useNoteActions();
 
@@ -77,8 +84,38 @@ export const NotesList: FC<NotesListProps> = () => {
 			}}
 		>
 			{noteIds.length === 0 ? (
-				<Text pos="relative" top="40%">
-					Nothing added yet
+				<Text
+					pos="relative"
+					top="40%"
+					paddingInline="1rem"
+					textAlign="center"
+					whiteSpace="pre-line"
+					lineHeight="1.6rem"
+				>
+					<Trans
+						t={t}
+						i18nKey="notesList.empty"
+						components={{
+							create: (
+								<Button
+									onClick={async () => {
+										await createNote();
+
+										telemetry.track(
+											TELEMETRY_EVENT_NAME.NOTE_CREATED,
+											{
+												context: 'empty notes list tip',
+											},
+										);
+									}}
+									size="sm"
+									variant="link"
+									leftIcon={<FaPenToSquare />}
+									iconSpacing=".2rem"
+								></Button>
+							),
+						}}
+					/>
 				</Text>
 			) : (
 				<Box
