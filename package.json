@@ -24,11 +24,8 @@
 		}
 	},
 	"scripts": {
-		"test": "vitest",
-		"bench": "node scripts/datasets/prepare-bench-data.ts  && vitest bench",
 		"prettify": "eslint --fix \"{*,**/*}.{ts,tsx,js,jsx}\" && prettier --write \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint '**/*.css' --fix",
 		"lint": "eslint --max-warnings 0 \"{*,**/*}.{ts,tsx,js,jsx}\" && prettier --check \"{*,**/*}.{ts,tsx,js,jsx}\" && stylelint '**/*.css'",
-		"update-icons": "tsx ./scripts/icons/build.ts",
 		"prepare": "husky install"
 	},
 	"devDependencies": {
