@@ -6,5 +6,10 @@
 		"deletePermanently": "Delete permanently",
 		"restoreFromBin": "Restore from bin",
 		"deleteToBin": "Move to bin"
+	},
+	"tag": {
+		"addNestedTag": "Add nested tag...",
+		"edit": "Edit...",
+		"delete": "Delete"
 	}
 }

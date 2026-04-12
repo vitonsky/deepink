@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
-import { ContextMenu } from '@electron/requests/contextMenu';
+import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { ContextMenuCallback, useContextMenu } from '@hooks/useContextMenu';
 
 export enum TagContextMenu {
@@ -7,22 +8,6 @@ export enum TagContextMenu {
 	EDIT = 'edit',
 	DELETE = 'delete',
 }
-
-export const tagMenu: ContextMenu = [
-	{
-		id: TagContextMenu.ADD,
-		label: 'Add',
-	},
-	{
-		id: TagContextMenu.EDIT,
-		label: 'Edit',
-	},
-	{ type: 'separator' },
-	{
-		id: TagContextMenu.DELETE,
-		label: 'Delete',
-	},
-];
 
 export type TagContextMenuCallbacks = {
 	onAdd: (id: string) => void;
@@ -35,6 +20,8 @@ export const useTagContextMenu = ({
 	onEdit,
 	onDelete,
 }: TagContextMenuCallbacks) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.contextMenu, { keyPrefix: 'tag' });
+
 	const noteContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
 		async ({ id, action }) => {
 			const actionsMap = {
@@ -50,5 +37,25 @@ export const useTagContextMenu = ({
 		[onAdd, onEdit, onDelete],
 	);
 
-	return useContextMenu(tagMenu, noteContextMenuCallback);
+	return useContextMenu(
+		useMemo(
+			() => [
+				{
+					id: TagContextMenu.ADD,
+					label: t('addNestedTag'),
+				},
+				{
+					id: TagContextMenu.EDIT,
+					label: t('edit'),
+				},
+				{ type: 'separator' },
+				{
+					id: TagContextMenu.DELETE,
+					label: t('delete'),
+				},
+			],
+			[t],
+		),
+		noteContextMenuCallback,
+	);
 };
