@@ -288,12 +288,7 @@ export default tseslint.config(
 		},
 	},
 	{
-		files: [
-			'packages/app/**/*.ts',
-			'packages/app/**/*.tsx',
-			'packages/app/*.ts',
-			'packages/app/*.mts',
-		],
+		files: ['packages/app/**/*.{ts,tsx,mts}'],
 		settings: {
 			'import/resolver': {
 				typescript: {
