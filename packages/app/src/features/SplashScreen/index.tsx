@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Spinner, VStack } from '@chakra-ui/react';
 
-// TODO: implement splash screen
 export const SplashScreen = () => {
 	return (
 		<Box
@@ -13,20 +12,19 @@ export const SplashScreen = () => {
 			backgroundColor="surface.background"
 			zIndex={9999}
 		>
-			<Text
+			<VStack
+				gap="2rem"
 				sx={{
-					display: 'flex',
 					height: '100%',
 					width: '100%',
 					margin: 'auto',
 					justifyContent: 'center',
 					alignItems: 'center',
-					fontSize: '2rem',
-					fontWeight: 'bold',
+					fontSize: '1.6rem',
 				}}
 			>
-				Loading...
-			</Text>
+				<Spinner size="lg" color="primary" />
+			</VStack>
 		</Box>
 	);
 };
