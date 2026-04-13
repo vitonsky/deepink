@@ -9,7 +9,6 @@ import {
 	Box,
 	Button,
 	Divider,
-	HStack,
 	Link,
 	Select,
 	Switch,
@@ -67,7 +66,7 @@ export const GeneralSettings = () => {
 
 				<FeaturesOption title={t('general.version.title')}>
 					<VStack gap=".3rem" align="start" width="100%">
-						<HStack gap="1rem" align="center">
+						<VStack gap=".5rem" align="start" paddingTop=".4rem">
 							<Text fontWeight="bold">{getAbout().version}</Text>
 							<Button
 								size="sm"
@@ -91,7 +90,7 @@ export const GeneralSettings = () => {
 							>
 								{t('general.version.checkForUpdates')}
 							</Button>
-						</HStack>
+						</VStack>
 
 						{appUpdatesState.state === 'result' && (
 							<>
