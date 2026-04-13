@@ -273,7 +273,15 @@ export const MonacoEditor = ({
 		if (!editor) return;
 
 		if (editor.getValue() !== value) {
-			editor.setValue(value);
+			const model = editor.getModel();
+			if (!model) return;
+
+			// Update content without resetting cursor position
+			model.pushEditOperations(
+				editor.getSelections(),
+				[{ range: model.getFullModelRange(), text: value }],
+				() => null,
+			);
 		}
 	});
 
