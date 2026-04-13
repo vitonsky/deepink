@@ -12,6 +12,7 @@ export class TemplateProcessor {
 		private readonly config: {
 			ignoreParsingErrors?: boolean;
 			timezone?: string;
+			language?: string;
 		} = {},
 	) {}
 
@@ -25,7 +26,13 @@ export class TemplateProcessor {
 					const format = directive.startsWith('date:')
 						? directive.slice('date:'.length)
 						: 'DD/MM/YYYY';
-					return dayjs().tz(this.config.timezone).format(format);
+					return (
+						this.config.language
+							? dayjs().locale(this.config.language)
+							: dayjs()
+					)
+						.tz(this.config.timezone)
+						.format(format);
 				}
 
 				return `{${token.value}}`;

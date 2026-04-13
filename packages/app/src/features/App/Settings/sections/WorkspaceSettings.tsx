@@ -31,6 +31,7 @@ import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TemplateProcessor } from '@hooks/notes/TemplateProcessor';
 import { useImportNotesPreset } from '@hooks/notes/useImportNotesPreset';
+import { useLoadedLanguage } from '@hooks/useLocalizedDate';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import {
@@ -51,6 +52,8 @@ import {
 
 export const WorkspaceSettings = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
+	const language = useLoadedLanguage();
+
 	const newNoteConfig = useWorkspaceSelector(selectNewNoteTemplate);
 
 	const telemetry = useTelemetryTracker();
@@ -228,6 +231,7 @@ export const WorkspaceSettings = () => {
 							<Text fontWeight="bold" maxWidth="100%">
 								{new TemplateProcessor({
 									ignoreParsingErrors: true,
+									language,
 								}).compile(newNoteConfig.title)}
 							</Text>
 						</VStack>

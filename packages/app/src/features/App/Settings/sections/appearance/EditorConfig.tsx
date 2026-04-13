@@ -1,6 +1,5 @@
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Divider, Link, Select, Switch, Text, VStack } from '@chakra-ui/react';
 import { FeaturesGroup } from '@components/Features/Group';
@@ -8,6 +7,7 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { RelaxedInput } from '@components/RelaxedInput';
 import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { editorModes } from '@features/NotesContainer/EditorModePicker/EditorModePicker';
+import { useLocalizedDate } from '@hooks/useLocalizedDate';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	selectEditorConfig,
@@ -24,6 +24,8 @@ import { FontFamilyInput } from './FontFamilyInput';
 
 export const EditorConfig = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.settings);
+	const localizedDate = useLocalizedDate();
+
 	const dispatch = useAppDispatch();
 	const editorMode = useAppSelector(selectEditorMode);
 	const editorConfig = useAppSelector(selectEditorConfig);
@@ -129,7 +131,7 @@ export const EditorConfig = () => {
 						<VStack align="start" gap={0} maxWidth="100%">
 							<Text fontSize=".8rem">{t('editor.dateFormat.example')}</Text>
 							<Text fontWeight="bold" maxWidth="100%">
-								{dayjs().format(editorConfig.dateFormat)}
+								{localizedDate(new Date(), editorConfig.dateFormat)}
 							</Text>
 						</VStack>
 					)}

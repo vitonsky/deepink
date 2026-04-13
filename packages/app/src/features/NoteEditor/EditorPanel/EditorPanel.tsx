@@ -13,9 +13,9 @@ import {
 	FaQuoteLeft,
 	FaStrikethrough,
 } from 'react-icons/fa6';
-import dayjs from 'dayjs';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Button, HStack } from '@chakra-ui/react';
+import { useLocalizedDate } from '@hooks/useLocalizedDate';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectEditorDateFormat } from '@state/redux/settings/selectors/preferences';
 
@@ -28,6 +28,8 @@ import { useEditorPanelContext } from '.';
 // TODO: implement notifications from editor to panel, to render current state for formatting buttons
 export const EditorPanel = memo(() => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+	const localizedDate = useLocalizedDate();
+
 	const { onInserting, onFormatting } = useEditorPanelContext();
 	const dateFormat = useAppSelector(selectEditorDateFormat);
 
@@ -157,7 +159,7 @@ export const EditorPanel = memo(() => {
 					onClick={() => {
 						onInserting({
 							type: 'date',
-							data: { date: dayjs().format(dateFormat) },
+							data: { date: localizedDate(new Date(), dateFormat) },
 						});
 					}}
 				>

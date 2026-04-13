@@ -4,6 +4,7 @@ import {
 	useNotesRegistry,
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
+import { useLoadedLanguage } from '@hooks/useLocalizedDate';
 import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
 import { selectActiveTag, selectNewNoteTemplate } from '@state/redux/profiles/profiles';
 
@@ -11,6 +12,7 @@ import { TemplateProcessor } from './TemplateProcessor';
 import { useUpdateNotes } from './useUpdateNotes';
 
 export const useCreateNote = () => {
+	const language = useLoadedLanguage();
 	const notesRegistry = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
 
@@ -22,7 +24,7 @@ export const useCreateNote = () => {
 	const { openNote } = useNotesContext();
 
 	return useCallback(async () => {
-		const templates = new TemplateProcessor({ ignoreParsingErrors: true });
+		const templates = new TemplateProcessor({ ignoreParsingErrors: true, language });
 
 		const noteId = await notesRegistry.add({
 			title: templates.compile(newNoteConfig.title),
@@ -40,5 +42,14 @@ export const useCreateNote = () => {
 		if (note) {
 			openNote(note);
 		}
-	}, [activeTag, newNoteConfig, notesRegistry, openNote, tagsRegistry, updateNotes]);
+	}, [
+		activeTag,
+		language,
+		newNoteConfig.tags,
+		newNoteConfig.title,
+		notesRegistry,
+		openNote,
+		tagsRegistry,
+		updateNotes,
+	]);
 };
