@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { editor, Position } from 'monaco-editor-core';
 import prettyBytes from 'pretty-bytes';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { formatResourceLink } from '@core/features/links';
 
 export type FileUploader = (file: File) => Promise<string>;
@@ -21,6 +23,8 @@ const alertLimits = {
  * Handle drop files, to upload and insert markdown link
  */
 export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
 	useEffect(() => {
 		if (editorObject === null) return;
 
@@ -35,11 +39,12 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 				files.length > alertLimits.filesLength ||
 				filesSize > alertLimits.filesSize
 			) {
-				// May be replaced to Intl: https://stackoverflow.com/a/73974452/18680275
-				const humanReadableBytes = prettyBytes(filesSize);
-
 				const isConfirmed = confirm(
-					`Are you sure to upload ${files.length} files with ${humanReadableBytes}?`,
+					t('files.confirmLargeUpload', {
+						filesCount: files.length,
+						// May be replaced to Intl: https://stackoverflow.com/a/73974452/18680275
+						size: prettyBytes(filesSize),
+					}),
 				);
 				if (!isConfirmed) return;
 			}
@@ -115,5 +120,5 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 			editorContainer.removeEventListener('drop', onDropFiles, { capture: true });
 			rootElement.removeEventListener('paste', onPaste, { capture: true });
 		};
-	}, [editorObject, uploadFile]);
+	}, [editorObject, t, uploadFile]);
 };

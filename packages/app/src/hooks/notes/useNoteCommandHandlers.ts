@@ -41,11 +41,7 @@ export const useNoteCommandHandlers = () => {
 	const eventBus = useEventBus();
 
 	useWorkspaceCommandCallback(GLOBAL_COMMANDS.MOVE_NOTE_TO_BIN, async ({ noteId }) => {
-		if (
-			deletionConfig.confirm &&
-			!confirm(`Do you want to move this note to the bin?`)
-		)
-			return;
+		if (deletionConfig.confirm && !confirm(t('note.bin.confirmMoveToBin'))) return;
 
 		await noteActions.close(noteId);
 
@@ -62,7 +58,7 @@ export const useNoteCommandHandlers = () => {
 		async ({ noteId }) => {
 			if (
 				deletionConfig.confirm &&
-				!confirm(`Do you want to permanently delete this note?`)
+				!confirm(t('note.bin.confirmPermanentDeletion'))
 			)
 				return;
 

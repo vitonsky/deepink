@@ -147,7 +147,14 @@
 				"backLinks": "Обратные ссылки",
 				"files": "Прикреплённые файлы"
 			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Переместить в корзину?",
+			"confirmPermanentDeletion": "Удалить заметку без возможности восстановления?"
 		}
+	},
+	"files": {
+		"confirmLargeUpload": "Подтвердите загрузку {{filesCount}} файлов, размером {{size}}"
 	},
 	"notesList": {
 		"search": {

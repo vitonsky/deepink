@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	$createParagraphNode,
 	$createTextNode,
@@ -8,6 +9,7 @@ import {
 	LexicalNode,
 } from 'lexical';
 import prettyBytes from 'pretty-bytes';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { formatResourceLink } from '@core/features/links';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { $createLinkNode } from '@lexical/link';
@@ -24,6 +26,8 @@ const alertLimits = {
 };
 
 export const useInsertFiles = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
 	const [editor] = useLexicalComposerContext();
 
 	const filesRegistry = useFilesRegistry();
@@ -37,11 +41,12 @@ export const useInsertFiles = () => {
 				files.length > alertLimits.filesLength ||
 				filesSize > alertLimits.filesSize
 			) {
-				// May be replaced to Intl: https://stackoverflow.com/a/73974452/18680275
-				const humanReadableBytes = prettyBytes(filesSize);
-
 				const isConfirmed = confirm(
-					`Are you sure to upload ${files.length} files with ${humanReadableBytes}?`,
+					t('files.confirmLargeUpload', {
+						filesCount: files.length,
+						// May be replaced to Intl: https://stackoverflow.com/a/73974452/18680275
+						size: prettyBytes(filesSize),
+					}),
 				);
 				if (!isConfirmed) return;
 			}
@@ -89,6 +94,6 @@ export const useInsertFiles = () => {
 				$insertAfter(selectedNode, nodes);
 			});
 		},
-		[editor, filesRegistry],
+		[editor, filesRegistry, t],
 	);
 };

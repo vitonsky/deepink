@@ -147,7 +147,14 @@
 				"backLinks": "Back links",
 				"files": "Attached files"
 			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Do you want to move this note to the bin?",
+			"confirmPermanentDeletion": "Do you want to permanently delete this note?"
 		}
+	},
+	"files": {
+		"confirmLargeUpload": "Are you sure to upload {{filesCount}} files {{size}} in total?"
 	},
 	"notesList": {
 		"search": {
