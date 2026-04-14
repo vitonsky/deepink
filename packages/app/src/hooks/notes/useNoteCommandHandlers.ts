@@ -119,7 +119,7 @@ export const useNoteCommandHandlers = () => {
 			}
 
 			await copyTextToClipboard(
-				`[${getNoteContentPreview(note.content) || 'Untitled note'}](${formatNoteLink(noteId)})`,
+				`[${getNoteContentPreview(note.content) || t('note.title.placeholder')}](${formatNoteLink(noteId)})`,
 			);
 		},
 	);
