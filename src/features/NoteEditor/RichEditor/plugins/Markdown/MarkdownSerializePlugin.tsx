@@ -40,7 +40,7 @@ export const MarkdownSerializePlugin = ({
 				$convertFromMarkdownString(value);
 				$setSelection(null);
 			},
-			{ tag: 'external-update' },
+			{ tag: 'non-user-update' },
 		);
 	}, [editor, value]);
 
@@ -65,8 +65,8 @@ export const MarkdownSerializePlugin = ({
 		<OnChangePlugin
 			ignoreSelectionChange
 			onChange={(_, editor, tags) => {
-				// Ignore non-user-initiated updates
-				if (tags.has('external-update')) return;
+				// Ignore updates initiated by useEffect to prevent loop between editor and external state
+				if (tags.has('non-user-update')) return;
 
 				const isActive = isFocusedElement(editor.getRootElement());
 				if (!isActive) return;
