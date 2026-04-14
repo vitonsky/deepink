@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import { DefaultValues, Path, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { isEqual } from 'lodash';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import z from 'zod';
 import { Button, HStack, Input, StackProps, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,11 +41,16 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	validatorScheme,
 	onUpdate,
 	onCancel,
-	submitButtonText = 'Save',
-	cancelButtonText = 'Cancel',
+	submitButtonText,
+	cancelButtonText,
 	isPending,
 	...props
 }: PropertiesFormProps<T>) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.common);
+
+	if (!submitButtonText) submitButtonText = t('actions.saveChanges');
+	if (!cancelButtonText) cancelButtonText = t('actions.cancel');
+
 	const optionsValues = useMemo(
 		() =>
 			Object.fromEntries(
