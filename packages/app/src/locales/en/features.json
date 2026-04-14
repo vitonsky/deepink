@@ -63,7 +63,8 @@
 	},
 	"note": {
 		"title": {
-			"placeholder": "Untitled"
+			"placeholder": "Untitled",
+			"duplicate": "Duplicate: {{title}}"
 		},
 		"editor": {
 			"placeholder": "Write your thoughts here...",

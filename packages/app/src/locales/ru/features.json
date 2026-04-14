@@ -63,7 +63,8 @@
 	},
 	"note": {
 		"title": {
-			"placeholder": "Без названия"
+			"placeholder": "Без названия",
+			"duplicate": "Дубликат: {{title}}"
 		},
 		"editor": {
 			"placeholder": "Запишите свои мысли здесь...",

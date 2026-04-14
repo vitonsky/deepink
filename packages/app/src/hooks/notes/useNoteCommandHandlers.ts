@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { WorkspaceEvents } from '@api/events/workspace';
 import { formatNoteLink } from '@core/features/links';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
@@ -23,6 +25,7 @@ import { buildFileName, configureNoteNameGetter, useNotesExport } from './useNot
  * Registers handlers for commands that operate on a specific note
  */
 export const useNoteCommandHandlers = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
 	const notes = useNotesRegistry();
 	const tagsRegistry = useTagsRegistry();
@@ -131,7 +134,7 @@ export const useNoteCommandHandlers = () => {
 
 		const { title, text } = sourceNote.content;
 		const newNoteId = await notes.add({
-			title: 'DUPLICATE: ' + title,
+			title: t('note.title.duplicate', { title }),
 			text,
 		});
 
