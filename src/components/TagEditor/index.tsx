@@ -167,9 +167,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 					<Button type="submit" variant="accent" isDisabled={isPending}>
 						{isEditingMode ? 'Save' : 'Add'}
 					</Button>
-					<Button onClick={onCancel} isDisabled={isPending}>
-						Cancel
-					</Button>
+					<Button onClick={onCancel}>Cancel</Button>
 				</HStack>
 			</ModalFooter>
 		</form>
