@@ -2,8 +2,12 @@ import 'dotenv/config';
 
 import chalk from 'chalk';
 import { app, Menu } from 'electron';
+import i18next, { TFunction } from 'i18next';
+import Backend, { FsBackendOptions } from 'i18next-fs-backend';
 import ms from 'ms';
+import { join } from 'path';
 import { onExit } from 'signal-exit';
+import { NAMESPACES } from 'src/i18n';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
 import { FileController } from '@core/features/files/FileController';
 import { NodeFS } from '@core/features/files/NodeFS';
@@ -14,7 +18,7 @@ import { Telemetry } from '@core/features/telemetry/Telemetry';
 import { AppTray } from '@electron/main/AppTray';
 import { serveTelemetry } from '@electron/requests/telemetry/main';
 import { isDevMode } from '@electron/utils/app';
-import { getUserDataPath } from '@electron/utils/files';
+import { getResourcesPath, getUserDataPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { getConfig } from '@utils/os/getConfig';
 import { wait } from '@utils/time';
@@ -24,8 +28,28 @@ import { getAbout } from '../../about';
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
 
+const initI18n = async () => {
+	const language = app.getLocale().split('-')[0];
+	const localesPath = join(getResourcesPath(), 'locales/{{lng}}/{{ns}}.json');
+
+	console.log('i18n debug', { localesPath, language });
+
+	return await i18next.use(Backend).init<FsBackendOptions>({
+		lng: language,
+		fallbackLng: 'en',
+
+		backend: {
+			loadPath: localesPath,
+		},
+
+		ns: NAMESPACES,
+		defaultNS: NAMESPACES,
+	});
+};
+
 export type AppContext = {
 	telemetry: Telemetry;
+	i18n: TFunction;
 };
 
 export class MainProcess {
@@ -128,6 +152,7 @@ export class MainProcess {
 	private context: {
 		tray: AppTray;
 		telemetry: Telemetry;
+		i18n: TFunction;
 	} | null = null;
 	private async onReady() {
 		console.log('App ready');
@@ -154,7 +179,9 @@ export class MainProcess {
 			]),
 		);
 
-		this.context = { telemetry, tray };
+		const i18n = await initI18n();
+
+		this.context = { telemetry, tray, i18n };
 
 		// Install dev tools
 		if (isDevMode()) {
@@ -175,8 +202,8 @@ export class MainProcess {
 		}
 
 		// Create main window
-		Menu.setApplicationMenu(createAppMenu({ telemetry }));
-		this.mainWindow = await openMainWindow({ telemetry });
+		Menu.setApplicationMenu(createAppMenu({ telemetry, i18n }));
+		this.mainWindow = await openMainWindow({ telemetry, i18n });
 		tray.update(
 			tray.update(
 				Menu.buildFromTemplate([

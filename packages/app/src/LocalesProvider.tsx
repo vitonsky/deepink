@@ -6,18 +6,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectAppLanguage } from '@state/redux/settings/selectors/preferences';
 
-export enum LOCALE_NAMESPACE {
-	common = 'common',
-	vault = 'vault',
-	workspace = 'workspace',
-	features = 'features',
-	settings = 'settings',
-	contextMenu = 'contextMenu',
-}
-
-export const NAMESPACES = Object.values(LOCALE_NAMESPACE);
-
-export const supportedLanguages = ['en', 'ru'];
+import { NAMESPACES } from './i18n';
 
 export const LocalesProvider = ({ children }: PropsWithChildren) => {
 	const language = useAppSelector(selectAppLanguage);

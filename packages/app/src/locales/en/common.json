@@ -1,6 +1,7 @@
 {
 	"actions": {
 		"cancel": "Cancel",
+		"confirm": "Confirm",
 		"apply": "Apply",
 		"save": "Save",
 		"saveChanges": "Save changes",

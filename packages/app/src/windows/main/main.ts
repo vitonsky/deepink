@@ -31,6 +31,7 @@ const quitRequested = createEvent();
 
 export const openMainWindow = async ({
 	telemetry,
+	i18n,
 }: AppContext): Promise<MainWindowAPI> => {
 	const cleanup = joinCallbacks(
 		// Requests handlers
@@ -39,7 +40,7 @@ export const openMainWindow = async ({
 		enableStorage(),
 		enableContextMenu(),
 		enableInteractions(),
-		enableElectronPatches(),
+		enableElectronPatches(i18n),
 
 		// Notifications
 		enableScreenLockNotifications(),

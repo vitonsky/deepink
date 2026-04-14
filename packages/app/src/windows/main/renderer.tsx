@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
-import { LocalesProvider } from 'src/i18n';
+import { LocalesProvider } from 'src/LocalesProvider';
 import { EventBus } from '@api/events/EventBus';
 import { GlobalEventsPayloadMap } from '@api/events/global';
 import { patchWindow } from '@electron/requests/electronPatches/renderer';

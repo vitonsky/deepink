@@ -5,7 +5,9 @@ import { openAboutWindow } from '../../windows/about';
 
 import { AppContext } from './main';
 
-export function createAppMenu({ telemetry }: AppContext) {
+export function createAppMenu(appContext: AppContext) {
+	const { telemetry } = appContext;
+
 	type MenuObject = MenuItemConstructorOptions | MenuItem;
 	const application: MenuObject = {
 		label: 'Application',
@@ -14,7 +16,7 @@ export function createAppMenu({ telemetry }: AppContext) {
 			{
 				label: 'About Application',
 				click(_item, window) {
-					openAboutWindow(window);
+					openAboutWindow(appContext, window);
 
 					telemetry.track(TELEMETRY_EVENT_NAME.ABOUT_WINDOW_CLICK);
 				},

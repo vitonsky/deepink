@@ -1,10 +1,11 @@
 import { BaseWindow, BrowserWindow } from 'electron';
 import path from 'path';
 import url from 'url';
+import { AppContext } from '@electron/main/main';
 import { enableElectronPatches } from '@electron/requests/electronPatches/main';
 
-export const openAboutWindow = async (parent?: BaseWindow) => {
-	enableElectronPatches();
+export const openAboutWindow = async ({ i18n }: AppContext, parent?: BaseWindow) => {
+	enableElectronPatches(i18n);
 
 	const win = new BrowserWindow({
 		width: 600,
