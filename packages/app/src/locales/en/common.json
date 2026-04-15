@@ -11,5 +11,8 @@
 		"add": "Add",
 		"create": "Create",
 		"close": "Close"
+	},
+	"form": {
+		"suggestTemplate": "Try this: <suggests>"
 	}
 }

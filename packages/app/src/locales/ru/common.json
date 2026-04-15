@@ -11,5 +11,8 @@
 		"add": "Добавить",
 		"create": "Создать",
 		"close": "Закрыть"
+	},
+	"form": {
+		"suggestTemplate": "Например: <suggests>"
 	}
 }

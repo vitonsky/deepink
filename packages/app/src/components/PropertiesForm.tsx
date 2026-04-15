@@ -1,11 +1,20 @@
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import { DefaultValues, Path, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { isEqual } from 'lodash';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import z from 'zod';
-import { Button, HStack, Input, StackProps, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	HStack,
+	Input,
+	Link,
+	StackProps,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 export type OptionObject = {
@@ -14,6 +23,7 @@ export type OptionObject = {
 	label: string;
 	placeholder?: string;
 	error?: string;
+	suggests?: string[];
 };
 
 type SchemaFromOptions<T extends OptionObject[]> = z.ZodObject<
@@ -64,6 +74,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 	const {
 		register,
 		getValues,
+		setFocus,
 		setValue,
 		reset,
 		handleSubmit,
@@ -92,7 +103,7 @@ export const PropertiesForm = <T extends OptionObject[]>({
 			})}
 		>
 			<VStack align="start" w="100%" gap="1rem">
-				{options.map(({ id, label, placeholder, error }) => {
+				{options.map(({ id, label, placeholder, error, suggests }) => {
 					const fieldErrors = errors as Record<
 						string,
 						{ message?: string } | undefined
@@ -110,6 +121,45 @@ export const PropertiesForm = <T extends OptionObject[]>({
 								placeholder={placeholder}
 								isDisabled={isPending}
 							/>
+							{suggests && suggests.length > 0 && (
+								<Box>
+									<Trans
+										t={t}
+										i18nKey="form.suggestTemplate"
+										components={{
+											suggests: (
+												<>
+													{suggests.map((suggest, i) => (
+														<React.Fragment key={i}>
+															{i > 0 && ', '}
+															<Link
+																textDecoration="underline dashed"
+																textUnderlineOffset="15%"
+																onClick={(evt) => {
+																	evt.preventDefault();
+																	setValue(
+																		id as Path<
+																			FormValues<T>
+																		>,
+																		suggest as any,
+																	);
+																	setFocus(
+																		id as Path<
+																			FormValues<T>
+																		>,
+																	);
+																}}
+															>
+																{suggest}
+															</Link>
+														</React.Fragment>
+													))}
+												</>
+											),
+										}}
+									/>
+								</Box>
+							)}
 							{errorMessage && (
 								<Text color="message.error">{errorMessage}</Text>
 							)}

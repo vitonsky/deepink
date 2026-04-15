@@ -1,11 +1,14 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { AutoFocusInside } from 'react-focus-lock';
 import { useTranslation } from 'react-i18next';
+import { FaDice } from 'react-icons/fa6';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
 	Button,
 	HStack,
 	Input,
+	InputGroup,
+	InputRightElement,
 	Modal,
 	ModalBody,
 	ModalCloseButton,
@@ -18,10 +21,12 @@ import {
 	useDisclosure,
 	VStack,
 } from '@chakra-ui/react';
+import { IconButton } from '@components/IconButton';
 import { ENCRYPTION_ALGORITHM } from '@core/features/encryption';
 import { ENCRYPTION_ALGORITHM_OPTIONS } from '@core/features/encryption/algorithms';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
+import { shuffleArray } from '@utils/collections/shuffleArray';
 
 import { ProfilesForm } from '../ProfilesForm';
 
@@ -43,6 +48,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	defaultProfileName,
 }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
+
 	const telemetry = useTelemetryTracker();
 
 	const profileNameInputRef = useRef<HTMLInputElement | null>(null);
@@ -194,21 +200,41 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			<VStack
 				w="100%"
 				alignItems="start"
-				gap="0.8rem"
+				gap="1.5rem"
 				fontSize="18px"
 				color="typography.additional"
 			>
-				<VStack w="100%" alignItems="start">
+				<VStack as="label" w="100%" alignItems="start">
 					<Text>{t('creator.field.name.label')}</Text>
-					<Input
-						ref={profileNameInputRef}
-						size="md"
-						placeholder={t('creator.field.name.placeholder')}
-						value={profileName}
-						onChange={(evt) => setProfileName(evt.target.value)}
-						focusBorderColor={profileNameError ? 'red.500' : undefined}
-						disabled={isPending}
-					/>
+
+					<InputGroup size="md">
+						<Input
+							ref={profileNameInputRef}
+							placeholder={t('creator.field.name.placeholder')}
+							value={profileName}
+							onChange={(evt) => setProfileName(evt.target.value)}
+							focusBorderColor={profileNameError ? 'red.500' : undefined}
+							disabled={isPending}
+						/>
+						<InputRightElement>
+							<IconButton
+								icon={<FaDice />}
+								title="Generate random"
+								onClick={(evt) => {
+									evt.preventDefault();
+
+									const suggestedName = shuffleArray(
+										t('creator.field.name.suggests', {
+											returnObjects: true,
+										}) as string[],
+									).find((name) => name !== profileName);
+
+									if (suggestedName) setProfileName(suggestedName);
+									profileNameInputRef.current?.focus();
+								}}
+							/>
+						</InputRightElement>
+					</InputGroup>
 
 					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
 				</VStack>

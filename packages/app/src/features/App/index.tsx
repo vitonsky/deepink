@@ -23,15 +23,6 @@ import { useProfilesList } from './useProfilesList';
 import { useRecentProfile } from './useRecentProfile';
 import { VaultScreen } from './VaultScreen';
 
-const defaultVaultNames = [
-	'Creative drafts',
-	'Second brain',
-	'Digital garden',
-	'Creative space',
-	'Mind space',
-	'Idea lab',
-];
-
 export const App: FC = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
 
@@ -158,9 +149,11 @@ export const App: FC = () => {
 						await onOpenVault(newProfile, profile.password || undefined);
 					}}
 					onCancel={hasNoProfiles ? undefined : () => setScreenName('choose')}
-					defaultProfileName={
-						hasNoProfiles ? getRandomItem(defaultVaultNames) : undefined
-					}
+					defaultProfileName={getRandomItem(
+						t('creator.field.name.suggests', {
+							returnObjects: true,
+						}) as string[],
+					)}
 				/>
 			</CenterBox>
 		);

@@ -21,6 +21,7 @@ import { useStandaloneToast } from '@hooks/useStandaloneToast';
 import { useAppDispatch } from '@state/redux/hooks';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
+import { shuffleArray } from '@utils/collections/shuffleArray';
 
 import { useWorkspacesList } from './useWorkspacesList';
 
@@ -82,6 +83,11 @@ export const WorkspaceCreatePopup = () => {
 									value: '',
 									label: tFeatures('field.name.label'),
 									placeholder: tFeatures('field.name.placeholder'),
+									suggests: shuffleArray(
+										tFeatures('field.name.suggests', {
+											returnObjects: true,
+										}) as string[],
+									).slice(0, 3),
 								},
 							]}
 							validatorScheme={localizedWorkspacePropsValidator}

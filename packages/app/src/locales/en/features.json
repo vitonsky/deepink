@@ -44,7 +44,19 @@
 			"field": {
 				"name": {
 					"label": "Workspace name",
-					"placeholder": "e.g., Personal"
+					"placeholder": "e.g. Health Journal, Business Ideas",
+					"suggests": [
+						"Finances",
+						"Health",
+						"Career",
+						"Family",
+						"Journal",
+						"Goals",
+						"Ideas",
+						"Legal",
+						"Travel",
+						"Private"
+					]
 				}
 			},
 			"error": {
