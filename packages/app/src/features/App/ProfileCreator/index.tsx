@@ -219,7 +219,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 						<InputRightElement>
 							<IconButton
 								icon={<FaDice />}
-								title="Generate random"
+								title={t('creator.field.name.random')}
 								onClick={(evt) => {
 									evt.preventDefault();
 

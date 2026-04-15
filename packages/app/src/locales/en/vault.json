@@ -11,6 +11,7 @@
 			"name": {
 				"label": "Vault name",
 				"placeholder": "e.g., My Vault, Shared with Alex",
+				"random": "Generate random name",
 				"suggests": [
 					"Marginalia",
 					"Vellum",
