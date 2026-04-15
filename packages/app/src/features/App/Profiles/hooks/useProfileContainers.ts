@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUnit } from 'effector-react';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { ManagedDatabase } from '@core/database/ManagedDatabase';
 import { SQLiteDB } from '@core/database/sqlite';
 import { openSQLite } from '@core/database/sqlite/openSQLite';
@@ -73,6 +75,8 @@ export class VaultOpenError extends Error {
  * Hook to manage active and opened profiles
  */
 export const useProfileContainers = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
 	const [{ $profiles, $activeProfile, ...api }] = useState(() =>
 		createProfilesApi<DisposableBox<ProfileContainer>>(),
 	);
@@ -176,7 +180,7 @@ export const useProfileContainers = () => {
 					.getList()
 					.then((workspaces) => workspaces.length > 0);
 				if (!isWorkspacesExists) {
-					await workspaces.create({ name: 'Notes' });
+					await workspaces.create({ name: t('workspace.defaultName') });
 
 					// Sync to avoid losing the default workspace if the app closes before the automatic sync
 					await db.sync();
@@ -212,7 +216,7 @@ export const useProfileContainers = () => {
 				throw error;
 			}
 		},
-		[activeProfileChanged, files, profileOpened],
+		[activeProfileChanged, files, profileOpened, t],
 	);
 
 	return {
