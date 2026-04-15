@@ -1,4 +1,6 @@
 import React, { createContext, FC, PropsWithChildren, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
@@ -12,6 +14,8 @@ export const useWorkspaceError = createContextGetterHook(WorkspaceErrorContext);
 export const WorkspaceErrorProvider: FC<
 	PropsWithChildren<{ onError: (error: Error, workspaceId: string) => void }>
 > = ({ children, onError }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
 	const telemetry = useTelemetryTracker();
 	const dispatch = useAppDispatch();
 	const workspaceData = useWorkspaceData();
@@ -22,11 +26,18 @@ export const WorkspaceErrorProvider: FC<
 			onError(error, workspaceData.workspaceId);
 
 			// Reset corrupted workspace to default state
-			dispatch(workspacesApi.resetWorkspace(workspaceData));
+			dispatch(
+				workspacesApi.resetWorkspace({
+					...workspaceData,
+					newNoteTemplate: t('note.title.defaultTemplate', {
+						date: '{date:D MMM YYYY, HH:mm}',
+					}),
+				}),
+			);
 
 			telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_OPEN_FAILED);
 		},
-		[dispatch, onError, telemetry, workspaceData],
+		[dispatch, onError, t, telemetry, workspaceData],
 	);
 
 	return (

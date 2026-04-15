@@ -77,6 +77,7 @@
 	"note": {
 		"title": {
 			"placeholder": "Untitled",
+			"defaultTemplate": "Untitled - {{date}}",
 			"duplicate": "Duplicate: {{title}}"
 		},
 		"editor": {

@@ -6,7 +6,9 @@ import React, {
 	useMemo,
 	useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { isEqual } from 'lodash';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useDebounce } from 'use-debounce';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
@@ -53,6 +55,8 @@ export type ProfileProps = {
 };
 
 export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls }) => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
 	const dispatch = useAppDispatch();
 
 	const profileId = currentProfile.profile.id;
@@ -99,7 +103,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 							workspaces: Object.fromEntries(
 								workspaces.map((workspace) => [
 									workspace.id,
-									createWorkspaceObject(workspace),
+									createWorkspaceObject({
+										...workspace,
+										newNoteTemplate: t('note.title.defaultTemplate', {
+											date: '{date:D MMM YYYY, HH:mm}',
+										}),
+									}),
 								]),
 							),
 							config: {

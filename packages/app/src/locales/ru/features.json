@@ -77,6 +77,7 @@
 	"note": {
 		"title": {
 			"placeholder": "Без названия",
+			"defaultTemplate": "Без названия - {{date}}",
 			"duplicate": "Дубликат: {{title}}"
 		},
 		"editor": {

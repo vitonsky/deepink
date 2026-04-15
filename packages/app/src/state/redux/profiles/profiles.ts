@@ -54,9 +54,13 @@ export enum NOTES_VIEW {
 	ARCHIVE = 'Archive',
 }
 
-export const createWorkspaceObject = (workspace: {
+export const createWorkspaceObject = ({
+	newNoteTemplate,
+	...workspace
+}: {
 	id: string;
 	name: string;
+	newNoteTemplate: string;
 }): WorkspaceData => ({
 	...workspace,
 	touched: false,
@@ -85,7 +89,7 @@ export const createWorkspaceObject = (workspace: {
 
 	config: {
 		newNote: {
-			title: 'Untitled - {date:D MMM YYYY, HH:mm}',
+			title: newNoteTemplate,
 			tags: 'selected',
 		},
 	},
@@ -211,9 +215,12 @@ export const profilesSlice = createSlice({
 		updateWorkspacesList: (
 			state,
 			{
-				payload: { profileId, workspaces },
+				payload: { profileId, workspaces, newNoteTemplate },
 			}: PayloadAction<
-				ProfileScoped<{ workspaces: { id: string; name: string }[] }>
+				ProfileScoped<{
+					workspaces: { id: string; name: string }[];
+					newNoteTemplate: string;
+				}>
 			>,
 		) => {
 			const profile = state.profiles[profileId];
@@ -228,7 +235,10 @@ export const profilesSlice = createSlice({
 				}
 
 				// Create new workspace
-				profile.workspaces[workspace.id] = createWorkspaceObject(workspace);
+				profile.workspaces[workspace.id] = createWorkspaceObject({
+					...workspace,
+					newNoteTemplate,
+				});
 			});
 
 			// Delete workspaces that no more exists
@@ -272,8 +282,10 @@ export const profilesSlice = createSlice({
 		resetWorkspace: (
 			state,
 			{
-				payload: { profileId, workspaceId },
-			}: PayloadAction<ProfileScoped<{ workspaceId: string }>>,
+				payload: { profileId, workspaceId, newNoteTemplate },
+			}: PayloadAction<
+				ProfileScoped<{ workspaceId: string; newNoteTemplate: string }>
+			>,
 		) => {
 			const profile = state.profiles[profileId];
 			if (!profile) return;
@@ -285,6 +297,7 @@ export const profilesSlice = createSlice({
 			profile.workspaces[workspaceId] = createWorkspaceObject({
 				id: workspace.id,
 				name: workspace.name,
+				newNoteTemplate,
 			});
 		},
 

@@ -122,6 +122,10 @@ export const WorkspaceErrorScreen = ({
 											workspacesApi.updateWorkspacesList({
 												profileId,
 												workspaces: updatedWorkspaces,
+												newNoteTemplate: t(
+													'note.title.defaultTemplate',
+													{ date: '{date:D MMM YYYY, HH:mm}' },
+												),
 											}),
 										);
 
