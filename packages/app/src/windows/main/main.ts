@@ -29,14 +29,13 @@ type WindowState = {
 
 const quitRequested = createEvent();
 
-export const openMainWindow = async ({
-	telemetry,
-	i18n,
-}: AppContext): Promise<MainWindowAPI> => {
+export const openMainWindow = async (appContext: AppContext): Promise<MainWindowAPI> => {
+	const { telemetry, i18n } = appContext;
+
 	const cleanup = joinCallbacks(
 		// Requests handlers
 		serveFiles(),
-		serveInterop(),
+		serveInterop(appContext),
 		enableStorage(),
 		enableContextMenu(),
 		enableInteractions(),

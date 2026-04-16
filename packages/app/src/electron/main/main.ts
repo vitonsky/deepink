@@ -2,15 +2,14 @@ import 'dotenv/config';
 
 import chalk from 'chalk';
 import { app, Menu } from 'electron';
-import i18next, { TFunction } from 'i18next';
-import Backend, { FsBackendOptions } from 'i18next-fs-backend';
 import ms from 'ms';
-import { join } from 'path';
 import { onExit } from 'signal-exit';
-import { LOCALE_NAMESPACE, NAMESPACES } from 'src/i18n';
+import { LOCALE_NAMESPACE } from 'src/i18n';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
+import z from 'zod';
 import { FileController } from '@core/features/files/FileController';
 import { NodeFS } from '@core/features/files/NodeFS';
+import { StateFile } from '@core/features/files/StateFile';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { AppVersions } from '@core/features/telemetry/AppVersions';
 import { RybbitTracker } from '@core/features/telemetry/RybbitTracker';
@@ -18,7 +17,7 @@ import { Telemetry } from '@core/features/telemetry/Telemetry';
 import { AppTray } from '@electron/main/AppTray';
 import { serveTelemetry } from '@electron/requests/telemetry/main';
 import { isDevMode } from '@electron/utils/app';
-import { getResourcesPath, getUserDataPath } from '@electron/utils/files';
+import { getUserDataPath } from '@electron/utils/files';
 import { openUrlWithExternalBrowser } from '@electron/utils/shell';
 import { getConfig } from '@utils/os/getConfig';
 import { wait } from '@utils/time';
@@ -27,27 +26,11 @@ import { getAbout } from '../../about';
 
 import { createAppMenu } from './createAppMenu';
 import { createTelemetrySession } from './createTelemetrySession';
-
-const initI18n = async () => {
-	const language = app.getLocale().split('-')[0];
-	const localesPath = join(getResourcesPath(), 'locales/{{lng}}/{{ns}}.json');
-
-	return await i18next.use(Backend).init<FsBackendOptions>({
-		lng: language,
-		fallbackLng: 'en',
-
-		backend: {
-			loadPath: localesPath,
-		},
-
-		ns: NAMESPACES,
-		defaultNS: NAMESPACES,
-	});
-};
+import { createNodeI18nContext, I18nContext } from './I18nContext';
 
 export type AppContext = {
 	telemetry: Telemetry;
-	i18n: TFunction;
+	i18n: I18nContext;
 };
 
 export class MainProcess {
@@ -150,12 +133,25 @@ export class MainProcess {
 	private context: {
 		tray: AppTray;
 		telemetry: Telemetry;
-		i18n: TFunction;
+		i18n: I18nContext;
 	} | null = null;
 	private async onReady() {
 		console.log('App ready');
 
-		const i18n = await initI18n();
+		const i18nState = new StateFile(
+			new FileController('i18n.json', this.userDataFs),
+			z.object({ language: z.string() }),
+			{
+				defaultValue: {
+					language: app.getLocale().split('-')[0],
+				},
+			},
+		);
+		const { language: initLanguage } = await i18nState.get();
+		const i18n = await createNodeI18nContext(initLanguage);
+		i18n.$language.updates.watch((language) => {
+			i18nState.set({ language });
+		});
 
 		// Setup telemetry
 		const telemetry = await this.setupTelemetry();
@@ -173,7 +169,7 @@ export class MainProcess {
 		tray.update(
 			Menu.buildFromTemplate([
 				{
-					label: i18n('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
+					label: i18n.t('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
 					click: () => this.quit(),
 				},
 			]),
@@ -202,22 +198,27 @@ export class MainProcess {
 		// Create main window
 		Menu.setApplicationMenu(createAppMenu({ telemetry, i18n }));
 		this.mainWindow = await openMainWindow({ telemetry, i18n });
-		tray.update(
+
+		i18n.$language.watch(() => {
+			Menu.setApplicationMenu(createAppMenu({ telemetry, i18n }));
+
 			tray.update(
-				Menu.buildFromTemplate([
-					{
-						label: i18n('tray.open', { ns: LOCALE_NAMESPACE.menu }),
-						click: () => {
-							this.mainWindow?.openWindow();
+				tray.update(
+					Menu.buildFromTemplate([
+						{
+							label: i18n.t('tray.open', { ns: LOCALE_NAMESPACE.menu }),
+							click: () => {
+								this.mainWindow?.openWindow();
+							},
 						},
-					},
-					{
-						label: i18n('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
-						click: () => this.quit(),
-					},
-				]),
-			),
-		);
+						{
+							label: i18n.t('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
+							click: () => this.quit(),
+						},
+					]),
+				),
+			);
+		});
 	}
 
 	private setListeners() {

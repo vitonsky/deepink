@@ -1,9 +1,9 @@
 import { BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
-import { TFunction } from 'i18next';
+import { I18nContext } from '@electron/main/I18nContext';
 
 import { CONFIRM_CHANNEL } from './shared';
 
-export const enableElectronPatches = (t: TFunction) => {
+export const enableElectronPatches = ({ t }: I18nContext) => {
 	const onMessage = (event: IpcMainEvent, message?: string) => {
 		const targetWindow = BrowserWindow.fromWebContents(event.sender);
 		if (!targetWindow) return;

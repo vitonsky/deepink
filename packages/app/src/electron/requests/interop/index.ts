@@ -7,4 +7,6 @@ import { createChannel } from '../../utils/ipc';
  */
 export const interopChannel = createChannel<{
 	getFontsList(): Promise<IFontInfo[]>;
+	getAppLanguage(): Promise<string>;
+	setAppLanguage(language: string): Promise<void>;
 }>({ name: 'os-interop' });

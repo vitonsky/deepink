@@ -2,6 +2,7 @@ import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
 import i18n from 'i18next';
 import HttpApi, { HttpBackendOptions } from 'i18next-http-backend';
+import { setAppLanguage } from '@electron/requests/interop/renderer';
 import { SplashScreen } from '@features/SplashScreen';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectAppLanguage } from '@state/redux/settings/selectors/preferences';
@@ -22,6 +23,7 @@ export const LocalesProvider = ({ children }: PropsWithChildren) => {
 					`Cannot find localization for language ${language} in dayjs`,
 				);
 			}),
+			setAppLanguage(language),
 			// Load i18next locales
 			i18n
 				.use(initReactI18next) // passes i18n down to react-i18next

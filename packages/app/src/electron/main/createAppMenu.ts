@@ -7,15 +7,18 @@ import { openAboutWindow } from '../../windows/about';
 import { AppContext } from './main';
 
 export function createAppMenu(appContext: AppContext) {
-	const { telemetry, i18n } = appContext;
+	const {
+		telemetry,
+		i18n: { t },
+	} = appContext;
 
 	type MenuObject = MenuItemConstructorOptions | MenuItem;
 	const application: MenuObject = {
-		label: i18n('app.appMenu', { ns: LOCALE_NAMESPACE.menu }),
+		label: t('app.appMenu', { ns: LOCALE_NAMESPACE.menu }),
 		role: 'appMenu',
 		submenu: [
 			{
-				label: i18n('app.about', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.about', { ns: LOCALE_NAMESPACE.menu }),
 				click(_item, window) {
 					openAboutWindow(appContext, window);
 
@@ -26,7 +29,7 @@ export function createAppMenu(appContext: AppContext) {
 				type: 'separator',
 			},
 			{
-				label: i18n('app.quit', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.quit', { ns: LOCALE_NAMESPACE.menu }),
 				accelerator: 'Command+Q',
 				click: () => {
 					app.quit();
@@ -36,17 +39,17 @@ export function createAppMenu(appContext: AppContext) {
 	};
 
 	const edit: MenuObject = {
-		label: i18n('app.edit', { ns: LOCALE_NAMESPACE.menu }),
+		label: t('app.edit', { ns: LOCALE_NAMESPACE.menu }),
 		submenu: [
 			{
 				accelerator: 'CmdOrCtrl+Z',
 				role: 'undo',
-				label: i18n('app.undo', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.undo', { ns: LOCALE_NAMESPACE.menu }),
 			},
 			{
 				accelerator: 'Shift+CmdOrCtrl+Z',
 				role: 'redo',
-				label: i18n('app.redo', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.redo', { ns: LOCALE_NAMESPACE.menu }),
 			},
 			{
 				type: 'separator',
@@ -54,22 +57,22 @@ export function createAppMenu(appContext: AppContext) {
 			{
 				accelerator: 'CmdOrCtrl+X',
 				role: 'cut',
-				label: i18n('app.cut', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.cut', { ns: LOCALE_NAMESPACE.menu }),
 			},
 			{
 				accelerator: 'CmdOrCtrl+C',
 				role: 'copy',
-				label: i18n('app.copy', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.copy', { ns: LOCALE_NAMESPACE.menu }),
 			},
 			{
 				accelerator: 'CmdOrCtrl+V',
 				role: 'paste',
-				label: i18n('app.paste', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.paste', { ns: LOCALE_NAMESPACE.menu }),
 			},
 			{
 				accelerator: 'CmdOrCtrl+A',
 				role: 'selectAll',
-				label: i18n('app.selectAll', { ns: LOCALE_NAMESPACE.menu }),
+				label: t('app.selectAll', { ns: LOCALE_NAMESPACE.menu }),
 			},
 		],
 	};
@@ -78,11 +81,11 @@ export function createAppMenu(appContext: AppContext) {
 		application,
 		edit,
 		{
-			label: i18n('app.help', { ns: LOCALE_NAMESPACE.menu }),
+			label: t('app.help', { ns: LOCALE_NAMESPACE.menu }),
 			role: 'help',
 			submenu: [
 				{
-					label: i18n('app.toggleDevTools', { ns: LOCALE_NAMESPACE.menu }),
+					label: t('app.toggleDevTools', { ns: LOCALE_NAMESPACE.menu }),
 					role: 'toggleDevTools',
 					accelerator: 'CmdOrCtrl+Alt+Shift+I',
 				},
