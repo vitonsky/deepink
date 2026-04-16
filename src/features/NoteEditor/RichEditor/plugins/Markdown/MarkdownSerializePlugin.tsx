@@ -65,7 +65,9 @@ export const MarkdownSerializePlugin = ({
 		<OnChangePlugin
 			ignoreSelectionChange
 			onChange={(_, editor, tags) => {
-				// Ignore updates initiated by useEffect to prevent loop between editor and external state
+				// Skip programmatic (non-user) changes to avoid note updates without user actions
+				// The serializer may produce output that differs from the original input (due to serializer implementation),
+				// which would trigger note updates without any user action
 				if (tags.has('non-user-update')) return;
 
 				const isActive = isFocusedElement(editor.getRootElement());
