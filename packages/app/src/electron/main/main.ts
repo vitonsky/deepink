@@ -7,7 +7,7 @@ import Backend, { FsBackendOptions } from 'i18next-fs-backend';
 import ms from 'ms';
 import { join } from 'path';
 import { onExit } from 'signal-exit';
-import { NAMESPACES } from 'src/i18n';
+import { LOCALE_NAMESPACE, NAMESPACES } from 'src/i18n';
 import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
 import { FileController } from '@core/features/files/FileController';
 import { NodeFS } from '@core/features/files/NodeFS';
@@ -31,8 +31,6 @@ import { createTelemetrySession } from './createTelemetrySession';
 const initI18n = async () => {
 	const language = app.getLocale().split('-')[0];
 	const localesPath = join(getResourcesPath(), 'locales/{{lng}}/{{ns}}.json');
-
-	console.log('i18n debug', { localesPath, language });
 
 	return await i18next.use(Backend).init<FsBackendOptions>({
 		lng: language,
@@ -157,6 +155,8 @@ export class MainProcess {
 	private async onReady() {
 		console.log('App ready');
 
+		const i18n = await initI18n();
+
 		// Setup telemetry
 		const telemetry = await this.setupTelemetry();
 
@@ -173,13 +173,11 @@ export class MainProcess {
 		tray.update(
 			Menu.buildFromTemplate([
 				{
-					label: 'Quit',
+					label: i18n('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
 					click: () => this.quit(),
 				},
 			]),
 		);
-
-		const i18n = await initI18n();
 
 		this.context = { telemetry, tray, i18n };
 
@@ -208,13 +206,13 @@ export class MainProcess {
 			tray.update(
 				Menu.buildFromTemplate([
 					{
-						label: `Open notes`,
+						label: i18n('tray.open', { ns: LOCALE_NAMESPACE.menu }),
 						click: () => {
 							this.mainWindow?.openWindow();
 						},
 					},
 					{
-						label: 'Quit',
+						label: i18n('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
 						click: () => this.quit(),
 					},
 				]),

@@ -20,7 +20,7 @@ export const useTagContextMenu = ({
 	onEdit,
 	onDelete,
 }: TagContextMenuCallbacks) => {
-	const { t } = useTranslation(LOCALE_NAMESPACE.contextMenu, { keyPrefix: 'tag' });
+	const { t } = useTranslation(LOCALE_NAMESPACE.menu, { keyPrefix: 'tag' });
 
 	const noteContextMenuCallback: ContextMenuCallback<TagContextMenu> = useCallback(
 		async ({ id, action }) => {

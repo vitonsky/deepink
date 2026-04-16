@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Application",
+		"quit": "Quit",
+		"edit": "Edit",
+		"undo": "Undo",
+		"redo": "Redo",
+		"cut": "Cut",
+		"copy": "Copy",
+		"paste": "Paste",
+		"selectAll": "Select All",
+		"help": "Help",
+		"toggleDevTools": "Toggle dev tools",
+		"about": "About Application"
+	},
+	"tray": {
+		"open": "Open notes",
+		"quit": "Quit"
+	},
+	"note": {
+		"duplicate": "Duplicate",
+		"export": "Export...",
+		"copyMarkdownLink": "Copy Markdown link",
+		"deletePermanently": "Delete permanently",
+		"restoreFromBin": "Restore from bin",
+		"deleteToBin": "Move to bin"
+	},
+	"tag": {
+		"addNestedTag": "Add nested tag...",
+		"edit": "Edit...",
+		"delete": "Delete"
+	}
+}

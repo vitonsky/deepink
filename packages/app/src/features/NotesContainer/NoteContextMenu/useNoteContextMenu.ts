@@ -15,7 +15,7 @@ import { NoteActions } from '.';
 
 export const useNoteContextMenu = () => {
 	const telemetry = useTelemetryTracker();
-	const { t } = useTranslation(LOCALE_NAMESPACE.contextMenu, { keyPrefix: 'note' });
+	const { t } = useTranslation(LOCALE_NAMESPACE.menu, { keyPrefix: 'note' });
 
 	const deletionConfig = useVaultSelector(selectDeletionConfig);
 
