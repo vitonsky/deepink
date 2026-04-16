@@ -35,10 +35,13 @@ export const MarkdownSerializePlugin = ({
 		// Otherwise we may have bug when value is updated via `editor.update`, an `OnChangePlugin` will not trigger callback (because synthetic update) and if next value update will have previous value - update will be ignored.
 		serializedValueRef.current = null;
 
-		editor.update(() => {
-			$convertFromMarkdownString(value);
-			$setSelection(null);
-		});
+		editor.update(
+			() => {
+				$convertFromMarkdownString(value);
+				$setSelection(null);
+			},
+			{ tag: 'non-user-update' },
+		);
 	}, [editor, value]);
 
 	const onChange = (value: string) => {
@@ -61,7 +64,12 @@ export const MarkdownSerializePlugin = ({
 	return (
 		<OnChangePlugin
 			ignoreSelectionChange
-			onChange={(_, editor) => {
+			onChange={(_, editor, tags) => {
+				// Skip programmatic (non-user) changes to avoid note updates without user actions
+				// The serializer may produce output that differs from the original input (due to serializer implementation),
+				// which would trigger note updates without any user action
+				if (tags.has('non-user-update')) return;
+
 				const isActive = isFocusedElement(editor.getRootElement());
 				if (!isActive) return;
 
