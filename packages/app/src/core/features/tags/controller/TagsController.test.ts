@@ -324,6 +324,23 @@ describe('manage tags', () => {
 		});
 	});
 
+	test('update method throw for duplicates', async () => {
+		const { db, workspaceId } = getWorkspaceContext();
+		const tags = new TagsController(db, workspaceId);
+
+		const fooId = await tags.add('foo', null);
+		await expect(tags.add('bar', fooId)).resolves.toBeTypeOf('string');
+
+		const bazId = await tags.add('baz', fooId);
+		await expect(
+			tags.update({ name: 'bar', parent: fooId, id: bazId }),
+		).rejects.toThrow(
+			expect.objectContaining({
+				code: TAG_ERROR_CODE.DUPLICATE,
+			}),
+		);
+	});
+
 	test('update tags', async () => {
 		const { db, workspaceId } = getWorkspaceContext();
 		const tags = new TagsController(db, workspaceId);

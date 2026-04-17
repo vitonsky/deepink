@@ -240,6 +240,19 @@ export class TagsController {
 
 		const db = wrapSQLite(this.db.get());
 
+		if (parent) {
+			const [{ count }] = await db.query(
+				qb.sql`SELECT COUNT(*) as count FROM tags WHERE name=${name} and parent_id=${parent} AND workspace_id=${this.workspace}`,
+				z.object({ count: z.number() }),
+			);
+
+			if (count > 0)
+				throw new TagControllerError(
+					`Tag name with that name is already exist`,
+					TAG_ERROR_CODE.DUPLICATE,
+				);
+		}
+
 		await db.query(
 			qb.sql`UPDATE tags SET name=${name}, parent_id=${parent} WHERE id=${id} AND workspace_id=${this.workspace}`,
 		);
