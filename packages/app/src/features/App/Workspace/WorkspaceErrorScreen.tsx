@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LOCALE_NAMESPACE } from 'src/i18n';
-import { Box, Button, Divider, Input, Select, Text, VStack } from '@chakra-ui/react';
+import { Button, Divider, HStack, Input, Select, Text, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useTelemetryTracker } from '@features/telemetry';
@@ -12,6 +12,7 @@ import {
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 
+import { CenterBox } from '../CenterBox';
 import { useProfileControls } from '../Profile';
 
 export const WorkspaceErrorScreen = ({
@@ -40,141 +41,137 @@ export const WorkspaceErrorScreen = ({
 	if (!currentWorkspace) return;
 
 	return (
-		<Box
-			flexDirection="column"
-			flexGrow="100"
-			width="100%"
-			height="100vh"
-			backgroundColor="surface.background"
-		>
-			<Box display="flex" minH="100vh" justifyContent="center" alignItems="center">
-				<VStack maxW="400px" minW="350px" gap="2rem">
-					<Text fontSize="1.3rem" fontWeight="bold">
-						{t('workspace.error.title', { name: currentWorkspace.name })}
-					</Text>
+		<CenterBox>
+			<VStack maxW="400px" minW="350px" gap="2rem">
+				<Text fontSize="1.3rem" fontWeight="bold">
+					{t('workspace.error.title', { name: currentWorkspace.name })}
+				</Text>
 
-					<Text color="typography.base">
-						{t('workspace.error.description')}
-					</Text>
+				<Text color="typography.base">{t('workspace.error.description')}</Text>
 
-					<VStack
-						alignItems="start"
-						w="100%"
-						color="typography.additional"
-						gap="0.5rem"
+				<VStack
+					alignItems="start"
+					w="100%"
+					color="typography.additional"
+					gap="0.5rem"
+				>
+					<Text>{t('workspace.error.chooseAnother')}</Text>
+
+					<Select
+						size="md"
+						marginTop="auto"
+						borderRadius="6px"
+						value={currentWorkspace.id}
+						onChange={(evt) => {
+							onWorkspaceErrorReset(currentWorkspace.id);
+
+							const workspaceId = evt.target.value;
+							dispatch(
+								workspacesApi.setActiveWorkspace({
+									profileId,
+									workspaceId,
+								}),
+							);
+
+							telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_SELECTED, {
+								totalWorkspacesCount: workspaces.length,
+							});
+						}}
 					>
-						<Text>{t('workspace.error.chooseAnother')}</Text>
-
-						<Select
-							size="sm"
-							marginTop="auto"
-							borderRadius="6px"
-							value={currentWorkspace.id}
-							onChange={(evt) => {
-								onWorkspaceErrorReset(currentWorkspace.id);
-
-								const workspaceId = evt.target.value;
-								dispatch(
-									workspacesApi.setActiveWorkspace({
-										profileId,
-										workspaceId,
-									}),
-								);
-
-								telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_SELECTED, {
-									totalWorkspacesCount: workspaces.length,
-								});
-							}}
-						>
-							{workspaces.map((workspace) => (
-								<option key={workspace.id} value={workspace.id}>
-									{workspace.name}
-								</option>
-							))}
-						</Select>
-					</VStack>
-
-					<Divider />
-
-					<VStack
-						alignItems="start"
-						w="100%"
-						color="typography.additional"
-						gap="0.5rem"
-					>
-						<Text>{t('workspace.error.createNew')}</Text>
-						<form
-							style={{ width: '100%' }}
-							onSubmit={(event) => {
-								event.preventDefault();
-								if (isPending || !newWorkspaceName.trim()) return;
-
-								setIsPending(true);
-
-								workspacesManager
-									.create({ name: newWorkspaceName })
-									.then(async (workspaceId) => {
-										await db.sync();
-
-										const updatedWorkspaces =
-											await workspacesManager.getList();
-										dispatch(
-											workspacesApi.updateWorkspacesList({
-												profileId,
-												workspaces: updatedWorkspaces,
-												newNoteTemplate: t(
-													'note.title.defaultTemplate',
-													{ date: '{date:D MMM YYYY, HH:mm}' },
-												),
-											}),
-										);
-
-										onWorkspaceErrorReset(currentWorkspace.id);
-
-										dispatch(
-											workspacesApi.setActiveWorkspace({
-												workspaceId,
-												profileId,
-											}),
-										);
-
-										telemetry.track(
-											TELEMETRY_EVENT_NAME.WORKSPACE_ADDED,
-										);
-									})
-									.finally(() => {
-										setIsPending(false);
-									});
-							}}
-						>
-							<VStack w="100%">
-								<Input
-									placeholder="e.g., Personal"
-									isDisabled={isPending}
-									value={newWorkspaceName}
-									onChange={(e) => setNewWorkspaceName(e.target.value)}
-								/>
-								<Button w="100%" isDisabled={isPending} type="submit">
-									{t('workspace.error.createWorkspace')}
-								</Button>
-							</VStack>
-						</form>
-					</VStack>
-
-					<Divider />
-
-					<VStack
-						alignItems="start"
-						w="100%"
-						gap="0.5rem"
-						color="typography.additional"
-					>
-						<Button w="100%" onClick={() => profileClose()}>
-							<Text>{t('workspace.error.closeVault')}</Text>
-						</Button>
-					</VStack>
+						{workspaces.map((workspace) => (
+							<option key={workspace.id} value={workspace.id}>
+								{workspace.name}
+							</option>
+						))}
+					</Select>
 				</VStack>
-			</Box>
-		</Box>
+
+				<HStack w="100%">
+					<Divider />
+					<Text paddingInline=".5rem">{t('workspace.error.dividerText')}</Text>
+					<Divider />
+				</HStack>
+
+				<VStack
+					alignItems="start"
+					w="100%"
+					color="typography.additional"
+					gap="0.5rem"
+				>
+					<Text>{t('workspace.error.createNew')}</Text>
+					<form
+						style={{ width: '100%' }}
+						onSubmit={(event) => {
+							event.preventDefault();
+							if (isPending || !newWorkspaceName.trim()) return;
+
+							setIsPending(true);
+
+							workspacesManager
+								.create({ name: newWorkspaceName })
+								.then(async (workspaceId) => {
+									await db.sync();
+
+									const updatedWorkspaces =
+										await workspacesManager.getList();
+									dispatch(
+										workspacesApi.updateWorkspacesList({
+											profileId,
+											workspaces: updatedWorkspaces,
+											newNoteTemplate: t(
+												'note.title.defaultTemplate',
+												{ date: '{date:D MMM YYYY, HH:mm}' },
+											),
+										}),
+									);
+
+									onWorkspaceErrorReset(currentWorkspace.id);
+
+									dispatch(
+										workspacesApi.setActiveWorkspace({
+											workspaceId,
+											profileId,
+										}),
+									);
+
+									telemetry.track(TELEMETRY_EVENT_NAME.WORKSPACE_ADDED);
+								})
+								.finally(() => {
+									setIsPending(false);
+								});
+						}}
+					>
+						<VStack w="100%">
+							<Input
+								placeholder={t('workspace.creator.field.name.label')}
+								isDisabled={isPending}
+								value={newWorkspaceName}
+								onChange={(e) => setNewWorkspaceName(e.target.value)}
+							/>
+							<Button w="100%" isDisabled={isPending} type="submit">
+								{t('workspace.error.createWorkspace')}
+							</Button>
+						</VStack>
+					</form>
+				</VStack>
+
+				<HStack w="100%">
+					<Divider />
+					<Text paddingInline=".5rem">{t('workspace.error.dividerText')}</Text>
+					<Divider />
+				</HStack>
+
+				<VStack
+					alignItems="start"
+					w="100%"
+					gap="0.5rem"
+					color="typography.additional"
+				>
+					<Button w="100%" onClick={() => profileClose()}>
+						<Text>{t('workspace.error.closeVault')}</Text>
+					</Button>
+				</VStack>
+			</VStack>
+		</CenterBox>
 	);
 };

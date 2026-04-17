@@ -35,10 +35,10 @@
 	"workspace": {
 		"defaultName": "Notebook",
 		"creator": {
-			"title": "Add new workspace",
-			"description": "Create a new workspace to manage your notes even better. Separate your notes by scope.",
+			"title": "Create new workspace",
+			"description": "Each workspace is a self-contained space for your notes, tags, and files. Everything stays separate, while still living inside your encrypted vault — ready when you switch.",
 			"action": {
-				"add": "Add",
+				"add": "Create",
 				"cancel": "Cancel"
 			},
 			"field": {
@@ -66,8 +66,9 @@
 		},
 		"error": {
 			"title": "Workspace \"{{name}}\" failed to load",
-			"description": "Something went wrong while loading workspace. The workspace data may be corrupted. Switch to another workspace or create a new one to continue.",
+			"description": "Failed to load this workspace. The data may be corrupted. Switch to another workspace or create a new one to keep working.",
 			"chooseAnother": "Choose another workspace",
+			"dividerText": "or",
 			"createNew": "Create a new workspace",
 			"createWorkspace": "Create workspace",
 			"closeVault": "Close current vault"
