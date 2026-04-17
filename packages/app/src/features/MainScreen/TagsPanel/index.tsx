@@ -73,10 +73,28 @@ export const TagsPanel = () => {
 							return { ok: true };
 						} catch (error) {
 							if (error instanceof TagControllerError) {
-								return {
-									ok: false,
-									error: tFeatures('tag.editor.messages.unknownError'),
-								};
+								let message: string;
+								switch (error.code) {
+									case TAG_ERROR_CODE.PARENT_TAG_NOT_EXIST:
+										message = tFeatures(
+											'tag.editor.messages.parentTagNotFound',
+										);
+										break;
+									case TAG_ERROR_CODE.DUPLICATE:
+										message = tFeatures(
+											'tag.editor.messages.duplicate',
+											{
+												name: [parent?.resolvedName, data.name]
+													.filter(Boolean)
+													.join('/'),
+											},
+										);
+										break;
+									default:
+										message = tFeatures('tag.editor.messages.format');
+								}
+
+								return { ok: false, error: message };
 							}
 
 							throw error;
@@ -112,7 +130,11 @@ export const TagsPanel = () => {
 									);
 									break;
 								case TAG_ERROR_CODE.DUPLICATE:
-									message = tFeatures('tag.editor.messages.duplicate');
+									message = tFeatures('tag.editor.messages.duplicate', {
+										name: [parentTag?.resolvedName, data.name]
+											.filter(Boolean)
+											.join('/'),
+									});
 									break;
 								default:
 									message = tFeatures('tag.editor.messages.format');

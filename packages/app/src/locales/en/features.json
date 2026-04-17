@@ -3,8 +3,8 @@
 		"editor": {
 			"mode": {
 				"add": {
-					"title": "Add tag",
-					"action": "Add"
+					"title": "Create tag",
+					"action": "Create"
 				},
 				"edit": {
 					"title": "Edit tag",
@@ -14,19 +14,18 @@
 			"field": {
 				"name": {
 					"label": "Tag name",
-					"placeholder": "e.g., brainstorm"
+					"placeholder": "e.g. Ideas"
 				},
 				"parent": {
 					"label": "Parent tag",
-					"placeholder": "e.g., brainstorm/work"
+					"placeholder": "e.g. Recipes/Desserts"
 				}
 			},
 			"messages": {
-				"unknownSubmitError": "Cannot save changes due to unknown error. You can try again.",
-				"unknownError": "Name of tag for editing cannot create sub tags or be empty",
-				"format": "Tag cannot be empty, start or end with \"/\", or contain \"//\"",
-				"duplicate": "Tag with such name is already exists",
-				"parentTagNotFound": "Parent tag not found, please select another tag"
+				"unknownSubmitError": "Cannot save changes due to unknown error.",
+				"format": "Tag cannot be empty, start or end with \"/\", or contain \"//\".",
+				"duplicate": "Tag '{{name}}' is already exists.",
+				"parentTagNotFound": "Parent tag not found, please select another tag."
 			}
 		},
 		"deletion": {

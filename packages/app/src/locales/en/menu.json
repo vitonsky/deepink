@@ -18,15 +18,15 @@
 		"quit": "Quit"
 	},
 	"note": {
-		"duplicate": "Duplicate",
 		"export": "Export...",
+		"duplicate": "Duplicate",
 		"copyMarkdownLink": "Copy Markdown link",
 		"deletePermanently": "Delete permanently",
 		"restoreFromBin": "Restore from bin",
 		"deleteToBin": "Move to bin"
 	},
 	"tag": {
-		"addNestedTag": "Add nested tag...",
+		"addNestedTag": "Create nested tag...",
 		"edit": "Edit...",
 		"delete": "Delete"
 	}
