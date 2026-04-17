@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import {
@@ -68,6 +68,14 @@ export const TagEditor: FC<ITagEditorProps> = ({
 	useEffect(() => {
 		setTagNameError(null);
 	}, [tagName, parentTagId, isEditingMode]);
+
+	const tagNameRef = useRef<HTMLInputElement>(null);
+	const hasNameError = tagNameError !== null;
+	useEffect(() => {
+		if (!hasNameError) return;
+
+		tagNameRef.current?.focus();
+	}, [hasNameError]);
 
 	// Reset parent tag
 	useEffect(() => {
@@ -157,6 +165,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 						<VStack w="100%" align="start" gap="0.5rem">
 							<Text>{t('tag.editor.field.name.label')}</Text>
 							<Input
+								ref={tagNameRef}
 								placeholder={t('tag.editor.field.name.placeholder')}
 								value={tagName}
 								onChange={(evt) => {
