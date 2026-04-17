@@ -19,6 +19,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommandCallback } from '@hooks/commands/useCommandCallback';
 import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
+import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
@@ -202,6 +203,23 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 		});
 	}, []);
 
+	// Debug knobs
+	const crashActiveWorkspace = useImmutableCallback(
+		(error?: Error) => {
+			if (!activeWorkspace) {
+				console.warn('No active workspace found');
+				return;
+			}
+
+			onWorkspaceError(error ?? new Error('Test error'), activeWorkspace?.id);
+		},
+		[activeWorkspace, onWorkspaceError],
+	);
+
+	useEffect(() => {
+		(window as any)[Symbol.for('WORKSPACE_CRASH')] = crashActiveWorkspace;
+	}, [crashActiveWorkspace]);
+
 	return (
 		<ProfileControlsContext.Provider value={controls}>
 			{!isLoadingComplete && <SplashScreen />}
@@ -211,8 +229,12 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				<WorkspaceErrorScreen onWorkspaceErrorReset={onWorkspaceErrorReset} />
 			)}
 
-			{workspaces.map((workspace) =>
-				workspace.touched ? (
+			{workspaces.map((workspace) => {
+				if (!workspace.touched) return null;
+				if (activeWorkspaceError && activeWorkspace?.id === workspace.id)
+					return null;
+
+				return (
 					<WorkspaceContext.Provider
 						key={workspace.id}
 						value={{ profileId, workspaceId: workspace.id }}
@@ -224,8 +246,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 							<ProfileStatusBar />
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
-				) : null,
-			)}
+				);
+			})}
 		</ProfileControlsContext.Provider>
 	);
 };
