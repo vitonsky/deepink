@@ -5,7 +5,6 @@ import {
 	FaBoxArchive,
 	FaClock,
 	FaCopy,
-	FaDownload,
 	FaEllipsis,
 	FaEye,
 	FaFileExport,
@@ -77,11 +76,6 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					<HStack>
 						<FaClock />
 						<Text>{t('note.menu.history')}</Text>
-						{note.isSnapshotsDisabled && (
-							<Text color="typography.secondary">
-								{t('note.menu.historyDisabled')}
-							</Text>
-						)}
 					</HStack>
 				</MenuItem>
 				<MenuItem>
@@ -94,12 +88,6 @@ export const NoteMenu = memo(({ note }: { note: INote }) => {
 					<HStack>
 						<FaEye />
 						<Text>{t('note.menu.readonlyMode')}</Text>
-					</HStack>
-				</MenuItem>
-				<MenuItem>
-					<HStack>
-						<FaDownload />
-						<Text>{t('note.menu.downloadMedia')}</Text>
 					</HStack>
 				</MenuItem>
 				<MenuItem>

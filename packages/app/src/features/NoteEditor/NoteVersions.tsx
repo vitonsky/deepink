@@ -71,16 +71,16 @@ export const NoteVersions = ({
 			<HStack w="100%">
 				<Button
 					size="sm"
-					title={t('note.versions.saveVersionTitle')}
+					title={t('note.versions.saveVersion.title')}
 					onClick={onSnapshot}
 				>
 					<TextWithIcon icon={<FaFloppyDisk />}>
-						{t('note.versions.saveVersion')}
+						{t('note.versions.saveVersion.label')}
 					</TextWithIcon>
 				</Button>
 				<Button
 					size="sm"
-					title={t('note.versions.deleteAllTitle')}
+					title={t('note.versions.deleteAll.title')}
 					onClick={(evt) => {
 						if (evt.ctrlKey || evt.metaKey) {
 							onDeleteAll();
@@ -120,7 +120,7 @@ export const NoteVersions = ({
 					}}
 				>
 					<TextWithIcon icon={<FaEraser />}>
-						{t('note.versions.deleteAll')}
+						{t('note.versions.deleteAll.label')}
 					</TextWithIcon>
 				</Button>
 
@@ -166,7 +166,7 @@ export const NoteVersions = ({
 										{new Date(version.createdAt).toLocaleString()}
 									</Text>
 									<Text color="typography.secondary">
-										{t('note.versions.chars', {
+										{t('note.version.chars', {
 											count: version.text.length,
 										})}
 									</Text>
@@ -177,10 +177,8 @@ export const NoteVersions = ({
 										size="sm"
 										title={
 											isReadOnly
-												? t(
-														'note.versions.applyVersionReadonlyTitle',
-													)
-												: t('note.versions.applyVersionTitle')
+												? t('note.version.apply.readonlyTitle')
+												: t('note.version.apply.title')
 										}
 										onClick={(evt) => {
 											const applyVersion = () => {
@@ -274,7 +272,7 @@ export const NoteVersions = ({
 
 									<Button
 										size="sm"
-										title={t('note.versions.openVersionTitle')}
+										title={t('note.version.open.title')}
 										onClick={() => {
 											onShowVersion(version);
 
@@ -293,7 +291,7 @@ export const NoteVersions = ({
 									</Button>
 									<Button
 										size="sm"
-										title={t('note.versions.deleteVersionTitle')}
+										title={t('note.version.delete.title')}
 										onClick={(evt) => {
 											const deleteVersion = async () => {
 												await noteHistory.delete([version.id]);

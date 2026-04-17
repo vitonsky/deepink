@@ -2,7 +2,7 @@
 	"panel": {
 		"tags": {
 			"label": "Tags",
-			"empty": "Add tags in this workspace to organize notes",
+			"empty": "Create tags to structure your notes",
 			"actions": {
 				"add": "Add tag"
 			}

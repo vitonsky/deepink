@@ -81,10 +81,10 @@
 			"duplicate": "Duplicate: {{title}}"
 		},
 		"editor": {
-			"placeholder": "Write your thoughts here...",
+			"placeholder": "Capture an idea, task, or thought…",
 			"modes": {
-				"plaintext": "Plain text",
-				"richtext": "Rich text",
+				"plaintext": "Text mode",
+				"richtext": "Rich editor",
 				"split-screen": "Split screen"
 			}
 		},
@@ -95,7 +95,7 @@
 			"removeFromArchive": "Remove from archive"
 		},
 		"tags": {
-			"addPlaceholder": "Add some tags..."
+			"addPlaceholder": "Type to add tag…"
 		},
 		"versionPreview": {
 			"versionAt": "Version at {{date}}",
@@ -103,13 +103,11 @@
 		},
 		"menu": {
 			"title": "Note options",
-			"copyReference": "Copy reference on note",
+			"copyReference": "Copy note link",
 			"remindMe": "Remind me",
 			"history": "History",
-			"historyDisabled": "(Disabled)",
 			"backLinks": "Back links",
 			"readonlyMode": "Readonly mode",
-			"downloadMedia": "Download and convert a network media",
 			"spellcheck": "Spellcheck",
 			"export": "Export...",
 			"passwordProtection": "Password protection...",
@@ -120,19 +118,31 @@
 			"deletePermanently": "Delete permanently",
 			"restoreFromBin": "Restore from bin"
 		},
+		"version": {
+			"chars": "{{count}} characters",
+			"apply": {
+				"title": "Apply version",
+				"readonlyTitle": "Version cannot be applied for a read-only note"
+			},
+			"open": {
+				"title": "Open version"
+			},
+			"delete": {
+				"title": "Delete version"
+			}
+		},
 		"versions": {
-			"saveVersion": "Save version",
-			"saveVersionTitle": "Save the current state of this note as a new version in history",
-			"deleteAll": "Delete all",
-			"deleteAllTitle": "Remove all saved versions of this note permanently",
-			"dontRecord": "Don't record changes for this note",
+			"saveVersion": {
+				"label": "Save snapshot",
+				"title": "Save the current state of this note as a new version in history"
+			},
+			"deleteAll": {
+				"label": "Delete all",
+				"title": "Permanently delete all saved versions of this note"
+			},
+			"dontRecord": "Don't record history for this note",
 			"empty": "This note has no recorded versions",
 			"loading": "Loading...",
-			"chars": "{{count}} chars",
-			"applyVersionTitle": "Apply version",
-			"applyVersionReadonlyTitle": "Version cannot be applied for a read-only note",
-			"openVersionTitle": "Open version",
-			"deleteVersionTitle": "Delete version",
 			"confirmDeleteAll": {
 				"title": "Delete all note versions",
 				"description": "This action will permanently delete all note versions.",
@@ -204,7 +214,7 @@
 	"editorPanel": {
 		"header": {
 			"insertTitle": "Click to insert header with level {{level}}. Open context menu to choose another option",
-			"level": "Level {{level}}"
+			"level": "Header level {{level}}"
 		},
 		"bold": "Toggle bold text style",
 		"italic": "Toggle italic text style",
@@ -283,10 +293,10 @@
 	},
 	"statusBar": {
 		"sync": {
-			"title": "Click to force save changes on disk",
-			"saving": "Saving changes"
+			"title": "Click to save changes on disk",
+			"saving": "Saving changes..."
 		},
-		"changeProfile": "Change profile",
+		"changeProfile": "Change vault",
 		"history": "History",
 		"notifications": "Notifications"
 	}
