@@ -24,7 +24,7 @@
 			"messages": {
 				"unknownSubmitError": "Cannot save changes due to unknown error.",
 				"format": "Tag cannot be empty, start or end with \"/\", or contain \"//\".",
-				"duplicate": "Tag '{{name}}' is already exists.",
+				"duplicate": "Tag '{{name}}' already exists.",
 				"parentTagNotFound": "Parent tag not found, please select another tag."
 			}
 		},
@@ -60,7 +60,7 @@
 				}
 			},
 			"error": {
-				"unknown": "Unknown error occurs. Try again.",
+				"unknown": "An unknown error occurred. Please try again.",
 				"format": "Workspace name cannot be empty."
 			}
 		},
@@ -178,14 +178,14 @@
 		}
 	},
 	"files": {
-		"confirmLargeUpload": "Are you sure to upload {{filesCount}} files {{size}} in total?"
+		"confirmLargeUpload": "Are you sure you want to upload {{filesCount}} files ({{size}} total)?"
 	},
 	"notesList": {
 		"search": {
 			"placeholder": "Search..."
 		},
 		"filterBy": "Filter by",
-		"empty": "Nothing added yet. <create>Add something</create>"
+		"empty": "No notes here yet. <create>Create a note</create>"
 	},
 	"notesView": {
 		"allNotes": "All notes",
@@ -195,7 +195,7 @@
 	},
 	"notesContainer": {
 		"empty": {
-			"placeholder": "Notes content will be shown here"
+			"placeholder": "Select a note to start reading or editing"
 		}
 	},
 	"activityBar": {
@@ -205,7 +205,7 @@
 		"extensions": "Extensions",
 		"inbox": "Inbox",
 		"publishNotes": "Publish notes",
-		"lockProfile": "Lock profile",
+		"lockProfile": "Lock vault",
 		"globalSettings": "Global settings"
 	},
 	"tabBar": {
@@ -275,7 +275,7 @@
 		},
 		"newVersion": {
 			"title": "New version is available",
-			"body": "Update app to a latest version to get new features and improvements",
+			"body": "A new version is ready. Update to get the latest improvements and fixes.",
 			"download": "Download new version",
 			"ignore": "Ignore"
 		}

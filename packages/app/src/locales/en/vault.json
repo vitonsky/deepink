@@ -1,8 +1,8 @@
 {
 	"chooseProfile": {
-		"title": "Choose the profile",
+		"title": "Choose a vault",
 		"actions": {
-			"createNew": "Create new profile"
+			"createNew": "Create new vault"
 		}
 	},
 	"creator": {
@@ -79,19 +79,19 @@
 		},
 		"noEncryptionDialog": {
 			"title": "Create vault with no encryption",
-			"description": "All your data and notes will be stored with no encryption.",
+			"description": "Your notes and data will be stored as plain text. Any app or person with access to the vault file on disk will be able to read everything inside it.",
 			"actions": {
 				"confirm": "Continue with no encryption",
 				"cancel": "Cancel"
 			}
 		},
 		"errors": {
-			"nameRequired": "Enter profile name",
+			"nameRequired": "Enter a vault name",
 			"passwordRequired": "Enter the password"
 		}
 	},
 	"login": {
-		"title": "Unlock profile",
+		"title": "Unlock vault",
 		"field": {
 			"password": {
 				"placeholder": "Enter password"
@@ -99,10 +99,10 @@
 		},
 		"actions": {
 			"unlock": "Unlock",
-			"changeProfile": "Change profile"
+			"changeProfile": "Change vault"
 		},
 		"errors": {
-			"cannotOpen": "Cannot open profile",
+			"cannotOpen": "Cannot open vault",
 			"invalidPassword": "Invalid password",
 			"passwordRequired": "Enter password"
 		}

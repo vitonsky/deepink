@@ -13,11 +13,11 @@
 	},
 	"general": {
 		"title": "General settings",
-		"subtitle": "Manage your overall preferences in app.",
+		"subtitle": "Manage your overall preferences in the app.",
 		"version": {
 			"title": "Version",
 			"checkForUpdates": "Check for updates",
-			"upToDate": "You use latest version",
+			"upToDate": "You're on the latest version",
 			"newVersionAvailable": "New version <bold>{{version}}</bold> is available.",
 			"downloadLatest": "Download",
 			"downloadDescription": "latest version to get new features and improvements."
@@ -98,7 +98,7 @@
 		},
 		"dateFormat": {
 			"title": "Date format",
-			"description": "Configure a format of date to insert. You may use standard syntax DD/MM/YYYY HH:mm:ss.",
+			"description": "Set the date format used when inserting dates. Supports standard token syntax like DD/MM/YYYY HH:mm:ss.",
 			"formatReference": "date format reference",
 			"example": "Example"
 		},
@@ -163,7 +163,7 @@
 			"groupTitle": "Synchronization",
 			"enable": {
 				"label": "Enable synchronization",
-				"description": "Sync all data in database between your devices, to not lose it. All data is encrypted."
+				"description": "Keep your vault in sync across devices. All data is encrypted before it leaves your device."
 			},
 			"method": {
 				"title": "Synchronization method",
@@ -183,7 +183,7 @@
 			},
 			"delay": {
 				"title": "Delay for snapshot",
-				"description": "Time in seconds to wait since recent note changes, before creating a new snapshot. The lower the time, the more snapshots will be created, and the larger the vault size."
+				"description": "How long to wait after a note is edited before saving a new snapshot, in seconds. Shorter intervals mean more frequent snapshots — and a larger vault."
 			}
 		},
 		"trashBin": {
@@ -202,7 +202,7 @@
 			},
 			"purgeDelay": {
 				"title": "Permanent deletion delay",
-				"description": "Time interval in days to delete a note from bin. Time counts from the moment you move the note to bin.",
+				"description": "Notes in the bin will be permanently deleted after this many days, counted from when they were moved there.",
 				"unit": "days"
 			}
 		}
@@ -229,7 +229,7 @@
 			"delete": {
 				"label": "Delete workspace and all related data, including notes, tags and files",
 				"action": "Delete workspace",
-				"cannotDeleteLast": "It is not possible to delete the last workspace in a profile.",
+				"cannotDeleteLast": "Cannot delete the last workspace in a vault.",
 				"createAnother": "Create",
 				"createAnotherSuffix": "another workspace first."
 			},
