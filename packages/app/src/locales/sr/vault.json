@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Izaberite sef",
+		"actions": {
+			"createNew": "Kreirajte novi sef"
+		}
+	},
+	"creator": {
+		"title": "Kreirajte sef",
+		"field": {
+			"name": {
+				"label": "Ime sefa",
+				"placeholder": "npr., Moj sef, Podeljeno sa Aleksom",
+				"random": "Generiši nasumično ime",
+				"suggests": {
+					"0": "Marginalije",
+					"1": "Vellum",
+					"2": "Krajna stranica",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Niša",
+					"6": "Polusena",
+					"7": "Mesečeva korespondencija",
+					"8": "Večernja kartografija",
+					"9": "Lanterne i tinta",
+					"10": "Arhiv osvetljen svećom",
+					"11": "Rastući bršljan rukopisi",
+					"12": "Cedarova pisma",
+					"13": "Pisma od ružinog drveta",
+					"14": "Nevezani kodeks",
+					"15": "Marginalije i šapti",
+					"16": "Ispovesti na kraju stranice",
+					"17": "Anotirana tišina",
+					"18": "Senčna kartografija",
+					"19": "Zapamljena soba",
+					"20": "Nepotpisana pisma",
+					"21": "Šapnute koordinate",
+					"22": "Nepretreseni almanah",
+					"23": "Pisma izgubljenog voska",
+					"24": "Nevidljiva biblioteka",
+					"25": "Nepoznate margine",
+					"26": "Tiha zavera",
+					"27": "Neporučena pošta",
+					"28": "Večnozeleni arhiv",
+					"29": "Papirni mesec",
+					"30": "Papirni cvet",
+					"31": "Noćni cvet",
+					"32": "Mekani atlas",
+					"33": "Velur",
+					"34": "Tinta",
+					"35": "Tišina",
+					"36": "Senka",
+					"37": "Mirna struja",
+					"38": "Duboka livada",
+					"39": "Nepisani dnevnik",
+					"40": "Tih beležnik",
+					"41": "Neizgovoreni arhiv",
+					"42": "Driftajući dnevnik",
+					"43": "Hronika solarnih vetrova",
+					"44": "Tihi fjord",
+					"45": "Fragmenti sećanja",
+					"46": "Tih trenutak",
+					"47": "Nestali trenuci"
+				}
+			},
+			"password": {
+				"label": "Lozinka za enkripciju",
+				"recommended": "(preporučeno)",
+				"placeholder": "Unesite jaku lozinku ovde"
+			},
+			"algorithm": {
+				"label": "Enkripcioni algoritam"
+			}
+		},
+		"actions": {
+			"create": "Kreirajte sef",
+			"continueNoPassword": "Nastavite bez lozinke",
+			"cancel": "Otkaži"
+		},
+		"noEncryptionDialog": {
+			"title": "Kreirajte sef bez enkripcije",
+			"description": "Vaše beleške i podaci biće sačuvani kao običan tekst. Svaka aplikacija ili osoba sa pristupom direktorijumu sefa na disku moći će da pročita sve unutar njega.",
+			"actions": {
+				"confirm": "Nastavite bez enkripcije",
+				"cancel": "Otkaži"
+			}
+		},
+		"errors": {
+			"nameRequired": "Unesite ime sefa",
+			"passwordRequired": "Unesite lozinku"
+		}
+	},
+	"login": {
+		"title": "Otključajte sef",
+		"field": {
+			"password": {
+				"placeholder": "Unesite lozinku"
+			}
+		},
+		"actions": {
+			"unlock": "Otključaj",
+			"changeVault": "Promeni sef"
+		},
+		"errors": {
+			"cannotOpen": "Nije moguće otvoriti sef",
+			"invalidPassword": "Nevažeća lozinka",
+			"passwordRequired": "Unesite lozinku"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Nije uspelo otvaranje sefa",
+		"corrupted": "\"{{name}}\" izgleda da je oštećen."
+	}
+}

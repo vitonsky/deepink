@@ -123,11 +123,11 @@ module.exports = {
 	openAIApiKey: process.env.OPENAI_API_KEY,
 	openAIApiUrl: process.env.OPENAI_API_URL,
 
-	// openAIApiModel: 'openai/gpt-4o-mini',
-	// modelContextLimit: 128_000,
+	openAIApiModel: 'openai/gpt-4o-mini',
+	modelContextLimit: 128_000,
 
 	// openAIApiModel: 'anthropic/claude-sonnet-4.6',
-	openAIApiModel: 'anthropic/claude-opus-4.6',
-	modelContextLimit: 1_000_000,
+	// openAIApiModel: 'anthropic/claude-opus-4.6',
+	// modelContextLimit: 50_000,
 	context,
 };
