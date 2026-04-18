@@ -7,7 +7,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createAppSelector } from '../utils';
 import { findNearNote } from './utils';
 
-type ProfileMutator<T extends {}> = (profile: ProfileData, payload: T) => void;
+type VaultMutator<T extends {}> = (vault: VaultData, payload: T) => void;
 
 export const defaultVaultConfig = {
 	filesIntegrity: {
@@ -25,26 +25,26 @@ export const defaultVaultConfig = {
 			cleanInterval: 30,
 		},
 	},
-} satisfies ProfileConfig;
+} satisfies VaultConfig;
 
-export function createProfileReducer<T extends {} = {}>(mutator: ProfileMutator<T>) {
-	return (state: ProfilesState, { payload }: PayloadAction<ProfileScoped<T>>) => {
-		const { profileId, ...rest } = payload;
-		const profile = state.profiles[profileId];
-		if (profile) {
-			mutator(profile, rest as unknown as T);
+export function createVaultReducer<T extends {} = {}>(mutator: VaultMutator<T>) {
+	return (state: VaultsState, { payload }: PayloadAction<VaultScoped<T>>) => {
+		const { vaultId, ...rest } = payload;
+		const vault = state.vaults[vaultId];
+		if (vault) {
+			mutator(vault, rest as unknown as T);
 		}
 	};
 }
 
 const selectWorkspaceObject = (
-	state: ProfilesState,
-	{ profileId, workspaceId }: WorkspaceScoped,
+	state: VaultsState,
+	{ vaultId, workspaceId }: WorkspaceScoped,
 ) => {
-	const profile = state.profiles[profileId];
-	if (!profile) return null;
+	const vault = state.vaults[vaultId];
+	if (!vault) return null;
 
-	return profile.workspaces[workspaceId] ?? null;
+	return vault.workspaces[workspaceId] ?? null;
 };
 
 export enum NOTES_VIEW {
@@ -95,11 +95,11 @@ export const createWorkspaceObject = ({
 	},
 });
 
-export type ProfileScoped<T extends {} = {}> = T & {
-	profileId: string;
+export type VaultScoped<T extends {} = {}> = T & {
+	vaultId: string;
 };
 export type WorkspaceScoped<T extends {} = {}> = T &
-	ProfileScoped<{
+	VaultScoped<{
 		workspaceId: string;
 	}>;
 
@@ -149,7 +149,7 @@ export type WorkspaceData = {
 	config: z.output<typeof WorkspaceConfigScheme>;
 };
 
-export const ProfileConfigScheme = z.object({
+export const VaultConfigScheme = z.object({
 	filesIntegrity: z.object({
 		enabled: z.boolean(),
 	}),
@@ -167,75 +167,75 @@ export const ProfileConfigScheme = z.object({
 	}),
 });
 
-export type ProfileConfig = z.output<typeof ProfileConfigScheme>;
+export type VaultConfig = z.output<typeof VaultConfigScheme>;
 
-export type ProfileData = {
+export type VaultData = {
 	activeWorkspace: string | null;
 	workspaces: Record<string, WorkspaceData | undefined>;
 
-	config: ProfileConfig;
+	config: VaultConfig;
 };
 
-export type ProfilesState = {
-	activeProfile: string | null;
-	profiles: Record<string, ProfileData | undefined>;
+export type VaultsState = {
+	activeVault: string | null;
+	vaults: Record<string, VaultData | undefined>;
 };
 
 export const profilesSlice = createSlice({
 	name: 'profiles',
 	initialState: {
-		activeProfile: null,
-		profiles: {},
-	} as ProfilesState,
+		activeVault: null,
+		vaults: {},
+	} as VaultsState,
 	reducers: {
-		setProfiles: (state, { payload }: PayloadAction<Record<string, ProfileData>>) => {
-			return { ...state, profiles: payload } as ProfilesState;
+		setVaults: (state, { payload }: PayloadAction<Record<string, VaultData>>) => {
+			return { ...state, vaults: payload } as VaultsState;
 		},
 
-		addProfile: (
+		addVault: (
 			state,
 			{
-				payload: { profileId, profile },
-			}: PayloadAction<{ profileId: string; profile: ProfileData }>,
+				payload: { vaultId, vault },
+			}: PayloadAction<{ vaultId: string; vault: VaultData }>,
 		) => {
-			state.profiles[profileId] = profile;
+			state.vaults[vaultId] = vault;
 		},
 
-		removeProfile: (
+		removeVault: (
 			state,
-			{ payload: { profileId } }: PayloadAction<{ profileId: string }>,
+			{ payload: { vaultId } }: PayloadAction<{ vaultId: string }>,
 		) => {
-			delete state.profiles[profileId];
+			delete state.vaults[vaultId];
 		},
 
-		setActiveProfile: (state, { payload }: PayloadAction<string | null>) => {
-			state.activeProfile = payload;
+		setActiveVault: (state, { payload }: PayloadAction<string | null>) => {
+			state.activeVault = payload;
 		},
 
 		updateWorkspacesList: (
 			state,
 			{
-				payload: { profileId, workspaces, newNoteTemplate },
+				payload: { vaultId, workspaces, newNoteTemplate },
 			}: PayloadAction<
-				ProfileScoped<{
+				VaultScoped<{
 					workspaces: { id: string; name: string }[];
 					newNoteTemplate: string;
 				}>
 			>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
+			const vault = state.vaults[vaultId];
+			if (!vault) return;
 
 			workspaces.forEach((workspace) => {
 				// Rename
-				const existingWorkspace = profile.workspaces[workspace.id];
+				const existingWorkspace = vault.workspaces[workspace.id];
 				if (existingWorkspace) {
 					existingWorkspace.name = workspace.name;
 					return;
 				}
 
 				// Create new workspace
-				profile.workspaces[workspace.id] = createWorkspaceObject({
+				vault.workspaces[workspace.id] = createWorkspaceObject({
 					...workspace,
 					newNoteTemplate,
 				});
@@ -245,9 +245,9 @@ export const profilesSlice = createSlice({
 			const actualWorkspaceIds = new Set(
 				workspaces.map((workspace) => workspace.id),
 			);
-			for (const id in profile.workspaces) {
+			for (const id in vault.workspaces) {
 				if (!actualWorkspaceIds.has(id)) {
-					delete profile.workspaces[id];
+					delete vault.workspaces[id];
 				}
 			}
 		},
@@ -255,25 +255,25 @@ export const profilesSlice = createSlice({
 		setActiveWorkspace: (
 			state,
 			{
-				payload: { profileId, workspaceId },
-			}: PayloadAction<ProfileScoped<{ workspaceId: string | null }>>,
+				payload: { vaultId, workspaceId },
+			}: PayloadAction<VaultScoped<{ workspaceId: string | null }>>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
+			const vault = state.vaults[vaultId];
+			if (!vault) return;
 
 			// Reset active workspace
 			if (workspaceId === null) {
-				profile.activeWorkspace = null;
+				vault.activeWorkspace = null;
 				return;
 			}
 
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = vault.workspaces[workspaceId];
 			if (!workspace) return;
 
 			// Touch workspace
 			workspace.touched = true;
 
-			profile.activeWorkspace = workspaceId;
+			vault.activeWorkspace = workspaceId;
 		},
 
 		/**
@@ -282,19 +282,19 @@ export const profilesSlice = createSlice({
 		resetWorkspace: (
 			state,
 			{
-				payload: { profileId, workspaceId, newNoteTemplate },
+				payload: { vaultId, workspaceId, newNoteTemplate },
 			}: PayloadAction<
-				ProfileScoped<{ workspaceId: string; newNoteTemplate: string }>
+				VaultScoped<{ workspaceId: string; newNoteTemplate: string }>
 			>,
 		) => {
-			const profile = state.profiles[profileId];
-			if (!profile) return;
+			const vault = state.vaults[vaultId];
+			if (!vault) return;
 
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = vault.workspaces[workspaceId];
 			if (!workspace) return;
 
 			// Reset all values to defaults
-			profile.workspaces[workspaceId] = createWorkspaceObject({
+			vault.workspaces[workspaceId] = createWorkspaceObject({
 				id: workspace.id,
 				name: workspace.name,
 				newNoteTemplate,
@@ -304,10 +304,10 @@ export const profilesSlice = createSlice({
 		updateWorkspaceLoadingStatus: (
 			state,
 			{
-				payload: { profileId, workspaceId, ...status },
+				payload: { vaultId, workspaceId, ...status },
 			}: PayloadAction<WorkspaceScoped<Partial<LoadingStatus>>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.loadingStatus = { ...workspace.loadingStatus, ...status };
@@ -316,10 +316,10 @@ export const profilesSlice = createSlice({
 		setActiveNote: (
 			state,
 			{
-				payload: { profileId, workspaceId, noteId },
+				payload: { vaultId, workspaceId, noteId },
 			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId | null }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			// Set null and avoid array iterating
@@ -338,10 +338,10 @@ export const profilesSlice = createSlice({
 		setNoteIds: (
 			state,
 			{
-				payload: { profileId, workspaceId, noteIds },
+				payload: { vaultId, workspaceId, noteIds },
 			}: PayloadAction<WorkspaceScoped<{ noteIds: NoteId[] }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.noteIds = noteIds;
@@ -350,10 +350,10 @@ export const profilesSlice = createSlice({
 		addOpenedNote: (
 			state,
 			{
-				payload: { profileId, workspaceId, note },
+				payload: { vaultId, workspaceId, note },
 			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			const foundNoteInList = workspace.openedNotes.find(
@@ -376,10 +376,10 @@ export const profilesSlice = createSlice({
 		removeOpenedNote: (
 			state,
 			{
-				payload: { profileId, workspaceId, noteId },
+				payload: { vaultId, workspaceId, noteId },
 			}: PayloadAction<WorkspaceScoped<{ noteId: NoteId }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			const { activeNote, openedNotes } = workspace;
@@ -399,10 +399,10 @@ export const profilesSlice = createSlice({
 		updateOpenedNote: (
 			state,
 			{
-				payload: { profileId, workspaceId, note },
+				payload: { vaultId, workspaceId, note },
 			}: PayloadAction<WorkspaceScoped<{ note: INote }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			const { openedNotes } = workspace;
@@ -421,10 +421,10 @@ export const profilesSlice = createSlice({
 		setOpenedNotes: (
 			state,
 			{
-				payload: { profileId, workspaceId, notes },
+				payload: { vaultId, workspaceId, notes },
 			}: PayloadAction<WorkspaceScoped<{ notes: INote[] }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.openedNotes = notes;
@@ -433,10 +433,10 @@ export const profilesSlice = createSlice({
 		setSelectedTag: (
 			state,
 			{
-				payload: { profileId, workspaceId, tag },
+				payload: { vaultId, workspaceId, tag },
 			}: PayloadAction<WorkspaceScoped<{ tag: string | null }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.tags.selected = tag;
@@ -453,10 +453,10 @@ export const profilesSlice = createSlice({
 		setTags: (
 			state,
 			{
-				payload: { profileId, workspaceId, tags },
+				payload: { vaultId, workspaceId, tags },
 			}: PayloadAction<WorkspaceScoped<{ tags: IResolvedTag[] }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.tags.list = tags;
@@ -473,10 +473,10 @@ export const profilesSlice = createSlice({
 		setSearch: (
 			state,
 			{
-				payload: { profileId, workspaceId, search },
+				payload: { vaultId, workspaceId, search },
 			}: PayloadAction<WorkspaceScoped<{ search: string }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.search = search;
@@ -484,10 +484,10 @@ export const profilesSlice = createSlice({
 		setView: (
 			state,
 			{
-				payload: { profileId, workspaceId, view },
+				payload: { vaultId, workspaceId, view },
 			}: PayloadAction<WorkspaceScoped<{ view: NOTES_VIEW }>>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.view = view;
@@ -496,7 +496,7 @@ export const profilesSlice = createSlice({
 		updateFilters: (
 			state,
 			{
-				payload: { profileId, workspaceId, view, search, selectedTagId },
+				payload: { vaultId, workspaceId, view, search, selectedTagId },
 			}: PayloadAction<
 				WorkspaceScoped<
 					Partial<{
@@ -507,7 +507,7 @@ export const profilesSlice = createSlice({
 				>
 			>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			if (view !== undefined) {
@@ -530,54 +530,54 @@ export const profilesSlice = createSlice({
 		setWorkspaceNoteTemplateConfig: (
 			state,
 			{
-				payload: { profileId, workspaceId, ...props },
+				payload: { vaultId, workspaceId, ...props },
 			}: PayloadAction<
 				WorkspaceScoped<Partial<WorkspaceData['config']['newNote']>>
 			>,
 		) => {
-			const workspace = selectWorkspaceObject(state, { profileId, workspaceId });
+			const workspace = selectWorkspaceObject(state, { vaultId, workspaceId });
 			if (!workspace) return;
 
 			workspace.config.newNote = { ...workspace.config.newNote, ...props };
 		},
 
-		setSnapshotsConfig: createProfileReducer(
-			(profile, payload: Partial<ProfileData['config']['snapshots']>) => {
-				profile.config.snapshots = {
-					...profile.config.snapshots,
+		setSnapshotsConfig: createVaultReducer(
+			(vault, payload: Partial<VaultData['config']['snapshots']>) => {
+				vault.config.snapshots = {
+					...vault.config.snapshots,
 					...payload,
 				};
 			},
 		),
 
-		setNoteDeletionConfig: createProfileReducer(
+		setNoteDeletionConfig: createVaultReducer(
 			(
-				profile,
+				vault,
 				payload: Partial<
 					Pick<
-						ProfileData['config']['deletion'],
+						VaultData['config']['deletion'],
 						'permanentDeletion' | 'confirm'
 					>
 				>,
 			) => {
-				profile.config.deletion = {
-					...profile.config.deletion,
+				vault.config.deletion = {
+					...vault.config.deletion,
 					...payload,
 				};
 			},
 		),
-		setBinAutoDeletionConfig: createProfileReducer(
-			(profile, payload: Partial<ProfileData['config']['deletion']['bin']>) => {
-				profile.config.deletion.bin = {
-					...profile.config.deletion.bin,
+		setBinAutoDeletionConfig: createVaultReducer(
+			(vault, payload: Partial<VaultData['config']['deletion']['bin']>) => {
+				vault.config.deletion.bin = {
+					...vault.config.deletion.bin,
 					...payload,
 				};
 			},
 		),
-		setFilesIntegrityConfig: createProfileReducer(
-			(profile, payload: Partial<ProfileData['config']['filesIntegrity']>) => {
-				profile.config.filesIntegrity = {
-					...profile.config.filesIntegrity,
+		setFilesIntegrityConfig: createVaultReducer(
+			(vault, payload: Partial<VaultData['config']['filesIntegrity']>) => {
+				vault.config.filesIntegrity = {
+					...vault.config.filesIntegrity,
 					...payload,
 				};
 			},
@@ -587,25 +587,25 @@ export const profilesSlice = createSlice({
 
 export const workspacesApi = profilesSlice.actions;
 
-export const selectActiveProfile = createAppSelector(
+export const selectActiveVault = createAppSelector(
 	profilesSlice.selectSlice,
 	(state) => {
-		return state.activeProfile ?? null;
+		return state.activeVault ?? null;
 	},
 );
 
-export const selectProfile = ({ profileId }: ProfileScoped) =>
+export const selectVaultById = ({ vaultId }: VaultScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
-		const profile = state.profiles[profileId];
-		return profile ?? null;
+		const vault = state.vaults[vaultId];
+		return vault ?? null;
 	});
 
-export const selectWorkspaces = ({ profileId }: ProfileScoped) =>
+export const selectWorkspaces = ({ vaultId }: VaultScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
-		const profile = state.profiles[profileId];
-		if (!profile) return [];
+		const vault = state.vaults[vaultId];
+		if (!vault) return [];
 
-		return Object.values(profile.workspaces ?? {}).filter(Boolean) as WorkspaceData[];
+		return Object.values(vault.workspaces ?? {}).filter(Boolean) as WorkspaceData[];
 	});
 
 /**
@@ -617,28 +617,28 @@ export const getWorkspaceInfo = ({ id, name, touched }: WorkspaceData) => ({
 	touched,
 });
 
-export const selectWorkspacesInfo = (scope: ProfileScoped) =>
+export const selectWorkspacesInfo = (scope: VaultScoped) =>
 	createAppSelector(selectWorkspaces(scope), (workspaces) =>
 		workspaces.map(getWorkspaceInfo),
 	);
 
-export const selectWorkspace = ({ profileId, workspaceId }: WorkspaceScoped) =>
+export const selectWorkspace = ({ vaultId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
-		const profile = state.profiles[profileId];
-		if (!profile) return null;
+		const vault = state.vaults[vaultId];
+		if (!vault) return null;
 
-		return profile.workspaces[workspaceId] ?? null;
+		return vault.workspaces[workspaceId] ?? null;
 	});
 
-export const selectActiveWorkspace = ({ profileId }: ProfileScoped) =>
+export const selectActiveWorkspace = ({ vaultId }: VaultScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {
-		const profile = state.profiles[profileId];
-		if (!profile || !profile.activeWorkspace) return null;
+		const vault = state.vaults[vaultId];
+		if (!vault || !vault.activeWorkspace) return null;
 
-		return profile.workspaces[profile.activeWorkspace] ?? null;
+		return vault.workspaces[vault.activeWorkspace] ?? null;
 	});
 
-export const selectActiveWorkspaceInfo = (scope: ProfileScoped) =>
+export const selectActiveWorkspaceInfo = (scope: VaultScoped) =>
 	createAppSelector(selectActiveWorkspace(scope), (workspace) =>
 		workspace ? getWorkspaceInfo(workspace) : null,
 	);

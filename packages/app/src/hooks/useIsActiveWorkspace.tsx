@@ -6,10 +6,10 @@ import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
 
 export const useIsActiveWorkspace = () => {
 	const workspaceData = useWorkspaceData();
-	const { profileId } = useWorkspaceData();
+	const { vaultId } = workspaceData;
 
 	const activeWorkspace = useAppSelector(
-		useMemo(() => selectActiveWorkspaceInfo({ profileId }), [profileId]),
+		useMemo(() => selectActiveWorkspaceInfo({ vaultId }), [vaultId]),
 		isEqual,
 	);
 	return Boolean(activeWorkspace && activeWorkspace.id === workspaceData.workspaceId);

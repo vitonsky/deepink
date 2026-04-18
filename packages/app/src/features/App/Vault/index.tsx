@@ -13,7 +13,7 @@ import { useDebounce } from 'use-debounce';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { useVaultShortcutsHandlers } from '@features/App/Profile/useVaultShortcutsHandlers';
+import { useVaultShortcutsHandlers } from '@features/App/Vault/useVaultShortcutsHandlers';
 import { StatusBarProvider } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { SplashScreen } from '@features/SplashScreen';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
@@ -25,45 +25,45 @@ import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
 import {
 	createWorkspaceObject,
 	defaultVaultConfig,
-	ProfileConfigScheme,
 	selectActiveWorkspaceInfo,
 	selectWorkspacesInfo,
+	VaultConfigScheme,
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
+import { VaultContainer } from '../Vaults/hooks/useVaultContainers';
 import { Workspace, WorkspaceContext } from '../Workspace';
 import { WorkspaceErrorProvider } from '../Workspace/WorkspaceErrorProvider';
 import { WorkspaceErrorScreen } from '../Workspace/WorkspaceErrorScreen';
-import { ProfileStatusBar } from './ProfileStatusBar/ProfileStatusBar';
-import { ProfileServices } from './services';
+import { VaultServices } from './services';
 import { useVaultState } from './useVaultState';
 import { useVaultError } from './VaultErrorProvider';
+import { VaultStatusBar } from './VaultStatusBar/VaultStatusBar';
 
-export type ProfileControls = {
-	profile: ProfileContainer;
+export type VaultControls = {
+	vault: VaultContainer;
 	close: () => void;
 };
 
-export const ProfileControlsContext = createContext<ProfileControls | null>(null);
-export const useProfileControls = createContextGetterHook(ProfileControlsContext);
+export const VaultControlsContext = createContext<VaultControls | null>(null);
+export const useVaultControls = createContextGetterHook(VaultControlsContext);
 
-export type ProfileProps = {
-	profile: ProfileContainer;
-	controls: ProfileControls;
+export type VaultProps = {
+	vault: VaultContainer;
+	controls: VaultControls;
 };
 
-export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls }) => {
+export const Vault: FC<VaultProps> = ({ vault: currentVault, controls }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 
 	const dispatch = useAppDispatch();
 
-	const profileId = currentProfile.profile.id;
+	const vaultId = currentVault.vault.id;
 
 	const workspaces = useAppSelector(
-		useMemo(() => selectWorkspacesInfo({ profileId }), [profileId]),
+		useMemo(() => selectWorkspacesInfo({ vaultId }), [vaultId]),
 		isEqual,
 	);
 
@@ -75,15 +75,15 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	});
 
 	const workspacesManager = useMemo(
-		() => new WorkspacesController(currentProfile.db),
-		[currentProfile.db],
+		() => new WorkspacesController(currentVault.db),
+		[currentVault.db],
 	);
 	useEffect(() => {
 		let isVaultLoadCancelled = false;
 
 		const vaultConfig = new StateFile(
-			new FileController('config.json', controls.profile.files),
-			ProfileConfigScheme,
+			new FileController('config.json', controls.vault.files),
+			VaultConfigScheme,
 		);
 
 		Promise.all([workspacesManager.getList(), vaultConfig.get(), getVaultState()])
@@ -97,9 +97,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 					);
 
 				dispatch(
-					workspacesApi.addProfile({
-						profileId,
-						profile: {
+					workspacesApi.addVault({
+						vaultId,
+						vault: {
 							activeWorkspace: null,
 							workspaces: Object.fromEntries(
 								workspaces.map((workspace) => [
@@ -119,7 +119,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 						},
 					}),
 				);
-				dispatch(workspacesApi.setActiveProfile(profileId));
+				dispatch(workspacesApi.setActiveVault(vaultId));
 
 				let selectedWorkspace = defaultWorkspace;
 				if (state?.activeWorkspace) {
@@ -129,7 +129,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				}
 				dispatch(
 					workspacesApi.setActiveWorkspace({
-						profileId,
+						vaultId,
 						workspaceId: selectedWorkspace.id,
 					}),
 				);
@@ -144,8 +144,8 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 			isVaultLoadCancelled = true;
 
 			dispatch(
-				workspacesApi.removeProfile({
-					profileId,
+				workspacesApi.removeVault({
+					vaultId,
 				}),
 			);
 		};
@@ -155,7 +155,7 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 
 	const isDevMode = useIsDeveloper();
 
-	const db = controls.profile.db;
+	const db = controls.vault.db;
 	useEffect(() => {
 		if (!isDevMode) return;
 
@@ -169,19 +169,19 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	useShortcutsBinding();
 	useVaultShortcutsHandlers();
 
-	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE, () => controls.close(), {
-		enabled: controls.profile.profile.isEncrypted,
+	useCommandCallback(GLOBAL_COMMANDS.LOCK_CURRENT_VAULT, () => controls.close(), {
+		enabled: controls.vault.vault.isEncrypted,
 	});
 	useCommandCallback(GLOBAL_COMMANDS.SYNC_DATABASE, () => db.sync());
 
 	const [workspaceErrors, setWorkspaceErrors] = useState<Record<string, Error>>({});
-	const activeWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
+	const activeWorkspace = useAppSelector(selectActiveWorkspaceInfo({ vaultId }));
 	const activeWorkspaceError = activeWorkspace
 		? workspaceErrors[activeWorkspace.id]
 		: null;
 
 	const isActiveWorkspaceLoaded = useAppSelector(
-		selectIsActiveWorkspaceLoaded({ profileId }),
+		selectIsActiveWorkspaceLoaded({ vaultId }),
 	);
 	const [isLoadingComplete] = useDebounce(
 		isActiveWorkspaceLoaded || activeWorkspaceError,
@@ -221,9 +221,9 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 	}, [crashActiveWorkspace]);
 
 	return (
-		<ProfileControlsContext.Provider value={controls}>
+		<VaultControlsContext.Provider value={controls}>
 			{!isLoadingComplete && <SplashScreen />}
-			{workspaces.length > 0 && <ProfileServices />}
+			{workspaces.length > 0 && <VaultServices />}
 
 			{activeWorkspaceError && (
 				<WorkspaceErrorScreen onWorkspaceErrorReset={onWorkspaceErrorReset} />
@@ -237,17 +237,17 @@ export const Profile: FC<ProfileProps> = ({ profile: currentProfile, controls })
 				return (
 					<WorkspaceContext.Provider
 						key={workspace.id}
-						value={{ profileId, workspaceId: workspace.id }}
+						value={{ vaultId, workspaceId: workspace.id }}
 					>
 						<StatusBarProvider>
 							<WorkspaceErrorProvider onError={onWorkspaceError}>
-								<Workspace profile={currentProfile} />
+								<Workspace vault={currentVault} />
 							</WorkspaceErrorProvider>
-							<ProfileStatusBar />
+							<VaultStatusBar />
 						</StatusBarProvider>
 					</WorkspaceContext.Provider>
 				);
 			})}
-		</ProfileControlsContext.Provider>
+		</VaultControlsContext.Provider>
 	);
 };

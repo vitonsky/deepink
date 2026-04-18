@@ -9,7 +9,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { ButtonGroup, VStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { useProfileControls } from '@features/App/Profile';
+import { useVaultControls } from '@features/App/Vault';
 import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
@@ -19,7 +19,7 @@ export const ActivityBar = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const telemetry = useTelemetryTracker();
 
-	const profileControls = useProfileControls();
+	const vaultControls = useVaultControls();
 
 	const command = useCommand();
 
@@ -98,14 +98,14 @@ export const ActivityBar = () => {
 				size="sm"
 				variant="ghost"
 			>
-				{profileControls.profile.profile.isEncrypted && (
-					// Only encrypted profiles can be locked
+				{vaultControls.vault.vault.isEncrypted && (
+					// Only encrypted vaults can be locked
 					<IconButton
 						icon={<MdLockOutline style={{ scale: 1.3 }} />}
-						title={t('activityBar.lockProfile')}
+						title={t('activityBar.lockVault')}
 						tooltipPlacement="right"
 						data-no-animation
-						onClick={() => profileControls.close()}
+						onClick={() => vaultControls.close()}
 					/>
 				)}
 				<IconButton

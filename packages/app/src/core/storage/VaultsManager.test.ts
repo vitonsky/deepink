@@ -3,7 +3,7 @@ import { webcrypto } from 'node:crypto';
 import { createFileManagerMock } from '@core/features/files/__tests__/mocks/createFileManagerMock';
 import { RootedFS } from '@core/features/files/RootedFS';
 
-import { ProfilesManager } from './ProfilesManager';
+import { VaultsManager } from './VaultsManager';
 
 vi.stubGlobal('self', {
 	crypto: webcrypto,
@@ -13,13 +13,13 @@ const UUID_PATTERN = /^[\da-f-]{36}$/i;
 
 test('Profiles may be created', async () => {
 	const files = createFileManagerMock();
-	const profiles = new ProfilesManager(
+	const profiles = new VaultsManager(
 		files,
 		(profileName) => new RootedFS(files, profileName),
 	);
 
 	await expect(files.list(), 'No files').resolves.toEqual([]);
-	await expect(profiles.getProfiles(), 'No profiles').resolves.toEqual([]);
+	await expect(profiles.getVaults(), 'No vaults').resolves.toEqual([]);
 
 	// Add few profiles
 	await expect(
@@ -44,7 +44,7 @@ test('Profiles may be created', async () => {
 		encryption: null,
 	});
 
-	await expect(profiles.getProfiles(), 'All profiles is in list').resolves.toEqual([
+	await expect(profiles.getVaults(), 'All profiles is in list').resolves.toEqual([
 		{
 			id: expect.stringMatching(UUID_PATTERN),
 			name: 'foo',
@@ -64,13 +64,13 @@ test('Profiles may be created', async () => {
 
 test('Profile with encryption writes a key into file', async () => {
 	const files = createFileManagerMock();
-	const profiles = new ProfilesManager(
+	const profiles = new VaultsManager(
 		files,
 		(profileName) => new RootedFS(files, '/' + profileName),
 	);
 
 	await expect(files.list(), 'No files').resolves.toEqual([]);
-	await expect(profiles.getProfiles(), 'No profiles').resolves.toEqual([]);
+	await expect(profiles.getVaults(), 'No profiles').resolves.toEqual([]);
 
 	// Add profile with encryption
 	const key = new Uint8Array(100).buffer;
@@ -101,7 +101,7 @@ test('Profile with encryption writes a key into file', async () => {
 		expect.stringMatching(/^\/[\da-f-]{36}\/key$/i),
 	]);
 
-	const profile = await profiles.getProfiles().then((profiles) => profiles[0]);
+	const profile = await profiles.getVaults().then((profiles) => profiles[0]);
 	expect(
 		files.get(`/${profile.id}/key`),
 		'Key file contains an exact buffer',

@@ -205,7 +205,7 @@
 		"extensions": "Extensions",
 		"inbox": "Inbox",
 		"publishNotes": "Publish notes",
-		"lockProfile": "Lock vault",
+		"lockVault": "Lock vault",
 		"globalSettings": "Global settings"
 	},
 	"tabBar": {
@@ -296,7 +296,7 @@
 			"title": "Click to save changes on disk",
 			"saving": "Saving changes..."
 		},
-		"changeProfile": "Change vault",
+		"changeVault": "Change vault",
 		"history": "History",
 		"notifications": "Notifications"
 	}

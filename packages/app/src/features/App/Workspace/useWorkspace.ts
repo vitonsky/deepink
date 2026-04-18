@@ -16,7 +16,7 @@ import { useVaultStorage } from '@features/files';
 import { getWorkspaceFilesPath, getWorkspacePath } from '@features/files/paths';
 import { useWorkspaceData } from '@state/redux/profiles/hooks';
 
-import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
+import { VaultContainer } from '../Vaults/hooks/useVaultContainers';
 
 export type WorkspaceContainer = {
 	attachmentsController: AttachmentsController;
@@ -31,14 +31,14 @@ export type WorkspaceContainer = {
 	};
 };
 
-export const useWorkspace = (currentProfile: ProfileContainer) => {
+export const useWorkspace = (currentVault: VaultContainer) => {
 	const [state, setState] = useState<WorkspaceContainer | null>(null);
 
 	const { workspaceId } = useWorkspaceData();
 
 	const files = useVaultStorage();
 	useEffect(() => {
-		const { db } = currentProfile;
+		const { db } = currentVault;
 
 		// TODO: index must be destroyed by unmount a workspace. That is privacy threat
 		const indexDir = new RootedFS(
@@ -72,7 +72,7 @@ export const useWorkspace = (currentProfile: ProfileContainer) => {
 				),
 			},
 		});
-	}, [currentProfile, files, workspaceId]);
+	}, [currentVault, files, workspaceId]);
 
 	// Free resources by unmount
 	useEffect(() => {

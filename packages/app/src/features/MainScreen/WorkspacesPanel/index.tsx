@@ -21,17 +21,17 @@ export const WorkspacesPanel = (props: StackProps) => {
 
 	const dispatch = useAppDispatch();
 
-	const { profileId, workspaceId } = useWorkspaceData();
+	const { vaultId, workspaceId } = useWorkspaceData();
 
 	const selectWorkspacesWithMemo = useMemo(
 		() =>
-			createSelector([selectWorkspaces({ profileId })], (workspaces) =>
+			createSelector([selectWorkspaces({ vaultId })], (workspaces) =>
 				workspaces.map((workspace) => ({
 					id: workspace.id,
 					content: workspace.name,
 				})),
 			),
-		[profileId],
+		[vaultId],
 	);
 	const workspaces = useAppSelector(selectWorkspacesWithMemo);
 
@@ -75,7 +75,7 @@ export const WorkspacesPanel = (props: StackProps) => {
 						const workspaceId = evt.target.value;
 						dispatch(
 							workspacesApi.setActiveWorkspace({
-								profileId,
+								vaultId,
 								workspaceId,
 							}),
 						);

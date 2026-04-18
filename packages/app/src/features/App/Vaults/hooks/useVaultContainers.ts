@@ -15,14 +15,14 @@ import { EncryptedFS } from '@core/features/files/EncryptedFS';
 import { FileController } from '@core/features/files/FileController';
 import { RootedFS } from '@core/features/files/RootedFS';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { ProfileObject } from '@core/storage/ProfilesManager';
+import { VaultObject } from '@core/storage/VaultsManager';
 import { useFilesStorage } from '@features/files';
 import { DisposableBox } from '@utils/disposable';
 
-import { createProfilesApi, ProfileEntry } from './profiles';
+import { createVaultsApi, VaultEntry } from './vaults';
 
-export type ProfileContainer = {
-	profile: ProfileEntry;
+export type VaultContainer = {
+	vault: VaultEntry;
 	db: ManagedDatabase<SQLiteDB>;
 	encryptionController: EncryptionController;
 	files: IFilesStorage;
@@ -72,25 +72,25 @@ export class VaultOpenError extends Error {
 
 // TODO: cover with tests to ensure we can decrypt exists vault
 /**
- * Hook to manage active and opened profiles
+ * Hook to manage active and opened vaults
  */
-export const useProfileContainers = () => {
+export const useVaultContainers = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 
-	const [{ $profiles, $activeProfile, ...api }] = useState(() =>
-		createProfilesApi<DisposableBox<ProfileContainer>>(),
+	const [{ $vaults, $activeVault, ...api }] = useState(() =>
+		createVaultsApi<DisposableBox<VaultContainer>>(),
 	);
 
-	const profiles = useUnit($profiles);
-	const activeProfile = useUnit($activeProfile);
+	const vaults = useUnit($vaults);
+	const activeVault = useUnit($activeVault);
 
 	const files = useFilesStorage();
 
-	const { profileOpened, activeProfileChanged } = api.events;
-	const openProfile = useCallback(
+	const { vaultOpened, activeVaultChanged } = api.events;
+	const openVault = useCallback(
 		async (
-			{ profile, password }: { profile: ProfileObject; password?: string },
-			changeActiveProfile = false,
+			{ vault, password }: { vault: VaultObject; password?: string },
+			changeActiveVault = false,
 		) => {
 			const cleanups: (() => void)[] = [];
 
@@ -108,15 +108,12 @@ export const useProfileContainers = () => {
 			};
 
 			try {
-				const profileFilesController = new RootedFS(
-					files,
-					`/vaults/${profile.id}`,
-				);
+				const vaultFilesController = new RootedFS(files, `/vaults/${vault.id}`);
 
 				// Setup encryption
 				let encryptionController: EncryptionController;
 
-				if (profile.encryption === null) {
+				if (vault.encryption === null) {
 					encryptionController = new EncryptionController(
 						new PlaceholderEncryptionController(),
 					);
@@ -124,25 +121,25 @@ export const useProfileContainers = () => {
 					if (password === undefined)
 						throw new VaultOpenError(
 							VaultOpenErrorCode.INCORRECT_PASSWORD,
-							'Empty password for encrypted profile',
+							'Empty password for encrypted vault',
 						);
 
-					const encryptedKeyBuffer = await profileFilesController.get('key');
+					const encryptedKeyBuffer = await vaultFilesController.get('key');
 					if (!encryptedKeyBuffer) {
 						throw new VaultOpenError(
 							VaultOpenErrorCode.KEY_FILE_NOT_FOUND,
-							'Key file is not found in profile directory',
+							'Key file is not found in vault directory',
 						);
 					}
 
-					const salt = new Uint8Array(base64ToBytes(profile.encryption.salt));
+					const salt = new Uint8Array(base64ToBytes(vault.encryption.salt));
 					let key;
 					try {
 						key = await decryptKey({
 							encryptedKey: encryptedKeyBuffer,
 							password,
 							salt,
-							algorithm: profile.encryption.algorithm,
+							algorithm: vault.encryption.algorithm,
 						});
 					} catch (error) {
 						throw new VaultOpenError(
@@ -155,21 +152,21 @@ export const useProfileContainers = () => {
 					const encryption = await createEncryption({
 						key,
 						salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
-						algorithm: profile.encryption.algorithm,
+						algorithm: vault.encryption.algorithm,
 					});
 
 					cleanups.push(() => encryption.dispose());
 					encryptionController = encryption.getContent();
 				}
 
-				const encryptedProfileFS = new EncryptedFS(
-					profileFilesController,
+				const encryptedVaultFS = new EncryptedFS(
+					vaultFilesController,
 					encryptionController,
 				);
 
 				// Setup DB
 				const db = await openSQLite(
-					new FileController('vault.db', encryptedProfileFS),
+					new FileController('vault.db', encryptedVaultFS),
 				);
 
 				cleanups.push(() => db.close());
@@ -186,45 +183,45 @@ export const useProfileContainers = () => {
 					await db.sync();
 				}
 
-				const profileObject: ProfileEntry = {
-					id: profile.id,
-					name: profile.name,
-					isEncrypted: profile.encryption !== null,
+				const vaultEntry: VaultEntry = {
+					id: vault.id,
+					name: vault.name,
+					isEncrypted: vault.encryption !== null,
 				};
 
-				const newProfile = new DisposableBox(
+				const newVault = new DisposableBox(
 					{
 						db,
-						profile: profileObject,
+						vault: vaultEntry,
 						encryptionController,
-						files: encryptedProfileFS,
-					} satisfies ProfileContainer,
+						files: encryptedVaultFS,
+					} satisfies VaultContainer,
 					runCleanups,
 				);
 
-				profileOpened(newProfile);
+				vaultOpened(newVault);
 
-				if (changeActiveProfile) {
-					activeProfileChanged(newProfile);
+				if (changeActiveVault) {
+					activeVaultChanged(newVault);
 				}
 
-				return newProfile;
+				return newVault;
 			} catch (error) {
-				// Close all resources if opening the profile fails
+				// Close all resources if opening the vault fails
 				await runCleanups();
 
 				throw error;
 			}
 		},
-		[activeProfileChanged, files, profileOpened, t],
+		[activeVaultChanged, files, vaultOpened, t],
 	);
 
 	return {
-		activeProfile,
-		profiles,
+		activeVault,
+		vaults,
 		...api,
-		openProfile,
+		openVault,
 	};
 };
 
-export type ProfilesApi = ReturnType<typeof useProfileContainers>;
+export type VaultsApi = ReturnType<typeof useVaultContainers>;

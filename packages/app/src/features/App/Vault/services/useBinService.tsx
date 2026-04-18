@@ -9,12 +9,12 @@ import {
 	selectWorkspacesSummary,
 } from '@state/redux/profiles/selectors/vault';
 
-import { useProfileControls } from '..';
+import { useVaultControls } from '..';
 
 export const useBinService = () => {
 	const {
-		profile: { db },
-	} = useProfileControls();
+		vault: { db },
+	} = useVaultControls();
 	const workspaces = useVaultSelector(selectWorkspacesSummary);
 	const { autoClean, cleanIntervalInMs } = useVaultSelector(selectBinRetentionPolicy);
 

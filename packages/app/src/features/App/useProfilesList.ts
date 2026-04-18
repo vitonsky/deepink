@@ -5,64 +5,64 @@ import { deriveBitsFromPassword, KEY_SALT_BYTES } from '@core/encryption/utils/k
 import { getRandomBytes } from '@core/encryption/utils/random';
 import { createEncryption } from '@core/features/encryption/createEncryption';
 import { RootedFS } from '@core/features/files/RootedFS';
-import { ProfileObject, ProfilesManager } from '@core/storage/ProfilesManager';
+import { VaultObject, VaultsManager } from '@core/storage/VaultsManager';
 import { useFilesStorage } from '@features/files';
 
-import { NewProfile } from './ProfileCreator';
+import { NewVault } from './VaultCreator';
 
-export type ProfilesListApi = {
-	isProfilesLoaded: boolean;
-	profiles: ProfileObject[];
-	createProfile: (profile: NewProfile) => Promise<ProfileObject>;
+export type VaultsListApi = {
+	isVaultsLoaded: boolean;
+	vaults: VaultObject[];
+	createVault: (vault: NewVault) => Promise<VaultObject>;
 };
 
 /**
- * Hook to manage profile accounts
+ * Hook to manage vault accounts
  */
-export const useProfilesList = (): ProfilesListApi => {
+export const useVaultsList = (): VaultsListApi => {
 	const files = useFilesStorage();
-	const profilesManager = useMemo(
+	const vaultsManager = useMemo(
 		() =>
-			new ProfilesManager(
+			new VaultsManager(
 				files,
-				(profileName) => new RootedFS(files, `/vaults/${profileName}`),
+				(vaultName) => new RootedFS(files, `/vaults/${vaultName}`),
 			),
 		[files],
 	);
 
-	const [profiles, setProfiles] = useState<ProfileObject[]>([]);
-	const [isProfilesLoaded, setIsProfilesLoaded] = useState(false);
+	const [vaults, setVaults] = useState<VaultObject[]>([]);
+	const [isVaultsLoaded, setIsVaultsLoaded] = useState(false);
 
-	const updateProfiles = useCallback(
+	const updateVaults = useCallback(
 		() =>
-			profilesManager.getProfiles().then((profiles) => {
-				setProfiles(profiles);
-				setIsProfilesLoaded(true);
+			vaultsManager.getVaults().then((vaults) => {
+				setVaults(vaults);
+				setIsVaultsLoaded(true);
 			}),
-		[profilesManager],
+		[vaultsManager],
 	);
 
 	// Init state
 	useEffect(() => {
-		updateProfiles();
-	}, [updateProfiles]);
+		updateVaults();
+	}, [updateVaults]);
 
-	const createProfile = useCallback(
-		async (profile: NewProfile) => {
-			let profileData;
-			if (profile.password === null) {
-				// Create profile with no encryption
-				profileData = await profilesManager.add({
-					name: profile.name,
+	const createVault = useCallback(
+		async (vault: NewVault) => {
+			let vaultData;
+			if (vault.password === null) {
+				// Create vault with no encryption
+				vaultData = await vaultsManager.add({
+					name: vault.name,
 					encryption: null,
 				});
 			} else {
-				// Create encrypted profile
-				console.log('Create profile with encryption', profile.algorithm);
+				// Create encrypted vault
+				console.log('Create vault with encryption', vault.algorithm);
 
 				const passwordSalt = getRandomBytes(16);
 				const keyPassword = await deriveBitsFromPassword(
-					profile.password,
+					vault.password,
 					passwordSalt,
 				);
 
@@ -72,7 +72,7 @@ export const useProfilesList = (): ProfilesListApi => {
 				const encryption = await createEncryption({
 					key: keyPassword,
 					salt: keySalt,
-					algorithm: profile.algorithm,
+					algorithm: vault.algorithm,
 				});
 
 				const encryptedKey = await encryption
@@ -80,26 +80,26 @@ export const useProfilesList = (): ProfilesListApi => {
 					.encrypt(key.buffer)
 					.finally(() => encryption.dispose());
 
-				profileData = await profilesManager.add({
-					name: profile.name,
+				vaultData = await vaultsManager.add({
+					name: vault.name,
 					encryption: {
-						algorithm: profile.algorithm,
+						algorithm: vault.algorithm,
 						salt: bytesToBase64(passwordSalt.buffer),
 						key: joinBuffers([keySalt.buffer, encryptedKey]),
 					},
 				});
 			}
 
-			await updateProfiles();
+			await updateVaults();
 
-			return profileData;
+			return vaultData;
 		},
-		[profilesManager, updateProfiles],
+		[vaultsManager, updateVaults],
 	);
 
 	return {
-		isProfilesLoaded,
-		profiles,
-		createProfile,
+		isVaultsLoaded,
+		vaults,
+		createVault,
 	};
 };

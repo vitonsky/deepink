@@ -28,39 +28,39 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { shuffleArray } from '@utils/collections/shuffleArray';
 
-import { ProfilesForm } from '../ProfilesForm';
+import { VaultsForm } from '../VaultsForm';
 
-export type NewProfile = {
+export type NewVault = {
 	name: string;
 	password: string | null;
 	algorithm: string;
 };
 
-export type ProfileCreatorProps = {
-	onCreateProfile: (profile: NewProfile) => Promise<void | string>;
+export type VaultCreatorProps = {
+	onCreateVault: (vault: NewVault) => Promise<void | string>;
 	onCancel?: () => void;
-	defaultProfileName?: string;
+	defaultVaultName?: string;
 };
 
-export const ProfileCreator: FC<ProfileCreatorProps> = ({
-	onCreateProfile,
+export const VaultCreator: FC<VaultCreatorProps> = ({
+	onCreateVault,
 	onCancel,
-	defaultProfileName,
+	defaultVaultName,
 }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
 
 	const telemetry = useTelemetryTracker();
 
-	const profileNameInputRef = useRef<HTMLInputElement | null>(null);
+	const vaultNameInputRef = useRef<HTMLInputElement | null>(null);
 	const passwordInputRef = useRef<HTMLInputElement | null>(null);
 
 	const [isPending, setIsPending] = useState(false);
 
-	const [profileName, setProfileName] = useState(defaultProfileName ?? '');
-	const [profileNameError, setProfileNameError] = useState<null | string>(null);
+	const [vaultName, setVaultName] = useState(defaultVaultName ?? '');
+	const [vaultNameError, setVaultNameError] = useState<null | string>(null);
 	useEffect(() => {
-		setProfileNameError(null);
-	}, [profileName]);
+		setVaultNameError(null);
+	}, [vaultName]);
 
 	const [password, setPassword] = useState('');
 	const [passwordError, setPasswordError] = useState<null | string>(null);
@@ -73,9 +73,9 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	const onPressCreate = useCallback(
 		async (usePassword = true) => {
-			if (!profileName) {
-				setProfileNameError(t('creator.errors.nameRequired'));
-				profileNameInputRef.current?.focus();
+			if (!vaultName) {
+				setVaultNameError(t('creator.errors.nameRequired'));
+				vaultNameInputRef.current?.focus();
 				return;
 			}
 
@@ -86,11 +86,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			}
 
 			setIsPending(true);
-			setProfileNameError(null);
+			setVaultNameError(null);
 			setPasswordError(null);
 
-			const response = await onCreateProfile({
-				name: profileName,
+			const response = await onCreateVault({
+				name: vaultName,
 				password: usePassword ? password : null,
 				algorithm,
 			}).finally(() => {
@@ -98,7 +98,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			});
 
 			if (response !== undefined) {
-				setProfileNameError(response);
+				setVaultNameError(response);
 			} else {
 				telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_CREATED, {
 					encryption: usePassword ? algorithm : 'none',
@@ -106,11 +106,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 			}
 		},
 		[
-			profileName,
+			vaultName,
 			password,
-			onCreateProfile,
+			onCreateVault,
 			algorithm,
-			profileNameInputRef,
+			vaultNameInputRef,
 			passwordInputRef,
 			t,
 			telemetry,
@@ -119,9 +119,9 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 	// Set focus to the input
 	useEffect(() => {
-		const hasProfileName = profileNameInputRef.current?.value;
-		if (!hasProfileName) {
-			profileNameInputRef.current?.focus();
+		const hasVaultName = vaultNameInputRef.current?.value;
+		if (!hasVaultName) {
+			vaultNameInputRef.current?.focus();
 			return;
 		}
 
@@ -131,7 +131,7 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 	const noPasswordDialogState = useDisclosure();
 
 	return (
-		<ProfilesForm
+		<VaultsForm
 			title={t('creator.title')}
 			controls={
 				<>
@@ -209,11 +209,11 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 
 					<InputGroup size="md">
 						<Input
-							ref={profileNameInputRef}
+							ref={vaultNameInputRef}
 							placeholder={t('creator.field.name.placeholder')}
-							value={profileName}
-							onChange={(evt) => setProfileName(evt.target.value)}
-							focusBorderColor={profileNameError ? 'red.500' : undefined}
+							value={vaultName}
+							onChange={(evt) => setVaultName(evt.target.value)}
+							focusBorderColor={vaultNameError ? 'red.500' : undefined}
 							disabled={isPending}
 						/>
 						<InputRightElement>
@@ -227,16 +227,16 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 										t('creator.field.name.suggests', {
 											returnObjects: true,
 										}) as string[],
-									).find((name) => name !== profileName);
+									).find((name) => name !== vaultName);
 
-									if (suggestedName) setProfileName(suggestedName);
-									profileNameInputRef.current?.focus();
+									if (suggestedName) setVaultName(suggestedName);
+									vaultNameInputRef.current?.focus();
 								}}
 							/>
 						</InputRightElement>
 					</InputGroup>
 
-					{profileNameError && <Text color="red.500">{profileNameError}</Text>}
+					{vaultNameError && <Text color="red.500">{vaultNameError}</Text>}
 				</VStack>
 				<VStack w="100%" alignItems="start">
 					<HStack>
@@ -279,6 +279,6 @@ export const ProfileCreator: FC<ProfileCreatorProps> = ({
 					</Select>
 				</VStack>
 			</VStack>
-		</ProfilesForm>
+		</VaultsForm>
 	);
 };

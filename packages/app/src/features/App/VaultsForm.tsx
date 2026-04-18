@@ -1,12 +1,12 @@
 import React, { PropsWithChildren, ReactNode } from 'react';
 import { Text, VStack } from '@chakra-ui/react';
 
-export type ProfilesFormProps = PropsWithChildren<{
+export type VaultsFormProps = PropsWithChildren<{
 	title?: ReactNode;
 	controls?: ReactNode;
 }>;
 
-export const ProfilesForm = ({ title, controls, children }: ProfilesFormProps) => {
+export const VaultsForm = ({ title, controls, children }: VaultsFormProps) => {
 	return (
 		<VStack alignItems="start" gap="1.5rem">
 			<VStack alignItems="start" w="100%" gap="1rem">

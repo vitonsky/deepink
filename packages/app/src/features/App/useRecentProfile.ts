@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 
-export const useRecentProfile = (config: ConfigStorage) => {
-	const [profileId, setProfileId] = useState<{
+export const useRecentVault = (config: ConfigStorage) => {
+	const [vaultId, setVaultId] = useState<{
 		isLoaded: boolean;
-		profileId: string | null;
+		vaultId: string | null;
 	}>({
 		isLoaded: false,
-		profileId: null,
+		vaultId: null,
 	});
 
 	// Restore
@@ -15,14 +15,14 @@ export const useRecentProfile = (config: ConfigStorage) => {
 	useEffect(() => {
 		if (isRestoredRef.current) return;
 
-		config.get('activeProfile').then((activeProfile) => {
+		config.get('activeVault').then((activeVault) => {
 			isRestoredRef.current = true;
-			setProfileId({
+			setVaultId({
 				isLoaded: true,
-				profileId: activeProfile,
+				vaultId: activeVault,
 			});
 		});
 	}, [config]);
 
-	return profileId;
+	return vaultId;
 };

@@ -41,7 +41,7 @@ import {
 	workspacesApi,
 } from '@state/redux/profiles/profiles';
 
-import { useProfileControls } from '../../Profile';
+import { useVaultControls } from '../../Vault';
 import {
 	useAttachmentsController,
 	useFilesController,
@@ -59,8 +59,8 @@ export const WorkspaceSettings = () => {
 	const telemetry = useTelemetryTracker();
 
 	const {
-		profile: { db },
-	} = useProfileControls();
+		vault: { db },
+	} = useVaultControls();
 
 	const { abort: abortImport } = useImportNotesPreset();
 
@@ -132,7 +132,7 @@ export const WorkspaceSettings = () => {
 		dispatch(
 			workspacesApi.setActiveWorkspace({
 				workspaceId: nextWorkspace.id,
-				profileId: currentWorkspace.profileId,
+				vaultId: currentWorkspace.vaultId,
 			}),
 		);
 
@@ -149,7 +149,7 @@ export const WorkspaceSettings = () => {
 		files,
 		filesController,
 		currentWorkspace.workspaceId,
-		currentWorkspace.profileId,
+		currentWorkspace.vaultId,
 		attachments,
 		workspaceFiles,
 		dispatch,

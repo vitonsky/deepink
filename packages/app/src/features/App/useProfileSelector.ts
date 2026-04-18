@@ -1,25 +1,25 @@
 import { useCallback, useEffect } from 'react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectActiveProfile, workspacesApi } from '@state/redux/profiles/profiles';
+import { selectActiveVault, workspacesApi } from '@state/redux/profiles/profiles';
 
-export const useProfileSelector = (config: ConfigStorage) => {
+export const useActiveVaultId = (config: ConfigStorage) => {
 	const dispatch = useAppDispatch();
 
-	const currentProfile = useAppSelector(selectActiveProfile);
-	const setCurrentProfile = useCallback(
-		(profileId: string | null) => {
-			dispatch(workspacesApi.setActiveProfile(profileId));
+	const currentVaultId = useAppSelector(selectActiveVault);
+	const setCurrentVaultId = useCallback(
+		(vaultId: string | null) => {
+			dispatch(workspacesApi.setActiveVault(vaultId));
 		},
 		[dispatch],
 	);
 
-	// Write recent profile to config
+	// Write recent vault to config
 	useEffect(() => {
-		if (currentProfile !== null) {
-			config.set('activeProfile', currentProfile);
+		if (currentVaultId !== null) {
+			config.set('activeVault', currentVaultId);
 		}
-	}, [config, currentProfile]);
+	}, [config, currentVaultId]);
 
-	return [currentProfile, setCurrentProfile] as const;
+	return [currentVaultId, setCurrentVaultId] as const;
 };

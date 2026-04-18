@@ -2,30 +2,30 @@ import { useEffect } from 'react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
-import { ProfileConfigScheme, selectProfile } from '@state/redux/profiles/profiles';
+import { selectVaultById, VaultConfigScheme } from '@state/redux/profiles/profiles';
 import { createAppSelector } from '@state/redux/utils';
 
-import { useProfileControls } from '..';
+import { useVaultControls } from '..';
 
 export const useVaultConfigSync = () => {
 	const {
-		profile: {
+		vault: {
 			files,
-			profile: { id: profileId },
+			vault: { id: vaultId },
 		},
-	} = useProfileControls();
+	} = useVaultControls();
 
 	const watchSelector = useWatchSelector();
 	useEffect(() => {
 		const vaultConfig = new StateFile(
 			new FileController('config.json', files),
-			ProfileConfigScheme,
+			VaultConfigScheme,
 		);
 
 		return watchSelector({
 			selector: createAppSelector(
-				selectProfile({ profileId }),
-				(profile) => profile?.config,
+				selectVaultById({ vaultId }),
+				(vault) => vault?.config,
 			),
 			onChange(config) {
 				if (!config) return;
@@ -35,5 +35,5 @@ export const useVaultConfigSync = () => {
 				});
 			},
 		});
-	}, [files, profileId, watchSelector]);
+	}, [files, vaultId, watchSelector]);
 };

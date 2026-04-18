@@ -10,8 +10,8 @@ import { selectWorkspaceName } from '@state/redux/profiles/profiles';
 import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { ProfileContainer } from '../Profiles/hooks/useProfileContainers';
 import { SettingsWindow } from '../Settings/SettingsWindow';
+import { VaultContainer } from '../Vaults/hooks/useVaultContainers';
 import { WorkspaceServices } from './services/WorkspaceServices';
 import { useWorkspace } from './useWorkspace';
 import { WorkspaceProvider } from './WorkspaceProvider';
@@ -20,19 +20,19 @@ import { WorkspaceStatusBarItems } from './WorkspaceStatusBarItems';
 
 export const WorkspaceContext = createContext<{
 	workspaceId: string;
-	profileId: string;
+	vaultId: string;
 } | null>(null);
 export const useWorkspaceContext = createContextGetterHook(WorkspaceContext);
 
 export interface WorkspaceProps {
-	profile: ProfileContainer;
+	vault: VaultContainer;
 }
 
 /**
  * Manage one workspace
  */
-export const Workspace: FC<WorkspaceProps> = ({ profile }) => {
-	const workspace = useWorkspace(profile);
+export const Workspace: FC<WorkspaceProps> = ({ vault }) => {
+	const workspace = useWorkspace(vault);
 	const dispatch = useAppDispatch();
 	const workspaceActions = useWorkspaceActions();
 

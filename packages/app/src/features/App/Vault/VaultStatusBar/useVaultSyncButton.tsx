@@ -6,17 +6,17 @@ import { useDebounce } from 'use-debounce';
 import { Box } from '@chakra-ui/react';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 
-import { useProfileControls } from '..';
+import { useVaultControls } from '..';
 
-import styles from './ProfileStatusBar.module.css';
+import styles from './VaultStatusBar.module.css';
 
-export const useProfileSyncButton = () => {
+export const useVaultSyncButton = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const { controls } = useStatusBarManager();
 
 	const {
-		profile: { db },
-	} = useProfileControls();
+		vault: { db },
+	} = useVaultControls();
 
 	const [isPending, setIsPending] = useDebounce(false, 900);
 	useEffect(() => {

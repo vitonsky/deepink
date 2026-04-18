@@ -2,10 +2,10 @@ import React, { FC } from 'react';
 import { Box } from '@chakra-ui/react';
 
 import { AppServices } from './AppServices';
-import { Profiles } from './Profiles';
-import { ProfilesApi } from './Profiles/hooks/useProfileContainers';
+import { Vaults } from './Vaults';
+import { VaultsApi } from './Vaults/hooks/useVaultContainers';
 
-export const VaultScreen: FC<{ vaultContainers: ProfilesApi }> = ({
+export const VaultScreen: FC<{ vaultContainers: VaultsApi }> = ({
 	vaultContainers,
 }) => {
 	return (
@@ -16,7 +16,7 @@ export const VaultScreen: FC<{ vaultContainers: ProfilesApi }> = ({
 				height: '100vh',
 			}}
 		>
-			<Profiles profilesApi={vaultContainers} />
+			<Vaults vaultsApi={vaultContainers} />
 			<AppServices />
 		</Box>
 	);

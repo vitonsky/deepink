@@ -1,5 +1,5 @@
 {
-	"chooseProfile": {
+	"chooseVault": {
 		"title": "Choose a vault",
 		"actions": {
 			"createNew": "Create new vault"
@@ -99,7 +99,7 @@
 		},
 		"actions": {
 			"unlock": "Unlock",
-			"changeProfile": "Change vault"
+			"changeVault": "Change vault"
 		},
 		"errors": {
 			"cannotOpen": "Cannot open vault",

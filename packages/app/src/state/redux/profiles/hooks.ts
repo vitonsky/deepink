@@ -1,31 +1,31 @@
 import { useCallback, useMemo } from 'react';
 import { isEqual } from 'lodash';
-import { useProfileControls } from '@features/App/Profile';
+import { useVaultControls } from '@features/App/Vault';
 import { useWorkspaceContext } from '@features/App/Workspace';
 import { ActionCreatorWithPayload, Selector } from '@reduxjs/toolkit';
 
 import { useAppSelector } from '../hooks';
 import { RootState } from '../store';
 import {
-	ProfileData,
-	selectProfile,
+	selectVaultById,
 	selectWorkspace,
+	VaultData,
 	WorkspaceData,
 	workspacesApi,
 } from './profiles';
 
 export const useWorkspaceData = () => {
-	const { profileId, workspaceId } = useWorkspaceContext();
-	return useMemo(() => ({ profileId, workspaceId }), [profileId, workspaceId]);
+	const { vaultId, workspaceId } = useWorkspaceContext();
+	return useMemo(() => ({ vaultId, workspaceId }), [vaultId, workspaceId]);
 };
 
-// Select profile and workspace from context
+// Select vault and workspace from context
 export const useWorkspaceRootSelector = () => {
-	const { profileId, workspaceId } = useWorkspaceData();
+	const { vaultId, workspaceId } = useWorkspaceData();
 
 	return useMemo(
-		() => selectWorkspace({ profileId, workspaceId }),
-		[profileId, workspaceId],
+		() => selectWorkspace({ vaultId, workspaceId }),
+		[vaultId, workspaceId],
 	);
 };
 
@@ -36,20 +36,20 @@ export const useWorkspaceSelector = <T>(
 	return useAppSelector((state) => selector(selectWorkspace(state)), isEqual);
 };
 
-export const useVaultSelector = <T>(selector: Selector<ProfileData | null, T>): T => {
+export const useVaultSelector = <T>(selector: Selector<VaultData | null, T>): T => {
 	const {
-		profile: {
-			profile: { id: profileId },
+		vault: {
+			vault: { id: vaultId },
 		},
-	} = useProfileControls();
+	} = useVaultControls();
 
 	const composedSelector = useCallback(
 		(state: RootState) => {
-			const selectConfiguredProfile = selectProfile({ profileId });
-			const profile = selectConfiguredProfile(state);
-			return selector(profile);
+			const selectConfiguredVault = selectVaultById({ vaultId });
+			const vault = selectConfiguredVault(state);
+			return selector(vault);
 		},
-		[profileId, selector],
+		[vaultId, selector],
 	);
 
 	return useAppSelector(composedSelector, isEqual);
@@ -60,33 +60,33 @@ type StripPropsInActionCreator<T, StripPropsSignature extends {}> = {
 		StripPropsSignature & infer _P,
 		infer _
 	>
-		? K
-		: never]: T[K] extends ActionCreatorWithPayload<
+	? K
+	: never]: T[K] extends ActionCreatorWithPayload<
 		StripPropsSignature & infer P,
 		infer N
 	>
-		? ActionCreatorWithPayload<Omit<P, keyof StripPropsSignature>, N>
-		: never;
+	? ActionCreatorWithPayload<Omit<P, keyof StripPropsSignature>, N>
+	: never;
 };
 
 export const useVaultActions = () => {
 	const {
-		profile: {
-			profile: { id: profileId },
+		vault: {
+			vault: { id: vaultId },
 		},
-	} = useProfileControls();
+	} = useVaultControls();
 
 	return useMemo(() => {
 		return Object.fromEntries(
 			Object.entries(workspacesApi).map(([key, action]) => [
 				key,
-				(props: Record<any, any>) => action({ profileId, ...props } as any),
+				(props: Record<any, any>) => action({ vaultId, ...props } as any),
 			]),
 		) as unknown as StripPropsInActionCreator<
 			typeof workspacesApi,
-			{ profileId: string }
+			{ vaultId: string }
 		>;
-	}, [profileId]);
+	}, [vaultId]);
 };
 
 export const useWorkspaceActions = () => {
@@ -102,7 +102,7 @@ export const useWorkspaceActions = () => {
 		) as unknown as StripPropsInActionCreator<
 			typeof workspacesApi,
 			{
-				profileId: string;
+				vaultId: string;
 				workspaceId: string;
 			}
 		>;

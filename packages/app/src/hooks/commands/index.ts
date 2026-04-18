@@ -42,7 +42,7 @@ export enum GLOBAL_COMMANDS {
 	OPEN_GLOBAL_SETTINGS = 'Open global settings',
 	SYNC_DATABASE = 'Synchronize database',
 
-	LOCK_CURRENT_PROFILE = 'Lock current profile',
+	LOCK_CURRENT_VAULT = 'Lock current vault',
 	FOCUS_SEARCH = 'Focus search input',
 
 	SHORTCUT_PRESSED = 'Shortcut pressed',
@@ -66,6 +66,6 @@ type CommandsWithPayload = {
 
 export type CommandPayloadsMap = {
 	[K in GLOBAL_COMMANDS]: K extends keyof CommandsWithPayload
-		? CommandsWithPayload[K]
-		: void;
+	? CommandsWithPayload[K]
+	: void;
 };

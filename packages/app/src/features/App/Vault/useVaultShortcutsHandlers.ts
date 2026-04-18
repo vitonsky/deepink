@@ -6,8 +6,8 @@ import { useShortcutCallback } from '@hooks/shortcuts/useShortcutCallback';
 export const useVaultShortcutsHandlers = () => {
 	const command = useCommand();
 
-	useShortcutCallback(Shortcuts.LOCK_CURRENT_PROFILE, () =>
-		command(GLOBAL_COMMANDS.LOCK_CURRENT_PROFILE),
+	useShortcutCallback(Shortcuts.LOCK_CURRENT_VAULT, () =>
+		command(GLOBAL_COMMANDS.LOCK_CURRENT_VAULT),
 	);
 
 	useShortcutCallback(Shortcuts.SYNC_DATABASE, () =>

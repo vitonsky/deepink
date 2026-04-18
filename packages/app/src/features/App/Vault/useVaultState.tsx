@@ -3,10 +3,10 @@ import z from 'zod';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
-import { selectProfile } from '@state/redux/profiles/profiles';
+import { selectVaultById } from '@state/redux/profiles/profiles';
 import { createAppSelector } from '@state/redux/utils';
 
-import { ProfileControls } from '.';
+import { VaultControls } from '.';
 
 const vaultStateScheme = z.object({
 	activeWorkspace: z.string().nullable(),
@@ -15,14 +15,14 @@ const vaultStateScheme = z.object({
 export const useVaultState = ({
 	sync,
 	controls: {
-		profile: {
+		vault: {
 			files,
-			profile: { id: profileId },
+			vault: { id: vaultId },
 		},
 	},
 }: {
 	sync: boolean;
-	controls: ProfileControls;
+	controls: VaultControls;
 }) => {
 	const [vaultState] = useState(
 		() =>
@@ -37,7 +37,7 @@ export const useVaultState = ({
 		if (!sync) return;
 
 		return watchSelector({
-			selector: createAppSelector(selectProfile({ profileId }), (state) => {
+			selector: createAppSelector(selectVaultById({ vaultId }), (state) => {
 				if (!state) return null;
 
 				const { activeWorkspace } = state;
@@ -50,7 +50,7 @@ export const useVaultState = ({
 				vaultState.set(state);
 			},
 		});
-	}, [files, profileId, sync, vaultState, watchSelector]);
+	}, [files, vaultId, sync, vaultState, watchSelector]);
 
 	return useCallback(() => vaultState.get(), [vaultState]);
 };

@@ -13,7 +13,7 @@ export enum Shortcuts {
 
 	TOGGLE_CURRENT_NOTE_HISTORY_PANEL,
 
-	LOCK_CURRENT_PROFILE,
+	LOCK_CURRENT_VAULT,
 	SYNC_DATABASE,
 
 	FOCUS_SEARCH,
@@ -35,7 +35,7 @@ export const SHORTCUTS_MAP = {
 
 	'CmdOrCtrl+H': Shortcuts.TOGGLE_CURRENT_NOTE_HISTORY_PANEL,
 
-	'CmdOrCtrl+L': Shortcuts.LOCK_CURRENT_PROFILE,
+	'CmdOrCtrl+L': Shortcuts.LOCK_CURRENT_VAULT,
 	'CmdOrCtrl+S': Shortcuts.SYNC_DATABASE,
 
 	'CmdOrCtrl+F': Shortcuts.FOCUS_SEARCH,
@@ -64,6 +64,6 @@ export const SHORTCUT_I18N_KEYS: Record<Shortcuts, string> = {
 	[Shortcuts.FOCUS_SEARCH]: 'hotkeys.shortcuts.focusSearch',
 	[Shortcuts.SYNC_DATABASE]: 'hotkeys.shortcuts.syncDatabase',
 
-	[Shortcuts.LOCK_CURRENT_PROFILE]: 'hotkeys.shortcuts.lockProfile',
+	[Shortcuts.LOCK_CURRENT_VAULT]: 'hotkeys.shortcuts.lockVault',
 	[Shortcuts.OPEN_GLOBAL_SETTINGS]: 'hotkeys.shortcuts.openSettings',
 };

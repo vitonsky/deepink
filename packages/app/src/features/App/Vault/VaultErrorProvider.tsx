@@ -6,12 +6,12 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
-import { ProfileControls } from '.';
+import { VaultControls } from '.';
 
 export const VaultErrorContext = createContext<((error: Error) => void) | null>(null);
 export const useVaultError = createContextGetterHook(VaultErrorContext);
 
-export const VaultErrorProvider: FC<PropsWithChildren<{ controls: ProfileControls }>> = ({
+export const VaultErrorProvider: FC<PropsWithChildren<{ controls: VaultControls }>> = ({
 	controls,
 	children,
 }) => {
@@ -29,7 +29,7 @@ export const VaultErrorProvider: FC<PropsWithChildren<{ controls: ProfileControl
 				isClosable: true,
 				title: t('errors.failedToOpen'),
 				description: t('errors.corrupted', {
-					name: controls.profile.profile.name,
+					name: controls.vault.vault.name,
 				}),
 				containerStyle: { maxW: '400px' },
 			});

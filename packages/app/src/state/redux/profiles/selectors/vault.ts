@@ -1,9 +1,9 @@
 import ms from 'ms';
 
-import { ProfileData } from '../profiles';
+import { VaultData } from '../profiles';
 import { createVaultSelector } from '../utils';
 
-export const selectVault = (state: ProfileData | null) => {
+export const selectVault = (state: VaultData | null) => {
 	if (!state) throw new Error('Vault selector is used out of vault context');
 	return state;
 };

@@ -1,10 +1,10 @@
 import { INote, NoteId } from '@core/features/notes';
 import { createSelector } from '@reduxjs/toolkit';
 
-import { ProfileData, WorkspaceData } from './profiles';
+import { VaultData, WorkspaceData } from './profiles';
 
 export const createWorkspaceSelector = createSelector.withTypes<WorkspaceData>();
-export const createVaultSelector = createSelector.withTypes<ProfileData>();
+export const createVaultSelector = createSelector.withTypes<VaultData>();
 
 export const selectWorkspaceRoot = (workspace: WorkspaceData | null) => workspace;
 

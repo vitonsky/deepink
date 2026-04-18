@@ -5,18 +5,18 @@ import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Button, Divider, HStack, Text } from '@chakra-ui/react';
 import { NestedList } from '@components/NestedList';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { ProfileObject } from '@core/storage/ProfilesManager';
+import { VaultObject } from '@core/storage/VaultsManager';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useAppDispatch } from '@state/redux/hooks';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
 import { CenterBox } from './CenterBox';
-import { ProfilesForm } from './ProfilesForm';
-import { OnPickProfile } from './types';
+import { VaultsForm } from './VaultsForm';
+import { OnPickVault } from './types';
 
 export const ChooseVaultScreen: FC<{
-	vaults: ProfileObject[];
-	onOpenVault: OnPickProfile;
+	vaults: VaultObject[];
+	onOpenVault: OnPickVault;
 	onCreateVault: () => void;
 }> = ({ vaults, onOpenVault, onCreateVault }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
@@ -24,8 +24,8 @@ export const ChooseVaultScreen: FC<{
 
 	return (
 		<CenterBox>
-			<ProfilesForm
-				title={t('chooseProfile.title')}
+			<VaultsForm
+				title={t('chooseVault.title')}
 				controls={
 					<Button
 						variant="accent"
@@ -33,7 +33,7 @@ export const ChooseVaultScreen: FC<{
 						w="100%"
 						onClick={() => onCreateVault()}
 					>
-						{t('chooseProfile.actions.createNew')}
+						{t('chooseVault.actions.createNew')}
 					</Button>
 				}
 			>
@@ -59,7 +59,7 @@ export const ChooseVaultScreen: FC<{
 									gap: '.8rem',
 								}}
 								onClick={() => {
-									dispatch(workspacesApi.setActiveProfile(vault.id));
+									dispatch(workspacesApi.setActiveVault(vault.id));
 
 									if (vault.encryption === null) {
 										onOpenVault(vault);
@@ -76,7 +76,7 @@ export const ChooseVaultScreen: FC<{
 						),
 					}))}
 				/>
-			</ProfilesForm>
+			</VaultsForm>
 		</CenterBox>
 	);
 };

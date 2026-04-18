@@ -14,16 +14,16 @@ import {
 } from '@state/redux/profiles/selectors/vault';
 import { wait } from '@utils/time';
 
-import { useProfileControls } from '..';
+import { useVaultControls } from '..';
 
 export const useFilesIntegrityService = () => {
 	const {
-		profile: {
+		vault: {
 			db,
-			profile: { id: profileId },
+			vault: { id: vaultId },
 			encryptionController,
 		},
-	} = useProfileControls();
+	} = useVaultControls();
 	const workspaces = useVaultSelector(selectWorkspacesSummary);
 	const { enabled: isServiceEnabled } = useVaultSelector(selectIntegrityServiceConfig);
 
@@ -97,7 +97,7 @@ export const useFilesIntegrityService = () => {
 		isServiceEnabled,
 		db,
 		encryptionController,
-		profileId,
+		vaultId,
 		runService,
 		workspaces,
 		vaultStorage,

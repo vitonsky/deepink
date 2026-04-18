@@ -5,14 +5,14 @@ import { createAppSelector } from '../../utils';
 
 import { profilesSlice, WorkspaceScoped } from '../profiles';
 
-export const selectWorkspaceState = ({ profileId, workspaceId }: WorkspaceScoped) =>
+export const selectWorkspaceState = ({ vaultId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(
 		[profilesSlice.selectSlice],
 		(state): WorkspaceStateData | null => {
-			const profile = state.profiles[profileId];
-			if (!profile) return null;
+			const vault = state.vaults[vaultId];
+			if (!vault) return null;
 
-			const workspace = profile.workspaces[workspaceId];
+			const workspace = vault.workspaces[workspaceId];
 			if (!workspace) return null;
 
 			return {

@@ -7,7 +7,7 @@ import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarPro
 import { useFirstRender } from '@hooks/useFirstRender';
 import { workspacesApi } from '@state/redux/profiles/profiles';
 
-import { useProfileControls } from '../Profile';
+import { useVaultControls } from '../Vault';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';
 
 export const WorkspaceStatusBarItems = () => {
@@ -15,17 +15,17 @@ export const WorkspaceStatusBarItems = () => {
 	const statusBarButtons = useStatusBarManager();
 	const dispatch = useDispatch();
 
-	// Profile controls on status bar
-	const profileControls = useProfileControls();
+	// Vault controls on status bar
+	const vaultControls = useVaultControls();
 	useFirstRender(() => {
 		statusBarButtons.controls.register(
-			'changeProfile',
+			'changeVault',
 			{
 				visible: true,
-				title: t('statusBar.changeProfile'),
+				title: t('statusBar.changeVault'),
 				onClick: () => {
-					dispatch(workspacesApi.setActiveProfile(null));
-					profileControls.close();
+					dispatch(workspacesApi.setActiveVault(null));
+					vaultControls.close();
 				},
 				icon: <FaUserLarge />,
 			},

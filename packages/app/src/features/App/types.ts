@@ -1,8 +1,8 @@
-import { ProfileObject } from '@core/storage/ProfilesManager';
+import { VaultObject } from '@core/storage/VaultsManager';
 
-type PickProfileResponse = { status: 'ok' } | { status: 'error'; message: string };
+type PickVaultResponse = { status: 'ok' } | { status: 'error'; message: string };
 
-export type OnPickProfile = (
-	profile: ProfileObject,
+export type OnPickVault = (
+	vault: VaultObject,
 	password?: string,
-) => Promise<PickProfileResponse>;
+) => Promise<PickVaultResponse>;

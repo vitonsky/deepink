@@ -3,7 +3,7 @@ import { useBinService } from './useBinService';
 import { useFilesIntegrityService } from './useFilesIntegrityService';
 import { useVaultConfigSync } from './useVaultConfigSync';
 
-export const ProfileServices = () => {
+export const VaultServices = () => {
 	useVaultConfigSync();
 	useAutoLock();
 

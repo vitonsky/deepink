@@ -10,17 +10,17 @@ import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { CenterBox } from './CenterBox';
 import { ChooseVaultScreen } from './ChooseVaultScreen';
-import { ProfileCreator } from './ProfileCreator';
-import { ProfileLoginForm } from './ProfileLoginForm';
+import { VaultLoginForm } from './VaultLoginForm';
+import { OnPickVault } from './types';
+import { useActiveVaultId } from './useProfileSelector';
+import { useVaultsList } from './useProfilesList';
+import { useRecentVault } from './useRecentProfile';
+import { VaultCreator } from './VaultCreator';
 import {
-	useProfileContainers,
+	useVaultContainers,
 	VaultOpenError,
 	VaultOpenErrorCode,
-} from './Profiles/hooks/useProfileContainers';
-import { OnPickProfile } from './types';
-import { useProfileSelector } from './useProfileSelector';
-import { useProfilesList } from './useProfilesList';
-import { useRecentProfile } from './useRecentProfile';
+} from './Vaults/hooks/useVaultContainers';
 import { VaultScreen } from './VaultScreen';
 
 export const App: FC = () => {
@@ -29,13 +29,13 @@ export const App: FC = () => {
 	const files = useFilesStorage();
 	const config = useMemo(() => new ConfigStorage('config.json', files), [files]);
 
-	const profilesList = useProfilesList();
-	const profileContainers = useProfileContainers();
+	const vaultsList = useVaultsList();
+	const vaultContainers = useVaultContainers();
 
-	const [currentVaultId, setCurrentVaultId] = useProfileSelector(config);
+	const [currentVaultId, setCurrentVaultId] = useActiveVaultId(config);
 	const currentVault = useMemo(
-		() => profilesList.profiles.find((p) => p.id === currentVaultId) ?? null,
-		[currentVaultId, profilesList.profiles],
+		() => vaultsList.vaults.find((v) => v.id === currentVaultId) ?? null,
+		[currentVaultId, vaultsList.vaults],
 	);
 
 	// When the active vault changes, close any open error toast
@@ -47,19 +47,19 @@ export const App: FC = () => {
 	const [screenName, setScreenName] = useState<'create' | 'choose' | 'loading'>(
 		'choose',
 	);
-	const onOpenVault: OnPickProfile = useCallback(
-		async (profile, password) => {
+	const onOpenVault: OnPickVault = useCallback(
+		async (vault, password) => {
 			setScreenName('loading');
 
 			try {
-				if (profile.encryption !== null && password === undefined) {
+				if (vault.encryption !== null && password === undefined) {
 					return {
 						status: 'error',
 						message: t('login.errors.passwordRequired'),
 					};
 				}
 
-				await profileContainers.openProfile({ profile, password }, true);
+				await vaultContainers.openVault({ vault, password }, true);
 				return { status: 'ok' };
 			} catch (err) {
 				// Only unexpected errors show a toast — wrong password is handled by the form
@@ -76,7 +76,7 @@ export const App: FC = () => {
 				toast({
 					status: 'error',
 					title: t('errors.failedToOpen'),
-					description: t('errors.corrupted', { name: profile.name }),
+					description: t('errors.corrupted', { name: vault.name }),
 					containerStyle: { maxW: '400px' },
 				});
 
@@ -85,34 +85,34 @@ export const App: FC = () => {
 				setScreenName('choose');
 			}
 		},
-		[profileContainers, t, toast],
+		[vaultContainers, t, toast],
 	);
 
-	// Restore and auto-open recent profile
-	const recentProfile = useRecentProfile(config);
+	// Restore and auto-open recent vault
+	const recentVault = useRecentVault(config);
 	useEffect(
 		() => {
-			if (!profilesList.isProfilesLoaded || !recentProfile.isLoaded) return;
+			if (!vaultsList.isVaultsLoaded || !recentVault.isLoaded) return;
 
-			// Restore profile id
-			setCurrentVaultId(recentProfile.profileId);
+			// Restore vault id
+			setCurrentVaultId(recentVault.vaultId);
 
-			const profile = profilesList.profiles.find(
-				(profile) => profile.id === recentProfile.profileId,
+			const vault = vaultsList.vaults.find(
+				(vault) => vault.id === recentVault.vaultId,
 			);
 
-			if (!profile || profile.encryption) return;
+			if (!vault || vault.encryption) return;
 
-			// Automatically open profile with no encryption
-			onOpenVault(profile);
+			// Automatically open vault with no encryption
+			onOpenVault(vault);
 		},
 		// Depends only of loading status and run only once
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[profilesList.isProfilesLoaded, recentProfile.isLoaded],
+		[vaultsList.isVaultsLoaded, recentVault.isLoaded],
 	);
 
 	const [isInitialLoading] = useDebounce(
-		!profilesList.isProfilesLoaded || !recentProfile.isLoaded,
+		!vaultsList.isVaultsLoaded || !recentVault.isLoaded,
 		500,
 	);
 
@@ -123,33 +123,33 @@ export const App: FC = () => {
 		return <SplashScreen />;
 	}
 
-	if (profileContainers.activeProfile) {
-		return <VaultScreen vaultContainers={profileContainers} />;
+	if (vaultContainers.activeVault) {
+		return <VaultScreen vaultContainers={vaultContainers} />;
 	}
 
 	if (currentVault && currentVault.encryption) {
 		return (
 			<CenterBox>
-				<ProfileLoginForm
-					profile={currentVault}
+				<VaultLoginForm
+					vault={currentVault}
 					onLogin={onOpenVault}
-					onPickAnotherProfile={() => setCurrentVaultId(null)}
+					onPickAnotherVault={() => setCurrentVaultId(null)}
 				/>
 			</CenterBox>
 		);
 	}
 
-	const hasNoProfiles = profilesList.profiles.length === 0;
-	if (screenName === 'create' || hasNoProfiles) {
+	const hasNoVaults = vaultsList.vaults.length === 0;
+	if (screenName === 'create' || hasNoVaults) {
 		return (
 			<CenterBox>
-				<ProfileCreator
-					onCreateProfile={async (profile) => {
-						const newProfile = await profilesList.createProfile(profile);
-						await onOpenVault(newProfile, profile.password || undefined);
+				<VaultCreator
+					onCreateVault={async (vault) => {
+						const newVault = await vaultsList.createVault(vault);
+						await onOpenVault(newVault, vault.password || undefined);
 					}}
-					onCancel={hasNoProfiles ? undefined : () => setScreenName('choose')}
-					defaultProfileName={getRandomItem(
+					onCancel={hasNoVaults ? undefined : () => setScreenName('choose')}
+					defaultVaultName={getRandomItem(
 						t('creator.field.name.suggests', {
 							returnObjects: true,
 						}) as string[],
@@ -161,7 +161,7 @@ export const App: FC = () => {
 
 	return (
 		<ChooseVaultScreen
-			vaults={profilesList.profiles}
+			vaults={vaultsList.vaults}
 			onOpenVault={onOpenVault}
 			onCreateVault={() => setScreenName('create')}
 		/>

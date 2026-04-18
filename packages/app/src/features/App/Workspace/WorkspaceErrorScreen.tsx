@@ -13,7 +13,7 @@ import {
 } from '@state/redux/profiles/profiles';
 
 import { CenterBox } from '../CenterBox';
-import { useProfileControls } from '../Profile';
+import { useVaultControls } from '../Vault';
 
 export const WorkspaceErrorScreen = ({
 	onWorkspaceErrorReset,
@@ -24,15 +24,15 @@ export const WorkspaceErrorScreen = ({
 	const dispatch = useAppDispatch();
 	const telemetry = useTelemetryTracker();
 	const {
-		close: profileClose,
-		profile: {
+		close: vaultClose,
+		vault: {
 			db,
-			profile: { id: profileId },
+			vault: { id: vaultId },
 		},
-	} = useProfileControls();
+	} = useVaultControls();
 
-	const workspaces = useAppSelector(selectWorkspacesInfo({ profileId }));
-	const currentWorkspace = useAppSelector(selectActiveWorkspaceInfo({ profileId }));
+	const workspaces = useAppSelector(selectWorkspacesInfo({ vaultId }));
+	const currentWorkspace = useAppSelector(selectActiveWorkspaceInfo({ vaultId }));
 
 	const [newWorkspaceName, setNewWorkspaceName] = useState('');
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
@@ -68,7 +68,7 @@ export const WorkspaceErrorScreen = ({
 							const workspaceId = evt.target.value;
 							dispatch(
 								workspacesApi.setActiveWorkspace({
-									profileId,
+									vaultId,
 									workspaceId,
 								}),
 							);
@@ -116,7 +116,7 @@ export const WorkspaceErrorScreen = ({
 										await workspacesManager.getList();
 									dispatch(
 										workspacesApi.updateWorkspacesList({
-											profileId,
+											vaultId,
 											workspaces: updatedWorkspaces,
 											newNoteTemplate: t(
 												'note.title.defaultTemplate',
@@ -130,7 +130,7 @@ export const WorkspaceErrorScreen = ({
 									dispatch(
 										workspacesApi.setActiveWorkspace({
 											workspaceId,
-											profileId,
+											vaultId,
 										}),
 									);
 
@@ -167,7 +167,7 @@ export const WorkspaceErrorScreen = ({
 					gap="0.5rem"
 					color="typography.additional"
 				>
-					<Button w="100%" onClick={() => profileClose()}>
+					<Button w="100%" onClick={() => vaultClose()}>
 						<Text>{t('workspace.error.closeVault')}</Text>
 					</Button>
 				</VStack>

@@ -14,7 +14,7 @@ import {
 import { PropertiesForm } from '@components/PropertiesForm';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
-import { useProfileControls } from '@features/App/Profile';
+import { useVaultControls } from '@features/App/Vault';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useStandaloneToast } from '@hooks/useStandaloneToast';
@@ -53,11 +53,11 @@ export const WorkspaceCreatePopup = () => {
 
 	const { onClose } = useModalApi();
 
-	const { profileId } = useWorkspaceData();
+	const { vaultId } = useWorkspaceData();
 
 	const {
-		profile: { db },
-	} = useProfileControls();
+		vault: { db },
+	} = useVaultControls();
 
 	const workspacesManager = useMemo(() => new WorkspacesController(db), [db]);
 
@@ -107,7 +107,7 @@ export const WorkspaceCreatePopup = () => {
 										dispatch(
 											workspacesApi.setActiveWorkspace({
 												workspaceId,
-												profileId,
+												vaultId,
 											}),
 										);
 

@@ -3,29 +3,29 @@ import { useTranslation } from 'react-i18next';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Button, Input, useToast, VStack } from '@chakra-ui/react';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
-import { ProfileObject } from '@core/storage/ProfilesManager';
+import { VaultObject } from '@core/storage/VaultsManager';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
-import { ProfilesForm } from '../ProfilesForm';
-import { OnPickProfile } from '../types';
+import { VaultsForm } from '../VaultsForm';
+import { OnPickVault } from '../types';
 
-export type ProfileLoginFormProps = {
-	profile: ProfileObject;
-	onLogin: OnPickProfile;
-	onPickAnotherProfile: () => void;
+export type VaultLoginFormProps = {
+	vault: VaultObject;
+	onLogin: OnPickVault;
+	onPickAnotherVault: () => void;
 };
 
-export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
-	profile,
+export const VaultLoginForm: FC<VaultLoginFormProps> = ({
+	vault,
 	onLogin,
-	onPickAnotherProfile,
+	onPickAnotherVault,
 }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.vault);
 	const telemetry = useTelemetryTracker();
 
 	const toast = useToast();
-	const toastId = 'profile-login' + useId();
+	const toastId = 'vault-login' + useId();
 	useEffect(
 		() => () => {
 			toast.close(toastId);
@@ -45,7 +45,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		setErrorMessage(null);
 		setIsPending(true);
 
-		const response = await onLogin(profile, secret || undefined).finally(() => {
+		const response = await onLogin(vault, secret || undefined).finally(() => {
 			setIsPending(false);
 		});
 
@@ -66,7 +66,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 		telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_LOGIN, {
 			status: response.status === 'error' ? 'error' : 'ok',
 		});
-	}, [onLogin, profile, secret, t, telemetry, toast, toastId]);
+	}, [onLogin, vault, secret, t, telemetry, toast, toastId]);
 
 	const firstInputRef = useFocusableRef<HTMLInputElement>();
 	useEffect(() => {
@@ -76,7 +76,7 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 	}, [firstInputRef, isPending]);
 
 	return (
-		<ProfilesForm
+		<VaultsForm
 			title={t('login.title')}
 			controls={
 				<>
@@ -88,8 +88,8 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 					>
 						{t('login.actions.unlock')}
 					</Button>
-					<Button w="100%" onClick={onPickAnotherProfile}>
-						{t('login.actions.changeProfile')}
+					<Button w="100%" onClick={onPickAnotherVault}>
+						{t('login.actions.changeVault')}
 					</Button>
 				</>
 			}
@@ -106,6 +106,6 @@ export const ProfileLoginForm: FC<ProfileLoginFormProps> = ({
 					disabled={isPending}
 				/>
 			</VStack>
-		</ProfilesForm>
+		</VaultsForm>
 	);
 };
