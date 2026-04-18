@@ -66,6 +66,6 @@ type CommandsWithPayload = {
 
 export type CommandPayloadsMap = {
 	[K in GLOBAL_COMMANDS]: K extends keyof CommandsWithPayload
-	? CommandsWithPayload[K]
-	: void;
+		? CommandsWithPayload[K]
+		: void;
 };

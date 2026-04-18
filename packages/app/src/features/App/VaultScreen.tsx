@@ -5,9 +5,7 @@ import { AppServices } from './AppServices';
 import { Vaults } from './Vaults';
 import { VaultsApi } from './Vaults/hooks/useVaultContainers';
 
-export const VaultScreen: FC<{ vaultContainers: VaultsApi }> = ({
-	vaultContainers,
-}) => {
+export const VaultScreen: FC<{ vaultContainers: VaultsApi }> = ({ vaultContainers }) => {
 	return (
 		<Box
 			sx={{

@@ -54,9 +54,7 @@ export const createVaultsApi = <T extends DisposableBox<unknown>>(
 		fn({ vaults }, closedVault) {
 			if (!autoChangeActiveVault) return null;
 
-			return (
-				[...vaults].reverse().find((vault) => vault !== closedVault) ?? null
-			);
+			return [...vaults].reverse().find((vault) => vault !== closedVault) ?? null;
 		},
 		target: $activeVault,
 	});
