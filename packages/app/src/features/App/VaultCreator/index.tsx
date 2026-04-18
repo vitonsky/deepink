@@ -224,9 +224,11 @@ export const VaultCreator: FC<VaultCreatorProps> = ({
 									evt.preventDefault();
 
 									const suggestedName = shuffleArray(
-										t('creator.field.name.suggests', {
-											returnObjects: true,
-										}) as string[],
+										Object.values(
+											t('creator.field.name.suggests', {
+												returnObjects: true,
+											}),
+										) as string[],
 									).find((name) => name !== vaultName);
 
 									if (suggestedName) setVaultName(suggestedName);

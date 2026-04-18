@@ -84,9 +84,11 @@ export const WorkspaceCreatePopup = () => {
 									label: tFeatures('field.name.label'),
 									placeholder: tFeatures('field.name.placeholder'),
 									suggests: shuffleArray(
-										tFeatures('field.name.suggests', {
-											returnObjects: true,
-										}) as string[],
+										Object.values(
+											tFeatures('field.name.suggests', {
+												returnObjects: true,
+											}),
+										) as string[],
 									).slice(0, 3),
 								},
 							]}

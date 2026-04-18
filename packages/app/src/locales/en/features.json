@@ -45,18 +45,18 @@
 				"name": {
 					"label": "Workspace name",
 					"placeholder": "e.g. Health Journal, Business Ideas",
-					"suggests": [
-						"Finances",
-						"Health",
-						"Career",
-						"Family",
-						"Journal",
-						"Goals",
-						"Ideas",
-						"Legal",
-						"Travel",
-						"Private"
-					]
+					"suggests": {
+						"0": "Finances",
+						"1": "Health",
+						"2": "Career",
+						"3": "Family",
+						"4": "Journal",
+						"5": "Goals",
+						"6": "Ideas",
+						"7": "Legal",
+						"8": "Travel",
+						"9": "Private"
+					}
 				}
 			},
 			"error": {

@@ -150,9 +150,11 @@ export const App: FC = () => {
 					}}
 					onCancel={hasNoVaults ? undefined : () => setScreenName('choose')}
 					defaultVaultName={getRandomItem(
-						t('creator.field.name.suggests', {
-							returnObjects: true,
-						}) as string[],
+						Object.values(
+							t('creator.field.name.suggests', {
+								returnObjects: true,
+							}),
+						) as string[],
 					)}
 				/>
 			</CenterBox>
