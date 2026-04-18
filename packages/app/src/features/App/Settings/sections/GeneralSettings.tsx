@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import ms from 'ms';
 import { getAbout } from 'src/about';
 import { LOCALE_NAMESPACE, supportedLanguages } from 'src/i18n';
+import languageNames from 'src/i18n/language-names.json';
 import z from 'zod';
 import Logo from '@assets/icons/app.svg';
 import {
@@ -28,8 +29,6 @@ import {
 } from '@state/redux/settings/selectors/preferences';
 import { settingsApi } from '@state/redux/settings/settings';
 import { wait } from '@utils/time';
-
-import languageNames from './language-names.json';
 
 type UpdateState = {
 	state: 'pending' | 'result' | null;

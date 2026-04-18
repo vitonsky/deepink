@@ -130,6 +130,8 @@
 	"pl": "Polski",
 	"ps": "پښتو",
 	"pt": "Português",
+	"pt-BR": "Português (Brasil)",
+	"pt-PT": "Português (Portugal)",
 	"qu": "Runa Simi",
 	"rm": "Rumantsch",
 	"rn": "Kirundi",
@@ -182,5 +184,7 @@
 	"yo": "Yorùbá",
 	"za": "Saɯ cueŋƅ",
 	"zh": "中文",
+	"zh-CN": "中文（简体）",
+	"zh-TW": "中文（繁體）",
 	"zu": "IsiZulu"
 }
