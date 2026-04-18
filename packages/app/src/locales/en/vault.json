@@ -79,7 +79,7 @@
 		},
 		"noEncryptionDialog": {
 			"title": "Create vault with no encryption",
-			"description": "Your notes and data will be stored as plain text. Any app or person with access to the vault file on disk will be able to read everything inside it.",
+			"description": "Your notes and data will be stored as plain text. Any app or person with access to the vault directory on disk will be able to read everything inside it.",
 			"actions": {
 				"confirm": "Continue with no encryption",
 				"cancel": "Cancel"
