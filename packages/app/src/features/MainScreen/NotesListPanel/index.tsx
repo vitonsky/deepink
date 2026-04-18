@@ -22,12 +22,8 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import {
-	selectActiveTag,
-	selectSearch,
-	workspacesApi,
-} from '@state/redux/profiles/profiles';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectActiveTag, selectSearch, workspacesApi } from '@state/redux/vaults/vaults';
 
 export const NotesListPanel = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);

@@ -1,5 +1,5 @@
 import z from 'zod';
-import { NOTES_VIEW } from '@state/redux/profiles/profiles';
+import { NOTES_VIEW } from '@state/redux/vaults/vaults';
 
 export const WorkspaceStateScheme = z.object({
 	openedNoteIds: z.array(z.string()).nullable(),

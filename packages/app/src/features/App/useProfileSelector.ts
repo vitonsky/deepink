@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { ConfigStorage } from '@core/storage/ConfigStorage';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { selectActiveVault, workspacesApi } from '@state/redux/profiles/profiles';
+import { selectActiveVault, workspacesApi } from '@state/redux/vaults/vaults';
 
 export const useActiveVaultId = (config: ConfigStorage) => {
 	const dispatch = useAppDispatch();

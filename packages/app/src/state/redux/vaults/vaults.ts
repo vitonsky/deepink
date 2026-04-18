@@ -182,7 +182,7 @@ export type VaultsState = {
 };
 
 export const profilesSlice = createSlice({
-	name: 'profiles',
+	name: 'vaults',
 	initialState: {
 		activeVault: null,
 		vaults: {},
@@ -554,10 +554,7 @@ export const profilesSlice = createSlice({
 			(
 				vault,
 				payload: Partial<
-					Pick<
-						VaultData['config']['deletion'],
-						'permanentDeletion' | 'confirm'
-					>
+					Pick<VaultData['config']['deletion'], 'permanentDeletion' | 'confirm'>
 				>,
 			) => {
 				vault.config.deletion = {
@@ -587,12 +584,9 @@ export const profilesSlice = createSlice({
 
 export const workspacesApi = profilesSlice.actions;
 
-export const selectActiveVault = createAppSelector(
-	profilesSlice.selectSlice,
-	(state) => {
-		return state.activeVault ?? null;
-	},
-);
+export const selectActiveVault = createAppSelector(profilesSlice.selectSlice, (state) => {
+	return state.activeVault ?? null;
+});
 
 export const selectVaultById = ({ vaultId }: VaultScoped) =>
 	createAppSelector(profilesSlice.selectSlice, (state) => {

@@ -8,11 +8,11 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { VaultObject } from '@core/storage/VaultsManager';
 import { telemetry } from '@electron/requests/telemetry/renderer';
 import { useAppDispatch } from '@state/redux/hooks';
-import { workspacesApi } from '@state/redux/profiles/profiles';
+import { workspacesApi } from '@state/redux/vaults/vaults';
 
 import { CenterBox } from './CenterBox';
-import { VaultsForm } from './VaultsForm';
 import { OnPickVault } from './types';
+import { VaultsForm } from './VaultsForm';
 
 export const ChooseVaultScreen: FC<{
 	vaults: VaultObject[];

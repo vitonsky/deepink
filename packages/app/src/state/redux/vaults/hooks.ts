@@ -12,7 +12,7 @@ import {
 	VaultData,
 	WorkspaceData,
 	workspacesApi,
-} from './profiles';
+} from './vaults';
 
 export const useWorkspaceData = () => {
 	const { vaultId, workspaceId } = useWorkspaceContext();
@@ -60,13 +60,13 @@ type StripPropsInActionCreator<T, StripPropsSignature extends {}> = {
 		StripPropsSignature & infer _P,
 		infer _
 	>
-	? K
-	: never]: T[K] extends ActionCreatorWithPayload<
+		? K
+		: never]: T[K] extends ActionCreatorWithPayload<
 		StripPropsSignature & infer P,
 		infer N
 	>
-	? ActionCreatorWithPayload<Omit<P, keyof StripPropsSignature>, N>
-	: never;
+		? ActionCreatorWithPayload<Omit<P, keyof StripPropsSignature>, N>
+		: never;
 };
 
 export const useVaultActions = () => {

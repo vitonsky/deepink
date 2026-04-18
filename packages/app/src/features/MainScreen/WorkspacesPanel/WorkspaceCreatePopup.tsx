@@ -19,8 +19,8 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { useModalApi } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useStandaloneToast } from '@hooks/useStandaloneToast';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData } from '@state/redux/vaults/hooks';
+import { workspacesApi } from '@state/redux/vaults/vaults';
 import { shuffleArray } from '@utils/collections/shuffleArray';
 
 import { useWorkspacesList } from './useWorkspacesList';

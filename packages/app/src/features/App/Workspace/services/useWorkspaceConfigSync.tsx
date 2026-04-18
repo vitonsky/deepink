@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useWatchSelector } from '@hooks/useWatchSelector';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectWorkspace } from '@state/redux/profiles/profiles';
-import { selectIsWorkspaceConfigLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
 import { createAppSelector } from '@state/redux/utils';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectIsWorkspaceConfigLoaded } from '@state/redux/vaults/selectors/workspaceLoadingStatus';
+import { selectWorkspace } from '@state/redux/vaults/vaults';
 
 import { createWorkspaceConfigFile } from '../utils/workspaceFiles';
 

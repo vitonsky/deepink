@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { isEqual } from 'lodash';
 import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectActiveWorkspaceInfo } from '@state/redux/profiles/profiles';
+import { useWorkspaceData } from '@state/redux/vaults/hooks';
+import { selectActiveWorkspaceInfo } from '@state/redux/vaults/vaults';
 
 export const useIsActiveWorkspace = () => {
 	const workspaceData = useWorkspaceData();

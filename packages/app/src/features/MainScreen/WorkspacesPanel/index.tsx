@@ -9,8 +9,8 @@ import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData } from '@state/redux/vaults/hooks';
+import { selectWorkspaces, workspacesApi } from '@state/redux/vaults/vaults';
 
 import { WorkspaceCreatePopup } from './WorkspaceCreatePopup';
 

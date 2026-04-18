@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { FileController } from '@core/features/files/FileController';
 import { StateFile } from '@core/features/files/StateFile';
 import { useWatchSelector } from '@hooks/useWatchSelector';
-import { selectVaultById, VaultConfigScheme } from '@state/redux/profiles/profiles';
 import { createAppSelector } from '@state/redux/utils';
+import { selectVaultById, VaultConfigScheme } from '@state/redux/vaults/vaults';
 
 import { useVaultControls } from '..';
 

@@ -12,12 +12,12 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useWorkspaceSelector } from '@state/redux/vaults/hooks';
 import {
 	selectActiveNoteId,
 	selectNoteIds,
 	selectSearch,
-} from '@state/redux/profiles/profiles';
+} from '@state/redux/vaults/vaults';
 import { ScrollToOptions, useVirtualizer } from '@tanstack/react-virtual';
 
 import { useLocalizedDate } from '../../../hooks/useLocalizedDate';

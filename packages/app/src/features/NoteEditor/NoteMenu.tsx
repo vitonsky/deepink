@@ -28,8 +28,8 @@ import {
 import { INote } from '@core/features/notes';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
-import { useVaultSelector } from '@state/redux/profiles/hooks';
-import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
+import { useVaultSelector } from '@state/redux/vaults/hooks';
+import { selectDeletionConfig } from '@state/redux/vaults/selectors/vault';
 
 export const NoteMenu = memo(({ note }: { note: INote }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);

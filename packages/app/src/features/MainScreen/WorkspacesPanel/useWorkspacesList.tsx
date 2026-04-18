@@ -4,8 +4,8 @@ import { LOCALE_NAMESPACE } from 'src/i18n';
 import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
 import { useVaultControls } from '@features/App/Vault';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspaces, workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData } from '@state/redux/vaults/hooks';
+import { selectWorkspaces, workspacesApi } from '@state/redux/vaults/vaults';
 
 export const useWorkspacesList = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);

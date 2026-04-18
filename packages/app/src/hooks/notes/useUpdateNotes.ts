@@ -4,14 +4,14 @@ import {
 	useWorkspaceContainer,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectNotesView } from '@state/redux/vaults/selectors/view';
 import {
 	NOTES_VIEW,
 	selectActiveTag,
 	selectSearch,
 	workspacesApi,
-} from '@state/redux/profiles/profiles';
-import { selectNotesView } from '@state/redux/profiles/selectors/view';
+} from '@state/redux/vaults/vaults';
 
 export const useUpdateNotes = () => {
 	const dispatch = useAppDispatch();

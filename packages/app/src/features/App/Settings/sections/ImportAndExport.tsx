@@ -19,8 +19,8 @@ import { useFilesPicker } from '@hooks/files/useFilesPicker';
 import { ImportTypes, useImportNotesPreset } from '@hooks/notes/useImportNotesPreset';
 import { buildFileName, useNotesExport } from '@hooks/notes/useNotesExport';
 import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspace } from '@state/redux/profiles/profiles';
+import { useWorkspaceData } from '@state/redux/vaults/hooks';
+import { selectWorkspace } from '@state/redux/vaults/vaults';
 
 export const ImportAndExport = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.settings);

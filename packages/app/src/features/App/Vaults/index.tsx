@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useMemo } from 'react';
 import { VaultStorage } from '@features/files';
 import { useAppDispatch } from '@state/redux/hooks';
-import { workspacesApi } from '@state/redux/profiles/profiles';
+import { workspacesApi } from '@state/redux/vaults/vaults';
 import { DisposableBox } from '@utils/disposable';
 
 import { Vault, VaultControls, VaultControlsContext } from '../Vault';

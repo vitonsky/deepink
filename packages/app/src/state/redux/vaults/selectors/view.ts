@@ -1,5 +1,5 @@
-import { NOTES_VIEW } from '../profiles';
 import { createWorkspaceSelector, selectWorkspaceRoot } from '../utils';
+import { NOTES_VIEW } from '../vaults';
 
 export const selectNotesView = createWorkspaceSelector(
 	[selectWorkspaceRoot],

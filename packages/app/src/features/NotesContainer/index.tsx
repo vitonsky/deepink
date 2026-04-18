@@ -17,10 +17,10 @@ import { useTelemetryTracker } from '@features/telemetry';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
-import { useVaultSelector, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
-import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
-import { createWorkspaceSelector } from '@state/redux/profiles/utils';
+import { useVaultSelector, useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectSnapshotSettings } from '@state/redux/vaults/selectors/vault';
+import { createWorkspaceSelector } from '@state/redux/vaults/utils';
+import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/vaults/vaults';
 import { joinCallbacks } from '@utils/react/joinCallbacks';
 
 import { EditorModePicker } from './EditorModePicker/EditorModePicker';

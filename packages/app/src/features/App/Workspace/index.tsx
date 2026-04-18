@@ -5,9 +5,9 @@ import { MainScreen } from '@features/MainScreen';
 import { WorkspaceModalProvider } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useIsActiveWorkspace } from '@hooks/useIsActiveWorkspace';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectWorkspaceName } from '@state/redux/profiles/profiles';
-import { selectIsWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+import { useWorkspaceActions, useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectIsWorkspaceLoaded } from '@state/redux/vaults/selectors/workspaceLoadingStatus';
+import { selectWorkspaceName } from '@state/redux/vaults/vaults';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { SettingsWindow } from '../Settings/SettingsWindow';

@@ -15,13 +15,13 @@ import { useTagsRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useWorkspaceModal } from '@features/WorkspaceModal/useWorkspaceModal';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/vaults/hooks';
 import {
 	selectActiveTag,
 	selectTags,
 	selectTagsTree,
 	workspacesApi,
-} from '@state/redux/profiles/profiles';
+} from '@state/redux/vaults/vaults';
 
 import { TagsList } from './TagsList';
 

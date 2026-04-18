@@ -33,13 +33,13 @@ import { TemplateProcessor } from '@hooks/notes/TemplateProcessor';
 import { useImportNotesPreset } from '@hooks/notes/useImportNotesPreset';
 import { useLoadedLanguage } from '@hooks/useLocalizedDate';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/vaults/hooks';
 import {
 	selectNewNoteTemplate,
 	selectWorkspace,
 	selectWorkspaceName,
 	workspacesApi,
-} from '@state/redux/profiles/profiles';
+} from '@state/redux/vaults/vaults';
 
 import { useVaultControls } from '../../Vault';
 import {

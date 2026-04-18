@@ -5,8 +5,8 @@ import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/profiles/profiles';
+import { useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectActiveNoteId, selectOpenedNotes } from '@state/redux/vaults/vaults';
 
 export const useActiveNoteHistoryButton = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);

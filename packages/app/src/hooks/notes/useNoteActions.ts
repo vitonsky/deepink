@@ -9,14 +9,14 @@ import {
 	useNotesRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
+import { RootState } from '@state/redux/store';
+import { useVaultSelector, useWorkspaceData } from '@state/redux/vaults/hooks';
+import { selectSnapshotSettings } from '@state/redux/vaults/selectors/vault';
 import {
 	selectIsNoteOpened,
 	selectWorkspace,
 	workspacesApi,
-} from '@state/redux/profiles/profiles';
-import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
-import { RootState } from '@state/redux/store';
+} from '@state/redux/vaults/vaults';
 
 export const useNoteActions = () => {
 	const dispatch = useAppDispatch();

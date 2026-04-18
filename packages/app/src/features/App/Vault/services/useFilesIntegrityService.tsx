@@ -7,11 +7,11 @@ import { FilesIntegrityController } from '@core/features/integrity/FilesIntegrit
 import { useVaultStorage } from '@features/files';
 import { getWorkspaceFilesPath } from '@features/files/paths';
 import { useService } from '@hooks/useService';
-import { useVaultSelector } from '@state/redux/profiles/hooks';
+import { useVaultSelector } from '@state/redux/vaults/hooks';
 import {
 	selectIntegrityServiceConfig,
 	selectWorkspacesSummary,
-} from '@state/redux/profiles/selectors/vault';
+} from '@state/redux/vaults/selectors/vault';
 import { wait } from '@utils/time';
 
 import { useVaultControls } from '..';

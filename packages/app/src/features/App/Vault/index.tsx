@@ -22,6 +22,7 @@ import { useShortcutsBinding } from '@hooks/shortcuts/useShortcutsBinding';
 import { useImmutableCallback } from '@hooks/useImmutableCallback';
 import { useIsDeveloper } from '@hooks/useIsDeveloper';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
+import { selectIsActiveWorkspaceLoaded } from '@state/redux/vaults/selectors/workspaceLoadingStatus';
 import {
 	createWorkspaceObject,
 	defaultVaultConfig,
@@ -29,8 +30,7 @@ import {
 	selectWorkspacesInfo,
 	VaultConfigScheme,
 	workspacesApi,
-} from '@state/redux/profiles/profiles';
-import { selectIsActiveWorkspaceLoaded } from '@state/redux/profiles/selectors/workspaceLoadingStatus';
+} from '@state/redux/vaults/vaults';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 import { VaultContainer } from '../Vaults/hooks/useVaultContainers';

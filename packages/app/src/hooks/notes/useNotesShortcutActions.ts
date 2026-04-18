@@ -4,12 +4,12 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommandCallback';
 import { useCreateNote } from '@hooks/notes/useCreateNote';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
+import { useWorkspaceSelector } from '@state/redux/vaults/hooks';
 import {
 	selectActiveNoteId,
 	selectOpenedNotes,
 	selectRecentlyClosedNotes,
-} from '@state/redux/profiles/profiles';
+} from '@state/redux/vaults/vaults';
 import { getItemByOffset } from '@utils/collections/getItemByOffset';
 
 /**

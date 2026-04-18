@@ -5,8 +5,8 @@ import {
 	useTagsRegistry,
 } from '@features/App/Workspace/WorkspaceProvider';
 import { useLoadedLanguage } from '@hooks/useLocalizedDate';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveTag, selectNewNoteTemplate } from '@state/redux/profiles/profiles';
+import { useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectActiveTag, selectNewNoteTemplate } from '@state/redux/vaults/vaults';
 
 import { TemplateProcessor } from './TemplateProcessor';
 import { useUpdateNotes } from './useUpdateNotes';

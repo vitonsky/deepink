@@ -2,9 +2,9 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { Shortcuts } from '@hooks/shortcuts';
 import { useWorkspaceShortcutsCallback } from '@hooks/shortcuts/useWorkspaceShortcutsCallback';
-import { useVaultSelector, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectActiveNoteId } from '@state/redux/profiles/profiles';
-import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
+import { useVaultSelector, useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectDeletionConfig } from '@state/redux/vaults/selectors/vault';
+import { selectActiveNoteId } from '@state/redux/vaults/vaults';
 
 import { useNotesRegistry } from './WorkspaceProvider';
 

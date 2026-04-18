@@ -4,9 +4,9 @@ import { LOCALE_NAMESPACE } from 'src/i18n';
 import { Box, Divider, HStack } from '@chakra-ui/react';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectSearch } from '@state/redux/profiles/profiles';
 import { selectEditorMode } from '@state/redux/settings/settings';
+import { useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectSearch } from '@state/redux/vaults/vaults';
 
 import { FileUploader } from '../MonakoEditor/features/useDropFiles';
 import { MonacoAPI, MonacoEditor } from '../MonakoEditor/MonacoEditor';

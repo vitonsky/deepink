@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { LOCALE_NAMESPACE } from 'src/i18n';
 import { useStatusBarManager } from '@features/MainScreen/StatusBar/StatusBarProvider';
 import { useFirstRender } from '@hooks/useFirstRender';
-import { workspacesApi } from '@state/redux/profiles/profiles';
+import { workspacesApi } from '@state/redux/vaults/vaults';
 
 import { useVaultControls } from '../Vault';
 import { useActiveNoteHistoryButton } from './useActiveNoteHistoryButton';

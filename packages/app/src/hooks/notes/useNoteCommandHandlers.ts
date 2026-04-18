@@ -14,9 +14,9 @@ import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommand
 import { getNoteContentPreview } from '@hooks/notes/getNoteContentPreview';
 import { useNoteActions } from '@hooks/notes/useNoteActions';
 import { useAppSelector } from '@state/redux/hooks';
-import { useVaultSelector, useWorkspaceData } from '@state/redux/profiles/hooks';
-import { selectWorkspace } from '@state/redux/profiles/profiles';
-import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
+import { useVaultSelector, useWorkspaceData } from '@state/redux/vaults/hooks';
+import { selectDeletionConfig } from '@state/redux/vaults/selectors/vault';
+import { selectWorkspace } from '@state/redux/vaults/vaults';
 import { copyTextToClipboard } from '@utils/clipboard';
 
 import { buildFileName, configureNoteNameGetter, useNotesExport } from './useNotesExport';

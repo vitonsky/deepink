@@ -3,11 +3,11 @@ import ms from 'ms';
 import { DeletedNotesController } from '@core/features/notes/bin/DeletedNotesController';
 import { NotesController } from '@core/features/notes/controller/NotesController';
 import { useService } from '@hooks/useService';
-import { useVaultSelector } from '@state/redux/profiles/hooks';
+import { useVaultSelector } from '@state/redux/vaults/hooks';
 import {
 	selectBinRetentionPolicy,
 	selectWorkspacesSummary,
-} from '@state/redux/profiles/selectors/vault';
+} from '@state/redux/vaults/selectors/vault';
 
 import { useVaultControls } from '..';
 

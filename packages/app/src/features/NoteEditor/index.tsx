@@ -46,9 +46,9 @@ import {
 	useVaultSelector,
 	useWorkspaceData,
 	useWorkspaceSelector,
-} from '@state/redux/profiles/hooks';
-import { selectTags, workspacesApi } from '@state/redux/profiles/profiles';
-import { selectSnapshotSettings } from '@state/redux/profiles/selectors/vault';
+} from '@state/redux/vaults/hooks';
+import { selectSnapshotSettings } from '@state/redux/vaults/selectors/vault';
+import { selectTags, workspacesApi } from '@state/redux/vaults/vaults';
 
 import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';

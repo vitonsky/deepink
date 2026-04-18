@@ -6,9 +6,9 @@ import { LOCALE_NAMESPACE } from 'src/i18n';
 import { ButtonGroup, HStack } from '@chakra-ui/react';
 import { IconButton } from '@components/IconButton';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { NOTES_VIEW, workspacesApi } from '@state/redux/profiles/profiles';
-import { selectNotesView } from '@state/redux/profiles/selectors/view';
+import { useWorkspaceData, useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectNotesView } from '@state/redux/vaults/selectors/view';
+import { NOTES_VIEW, workspacesApi } from '@state/redux/vaults/vaults';
 
 export type NotesOverviewProps = {};
 

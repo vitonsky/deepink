@@ -10,7 +10,7 @@ import {
 	selectActiveWorkspaceInfo,
 	selectWorkspacesInfo,
 	workspacesApi,
-} from '@state/redux/profiles/profiles';
+} from '@state/redux/vaults/vaults';
 
 import { CenterBox } from '../CenterBox';
 import { useVaultControls } from '../Vault';

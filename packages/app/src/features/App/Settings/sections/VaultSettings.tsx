@@ -20,13 +20,13 @@ import { FeaturesOption } from '@components/Features/Option/FeaturesOption';
 import { RelaxedInput } from '@components/RelaxedInput';
 import { RelaxedSlider } from '@components/Slider/RelaxedSlider';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useVaultActions, useVaultSelector } from '@state/redux/profiles/hooks';
-import { defaultVaultConfig } from '@state/redux/profiles/profiles';
+import { useVaultActions, useVaultSelector } from '@state/redux/vaults/hooks';
 import {
 	selectDeletionConfig,
 	selectIntegrityServiceConfig,
 	selectSnapshotSettings,
-} from '@state/redux/profiles/selectors/vault';
+} from '@state/redux/vaults/selectors/vault';
+import { defaultVaultConfig } from '@state/redux/vaults/vaults';
 
 export const VaultSettings = () => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.settings);

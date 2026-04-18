@@ -3,7 +3,7 @@ import { FaChevronDown, FaChevronUp, FaHashtag } from 'react-icons/fa6';
 import { Button, HStack, Text } from '@chakra-ui/react';
 import { ListItem, NestedList } from '@components/NestedList';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
-import { TagNode } from '@state/redux/profiles/selectors/tags/types';
+import { TagNode } from '@state/redux/vaults/selectors/tags/types';
 
 import { TagContextMenuCallbacks, useTagContextMenu } from './useTagContextMenu';
 

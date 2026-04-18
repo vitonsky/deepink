@@ -3,7 +3,7 @@ import { useVaultStorage } from '@features/files';
 import { getWorkspacePath } from '@features/files/paths';
 import { useUpdateNotes } from '@hooks/notes/useUpdateNotes';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceActions, useWorkspaceData } from '@state/redux/profiles/hooks';
+import { useWorkspaceActions, useWorkspaceData } from '@state/redux/vaults/hooks';
 
 import {
 	createWorkspaceConfigFile,

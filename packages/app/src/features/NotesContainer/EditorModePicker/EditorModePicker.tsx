@@ -8,13 +8,13 @@ import { Popper } from '@components/Popper';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch, useAppSelector } from '@state/redux/hooks';
-import { useWorkspaceSelector } from '@state/redux/profiles/hooks';
-import { selectOpenedNotes } from '@state/redux/profiles/profiles';
 import {
 	EditorMode,
 	selectEditorMode,
 	settingsApi,
 } from '@state/redux/settings/settings';
+import { useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectOpenedNotes } from '@state/redux/vaults/vaults';
 
 import { useStatusBarManager } from '../../MainScreen/StatusBar/StatusBarProvider';
 

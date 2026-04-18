@@ -1,7 +1,7 @@
 import ms from 'ms';
 
-import { VaultData } from '../profiles';
 import { createVaultSelector } from '../utils';
+import { VaultData } from '../vaults';
 
 export const selectVault = (state: VaultData | null) => {
 	if (!state) throw new Error('Vault selector is used out of vault context');

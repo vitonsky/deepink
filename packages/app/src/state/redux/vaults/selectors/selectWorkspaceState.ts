@@ -3,7 +3,7 @@ import { WorkspaceStateData } from '@features/App/Workspace/services/workspaceSt
 
 import { createAppSelector } from '../../utils';
 
-import { profilesSlice, WorkspaceScoped } from '../profiles';
+import { profilesSlice, WorkspaceScoped } from '../vaults';
 
 export const selectWorkspaceState = ({ vaultId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(

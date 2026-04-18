@@ -4,8 +4,8 @@ import { LOCALE_NAMESPACE } from 'src/i18n';
 import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useAppDispatch } from '@state/redux/hooks';
-import { useWorkspaceData } from '@state/redux/profiles/hooks';
-import { workspacesApi } from '@state/redux/profiles/profiles';
+import { useWorkspaceData } from '@state/redux/vaults/hooks';
+import { workspacesApi } from '@state/redux/vaults/vaults';
 import { createContextGetterHook } from '@utils/react/createContextGetterHook';
 
 export const WorkspaceErrorContext = createContext<((error: Error) => void) | null>(null);

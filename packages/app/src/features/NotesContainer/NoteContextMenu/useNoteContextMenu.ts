@@ -8,8 +8,8 @@ import { GLOBAL_COMMANDS } from '@hooks/commands';
 import { useCommand } from '@hooks/commands/useCommand';
 import { ContextMenuCallback } from '@hooks/useContextMenu';
 import { useShowNoteContextMenu } from '@hooks/useShowNoteContextMenu';
-import { useVaultSelector } from '@state/redux/profiles/hooks';
-import { selectDeletionConfig } from '@state/redux/profiles/selectors/vault';
+import { useVaultSelector } from '@state/redux/vaults/hooks';
+import { selectDeletionConfig } from '@state/redux/vaults/selectors/vault';
 
 import { NoteActions } from '.';
 
