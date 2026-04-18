@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Scegli un vault",
+		"actions": {
+			"createNew": "Crea nuovo vault"
+		}
+	},
+	"creator": {
+		"title": "Crea vault",
+		"field": {
+			"name": {
+				"label": "Nome del vault",
+				"placeholder": "es. Il mio vault, Condiviso con Alex",
+				"random": "Genera nome casuale",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Risguardo",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alcova",
+					"6": "Penombra",
+					"7": "Corrispondenza al chiaro di luna",
+					"8": "Cartografia serale",
+					"9": "Lanterna e inchiostro",
+					"10": "Archivio a lume di candela",
+					"11": "Manoscritti d'edera",
+					"12": "Lettere di cedro",
+					"13": "Scriptorium di palissandro",
+					"14": "Il codice slegato",
+					"15": "Marginalia e sussurri",
+					"16": "Confessioni di risguardo",
+					"17": "Il silenzio annotato",
+					"18": "Cartografia d'ombra",
+					"19": "La stanza ricordata",
+					"20": "Le lettere non firmate",
+					"21": "Coordinate sussurrate",
+					"22": "L'almanacco inedito",
+					"23": "Lettere a cera persa",
+					"24": "La biblioteca invisibile",
+					"25": "Margini inesplorati",
+					"26": "La quieta cospirazione",
+					"27": "La posta mai consegnata",
+					"28": "Archivio sempreverde",
+					"29": "Luna di carta",
+					"30": "Fioritura di carta",
+					"31": "Fioritura notturna",
+					"32": "Atlante soffice",
+					"33": "Velour",
+					"34": "Pietra d'inchiostro",
+					"35": "Silenzio",
+					"36": "Ombra",
+					"37": "Quieta deriva",
+					"38": "Prato profondo",
+					"39": "Registro non scritto",
+					"40": "Taccuino silente",
+					"41": "Archivio inespresso",
+					"42": "Diario alla deriva",
+					"43": "Cronaca del vento solare",
+					"44": "Fiordo silenzioso",
+					"45": "Frammenti di memoria",
+					"46": "Istante silenzioso",
+					"47": "Minuti svaniti"
+				}
+			},
+			"password": {
+				"label": "Password di crittografia",
+				"recommended": "(consigliata)",
+				"placeholder": "Inserisci una password sicura"
+			},
+			"algorithm": {
+				"label": "Algoritmo di crittografia"
+			}
+		},
+		"actions": {
+			"create": "Crea vault",
+			"continueNoPassword": "Continua senza password",
+			"cancel": "Annulla"
+		},
+		"noEncryptionDialog": {
+			"title": "Crea vault senza crittografia",
+			"description": "Le note e i dati verranno salvati in chiaro. Qualsiasi app o persona con accesso alla cartella del vault potrà leggerne il contenuto.",
+			"actions": {
+				"confirm": "Continua senza crittografia",
+				"cancel": "Annulla"
+			}
+		},
+		"errors": {
+			"nameRequired": "Inserisci un nome per il vault",
+			"passwordRequired": "Inserisci la password"
+		}
+	},
+	"login": {
+		"title": "Sblocca vault",
+		"field": {
+			"password": {
+				"placeholder": "Inserisci la password"
+			}
+		},
+		"actions": {
+			"unlock": "Sblocca",
+			"changeVault": "Cambia vault"
+		},
+		"errors": {
+			"cannotOpen": "Impossibile aprire il vault",
+			"invalidPassword": "Password non valida",
+			"passwordRequired": "Inserisci la password"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Impossibile aprire il vault",
+		"corrupted": "\"{{name}}\" sembra essere danneggiato."
+	}
+}

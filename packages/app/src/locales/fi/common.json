@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Kumoa",
+		"confirm": "Vahvista",
+		"apply": "Käytä",
+		"save": "Tallenna",
+		"saveChanges": "Tallenna muutokset",
+		"delete": "Poista",
+		"reset": "Palauta",
+		"update": "Päivitä",
+		"add": "Lisää",
+		"create": "Luo",
+		"close": "Sulje"
+	},
+	"form": {
+		"suggestTemplate": "Kokeile tätä: <suggests>"
+	}
+}

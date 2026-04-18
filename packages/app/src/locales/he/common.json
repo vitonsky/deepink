@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "ביטול",
+		"confirm": "אישור",
+		"apply": "החלה",
+		"save": "שמירה",
+		"saveChanges": "שמירת שינויים",
+		"delete": "מחיקה",
+		"reset": "איפוס",
+		"update": "עדכון",
+		"add": "הוספה",
+		"create": "יצירה",
+		"close": "סגירה"
+	},
+	"form": {
+		"suggestTemplate": "אפשר לנסות: <suggests>"
+	}
+}

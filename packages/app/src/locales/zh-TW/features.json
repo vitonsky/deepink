@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "建立標籤",
+					"action": "建立"
+				},
+				"edit": {
+					"title": "編輯標籤",
+					"action": "儲存"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "標籤名稱",
+					"placeholder": "例如：靈感"
+				},
+				"parent": {
+					"label": "上層標籤",
+					"placeholder": "例如：食譜/甜點"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "因未知錯誤，無法儲存變更。",
+				"format": "標籤不可為空白，不可以「/」開頭或結尾，也不可包含「//」。",
+				"duplicate": "標籤「{{name}}」已存在。",
+				"parentTagNotFound": "找不到上層標籤，請選擇其他標籤。"
+			}
+		},
+		"deletion": {
+			"confirm": "確定要刪除標籤「{{name}}」及其所有子標籤嗎？"
+		}
+	},
+	"workspace": {
+		"defaultName": "筆記本",
+		"creator": {
+			"title": "建立新空間",
+			"description": "每個空間都是獨立的區域，擁有各自的筆記、標籤和檔案。所有內容彼此隔離，但都安全存放在你的加密保險庫中，隨時可以切換使用。",
+			"action": {
+				"add": "建立",
+				"cancel": "取消"
+			},
+			"field": {
+				"name": {
+					"label": "空間名稱",
+					"placeholder": "例如：健康日誌、商業點子",
+					"suggests": {
+						"0": "財務",
+						"1": "健康",
+						"2": "職涯",
+						"3": "家庭",
+						"4": "日記",
+						"5": "目標",
+						"6": "靈感",
+						"7": "法律",
+						"8": "旅行",
+						"9": "私人"
+					}
+				}
+			},
+			"error": {
+				"unknown": "發生未知錯誤，請再試一次。",
+				"format": "空間名稱不可為空白。"
+			}
+		},
+		"error": {
+			"title": "空間「{{name}}」載入失敗",
+			"description": "無法載入此空間，資料可能已損毀。請切換至其他空間或建立新空間以繼續使用。",
+			"chooseAnother": "選擇其他空間",
+			"dividerText": "或",
+			"createNew": "建立新空間",
+			"createWorkspace": "建立空間",
+			"closeVault": "關閉目前的保險庫"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "未命名",
+			"defaultTemplate": "未命名 - {{date}}",
+			"duplicate": "副本：{{title}}"
+		},
+		"editor": {
+			"placeholder": "記下想法、待辦或隨筆⋯",
+			"modes": {
+				"plaintext": "純文字模式",
+				"richtext": "富文字編輯",
+				"split-screen": "分割畫面"
+			}
+		},
+		"actions": {
+			"addToFavorites": "加入收藏",
+			"removeFromFavorites": "取消收藏",
+			"moveToArchive": "移至封存",
+			"removeFromArchive": "取消封存"
+		},
+		"tags": {
+			"addPlaceholder": "輸入以新增標籤⋯"
+		},
+		"versionPreview": {
+			"versionAt": "{{date}} 的版本",
+			"backToEditing": "返回編輯"
+		},
+		"menu": {
+			"title": "筆記選項",
+			"copyReference": "複製筆記連結",
+			"remindMe": "提醒我",
+			"history": "歷史紀錄",
+			"backLinks": "反向連結",
+			"readonlyMode": "唯讀模式",
+			"spellcheck": "拼字檢查",
+			"export": "匯出⋯",
+			"passwordProtection": "密碼保護⋯",
+			"disableSync": "停用同步",
+			"moveToArchive": "移至封存",
+			"removeFromArchive": "取消封存",
+			"deleteToBin": "移至垃圾桶",
+			"deletePermanently": "永久刪除",
+			"restoreFromBin": "從垃圾桶還原"
+		},
+		"version": {
+			"chars": "{{count}} 個字元",
+			"apply": {
+				"title": "套用版本",
+				"readonlyTitle": "唯讀筆記無法套用版本"
+			},
+			"open": {
+				"title": "開啟版本"
+			},
+			"delete": {
+				"title": "刪除版本"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "儲存快照",
+				"title": "將此筆記的目前狀態儲存為歷史紀錄中的新版本"
+			},
+			"deleteAll": {
+				"label": "全部刪除",
+				"title": "永久刪除此筆記的所有已儲存版本"
+			},
+			"dontRecord": "不記錄此筆記的歷史",
+			"empty": "此筆記沒有已記錄的版本",
+			"loading": "載入中⋯",
+			"confirmDeleteAll": {
+				"title": "刪除所有筆記版本",
+				"description": "此操作將永久刪除所有筆記版本。",
+				"confirm": "確定要執行嗎？",
+				"action": "套用"
+			},
+			"confirmApply": {
+				"title": "套用筆記版本",
+				"description": "即將套用筆記版本 {{version}}。",
+				"warning": "此操作會以所選快照的內容取代目前的筆記資料。確定要繼續嗎？",
+				"apply": "套用",
+				"preview": "預覽"
+			},
+			"confirmDelete": {
+				"title": "刪除筆記版本",
+				"description": "即將刪除筆記版本 {{version}}。",
+				"warning": "此操作將不可逆地刪除該筆記版本。確定要繼續嗎？",
+				"delete": "刪除",
+				"preview": "預覽"
+			}
+		},
+		"sidebar": {
+			"closePanel": "關閉面板",
+			"tabs": {
+				"history": "筆記版本",
+				"backLinks": "反向連結",
+				"files": "附加檔案"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "要將此筆記移至垃圾桶嗎？",
+			"confirmPermanentDeletion": "要永久刪除此筆記嗎？"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "確定要上傳 {{filesCount}} 個檔案（共 {{size}}）嗎？"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "搜尋⋯"
+		},
+		"filterBy": "篩選條件",
+		"empty": "這裡還沒有筆記。<create>建立一則筆記</create>"
+	},
+	"notesView": {
+		"allNotes": "所有筆記",
+		"favorites": "收藏筆記",
+		"archived": "已封存筆記",
+		"deleted": "已刪除筆記"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "選擇一則筆記以開始閱讀或編輯"
+		}
+	},
+	"activityBar": {
+		"newNote": "新增筆記",
+		"files": "檔案",
+		"reminders": "提醒",
+		"extensions": "擴充功能",
+		"inbox": "收件匣",
+		"publishNotes": "發佈筆記",
+		"lockVault": "鎖定保險庫",
+		"globalSettings": "全域設定"
+	},
+	"tabBar": {
+		"closeTab": "關閉分頁"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "點擊插入第 {{level}} 級標題。右鍵開啟選單以選擇其他選項",
+			"level": "第 {{level}} 級標題"
+		},
+		"bold": "切換粗體樣式",
+		"italic": "切換斜體樣式",
+		"strikethrough": "切換刪除線樣式",
+		"unorderedList": "插入或切換無序列表",
+		"checkboxList": "插入或切換核取方塊列表",
+		"orderedList": "插入或切換有序列表",
+		"codeBlock": "插入或套用程式碼區塊",
+		"quoteBlock": "插入或套用引用區塊",
+		"insertDate": "插入日期",
+		"insertPageBreak": "插入分頁符號",
+		"insertFile": "插入檔案",
+		"image": {
+			"buttonTitle": "插入圖片",
+			"dialogTitle": "新增圖片",
+			"dialogDescription": "圖片將插入於游標位置。",
+			"field": {
+				"url": {
+					"label": "圖片網址",
+					"placeholder": "例如：https://example.com/image.png"
+				},
+				"altText": {
+					"label": "圖片替代文字（選填）",
+					"placeholder": "簡短描述圖片內容"
+				}
+			},
+			"actions": {
+				"add": "新增",
+				"cancel": "取消"
+			}
+		},
+		"link": {
+			"buttonTitle": "插入連結",
+			"dialogTitle": "新增連結",
+			"dialogDescription": "選取的文字將成為連結；若未選取文字，連結將插入於游標位置。",
+			"field": {
+				"url": {
+					"label": "連結網址",
+					"placeholder": "例如：https://example.com"
+				}
+			},
+			"actions": {
+				"add": "新增",
+				"cancel": "取消"
+			}
+		}
+	},
+	"image": {
+		"loading": "圖片載入中"
+	},
+	"notifications": {
+		"title": "通知"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "應用程式更新",
+			"reminderLater": "將於一週後再次提醒"
+		},
+		"newVersion": {
+			"title": "有新版本可用",
+			"body": "新版本已就緒。立即更新以取得最新改進與修正。",
+			"download": "下載新版本",
+			"ignore": "忽略"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "圖片屬性",
+			"urlLabel": "圖片網址",
+			"altLabel": "圖片替代文字"
+		},
+		"linkProperties": {
+			"title": "連結屬性",
+			"urlLabel": "連結網址"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "點擊以將變更儲存至磁碟",
+			"saving": "正在儲存變更⋯"
+		},
+		"changeVault": "切換保險庫",
+		"history": "歷史紀錄",
+		"notifications": "通知"
+	}
+}

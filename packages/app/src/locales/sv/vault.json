@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Välj ett valv",
+		"actions": {
+			"createNew": "Skapa nytt valv"
+		}
+	},
+	"creator": {
+		"title": "Skapa valv",
+		"field": {
+			"name": {
+				"label": "Valvets namn",
+				"placeholder": "t.ex. Mitt valv, Delat med Alex",
+				"random": "Slumpa ett namn",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Pergament",
+					"2": "Försättsblad",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alkov",
+					"6": "Halvskugga",
+					"7": "Månbelyst korrespondens",
+					"8": "Kvällskartografi",
+					"9": "Lykta & bläck",
+					"10": "Levande ljus arkiv",
+					"11": "Klättrande murgröna",
+					"12": "Cederbrev",
+					"13": "Rosenträ-skriptorium",
+					"14": "Den obundna kodexen",
+					"15": "Marginalia & mummel",
+					"16": "Försättsbladets bekännelser",
+					"17": "Den annoterade tystnaden",
+					"18": "Skuggkartografi",
+					"19": "Det mindes rum",
+					"20": "De osignerade breven",
+					"21": "Viskade koordinater",
+					"22": "Den oberättade almanackan",
+					"23": "Förlorade vaxbrev",
+					"24": "Det osynliga biblioteket",
+					"25": "Okartlagda marginaler",
+					"26": "Den tysta konspirationen",
+					"27": "Den olevererade posten",
+					"28": "Vintergrönt arkiv",
+					"29": "Pappersmåne",
+					"30": "Pappersblom",
+					"31": "Nattblom",
+					"32": "Mjuk atlas",
+					"33": "Velour",
+					"34": "Bläcksten",
+					"35": "Tystnad",
+					"36": "Skugga",
+					"37": "Stilla drift",
+					"38": "Djup äng",
+					"39": "Oskriven liggare",
+					"40": "Tyst skissbok",
+					"41": "Outtalat arkiv",
+					"42": "Drivande journal",
+					"43": "Solvindens krönika",
+					"44": "Stilla fjord",
+					"45": "Minnesfragment",
+					"46": "Tyst ögonblick",
+					"47": "Försvunna minuter"
+				}
+			},
+			"password": {
+				"label": "Krypteringslösenord",
+				"recommended": "(rekommenderas)",
+				"placeholder": "Ange ett starkt lösenord"
+			},
+			"algorithm": {
+				"label": "Krypteringsalgoritm"
+			}
+		},
+		"actions": {
+			"create": "Skapa valv",
+			"continueNoPassword": "Fortsätt utan lösenord",
+			"cancel": "Avbryt"
+		},
+		"noEncryptionDialog": {
+			"title": "Skapa valv utan kryptering",
+			"description": "Dina anteckningar och data lagras som oformaterad text. Alla appar och personer med åtkomst till valvets mapp på disk kan läsa allt innehåll.",
+			"actions": {
+				"confirm": "Fortsätt utan kryptering",
+				"cancel": "Avbryt"
+			}
+		},
+		"errors": {
+			"nameRequired": "Ange ett namn för valvet",
+			"passwordRequired": "Ange lösenordet"
+		}
+	},
+	"login": {
+		"title": "Lås upp valv",
+		"field": {
+			"password": {
+				"placeholder": "Ange lösenord"
+			}
+		},
+		"actions": {
+			"unlock": "Lås upp",
+			"changeVault": "Byt valv"
+		},
+		"errors": {
+			"cannotOpen": "Kan inte öppna valvet",
+			"invalidPassword": "Felaktigt lösenord",
+			"passwordRequired": "Ange lösenord"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Kunde inte öppna valvet",
+		"corrupted": "\"{{name}}\" verkar vara skadat."
+	}
+}

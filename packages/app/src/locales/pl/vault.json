@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Wybierz sejf",
+		"actions": {
+			"createNew": "Utwórz nowy sejf"
+		}
+	},
+	"creator": {
+		"title": "Utwórz sejf",
+		"field": {
+			"name": {
+				"label": "Nazwa sejfu",
+				"placeholder": "np. Mój sejf, Wspólny z Olą",
+				"random": "Losowa nazwa",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Wyklejka",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alkowa",
+					"6": "Półcień",
+					"7": "Korespondencja w świetle księżyca",
+					"8": "Wieczorna kartografia",
+					"9": "Latarnia i atrament",
+					"10": "Archiwum przy świecach",
+					"11": "Rękopisy w bluszczu",
+					"12": "Cedrowe listy",
+					"13": "Skryptorium z palisandru",
+					"14": "Nieoprawiony kodeks",
+					"15": "Marginalia i szepty",
+					"16": "Wyznania na wyklejce",
+					"17": "Opatrzona cisza",
+					"18": "Kartografia cieni",
+					"19": "Zapamiętany pokój",
+					"20": "Niepodpisane listy",
+					"21": "Szeptane współrzędne",
+					"22": "Nieopowiedziany almanach",
+					"23": "Listy z wosku",
+					"24": "Niewidzialna biblioteka",
+					"25": "Niezbadane marginesy",
+					"26": "Cichy spisek",
+					"27": "Niedoręczona poczta",
+					"28": "Wiecznie zielone archiwum",
+					"29": "Papierowy księżyc",
+					"30": "Papierowy kwiat",
+					"31": "Nocny kwiat",
+					"32": "Miękki atlas",
+					"33": "Velour",
+					"34": "Kamień atramentowy",
+					"35": "Cisza",
+					"36": "Cień",
+					"37": "Spokojny dryf",
+					"38": "Głęboka łąka",
+					"39": "Niepisana księga",
+					"40": "Cichy szkicownik",
+					"41": "Niewypowiedziane archiwum",
+					"42": "Dryfujący dziennik",
+					"43": "Kronika słonecznego wiatru",
+					"44": "Cichy fiord",
+					"45": "Fragmenty wspomnień",
+					"46": "Cicha chwila",
+					"47": "Zniknięte minuty"
+				}
+			},
+			"password": {
+				"label": "Hasło szyfrowania",
+				"recommended": "(zalecane)",
+				"placeholder": "Wprowadź silne hasło"
+			},
+			"algorithm": {
+				"label": "Algorytm szyfrowania"
+			}
+		},
+		"actions": {
+			"create": "Utwórz sejf",
+			"continueNoPassword": "Kontynuuj bez hasła",
+			"cancel": "Anuluj"
+		},
+		"noEncryptionDialog": {
+			"title": "Utwórz sejf bez szyfrowania",
+			"description": "Notatki i dane będą przechowywane jako zwykły tekst. Każda aplikacja lub osoba z dostępem do katalogu sejfu na dysku będzie mogła odczytać całą jego zawartość.",
+			"actions": {
+				"confirm": "Kontynuuj bez szyfrowania",
+				"cancel": "Anuluj"
+			}
+		},
+		"errors": {
+			"nameRequired": "Podaj nazwę sejfu",
+			"passwordRequired": "Podaj hasło"
+		}
+	},
+	"login": {
+		"title": "Odblokuj sejf",
+		"field": {
+			"password": {
+				"placeholder": "Wprowadź hasło"
+			}
+		},
+		"actions": {
+			"unlock": "Odblokuj",
+			"changeVault": "Zmień sejf"
+		},
+		"errors": {
+			"cannotOpen": "Nie można otworzyć sejfu",
+			"invalidPassword": "Nieprawidłowe hasło",
+			"passwordRequired": "Wprowadź hasło"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Nie udało się otworzyć sejfu",
+		"corrupted": "\"{{name}}\" wydaje się uszkodzony."
+	}
+}

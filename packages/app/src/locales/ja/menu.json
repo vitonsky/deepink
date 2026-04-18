@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "アプリケーション",
+		"quit": "終了",
+		"edit": "編集",
+		"undo": "取り消す",
+		"redo": "やり直す",
+		"cut": "カット",
+		"copy": "コピー",
+		"paste": "ペースト",
+		"selectAll": "すべてを選択",
+		"help": "ヘルプ",
+		"toggleDevTools": "開発ツールの切り替え",
+		"about": "アプリケーションについて"
+	},
+	"tray": {
+		"open": "ノートを開く",
+		"quit": "終了"
+	},
+	"note": {
+		"export": "書き出す...",
+		"duplicate": "複製",
+		"copyMarkdownLink": "Markdownリンクをコピー",
+		"deletePermanently": "完全に削除",
+		"restoreFromBin": "ゴミ箱から戻す",
+		"deleteToBin": "ゴミ箱に移動"
+	},
+	"tag": {
+		"addNestedTag": "サブタグを作成...",
+		"edit": "編集...",
+		"delete": "削除"
+	}
+}

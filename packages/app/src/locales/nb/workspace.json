@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tagger",
+			"empty": "Opprett tagger for å organisere notatene dine. Bygg hierarkier for mer fleksibel struktur.",
+			"actions": {
+				"add": "Legg til tagg"
+			}
+		},
+		"workspaces": {
+			"label": "Arbeidsområder",
+			"actions": {
+				"add": "Legg til arbeidsområde"
+			}
+		}
+	}
+}

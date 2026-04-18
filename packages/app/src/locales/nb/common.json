@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Avbryt",
+		"confirm": "Bekreft",
+		"apply": "Bruk",
+		"save": "Lagre",
+		"saveChanges": "Lagre endringer",
+		"delete": "Slett",
+		"reset": "Tilbakestill",
+		"update": "Oppdater",
+		"add": "Legg til",
+		"create": "Opprett",
+		"close": "Lukk"
+	},
+	"form": {
+		"suggestTemplate": "Prøv dette: <suggests>"
+	}
+}

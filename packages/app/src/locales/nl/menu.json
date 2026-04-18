@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Applicatie",
+		"quit": "Stop",
+		"edit": "Wijzig",
+		"undo": "Ongedaan maken",
+		"redo": "Opnieuw",
+		"cut": "Knip",
+		"copy": "Kopieer",
+		"paste": "Plak",
+		"selectAll": "Selecteer alles",
+		"help": "Help",
+		"toggleDevTools": "Ontwikkeltools in-/uitschakelen",
+		"about": "Over deze applicatie"
+	},
+	"tray": {
+		"open": "Open notities",
+		"quit": "Stop"
+	},
+	"note": {
+		"export": "Exporteer...",
+		"duplicate": "Dupliceer",
+		"copyMarkdownLink": "Kopieer Markdown-link",
+		"deletePermanently": "Definitief verwijderen",
+		"restoreFromBin": "Terugzetten uit prullenmand",
+		"deleteToBin": "Naar prullenmand"
+	},
+	"tag": {
+		"addNestedTag": "Subtag aanmaken...",
+		"edit": "Bewerk...",
+		"delete": "Verwijder"
+	}
+}

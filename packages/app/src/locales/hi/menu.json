@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "ऐप्लिकेशन",
+		"quit": "बंद करें",
+		"edit": "संपादन",
+		"undo": "पूर्ववत करें",
+		"redo": "फिर से करें",
+		"cut": "कट करें",
+		"copy": "कॉपी करें",
+		"paste": "पेस्ट करें",
+		"selectAll": "सभी चुनें",
+		"help": "सहायता",
+		"toggleDevTools": "डेव टूल्स टॉगल करें",
+		"about": "ऐप्लिकेशन के बारे में"
+	},
+	"tray": {
+		"open": "नोट्स खोलें",
+		"quit": "बंद करें"
+	},
+	"note": {
+		"export": "एक्सपोर्ट...",
+		"duplicate": "प्रतिलिपि बनाएँ",
+		"copyMarkdownLink": "Markdown लिंक कॉपी करें",
+		"deletePermanently": "स्थायी रूप से हटाएँ",
+		"restoreFromBin": "बिन से वापस लाएँ",
+		"deleteToBin": "बिन में भेजें"
+	},
+	"tag": {
+		"addNestedTag": "सब-टैग बनाएँ...",
+		"edit": "संपादित करें...",
+		"delete": "हटाएँ"
+	}
+}

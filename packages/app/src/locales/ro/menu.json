@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Aplicație",
+		"quit": "Ieșire",
+		"edit": "Editare",
+		"undo": "Anulare",
+		"redo": "Refacere",
+		"cut": "Decupare",
+		"copy": "Copiere",
+		"paste": "Lipire",
+		"selectAll": "Selectează tot",
+		"help": "Ajutor",
+		"toggleDevTools": "Comutare instrumente dezvoltator",
+		"about": "Despre aplicație"
+	},
+	"tray": {
+		"open": "Deschide notițele",
+		"quit": "Ieșire"
+	},
+	"note": {
+		"export": "Exportă...",
+		"duplicate": "Duplică",
+		"copyMarkdownLink": "Copiază link Markdown",
+		"deletePermanently": "Șterge definitiv",
+		"restoreFromBin": "Restaurează din coș",
+		"deleteToBin": "Mută în coș"
+	},
+	"tag": {
+		"addNestedTag": "Creează sub-tag...",
+		"edit": "Editează...",
+		"delete": "Șterge"
+	}
+}

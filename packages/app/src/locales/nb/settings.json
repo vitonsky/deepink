@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Innstillinger"
+	},
+	"tabs": {
+		"general": "Generelt",
+		"appearance": "Utseende",
+		"hotkeys": "Hurtigtaster",
+		"vault": "Vault",
+		"workspace": "Arbeidsområde",
+		"importExport": "Import og eksport",
+		"vaultSettingsGroup": "Vault-innstillinger"
+	},
+	"general": {
+		"title": "Generelle innstillinger",
+		"subtitle": "Administrer de overordnede innstillingene for appen.",
+		"version": {
+			"title": "Versjon",
+			"checkForUpdates": "Se etter oppdateringer",
+			"upToDate": "Du har den nyeste versjonen",
+			"newVersionAvailable": "Ny versjon <bold>{{version}}</bold> er tilgjengelig.",
+			"downloadLatest": "Last ned",
+			"downloadDescription": "nyeste versjon for nye funksjoner og forbedringer."
+		},
+		"autoCheckUpdates": {
+			"label": "Automatisk sjekk for oppdateringer",
+			"description": "Appen sjekker jevnlig etter oppdateringer og varsler deg når en ny versjon er tilgjengelig."
+		},
+		"language": {
+			"title": "Språk",
+			"description": "Endre visningsspråk."
+		},
+		"notifications": {
+			"title": "Varsler",
+			"description": "Systemvarsler brukes kun til påminnelser. Når de er deaktivert, vises påminnelser bare i appens varselliste.",
+			"useSystem": "Bruk systemvarsler"
+		},
+		"vaultLock": {
+			"groupTitle": "Vault-låsing",
+			"lockOnSystemLock": {
+				"label": "Lås vault når systemet låses",
+				"description": "Vault låses når skjermspareren starter eller enheten går i dvale."
+			},
+			"lockAfterIdle": {
+				"title": "Lås vault etter inaktivitet",
+				"description": "Vault låses etter valgt tid med inaktivitet.",
+				"never": "Ikke lås",
+				"minutes5": "etter 5 minutter",
+				"minutes10": "etter 10 minutter",
+				"minutes15": "etter 15 minutter",
+				"minutes30": "etter 30 minutter",
+				"hour1": "etter 1 time",
+				"hours2": "etter 2 timer",
+				"hours3": "etter 3 timer",
+				"hours5": "etter 5 timer"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Tema",
+			"auto": "Automatisk",
+			"dark": "Mørkt",
+			"light": "Lyst",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Aksentfarge",
+			"zenNotApplicable": "Aksentfarge gjelder ikke for valgt tema."
+		},
+		"zoomLevel": {
+			"title": "Zoomnivå",
+			"description": "Juster standard zoomnivå for alle vinduer.\nHvis systemet ditt ikke skalerer apper automatisk, kan du endre zoom for å tilpasse den faktiske pikseltettheten (DPR). Oppdaget DPR er {{dpr}}.",
+			"apply": "Bruk",
+			"reset": "Tilbakestill",
+			"errors": {
+				"enterNumber": "Skriv inn et tall for å angi zoom",
+				"tooSmall": "Zoom kan ikke være mindre enn {{min}} %",
+				"tooBig": "Zoom kan ikke være mer enn {{max}} %"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Redigering",
+		"mode": {
+			"title": "Redigeringsmodus"
+		},
+		"fontFamily": {
+			"title": "Skrifttype",
+			"description": "Angi en skrifttype for alle redigeringsvindu, eller la feltet stå tomt for å bruke standard.",
+			"placeholder": "Skriv inn navn på skrifttype"
+		},
+		"fontSize": {
+			"title": "Skriftstørrelse"
+		},
+		"lineHeight": {
+			"title": "Linjehøyde"
+		},
+		"dateFormat": {
+			"title": "Datoformat",
+			"description": "Angi datoformatet som brukes ved innsetting av datoer. Støtter standard tokensyntaks som DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "referanse for datoformat",
+			"example": "Eksempel"
+		},
+		"plainText": {
+			"groupTitle": "Ren tekst-redigering",
+			"lineNumbers": "Vis linjenumre",
+			"miniMap": "Aktiver minikart"
+		}
+	},
+	"hotkeys": {
+		"blank": "Ingen",
+		"shortcuts": {
+			"createNote": "Opprett nytt notat",
+			"closeCurrentNote": "Lukk aktivt notat",
+			"restoreClosedNote": "Gjenopprett nylig lukket notat",
+			"focusNextNote": "Gå til neste åpne notat",
+			"focusPreviousNote": "Gå til forrige åpne notat",
+			"toggleArchive": "Flytt aktivt notat til/fra arkiv",
+			"toggleBookmark": "Legg til/fjern bokmerke for aktivt notat",
+			"deleteNote": "Slett aktivt notat",
+			"restoreFromBin": "Gjenopprett aktivt notat fra papirkurven",
+			"toggleHistory": "Vis eller skjul historikk for aktivt notat",
+			"focusSearch": "Søk i notater",
+			"syncDatabase": "Synkroniser vault til disk",
+			"lockVault": "Lås vault",
+			"openSettings": "Åpne innstillinger"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Vault-navn"
+		},
+		"rememberPasswords": {
+			"label": "Husk passord for arbeidsområder",
+			"description": "Passord for arbeidsområder krypteres med hovednøkkelen og lagres i databasen, slik at krypterte arbeidsområder åpnes automatisk uten å skrive inn passord."
+		},
+		"filesAndData": {
+			"groupTitle": "Filer og data",
+			"imagesCompression": {
+				"title": "Bildekomprimering",
+				"compress": "Komprimer bilder",
+				"doNotCompress": "Ikke komprimer bilder",
+				"alwaysAsk": "Spør alltid"
+			},
+			"deleteOrphaned": {
+				"label": "Slett foreldreløse filer",
+				"description": "Slett filer som ikke lenger er i bruk."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Kryptering",
+			"algorithm": {
+				"title": "Krypteringsalgoritme",
+				"none": "Ingen"
+			},
+			"password": {
+				"title": "Passord",
+				"update": "Oppdater passord"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Synkronisering",
+			"enable": {
+				"label": "Aktiver synkronisering",
+				"description": "Hold din vault synkronisert på tvers av enheter. All data krypteres før den forlater enheten din."
+			},
+			"method": {
+				"title": "Synkroniseringsmetode",
+				"fileSystem": "Filsystem",
+				"server": "Server"
+			},
+			"directory": {
+				"title": "Synkroniseringsmappe",
+				"placeholder": "Skriv inn sti til mappe"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Øyeblikksbilder",
+			"record": {
+				"label": "Ta øyeblikksbilder av notater",
+				"description": "Når aktivert, opprettes øyeblikksbilder av notatinnhold når et notat endres. Du kan styre øyeblikksbilder per notat i notatets historikkpanel."
+			},
+			"delay": {
+				"title": "Forsinkelse for øyeblikksbilde",
+				"description": "Hvor lenge det skal ventes etter at et notat er redigert før et nytt øyeblikksbilde lagres, i sekunder. Kortere intervaller gir hyppigere øyeblikksbilder — og en større vault."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Papirkurv",
+			"confirmDeletion": {
+				"label": "Bekreft sletting",
+				"description": "Spør før et notat slettes."
+			},
+			"moveToBin": {
+				"label": "Flytt notater til papirkurven",
+				"description": "Flytt notater til papirkurven i stedet for å slette dem permanent, slik at du kan gjenopprette dem senere."
+			},
+			"autoPurge": {
+				"label": "Slett gamle notater i papirkurven permanent",
+				"description": "Notater i papirkurven slettes permanent etter en viss tid."
+			},
+			"purgeDelay": {
+				"title": "Tid før permanent sletting",
+				"description": "Notater i papirkurven slettes permanent etter dette antall dager, regnet fra da de ble flyttet dit.",
+				"unit": "dager"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Navn på arbeidsområde",
+			"update": "Oppdater"
+		},
+		"newNoteTitle": {
+			"title": "Tittel for nye notater",
+			"description": "Angi tittel for nye notater. Du kan bruke dato med syntaksen {date} eller {date:FORMAT}, for eksempel {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "formatreferanse",
+			"placeholder": "f.eks. Notat {date:DD/MM/YYYY HH:mm}",
+			"example": "Eksempel"
+		},
+		"tagsForNewNote": {
+			"title": "Tagger for nye notater",
+			"none": "Ikke sett noen tagger",
+			"selected": "Samme som valgt tagg"
+		},
+		"dangerousZone": {
+			"groupTitle": "Faresone",
+			"delete": {
+				"label": "Slett arbeidsområdet og all tilhørende data, inkludert notater, tagger og filer",
+				"action": "Slett arbeidsområde",
+				"cannotDeleteLast": "Kan ikke slette det siste arbeidsområdet i en vault.",
+				"createAnother": "Opprett",
+				"createAnotherSuffix": "et annet arbeidsområde først."
+			},
+			"confirmDelete": "Du er i ferd med å slette arbeidsområdet «{{name}}». Er du sikker på at du vil gjøre dette?\n\nHvis du fortsetter, slettes all data knyttet til dette arbeidsområdet, inkludert notater, tagger og filer."
+		}
+	},
+	"importExport": {
+		"importNotes": "Importer notater",
+		"exportNotes": "Eksporter notater",
+		"importFromZip": "Importer notater fra .zip-arkiv",
+		"importFromDirectory": "Importer mappe med Markdown-filer",
+		"dropzone": {
+			"title": "Slipp Markdown-filer eller .zip-arkiv for å importere",
+			"description": "Dra og slipp filer her, eller klikk for å velge filer"
+		},
+		"progress": "Notatimport pågår. Steg: {{stage}} {{processed}}/{{total}}"
+	}
+}

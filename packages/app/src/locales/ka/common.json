@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "გაუქმება",
+		"confirm": "დადასტურება",
+		"apply": "გამოყენება",
+		"save": "შენახვა",
+		"saveChanges": "ცვლილებების შენახვა",
+		"delete": "წაშლა",
+		"reset": "აღდგენა",
+		"update": "განახლება",
+		"add": "დამატება",
+		"create": "შექმნა",
+		"close": "დახურვა"
+	},
+	"form": {
+		"suggestTemplate": "სცადეთ: <suggests>"
+	}
+}

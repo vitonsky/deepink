@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Etiketler",
+			"empty": "Notlarınızı düzenlemek için etiketler oluşturun. Esnek bir hiyerarşi kurmak için alt etiketler ekleyin.",
+			"actions": {
+				"add": "Etiket ekle"
+			}
+		},
+		"workspaces": {
+			"label": "Alanlar",
+			"actions": {
+				"add": "Alan ekle"
+			}
+		}
+	}
+}

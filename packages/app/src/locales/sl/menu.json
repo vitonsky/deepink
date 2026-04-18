@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Aplikacija",
+		"quit": "Zapri",
+		"edit": "Uredi",
+		"undo": "Razveljavi",
+		"redo": "Ponovi",
+		"cut": "Izreži",
+		"copy": "Kopiraj",
+		"paste": "Prilepi",
+		"selectAll": "Izberi vse",
+		"help": "Pomoč",
+		"toggleDevTools": "Preklopi razvojna orodja",
+		"about": "O aplikaciji"
+	},
+	"tray": {
+		"open": "Odpri zapiske",
+		"quit": "Zapri"
+	},
+	"note": {
+		"export": "Izvozi …",
+		"duplicate": "Podvoji",
+		"copyMarkdownLink": "Kopiraj Markdown povezavo",
+		"deletePermanently": "Trajno izbriši",
+		"restoreFromBin": "Obnovi iz koša",
+		"deleteToBin": "Premakni v koš"
+	},
+	"tag": {
+		"addNestedTag": "Ustvari podoznako …",
+		"edit": "Uredi …",
+		"delete": "Izbriši"
+	}
+}

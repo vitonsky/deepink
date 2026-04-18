@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Tercihler"
+	},
+	"tabs": {
+		"general": "Genel",
+		"appearance": "Görünüm",
+		"hotkeys": "Kısayollar",
+		"vault": "Vault",
+		"workspace": "Alan",
+		"importExport": "İçe ve Dışa Aktarma",
+		"vaultSettingsGroup": "Vault Ayarları"
+	},
+	"general": {
+		"title": "Genel ayarlar",
+		"subtitle": "Uygulamadaki genel tercihlerinizi yönetin.",
+		"version": {
+			"title": "Sürüm",
+			"checkForUpdates": "Güncellemeleri kontrol et",
+			"upToDate": "En güncel sürümü kullanıyorsunuz",
+			"newVersionAvailable": "Yeni sürüm <bold>{{version}}</bold> mevcut.",
+			"downloadLatest": "İndir",
+			"downloadDescription": "yeni özellikler ve iyileştirmeler için en son sürümü indirin."
+		},
+		"autoCheckUpdates": {
+			"label": "Otomatik güncelleme kontrolü",
+			"description": "Uygulama düzenli olarak güncellemeleri kontrol eder ve yeni sürüm varsa bildirir."
+		},
+		"language": {
+			"title": "Dil",
+			"description": "Görüntüleme dilini değiştirin."
+		},
+		"notifications": {
+			"title": "Bildirimler",
+			"description": "Sistem bildirimleri yalnızca hatırlatıcılar için kullanılır. Devre dışı bırakıldığında hatırlatıcılar yalnızca uygulama içi bildirim listesinde görünür.",
+			"useSystem": "Sistem bildirimlerini kullan"
+		},
+		"vaultLock": {
+			"groupTitle": "Vault kilidi",
+			"lockOnSystemLock": {
+				"label": "Sistem kilitlendiğinde vault'u kilitle",
+				"description": "Ekran koruyucu başladığında veya cihaz uyku moduna geçtiğinde vault kilitlenir."
+			},
+			"lockAfterIdle": {
+				"title": "Boşta kaldığında vault'u kilitle",
+				"description": "Seçilen süre boyunca işlem yapılmadığında vault kilitlenir.",
+				"never": "Kilitleme",
+				"minutes5": "5 dakika sonra",
+				"minutes10": "10 dakika sonra",
+				"minutes15": "15 dakika sonra",
+				"minutes30": "30 dakika sonra",
+				"hour1": "1 saat sonra",
+				"hours2": "2 saat sonra",
+				"hours3": "3 saat sonra",
+				"hours5": "5 saat sonra"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Tema",
+			"auto": "Otomatik",
+			"dark": "Koyu",
+			"light": "Açık",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Vurgu rengi",
+			"zenNotApplicable": "Vurgu rengi seçili tema için geçerli değil."
+		},
+		"zoomLevel": {
+			"title": "Yakınlaştırma düzeyi",
+			"description": "Tüm pencereler için varsayılan yakınlaştırma düzeyini ayarlayın.\nSisteminiz uygulamaları otomatik olarak ölçeklendirmiyorsa, ekranın gerçek piksel oranına (DPR) uygun hale getirmek için yakınlaştırmayı değiştirebilirsiniz. Algılanan DPR: {{dpr}}.",
+			"apply": "Uygula",
+			"reset": "Sıfırla",
+			"errors": {
+				"enterNumber": "Yakınlaştırmayı ayarlamak için bir sayı girin",
+				"tooSmall": "Yakınlaştırma %{{min}} değerinden az olamaz",
+				"tooBig": "Yakınlaştırma %{{max}} değerinden fazla olamaz"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editör",
+		"mode": {
+			"title": "Editör modu"
+		},
+		"fontFamily": {
+			"title": "Yazı tipi",
+			"description": "Tüm editörlerde kullanılacak yazı tipini belirleyin veya varsayılanı kullanmak için boş bırakın.",
+			"placeholder": "Yazı tipi adını girin"
+		},
+		"fontSize": {
+			"title": "Yazı boyutu"
+		},
+		"lineHeight": {
+			"title": "Satır yüksekliği"
+		},
+		"dateFormat": {
+			"title": "Tarih biçimi",
+			"description": "Tarih eklerken kullanılacak biçimi ayarlayın. DD/MM/YYYY HH:mm:ss gibi standart söz dizimini destekler.",
+			"formatReference": "tarih biçimi referansı",
+			"example": "Örnek"
+		},
+		"plainText": {
+			"groupTitle": "Düz metin editörü",
+			"lineNumbers": "Satır numaralarını göster",
+			"miniMap": "Mini haritayı etkinleştir"
+		}
+	},
+	"hotkeys": {
+		"blank": "Boş",
+		"shortcuts": {
+			"createNote": "Yeni not oluştur",
+			"closeCurrentNote": "Etkin notu kapat",
+			"restoreClosedNote": "Son kapatılan notu geri aç",
+			"focusNextNote": "Sonraki açık nota geç",
+			"focusPreviousNote": "Önceki açık nota geç",
+			"toggleArchive": "Etkin notu arşive taşı/arşivden çıkar",
+			"toggleBookmark": "Etkin notu yer imlerine ekle/çıkar",
+			"deleteNote": "Etkin notu sil",
+			"restoreFromBin": "Etkin notu çöp kutusundan geri yükle",
+			"toggleHistory": "Etkin notun geçmişini göster/gizle",
+			"focusSearch": "Notlarda ara",
+			"syncDatabase": "Vault'u diske eşitle",
+			"lockVault": "Vault'u kilitle",
+			"openSettings": "Tercihleri aç"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Vault adı"
+		},
+		"rememberPasswords": {
+			"label": "Alan parolalarını hatırla",
+			"description": "Alan parolaları ana anahtarla şifrelenerek veritabanına kaydedilir; böylece şifreli alanlar parola girmeden otomatik olarak açılır."
+		},
+		"filesAndData": {
+			"groupTitle": "Dosyalar ve veriler",
+			"imagesCompression": {
+				"title": "Görsel sıkıştırma",
+				"compress": "Görselleri sıkıştır",
+				"doNotCompress": "Görselleri sıkıştırma",
+				"alwaysAsk": "Her zaman sor"
+			},
+			"deleteOrphaned": {
+				"label": "Kullanılmayan dosyaları sil",
+				"description": "Artık kullanılmayan dosyaları silin."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Şifreleme",
+			"algorithm": {
+				"title": "Şifreleme algoritması",
+				"none": "Yok"
+			},
+			"password": {
+				"title": "Parola",
+				"update": "Parolayı güncelle"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Eşitleme",
+			"enable": {
+				"label": "Eşitlemeyi etkinleştir",
+				"description": "Vault'unuzu cihazlar arasında eşitleyin. Tüm veriler cihazınızdan ayrılmadan önce şifrelenir."
+			},
+			"method": {
+				"title": "Eşitleme yöntemi",
+				"fileSystem": "Dosya sistemi",
+				"server": "Sunucu"
+			},
+			"directory": {
+				"title": "Eşitleme dizini",
+				"placeholder": "Dizin yolunu girin"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Anlık görüntüler",
+			"record": {
+				"label": "Not anlık görüntülerini kaydet",
+				"description": "Etkinleştirildiğinde, not değiştirildiğinde içeriğin anlık görüntüsü oluşturulur. Not geçmişi panelinden her not için anlık görüntü kaydını ayrıca kontrol edebilirsiniz."
+			},
+			"delay": {
+				"title": "Anlık görüntü gecikmesi",
+				"description": "Not düzenlendikten sonra yeni bir anlık görüntü kaydedilmeden önce beklenecek süre (saniye). Daha kısa aralıklar daha sık anlık görüntü ve daha büyük vault anlamına gelir."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Çöp kutusu",
+			"confirmDeletion": {
+				"label": "Silme onayı",
+				"description": "Bir notu silmeden önce onay isteyin."
+			},
+			"moveToBin": {
+				"label": "Notları çöp kutusuna taşı",
+				"description": "Notları kalıcı olarak silmek yerine çöp kutusuna taşıyın; böylece daha sonra geri yükleyebilirsiniz."
+			},
+			"autoPurge": {
+				"label": "Çöp kutusundaki eski notları kalıcı olarak sil",
+				"description": "Çöp kutusuna taşınan notlar belirli bir süre sonra kalıcı olarak silinir."
+			},
+			"purgeDelay": {
+				"title": "Kalıcı silme süresi",
+				"description": "Çöp kutusundaki notlar, taşındıkları tarihten itibaren bu kadar gün sonra kalıcı olarak silinir.",
+				"unit": "gün"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Alan adı",
+			"update": "Güncelle"
+		},
+		"newNoteTitle": {
+			"title": "Yeni not başlığı",
+			"description": "Yeni notlar için başlık belirleyin. {date} veya {date:BİÇİM} söz dizimiyle tarih ekleyebilirsiniz, örneğin {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "biçim referansı",
+			"placeholder": "ör. Not {date:DD/MM/YYYY HH:mm}",
+			"example": "Örnek"
+		},
+		"tagsForNewNote": {
+			"title": "Yeni not için etiketler",
+			"none": "Etiket ekleme",
+			"selected": "Seçili etiketle aynı"
+		},
+		"dangerousZone": {
+			"groupTitle": "Tehlikeli bölge",
+			"delete": {
+				"label": "Alanı ve notlar, etiketler, dosyalar dahil tüm ilgili verileri sil",
+				"action": "Alanı sil",
+				"cannotDeleteLast": "Vault'taki son alan silinemez.",
+				"createAnother": "Oluştur",
+				"createAnotherSuffix": "önce başka bir alan oluşturun."
+			},
+			"confirmDelete": "\"{{name}}\" alanını silmek üzeresiniz. Devam etmek istediğinizden emin misiniz?\n\nDevam ederseniz bu alana ait notlar, etiketler ve dosyalar dahil tüm veriler silinecektir."
+		}
+	},
+	"importExport": {
+		"importNotes": "Notları içe aktar",
+		"exportNotes": "Notları dışa aktar",
+		"importFromZip": ".zip arşivinden notları içe aktar",
+		"importFromDirectory": "Markdown dosyaları içeren dizini içe aktar",
+		"dropzone": {
+			"title": "İçe aktarmak için Markdown dosyalarını veya .zip arşivini buraya bırakın",
+			"description": "Dosyaları sürükleyip bırakın veya seçmek için tıklayın"
+		},
+		"progress": "Notlar içe aktarılıyor. Aşama: {{stage}} {{processed}}/{{total}}"
+	}
+}

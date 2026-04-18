@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Ứng dụng",
+		"quit": "Thoát",
+		"edit": "Chỉnh sửa",
+		"undo": "Hoàn tác",
+		"redo": "Làm lại",
+		"cut": "Cắt",
+		"copy": "Sao chép",
+		"paste": "Dán",
+		"selectAll": "Chọn tất cả",
+		"help": "Trợ giúp",
+		"toggleDevTools": "Bật/tắt công cụ nhà phát triển",
+		"about": "Giới thiệu ứng dụng"
+	},
+	"tray": {
+		"open": "Mở ghi chú",
+		"quit": "Thoát"
+	},
+	"note": {
+		"export": "Xuất...",
+		"duplicate": "Nhân bản",
+		"copyMarkdownLink": "Sao chép liên kết Markdown",
+		"deletePermanently": "Xoá vĩnh viễn",
+		"restoreFromBin": "Khôi phục từ thùng rác",
+		"deleteToBin": "Chuyển vào thùng rác"
+	},
+	"tag": {
+		"addNestedTag": "Tạo tag con...",
+		"edit": "Chỉnh sửa...",
+		"delete": "Xoá"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Annuller",
+		"confirm": "Bekræft",
+		"apply": "Anvend",
+		"save": "Gem",
+		"saveChanges": "Gem ændringer",
+		"delete": "Slet",
+		"reset": "Nulstil",
+		"update": "Opdater",
+		"add": "Tilføj",
+		"create": "Opret",
+		"close": "Luk"
+	},
+	"form": {
+		"suggestTemplate": "Prøv dette: <suggests>"
+	}
+}

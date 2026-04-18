@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Preferencias"
+	},
+	"tabs": {
+		"general": "General",
+		"appearance": "Apariencia",
+		"hotkeys": "Atajos",
+		"vault": "Vault",
+		"workspace": "Espacio",
+		"importExport": "Importar y exportar",
+		"vaultSettingsGroup": "Ajustes del vault"
+	},
+	"general": {
+		"title": "Ajustes generales",
+		"subtitle": "Gestiona las preferencias generales de la app.",
+		"version": {
+			"title": "Versión",
+			"checkForUpdates": "Buscar actualizaciones",
+			"upToDate": "Tienes la última versión",
+			"newVersionAvailable": "La versión <bold>{{version}}</bold> está disponible.",
+			"downloadLatest": "Descargar",
+			"downloadDescription": "la última versión para obtener nuevas funciones y mejoras."
+		},
+		"autoCheckUpdates": {
+			"label": "Buscar actualizaciones automáticamente",
+			"description": "La app buscará actualizaciones periódicamente y te notificará si hay una nueva versión disponible."
+		},
+		"language": {
+			"title": "Idioma",
+			"description": "Cambia el idioma de la interfaz."
+		},
+		"notifications": {
+			"title": "Notificaciones",
+			"description": "Las notificaciones del sistema se usarán solo para recordatorios. Si se desactivan, los recordatorios aparecerán únicamente en la lista de notificaciones de la app.",
+			"useSystem": "Usar notificaciones del sistema"
+		},
+		"vaultLock": {
+			"groupTitle": "Bloqueo del vault",
+			"lockOnSystemLock": {
+				"label": "Bloquear vault al bloquear el sistema",
+				"description": "El vault se bloqueará cuando se active el protector de pantalla o el dispositivo entre en reposo."
+			},
+			"lockAfterIdle": {
+				"title": "Bloquear vault tras inactividad",
+				"description": "El vault se bloqueará tras el tiempo de inactividad seleccionado.",
+				"never": "No bloquear",
+				"minutes5": "5 minutos",
+				"minutes10": "10 minutos",
+				"minutes15": "15 minutos",
+				"minutes30": "30 minutos",
+				"hour1": "1 hora",
+				"hours2": "2 horas",
+				"hours3": "3 horas",
+				"hours5": "5 horas"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Tema",
+			"auto": "Automático",
+			"dark": "Oscuro",
+			"light": "Claro",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Color de acento",
+			"zenNotApplicable": "El color de acento no se aplica al tema seleccionado."
+		},
+		"zoomLevel": {
+			"title": "Nivel de zoom",
+			"description": "Ajusta el nivel de zoom predeterminado para todas las ventanas.\nSi tu sistema no escala las apps automáticamente, puedes cambiar el zoom para adaptarlo a la proporción de píxeles de tu pantalla (DPR). DPR detectado: {{dpr}}.",
+			"apply": "Aplicar",
+			"reset": "Restablecer",
+			"errors": {
+				"enterNumber": "Introduce un número para ajustar el zoom",
+				"tooSmall": "El zoom no puede ser menor de {{min}}%",
+				"tooBig": "El zoom no puede ser mayor de {{max}}%"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editor",
+		"mode": {
+			"title": "Modo del editor"
+		},
+		"fontFamily": {
+			"title": "Tipografía",
+			"description": "Establece una tipografía para todos los editores, o déjalo vacío para usar la predeterminada.",
+			"placeholder": "Nombre de la tipografía"
+		},
+		"fontSize": {
+			"title": "Tamaño de fuente"
+		},
+		"lineHeight": {
+			"title": "Altura de línea"
+		},
+		"dateFormat": {
+			"title": "Formato de fecha",
+			"description": "Establece el formato de fecha al insertar fechas. Admite sintaxis estándar de tokens como DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "referencia de formato de fecha",
+			"example": "Ejemplo"
+		},
+		"plainText": {
+			"groupTitle": "Editor de texto plano",
+			"lineNumbers": "Mostrar números de línea",
+			"miniMap": "Activar minimapa"
+		}
+	},
+	"hotkeys": {
+		"blank": "Sin asignar",
+		"shortcuts": {
+			"createNote": "Crear nueva nota",
+			"closeCurrentNote": "Cerrar nota activa",
+			"restoreClosedNote": "Restaurar nota cerrada recientemente",
+			"focusNextNote": "Ir a la siguiente nota abierta",
+			"focusPreviousNote": "Ir a la nota abierta anterior",
+			"toggleArchive": "Mover nota activa al archivo o sacarla",
+			"toggleBookmark": "Añadir o quitar marcador de la nota activa",
+			"deleteNote": "Eliminar nota activa",
+			"restoreFromBin": "Restaurar nota activa de la papelera",
+			"toggleHistory": "Mostrar u ocultar historial de la nota activa",
+			"focusSearch": "Buscar notas",
+			"syncDatabase": "Sincronizar vault con disco",
+			"lockVault": "Bloquear vault",
+			"openSettings": "Abrir preferencias"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Nombre del vault"
+		},
+		"rememberPasswords": {
+			"label": "Recordar contraseñas de los espacios",
+			"description": "Las contraseñas de los espacios se cifrarán con la clave maestra y se guardarán en la base de datos, para abrir automáticamente los espacios cifrados sin introducir contraseña."
+		},
+		"filesAndData": {
+			"groupTitle": "Archivos y datos",
+			"imagesCompression": {
+				"title": "Compresión de imágenes",
+				"compress": "Comprimir imágenes",
+				"doNotCompress": "No comprimir imágenes",
+				"alwaysAsk": "Preguntar siempre"
+			},
+			"deleteOrphaned": {
+				"label": "Eliminar archivos huérfanos",
+				"description": "Elimina archivos que ya no se utilizan."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Cifrado",
+			"algorithm": {
+				"title": "Algoritmo de cifrado",
+				"none": "Ninguno"
+			},
+			"password": {
+				"title": "Contraseña",
+				"update": "Actualizar contraseña"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Sincronización",
+			"enable": {
+				"label": "Activar sincronización",
+				"description": "Mantén tu vault sincronizado entre dispositivos. Todos los datos se cifran antes de salir de tu dispositivo."
+			},
+			"method": {
+				"title": "Método de sincronización",
+				"fileSystem": "Sistema de archivos",
+				"server": "Servidor"
+			},
+			"directory": {
+				"title": "Directorio de sincronización",
+				"placeholder": "Introduce la ruta del directorio"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Instantáneas",
+			"record": {
+				"label": "Registrar instantáneas de notas",
+				"description": "Cuando está activado, se crearán instantáneas del contenido de la nota cada vez que se modifique. Puedes controlar el registro de instantáneas por nota en el panel de historial."
+			},
+			"delay": {
+				"title": "Espera antes de la instantánea",
+				"description": "Tiempo de espera en segundos tras editar una nota antes de guardar una nueva instantánea. Intervalos más cortos generan más instantáneas y un vault más grande."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Papelera",
+			"confirmDeletion": {
+				"label": "Confirmar eliminación",
+				"description": "Preguntar antes de eliminar una nota."
+			},
+			"moveToBin": {
+				"label": "Mover notas a la papelera",
+				"description": "Las notas se moverán a la papelera en lugar de eliminarse permanentemente, para poder restaurarlas después."
+			},
+			"autoPurge": {
+				"label": "Eliminar permanentemente notas antiguas de la papelera",
+				"description": "Las notas en la papelera se eliminarán permanentemente tras un tiempo."
+			},
+			"purgeDelay": {
+				"title": "Plazo de eliminación permanente",
+				"description": "Las notas en la papelera se eliminarán permanentemente tras este número de días, contados desde que se movieron allí.",
+				"unit": "días"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Nombre del espacio",
+			"update": "Actualizar"
+		},
+		"newNoteTitle": {
+			"title": "Título de nueva nota",
+			"description": "Establece el título para nuevas notas. Puedes usar la fecha con la sintaxis {date} o {date:FORMATO} como {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "referencia de formato",
+			"placeholder": "Ej., Nota {date:DD/MM/YYYY HH:mm}",
+			"example": "Ejemplo"
+		},
+		"tagsForNewNote": {
+			"title": "Tags para nueva nota",
+			"none": "No asignar tags",
+			"selected": "Mismo que el tag seleccionado"
+		},
+		"dangerousZone": {
+			"groupTitle": "Zona de riesgo",
+			"delete": {
+				"label": "Eliminar espacio y todos los datos relacionados, incluyendo notas, tags y archivos",
+				"action": "Eliminar espacio",
+				"cannotDeleteLast": "No se puede eliminar el último espacio del vault.",
+				"createAnother": "Crea",
+				"createAnotherSuffix": "otro espacio primero."
+			},
+			"confirmDelete": "Estás a punto de eliminar el espacio \"{{name}}\". ¿Seguro que quieres continuar?\n\nSi continúas, se eliminarán todos los datos de este espacio, incluyendo notas, tags y archivos."
+		}
+	},
+	"importExport": {
+		"importNotes": "Importar notas",
+		"exportNotes": "Exportar notas",
+		"importFromZip": "Importar notas desde archivo .zip",
+		"importFromDirectory": "Importar directorio con archivos Markdown",
+		"dropzone": {
+			"title": "Arrastra archivos Markdown o un archivo .zip para importar",
+			"description": "Arrastra archivos aquí o haz clic para seleccionarlos"
+		},
+		"progress": "Importación de notas en curso. Etapa: {{stage}} {{processed}}/{{total}}"
+	}
+}

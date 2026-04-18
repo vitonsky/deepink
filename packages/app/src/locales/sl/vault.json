@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Izberite trezor",
+		"actions": {
+			"createNew": "Ustvari nov trezor"
+		}
+	},
+	"creator": {
+		"title": "Ustvari trezor",
+		"field": {
+			"name": {
+				"label": "Ime trezorja",
+				"placeholder": "npr. Moj trezor, Deljeno z Alešem",
+				"random": "Naključno ime",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Pergament",
+					"2": "Predlist",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alkova",
+					"6": "Polsenca",
+					"7": "Mesečna korespondenca",
+					"8": "Večerna kartografija",
+					"9": "Svetilka in črnilo",
+					"10": "Arhiv ob svečah",
+					"11": "Rokopisi vzpenjajoče bršljanke",
+					"12": "Cedrova pisma",
+					"13": "Skriptorij iz palisandra",
+					"14": "Nevezani kodeks",
+					"15": "Marginalia in šepeti",
+					"16": "Izpovedi na predlistu",
+					"17": "Anotirana tišina",
+					"18": "Kartografija senc",
+					"19": "Zapomnjena soba",
+					"20": "Nepodpisana pisma",
+					"21": "Šepetane koordinate",
+					"22": "Nepovedani almanah",
+					"23": "Pisma iz izgubljenega voska",
+					"24": "Nevidna knjižnica",
+					"25": "Neraziskani robovi",
+					"26": "Tiha zarota",
+					"27": "Nedostavljena pošta",
+					"28": "Zimzeleni arhiv",
+					"29": "Papirnata luna",
+					"30": "Papirnati cvet",
+					"31": "Nočni cvet",
+					"32": "Nežni atlas",
+					"33": "Velur",
+					"34": "Črnilni kamen",
+					"35": "Tišina",
+					"36": "Senca",
+					"37": "Mirno plavanje",
+					"38": "Globoki travnik",
+					"39": "Nenapisana knjiga",
+					"40": "Tiha skicirka",
+					"41": "Neizrečeni arhiv",
+					"42": "Plavajoči dnevnik",
+					"43": "Kronika sončnega vetra",
+					"44": "Tihi fjord",
+					"45": "Drobci spominov",
+					"46": "Tihi trenutek",
+					"47": "Izginule minute"
+				}
+			},
+			"password": {
+				"label": "Geslo za šifriranje",
+				"recommended": "(priporočeno)",
+				"placeholder": "Vnesite močno geslo"
+			},
+			"algorithm": {
+				"label": "Algoritem šifriranja"
+			}
+		},
+		"actions": {
+			"create": "Ustvari trezor",
+			"continueNoPassword": "Nadaljuj brez gesla",
+			"cancel": "Prekliči"
+		},
+		"noEncryptionDialog": {
+			"title": "Ustvari trezor brez šifriranja",
+			"description": "Vaši zapiski in podatki bodo shranjeni kot navadno besedilo. Vsaka aplikacija ali oseba z dostopom do mape trezorja na disku bo lahko prebrala vso vsebino.",
+			"actions": {
+				"confirm": "Nadaljuj brez šifriranja",
+				"cancel": "Prekliči"
+			}
+		},
+		"errors": {
+			"nameRequired": "Vnesite ime trezorja",
+			"passwordRequired": "Vnesite geslo"
+		}
+	},
+	"login": {
+		"title": "Odkleni trezor",
+		"field": {
+			"password": {
+				"placeholder": "Vnesite geslo"
+			}
+		},
+		"actions": {
+			"unlock": "Odkleni",
+			"changeVault": "Zamenjaj trezor"
+		},
+		"errors": {
+			"cannotOpen": "Trezorja ni mogoče odpreti",
+			"invalidPassword": "Napačno geslo",
+			"passwordRequired": "Vnesite geslo"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Trezorja ni bilo mogoče odpreti",
+		"corrupted": "\"{{name}}\" je morda poškodovan."
+	}
+}

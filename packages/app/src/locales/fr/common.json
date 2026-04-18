@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Annuler",
+		"confirm": "Confirmer",
+		"apply": "Appliquer",
+		"save": "Enregistrer",
+		"saveChanges": "Enregistrer les modifications",
+		"delete": "Supprimer",
+		"reset": "Réinitialiser",
+		"update": "Mettre à jour",
+		"add": "Ajouter",
+		"create": "Créer",
+		"close": "Fermer"
+	},
+	"form": {
+		"suggestTemplate": "Essayez ceci : <suggests>"
+	}
+}

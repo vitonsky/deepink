@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Crear etiqueta",
+					"action": "Crear"
+				},
+				"edit": {
+					"title": "Editar etiqueta",
+					"action": "Desar"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Nom de l'etiqueta",
+					"placeholder": "p. ex. Idees"
+				},
+				"parent": {
+					"label": "Etiqueta superior",
+					"placeholder": "p. ex. Receptes/Postres"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "No s'han pogut desar els canvis per un error desconegut.",
+				"format": "L'etiqueta no pot estar buida, començar o acabar amb \"/\", ni contenir \"//\".",
+				"duplicate": "L'etiqueta '{{name}}' ja existeix.",
+				"parentTagNotFound": "No s'ha trobat l'etiqueta superior. Selecciona'n una altra."
+			}
+		},
+		"deletion": {
+			"confirm": "Vols eliminar l'etiqueta \"{{name}}\" i totes les subetiquetes?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Llibreta",
+		"creator": {
+			"title": "Crear un nou espai",
+			"description": "Cada espai és un lloc independent per a les teves notes, etiquetes i fitxers. Tot es manté separat, però dins del teu vault xifrat — a punt quan hi vulguis accedir.",
+			"action": {
+				"add": "Crear",
+				"cancel": "Cancel·lar"
+			},
+			"field": {
+				"name": {
+					"label": "Nom de l'espai",
+					"placeholder": "p. ex. Diari de salut, Idees de negoci",
+					"suggests": {
+						"0": "Finances",
+						"1": "Salut",
+						"2": "Carrera",
+						"3": "Família",
+						"4": "Diari",
+						"5": "Objectius",
+						"6": "Idees",
+						"7": "Legal",
+						"8": "Viatges",
+						"9": "Privat"
+					}
+				}
+			},
+			"error": {
+				"unknown": "S'ha produït un error desconegut. Torna-ho a provar.",
+				"format": "El nom de l'espai no pot estar buit."
+			}
+		},
+		"error": {
+			"title": "L'espai \"{{name}}\" no s'ha pogut carregar",
+			"description": "No s'ha pogut carregar aquest espai. Les dades podrien estar malmeses. Canvia a un altre espai o crea'n un de nou per continuar treballant.",
+			"chooseAnother": "Triar un altre espai",
+			"dividerText": "o",
+			"createNew": "Crear un nou espai",
+			"createWorkspace": "Crear espai",
+			"closeVault": "Tancar el vault actual"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Sense títol",
+			"defaultTemplate": "Sense títol - {{date}}",
+			"duplicate": "Duplicat: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Apunta una idea, tasca o pensament…",
+			"modes": {
+				"plaintext": "Mode text",
+				"richtext": "Editor enriquit",
+				"split-screen": "Pantalla dividida"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Afegir a preferits",
+			"removeFromFavorites": "Treure de preferits",
+			"moveToArchive": "Moure a l'arxiu",
+			"removeFromArchive": "Treure de l'arxiu"
+		},
+		"tags": {
+			"addPlaceholder": "Escriu per afegir etiqueta…"
+		},
+		"versionPreview": {
+			"versionAt": "Versió de {{date}}",
+			"backToEditing": "Tornar a l'edició"
+		},
+		"menu": {
+			"title": "Opcions de la nota",
+			"copyReference": "Copiar enllaç de la nota",
+			"remindMe": "Recordar-me",
+			"history": "Historial",
+			"backLinks": "Enllaços inversos",
+			"readonlyMode": "Mode de lectura",
+			"spellcheck": "Corrector ortogràfic",
+			"export": "Exportar...",
+			"passwordProtection": "Protecció amb contrasenya...",
+			"disableSync": "Desactivar sincronització",
+			"moveToArchive": "Moure a l'arxiu",
+			"removeFromArchive": "Treure de l'arxiu",
+			"deleteToBin": "Enviar a la paperera",
+			"deletePermanently": "Eliminar permanentment",
+			"restoreFromBin": "Restaurar de la paperera"
+		},
+		"version": {
+			"chars": "{{count}} caràcters",
+			"apply": {
+				"title": "Aplicar versió",
+				"readonlyTitle": "No es pot aplicar la versió en una nota de només lectura"
+			},
+			"open": {
+				"title": "Obrir versió"
+			},
+			"delete": {
+				"title": "Eliminar versió"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Desar instantània",
+				"title": "Desar l'estat actual d'aquesta nota com a nova versió a l'historial"
+			},
+			"deleteAll": {
+				"label": "Eliminar-ho tot",
+				"title": "Eliminar permanentment totes les versions desades d'aquesta nota"
+			},
+			"dontRecord": "No registrar l'historial d'aquesta nota",
+			"empty": "Aquesta nota no té versions registrades",
+			"loading": "Carregant...",
+			"confirmDeleteAll": {
+				"title": "Eliminar totes les versions de la nota",
+				"description": "Aquesta acció eliminarà permanentment totes les versions de la nota.",
+				"confirm": "N'estàs segur?",
+				"action": "Aplicar"
+			},
+			"confirmApply": {
+				"title": "Aplicar versió de la nota",
+				"description": "Estàs a punt d'aplicar la versió {{version}} de la nota.",
+				"warning": "Aquesta acció substituirà les dades actuals de la nota pel text de la instantània seleccionada. N'estàs segur?",
+				"apply": "Aplicar",
+				"preview": "Previsualitzar"
+			},
+			"confirmDelete": {
+				"title": "Eliminar versió de la nota",
+				"description": "Estàs a punt d'eliminar la versió {{version}} de la nota.",
+				"warning": "Aquesta acció eliminarà la versió de la nota de manera irreversible. N'estàs segur?",
+				"delete": "Eliminar",
+				"preview": "Previsualitzar"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Tancar panell",
+			"tabs": {
+				"history": "Versions de la nota",
+				"backLinks": "Enllaços inversos",
+				"files": "Fitxers adjunts"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Vols enviar aquesta nota a la paperera?",
+			"confirmPermanentDeletion": "Vols eliminar permanentment aquesta nota?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Vols pujar {{filesCount}} fitxers ({{size}} en total)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Cercar..."
+		},
+		"filterBy": "Filtrar per",
+		"empty": "Encara no hi ha notes. <create>Crea una nota</create>"
+	},
+	"notesView": {
+		"allNotes": "Totes les notes",
+		"favorites": "Notes preferides",
+		"archived": "Notes arxivades",
+		"deleted": "Notes eliminades"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Selecciona una nota per llegir-la o editar-la"
+		}
+	},
+	"activityBar": {
+		"newNote": "Nova nota",
+		"files": "Fitxers",
+		"reminders": "Recordatoris",
+		"extensions": "Extensions",
+		"inbox": "Safata d'entrada",
+		"publishNotes": "Publicar notes",
+		"lockVault": "Bloquejar vault",
+		"globalSettings": "Configuració general"
+	},
+	"tabBar": {
+		"closeTab": "Tancar pestanya"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Fes clic per inserir una capçalera de nivell {{level}}. Obre el menú contextual per triar una altra opció",
+			"level": "Capçalera de nivell {{level}}"
+		},
+		"bold": "Activar o desactivar negreta",
+		"italic": "Activar o desactivar cursiva",
+		"strikethrough": "Activar o desactivar ratllat",
+		"unorderedList": "Inserir o alternar llista sense ordre",
+		"checkboxList": "Inserir o alternar llista de caselles",
+		"orderedList": "Inserir o alternar llista ordenada",
+		"codeBlock": "Inserir o embolicar text amb bloc de codi",
+		"quoteBlock": "Inserir o embolicar text amb bloc de citació",
+		"insertDate": "Inserir data",
+		"insertPageBreak": "Inserir salt de pàgina",
+		"insertFile": "Inserir fitxer",
+		"image": {
+			"buttonTitle": "Inserir imatge",
+			"dialogTitle": "Afegir imatge",
+			"dialogDescription": "La imatge s'inserirà a la posició del cursor.",
+			"field": {
+				"url": {
+					"label": "URL de la imatge",
+					"placeholder": "p. ex., https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Text alternatiu de la imatge (opcional)",
+					"placeholder": "Breu descripció de la imatge"
+				}
+			},
+			"actions": {
+				"add": "Afegir",
+				"cancel": "Cancel·lar"
+			}
+		},
+		"link": {
+			"buttonTitle": "Inserir enllaç",
+			"dialogTitle": "Afegir enllaç",
+			"dialogDescription": "El text seleccionat es convertirà en un enllaç, o l'enllaç s'afegirà a la posició del cursor si no hi ha res seleccionat.",
+			"field": {
+				"url": {
+					"label": "URL de l'enllaç",
+					"placeholder": "p. ex., https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Afegir",
+				"cancel": "Cancel·lar"
+			}
+		}
+	},
+	"image": {
+		"loading": "Carregant imatge"
+	},
+	"notifications": {
+		"title": "Notificacions"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Actualització de l'app",
+			"reminderLater": "El recordatori es mostrarà d'aquí a una setmana"
+		},
+		"newVersion": {
+			"title": "Nova versió disponible",
+			"body": "Hi ha una nova versió disponible. Actualitza per obtenir les últimes millores i correccions.",
+			"download": "Descarregar nova versió",
+			"ignore": "Ignorar"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Propietats de la imatge",
+			"urlLabel": "URL de la imatge",
+			"altLabel": "Text alternatiu de la imatge"
+		},
+		"linkProperties": {
+			"title": "Propietats de l'enllaç",
+			"urlLabel": "URL de l'enllaç"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Fes clic per desar els canvis al disc",
+			"saving": "Desant canvis..."
+		},
+		"changeVault": "Canviar de vault",
+		"history": "Historial",
+		"notifications": "Notificacions"
+	}
+}

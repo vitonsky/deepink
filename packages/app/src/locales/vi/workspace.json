@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tag",
+			"empty": "Tạo tag để sắp xếp ghi chú. Phân cấp tag để quản lý linh hoạt hơn.",
+			"actions": {
+				"add": "Thêm tag"
+			}
+		},
+		"workspaces": {
+			"label": "Không gian",
+			"actions": {
+				"add": "Thêm không gian"
+			}
+		}
+	}
+}

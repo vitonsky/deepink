@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Program",
+		"quit": "Avsluta",
+		"edit": "Redigera",
+		"undo": "Ångra",
+		"redo": "Gör om",
+		"cut": "Klipp ut",
+		"copy": "Kopiera",
+		"paste": "Klistra in",
+		"selectAll": "Markera allt",
+		"help": "Hjälp",
+		"toggleDevTools": "Växla utvecklarverktyg",
+		"about": "Om programmet"
+	},
+	"tray": {
+		"open": "Öppna anteckningar",
+		"quit": "Avsluta"
+	},
+	"note": {
+		"export": "Exportera…",
+		"duplicate": "Duplicera",
+		"copyMarkdownLink": "Kopiera Markdown-länk",
+		"deletePermanently": "Radera permanent",
+		"restoreFromBin": "Återställ från papperskorgen",
+		"deleteToBin": "Flytta till papperskorgen"
+	},
+	"tag": {
+		"addNestedTag": "Skapa undertagg…",
+		"edit": "Redigera…",
+		"delete": "Ta bort"
+	}
+}

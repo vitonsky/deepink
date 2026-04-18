@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "İptal",
+		"confirm": "Onayla",
+		"apply": "Uygula",
+		"save": "Kaydet",
+		"saveChanges": "Değişiklikleri kaydet",
+		"delete": "Sil",
+		"reset": "Sıfırla",
+		"update": "Güncelle",
+		"add": "Ekle",
+		"create": "Oluştur",
+		"close": "Kapat"
+	},
+	"form": {
+		"suggestTemplate": "Şunu deneyin: <suggests>"
+	}
+}

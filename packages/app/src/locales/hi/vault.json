@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "वॉल्ट चुनें",
+		"actions": {
+			"createNew": "नया वॉल्ट बनाएँ"
+		}
+	},
+	"creator": {
+		"title": "वॉल्ट बनाएँ",
+		"field": {
+			"name": {
+				"label": "वॉल्ट का नाम",
+				"placeholder": "जैसे, मेरा वॉल्ट, Alex के साथ साझा",
+				"random": "रैंडम नाम बनाएँ",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Endpaper",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alcove",
+					"6": "Penumbra",
+					"7": "Moonlit Correspondence",
+					"8": "Evening Cartography",
+					"9": "Lantern & Ink",
+					"10": "Candlelit Archive",
+					"11": "Climbing Ivy Manuscripts",
+					"12": "Cedarwood Letters",
+					"13": "Rosewood Scriptorium",
+					"14": "The Unbound Codex",
+					"15": "Marginalia & Murmurs",
+					"16": "Endpaper Confessions",
+					"17": "The Annotated Silence",
+					"18": "Shadow Cartography",
+					"19": "The Remembered Room",
+					"20": "The Unsigned Letters",
+					"21": "Whispered Coordinates",
+					"22": "The Untold Almanac",
+					"23": "Lost Wax Letters",
+					"24": "The Invisible Library",
+					"25": "Uncharted Margins",
+					"26": "The Quiet Conspiracy",
+					"27": "The Undelivered Post",
+					"28": "Evergreen Archive",
+					"29": "Paper Moon",
+					"30": "Paper Bloom",
+					"31": "Night Bloom",
+					"32": "Soft Atlas",
+					"33": "Velour",
+					"34": "Inkstone",
+					"35": "Hush",
+					"36": "Shade",
+					"37": "Calm Drift",
+					"38": "Deep Meadow",
+					"39": "Unwritten Ledger",
+					"40": "Silent Draftbook",
+					"41": "Unspoken Archive",
+					"42": "Drifting Journal",
+					"43": "Solar Wind Chronicle",
+					"44": "Quiet Fjord",
+					"45": "Memory Fragments",
+					"46": "Silent Moment",
+					"47": "Vanished Minutes"
+				}
+			},
+			"password": {
+				"label": "एन्क्रिप्शन पासवर्ड",
+				"recommended": "(अनुशंसित)",
+				"placeholder": "एक मज़बूत पासवर्ड दर्ज करें"
+			},
+			"algorithm": {
+				"label": "एन्क्रिप्शन एल्गोरिदम"
+			}
+		},
+		"actions": {
+			"create": "वॉल्ट बनाएँ",
+			"continueNoPassword": "बिना पासवर्ड के जारी रखें",
+			"cancel": "रद्द करें"
+		},
+		"noEncryptionDialog": {
+			"title": "बिना एन्क्रिप्शन के वॉल्ट बनाएँ",
+			"description": "आपके नोट्स और डेटा सादे टेक्स्ट में सहेजे जाएँगे। डिस्क पर वॉल्ट डायरेक्टरी तक पहुँच रखने वाला कोई भी ऐप या व्यक्ति इसमें मौजूद सब कुछ पढ़ सकेगा।",
+			"actions": {
+				"confirm": "बिना एन्क्रिप्शन के जारी रखें",
+				"cancel": "रद्द करें"
+			}
+		},
+		"errors": {
+			"nameRequired": "वॉल्ट का नाम दर्ज करें",
+			"passwordRequired": "पासवर्ड दर्ज करें"
+		}
+	},
+	"login": {
+		"title": "वॉल्ट अनलॉक करें",
+		"field": {
+			"password": {
+				"placeholder": "पासवर्ड दर्ज करें"
+			}
+		},
+		"actions": {
+			"unlock": "अनलॉक करें",
+			"changeVault": "वॉल्ट बदलें"
+		},
+		"errors": {
+			"cannotOpen": "वॉल्ट खोला नहीं जा सका",
+			"invalidPassword": "गलत पासवर्ड",
+			"passwordRequired": "पासवर्ड दर्ज करें"
+		}
+	},
+	"errors": {
+		"failedToOpen": "वॉल्ट खोलने में विफल",
+		"corrupted": "\"{{name}}\" दूषित प्रतीत होता है।"
+	}
+}

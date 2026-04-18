@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Cancel·la",
+		"confirm": "Confirma",
+		"apply": "Aplica",
+		"save": "Desa",
+		"saveChanges": "Desa els canvis",
+		"delete": "Elimina",
+		"reset": "Restableix",
+		"update": "Actualitza",
+		"add": "Afegeix",
+		"create": "Crea",
+		"close": "Tanca"
+	},
+	"form": {
+		"suggestTemplate": "Prova això: <suggests>"
+	}
+}

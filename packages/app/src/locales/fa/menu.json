@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "برنامه",
+		"quit": "خروج",
+		"edit": "ویرایش",
+		"undo": "بازگردانی",
+		"redo": "انجام مجدد",
+		"cut": "برش",
+		"copy": "کپی",
+		"paste": "جای‌گذاری",
+		"selectAll": "انتخاب همه",
+		"help": "راهنما",
+		"toggleDevTools": "نمایش/مخفی‌کردن ابزار توسعه",
+		"about": "درباره برنامه"
+	},
+	"tray": {
+		"open": "باز کردن یادداشت‌ها",
+		"quit": "خروج"
+	},
+	"note": {
+		"export": "خروجی گرفتن…",
+		"duplicate": "ایجاد کپی",
+		"copyMarkdownLink": "کپی لینک Markdown",
+		"deletePermanently": "حذف دائمی",
+		"restoreFromBin": "بازیابی از سطل زباله",
+		"deleteToBin": "انتقال به سطل زباله"
+	},
+	"tag": {
+		"addNestedTag": "ایجاد زیربرچسب…",
+		"edit": "ویرایش…",
+		"delete": "حذف"
+	}
+}

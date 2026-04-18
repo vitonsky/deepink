@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tag",
+			"empty": "Buat tag untuk mengelola catatan Anda. Susun bertingkat untuk membentuk hierarki yang fleksibel.",
+			"actions": {
+				"add": "Tambah tag"
+			}
+		},
+		"workspaces": {
+			"label": "Workspace",
+			"actions": {
+				"add": "Tambah workspace"
+			}
+		}
+	}
+}

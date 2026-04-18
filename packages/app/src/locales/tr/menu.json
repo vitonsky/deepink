@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Uygulama",
+		"quit": "Çıkış",
+		"edit": "Düzenle",
+		"undo": "Geri Al",
+		"redo": "Yinele",
+		"cut": "Kes",
+		"copy": "Kopyala",
+		"paste": "Yapıştır",
+		"selectAll": "Tümünü Seç",
+		"help": "Yardım",
+		"toggleDevTools": "Geliştirici araçlarını aç/kapat",
+		"about": "Uygulama Hakkında"
+	},
+	"tray": {
+		"open": "Notları aç",
+		"quit": "Çıkış"
+	},
+	"note": {
+		"export": "Dışa Aktar…",
+		"duplicate": "Çoğalt",
+		"copyMarkdownLink": "Markdown bağlantısını kopyala",
+		"deletePermanently": "Kalıcı olarak sil",
+		"restoreFromBin": "Çöp kutusundan geri yükle",
+		"deleteToBin": "Çöp kutusuna taşı"
+	},
+	"tag": {
+		"addNestedTag": "Alt etiket oluştur…",
+		"edit": "Düzenle…",
+		"delete": "Sil"
+	}
+}

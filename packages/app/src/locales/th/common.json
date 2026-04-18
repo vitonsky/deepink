@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "ยกเลิก",
+		"confirm": "ยืนยัน",
+		"apply": "ใช้งาน",
+		"save": "บันทึก",
+		"saveChanges": "บันทึกการเปลี่ยนแปลง",
+		"delete": "ลบ",
+		"reset": "รีเซ็ต",
+		"update": "อัปเดต",
+		"add": "เพิ่ม",
+		"create": "สร้าง",
+		"close": "ปิด"
+	},
+	"form": {
+		"suggestTemplate": "ลองใช้: <suggests>"
+	}
+}

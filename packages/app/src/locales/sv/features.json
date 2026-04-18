@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Skapa tagg",
+					"action": "Skapa"
+				},
+				"edit": {
+					"title": "Redigera tagg",
+					"action": "Spara"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Taggnamn",
+					"placeholder": "t.ex. Idéer"
+				},
+				"parent": {
+					"label": "Överordnad tagg",
+					"placeholder": "t.ex. Recept/Desserter"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Kan inte spara ändringar på grund av ett okänt fel.",
+				"format": "Taggen kan inte vara tom, börja eller sluta med \"/\" eller innehålla \"//\".",
+				"duplicate": "Taggen '{{name}}' finns redan.",
+				"parentTagNotFound": "Överordnad tagg hittades inte, välj en annan tagg."
+			}
+		},
+		"deletion": {
+			"confirm": "Vill du verkligen ta bort taggen \"{{name}}\" och alla undertaggar?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Anteckningsbok",
+		"creator": {
+			"title": "Skapa nytt utrymme",
+			"description": "Varje utrymme är en fristående plats för dina anteckningar, taggar och filer. Allt hålls åtskilt, men lagras i ditt krypterade valv — redo när du växlar.",
+			"action": {
+				"add": "Skapa",
+				"cancel": "Avbryt"
+			},
+			"field": {
+				"name": {
+					"label": "Namn på utrymme",
+					"placeholder": "t.ex. Hälsodagbok, Affärsidéer",
+					"suggests": {
+						"0": "Ekonomi",
+						"1": "Hälsa",
+						"2": "Karriär",
+						"3": "Familj",
+						"4": "Dagbok",
+						"5": "Mål",
+						"6": "Idéer",
+						"7": "Juridik",
+						"8": "Resor",
+						"9": "Privat"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Ett okänt fel uppstod. Försök igen.",
+				"format": "Utrymmets namn kan inte vara tomt."
+			}
+		},
+		"error": {
+			"title": "Utrymmet \"{{name}}\" kunde inte läsas in",
+			"description": "Det gick inte att läsa in detta utrymme. Data kan vara skadat. Växla till ett annat utrymme eller skapa ett nytt för att fortsätta.",
+			"chooseAnother": "Välj ett annat utrymme",
+			"dividerText": "eller",
+			"createNew": "Skapa ett nytt utrymme",
+			"createWorkspace": "Skapa utrymme",
+			"closeVault": "Stäng aktuellt valv"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Namnlös",
+			"defaultTemplate": "Namnlös - {{date}}",
+			"duplicate": "Kopia: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Fånga en idé, uppgift eller tanke…",
+			"modes": {
+				"plaintext": "Textläge",
+				"richtext": "Redigerare",
+				"split-screen": "Delad vy"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Lägg till i favoriter",
+			"removeFromFavorites": "Ta bort från favoriter",
+			"moveToArchive": "Flytta till arkiv",
+			"removeFromArchive": "Ta bort från arkiv"
+		},
+		"tags": {
+			"addPlaceholder": "Skriv för att lägga till tagg…"
+		},
+		"versionPreview": {
+			"versionAt": "Version från {{date}}",
+			"backToEditing": "Tillbaka till redigering"
+		},
+		"menu": {
+			"title": "Anteckningsalternativ",
+			"copyReference": "Kopiera länk till anteckning",
+			"remindMe": "Påminn mig",
+			"history": "Historik",
+			"backLinks": "Bakåtlänkar",
+			"readonlyMode": "Skrivskyddat läge",
+			"spellcheck": "Stavningskontroll",
+			"export": "Exportera...",
+			"passwordProtection": "Lösenordsskydd...",
+			"disableSync": "Inaktivera synkronisering",
+			"moveToArchive": "Flytta till arkiv",
+			"removeFromArchive": "Ta bort från arkiv",
+			"deleteToBin": "Flytta till papperskorgen",
+			"deletePermanently": "Radera permanent",
+			"restoreFromBin": "Återställ från papperskorgen"
+		},
+		"version": {
+			"chars": "{{count}} tecken",
+			"apply": {
+				"title": "Tillämpa version",
+				"readonlyTitle": "Version kan inte tillämpas på en skrivskyddad anteckning"
+			},
+			"open": {
+				"title": "Öppna version"
+			},
+			"delete": {
+				"title": "Ta bort version"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Spara ögonblicksbild",
+				"title": "Spara det aktuella tillståndet för denna anteckning som en ny version i historiken"
+			},
+			"deleteAll": {
+				"label": "Ta bort alla",
+				"title": "Radera alla sparade versioner av denna anteckning permanent"
+			},
+			"dontRecord": "Spara inte historik för denna anteckning",
+			"empty": "Denna anteckning har inga sparade versioner",
+			"loading": "Läser in...",
+			"confirmDeleteAll": {
+				"title": "Ta bort alla versioner",
+				"description": "Detta raderar alla versioner av anteckningen permanent.",
+				"confirm": "Är du säker?",
+				"action": "Tillämpa"
+			},
+			"confirmApply": {
+				"title": "Tillämpa version",
+				"description": "Du är på väg att tillämpa version {{version}}.",
+				"warning": "Detta ersätter anteckningens nuvarande innehåll med texten från den valda ögonblicksbilden. Är du säker?",
+				"apply": "Tillämpa",
+				"preview": "Förhandsgranska"
+			},
+			"confirmDelete": {
+				"title": "Ta bort version",
+				"description": "Du är på väg att ta bort version {{version}}.",
+				"warning": "Detta raderar versionen permanent. Är du säker?",
+				"delete": "Ta bort",
+				"preview": "Förhandsgranska"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Stäng panel",
+			"tabs": {
+				"history": "Versioner",
+				"backLinks": "Bakåtlänkar",
+				"files": "Bifogade filer"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Vill du flytta denna anteckning till papperskorgen?",
+			"confirmPermanentDeletion": "Vill du radera denna anteckning permanent?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Vill du ladda upp {{filesCount}} filer ({{size}} totalt)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Sök..."
+		},
+		"filterBy": "Filtrera efter",
+		"empty": "Inga anteckningar här ännu. <create>Skapa en anteckning</create>"
+	},
+	"notesView": {
+		"allNotes": "Alla anteckningar",
+		"favorites": "Favoriter",
+		"archived": "Arkiverade",
+		"deleted": "Borttagna"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Välj en anteckning för att läsa eller redigera"
+		}
+	},
+	"activityBar": {
+		"newNote": "Ny anteckning",
+		"files": "Filer",
+		"reminders": "Påminnelser",
+		"extensions": "Tillägg",
+		"inbox": "Inkorg",
+		"publishNotes": "Publicera anteckningar",
+		"lockVault": "Lås valvet",
+		"globalSettings": "Globala inställningar"
+	},
+	"tabBar": {
+		"closeTab": "Stäng flik"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Klicka för att infoga rubrik med nivå {{level}}. Öppna snabbmenyn för fler alternativ",
+			"level": "Rubriknivå {{level}}"
+		},
+		"bold": "Växla fetstil",
+		"italic": "Växla kursiv stil",
+		"strikethrough": "Växla genomstruken stil",
+		"unorderedList": "Infoga eller växla punktlista",
+		"checkboxList": "Infoga eller växla kryssrutelista",
+		"orderedList": "Infoga eller växla numrerad lista",
+		"codeBlock": "Infoga eller omslut text med kodblock",
+		"quoteBlock": "Infoga eller omslut text med citatblock",
+		"insertDate": "Infoga datum",
+		"insertPageBreak": "Infoga sidbrytning",
+		"insertFile": "Infoga fil",
+		"image": {
+			"buttonTitle": "Infoga bild",
+			"dialogTitle": "Lägg till bild",
+			"dialogDescription": "Bilden infogas vid markörens position.",
+			"field": {
+				"url": {
+					"label": "Bild-URL",
+					"placeholder": "t.ex. https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Alternativtext för bild (valfritt)",
+					"placeholder": "Kort beskrivning av bilden"
+				}
+			},
+			"actions": {
+				"add": "Lägg till",
+				"cancel": "Avbryt"
+			}
+		},
+		"link": {
+			"buttonTitle": "Infoga länk",
+			"dialogTitle": "Lägg till länk",
+			"dialogDescription": "Markerad text blir en länk, eller så infogas länken vid markörens position om inget är markerat.",
+			"field": {
+				"url": {
+					"label": "Länk-URL",
+					"placeholder": "t.ex. https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Lägg till",
+				"cancel": "Avbryt"
+			}
+		}
+	},
+	"image": {
+		"loading": "Bilden läses in"
+	},
+	"notifications": {
+		"title": "Aviseringar"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Appuppdatering",
+			"reminderLater": "Påminnelsen visas igen om en vecka"
+		},
+		"newVersion": {
+			"title": "Ny version tillgänglig",
+			"body": "En ny version är redo. Uppdatera för att få de senaste förbättringarna och korrigeringarna.",
+			"download": "Ladda ner ny version",
+			"ignore": "Ignorera"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Bildegenskaper",
+			"urlLabel": "Bild-URL",
+			"altLabel": "Alternativtext för bild"
+		},
+		"linkProperties": {
+			"title": "Länkegenskaper",
+			"urlLabel": "Länk-URL"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Klicka för att spara ändringar till disk",
+			"saving": "Sparar ändringar..."
+		},
+		"changeVault": "Byt valv",
+		"history": "Historik",
+		"notifications": "Aviseringar"
+	}
+}

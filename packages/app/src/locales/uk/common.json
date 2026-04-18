@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Скасувати",
+		"confirm": "Підтвердити",
+		"apply": "Застосувати",
+		"save": "Зберегти",
+		"saveChanges": "Зберегти зміни",
+		"delete": "Видалити",
+		"reset": "Скинути",
+		"update": "Оновити",
+		"add": "Додати",
+		"create": "Створити",
+		"close": "Закрити"
+	},
+	"form": {
+		"suggestTemplate": "Спробуйте: <suggests>"
+	}
+}

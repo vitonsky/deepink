@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Címkék",
+			"empty": "Hozz létre címkéket a jegyzeteid rendszerezéséhez. Építs belőlük hierarchiát.",
+			"actions": {
+				"add": "Új címke"
+			}
+		},
+		"workspaces": {
+			"label": "Munkaterek",
+			"actions": {
+				"add": "Új munkatér"
+			}
+		}
+	}
+}

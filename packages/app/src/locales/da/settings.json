@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Indstillinger"
+	},
+	"tabs": {
+		"general": "Generelt",
+		"appearance": "Udseende",
+		"hotkeys": "Genvejstaster",
+		"vault": "Vault",
+		"workspace": "Område",
+		"importExport": "Import & eksport",
+		"vaultSettingsGroup": "Vault-indstillinger"
+	},
+	"general": {
+		"title": "Generelle indstillinger",
+		"subtitle": "Administrer dine overordnede præferencer i appen.",
+		"version": {
+			"title": "Version",
+			"checkForUpdates": "Søg efter opdateringer",
+			"upToDate": "Du har den nyeste version",
+			"newVersionAvailable": "Ny version <bold>{{version}}</bold> er tilgængelig.",
+			"downloadLatest": "Download",
+			"downloadDescription": "den nyeste version for at få nye funktioner og forbedringer."
+		},
+		"autoCheckUpdates": {
+			"label": "Automatisk søgning efter opdateringer",
+			"description": "Appen søger løbende efter opdateringer og giver besked, hvis en ny version er tilgængelig."
+		},
+		"language": {
+			"title": "Sprog",
+			"description": "Skift visningssprog."
+		},
+		"notifications": {
+			"title": "Notifikationer",
+			"description": "Systemnotifikationer bruges kun til påmindelser. Når de er deaktiveret, vises påmindelser kun i appens notifikationsliste.",
+			"useSystem": "Brug systemnotifikationer"
+		},
+		"vaultLock": {
+			"groupTitle": "Vault-lås",
+			"lockOnSystemLock": {
+				"label": "Lås vault, når systemet låses",
+				"description": "Vault låses, når pauseskærmen starter, eller enheden går i dvale."
+			},
+			"lockAfterIdle": {
+				"title": "Lås vault efter inaktivitet",
+				"description": "Vault låses efter den valgte inaktivitetstid.",
+				"never": "Lås ikke",
+				"minutes5": "efter 5 minutter",
+				"minutes10": "efter 10 minutter",
+				"minutes15": "efter 15 minutter",
+				"minutes30": "efter 30 minutter",
+				"hour1": "efter 1 time",
+				"hours2": "efter 2 timer",
+				"hours3": "efter 3 timer",
+				"hours5": "efter 5 timer"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Tema",
+			"auto": "Automatisk",
+			"dark": "Mørkt",
+			"light": "Lyst",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Accentfarve",
+			"zenNotApplicable": "Accentfarve gælder ikke for det valgte tema."
+		},
+		"zoomLevel": {
+			"title": "Zoomniveau",
+			"description": "Juster standard zoomniveau for alle vinduer.\nHvis dit system ikke skalerer apps automatisk, kan du ændre zoom, så det passer til den faktiske skærmpixelratio (DPR). Registreret DPR er {{dpr}}.",
+			"apply": "Anvend",
+			"reset": "Nulstil",
+			"errors": {
+				"enterNumber": "Indtast et tal for at indstille zoom",
+				"tooSmall": "Zoom kan ikke være mindre end {{min}}%",
+				"tooBig": "Zoom kan ikke være mere end {{max}}%"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editor",
+		"mode": {
+			"title": "Editortilstand"
+		},
+		"fontFamily": {
+			"title": "Skrifttype",
+			"description": "Angiv en skrifttype til alle editorer, eller lad feltet stå tomt for at bruge standard.",
+			"placeholder": "Indtast skrifttypenavn"
+		},
+		"fontSize": {
+			"title": "Skriftstørrelse"
+		},
+		"lineHeight": {
+			"title": "Linjehøjde"
+		},
+		"dateFormat": {
+			"title": "Datoformat",
+			"description": "Angiv datoformatet, der bruges ved indsættelse af datoer. Understøtter standard tokensyntaks som DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "datoformatreference",
+			"example": "Eksempel"
+		},
+		"plainText": {
+			"groupTitle": "Ren tekst-editor",
+			"lineNumbers": "Vis linjenumre",
+			"miniMap": "Aktivér minikort"
+		}
+	},
+	"hotkeys": {
+		"blank": "Ingen",
+		"shortcuts": {
+			"createNote": "Opret ny note",
+			"closeCurrentNote": "Luk aktiv note",
+			"restoreClosedNote": "Genåbn senest lukkede note",
+			"focusNextNote": "Gå til næste åbne note",
+			"focusPreviousNote": "Gå til forrige åbne note",
+			"toggleArchive": "Flyt aktiv note til/fra arkiv",
+			"toggleBookmark": "Flyt aktiv note til/fra bogmærker",
+			"deleteNote": "Slet aktiv note",
+			"restoreFromBin": "Gendan aktiv note fra papirkurv",
+			"toggleHistory": "Vis eller skjul historik for aktiv note",
+			"focusSearch": "Søg i noter",
+			"syncDatabase": "Synkroniser vault til disk",
+			"lockVault": "Lås vault",
+			"openSettings": "Åbn indstillinger"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Vault-navn"
+		},
+		"rememberPasswords": {
+			"label": "Husk adgangskoder til områder",
+			"description": "Adgangskoder til områder krypteres med hovednøglen og gemmes i databasen, så krypterede områder åbnes automatisk uden at indtaste adgangskode."
+		},
+		"filesAndData": {
+			"groupTitle": "Filer og data",
+			"imagesCompression": {
+				"title": "Billedkomprimering",
+				"compress": "Komprimer billeder",
+				"doNotCompress": "Komprimer ikke billeder",
+				"alwaysAsk": "Spørg altid"
+			},
+			"deleteOrphaned": {
+				"label": "Slet forældreløse filer",
+				"description": "Slet filer, der ikke længere bruges."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Kryptering",
+			"algorithm": {
+				"title": "Krypteringsalgoritme",
+				"none": "Ingen"
+			},
+			"password": {
+				"title": "Adgangskode",
+				"update": "Opdater adgangskode"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Synkronisering",
+			"enable": {
+				"label": "Aktivér synkronisering",
+				"description": "Hold din vault synkroniseret på tværs af enheder. Alle data krypteres, før de forlader din enhed."
+			},
+			"method": {
+				"title": "Synkroniseringsmetode",
+				"fileSystem": "Filsystem",
+				"server": "Server"
+			},
+			"directory": {
+				"title": "Synkroniseringsmappe",
+				"placeholder": "Indtast sti til mappe"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Snapshots",
+			"record": {
+				"label": "Optag note-snapshots",
+				"description": "Når aktiveret, oprettes snapshots af noteindhold, når en note ændres. Du kan styre snapshot-optagelse pr. note i notens historikpanel."
+			},
+			"delay": {
+				"title": "Forsinkelse for snapshot",
+				"description": "Hvor længe der ventes efter en note er redigeret, før et nyt snapshot gemmes, i sekunder. Kortere intervaller giver hyppigere snapshots — og en større vault."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Papirkurv",
+			"confirmDeletion": {
+				"label": "Bekræft sletning",
+				"description": "Spørg før en note slettes."
+			},
+			"moveToBin": {
+				"label": "Flyt noter til papirkurv",
+				"description": "Flyt noter til papirkurven i stedet for permanent sletning, så du kan gendanne dem senere."
+			},
+			"autoPurge": {
+				"label": "Slet gamle noter i papirkurven permanent",
+				"description": "Noter i papirkurven slettes permanent efter et stykke tid."
+			},
+			"purgeDelay": {
+				"title": "Forsinkelse for permanent sletning",
+				"description": "Noter i papirkurven slettes permanent efter dette antal dage, regnet fra da de blev flyttet dertil.",
+				"unit": "dage"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Områdenavn",
+			"update": "Opdater"
+		},
+		"newNoteTitle": {
+			"title": "Titel på ny note",
+			"description": "Angiv titel for nye noter. Du kan bruge dato via syntaksen {date} eller {date:FORMAT} som {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "formatreference",
+			"placeholder": "f.eks. Note {date:DD/MM/YYYY HH:mm}",
+			"example": "Eksempel"
+		},
+		"tagsForNewNote": {
+			"title": "Tags for ny note",
+			"none": "Angiv ingen tags",
+			"selected": "Samme som valgt tag"
+		},
+		"dangerousZone": {
+			"groupTitle": "Farezone",
+			"delete": {
+				"label": "Slet område og alle tilhørende data, inkl. noter, tags og filer",
+				"action": "Slet område",
+				"cannotDeleteLast": "Det sidste område i en vault kan ikke slettes.",
+				"createAnother": "Opret",
+				"createAnotherSuffix": "et andet område først."
+			},
+			"confirmDelete": "Du er ved at slette området \"{{name}}\". Er du sikker på, at du vil fortsætte?\n\nHvis du fortsætter, slettes alle data tilknyttet dette område, inkl. noter, tags og filer."
+		}
+	},
+	"importExport": {
+		"importNotes": "Importér noter",
+		"exportNotes": "Eksportér noter",
+		"importFromZip": "Importér noter fra .zip-arkiv",
+		"importFromDirectory": "Importér mappe med Markdown-filer",
+		"dropzone": {
+			"title": "Træk Markdown-filer eller .zip-arkiv hertil for at importere",
+			"description": "Træk og slip filer her, eller klik for at vælge filer"
+		},
+		"progress": "Import af noter er i gang. Trin: {{stage}} {{processed}}/{{total}}"
+	}
+}

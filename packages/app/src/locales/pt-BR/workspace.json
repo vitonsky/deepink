@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tags",
+			"empty": "Crie tags para organizar suas notas. Use hierarquias para uma estrutura flexível.",
+			"actions": {
+				"add": "Adicionar tag"
+			}
+		},
+		"workspaces": {
+			"label": "Espaços",
+			"actions": {
+				"add": "Adicionar espaço"
+			}
+		}
+	}
+}

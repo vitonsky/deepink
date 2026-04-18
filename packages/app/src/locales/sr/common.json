@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Откажи",
+		"confirm": "Потврди",
+		"apply": "Примени",
+		"save": "Сачувај",
+		"saveChanges": "Сачувај измене",
+		"delete": "Обриши",
+		"reset": "Поништи",
+		"update": "Ажурирај",
+		"add": "Додај",
+		"create": "Направи",
+		"close": "Затвори"
+	},
+	"form": {
+		"suggestTemplate": "Пробајте ово: <suggests>"
+	}
+}

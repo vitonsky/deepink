@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tags",
+			"empty": "Maak tags om je notities te ordenen. Groepeer ze in een flexibele hiërarchie.",
+			"actions": {
+				"add": "Tag toevoegen"
+			}
+		},
+		"workspaces": {
+			"label": "Werkruimtes",
+			"actions": {
+				"add": "Werkruimte toevoegen"
+			}
+		}
+	}
+}

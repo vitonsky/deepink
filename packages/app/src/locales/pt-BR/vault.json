@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Escolha um vault",
+		"actions": {
+			"createNew": "Criar novo vault"
+		}
+	},
+	"creator": {
+		"title": "Criar Vault",
+		"field": {
+			"name": {
+				"label": "Nome do vault",
+				"placeholder": "ex.: Meu Vault, Compartilhado com Alex",
+				"random": "Gerar nome aleatório",
+				"suggests": {
+					"0": "Marginália",
+					"1": "Velino",
+					"2": "Guarda",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alcova",
+					"6": "Penumbra",
+					"7": "Correspondência ao Luar",
+					"8": "Cartografia Noturna",
+					"9": "Lanterna & Tinta",
+					"10": "Arquivo à Luz de Velas",
+					"11": "Manuscritos de Hera",
+					"12": "Cartas de Cedro",
+					"13": "Escritório de Jacarandá",
+					"14": "O Códice Solto",
+					"15": "Marginália & Murmúrios",
+					"16": "Confissões na Guarda",
+					"17": "O Silêncio Anotado",
+					"18": "Cartografia de Sombras",
+					"19": "O Quarto Lembrado",
+					"20": "As Cartas Não Assinadas",
+					"21": "Coordenadas Sussurradas",
+					"22": "O Almanaque Não Contado",
+					"23": "Cartas em Cera Perdida",
+					"24": "A Biblioteca Invisível",
+					"25": "Margens Inexploradas",
+					"26": "A Conspiração Silenciosa",
+					"27": "A Correspondência Não Entregue",
+					"28": "Arquivo Perene",
+					"29": "Lua de Papel",
+					"30": "Flor de Papel",
+					"31": "Flor Noturna",
+					"32": "Atlas Suave",
+					"33": "Veludo",
+					"34": "Pedra de Tinta",
+					"35": "Silêncio",
+					"36": "Sombra",
+					"37": "Deriva Calma",
+					"38": "Campina Profunda",
+					"39": "Registro Não Escrito",
+					"40": "Rascunho Silencioso",
+					"41": "Arquivo Não Dito",
+					"42": "Diário à Deriva",
+					"43": "Crônica do Vento Solar",
+					"44": "Fiorde Silencioso",
+					"45": "Fragmentos de Memória",
+					"46": "Instante Silencioso",
+					"47": "Minutos Perdidos"
+				}
+			},
+			"password": {
+				"label": "Senha de criptografia",
+				"recommended": "(recomendado)",
+				"placeholder": "Digite uma senha forte"
+			},
+			"algorithm": {
+				"label": "Algoritmo de criptografia"
+			}
+		},
+		"actions": {
+			"create": "Criar vault",
+			"continueNoPassword": "Continuar sem senha",
+			"cancel": "Cancelar"
+		},
+		"noEncryptionDialog": {
+			"title": "Criar vault sem criptografia",
+			"description": "Suas notas e dados serão armazenados como texto simples. Qualquer aplicativo ou pessoa com acesso ao diretório do vault no disco poderá ler todo o conteúdo.",
+			"actions": {
+				"confirm": "Continuar sem criptografia",
+				"cancel": "Cancelar"
+			}
+		},
+		"errors": {
+			"nameRequired": "Digite um nome para o vault",
+			"passwordRequired": "Digite a senha"
+		}
+	},
+	"login": {
+		"title": "Desbloquear vault",
+		"field": {
+			"password": {
+				"placeholder": "Digite a senha"
+			}
+		},
+		"actions": {
+			"unlock": "Desbloquear",
+			"changeVault": "Trocar vault"
+		},
+		"errors": {
+			"cannotOpen": "Não foi possível abrir o vault",
+			"invalidPassword": "Senha inválida",
+			"passwordRequired": "Digite a senha"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Falha ao abrir o vault",
+		"corrupted": "\"{{name}}\" parece estar corrompido."
+	}
+}

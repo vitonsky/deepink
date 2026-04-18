@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Buat tag",
+					"action": "Buat"
+				},
+				"edit": {
+					"title": "Edit tag",
+					"action": "Simpan"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Nama tag",
+					"placeholder": "mis. Ide"
+				},
+				"parent": {
+					"label": "Tag induk",
+					"placeholder": "mis. Resep/Dessert"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Tidak dapat menyimpan perubahan karena kesalahan yang tidak diketahui.",
+				"format": "Tag tidak boleh kosong, diawali atau diakhiri dengan \"/\", atau mengandung \"//\".",
+				"duplicate": "Tag '{{name}}' sudah ada.",
+				"parentTagNotFound": "Tag induk tidak ditemukan, silakan pilih tag lain."
+			}
+		},
+		"deletion": {
+			"confirm": "Yakin ingin menghapus tag \"{{name}}\" beserta semua sub tag-nya?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Buku Catatan",
+		"creator": {
+			"title": "Buat workspace baru",
+			"description": "Setiap workspace adalah ruang tersendiri untuk catatan, tag, dan file Anda. Semuanya terpisah, namun tetap tersimpan di dalam vault terenkripsi Anda — siap saat Anda beralih.",
+			"action": {
+				"add": "Buat",
+				"cancel": "Batal"
+			},
+			"field": {
+				"name": {
+					"label": "Nama workspace",
+					"placeholder": "mis. Jurnal Kesehatan, Ide Bisnis",
+					"suggests": {
+						"0": "Keuangan",
+						"1": "Kesehatan",
+						"2": "Karier",
+						"3": "Keluarga",
+						"4": "Jurnal",
+						"5": "Target",
+						"6": "Ide",
+						"7": "Legal",
+						"8": "Perjalanan",
+						"9": "Pribadi"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.",
+				"format": "Nama workspace tidak boleh kosong."
+			}
+		},
+		"error": {
+			"title": "Workspace \"{{name}}\" gagal dimuat",
+			"description": "Gagal memuat workspace ini. Data mungkin rusak. Beralih ke workspace lain atau buat yang baru untuk melanjutkan.",
+			"chooseAnother": "Pilih workspace lain",
+			"dividerText": "atau",
+			"createNew": "Buat workspace baru",
+			"createWorkspace": "Buat workspace",
+			"closeVault": "Tutup vault saat ini"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Tanpa Judul",
+			"defaultTemplate": "Tanpa Judul - {{date}}",
+			"duplicate": "Duplikat: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Tulis ide, tugas, atau pemikiran…",
+			"modes": {
+				"plaintext": "Mode teks",
+				"richtext": "Editor visual",
+				"split-screen": "Layar terbagi"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Tambah ke favorit",
+			"removeFromFavorites": "Hapus dari favorit",
+			"moveToArchive": "Pindahkan ke arsip",
+			"removeFromArchive": "Keluarkan dari arsip"
+		},
+		"tags": {
+			"addPlaceholder": "Ketik untuk menambah tag…"
+		},
+		"versionPreview": {
+			"versionAt": "Versi pada {{date}}",
+			"backToEditing": "Kembali ke pengeditan"
+		},
+		"menu": {
+			"title": "Opsi catatan",
+			"copyReference": "Salin tautan catatan",
+			"remindMe": "Ingatkan saya",
+			"history": "Riwayat",
+			"backLinks": "Tautan balik",
+			"readonlyMode": "Mode baca saja",
+			"spellcheck": "Periksa ejaan",
+			"export": "Ekspor...",
+			"passwordProtection": "Proteksi kata sandi...",
+			"disableSync": "Nonaktifkan sinkronisasi",
+			"moveToArchive": "Pindahkan ke arsip",
+			"removeFromArchive": "Keluarkan dari arsip",
+			"deleteToBin": "Hapus ke tempat sampah",
+			"deletePermanently": "Hapus permanen",
+			"restoreFromBin": "Pulihkan dari tempat sampah"
+		},
+		"version": {
+			"chars": "{{count}} karakter",
+			"apply": {
+				"title": "Terapkan versi",
+				"readonlyTitle": "Versi tidak dapat diterapkan pada catatan baca saja"
+			},
+			"open": {
+				"title": "Buka versi"
+			},
+			"delete": {
+				"title": "Hapus versi"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Simpan snapshot",
+				"title": "Simpan kondisi catatan saat ini sebagai versi baru di riwayat"
+			},
+			"deleteAll": {
+				"label": "Hapus semua",
+				"title": "Hapus permanen semua versi tersimpan dari catatan ini"
+			},
+			"dontRecord": "Jangan rekam riwayat untuk catatan ini",
+			"empty": "Catatan ini belum memiliki versi yang direkam",
+			"loading": "Memuat...",
+			"confirmDeleteAll": {
+				"title": "Hapus semua versi catatan",
+				"description": "Tindakan ini akan menghapus semua versi catatan secara permanen.",
+				"confirm": "Apakah Anda yakin?",
+				"action": "Terapkan"
+			},
+			"confirmApply": {
+				"title": "Terapkan versi catatan",
+				"description": "Anda akan menerapkan versi catatan {{version}}.",
+				"warning": "Tindakan ini akan mengganti data catatan saat ini dengan teks dari snapshot yang dipilih. Apakah Anda yakin?",
+				"apply": "Terapkan",
+				"preview": "Pratinjau"
+			},
+			"confirmDelete": {
+				"title": "Hapus versi catatan",
+				"description": "Anda akan menghapus versi catatan {{version}}.",
+				"warning": "Tindakan ini akan menghapus versi catatan secara permanen. Apakah Anda yakin?",
+				"delete": "Hapus",
+				"preview": "Pratinjau"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Tutup panel",
+			"tabs": {
+				"history": "Versi catatan",
+				"backLinks": "Tautan balik",
+				"files": "File terlampir"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Apakah Anda ingin memindahkan catatan ini ke tempat sampah?",
+			"confirmPermanentDeletion": "Apakah Anda ingin menghapus catatan ini secara permanen?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Apakah Anda yakin ingin mengunggah {{filesCount}} file (total {{size}})?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Cari..."
+		},
+		"filterBy": "Filter berdasarkan",
+		"empty": "Belum ada catatan di sini. <create>Buat catatan</create>"
+	},
+	"notesView": {
+		"allNotes": "Semua catatan",
+		"favorites": "Catatan favorit",
+		"archived": "Catatan diarsipkan",
+		"deleted": "Catatan dihapus"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Pilih catatan untuk mulai membaca atau mengedit"
+		}
+	},
+	"activityBar": {
+		"newNote": "Catatan baru",
+		"files": "File",
+		"reminders": "Pengingat",
+		"extensions": "Ekstensi",
+		"inbox": "Kotak masuk",
+		"publishNotes": "Publikasikan catatan",
+		"lockVault": "Kunci vault",
+		"globalSettings": "Pengaturan global"
+	},
+	"tabBar": {
+		"closeTab": "Tutup tab"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Klik untuk menyisipkan header level {{level}}. Buka menu konteks untuk memilih opsi lain",
+			"level": "Header level {{level}}"
+		},
+		"bold": "Aktifkan/nonaktifkan gaya teks tebal",
+		"italic": "Aktifkan/nonaktifkan gaya teks miring",
+		"strikethrough": "Aktifkan/nonaktifkan gaya teks coret",
+		"unorderedList": "Sisipkan atau ubah ke daftar tak berurut",
+		"checkboxList": "Sisipkan atau ubah ke daftar centang",
+		"orderedList": "Sisipkan atau ubah ke daftar berurut",
+		"codeBlock": "Sisipkan atau bungkus teks dengan blok kode",
+		"quoteBlock": "Sisipkan atau bungkus teks dengan blok kutipan",
+		"insertDate": "Sisipkan tanggal",
+		"insertPageBreak": "Sisipkan pemisah halaman",
+		"insertFile": "Sisipkan file",
+		"image": {
+			"buttonTitle": "Sisipkan gambar",
+			"dialogTitle": "Tambah gambar",
+			"dialogDescription": "Gambar akan disisipkan di posisi kursor.",
+			"field": {
+				"url": {
+					"label": "URL gambar",
+					"placeholder": "mis., https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Teks alt gambar (opsional)",
+					"placeholder": "Deskripsi singkat gambar"
+				}
+			},
+			"actions": {
+				"add": "Tambah",
+				"cancel": "Batal"
+			}
+		},
+		"link": {
+			"buttonTitle": "Sisipkan tautan",
+			"dialogTitle": "Tambah tautan",
+			"dialogDescription": "Teks yang dipilih akan menjadi tautan, atau tautan akan ditambahkan di posisi kursor jika tidak ada yang dipilih.",
+			"field": {
+				"url": {
+					"label": "URL tautan",
+					"placeholder": "mis., https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Tambah",
+				"cancel": "Batal"
+			}
+		}
+	},
+	"image": {
+		"loading": "Memuat gambar"
+	},
+	"notifications": {
+		"title": "Notifikasi"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Pembaruan aplikasi",
+			"reminderLater": "Pengingat akan ditampilkan seminggu kemudian"
+		},
+		"newVersion": {
+			"title": "Versi baru tersedia",
+			"body": "Versi baru sudah siap. Perbarui untuk mendapatkan peningkatan dan perbaikan terbaru.",
+			"download": "Unduh versi baru",
+			"ignore": "Abaikan"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Properti gambar",
+			"urlLabel": "URL gambar",
+			"altLabel": "Teks alt gambar"
+		},
+		"linkProperties": {
+			"title": "Properti tautan",
+			"urlLabel": "URL tautan"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Klik untuk menyimpan perubahan ke disk",
+			"saving": "Menyimpan perubahan..."
+		},
+		"changeVault": "Ganti vault",
+		"history": "Riwayat",
+		"notifications": "Notifikasi"
+	}
+}

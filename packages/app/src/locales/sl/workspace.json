@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Oznake",
+			"empty": "Ustvarite oznake za organizacijo zapiskov. Razporedite jih v hierarhijo za večjo preglednost.",
+			"actions": {
+				"add": "Dodaj oznako"
+			}
+		},
+		"workspaces": {
+			"label": "Prostori",
+			"actions": {
+				"add": "Dodaj prostor"
+			}
+		}
+	}
+}

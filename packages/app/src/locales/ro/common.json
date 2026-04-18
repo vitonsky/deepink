@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Anulează",
+		"confirm": "Confirmă",
+		"apply": "Aplică",
+		"save": "Salvează",
+		"saveChanges": "Salvează modificările",
+		"delete": "Șterge",
+		"reset": "Resetează",
+		"update": "Actualizează",
+		"add": "Adaugă",
+		"create": "Creează",
+		"close": "Închide"
+	},
+	"form": {
+		"suggestTemplate": "Încearcă: <suggests>"
+	}
+}

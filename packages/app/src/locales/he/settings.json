@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "העדפות"
+	},
+	"tabs": {
+		"general": "כללי",
+		"appearance": "מראה",
+		"hotkeys": "קיצורי מקשים",
+		"vault": "כספת",
+		"workspace": "מרחב",
+		"importExport": "ייבוא וייצוא",
+		"vaultSettingsGroup": "הגדרות כספת"
+	},
+	"general": {
+		"title": "הגדרות כלליות",
+		"subtitle": "ניהול ההעדפות הכלליות של האפליקציה.",
+		"version": {
+			"title": "גרסה",
+			"checkForUpdates": "בדיקת עדכונים",
+			"upToDate": "מותקנת הגרסה העדכנית ביותר",
+			"newVersionAvailable": "גרסה חדשה <bold>{{version}}</bold> זמינה.",
+			"downloadLatest": "הורדה",
+			"downloadDescription": "הגרסה האחרונה כוללת תכונות ושיפורים חדשים."
+		},
+		"autoCheckUpdates": {
+			"label": "בדיקת עדכונים אוטומטית",
+			"description": "האפליקציה תבדוק מעת לעת אם יש עדכונים ותודיע כשגרסה חדשה זמינה."
+		},
+		"language": {
+			"title": "שפה",
+			"description": "שינוי שפת התצוגה."
+		},
+		"notifications": {
+			"title": "התראות",
+			"description": "התראות מערכת ישמשו רק לתזכורות. כשמושבתות, תזכורות יופיעו רק ברשימת ההתראות באפליקציה.",
+			"useSystem": "שימוש בהתראות מערכת"
+		},
+		"vaultLock": {
+			"groupTitle": "נעילת כספת",
+			"lockOnSystemLock": {
+				"label": "נעילת כספת עם נעילת המערכת",
+				"description": "הכספת תינעל כאשר שומר המסך מופעל או כשהמכשיר עובר למצב שינה."
+			},
+			"lockAfterIdle": {
+				"title": "נעילת כספת לאחר חוסר פעילות",
+				"description": "הכספת תינעל לאחר זמן חוסר הפעילות שנבחר.",
+				"never": "ללא נעילה",
+				"minutes5": "5 דקות",
+				"minutes10": "10 דקות",
+				"minutes15": "15 דקות",
+				"minutes30": "30 דקות",
+				"hour1": "שעה",
+				"hours2": "שעתיים",
+				"hours3": "3 שעות",
+				"hours5": "5 שעות"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "ערכת נושא",
+			"auto": "אוטומטי",
+			"dark": "כהה",
+			"light": "בהיר",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "צבע הדגשה",
+			"zenNotApplicable": "צבע הדגשה אינו חל על ערכת הנושא שנבחרה."
+		},
+		"zoomLevel": {
+			"title": "רמת זום",
+			"description": "התאמת רמת הזום לכל החלונות.\nאם המערכת אינה מתאימה את גודל האפליקציות באופן אוטומטי, ניתן לשנות את הזום כך שיתאים ליחס הפיקסלים בפועל (DPR). ה-DPR שזוהה הוא {{dpr}}.",
+			"apply": "החל",
+			"reset": "איפוס",
+			"errors": {
+				"enterNumber": "יש להזין מספר כדי להגדיר זום",
+				"tooSmall": "הזום לא יכול להיות פחות מ-{{min}}%",
+				"tooBig": "הזום לא יכול להיות יותר מ-{{max}}%"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "עורך",
+		"mode": {
+			"title": "מצב עורך"
+		},
+		"fontFamily": {
+			"title": "גופן",
+			"description": "הגדרת גופן לשימוש בכל העורכים, או השארת השדה ריק לשימוש בברירת המחדל.",
+			"placeholder": "הזנת שם גופן"
+		},
+		"fontSize": {
+			"title": "גודל גופן"
+		},
+		"lineHeight": {
+			"title": "גובה שורה"
+		},
+		"dateFormat": {
+			"title": "תבנית תאריך",
+			"description": "הגדרת תבנית התאריך בעת הוספת תאריכים. תומך בתחביר סטנדרטי כמו DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "מדריך תבניות תאריך",
+			"example": "דוגמה"
+		},
+		"plainText": {
+			"groupTitle": "עורך טקסט פשוט",
+			"lineNumbers": "הצגת מספרי שורות",
+			"miniMap": "הפעלת מפה מוקטנת"
+		}
+	},
+	"hotkeys": {
+		"blank": "ריק",
+		"shortcuts": {
+			"createNote": "יצירת פתק חדש",
+			"closeCurrentNote": "סגירת הפתק הפעיל",
+			"restoreClosedNote": "שחזור פתק שנסגר לאחרונה",
+			"focusNextNote": "מעבר לפתק הפתוח הבא",
+			"focusPreviousNote": "מעבר לפתק הפתוח הקודם",
+			"toggleArchive": "העברת הפתק הפעיל אל/מהארכיון",
+			"toggleBookmark": "הוספה/הסרה של הפתק הפעיל מהסימניות",
+			"deleteNote": "מחיקת הפתק הפעיל",
+			"restoreFromBin": "שחזור הפתק הפעיל מהאשפה",
+			"toggleHistory": "הצגה או הסתרה של היסטוריית הפתק הפעיל",
+			"focusSearch": "חיפוש פתקים",
+			"syncDatabase": "סנכרון כספת לדיסק",
+			"lockVault": "נעילת כספת",
+			"openSettings": "פתיחת העדפות"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "שם הכספת"
+		},
+		"rememberPasswords": {
+			"label": "שמירת סיסמאות מרחבים",
+			"description": "סיסמאות המרחבים יוצפנו באמצעות המפתח הראשי וישמרו בבסיס הנתונים, כדי לפתוח מרחבים מוצפנים באופן אוטומטי ללא הזנת סיסמה."
+		},
+		"filesAndData": {
+			"groupTitle": "קבצים ונתונים",
+			"imagesCompression": {
+				"title": "דחיסת תמונות",
+				"compress": "דחיסת תמונות",
+				"doNotCompress": "ללא דחיסת תמונות",
+				"alwaysAsk": "שאל תמיד"
+			},
+			"deleteOrphaned": {
+				"label": "מחיקת קבצים שאינם בשימוש",
+				"description": "מחיקת קבצים שאינם משויכים יותר."
+			}
+		},
+		"encryption": {
+			"groupTitle": "הצפנה",
+			"algorithm": {
+				"title": "אלגוריתם הצפנה",
+				"none": "ללא"
+			},
+			"password": {
+				"title": "סיסמה",
+				"update": "עדכון סיסמה"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "סנכרון",
+			"enable": {
+				"label": "הפעלת סנכרון",
+				"description": "שמירה על הכספת מסונכרנת בין מכשירים. כל הנתונים מוצפנים לפני שהם עוזבים את המכשיר."
+			},
+			"method": {
+				"title": "שיטת סנכרון",
+				"fileSystem": "מערכת קבצים",
+				"server": "שרת"
+			},
+			"directory": {
+				"title": "תיקיית סנכרון",
+				"placeholder": "הזנת נתיב לתיקייה"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "תמונות מצב",
+			"record": {
+				"label": "שמירת תמונות מצב של פתקים",
+				"description": "כשמופעל, תמונות מצב של תוכן הפתק ייווצרו בעת שינוי. ניתן לשלוט בשמירת תמונות מצב לכל פתק בנפרד דרך חלונית ההיסטוריה."
+			},
+			"delay": {
+				"title": "השהיה לפני תמונת מצב",
+				"description": "כמה זמן להמתין לאחר עריכת פתק לפני שמירת תמונת מצב חדשה, בשניות. מרווחים קצרים יותר משמעם תמונות מצב תכופות יותר — וכספת גדולה יותר."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "אשפה",
+			"confirmDeletion": {
+				"label": "אישור מחיקה",
+				"description": "בקשת אישור לפני מחיקת פתק."
+			},
+			"moveToBin": {
+				"label": "העברת פתקים לאשפה",
+				"description": "העברת פתקים לאשפה במקום מחיקה לצמיתות, כדי לאפשר שחזור בהמשך."
+			},
+			"autoPurge": {
+				"label": "מחיקה לצמיתות של פתקים ישנים באשפה",
+				"description": "פתקים שהועברו לאשפה יימחקו לצמיתות לאחר זמן מה."
+			},
+			"purgeDelay": {
+				"title": "השהיה לפני מחיקה לצמיתות",
+				"description": "פתקים באשפה יימחקו לצמיתות לאחר מספר הימים שנקבע, מרגע ההעברה לאשפה.",
+				"unit": "ימים"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "שם המרחב",
+			"update": "עדכון"
+		},
+		"newNoteTitle": {
+			"title": "כותרת לפתק חדש",
+			"description": "הגדרת כותרת לפתקים חדשים. ניתן להשתמש בתאריך באמצעות התחביר {date} או {date:FORMAT} כמו {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "מדריך תבניות",
+			"placeholder": "לדוגמה, פתק {date:DD/MM/YYYY HH:mm}",
+			"example": "דוגמה"
+		},
+		"tagsForNewNote": {
+			"title": "תגיות לפתק חדש",
+			"none": "ללא תגיות",
+			"selected": "כמו התגית שנבחרה"
+		},
+		"dangerousZone": {
+			"groupTitle": "אזור מסוכן",
+			"delete": {
+				"label": "מחיקת המרחב וכל הנתונים הקשורים, כולל פתקים, תגיות וקבצים",
+				"action": "מחיקת מרחב",
+				"cannotDeleteLast": "לא ניתן למחוק את המרחב האחרון בכספת.",
+				"createAnother": "יצירת",
+				"createAnotherSuffix": "מרחב נוסף תחילה."
+			},
+			"confirmDelete": "המרחב \"{{name}}\" עומד להימחק. האם להמשיך?\n\nכל הנתונים הקשורים למרחב זה יימחקו, כולל פתקים, תגיות וקבצים."
+		}
+	},
+	"importExport": {
+		"importNotes": "ייבוא פתקים",
+		"exportNotes": "ייצוא פתקים",
+		"importFromZip": "ייבוא פתקים מקובץ .zip",
+		"importFromDirectory": "ייבוא תיקייה עם קובצי Markdown",
+		"dropzone": {
+			"title": "גרירת קובצי Markdown או קובץ .zip לייבוא",
+			"description": "גרירת קבצים לכאן, או לחיצה לבחירת קבצים"
+		},
+		"progress": "ייבוא פתקים בתהליך. שלב: {{stage}} {{processed}}/{{total}}"
+	}
+}

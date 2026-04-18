@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Alkalmazás",
+		"quit": "Kilépés",
+		"edit": "Szerkesztés",
+		"undo": "Visszavonás",
+		"redo": "Újra",
+		"cut": "Kivágás",
+		"copy": "Másolás",
+		"paste": "Beillesztés",
+		"selectAll": "Összes kijelölése",
+		"help": "Súgó",
+		"toggleDevTools": "Fejlesztői eszközök",
+		"about": "Az alkalmazásról"
+	},
+	"tray": {
+		"open": "Jegyzetek megnyitása",
+		"quit": "Kilépés"
+	},
+	"note": {
+		"export": "Exportálás…",
+		"duplicate": "Másolat készítése",
+		"copyMarkdownLink": "Markdown-hivatkozás másolása",
+		"deletePermanently": "Végleges törlés",
+		"restoreFromBin": "Visszaállítás a kukából",
+		"deleteToBin": "Áthelyezés a kukába"
+	},
+	"tag": {
+		"addNestedTag": "Alcímke létrehozása…",
+		"edit": "Szerkesztés…",
+		"delete": "Törlés"
+	}
+}

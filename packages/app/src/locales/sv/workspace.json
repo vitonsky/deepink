@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Taggar",
+			"empty": "Skapa taggar för att organisera dina anteckningar. Ordna dem i hierarkier för flexibel struktur.",
+			"actions": {
+				"add": "Lägg till tagg"
+			}
+		},
+		"workspaces": {
+			"label": "Ytor",
+			"actions": {
+				"add": "Lägg till yta"
+			}
+		}
+	}
+}

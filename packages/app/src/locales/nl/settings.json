@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Voorkeuren"
+	},
+	"tabs": {
+		"general": "Algemeen",
+		"appearance": "Weergave",
+		"hotkeys": "Sneltoetsen",
+		"vault": "Vault",
+		"workspace": "Werkruimte",
+		"importExport": "Import & Export",
+		"vaultSettingsGroup": "Vault-instellingen"
+	},
+	"general": {
+		"title": "Algemene instellingen",
+		"subtitle": "Beheer je algemene voorkeuren in de app.",
+		"version": {
+			"title": "Versie",
+			"checkForUpdates": "Controleer op updates",
+			"upToDate": "Je hebt de nieuwste versie",
+			"newVersionAvailable": "Nieuwe versie <bold>{{version}}</bold> is beschikbaar.",
+			"downloadLatest": "Download",
+			"downloadDescription": "de nieuwste versie voor nieuwe functies en verbeteringen."
+		},
+		"autoCheckUpdates": {
+			"label": "Automatisch controleren op updates",
+			"description": "De app controleert regelmatig op updates en meldt het als er een nieuwe versie beschikbaar is."
+		},
+		"language": {
+			"title": "Taal",
+			"description": "Wijzig de weergavetaal."
+		},
+		"notifications": {
+			"title": "Meldingen",
+			"description": "Systeemmeldingen worden alleen gebruikt voor herinneringen. Wanneer uitgeschakeld, verschijnen herinneringen alleen in de meldingenlijst van de app.",
+			"useSystem": "Gebruik systeemmeldingen"
+		},
+		"vaultLock": {
+			"groupTitle": "Vault vergrendelen",
+			"lockOnSystemLock": {
+				"label": "Vault vergrendelen bij systeemvergrendeling",
+				"description": "De vault wordt vergrendeld wanneer de schermbeveiliging start of het apparaat in slaapstand gaat."
+			},
+			"lockAfterIdle": {
+				"title": "Vault vergrendelen na inactiviteit",
+				"description": "De vault wordt vergrendeld na de geselecteerde inactieve tijd.",
+				"never": "Niet vergrendelen",
+				"minutes5": "na 5 minuten",
+				"minutes10": "na 10 minuten",
+				"minutes15": "na 15 minuten",
+				"minutes30": "na 30 minuten",
+				"hour1": "na 1 uur",
+				"hours2": "na 2 uur",
+				"hours3": "na 3 uur",
+				"hours5": "na 5 uur"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Thema",
+			"auto": "Automatisch",
+			"dark": "Donker",
+			"light": "Licht",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Accentkleur",
+			"zenNotApplicable": "Accentkleur is niet beschikbaar voor het geselecteerde thema."
+		},
+		"zoomLevel": {
+			"title": "Zoomniveau",
+			"description": "Pas het standaard zoomniveau aan voor alle vensters.\nAls je systeem apps niet automatisch schaalt, kun je het zoomniveau aanpassen aan de werkelijke beeldschermverhouding (DPR). Gedetecteerde DPR is {{dpr}}.",
+			"apply": "Toepassen",
+			"reset": "Herstellen",
+			"errors": {
+				"enterNumber": "Voer een getal in om het zoomniveau in te stellen",
+				"tooSmall": "Zoom kan niet minder zijn dan {{min}}%",
+				"tooBig": "Zoom kan niet meer zijn dan {{max}}%"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editor",
+		"mode": {
+			"title": "Editormodus"
+		},
+		"fontFamily": {
+			"title": "Lettertype",
+			"description": "Stel een lettertype in voor alle editors, of laat leeg voor de standaardinstelling.",
+			"placeholder": "Voer lettertypenaam in"
+		},
+		"fontSize": {
+			"title": "Lettergrootte"
+		},
+		"lineHeight": {
+			"title": "Regelhoogte"
+		},
+		"dateFormat": {
+			"title": "Datumnotatie",
+			"description": "Stel de datumnotatie in voor het invoegen van datums. Ondersteunt standaard tokensyntaxis zoals DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "referentie datumnotatie",
+			"example": "Voorbeeld"
+		},
+		"plainText": {
+			"groupTitle": "Platte-teksteditor",
+			"lineNumbers": "Regelnummers tonen",
+			"miniMap": "Minimap inschakelen"
+		}
+	},
+	"hotkeys": {
+		"blank": "Leeg",
+		"shortcuts": {
+			"createNote": "Nieuwe notitie aanmaken",
+			"closeCurrentNote": "Actieve notitie sluiten",
+			"restoreClosedNote": "Laatst gesloten notitie herstellen",
+			"focusNextNote": "Naar volgende geopende notitie",
+			"focusPreviousNote": "Naar vorige geopende notitie",
+			"toggleArchive": "Actieve notitie archiveren/uit archief halen",
+			"toggleBookmark": "Actieve notitie als bladwijzer in-/uitschakelen",
+			"deleteNote": "Actieve notitie verwijderen",
+			"restoreFromBin": "Actieve notitie uit prullenbak herstellen",
+			"toggleHistory": "Geschiedenis van actieve notitie tonen of verbergen",
+			"focusSearch": "Notities zoeken",
+			"syncDatabase": "Vault synchroniseren naar schijf",
+			"lockVault": "Vault vergrendelen",
+			"openSettings": "Voorkeuren openen"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Vaultnaam"
+		},
+		"rememberPasswords": {
+			"label": "Wachtwoorden van werkruimtes onthouden",
+			"description": "Wachtwoorden van werkruimtes worden versleuteld met de hoofdsleutel en opgeslagen in de database, zodat versleutelde werkruimtes automatisch geopend worden zonder een wachtwoord in te voeren."
+		},
+		"filesAndData": {
+			"groupTitle": "Bestanden en gegevens",
+			"imagesCompression": {
+				"title": "Afbeeldingscompressie",
+				"compress": "Afbeeldingen comprimeren",
+				"doNotCompress": "Afbeeldingen niet comprimeren",
+				"alwaysAsk": "Altijd vragen"
+			},
+			"deleteOrphaned": {
+				"label": "Ongebruikte bestanden verwijderen",
+				"description": "Verwijder bestanden die niet meer in gebruik zijn."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Versleuteling",
+			"algorithm": {
+				"title": "Versleutelingsalgoritme",
+				"none": "Geen"
+			},
+			"password": {
+				"title": "Wachtwoord",
+				"update": "Wachtwoord wijzigen"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Synchronisatie",
+			"enable": {
+				"label": "Synchronisatie inschakelen",
+				"description": "Houd je vault gesynchroniseerd tussen apparaten. Alle gegevens worden versleuteld voordat ze je apparaat verlaten."
+			},
+			"method": {
+				"title": "Synchronisatiemethode",
+				"fileSystem": "Bestandssysteem",
+				"server": "Server"
+			},
+			"directory": {
+				"title": "Synchronisatiemap",
+				"placeholder": "Voer pad naar map in"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Snapshots",
+			"record": {
+				"label": "Snapshots van notities opslaan",
+				"description": "Wanneer ingeschakeld, worden snapshots van de notitie-inhoud aangemaakt bij wijzigingen. Je kunt het opslaan van snapshots per notitie beheren in het geschiedenispaneel."
+			},
+			"delay": {
+				"title": "Vertraging voor snapshot",
+				"description": "Hoe lang er gewacht wordt na een bewerking voordat een nieuwe snapshot wordt opgeslagen, in seconden. Kortere intervallen betekenen meer snapshots — en een grotere vault."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Prullenbak",
+			"confirmDeletion": {
+				"label": "Verwijdering bevestigen",
+				"description": "Vraag om bevestiging voordat een notitie wordt verwijderd."
+			},
+			"moveToBin": {
+				"label": "Notities naar prullenbak verplaatsen",
+				"description": "Verplaats notities naar de prullenbak in plaats van ze definitief te verwijderen, zodat je ze later kunt herstellen."
+			},
+			"autoPurge": {
+				"label": "Oude notities in prullenbak definitief verwijderen",
+				"description": "Notities in de prullenbak worden na verloop van tijd definitief verwijderd."
+			},
+			"purgeDelay": {
+				"title": "Termijn voor definitieve verwijdering",
+				"description": "Notities in de prullenbak worden na dit aantal dagen definitief verwijderd, gerekend vanaf het moment dat ze erin zijn geplaatst.",
+				"unit": "dagen"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Naam werkruimte",
+			"update": "Bijwerken"
+		},
+		"newNoteTitle": {
+			"title": "Titel nieuwe notitie",
+			"description": "Stel een titel in voor nieuwe notities. Je kunt een datum gebruiken via de syntax {date} of {date:FORMAT} zoals {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "notatiereferentie",
+			"placeholder": "bijv. Notitie {date:DD/MM/YYYY HH:mm}",
+			"example": "Voorbeeld"
+		},
+		"tagsForNewNote": {
+			"title": "Tags voor nieuwe notitie",
+			"none": "Geen tags instellen",
+			"selected": "Zelfde als geselecteerde tag"
+		},
+		"dangerousZone": {
+			"groupTitle": "Gevarenzone",
+			"delete": {
+				"label": "Verwijder werkruimte en alle bijbehorende gegevens, inclusief notities, tags en bestanden",
+				"action": "Werkruimte verwijderen",
+				"cannotDeleteLast": "De laatste werkruimte in een vault kan niet worden verwijderd.",
+				"createAnother": "Maak",
+				"createAnotherSuffix": "eerst een andere werkruimte aan."
+			},
+			"confirmDelete": "Je staat op het punt werkruimte \"{{name}}\" te verwijderen. Weet je zeker dat je dit wilt doen?\n\nAls je doorgaat, worden alle gegevens van deze werkruimte verwijderd, inclusief notities, tags en bestanden."
+		}
+	},
+	"importExport": {
+		"importNotes": "Notities importeren",
+		"exportNotes": "Notities exporteren",
+		"importFromZip": "Notities importeren uit .zip-archief",
+		"importFromDirectory": "Map met Markdown-bestanden importeren",
+		"dropzone": {
+			"title": "Sleep Markdown-bestanden of een .zip-archief hierheen om te importeren",
+			"description": "Sleep bestanden hierheen, of klik om bestanden te selecteren"
+		},
+		"progress": "Notities worden geïmporteerd. Fase: {{stage}} {{processed}}/{{total}}"
+	}
+}

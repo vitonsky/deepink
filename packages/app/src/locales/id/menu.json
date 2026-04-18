@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Aplikasi",
+		"quit": "Keluar",
+		"edit": "Edit",
+		"undo": "Urungkan",
+		"redo": "Ulangi",
+		"cut": "Potong",
+		"copy": "Salin",
+		"paste": "Tempel",
+		"selectAll": "Pilih Semua",
+		"help": "Bantuan",
+		"toggleDevTools": "Tampilkan/sembunyikan dev tools",
+		"about": "Tentang Aplikasi"
+	},
+	"tray": {
+		"open": "Buka catatan",
+		"quit": "Keluar"
+	},
+	"note": {
+		"export": "Ekspor...",
+		"duplicate": "Duplikat",
+		"copyMarkdownLink": "Salin tautan Markdown",
+		"deletePermanently": "Hapus permanen",
+		"restoreFromBin": "Pulihkan dari tong sampah",
+		"deleteToBin": "Pindahkan ke tong sampah"
+	},
+	"tag": {
+		"addNestedTag": "Buat sub-tag...",
+		"edit": "Edit...",
+		"delete": "Hapus"
+	}
+}
