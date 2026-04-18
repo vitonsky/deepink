@@ -7,8 +7,8 @@ import { VaultObject } from '@core/storage/VaultsManager';
 import { useTelemetryTracker } from '@features/telemetry';
 import { useFocusableRef } from '@hooks/useFocusableRef';
 
-import { VaultsForm } from '../VaultsForm';
 import { OnPickVault } from '../types';
+import { VaultsForm } from '../VaultsForm';
 
 export type VaultLoginFormProps = {
 	vault: VaultObject;
@@ -63,7 +63,7 @@ export const VaultLoginForm: FC<VaultLoginFormProps> = ({
 			});
 		}
 
-		telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_LOGIN, {
+		telemetry.track(TELEMETRY_EVENT_NAME.VAULT_OPEN, {
 			status: response.status === 'error' ? 'error' : 'ok',
 		});
 	}, [onLogin, vault, secret, t, telemetry, toast, toastId]);

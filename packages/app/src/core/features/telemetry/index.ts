@@ -49,9 +49,9 @@ export enum TELEMETRY_EVENT_NAME {
 	WORKSPACE_SELECTED = 'Workspace selected',
 	WORKSPACE_OPEN_FAILED = 'Workspace open failed',
 
-	PROFILE_LOGIN = 'Profile log in',
-	PROFILE_CREATED = 'Profile created',
-	PROFILE_SELECTED = 'Profile selected',
+	VAULT_OPEN = 'Vault open',
+	VAULT_CREATED = 'Vault created',
+	VAULT_SELECTED = 'Vault selected',
 	VAULT_OPEN_FAILED = 'Vault open failed',
 
 	MAIN_WINDOW_LOADED = 'Main window loaded',

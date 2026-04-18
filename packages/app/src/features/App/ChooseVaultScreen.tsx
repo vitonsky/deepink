@@ -65,9 +65,7 @@ export const ChooseVaultScreen: FC<{
 										onOpenVault(vault);
 									}
 
-									telemetry.track(
-										TELEMETRY_EVENT_NAME.PROFILE_SELECTED,
-									);
+									telemetry.track(TELEMETRY_EVENT_NAME.VAULT_SELECTED);
 								}}
 							>
 								<FaUser />

@@ -100,7 +100,7 @@ export const VaultCreator: FC<VaultCreatorProps> = ({
 			if (response !== undefined) {
 				setVaultNameError(response);
 			} else {
-				telemetry.track(TELEMETRY_EVENT_NAME.PROFILE_CREATED, {
+				telemetry.track(TELEMETRY_EVENT_NAME.VAULT_CREATED, {
 					encryption: usePassword ? algorithm : 'none',
 				});
 			}

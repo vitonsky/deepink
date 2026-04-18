@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { settingsSlice } from './settings/settings';
-import { profilesSlice, WorkspaceData } from './vaults/vaults';
+import { vaultsSlice, WorkspaceData } from './vaults/vaults';
 
 export const store = configureStore({
 	reducer: {
 		settings: settingsSlice.reducer,
-		vaults: profilesSlice.reducer,
+		vaults: vaultsSlice.reducer,
 	},
 });
 

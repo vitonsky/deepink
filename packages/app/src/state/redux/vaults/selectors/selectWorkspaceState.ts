@@ -3,11 +3,11 @@ import { WorkspaceStateData } from '@features/App/Workspace/services/workspaceSt
 
 import { createAppSelector } from '../../utils';
 
-import { profilesSlice, WorkspaceScoped } from '../vaults';
+import { vaultsSlice, WorkspaceScoped } from '../vaults';
 
 export const selectWorkspaceState = ({ vaultId, workspaceId }: WorkspaceScoped) =>
 	createAppSelector(
-		[profilesSlice.selectSlice],
+		[vaultsSlice.selectSlice],
 		(state): WorkspaceStateData | null => {
 			const vault = state.vaults[vaultId];
 			if (!vault) return null;

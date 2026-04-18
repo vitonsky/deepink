@@ -14,8 +14,8 @@ export class ConfigStorage<T extends Record<string, any> = Config> {
 		// Load actual JSON
 		const buffer = await this.filesController.get(this.filename);
 		if (buffer) {
-			const profilesJson = new TextDecoder().decode(buffer);
-			json = JSON.parse(profilesJson);
+			const vaultsJson = new TextDecoder().decode(buffer);
+			json = JSON.parse(vaultsJson);
 		}
 
 		json[key] = value;
@@ -29,8 +29,8 @@ export class ConfigStorage<T extends Record<string, any> = Config> {
 		const buffer = await this.filesController.get(this.filename);
 		if (!buffer) return null;
 
-		const profilesJson = new TextDecoder().decode(buffer);
-		const json = JSON.parse(profilesJson);
+		const vaultsJson = new TextDecoder().decode(buffer);
+		const json = JSON.parse(vaultsJson);
 		return key in json ? json[key] : null;
 	}
 }

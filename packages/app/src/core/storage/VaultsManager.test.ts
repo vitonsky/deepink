@@ -11,19 +11,16 @@ vi.stubGlobal('self', {
 
 const UUID_PATTERN = /^[\da-f-]{36}$/i;
 
-test('Profiles may be created', async () => {
+test('Vault may be created', async () => {
 	const files = createFileManagerMock();
-	const profiles = new VaultsManager(
-		files,
-		(profileName) => new RootedFS(files, profileName),
-	);
+	const vaults = new VaultsManager(files, (name) => new RootedFS(files, name));
 
 	await expect(files.list(), 'No files').resolves.toEqual([]);
-	await expect(profiles.getVaults(), 'No vaults').resolves.toEqual([]);
+	await expect(vaults.getVaults(), 'No vaults').resolves.toEqual([]);
 
-	// Add few profiles
+	// Add few vaults
 	await expect(
-		profiles.add({
+		vaults.add({
 			name: 'foo',
 			encryption: null,
 		}),
@@ -34,7 +31,7 @@ test('Profiles may be created', async () => {
 	});
 
 	await expect(
-		profiles.add({
+		vaults.add({
 			name: 'bar',
 			encryption: null,
 		}),
@@ -44,7 +41,7 @@ test('Profiles may be created', async () => {
 		encryption: null,
 	});
 
-	await expect(profiles.getVaults(), 'All profiles is in list').resolves.toEqual([
+	await expect(vaults.getVaults(), 'All vaults is in list').resolves.toEqual([
 		{
 			id: expect.stringMatching(UUID_PATTERN),
 			name: 'foo',
@@ -57,25 +54,22 @@ test('Profiles may be created', async () => {
 		},
 	]);
 
-	await expect(files.list(), 'Only profiles list is created').resolves.toEqual([
-		'/profiles.json',
+	await expect(files.list(), 'Only vaults list is created').resolves.toEqual([
+		'/vaults.json',
 	]);
 });
 
-test('Profile with encryption writes a key into file', async () => {
+test('Vault with encryption writes a key into file', async () => {
 	const files = createFileManagerMock();
-	const profiles = new VaultsManager(
-		files,
-		(profileName) => new RootedFS(files, '/' + profileName),
-	);
+	const vaults = new VaultsManager(files, (name) => new RootedFS(files, '/' + name));
 
 	await expect(files.list(), 'No files').resolves.toEqual([]);
-	await expect(profiles.getVaults(), 'No profiles').resolves.toEqual([]);
+	await expect(vaults.getVaults(), 'No vaults').resolves.toEqual([]);
 
-	// Add profile with encryption
+	// Add vault with encryption
 	const key = new Uint8Array(100).buffer;
 	await expect(
-		profiles.add({
+		vaults.add({
 			name: 'foo',
 			encryption: {
 				algorithm: 'test',
@@ -95,19 +89,16 @@ test('Profile with encryption writes a key into file', async () => {
 
 	await expect(
 		files.list(),
-		'Profiles file and profile dir with key is created',
-	).resolves.toEqual([
-		'/profiles.json',
-		expect.stringMatching(/^\/[\da-f-]{36}\/key$/i),
-	]);
+		'Vaults file and vault dir with key is created',
+	).resolves.toEqual(['/vaults.json', expect.stringMatching(/^\/[\da-f-]{36}\/key$/i)]);
 
-	const profile = await profiles.getVaults().then((profiles) => profiles[0]);
+	const vault = await vaults.getVaults().then((vaults) => vaults[0]);
 	expect(
-		files.get(`/${profile.id}/key`),
+		files.get(`/${vault.id}/key`),
 		'Key file contains an exact buffer',
 	).resolves.toStrictEqual(key);
 
-	await expect(profiles.get(profile.id)).resolves.toEqual({
+	await expect(vaults.get(vault.id)).resolves.toEqual({
 		id: expect.stringMatching(UUID_PATTERN),
 		name: 'foo',
 		// FIXME: vault manager should only list vaults, not its encryption settings. See #215

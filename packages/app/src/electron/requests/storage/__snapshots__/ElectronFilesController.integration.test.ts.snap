@@ -24,13 +24,13 @@ exports[`Write files > FS structure after writing 1`] = `
 [
   "/home/userData/appDir/app",
   "/home/userData/appDir",
-  "/home/userData/appDir/app/profileDir/foo/bar",
-  "/home/userData/appDir/app/profileDir/foo/bar/baz",
-  "/home/userData/appDir/app/profileDir/foo",
+  "/home/userData/appDir/app/vaultDir/foo/bar",
+  "/home/userData/appDir/app/vaultDir/foo/bar/baz",
+  "/home/userData/appDir/app/vaultDir/foo",
   "/home",
-  "/home/userData/appDir/app/profileDir",
-  "/home/userData/appDir/app/profileDir/test.txt",
-  "/home/userData/appDir/app/profileDir/foo/bar/baz/test.txt",
+  "/home/userData/appDir/app/vaultDir/test.txt",
+  "/home/userData/appDir/app/vaultDir/foo/bar/baz/test.txt",
   "/home/userData",
+  "/home/userData/appDir/app/vaultDir",
 ]
 `;

@@ -16,10 +16,10 @@ export class VaultsManager {
 	constructor(
 		private readonly filesController: IFilesStorage,
 		private readonly getVaultFilesController: (vaultName: string) => IFilesStorage,
-	) { }
+	) {}
 
 	public async getVaults(): Promise<VaultObject[]> {
-		const buffer = await this.filesController.get('profiles.json');
+		const buffer = await this.filesController.get('vaults.json');
 		if (!buffer) return [];
 
 		try {
@@ -45,7 +45,7 @@ export class VaultsManager {
 
 		const serializedVaults = JSON.stringify(vaults);
 		const buffer = new TextEncoder().encode(serializedVaults);
-		await this.filesController.write('profiles.json', buffer.buffer);
+		await this.filesController.write('vaults.json', buffer.buffer);
 
 		// Write key
 		if (vaultData.encryption) {

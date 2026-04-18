@@ -181,7 +181,7 @@ export type VaultsState = {
 	vaults: Record<string, VaultData | undefined>;
 };
 
-export const profilesSlice = createSlice({
+export const vaultsSlice = createSlice({
 	name: 'vaults',
 	initialState: {
 		activeVault: null,
@@ -582,20 +582,20 @@ export const profilesSlice = createSlice({
 	},
 });
 
-export const workspacesApi = profilesSlice.actions;
+export const workspacesApi = vaultsSlice.actions;
 
-export const selectActiveVault = createAppSelector(profilesSlice.selectSlice, (state) => {
+export const selectActiveVault = createAppSelector(vaultsSlice.selectSlice, (state) => {
 	return state.activeVault ?? null;
 });
 
 export const selectVaultById = ({ vaultId }: VaultScoped) =>
-	createAppSelector(profilesSlice.selectSlice, (state) => {
+	createAppSelector(vaultsSlice.selectSlice, (state) => {
 		const vault = state.vaults[vaultId];
 		return vault ?? null;
 	});
 
 export const selectWorkspaces = ({ vaultId }: VaultScoped) =>
-	createAppSelector(profilesSlice.selectSlice, (state) => {
+	createAppSelector(vaultsSlice.selectSlice, (state) => {
 		const vault = state.vaults[vaultId];
 		if (!vault) return [];
 
@@ -617,7 +617,7 @@ export const selectWorkspacesInfo = (scope: VaultScoped) =>
 	);
 
 export const selectWorkspace = ({ vaultId, workspaceId }: WorkspaceScoped) =>
-	createAppSelector(profilesSlice.selectSlice, (state) => {
+	createAppSelector(vaultsSlice.selectSlice, (state) => {
 		const vault = state.vaults[vaultId];
 		if (!vault) return null;
 
@@ -625,7 +625,7 @@ export const selectWorkspace = ({ vaultId, workspaceId }: WorkspaceScoped) =>
 	});
 
 export const selectActiveWorkspace = ({ vaultId }: VaultScoped) =>
-	createAppSelector(profilesSlice.selectSlice, (state) => {
+	createAppSelector(vaultsSlice.selectSlice, (state) => {
 		const vault = state.vaults[vaultId];
 		if (!vault || !vault.activeWorkspace) return null;
 

@@ -10,12 +10,12 @@ import { getRandomItem } from '@utils/collections/getRandomItem';
 
 import { CenterBox } from './CenterBox';
 import { ChooseVaultScreen } from './ChooseVaultScreen';
-import { VaultLoginForm } from './VaultLoginForm';
 import { OnPickVault } from './types';
-import { useActiveVaultId } from './useProfileSelector';
-import { useVaultsList } from './useProfilesList';
-import { useRecentVault } from './useRecentProfile';
+import { useActiveVaultId } from './useActiveVaultId';
+import { useRecentVault } from './useRecentVault';
+import { useVaultsList } from './useVaultsList';
 import { VaultCreator } from './VaultCreator';
+import { VaultLoginForm } from './VaultLoginForm';
 import {
 	useVaultContainers,
 	VaultOpenError,

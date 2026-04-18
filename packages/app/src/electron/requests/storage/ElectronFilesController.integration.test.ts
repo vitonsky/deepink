@@ -9,7 +9,7 @@ vi.mock('recursive-readdir', () => vi.importActual('@mocks/recursive-readdir'));
 vi.mock('electron', () => vi.importActual('@mocks/electron'));
 
 const storageHandlerCleanup = enableStorage();
-const filesController = new ElectronFilesController(storageApi, 'profileDir');
+const filesController = new ElectronFilesController(storageApi, 'vaultDir');
 
 const getBufferFromText = (text: string) => new Uint8Array(Buffer.from(text)).buffer;
 
@@ -140,8 +140,8 @@ describe('Deletion tests', () => {
 });
 
 describe('Many clients', () => {
-	const files1 = new ElectronFilesController(storageApi, 'profile1');
-	const files2 = new ElectronFilesController(storageApi, 'profile2');
+	const files1 = new ElectronFilesController(storageApi, 'vault1');
+	const files2 = new ElectronFilesController(storageApi, 'vault2');
 
 	test('Available files is scoped by client root', async () => {
 		await files1.write('test.bytes', new Uint8Array(1).buffer);
@@ -160,7 +160,7 @@ describe('Many clients', () => {
 	});
 
 	test("Client can't traverse out of it's root", async () => {
-		await expect(files1.get('../profile2/test.bytes')).rejects.toThrowError(
+		await expect(files1.get('../vault2/test.bytes')).rejects.toThrowError(
 			'Resolved path is out of root directory',
 		);
 	});
@@ -169,11 +169,11 @@ describe('Many clients', () => {
 test('Path traversal out of scope directory must not be possible', async () => {
 	await expect(filesController.get('/')).resolves.toBeNull();
 	await expect(filesController.write('/', new ArrayBuffer(1))).rejects.toThrowError(
-		"EISDIR: illegal operation on a directory, open '/home/userData/appDir/app/profileDir'",
+		"EISDIR: illegal operation on a directory, open '/home/userData/appDir/app/vaultDir'",
 	);
 
 	// Just to ensure we can read available files
-	vol.writeFileSync('/home/userData/appDir/app/profileDir/secret.txt', 'Secret data');
+	vol.writeFileSync('/home/userData/appDir/app/vaultDir/secret.txt', 'Secret data');
 	await expect(filesController.get('./secret.txt')).resolves.toBeInstanceOf(
 		ArrayBuffer,
 	);
