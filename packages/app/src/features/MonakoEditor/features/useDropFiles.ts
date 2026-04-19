@@ -54,7 +54,7 @@ export const useDropFiles = ({ editor: editorObject, uploadFile }: Props) => {
 			const urls = await Promise.all(
 				Array.from(files).map((file) =>
 					uploadFile(file).then((fileId) => {
-						const escapedFilename = file.name.replace(/(\[|\])/g, '\\$1');
+						const escapedFilename = file.name.replace(/([[\]\\/])/g, '\\$1');
 						const imagePrefix = file.type.startsWith('image/') ? '!' : '';
 						return `${imagePrefix}[${escapedFilename}](${formatResourceLink(
 							fileId,
