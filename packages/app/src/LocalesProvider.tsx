@@ -7,7 +7,7 @@ import { SplashScreen } from '@features/SplashScreen';
 import { useAppSelector } from '@state/redux/hooks';
 import { selectAppLanguage } from '@state/redux/settings/selectors/preferences';
 
-import { NAMESPACES } from './i18n';
+import { NAMESPACES, supportedLanguages } from './i18n';
 
 export const LocalesProvider = ({ children }: PropsWithChildren) => {
 	const language = useAppSelector(selectAppLanguage);
@@ -31,6 +31,8 @@ export const LocalesProvider = ({ children }: PropsWithChildren) => {
 				.init<HttpBackendOptions>({
 					lng: language,
 					fallbackLng: 'en',
+					// eslint-disable-next-line @cspell/spellchecker
+					supportedLngs: supportedLanguages,
 
 					ns: NAMESPACES,
 					defaultNS: NAMESPACES,
