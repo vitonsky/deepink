@@ -131,9 +131,7 @@ export const TagEditor: FC<ITagEditorProps> = ({
 				} catch (error) {
 					console.error(error);
 
-					setTagNameError(
-						t('tag.editor.messages.unknownSubmitError'),
-					);
+					setTagNameError(t('tag.editor.messages.unknownSubmitError'));
 				} finally {
 					setIsPending(false);
 				}
