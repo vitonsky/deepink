@@ -86,6 +86,15 @@ export const WorkspaceStateInitializer = () => {
 						dispatch(
 							workspaceActions.setActiveNote({ noteId: activeNote.id }),
 						);
+
+						// Restore the temporary opened notes
+						if (state.temporaryNoteId) {
+							dispatch(
+								workspaceActions.markNoteAsTemporary({
+									noteId: state.temporaryNoteId,
+								}),
+							);
+						}
 					}
 				}
 

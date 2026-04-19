@@ -44,11 +44,16 @@ import { useWorkspaceCommandCallback } from '@hooks/commands/useWorkspaceCommand
 import { useAppDispatch } from '@state/redux/hooks';
 import {
 	useVaultSelector,
+	useWorkspaceActions,
 	useWorkspaceData,
 	useWorkspaceSelector,
 } from '@state/redux/vaults/hooks';
 import { selectSnapshotSettings } from '@state/redux/vaults/selectors/vault';
-import { selectTags, workspacesApi } from '@state/redux/vaults/vaults';
+import {
+	selectTags,
+	selectTemporaryNoteId,
+	workspacesApi,
+} from '@state/redux/vaults/vaults';
 
 import { NoteEditor } from './NoteEditor';
 import { NoteMenu } from './NoteMenu';
@@ -77,6 +82,7 @@ export const Note: FC<NoteEditorProps> = memo(
 		const telemetry = useTelemetryTracker();
 		const dispatch = useAppDispatch();
 		const workspaceData = useWorkspaceData();
+		const workspaceAction = useWorkspaceActions();
 
 		const eventBus = useEventBus();
 		const notesRegistry = useNotesRegistry();
@@ -170,6 +176,21 @@ export const Note: FC<NoteEditorProps> = memo(
 				});
 			}
 		}, [title, text, debouncedUpdateNote]);
+
+		// Immediately update a temporary note to permanent if content has changed, without waiting for debounce
+		const temporaryNote = useWorkspaceSelector(selectTemporaryNoteId);
+		const isFirstRunRef = useRef(true);
+		useEffect(() => {
+			if (isFirstRunRef.current) {
+				isFirstRunRef.current = false;
+				return;
+			}
+
+			// Update status only if the note is in temporary mode
+			if (temporaryNote === note.id) return;
+
+			dispatch(workspaceAction.markNoteAsPermanent({ noteId: note.id }));
+		}, [title, text, temporaryNote, dispatch, workspaceAction, note.id]);
 
 		const attachments = useAttachmentsController();
 

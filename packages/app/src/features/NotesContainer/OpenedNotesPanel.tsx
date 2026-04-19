@@ -6,6 +6,8 @@ import { Box, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 import { INote, NoteId } from '@core/features/notes';
 import { getNoteTitle } from '@core/features/notes/utils';
 import { getContextMenuCoords } from '@electron/requests/contextMenu/renderer';
+import { useWorkspaceSelector } from '@state/redux/vaults/hooks';
+import { selectTemporaryNoteId } from '@state/redux/vaults/vaults';
 
 import { useNoteContextMenu } from './NoteContextMenu/useNoteContextMenu';
 
@@ -14,6 +16,7 @@ export type TopBarProps = {
 	activeTab: NoteId | null;
 	onPick: (id: NoteId) => void;
 	onClose: (id: NoteId) => void;
+	onOpenPersistently: (id: NoteId) => void;
 
 	notes: INote[];
 };
@@ -25,6 +28,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 	activeTab,
 	onClose,
 	onPick,
+	onOpenPersistently,
 }) => {
 	const { t } = useTranslation(LOCALE_NAMESPACE.features);
 	const openNoteContextMenu = useNoteContextMenu();
@@ -43,6 +47,8 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 	useEffect(() => {
 		activeTabRef.current?.scrollIntoView();
 	}, [tabIndex]);
+
+	const temporaryNoteId = useWorkspaceSelector(selectTemporaryNoteId);
 
 	return (
 		<Tabs
@@ -71,6 +77,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 					}
 
 					const title = getNoteTitle(note.content, 50);
+					const isTemporary = temporaryNoteId === note.id;
 
 					return (
 						<Tab
@@ -78,7 +85,8 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 							ref={isActiveTab ? activeTabRef : undefined}
 							padding="0.4rem 0.7rem"
 							border="none"
-							fontWeight="600"
+							fontStyle={isTemporary ? 'italic' : undefined}
+							fontWeight={!isTemporary ? '600' : undefined}
 							fontSize="14"
 							maxW="250px"
 							minW="150px"
@@ -114,6 +122,7 @@ export const OpenedNotesPanel: FC<TopBarProps> = ({
 									getContextMenuCoords(evt.nativeEvent),
 								);
 							}}
+							onDoubleClick={() => onOpenPersistently(note.id)}
 						>
 							<HStack gap=".5rem" w="100%" justifyContent="space-between">
 								<Text

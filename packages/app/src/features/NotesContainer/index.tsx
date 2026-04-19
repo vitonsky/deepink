@@ -124,6 +124,9 @@ export const NotesContainer: FC<NotesContainerProps> = ({ ...props }) => {
 									context: 'top bar',
 								});
 							},
+							onOpenPersistently(id) {
+								noteActions.click(id, { isTemporary: false });
+							},
 						}}
 					/>
 
