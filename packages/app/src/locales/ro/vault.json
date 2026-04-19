@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Alege un seif",
+		"actions": {
+			"createNew": "Creează un seif nou"
+		}
+	},
+	"creator": {
+		"title": "Creează Seif",
+		"field": {
+			"name": {
+				"label": "Numele seifului",
+				"placeholder": "de exemplu, Seiful Meu, Partajat cu Alex",
+				"random": "Generează un nume aleator",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Hârtie de final",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Colțar",
+					"6": "Penumbra",
+					"7": "Corespondență sub lumina lunii",
+					"8": "Cartografie de seară",
+					"9": "Lanternă & Cerneală",
+					"10": "Arhivă iluminată de lumânări",
+					"11": "Manuscrise de iederă cățărătoare",
+					"12": "Scrisori din lemn de cedru",
+					"13": "Scriptorium din lemn de trandafir",
+					"14": "Codexul nelegat",
+					"15": "Marginalia & Murmure",
+					"16": "Confesiuni de hârtie de final",
+					"17": "Silence Annotat",
+					"18": "Cartografie a umbrelor",
+					"19": "Camera amintită",
+					"20": "Scrisori nesemnate",
+					"21": "Coordonate șoptite",
+					"22": "Almanahul nespus",
+					"23": "Scrisori din ceară pierdută",
+					"24": "Biblioteca invizibilă",
+					"25": "Margini neexplorate",
+					"26": "Conspirația tăcută",
+					"27": "Poșta nedistribuită",
+					"28": "Arhivă veșnic verde",
+					"29": "Lună de hârtie",
+					"30": "Floare de hârtie",
+					"31": "Floare de noapte",
+					"32": "Atlas blând",
+					"33": "Velur",
+					"34": "Piatra de cerneală",
+					"35": "Tăcere",
+					"36": "Umbră",
+					"37": "Derivă calmă",
+					"38": "Pădure adâncă",
+					"39": "Registru nescris",
+					"40": "Caiet tăcut",
+					"41": "Arhivă nespusă",
+					"42": "Jurnal plutitor",
+					"43": "Cronică a vântului solar",
+					"44": "Fjord tăcut",
+					"45": "Fragmente de memorie",
+					"46": "Moment tăcut",
+					"47": "Minute dispărute"
+				}
+			},
+			"password": {
+				"label": "Parola de criptare",
+				"recommended": "(recomandat)",
+				"placeholder": "Introdu o parolă puternică aici"
+			},
+			"algorithm": {
+				"label": "Algoritm de criptare"
+			}
+		},
+		"actions": {
+			"create": "Creează seif",
+			"continueNoPassword": "Continuă fără parolă",
+			"cancel": "Anulează"
+		},
+		"noEncryptionDialog": {
+			"title": "Creează seif fără criptare",
+			"description": "Notițele și datele tale vor fi stocate ca text simplu. Orice aplicație sau persoană cu acces la directorul seifului pe disc va putea citi tot ce se află în interior.",
+			"actions": {
+				"confirm": "Continuă fără criptare",
+				"cancel": "Anulează"
+			}
+		},
+		"errors": {
+			"nameRequired": "Introdu un nume pentru seif",
+			"passwordRequired": "Introdu parola"
+		}
+	},
+	"login": {
+		"title": "Deblochează seiful",
+		"field": {
+			"password": {
+				"placeholder": "Introdu parola"
+			}
+		},
+		"actions": {
+			"unlock": "Deblochează",
+			"changeVault": "Schimbă seiful"
+		},
+		"errors": {
+			"cannotOpen": "Nu se poate deschide seiful",
+			"invalidPassword": "Parolă invalidă",
+			"passwordRequired": "Introdu parola"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Nu s-a reușit deschiderea seifului",
+		"corrupted": "\"{{name}}\" pare a fi corupt."
+	}
+}

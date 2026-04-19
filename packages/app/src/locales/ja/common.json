@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "キャンセル",
+		"confirm": "確認",
+		"apply": "適用",
+		"save": "保存",
+		"saveChanges": "変更を保存",
+		"delete": "削除",
+		"reset": "リセット",
+		"update": "更新",
+		"add": "追加",
+		"create": "作成",
+		"close": "閉じる"
+	},
+	"form": {
+		"suggestTemplate": "こちらはいかがですか: <suggests>"
+	}
+}

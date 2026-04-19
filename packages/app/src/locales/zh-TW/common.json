@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "取消",
+		"confirm": "確認",
+		"apply": "套用",
+		"save": "儲存",
+		"saveChanges": "儲存變更",
+		"delete": "刪除",
+		"reset": "重設",
+		"update": "更新",
+		"add": "新增",
+		"create": "建立",
+		"close": "關閉"
+	},
+	"form": {
+		"suggestTemplate": "試試看：<suggests>"
+	}
+}

@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "แอปพลิเคชัน",
+		"quit": "ออก",
+		"edit": "แก้ไข",
+		"undo": "เลิกทำ",
+		"redo": "ทำซ้ำ",
+		"cut": "ตัด",
+		"copy": "คัดลอก",
+		"paste": "วาง",
+		"selectAll": "เลือกทั้งหมด",
+		"help": "ช่วยเหลือ",
+		"toggleDevTools": "เปิด/ปิดเครื่องมือนักพัฒนา",
+		"about": "เกี่ยวกับแอปพลิเคชัน"
+	},
+	"tray": {
+		"open": "เปิดโน้ต",
+		"quit": "ออก"
+	},
+	"note": {
+		"export": "ส่งออก...",
+		"duplicate": "ทำสำเนา",
+		"copyMarkdownLink": "คัดลอกลิงก์ Markdown",
+		"deletePermanently": "ลบถาวร",
+		"restoreFromBin": "กู้คืนจากถังขยะ",
+		"deleteToBin": "ย้ายไปถังขยะ"
+	},
+	"tag": {
+		"addNestedTag": "สร้างแท็กย่อย...",
+		"edit": "แก้ไข...",
+		"delete": "ลบ"
+	}
+}

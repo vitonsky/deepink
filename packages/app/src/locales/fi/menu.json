@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Sovellus",
+		"quit": "Lopeta",
+		"edit": "Muokkaa",
+		"undo": "Kumoa",
+		"redo": "Tee uudelleen",
+		"cut": "Leikkaa",
+		"copy": "Kopioi",
+		"paste": "Liitä",
+		"selectAll": "Valitse kaikki",
+		"help": "Ohje",
+		"toggleDevTools": "Kehitystyökalut",
+		"about": "Tietoja sovelluksesta"
+	},
+	"tray": {
+		"open": "Avaa muistiinpanot",
+		"quit": "Lopeta"
+	},
+	"note": {
+		"export": "Vie...",
+		"duplicate": "Monista",
+		"copyMarkdownLink": "Kopioi Markdown-linkki",
+		"deletePermanently": "Poista pysyvästi",
+		"restoreFromBin": "Palauta roskakorista",
+		"deleteToBin": "Siirrä roskakoriin"
+	},
+	"tag": {
+		"addNestedTag": "Luo alitunniste...",
+		"edit": "Muokkaa...",
+		"delete": "Poista"
+	}
+}

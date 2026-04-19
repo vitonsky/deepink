@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "إنشاء وسم",
+					"action": "إنشاء"
+				},
+				"edit": {
+					"title": "تعديل الوسم",
+					"action": "حفظ"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "اسم الوسم",
+					"placeholder": "مثال: أفكار"
+				},
+				"parent": {
+					"label": "الوسم الأصل",
+					"placeholder": "مثال: وصفات/حلويات"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "تعذّر حفظ التغييرات بسبب خطأ غير معروف.",
+				"format": "لا يمكن أن يكون الوسم فارغًا، أو يبدأ أو ينتهي بـ \"/\"، أو يحتوي على \"//\".",
+				"duplicate": "الوسم '{{name}}' موجود بالفعل.",
+				"parentTagNotFound": "لم يُعثر على الوسم الأصل، يرجى اختيار وسم آخر."
+			}
+		},
+		"deletion": {
+			"confirm": "هل تريد حذف الوسم \"{{name}}\" وجميع الوسوم الفرعية؟"
+		}
+	},
+	"workspace": {
+		"defaultName": "دفتر ملاحظات",
+		"creator": {
+			"title": "إنشاء مساحة جديدة",
+			"description": "كل مساحة هي حيّز مستقل لملاحظاتك ووسومك وملفاتك. يبقى كل شيء منفصلًا، وفي الوقت نفسه محفوظًا داخل خزنتك المشفّرة — جاهزًا عند التبديل.",
+			"action": {
+				"add": "إنشاء",
+				"cancel": "إلغاء"
+			},
+			"field": {
+				"name": {
+					"label": "اسم المساحة",
+					"placeholder": "مثال: يوميات صحية، أفكار عمل",
+					"suggests": {
+						"0": "مالية",
+						"1": "صحة",
+						"2": "مسيرة مهنية",
+						"3": "عائلة",
+						"4": "يوميات",
+						"5": "أهداف",
+						"6": "أفكار",
+						"7": "قانونية",
+						"8": "سفر",
+						"9": "خاص"
+					}
+				}
+			},
+			"error": {
+				"unknown": "حدث خطأ غير معروف. يرجى المحاولة مرة أخرى.",
+				"format": "لا يمكن أن يكون اسم المساحة فارغًا."
+			}
+		},
+		"error": {
+			"title": "تعذّر تحميل المساحة \"{{name}}\"",
+			"description": "تعذّر تحميل هذه المساحة. قد تكون البيانات تالفة. انتقل إلى مساحة أخرى أو أنشئ واحدة جديدة لمتابعة العمل.",
+			"chooseAnother": "اختيار مساحة أخرى",
+			"dividerText": "أو",
+			"createNew": "إنشاء مساحة جديدة",
+			"createWorkspace": "إنشاء مساحة",
+			"closeVault": "إغلاق الخزنة الحالية"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "بدون عنوان",
+			"defaultTemplate": "بدون عنوان - {{date}}",
+			"duplicate": "نسخة: {{title}}"
+		},
+		"editor": {
+			"placeholder": "دوّن فكرة، مهمة، أو خاطرة…",
+			"modes": {
+				"plaintext": "نص عادي",
+				"richtext": "محرر منسّق",
+				"split-screen": "شاشة مقسّمة"
+			}
+		},
+		"actions": {
+			"addToFavorites": "إضافة إلى المفضلة",
+			"removeFromFavorites": "إزالة من المفضلة",
+			"moveToArchive": "نقل إلى الأرشيف",
+			"removeFromArchive": "إزالة من الأرشيف"
+		},
+		"tags": {
+			"addPlaceholder": "اكتب لإضافة وسم…"
+		},
+		"versionPreview": {
+			"versionAt": "نسخة بتاريخ {{date}}",
+			"backToEditing": "العودة إلى التحرير"
+		},
+		"menu": {
+			"title": "خيارات الملاحظة",
+			"copyReference": "نسخ رابط الملاحظة",
+			"remindMe": "تذكيري",
+			"history": "السجل",
+			"backLinks": "الروابط الراجعة",
+			"readonlyMode": "وضع القراءة فقط",
+			"spellcheck": "التدقيق الإملائي",
+			"export": "تصدير...",
+			"passwordProtection": "حماية بكلمة مرور...",
+			"disableSync": "تعطيل المزامنة",
+			"moveToArchive": "نقل إلى الأرشيف",
+			"removeFromArchive": "إزالة من الأرشيف",
+			"deleteToBin": "حذف إلى السلة",
+			"deletePermanently": "حذف نهائي",
+			"restoreFromBin": "استعادة من السلة"
+		},
+		"version": {
+			"chars": "{{count}} حرف",
+			"apply": {
+				"title": "تطبيق النسخة",
+				"readonlyTitle": "لا يمكن تطبيق النسخة على ملاحظة للقراءة فقط"
+			},
+			"open": {
+				"title": "فتح النسخة"
+			},
+			"delete": {
+				"title": "حذف النسخة"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "حفظ لقطة",
+				"title": "حفظ الحالة الحالية لهذه الملاحظة كنسخة جديدة في السجل"
+			},
+			"deleteAll": {
+				"label": "حذف الكل",
+				"title": "حذف جميع النسخ المحفوظة لهذه الملاحظة نهائيًا"
+			},
+			"dontRecord": "عدم تسجيل السجل لهذه الملاحظة",
+			"empty": "لا توجد نسخ مسجّلة لهذه الملاحظة",
+			"loading": "جارٍ التحميل...",
+			"confirmDeleteAll": {
+				"title": "حذف جميع نسخ الملاحظة",
+				"description": "سيؤدي هذا الإجراء إلى حذف جميع نسخ الملاحظة نهائيًا.",
+				"confirm": "هل أنت متأكد؟",
+				"action": "تطبيق"
+			},
+			"confirmApply": {
+				"title": "تطبيق نسخة الملاحظة",
+				"description": "أنت على وشك تطبيق نسخة الملاحظة {{version}}.",
+				"warning": "سيؤدي هذا الإجراء إلى استبدال بيانات الملاحظة الحالية بنص اللقطة المحددة. هل أنت متأكد؟",
+				"apply": "تطبيق",
+				"preview": "معاينة"
+			},
+			"confirmDelete": {
+				"title": "حذف نسخة الملاحظة",
+				"description": "أنت على وشك حذف نسخة الملاحظة {{version}}.",
+				"warning": "سيؤدي هذا الإجراء إلى حذف نسخة الملاحظة بشكل لا رجعة فيه. هل أنت متأكد؟",
+				"delete": "حذف",
+				"preview": "معاينة"
+			}
+		},
+		"sidebar": {
+			"closePanel": "إغلاق اللوحة",
+			"tabs": {
+				"history": "نسخ الملاحظة",
+				"backLinks": "الروابط الراجعة",
+				"files": "الملفات المرفقة"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "هل تريد نقل هذه الملاحظة إلى السلة؟",
+			"confirmPermanentDeletion": "هل تريد حذف هذه الملاحظة نهائيًا؟"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "هل تريد رفع {{filesCount}} ملفات ({{size}} إجمالًا)؟"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "بحث..."
+		},
+		"filterBy": "تصفية حسب",
+		"empty": "لا توجد ملاحظات هنا بعد. <create>أنشئ ملاحظة</create>"
+	},
+	"notesView": {
+		"allNotes": "جميع الملاحظات",
+		"favorites": "الملاحظات المفضلة",
+		"archived": "الملاحظات المؤرشفة",
+		"deleted": "الملاحظات المحذوفة"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "اختر ملاحظة للقراءة أو التحرير"
+		}
+	},
+	"activityBar": {
+		"newNote": "ملاحظة جديدة",
+		"files": "الملفات",
+		"reminders": "التذكيرات",
+		"extensions": "الإضافات",
+		"inbox": "الوارد",
+		"publishNotes": "نشر الملاحظات",
+		"lockVault": "قفل الخزنة",
+		"globalSettings": "الإعدادات العامة"
+	},
+	"tabBar": {
+		"closeTab": "إغلاق التبويب"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "انقر لإدراج عنوان بمستوى {{level}}. افتح قائمة السياق لاختيار خيار آخر",
+			"level": "مستوى العنوان {{level}}"
+		},
+		"bold": "تبديل النص العريض",
+		"italic": "تبديل النص المائل",
+		"strikethrough": "تبديل النص المشطوب",
+		"unorderedList": "إدراج أو تبديل قائمة غير مرتبة",
+		"checkboxList": "إدراج أو تبديل قائمة مهام",
+		"orderedList": "إدراج أو تبديل قائمة مرتبة",
+		"codeBlock": "إدراج أو تغليف النص بكتلة برمجية",
+		"quoteBlock": "إدراج أو تغليف النص بكتلة اقتباس",
+		"insertDate": "إدراج التاريخ",
+		"insertPageBreak": "إدراج فاصل صفحات",
+		"insertFile": "إدراج ملف",
+		"image": {
+			"buttonTitle": "إدراج صورة",
+			"dialogTitle": "إضافة صورة",
+			"dialogDescription": "ستُدرج الصورة عند موضع المؤشر.",
+			"field": {
+				"url": {
+					"label": "رابط الصورة",
+					"placeholder": "مثال: https://example.com/image.png"
+				},
+				"altText": {
+					"label": "نص بديل للصورة (اختياري)",
+					"placeholder": "وصف مختصر للصورة"
+				}
+			},
+			"actions": {
+				"add": "إضافة",
+				"cancel": "إلغاء"
+			}
+		},
+		"link": {
+			"buttonTitle": "إدراج رابط",
+			"dialogTitle": "إضافة رابط",
+			"dialogDescription": "سيتحول النص المحدد إلى رابط، أو سيُضاف الرابط عند موضع المؤشر إن لم يكن هناك نص محدد.",
+			"field": {
+				"url": {
+					"label": "عنوان الرابط",
+					"placeholder": "مثال: https://example.com"
+				}
+			},
+			"actions": {
+				"add": "إضافة",
+				"cancel": "إلغاء"
+			}
+		}
+	},
+	"image": {
+		"loading": "جارٍ تحميل الصورة"
+	},
+	"notifications": {
+		"title": "الإشعارات"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "تحديث التطبيق",
+			"reminderLater": "سيظهر التذكير بعد أسبوع"
+		},
+		"newVersion": {
+			"title": "يتوفر إصدار جديد",
+			"body": "إصدار جديد جاهز. حدّث للحصول على أحدث التحسينات والإصلاحات.",
+			"download": "تنزيل الإصدار الجديد",
+			"ignore": "تجاهل"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "خصائص الصورة",
+			"urlLabel": "رابط الصورة",
+			"altLabel": "النص البديل للصورة"
+		},
+		"linkProperties": {
+			"title": "خصائص الرابط",
+			"urlLabel": "عنوان الرابط"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "انقر لحفظ التغييرات على القرص",
+			"saving": "جارٍ حفظ التغييرات..."
+		},
+		"changeVault": "تغيير الخزنة",
+		"history": "السجل",
+		"notifications": "الإشعارات"
+	}
+}

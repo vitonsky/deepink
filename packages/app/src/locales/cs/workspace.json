@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Štítky",
+			"empty": "Vytvořte si štítky pro organizaci poznámek. Uspořádejte je do hierarchie podle potřeby.",
+			"actions": {
+				"add": "Přidat štítek"
+			}
+		},
+		"workspaces": {
+			"label": "Prostory",
+			"actions": {
+				"add": "Přidat prostor"
+			}
+		}
+	}
+}

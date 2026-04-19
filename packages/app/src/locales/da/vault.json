@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Vælg et vault",
+		"actions": {
+			"createNew": "Opret nyt vault"
+		}
+	},
+	"creator": {
+		"title": "Opret vault",
+		"field": {
+			"name": {
+				"label": "Vault-navn",
+				"placeholder": "f.eks. Mit Vault, Delt med Alex",
+				"random": "Generér tilfældigt navn",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Pergament",
+					"2": "Forsatsblad",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alkove",
+					"6": "Halvskygge",
+					"7": "Månelys-korrespondance",
+					"8": "Aftenkartografi",
+					"9": "Lanterne & Blæk",
+					"10": "Levende Lys Arkiv",
+					"11": "Vildvin-manuskripter",
+					"12": "Cedertræsbreve",
+					"13": "Rosentræs Scriptorium",
+					"14": "Den ubundne kodeks",
+					"15": "Marginalia & Mumlen",
+					"16": "Forsatsbladets bekendelser",
+					"17": "Den annoterede stilhed",
+					"18": "Skyggekartografi",
+					"19": "Det erindrede rum",
+					"20": "De usignerede breve",
+					"21": "Hviskede koordinater",
+					"22": "Den ufortalte almanak",
+					"23": "Tabte voksbreve",
+					"24": "Det usynlige bibliotek",
+					"25": "Ukortlagte marginer",
+					"26": "Den stille sammensværgelse",
+					"27": "Den uleverede post",
+					"28": "Stedsegrønt arkiv",
+					"29": "Papirmåne",
+					"30": "Papirblomst",
+					"31": "Natblomst",
+					"32": "Blidt atlas",
+					"33": "Velour",
+					"34": "Blæksten",
+					"35": "Stilhed",
+					"36": "Skygge",
+					"37": "Stille strøm",
+					"38": "Dyb eng",
+					"39": "Uskrevet hovedbog",
+					"40": "Stille kladde",
+					"41": "Uudtalt arkiv",
+					"42": "Drivende journal",
+					"43": "Solvindskrønike",
+					"44": "Stille fjord",
+					"45": "Erindringsfragmenter",
+					"46": "Stille øjeblik",
+					"47": "Forsvundne minutter"
+				}
+			},
+			"password": {
+				"label": "Krypteringsadgangskode",
+				"recommended": "(anbefalet)",
+				"placeholder": "Indtast en stærk adgangskode"
+			},
+			"algorithm": {
+				"label": "Krypteringsalgoritme"
+			}
+		},
+		"actions": {
+			"create": "Opret vault",
+			"continueNoPassword": "Fortsæt uden adgangskode",
+			"cancel": "Annuller"
+		},
+		"noEncryptionDialog": {
+			"title": "Opret vault uden kryptering",
+			"description": "Dine noter og data gemmes som almindelig tekst. Enhver app eller person med adgang til vault-mappen på disken vil kunne læse alt indholdet.",
+			"actions": {
+				"confirm": "Fortsæt uden kryptering",
+				"cancel": "Annuller"
+			}
+		},
+		"errors": {
+			"nameRequired": "Indtast et vault-navn",
+			"passwordRequired": "Indtast adgangskoden"
+		}
+	},
+	"login": {
+		"title": "Lås vault op",
+		"field": {
+			"password": {
+				"placeholder": "Indtast adgangskode"
+			}
+		},
+		"actions": {
+			"unlock": "Lås op",
+			"changeVault": "Skift vault"
+		},
+		"errors": {
+			"cannotOpen": "Kan ikke åbne vault",
+			"invalidPassword": "Forkert adgangskode",
+			"passwordRequired": "Indtast adgangskode"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Kunne ikke åbne vault",
+		"corrupted": "\"{{name}}\" ser ud til at være beskadiget."
+	}
+}

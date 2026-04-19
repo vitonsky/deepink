@@ -14,5 +14,6 @@ build
 *.md
 package-lock.json
 
+tmp
 **/.astro
 **/.cache

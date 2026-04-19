@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Aplikace",
+		"quit": "Ukončit",
+		"edit": "Úpravy",
+		"undo": "Zpět",
+		"redo": "Znovu",
+		"cut": "Vyjmout",
+		"copy": "Kopírovat",
+		"paste": "Vložit",
+		"selectAll": "Vybrat vše",
+		"help": "Nápověda",
+		"toggleDevTools": "Vývojářské nástroje",
+		"about": "O aplikaci"
+	},
+	"tray": {
+		"open": "Otevřít poznámky",
+		"quit": "Ukončit"
+	},
+	"note": {
+		"export": "Exportovat…",
+		"duplicate": "Duplikovat",
+		"copyMarkdownLink": "Kopírovat Markdown odkaz",
+		"deletePermanently": "Trvale smazat",
+		"restoreFromBin": "Obnovit z koše",
+		"deleteToBin": "Přesunout do koše"
+	},
+	"tag": {
+		"addNestedTag": "Vytvořit podštítek…",
+		"edit": "Upravit…",
+		"delete": "Smazat"
+	}
+}

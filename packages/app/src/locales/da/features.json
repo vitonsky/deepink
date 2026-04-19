@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Opret tag",
+					"action": "Opret"
+				},
+				"edit": {
+					"title": "Rediger tag",
+					"action": "Gem"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Tagnavn",
+					"placeholder": "f.eks. Idéer"
+				},
+				"parent": {
+					"label": "Overordnet tag",
+					"placeholder": "f.eks. Opskrifter/Desserter"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Ændringerne kunne ikke gemmes på grund af en ukendt fejl.",
+				"format": "Tag må ikke være tomt, starte eller slutte med \"/\" eller indeholde \"//\".",
+				"duplicate": "Tagget '{{name}}' findes allerede.",
+				"parentTagNotFound": "Overordnet tag blev ikke fundet. Vælg et andet tag."
+			}
+		},
+		"deletion": {
+			"confirm": "Er du sikker på, at du vil slette tagget \"{{name}}\" og alle undertags?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Notesbog",
+		"creator": {
+			"title": "Opret nyt område",
+			"description": "Hvert område er et selvstændigt rum til dine noter, tags og filer. Alt holdes adskilt, men ligger stadig i dit krypterede vault — klar når du skifter.",
+			"action": {
+				"add": "Opret",
+				"cancel": "Annuller"
+			},
+			"field": {
+				"name": {
+					"label": "Områdenavn",
+					"placeholder": "f.eks. Sundhedsjournal, Forretningsidéer",
+					"suggests": {
+						"0": "Økonomi",
+						"1": "Sundhed",
+						"2": "Karriere",
+						"3": "Familie",
+						"4": "Dagbog",
+						"5": "Mål",
+						"6": "Idéer",
+						"7": "Juridisk",
+						"8": "Rejser",
+						"9": "Privat"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Der opstod en ukendt fejl. Prøv igen.",
+				"format": "Områdenavn må ikke være tomt."
+			}
+		},
+		"error": {
+			"title": "Området \"{{name}}\" kunne ikke indlæses",
+			"description": "Området kunne ikke indlæses. Data kan være beskadiget. Skift til et andet område, eller opret et nyt for at fortsætte.",
+			"chooseAnother": "Vælg et andet område",
+			"dividerText": "eller",
+			"createNew": "Opret et nyt område",
+			"createWorkspace": "Opret område",
+			"closeVault": "Luk nuværende vault"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Uden titel",
+			"defaultTemplate": "Uden titel - {{date}}",
+			"duplicate": "Kopi: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Skriv en idé, opgave eller tanke…",
+			"modes": {
+				"plaintext": "Teksttilstand",
+				"richtext": "Formateret editor",
+				"split-screen": "Delt skærm"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Føj til favoritter",
+			"removeFromFavorites": "Fjern fra favoritter",
+			"moveToArchive": "Flyt til arkiv",
+			"removeFromArchive": "Fjern fra arkiv"
+		},
+		"tags": {
+			"addPlaceholder": "Skriv for at tilføje tag…"
+		},
+		"versionPreview": {
+			"versionAt": "Version fra {{date}}",
+			"backToEditing": "Tilbage til redigering"
+		},
+		"menu": {
+			"title": "Noteindstillinger",
+			"copyReference": "Kopiér notelink",
+			"remindMe": "Påmind mig",
+			"history": "Historik",
+			"backLinks": "Tilbagelinks",
+			"readonlyMode": "Skrivebeskyttet tilstand",
+			"spellcheck": "Stavekontrol",
+			"export": "Eksportér...",
+			"passwordProtection": "Adgangskodebeskyttelse...",
+			"disableSync": "Deaktivér synkronisering",
+			"moveToArchive": "Flyt til arkiv",
+			"removeFromArchive": "Fjern fra arkiv",
+			"deleteToBin": "Slet til papirkurv",
+			"deletePermanently": "Slet permanent",
+			"restoreFromBin": "Gendan fra papirkurv"
+		},
+		"version": {
+			"chars": "{{count}} tegn",
+			"apply": {
+				"title": "Anvend version",
+				"readonlyTitle": "Version kan ikke anvendes på en skrivebeskyttet note"
+			},
+			"open": {
+				"title": "Åbn version"
+			},
+			"delete": {
+				"title": "Slet version"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Gem øjebliksbillede",
+				"title": "Gem den aktuelle tilstand af denne note som en ny version i historikken"
+			},
+			"deleteAll": {
+				"label": "Slet alle",
+				"title": "Slet alle gemte versioner af denne note permanent"
+			},
+			"dontRecord": "Optag ikke historik for denne note",
+			"empty": "Denne note har ingen gemte versioner",
+			"loading": "Indlæser...",
+			"confirmDeleteAll": {
+				"title": "Slet alle noteversioner",
+				"description": "Denne handling sletter alle noteversioner permanent.",
+				"confirm": "Er du sikker?",
+				"action": "Anvend"
+			},
+			"confirmApply": {
+				"title": "Anvend noteversion",
+				"description": "Du er ved at anvende noteversion {{version}}.",
+				"warning": "Denne handling erstatter den aktuelle note med teksten fra det valgte øjebliksbillede. Er du sikker?",
+				"apply": "Anvend",
+				"preview": "Forhåndsvis"
+			},
+			"confirmDelete": {
+				"title": "Slet noteversion",
+				"description": "Du er ved at slette noteversion {{version}}.",
+				"warning": "Denne handling sletter noteversionen permanent. Er du sikker?",
+				"delete": "Slet",
+				"preview": "Forhåndsvis"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Luk panel",
+			"tabs": {
+				"history": "Noteversioner",
+				"backLinks": "Tilbagelinks",
+				"files": "Vedhæftede filer"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Vil du flytte denne note til papirkurven?",
+			"confirmPermanentDeletion": "Vil du slette denne note permanent?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Er du sikker på, at du vil uploade {{filesCount}} filer ({{size}} i alt)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Søg..."
+		},
+		"filterBy": "Filtrer efter",
+		"empty": "Ingen noter her endnu. <create>Opret en note</create>"
+	},
+	"notesView": {
+		"allNotes": "Alle noter",
+		"favorites": "Favoritnoter",
+		"archived": "Arkiverede noter",
+		"deleted": "Slettede noter"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Vælg en note for at læse eller redigere"
+		}
+	},
+	"activityBar": {
+		"newNote": "Ny note",
+		"files": "Filer",
+		"reminders": "Påmindelser",
+		"extensions": "Udvidelser",
+		"inbox": "Indbakke",
+		"publishNotes": "Publicér noter",
+		"lockVault": "Lås vault",
+		"globalSettings": "Globale indstillinger"
+	},
+	"tabBar": {
+		"closeTab": "Luk fane"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Klik for at indsætte overskrift med niveau {{level}}. Åbn kontekstmenuen for at vælge en anden mulighed",
+			"level": "Overskriftsniveau {{level}}"
+		},
+		"bold": "Skift fed tekststil",
+		"italic": "Skift kursiv tekststil",
+		"strikethrough": "Skift gennemstreget tekststil",
+		"unorderedList": "Indsæt eller skift punktliste",
+		"checkboxList": "Indsæt eller skift tjekliste",
+		"orderedList": "Indsæt eller skift nummereret liste",
+		"codeBlock": "Indsæt eller omslut tekst med kodeblok",
+		"quoteBlock": "Indsæt eller omslut tekst med citatblok",
+		"insertDate": "Indsæt dato",
+		"insertPageBreak": "Indsæt sideskift",
+		"insertFile": "Indsæt fil",
+		"image": {
+			"buttonTitle": "Indsæt billede",
+			"dialogTitle": "Tilføj billede",
+			"dialogDescription": "Billedet indsættes ved markørens position.",
+			"field": {
+				"url": {
+					"label": "Billed-URL",
+					"placeholder": "f.eks. https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Alternativ billedtekst (valgfrit)",
+					"placeholder": "Kort beskrivelse af billedet"
+				}
+			},
+			"actions": {
+				"add": "Tilføj",
+				"cancel": "Annuller"
+			}
+		},
+		"link": {
+			"buttonTitle": "Indsæt link",
+			"dialogTitle": "Tilføj link",
+			"dialogDescription": "Markeret tekst bliver til et link, eller linket indsættes ved markørens position, hvis intet er markeret.",
+			"field": {
+				"url": {
+					"label": "Link-URL",
+					"placeholder": "f.eks. https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Tilføj",
+				"cancel": "Annuller"
+			}
+		}
+	},
+	"image": {
+		"loading": "Billede indlæses"
+	},
+	"notifications": {
+		"title": "Notifikationer"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Appopdatering",
+			"reminderLater": "Påmindelsen vises igen om en uge"
+		},
+		"newVersion": {
+			"title": "Ny version tilgængelig",
+			"body": "En ny version er klar. Opdatér for at få de seneste forbedringer og rettelser.",
+			"download": "Download ny version",
+			"ignore": "Ignorer"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Billedegenskaber",
+			"urlLabel": "Billed-URL",
+			"altLabel": "Alternativ billedtekst"
+		},
+		"linkProperties": {
+			"title": "Linkegenskaber",
+			"urlLabel": "Link-URL"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Klik for at gemme ændringer på disk",
+			"saving": "Gemmer ændringer..."
+		},
+		"changeVault": "Skift vault",
+		"history": "Historik",
+		"notifications": "Notifikationer"
+	}
+}

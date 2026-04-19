@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tags",
+			"empty": "Erstelle Tags, um deine Notizen zu ordnen. Verschachtele sie zu einer flexiblen Hierarchie.",
+			"actions": {
+				"add": "Tag hinzufügen"
+			}
+		},
+		"workspaces": {
+			"label": "Bereiche",
+			"actions": {
+				"add": "Bereich hinzufügen"
+			}
+		}
+	}
+}

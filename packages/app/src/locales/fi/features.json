@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Luo tunniste",
+					"action": "Luo"
+				},
+				"edit": {
+					"title": "Muokkaa tunnistetta",
+					"action": "Tallenna"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Tunnisteen nimi",
+					"placeholder": "esim. Ideat"
+				},
+				"parent": {
+					"label": "Ylätunniste",
+					"placeholder": "esim. Reseptit/Jälkiruoat"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Muutoksia ei voitu tallentaa tuntemattoman virheen vuoksi.",
+				"format": "Tunniste ei voi olla tyhjä, alkaa tai päättyä merkillä \"/\" eikä sisältää merkkijonoa \"//\".",
+				"duplicate": "Tunniste '{{name}}' on jo olemassa.",
+				"parentTagNotFound": "Ylätunnistetta ei löytynyt. Valitse toinen tunniste."
+			}
+		},
+		"deletion": {
+			"confirm": "Haluatko varmasti poistaa tunnisteen \"{{name}}\" ja kaikki sen alatunnisteet?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Muistikirja",
+		"creator": {
+			"title": "Luo uusi työtila",
+			"description": "Jokainen työtila on erillinen tila muistiinpanoillesi, tunnisteillesi ja tiedostoillesi. Kaikki pysyy erillään, mutta salatun holvin sisällä — valmiina kun vaihdat.",
+			"action": {
+				"add": "Luo",
+				"cancel": "Peruuta"
+			},
+			"field": {
+				"name": {
+					"label": "Työtilan nimi",
+					"placeholder": "esim. Terveyspäiväkirja, Liikeideat",
+					"suggests": {
+						"0": "Talous",
+						"1": "Terveys",
+						"2": "Ura",
+						"3": "Perhe",
+						"4": "Päiväkirja",
+						"5": "Tavoitteet",
+						"6": "Ideat",
+						"7": "Lakiasiat",
+						"8": "Matkat",
+						"9": "Yksityinen"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Tuntematon virhe. Yritä uudelleen.",
+				"format": "Työtilan nimi ei voi olla tyhjä."
+			}
+		},
+		"error": {
+			"title": "Työtilan \"{{name}}\" lataaminen epäonnistui",
+			"description": "Työtilan lataaminen epäonnistui. Tiedot saattavat olla vaurioituneet. Vaihda toiseen työtilaan tai luo uusi jatkaaksesi.",
+			"chooseAnother": "Valitse toinen työtila",
+			"dividerText": "tai",
+			"createNew": "Luo uusi työtila",
+			"createWorkspace": "Luo työtila",
+			"closeVault": "Sulje nykyinen holvi"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Nimetön",
+			"defaultTemplate": "Nimetön – {{date}}",
+			"duplicate": "Kopio: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Kirjaa idea, tehtävä tai ajatus…",
+			"modes": {
+				"plaintext": "Tekstitila",
+				"richtext": "Muotoilutila",
+				"split-screen": "Jaettu näkymä"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Lisää suosikkeihin",
+			"removeFromFavorites": "Poista suosikeista",
+			"moveToArchive": "Siirrä arkistoon",
+			"removeFromArchive": "Poista arkistosta"
+		},
+		"tags": {
+			"addPlaceholder": "Kirjoita lisätäksesi tunnisteen…"
+		},
+		"versionPreview": {
+			"versionAt": "Versio {{date}}",
+			"backToEditing": "Palaa muokkaukseen"
+		},
+		"menu": {
+			"title": "Muistiinpanon asetukset",
+			"copyReference": "Kopioi muistiinpanon linkki",
+			"remindMe": "Muistuta minua",
+			"history": "Historia",
+			"backLinks": "Paluulinkit",
+			"readonlyMode": "Vain luku -tila",
+			"spellcheck": "Oikeinkirjoituksen tarkistus",
+			"export": "Vie...",
+			"passwordProtection": "Salasanasuojaus...",
+			"disableSync": "Poista synkronointi käytöstä",
+			"moveToArchive": "Siirrä arkistoon",
+			"removeFromArchive": "Poista arkistosta",
+			"deleteToBin": "Siirrä roskakoriin",
+			"deletePermanently": "Poista pysyvästi",
+			"restoreFromBin": "Palauta roskakorista"
+		},
+		"version": {
+			"chars": "{{count}} merkkiä",
+			"apply": {
+				"title": "Ota versio käyttöön",
+				"readonlyTitle": "Versiota ei voi ottaa käyttöön vain luku -tilassa"
+			},
+			"open": {
+				"title": "Avaa versio"
+			},
+			"delete": {
+				"title": "Poista versio"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Tallenna tilannekuva",
+				"title": "Tallenna muistiinpanon nykyinen tila uutena versiona historiaan"
+			},
+			"deleteAll": {
+				"label": "Poista kaikki",
+				"title": "Poista pysyvästi kaikki tämän muistiinpanon tallennetut versiot"
+			},
+			"dontRecord": "Älä tallenna tämän muistiinpanon historiaa",
+			"empty": "Tällä muistiinpanolla ei ole tallennettuja versioita",
+			"loading": "Ladataan...",
+			"confirmDeleteAll": {
+				"title": "Poista kaikki versiot",
+				"description": "Tämä poistaa pysyvästi kaikki muistiinpanon versiot.",
+				"confirm": "Oletko varma?",
+				"action": "Toteuta"
+			},
+			"confirmApply": {
+				"title": "Ota versio käyttöön",
+				"description": "Olet ottamassa käyttöön versiota {{version}}.",
+				"warning": "Tämä korvaa muistiinpanon nykyisen sisällön valitun tilannekuvan tekstillä. Oletko varma?",
+				"apply": "Toteuta",
+				"preview": "Esikatsele"
+			},
+			"confirmDelete": {
+				"title": "Poista versio",
+				"description": "Olet poistamassa versiota {{version}}.",
+				"warning": "Tämä poistaa version peruuttamattomasti. Oletko varma?",
+				"delete": "Poista",
+				"preview": "Esikatsele"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Sulje paneeli",
+			"tabs": {
+				"history": "Versiohistoria",
+				"backLinks": "Paluulinkit",
+				"files": "Liitetiedostot"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Haluatko siirtää tämän muistiinpanon roskakoriin?",
+			"confirmPermanentDeletion": "Haluatko poistaa tämän muistiinpanon pysyvästi?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Haluatko varmasti ladata {{filesCount}} tiedostoa (yhteensä {{size}})?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Hae..."
+		},
+		"filterBy": "Suodata",
+		"empty": "Täällä ei ole vielä muistiinpanoja. <create>Luo muistiinpano</create>"
+	},
+	"notesView": {
+		"allNotes": "Kaikki muistiinpanot",
+		"favorites": "Suosikit",
+		"archived": "Arkistoidut",
+		"deleted": "Poistetut"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Valitse muistiinpano lukeaksesi tai muokataksesi"
+		}
+	},
+	"activityBar": {
+		"newNote": "Uusi muistiinpano",
+		"files": "Tiedostot",
+		"reminders": "Muistutukset",
+		"extensions": "Laajennukset",
+		"inbox": "Saapuneet",
+		"publishNotes": "Julkaise muistiinpanoja",
+		"lockVault": "Lukitse holvi",
+		"globalSettings": "Yleiset asetukset"
+	},
+	"tabBar": {
+		"closeTab": "Sulje välilehti"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Lisää otsikkotaso {{level}} napsauttamalla. Avaa kontekstivalikko valitaksesi toisen vaihtoehdon",
+			"level": "Otsikkotaso {{level}}"
+		},
+		"bold": "Lihavointi päälle/pois",
+		"italic": "Kursivointi päälle/pois",
+		"strikethrough": "Yliviivaus päälle/pois",
+		"unorderedList": "Lisää tai vaihda luettelomerkit",
+		"checkboxList": "Lisää tai vaihda valintaruutuluettelo",
+		"orderedList": "Lisää tai vaihda numeroitu luettelo",
+		"codeBlock": "Lisää tai kääri koodilohkoon",
+		"quoteBlock": "Lisää tai kääri lainauslohkoon",
+		"insertDate": "Lisää päivämäärä",
+		"insertPageBreak": "Lisää sivunvaihto",
+		"insertFile": "Lisää tiedosto",
+		"image": {
+			"buttonTitle": "Lisää kuva",
+			"dialogTitle": "Lisää kuva",
+			"dialogDescription": "Kuva lisätään kohdistimen kohtaan.",
+			"field": {
+				"url": {
+					"label": "Kuvan URL",
+					"placeholder": "esim. https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Kuvan vaihtoehtoinen teksti (valinnainen)",
+					"placeholder": "Lyhyt kuvaus kuvasta"
+				}
+			},
+			"actions": {
+				"add": "Lisää",
+				"cancel": "Peruuta"
+			}
+		},
+		"link": {
+			"buttonTitle": "Lisää linkki",
+			"dialogTitle": "Lisää linkki",
+			"dialogDescription": "Valittu teksti muuttuu linkiksi. Jos tekstiä ei ole valittu, linkki lisätään kohdistimen kohtaan.",
+			"field": {
+				"url": {
+					"label": "Linkin URL",
+					"placeholder": "esim. https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Lisää",
+				"cancel": "Peruuta"
+			}
+		}
+	},
+	"image": {
+		"loading": "Kuvaa ladataan"
+	},
+	"notifications": {
+		"title": "Ilmoitukset"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Sovelluspäivitys",
+			"reminderLater": "Muistutus näytetään viikon kuluttua"
+		},
+		"newVersion": {
+			"title": "Uusi versio saatavilla",
+			"body": "Uusi versio on valmis. Päivitä saadaksesi uusimmat parannukset ja korjaukset.",
+			"download": "Lataa uusi versio",
+			"ignore": "Ohita"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Kuvan ominaisuudet",
+			"urlLabel": "Kuvan URL",
+			"altLabel": "Kuvan vaihtoehtoinen teksti"
+		},
+		"linkProperties": {
+			"title": "Linkin ominaisuudet",
+			"urlLabel": "Linkin URL"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Tallenna muutokset levylle napsauttamalla",
+			"saving": "Tallennetaan muutoksia..."
+		},
+		"changeVault": "Vaihda holvia",
+		"history": "Historia",
+		"notifications": "Ilmoitukset"
+	}
+}

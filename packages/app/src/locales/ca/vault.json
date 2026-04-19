@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Tria un vault",
+		"actions": {
+			"createNew": "Crear un vault nou"
+		}
+	},
+	"creator": {
+		"title": "Crear vault",
+		"field": {
+			"name": {
+				"label": "Nom del vault",
+				"placeholder": "p. ex., El meu vault, Compartit amb l'Àlex",
+				"random": "Generar nom aleatori",
+				"suggests": {
+					"0": "Marginàlia",
+					"1": "Vitel·la",
+					"2": "Guarda",
+					"3": "Verso",
+					"4": "Record",
+					"5": "Alcova",
+					"6": "Penombra",
+					"7": "Correspondència de lluna",
+					"8": "Cartografia nocturna",
+					"9": "Llanterna i tinta",
+					"10": "Arxiu a la llum d'espelma",
+					"11": "Manuscrits d'heura",
+					"12": "Cartes de cedre",
+					"13": "Escriptori de palissandre",
+					"14": "El còdex deslligat",
+					"15": "Marginàlia i murmuris",
+					"16": "Confessions de guarda",
+					"17": "El silenci anotat",
+					"18": "Cartografia d'ombres",
+					"19": "L'habitació recordada",
+					"20": "Les cartes sense signar",
+					"21": "Coordenades xiuxiuejades",
+					"22": "L'almanac inèdit",
+					"23": "Cartes de cera perduda",
+					"24": "La biblioteca invisible",
+					"25": "Marges inexplorats",
+					"26": "La conspiració silenciosa",
+					"27": "El correu no lliurat",
+					"28": "Arxiu perenne",
+					"29": "Lluna de paper",
+					"30": "Flor de paper",
+					"31": "Flor nocturna",
+					"32": "Atles suau",
+					"33": "Vellut",
+					"34": "Pedra de tinta",
+					"35": "Silenci",
+					"36": "Ombra",
+					"37": "Deriva serena",
+					"38": "Prat profund",
+					"39": "Llibre major inèdit",
+					"40": "Esborrany silenciós",
+					"41": "Arxiu tàcit",
+					"42": "Diari a la deriva",
+					"43": "Crònica del vent solar",
+					"44": "Fiord silenciós",
+					"45": "Fragments de memòria",
+					"46": "Instant silenciós",
+					"47": "Minuts esvaïts"
+				}
+			},
+			"password": {
+				"label": "Contrasenya de xifratge",
+				"recommended": "(recomanat)",
+				"placeholder": "Introdueix una contrasenya segura"
+			},
+			"algorithm": {
+				"label": "Algorisme de xifratge"
+			}
+		},
+		"actions": {
+			"create": "Crear vault",
+			"continueNoPassword": "Continuar sense contrasenya",
+			"cancel": "Cancel·lar"
+		},
+		"noEncryptionDialog": {
+			"title": "Crear vault sense xifratge",
+			"description": "Les notes i dades s'emmagatzemaran com a text pla. Qualsevol aplicació o persona amb accés al directori del vault podrà llegir-ne tot el contingut.",
+			"actions": {
+				"confirm": "Continuar sense xifratge",
+				"cancel": "Cancel·lar"
+			}
+		},
+		"errors": {
+			"nameRequired": "Introdueix un nom per al vault",
+			"passwordRequired": "Introdueix la contrasenya"
+		}
+	},
+	"login": {
+		"title": "Desbloquejar vault",
+		"field": {
+			"password": {
+				"placeholder": "Introdueix la contrasenya"
+			}
+		},
+		"actions": {
+			"unlock": "Desbloquejar",
+			"changeVault": "Canviar de vault"
+		},
+		"errors": {
+			"cannotOpen": "No s'ha pogut obrir el vault",
+			"invalidPassword": "Contrasenya incorrecta",
+			"passwordRequired": "Introdueix la contrasenya"
+		}
+	},
+	"errors": {
+		"failedToOpen": "No s'ha pogut obrir el vault",
+		"corrupted": "\"{{name}}\" sembla estar corromput."
+	}
+}

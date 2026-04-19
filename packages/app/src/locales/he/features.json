@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "יצירת תגית",
+					"action": "יצירה"
+				},
+				"edit": {
+					"title": "עריכת תגית",
+					"action": "שמירה"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "שם התגית",
+					"placeholder": "למשל: רעיונות"
+				},
+				"parent": {
+					"label": "תגית הורה",
+					"placeholder": "למשל: מתכונים/קינוחים"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "לא ניתן לשמור את השינויים עקב שגיאה לא ידועה.",
+				"format": "תגית לא יכולה להיות ריקה, להתחיל או להסתיים ב-\"/\", או להכיל \"//\".",
+				"duplicate": "התגית '{{name}}' כבר קיימת.",
+				"parentTagNotFound": "תגית ההורה לא נמצאה, יש לבחור תגית אחרת."
+			}
+		},
+		"deletion": {
+			"confirm": "למחוק את התגית \"{{name}}\" ואת כל תגיות המשנה שלה?"
+		}
+	},
+	"workspace": {
+		"defaultName": "מחברת",
+		"creator": {
+			"title": "יצירת מרחב חדש",
+			"description": "כל מרחב הוא אזור עצמאי לפתקים, תגיות וקבצים. הכול נשאר מופרד, אך מאוחסן בתוך המאגר המוצפן שלך — מוכן כשתעברו אליו.",
+			"action": {
+				"add": "יצירה",
+				"cancel": "ביטול"
+			},
+			"field": {
+				"name": {
+					"label": "שם המרחב",
+					"placeholder": "למשל: יומן בריאות, רעיונות עסקיים",
+					"suggests": {
+						"0": "כספים",
+						"1": "בריאות",
+						"2": "קריירה",
+						"3": "משפחה",
+						"4": "יומן",
+						"5": "מטרות",
+						"6": "רעיונות",
+						"7": "משפטי",
+						"8": "נסיעות",
+						"9": "אישי"
+					}
+				}
+			},
+			"error": {
+				"unknown": "אירעה שגיאה לא ידועה. יש לנסות שוב.",
+				"format": "שם המרחב לא יכול להיות ריק."
+			}
+		},
+		"error": {
+			"title": "המרחב \"{{name}}\" לא נטען",
+			"description": "לא ניתן לטעון מרחב זה. ייתכן שהנתונים פגומים. ניתן לעבור למרחב אחר או ליצור חדש.",
+			"chooseAnother": "בחירת מרחב אחר",
+			"dividerText": "או",
+			"createNew": "יצירת מרחב חדש",
+			"createWorkspace": "יצירת מרחב",
+			"closeVault": "סגירת המאגר הנוכחי"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "ללא כותרת",
+			"defaultTemplate": "ללא כותרת - {{date}}",
+			"duplicate": "עותק: {{title}}"
+		},
+		"editor": {
+			"placeholder": "רעיון, משימה או מחשבה…",
+			"modes": {
+				"plaintext": "טקסט פשוט",
+				"richtext": "עורך עשיר",
+				"split-screen": "מסך מפוצל"
+			}
+		},
+		"actions": {
+			"addToFavorites": "הוספה למועדפים",
+			"removeFromFavorites": "הסרה מהמועדפים",
+			"moveToArchive": "העברה לארכיון",
+			"removeFromArchive": "הסרה מהארכיון"
+		},
+		"tags": {
+			"addPlaceholder": "הקלידו להוספת תגית…"
+		},
+		"versionPreview": {
+			"versionAt": "גרסה מ-{{date}}",
+			"backToEditing": "חזרה לעריכה"
+		},
+		"menu": {
+			"title": "אפשרויות פתק",
+			"copyReference": "העתקת קישור לפתק",
+			"remindMe": "תזכורת",
+			"history": "היסטוריה",
+			"backLinks": "קישורים נכנסים",
+			"readonlyMode": "מצב קריאה בלבד",
+			"spellcheck": "בדיקת איות",
+			"export": "ייצוא...",
+			"passwordProtection": "הגנה בסיסמה...",
+			"disableSync": "השבתת סנכרון",
+			"moveToArchive": "העברה לארכיון",
+			"removeFromArchive": "הסרה מהארכיון",
+			"deleteToBin": "מחיקה לסל",
+			"deletePermanently": "מחיקה לצמיתות",
+			"restoreFromBin": "שחזור מהסל"
+		},
+		"version": {
+			"chars": "{{count}} תווים",
+			"apply": {
+				"title": "החלת גרסה",
+				"readonlyTitle": "לא ניתן להחיל גרסה על פתק לקריאה בלבד"
+			},
+			"open": {
+				"title": "פתיחת גרסה"
+			},
+			"delete": {
+				"title": "מחיקת גרסה"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "שמירת תמונת מצב",
+				"title": "שמירת המצב הנוכחי של הפתק כגרסה חדשה בהיסטוריה"
+			},
+			"deleteAll": {
+				"label": "מחיקת הכול",
+				"title": "מחיקה לצמיתות של כל הגרסאות השמורות של פתק זה"
+			},
+			"dontRecord": "לא לתעד היסטוריה לפתק זה",
+			"empty": "לפתק זה אין גרסאות שמורות",
+			"loading": "טוען...",
+			"confirmDeleteAll": {
+				"title": "מחיקת כל גרסאות הפתק",
+				"description": "פעולה זו תמחק לצמיתות את כל גרסאות הפתק.",
+				"confirm": "לבצע?",
+				"action": "אישור"
+			},
+			"confirmApply": {
+				"title": "החלת גרסת פתק",
+				"description": "גרסה {{version}} עומדת להיות מוחלת.",
+				"warning": "פעולה זו תחליף את תוכן הפתק הנוכחי בטקסט מתמונת המצב שנבחרה. לבצע?",
+				"apply": "החלה",
+				"preview": "תצוגה מקדימה"
+			},
+			"confirmDelete": {
+				"title": "מחיקת גרסת פתק",
+				"description": "גרסה {{version}} עומדת להימחק.",
+				"warning": "פעולה זו תמחק את גרסת הפתק באופן בלתי הפיך. לבצע?",
+				"delete": "מחיקה",
+				"preview": "תצוגה מקדימה"
+			}
+		},
+		"sidebar": {
+			"closePanel": "סגירת חלונית",
+			"tabs": {
+				"history": "גרסאות פתק",
+				"backLinks": "קישורים נכנסים",
+				"files": "קבצים מצורפים"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "להעביר את הפתק לסל?",
+			"confirmPermanentDeletion": "למחוק את הפתק לצמיתות?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "להעלות {{filesCount}} קבצים ({{size}} סה\"כ)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "חיפוש..."
+		},
+		"filterBy": "סינון לפי",
+		"empty": "אין כאן פתקים עדיין. <create>יצירת פתק</create>"
+	},
+	"notesView": {
+		"allNotes": "כל הפתקים",
+		"favorites": "מועדפים",
+		"archived": "ארכיון",
+		"deleted": "פתקים שנמחקו"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "יש לבחור פתק לקריאה או עריכה"
+		}
+	},
+	"activityBar": {
+		"newNote": "פתק חדש",
+		"files": "קבצים",
+		"reminders": "תזכורות",
+		"extensions": "הרחבות",
+		"inbox": "דואר נכנס",
+		"publishNotes": "פרסום פתקים",
+		"lockVault": "נעילת המאגר",
+		"globalSettings": "הגדרות כלליות"
+	},
+	"tabBar": {
+		"closeTab": "סגירת לשונית"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "לחצו להוספת כותרת ברמה {{level}}. פתחו תפריט הקשר לאפשרויות נוספות",
+			"level": "כותרת רמה {{level}}"
+		},
+		"bold": "החלפת סגנון טקסט מודגש",
+		"italic": "החלפת סגנון טקסט נטוי",
+		"strikethrough": "החלפת סגנון טקסט חוצה",
+		"unorderedList": "הוספה או החלפה של רשימה לא ממוספרת",
+		"checkboxList": "הוספה או החלפה של רשימת סימון",
+		"orderedList": "הוספה או החלפה של רשימה ממוספרת",
+		"codeBlock": "הוספה או עטיפת טקסט בבלוק קוד",
+		"quoteBlock": "הוספה או עטיפת טקסט בבלוק ציטוט",
+		"insertDate": "הוספת תאריך",
+		"insertPageBreak": "הוספת מעבר עמוד",
+		"insertFile": "הוספת קובץ",
+		"image": {
+			"buttonTitle": "הוספת תמונה",
+			"dialogTitle": "הוספת תמונה",
+			"dialogDescription": "התמונה תתווסף במיקום הסמן.",
+			"field": {
+				"url": {
+					"label": "כתובת התמונה",
+					"placeholder": "למשל: https://example.com/image.png"
+				},
+				"altText": {
+					"label": "טקסט חלופי לתמונה (אופציונלי)",
+					"placeholder": "תיאור קצר של התמונה"
+				}
+			},
+			"actions": {
+				"add": "הוספה",
+				"cancel": "ביטול"
+			}
+		},
+		"link": {
+			"buttonTitle": "הוספת קישור",
+			"dialogTitle": "הוספת קישור",
+			"dialogDescription": "הטקסט המסומן יהפוך לקישור, או שהקישור יתווסף במיקום הסמן אם לא נבחר טקסט.",
+			"field": {
+				"url": {
+					"label": "כתובת הקישור",
+					"placeholder": "למשל: https://example.com"
+				}
+			},
+			"actions": {
+				"add": "הוספה",
+				"cancel": "ביטול"
+			}
+		}
+	},
+	"image": {
+		"loading": "טוען תמונה"
+	},
+	"notifications": {
+		"title": "התראות"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "עדכון אפליקציה",
+			"reminderLater": "התזכורת תוצג שוב בעוד שבוע"
+		},
+		"newVersion": {
+			"title": "גרסה חדשה זמינה",
+			"body": "גרסה חדשה מוכנה. עדכנו כדי לקבל את השיפורים והתיקונים האחרונים.",
+			"download": "הורדת הגרסה החדשה",
+			"ignore": "התעלמות"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "מאפייני תמונה",
+			"urlLabel": "כתובת התמונה",
+			"altLabel": "טקסט חלופי לתמונה"
+		},
+		"linkProperties": {
+			"title": "מאפייני קישור",
+			"urlLabel": "כתובת הקישור"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "לחצו לשמירת שינויים לדיסק",
+			"saving": "שומר שינויים..."
+		},
+		"changeVault": "החלפת מאגר",
+		"history": "היסטוריה",
+		"notifications": "התראות"
+	}
+}

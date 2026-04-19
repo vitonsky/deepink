@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Zrušit",
+		"confirm": "Potvrdit",
+		"apply": "Použít",
+		"save": "Uložit",
+		"saveChanges": "Uložit změny",
+		"delete": "Smazat",
+		"reset": "Obnovit",
+		"update": "Aktualizovat",
+		"add": "Přidat",
+		"create": "Vytvořit",
+		"close": "Zavřít"
+	},
+	"form": {
+		"suggestTemplate": "Zkuste toto: <suggests>"
+	}
+}

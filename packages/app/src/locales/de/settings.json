@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Einstellungen"
+	},
+	"tabs": {
+		"general": "Allgemein",
+		"appearance": "Erscheinungsbild",
+		"hotkeys": "Tastenkombinationen",
+		"vault": "Tresor",
+		"workspace": "Bereich",
+		"importExport": "Importieren & Exportieren",
+		"vaultSettingsGroup": "Tresoreinstellungen"
+	},
+	"general": {
+		"title": "Allgemeine Einstellungen",
+		"subtitle": "Verwalten Sie Ihre allgemeinen Präferenzen in der App.",
+		"version": {
+			"title": "Version",
+			"checkForUpdates": "Auf Updates prüfen",
+			"upToDate": "Sie sind auf der neuesten Version",
+			"newVersionAvailable": "Neue Version <bold>{{version}}</bold> ist verfügbar.",
+			"downloadLatest": "Herunterladen",
+			"downloadDescription": "neueste Version, um neue Funktionen und Verbesserungen zu erhalten."
+		},
+		"autoCheckUpdates": {
+			"label": "Automatische Überprüfung auf Updates",
+			"description": "Die App überprüft regelmäßig auf Updates und benachrichtigt, wenn eine neue Version verfügbar ist."
+		},
+		"language": {
+			"title": "Sprache",
+			"description": "Ändern Sie die Anzeigesprache."
+		},
+		"notifications": {
+			"title": "Benachrichtigungen",
+			"description": "Systembenachrichtigungen werden nur für Erinnerungen verwendet. Wenn deaktiviert, erscheinen Erinnerungen nur in der Benachrichtigungsliste der App.",
+			"useSystem": "Systembenachrichtigungen verwenden"
+		},
+		"vaultLock": {
+			"groupTitle": "Tresorsperre",
+			"lockOnSystemLock": {
+				"label": "Tresor sperren, wenn das System gesperrt wird",
+				"description": "Der Tresor wird gesperrt, wenn ein Bildschirmschoner startet oder das Gerät in den Ruhezustand wechselt."
+			},
+			"lockAfterIdle": {
+				"title": "Tresor nach Inaktivität sperren",
+				"description": "Der Tresor wird nach der ausgewählten Inaktivitätszeit gesperrt.",
+				"never": "Nicht sperren",
+				"minutes5": "für 5 Minuten",
+				"minutes10": "für 10 Minuten",
+				"minutes15": "für 15 Minuten",
+				"minutes30": "für 30 Minuten",
+				"hour1": "für 1 Stunde",
+				"hours2": "für 2 Stunden",
+				"hours3": "für 3 Stunden",
+				"hours5": "für 5 Stunden"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Thema",
+			"auto": "Automatisch",
+			"dark": "Dunkel",
+			"light": "Hell",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Akzentfarbe",
+			"zenNotApplicable": "Akzentfarbe ist für das ausgewählte Thema nicht anwendbar."
+		},
+		"zoomLevel": {
+			"title": "Zoomstufe",
+			"description": "Passen Sie die Standard-Zoomstufe für alle Fenster an.\nFalls Ihr System Apps nicht automatisch skaliert, können Sie den Zoom ändern, um ihn an das tatsächliche Display-Pixelverhältnis (DPR) anzupassen. Erkanntes DPR ist {{dpr}}.",
+			"apply": "Anwenden",
+			"reset": "Zurücksetzen",
+			"errors": {
+				"enterNumber": "Geben Sie eine Zahl ein, um den Zoom festzulegen",
+				"tooSmall": "Der Zoom kann nicht kleiner als {{min}}% sein",
+				"tooBig": "Der Zoom kann nicht größer als {{max}}% sein"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editor",
+		"mode": {
+			"title": "Editor-Modus"
+		},
+		"fontFamily": {
+			"title": "Schriftart",
+			"description": "Legen Sie eine Schriftart fest, die in allen Editoren verwendet wird, oder lassen Sie das Feld leer, um die Standardwerte zu verwenden.",
+			"placeholder": "Geben Sie den Namen der Schriftart ein"
+		},
+		"fontSize": {
+			"title": "Schriftgröße"
+		},
+		"lineHeight": {
+			"title": "Zeilenhöhe"
+		},
+		"dateFormat": {
+			"title": "Datumsformat",
+			"description": "Legen Sie das Datumsformat fest, das beim Einfügen von Daten verwendet wird. Unterstützt die Standard-Token-Syntax wie DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "Datumsformat-Referenz",
+			"example": "Beispiel"
+		},
+		"plainText": {
+			"groupTitle": "Texteditor",
+			"lineNumbers": "Zeilennummern anzeigen",
+			"miniMap": "Mini-Karte aktivieren"
+		}
+	},
+	"hotkeys": {
+		"blank": "Leer",
+		"shortcuts": {
+			"createNote": "Neue Notiz erstellen",
+			"closeCurrentNote": "Aktive Notiz schließen",
+			"restoreClosedNote": "Kürzlich geschlossene Notiz wiederherstellen",
+			"focusNextNote": "Zur nächsten geöffneten Notiz wechseln",
+			"focusPreviousNote": "Zur vorherigen geöffneten Notiz wechseln",
+			"toggleArchive": "Aktive Notiz in/out des Archivs verschieben",
+			"toggleBookmark": "Aktive Notiz in/out des Lesezeichens verschieben",
+			"deleteNote": "Aktive Notiz löschen",
+			"restoreFromBin": "Aktive Notiz aus dem Papierkorb wiederherstellen",
+			"toggleHistory": "Verlauf der aktiven Notiz anzeigen oder ausblenden",
+			"focusSearch": "Notizen suchen",
+			"syncDatabase": "Tresor mit Festplatte synchronisieren",
+			"lockVault": "Tresor sperren",
+			"openSettings": "Einstellungen öffnen"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Tresorname"
+		},
+		"rememberPasswords": {
+			"label": "Passwörter für Bereiche merken",
+			"description": "Passwörter für Bereiche werden mit dem Master-Passwort verschlüsselt und in der Datenbank gespeichert, um verschlüsselte Bereiche automatisch zu öffnen, ohne ein Passwort einzugeben."
+		},
+		"filesAndData": {
+			"groupTitle": "Dateien und Daten",
+			"imagesCompression": {
+				"title": "Bildkompression",
+				"compress": "Bilder komprimieren",
+				"doNotCompress": "Bilder nicht komprimieren",
+				"alwaysAsk": "Immer fragen"
+			},
+			"deleteOrphaned": {
+				"label": "Verwaiste Dateien löschen",
+				"description": "Löschen Sie Dateien, die nicht mehr verwendet werden."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Verschlüsselung",
+			"algorithm": {
+				"title": "Verschlüsselungsalgorithmus",
+				"none": "Keine"
+			},
+			"password": {
+				"title": "Passwort",
+				"update": "Passwort aktualisieren"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Synchronisation",
+			"enable": {
+				"label": "Synchronisation aktivieren",
+				"description": "Halten Sie Ihren Tresor auf allen Geräten synchron. Alle Daten werden verschlüsselt, bevor sie Ihr Gerät verlassen."
+			},
+			"method": {
+				"title": "Synchronisationsmethode",
+				"fileSystem": "Dateisystem",
+				"server": "Server"
+			},
+			"directory": {
+				"title": "Synchronisationsverzeichnis",
+				"placeholder": "Geben Sie den Pfad zum Verzeichnis ein"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Snapshots",
+			"record": {
+				"label": "Notiz-Snapshots aufzeichnen",
+				"description": "Wenn aktiviert, werden Snapshots des Notizinhalts erstellt, wenn eine Notiz geändert wird. Sie können die Snapshot-Aufzeichnung pro Notiz im Notizverlauf-Panel steuern."
+			},
+			"delay": {
+				"title": "Verzögerung für Snapshot",
+				"description": "Wie lange nach der Bearbeitung einer Notiz gewartet werden soll, bevor ein neuer Snapshot gespeichert wird, in Sekunden. Kürzere Intervalle bedeuten häufigere Snapshots — und einen größeren Tresor."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Papierkorb",
+			"confirmDeletion": {
+				"label": "Löschen bestätigen",
+				"description": "Vor dem Löschen einer Notiz fragen."
+			},
+			"moveToBin": {
+				"label": "Notizen in den Papierkorb verschieben",
+				"description": "Notizen in einen Papierkorb verschieben, anstatt sie dauerhaft zu löschen, damit Sie sie später wiederherstellen können."
+			},
+			"autoPurge": {
+				"label": "Alte Notizen im Papierkorb dauerhaft löschen",
+				"description": "Notizen, die in den Papierkorb verschoben werden, werden nach einiger Zeit dauerhaft gelöscht."
+			},
+			"purgeDelay": {
+				"title": "Verzögerung für permanente Löschung",
+				"description": "Notizen im Papierkorb werden nach dieser Anzahl von Tagen dauerhaft gelöscht, gerechnet ab dem Zeitpunkt, an dem sie dorthin verschoben wurden.",
+				"unit": "Tage"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Bereichsname",
+			"update": "Aktualisieren"
+		},
+		"newNoteTitle": {
+			"title": "Titel der neuen Notiz",
+			"description": "Legen Sie den Titel für neue Notizen fest. Sie können das Datum über die Syntax {date} oder {date:FORMAT} wie {date:DD/MM/YYYY HH:mm} verwenden.",
+			"formatReference": "Formatreferenz",
+			"placeholder": "z.B. Notiz {date:DD/MM/YYYY HH:mm}",
+			"example": "Beispiel"
+		},
+		"tagsForNewNote": {
+			"title": "Tags für neue Notiz",
+			"none": "Keine Tags festlegen",
+			"selected": "Gleich wie ausgewählter Tag"
+		},
+		"dangerousZone": {
+			"groupTitle": "Gefährlicher Bereich",
+			"delete": {
+				"label": "Bereich und alle zugehörigen Daten, einschließlich Notizen, Tags und Dateien löschen",
+				"action": "Bereich löschen",
+				"cannotDeleteLast": "Der letzte Bereich in einem Tresor kann nicht gelöscht werden.",
+				"createAnother": "Erstellen",
+				"createAnotherSuffix": "zuerst einen anderen Bereich."
+			},
+			"confirmDelete": "Sie sind dabei, den Bereich \"{{name}}\" zu löschen. Sind Sie sicher, dass Sie dies tun möchten?\n\nWenn Sie fortfahren, werden alle Daten, die mit diesem Bereich verbunden sind, einschließlich Notizen, Tags und Dateien, gelöscht."
+		}
+	},
+	"importExport": {
+		"importNotes": "Notizen importieren",
+		"exportNotes": "Notizen exportieren",
+		"importFromZip": "Notizen aus .zip-Archiv importieren",
+		"importFromDirectory": "Verzeichnis mit Markdown-Dateien importieren",
+		"dropzone": {
+			"title": "Markdown-Dateien oder .zip-Archiv zum Importieren ablegen",
+			"description": "Ziehen Sie einige Dateien hierher oder klicken Sie, um Dateien auszuwählen"
+		},
+		"progress": "Der Import von Notizen ist im Gange. Status: {{stage}} {{processed}}/{{total}}"
+	}
+}

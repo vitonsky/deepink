@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Valitse holvi",
+		"actions": {
+			"createNew": "Luo uusi holvi"
+		}
+	},
+	"creator": {
+		"title": "Luo holvi",
+		"field": {
+			"name": {
+				"label": "Holvin nimi",
+				"placeholder": "esim. Oma holvi, Jaettu Alexin kanssa",
+				"random": "Luo satunnainen nimi",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Pergamentti",
+					"2": "Päätypaperi",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alkovi",
+					"6": "Puolihämärä",
+					"7": "Kuutamokirjeet",
+					"8": "Iltakartografia",
+					"9": "Lyhty ja muste",
+					"10": "Kynttilänvaloarkisto",
+					"11": "Villiviiniköynnökset",
+					"12": "Setripuukirjeet",
+					"13": "Ruusupuinen kirjoitushuone",
+					"14": "Sitomaton koodeksi",
+					"15": "Marginaalit ja kuiskeet",
+					"16": "Päätypaperin tunnustukset",
+					"17": "Merkitty hiljaisuus",
+					"18": "Varjokartografia",
+					"19": "Muistettu huone",
+					"20": "Allekirjoittamattomat kirjeet",
+					"21": "Kuiskatut koordinaatit",
+					"22": "Kertomaton almanakka",
+					"23": "Kadonneen vahan kirjeet",
+					"24": "Näkymätön kirjasto",
+					"25": "Kartoittamattomat marginaalit",
+					"26": "Hiljainen salaliitto",
+					"27": "Toimittamaton posti",
+					"28": "Ikivihreä arkisto",
+					"29": "Paperikuu",
+					"30": "Paperikukinto",
+					"31": "Yökukinto",
+					"32": "Pehmeä atlas",
+					"33": "Sametti",
+					"34": "Mustekivi",
+					"35": "Hiljaisuus",
+					"36": "Varjo",
+					"37": "Tyyni virta",
+					"38": "Syvä niitty",
+					"39": "Kirjoittamaton tilikirja",
+					"40": "Hiljainen luonnoskirja",
+					"41": "Sanaton arkisto",
+					"42": "Ajelehtiva päiväkirja",
+					"43": "Aurinkotuulen kronikka",
+					"44": "Hiljainen vuono",
+					"45": "Muistojen sirpaleet",
+					"46": "Hiljainen hetki",
+					"47": "Kadonneet minuutit"
+				}
+			},
+			"password": {
+				"label": "Salausavain",
+				"recommended": "(suositeltu)",
+				"placeholder": "Syötä vahva salasana"
+			},
+			"algorithm": {
+				"label": "Salausalgoritmi"
+			}
+		},
+		"actions": {
+			"create": "Luo holvi",
+			"continueNoPassword": "Jatka ilman salasanaa",
+			"cancel": "Peruuta"
+		},
+		"noEncryptionDialog": {
+			"title": "Luo holvi ilman salausta",
+			"description": "Muistiinpanosi ja tietosi tallennetaan selkokielisenä tekstinä. Kaikki sovellukset ja henkilöt, joilla on pääsy holvin kansioon levyllä, voivat lukea sen sisällön.",
+			"actions": {
+				"confirm": "Jatka ilman salausta",
+				"cancel": "Peruuta"
+			}
+		},
+		"errors": {
+			"nameRequired": "Syötä holvin nimi",
+			"passwordRequired": "Syötä salasana"
+		}
+	},
+	"login": {
+		"title": "Avaa holvi",
+		"field": {
+			"password": {
+				"placeholder": "Syötä salasana"
+			}
+		},
+		"actions": {
+			"unlock": "Avaa",
+			"changeVault": "Vaihda holvia"
+		},
+		"errors": {
+			"cannotOpen": "Holvia ei voi avata",
+			"invalidPassword": "Virheellinen salasana",
+			"passwordRequired": "Syötä salasana"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Holvin avaaminen epäonnistui",
+		"corrupted": "\"{{name}}\" vaikuttaa vioittuneelta."
+	}
+}

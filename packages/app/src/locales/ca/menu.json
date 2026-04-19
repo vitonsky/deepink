@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Aplicació",
+		"quit": "Sortir",
+		"edit": "Edita",
+		"undo": "Desfés",
+		"redo": "Refés",
+		"cut": "Retalla",
+		"copy": "Copia",
+		"paste": "Enganxa",
+		"selectAll": "Selecciona-ho tot",
+		"help": "Ajuda",
+		"toggleDevTools": "Eines de desenvolupament",
+		"about": "Sobre l'aplicació"
+	},
+	"tray": {
+		"open": "Obrir notes",
+		"quit": "Sortir"
+	},
+	"note": {
+		"export": "Exporta…",
+		"duplicate": "Duplica",
+		"copyMarkdownLink": "Copia l'enllaç Markdown",
+		"deletePermanently": "Elimina permanentment",
+		"restoreFromBin": "Restaura de la paperera",
+		"deleteToBin": "Mou a la paperera"
+	},
+	"tag": {
+		"addNestedTag": "Crea una subetiqueta…",
+		"edit": "Edita…",
+		"delete": "Suprimeix"
+	}
+}

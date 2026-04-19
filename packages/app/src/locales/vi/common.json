@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Hủy",
+		"confirm": "Xác nhận",
+		"apply": "Áp dụng",
+		"save": "Lưu",
+		"saveChanges": "Lưu thay đổi",
+		"delete": "Xóa",
+		"reset": "Đặt lại",
+		"update": "Cập nhật",
+		"add": "Thêm",
+		"create": "Tạo",
+		"close": "Đóng"
+	},
+	"form": {
+		"suggestTemplate": "Thử xem: <suggests>"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "रद्द करें",
+		"confirm": "पुष्टि करें",
+		"apply": "लागू करें",
+		"save": "सहेजें",
+		"saveChanges": "बदलाव सहेजें",
+		"delete": "हटाएँ",
+		"reset": "रीसेट करें",
+		"update": "अपडेट करें",
+		"add": "जोड़ें",
+		"create": "बनाएँ",
+		"close": "बंद करें"
+	},
+	"form": {
+		"suggestTemplate": "यह आज़माएँ: <suggests>"
+	}
+}

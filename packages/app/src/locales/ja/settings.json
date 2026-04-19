@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "設定"
+	},
+	"tabs": {
+		"general": "一般",
+		"appearance": "外観",
+		"hotkeys": "ショートカット",
+		"vault": "保管庫",
+		"workspace": "ワークスペース",
+		"importExport": "インポート・エクスポート",
+		"vaultSettingsGroup": "保管庫の設定"
+	},
+	"general": {
+		"title": "一般設定",
+		"subtitle": "アプリ全体の設定を管理します。",
+		"version": {
+			"title": "バージョン",
+			"checkForUpdates": "アップデートを確認",
+			"upToDate": "最新バージョンです",
+			"newVersionAvailable": "新しいバージョン <bold>{{version}}</bold> が利用可能です。",
+			"downloadLatest": "ダウンロード",
+			"downloadDescription": "最新バージョンをダウンロードして、新機能と改善をお使いください。"
+		},
+		"autoCheckUpdates": {
+			"label": "アップデートの自動確認",
+			"description": "定期的にアップデートを確認し、新しいバージョンがある場合に通知します。"
+		},
+		"language": {
+			"title": "言語",
+			"description": "表示言語を変更します。"
+		},
+		"notifications": {
+			"title": "通知",
+			"description": "システム通知はリマインダーにのみ使用されます。無効にすると、リマインダーはアプリ内の通知一覧にのみ表示されます。",
+			"useSystem": "システム通知を使用"
+		},
+		"vaultLock": {
+			"groupTitle": "保管庫のロック",
+			"lockOnSystemLock": {
+				"label": "システムロック時に保管庫をロック",
+				"description": "スクリーンセーバーの起動時やデバイスのスリープ時に保管庫をロックします。"
+			},
+			"lockAfterIdle": {
+				"title": "一定時間操作がない場合にロック",
+				"description": "指定した時間操作がないと、保管庫をロックします。",
+				"never": "ロックしない",
+				"minutes5": "5分後",
+				"minutes10": "10分後",
+				"minutes15": "15分後",
+				"minutes30": "30分後",
+				"hour1": "1時間後",
+				"hours2": "2時間後",
+				"hours3": "3時間後",
+				"hours5": "5時間後"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "テーマ",
+			"auto": "自動",
+			"dark": "ダーク",
+			"light": "ライト",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "アクセントカラー",
+			"zenNotApplicable": "選択中のテーマにはアクセントカラーは適用されません。"
+		},
+		"zoomLevel": {
+			"title": "ズームレベル",
+			"description": "すべてのウィンドウの既定のズームレベルを調整します。\nシステムがアプリを自動的にスケーリングしない場合は、ズームを変更して実際のディスプレイピクセル比（DPR）に合わせることができます。検出されたDPRは {{dpr}} です。",
+			"apply": "適用",
+			"reset": "リセット",
+			"errors": {
+				"enterNumber": "ズームを設定するには数値を入力してください",
+				"tooSmall": "ズームは {{min}}% 未満にできません",
+				"tooBig": "ズームは {{max}}% を超えられません"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "エディタ",
+		"mode": {
+			"title": "エディタモード"
+		},
+		"fontFamily": {
+			"title": "フォント",
+			"description": "すべてのエディタで使用するフォントを設定します。空欄の場合は既定のフォントが使用されます。",
+			"placeholder": "フォント名を入力"
+		},
+		"fontSize": {
+			"title": "フォントサイズ"
+		},
+		"lineHeight": {
+			"title": "行の高さ"
+		},
+		"dateFormat": {
+			"title": "日付形式",
+			"description": "日付挿入時に使用する形式を設定します。DD/MM/YYYY HH:mm:ss のような標準的なトークン構文に対応しています。",
+			"formatReference": "日付形式リファレンス",
+			"example": "例"
+		},
+		"plainText": {
+			"groupTitle": "プレーンテキストエディタ",
+			"lineNumbers": "行番号を表示",
+			"miniMap": "ミニマップを有効にする"
+		}
+	},
+	"hotkeys": {
+		"blank": "未設定",
+		"shortcuts": {
+			"createNote": "新しいノートを作成",
+			"closeCurrentNote": "アクティブなノートを閉じる",
+			"restoreClosedNote": "最近閉じたノートを復元",
+			"focusNextNote": "次のノートに移動",
+			"focusPreviousNote": "前のノートに移動",
+			"toggleArchive": "アクティブなノートをアーカイブに移動／解除",
+			"toggleBookmark": "アクティブなノートをブックマークに追加／解除",
+			"deleteNote": "アクティブなノートを削除",
+			"restoreFromBin": "アクティブなノートをゴミ箱から復元",
+			"toggleHistory": "アクティブなノートの履歴を表示／非表示",
+			"focusSearch": "ノートを検索",
+			"syncDatabase": "保管庫をディスクに同期",
+			"lockVault": "保管庫をロック",
+			"openSettings": "設定を開く"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "保管庫の名前"
+		},
+		"rememberPasswords": {
+			"label": "ワークスペースのパスワードを記憶",
+			"description": "ワークスペースのパスワードをマスターキーで暗号化してデータベースに保存し、暗号化されたワークスペースをパスワード入力なしで自動的に開きます。"
+		},
+		"filesAndData": {
+			"groupTitle": "ファイルとデータ",
+			"imagesCompression": {
+				"title": "画像の圧縮",
+				"compress": "画像を圧縮する",
+				"doNotCompress": "画像を圧縮しない",
+				"alwaysAsk": "毎回確認する"
+			},
+			"deleteOrphaned": {
+				"label": "未使用ファイルを削除",
+				"description": "使用されなくなったファイルを削除します。"
+			}
+		},
+		"encryption": {
+			"groupTitle": "暗号化",
+			"algorithm": {
+				"title": "暗号化アルゴリズム",
+				"none": "なし"
+			},
+			"password": {
+				"title": "パスワード",
+				"update": "パスワードを変更"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "同期",
+			"enable": {
+				"label": "同期を有効にする",
+				"description": "デバイス間で保管庫を同期します。すべてのデータはデバイスから送信される前に暗号化されます。"
+			},
+			"method": {
+				"title": "同期方法",
+				"fileSystem": "ファイルシステム",
+				"server": "サーバー"
+			},
+			"directory": {
+				"title": "同期ディレクトリ",
+				"placeholder": "ディレクトリのパスを入力"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "スナップショット",
+			"record": {
+				"label": "ノートのスナップショットを記録",
+				"description": "有効にすると、ノートの変更時にコンテンツのスナップショットが作成されます。ノートごとの記録設定は、ノートの履歴パネルで変更できます。"
+			},
+			"delay": {
+				"title": "スナップショットの遅延",
+				"description": "ノートの編集後、新しいスナップショットを保存するまでの待機時間（秒）。間隔が短いほどスナップショットが増え、保管庫のサイズも大きくなります。"
+			}
+		},
+		"trashBin": {
+			"groupTitle": "ゴミ箱",
+			"confirmDeletion": {
+				"label": "削除時に確認する",
+				"description": "ノートを削除する前に確認します。"
+			},
+			"moveToBin": {
+				"label": "ノートをゴミ箱に移動",
+				"description": "完全に削除する代わりにゴミ箱に移動し、後から復元できるようにします。"
+			},
+			"autoPurge": {
+				"label": "ゴミ箱の古いノートを完全に削除",
+				"description": "ゴミ箱に移動されたノートは、一定期間後に完全に削除されます。"
+			},
+			"purgeDelay": {
+				"title": "完全削除までの日数",
+				"description": "ゴミ箱に移動されてからこの日数が経過すると、ノートは完全に削除されます。",
+				"unit": "日"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "ワークスペース名",
+			"update": "更新"
+		},
+		"newNoteTitle": {
+			"title": "新しいノートのタイトル",
+			"description": "新しいノートのタイトルを設定します。{date} や {date:FORMAT}（例: {date:DD/MM/YYYY HH:mm}）の構文で日付を使用できます。",
+			"formatReference": "形式リファレンス",
+			"placeholder": "例: ノート {date:DD/MM/YYYY HH:mm}",
+			"example": "例"
+		},
+		"tagsForNewNote": {
+			"title": "新しいノートのタグ",
+			"none": "タグを設定しない",
+			"selected": "選択中のタグと同じ"
+		},
+		"dangerousZone": {
+			"groupTitle": "危険な操作",
+			"delete": {
+				"label": "ワークスペースと、ノート・タグ・ファイルを含むすべての関連データを削除",
+				"action": "ワークスペースを削除",
+				"cannotDeleteLast": "保管庫内の最後のワークスペースは削除できません。",
+				"createAnother": "作成",
+				"createAnotherSuffix": "してから削除してください。"
+			},
+			"confirmDelete": "ワークスペース「{{name}}」を削除しようとしています。本当に削除しますか？\n\n続行すると、ノート・タグ・ファイルを含むこのワークスペースのすべてのデータが削除されます。"
+		}
+	},
+	"importExport": {
+		"importNotes": "ノートをインポート",
+		"exportNotes": "ノートをエクスポート",
+		"importFromZip": ".zipアーカイブからノートをインポート",
+		"importFromDirectory": "Markdownファイルのディレクトリをインポート",
+		"dropzone": {
+			"title": "Markdownファイルまたは.zipアーカイブをドロップしてインポート",
+			"description": "ここにファイルをドラッグ＆ドロップするか、クリックして選択"
+		},
+		"progress": "ノートのインポート中です。ステージ: {{stage}} {{processed}}/{{total}}"
+	}
+}

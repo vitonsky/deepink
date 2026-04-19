@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Vyberte trezor",
+		"actions": {
+			"createNew": "Vytvořit nový trezor"
+		}
+	},
+	"creator": {
+		"title": "Vytvořit trezor",
+		"field": {
+			"name": {
+				"label": "Název trezoru",
+				"placeholder": "např. Můj trezor, Sdíleno s Alexem",
+				"random": "Vygenerovat náhodný název",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Endpaper",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alcove",
+					"6": "Penumbra",
+					"7": "Měsíční korespondence",
+					"8": "Večerní kartografie",
+					"9": "Lucerna & Inkoust",
+					"10": "Archív při svíčkách",
+					"11": "Manuskripty popínavého břečťanu",
+					"12": "Cédrové dopisy",
+					"13": "Růžové dřevo Scriptorium",
+					"14": "Neomezený kodex",
+					"15": "Marginalia & Šepoty",
+					"16": "Endpaper Vyznání",
+					"17": "Anotované ticho",
+					"18": "Stínová kartografie",
+					"19": "Pamětihodná místnost",
+					"20": "Nepodepsané dopisy",
+					"21": "Šeptané souřadnice",
+					"22": "Nevyprávěný almanach",
+					"23": "Ztracené voskové dopisy",
+					"24": "Neviditelná knihovna",
+					"25": "Neprozkoumané okraje",
+					"26": "Tichá konspirace",
+					"27": "Nedoručená pošta",
+					"28": "Věčně zelený archív",
+					"29": "Papírový měsíc",
+					"30": "Papírový květ",
+					"31": "Noční květ",
+					"32": "Měkký atlas",
+					"33": "Velour",
+					"34": "Inkoustový kámen",
+					"35": "Ticho",
+					"36": "Stín",
+					"37": "Klidný drift",
+					"38": "Hluboká louka",
+					"39": "Nepopsaný účet",
+					"40": "Tichý zápisník",
+					"41": "Nevyslovený archív",
+					"42": "Plovoucí deník",
+					"43": "Kronika slunečního větru",
+					"44": "Tichý fjord",
+					"45": "Fragmenty paměti",
+					"46": "Tichý okamžik",
+					"47": "Zmizelé minuty"
+				}
+			},
+			"password": {
+				"label": "Heslo pro šifrování",
+				"recommended": "(doporučeno)",
+				"placeholder": "Zadejte silné heslo"
+			},
+			"algorithm": {
+				"label": "Šifrovací algoritmus"
+			}
+		},
+		"actions": {
+			"create": "Vytvořit trezor",
+			"continueNoPassword": "Pokračovat bez hesla",
+			"cancel": "Zrušit"
+		},
+		"noEncryptionDialog": {
+			"title": "Vytvořit trezor bez šifrování",
+			"description": "Vaše poznámky a data budou uložena jako prostý text. Jakákoli aplikace nebo osoba s přístupem k adresáři trezoru na disku bude moci přečíst vše uvnitř.",
+			"actions": {
+				"confirm": "Pokračovat bez šifrování",
+				"cancel": "Zrušit"
+			}
+		},
+		"errors": {
+			"nameRequired": "Zadejte název trezoru",
+			"passwordRequired": "Zadejte heslo"
+		}
+	},
+	"login": {
+		"title": "Odemknout trezor",
+		"field": {
+			"password": {
+				"placeholder": "Zadejte heslo"
+			}
+		},
+		"actions": {
+			"unlock": "Odemknout",
+			"changeVault": "Změnit trezor"
+		},
+		"errors": {
+			"cannotOpen": "Nelze otevřít trezor",
+			"invalidPassword": "Neplatné heslo",
+			"passwordRequired": "Zadejte heslo"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Nepodařilo se otevřít trezor",
+		"corrupted": "\"{{name}}\" se zdá být poškozený."
+	}
+}

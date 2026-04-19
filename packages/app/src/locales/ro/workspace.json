@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Taguri",
+			"empty": "Creează taguri pentru a-ți organiza notițele. Ierarhizează-le pentru o structură flexibilă.",
+			"actions": {
+				"add": "Adaugă tag"
+			}
+		},
+		"workspaces": {
+			"label": "Spații de lucru",
+			"actions": {
+				"add": "Adaugă spațiu"
+			}
+		}
+	}
+}

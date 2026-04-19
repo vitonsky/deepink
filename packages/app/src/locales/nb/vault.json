@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Velg hvelv",
+		"actions": {
+			"createNew": "Opprett nytt hvelv"
+		}
+	},
+	"creator": {
+		"title": "Opprett hvelv",
+		"field": {
+			"name": {
+				"label": "Hvelvnavn",
+				"placeholder": "f.eks. Mitt hvelv, Delt med Alex",
+				"random": "Generer tilfeldig navn",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Pergament",
+					"2": "Forsatsblad",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alkove",
+					"6": "Halvskygge",
+					"7": "Månelyst korrespondanse",
+					"8": "Kveldskartografi",
+					"9": "Lykt & blekk",
+					"10": "Levende lys-arkiv",
+					"11": "Villvin-manuskripter",
+					"12": "Sedertre-brev",
+					"13": "Rosentre-skriptorium",
+					"14": "Den ubundne kodeks",
+					"15": "Marginalia & mumling",
+					"16": "Forsatsbladbekjennelser",
+					"17": "Den annoterte stillheten",
+					"18": "Skyggekartografi",
+					"19": "Det erindrende rommet",
+					"20": "De usignerte brevene",
+					"21": "Hviskede koordinater",
+					"22": "Den ufortalte almanakken",
+					"23": "Tapt voks-brev",
+					"24": "Det usynlige biblioteket",
+					"25": "Ukjente marger",
+					"26": "Den stille sammensvergelsen",
+					"27": "Den uleverte posten",
+					"28": "Eviggrønt arkiv",
+					"29": "Papirmåne",
+					"30": "Papirblomst",
+					"31": "Nattblomst",
+					"32": "Mykt atlas",
+					"33": "Velur",
+					"34": "Blekkstein",
+					"35": "Hvisk",
+					"36": "Skygge",
+					"37": "Stille drift",
+					"38": "Dyp eng",
+					"39": "Uskrevet hovedbok",
+					"40": "Stille skissebok",
+					"41": "Uuttalt arkiv",
+					"42": "Drivende journal",
+					"43": "Solvind-krønike",
+					"44": "Stille fjord",
+					"45": "Minnefragmenter",
+					"46": "Stille øyeblikk",
+					"47": "Forsvunne minutter"
+				}
+			},
+			"password": {
+				"label": "Krypteringspassord",
+				"recommended": "(anbefalt)",
+				"placeholder": "Skriv inn et sterkt passord"
+			},
+			"algorithm": {
+				"label": "Krypteringsalgoritme"
+			}
+		},
+		"actions": {
+			"create": "Opprett hvelv",
+			"continueNoPassword": "Fortsett uten passord",
+			"cancel": "Avbryt"
+		},
+		"noEncryptionDialog": {
+			"title": "Opprett hvelv uten kryptering",
+			"description": "Notatene og dataene dine lagres som ren tekst. Alle apper eller personer med tilgang til hvelvets mappe på disken vil kunne lese alt innholdet.",
+			"actions": {
+				"confirm": "Fortsett uten kryptering",
+				"cancel": "Avbryt"
+			}
+		},
+		"errors": {
+			"nameRequired": "Skriv inn et hvelvnavn",
+			"passwordRequired": "Skriv inn passordet"
+		}
+	},
+	"login": {
+		"title": "Lås opp hvelv",
+		"field": {
+			"password": {
+				"placeholder": "Skriv inn passord"
+			}
+		},
+		"actions": {
+			"unlock": "Lås opp",
+			"changeVault": "Bytt hvelv"
+		},
+		"errors": {
+			"cannotOpen": "Kan ikke åpne hvelvet",
+			"invalidPassword": "Feil passord",
+			"passwordRequired": "Skriv inn passord"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Kunne ikke åpne hvelvet",
+		"corrupted": "«{{name}}» ser ut til å være skadet."
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Etiquetes",
+			"empty": "Crea etiquetes per organitzar les teves notes. Agrupa-les en jerarquies flexibles.",
+			"actions": {
+				"add": "Afegir etiqueta"
+			}
+		},
+		"workspaces": {
+			"label": "Espais",
+			"actions": {
+				"add": "Afegir espai"
+			}
+		}
+	}
+}

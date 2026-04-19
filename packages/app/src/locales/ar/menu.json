@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "التطبيق",
+		"quit": "إنهاء",
+		"edit": "تحرير",
+		"undo": "تراجع",
+		"redo": "إعادة",
+		"cut": "قص",
+		"copy": "نسخ",
+		"paste": "لصق",
+		"selectAll": "تحديد الكل",
+		"help": "مساعدة",
+		"toggleDevTools": "أدوات المطوّر",
+		"about": "حول التطبيق"
+	},
+	"tray": {
+		"open": "فتح الملاحظات",
+		"quit": "إنهاء"
+	},
+	"note": {
+		"export": "تصدير...",
+		"duplicate": "تكرار",
+		"copyMarkdownLink": "نسخ رابط Markdown",
+		"deletePermanently": "حذف نهائي",
+		"restoreFromBin": "استعادة من السلة",
+		"deleteToBin": "نقل إلى السلة"
+	},
+	"tag": {
+		"addNestedTag": "إنشاء وسم فرعي...",
+		"edit": "تعديل...",
+		"delete": "حذف"
+	}
+}

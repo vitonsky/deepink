@@ -1,0 +1,347 @@
+import 'dotenv/config';
+
+import chalk from 'chalk';
+import { app, Menu } from 'electron';
+import ms from 'ms';
+import { onExit } from 'signal-exit';
+import { LOCALE_NAMESPACE } from 'src/i18n';
+import { MainWindowAPI, openMainWindow } from 'src/windows/main/main';
+import z from 'zod';
+import { FileController } from '@core/features/files/FileController';
+import { NodeFS } from '@core/features/files/NodeFS';
+import { StateFile } from '@core/features/files/StateFile';
+import { TELEMETRY_EVENT_NAME } from '@core/features/telemetry';
+import { AppVersions } from '@core/features/telemetry/AppVersions';
+import { RybbitTracker } from '@core/features/telemetry/RybbitTracker';
+import { Telemetry } from '@core/features/telemetry/Telemetry';
+import { AppTray } from '@electron/main/AppTray';
+import { serveTelemetry } from '@electron/requests/telemetry/main';
+import { isDevMode } from '@electron/utils/app';
+import { getUserDataPath } from '@electron/utils/files';
+import { openUrlWithExternalBrowser } from '@electron/utils/shell';
+import { getConfig } from '@utils/os/getConfig';
+import { wait } from '@utils/time';
+
+import { getAbout } from '../../about';
+
+import { createAppMenu } from './createAppMenu';
+import { createTelemetrySession } from './createTelemetrySession';
+import { createNodeI18nContext, I18nContext } from './I18nContext';
+
+export type AppContext = {
+	telemetry: Telemetry;
+	i18n: I18nContext;
+};
+
+export class MainProcess {
+	private readonly userDataFs;
+	constructor() {
+		this.userDataFs = new NodeFS({ root: getUserDataPath() });
+	}
+
+	private readonly cleanups = new Set<() => void>();
+	public async start() {
+		// Force app shutdown by OS requests
+		this.cleanups.add(
+			onExit((code, signal) => {
+				console.log('process exited!', code, signal);
+				this.quit();
+			}),
+		);
+
+		// Handle case with Ctrl+C
+		const onBeforeForcedQuit = (evt: { preventDefault: () => void }) => {
+			console.log('App force quit is requested...');
+			evt.preventDefault();
+			this.quit(true);
+		};
+		app.once('before-quit', onBeforeForcedQuit);
+		this.cleanups.add(() => {
+			app.off('before-quit', onBeforeForcedQuit);
+		});
+
+		// TODO: pass arguments when take a lock
+		const gotTheLock = app.requestSingleInstanceLock();
+
+		// Quit instantly if can't get lock
+		if (!gotTheLock) {
+			console.log('Close app because another instance is already opened');
+			app.quit();
+			return;
+		}
+
+		// Init app
+		this.setListeners();
+
+		app.whenReady().then(() => this.onReady());
+	}
+
+	private isQuitInProcess = false;
+	public async quit(force = false) {
+		if (this.isQuitInProcess) return;
+		this.isQuitInProcess = true;
+
+		// Run all cleanups
+		for (const cleanup of this.cleanups) {
+			try {
+				cleanup();
+				this.cleanups.delete(cleanup);
+			} catch (err) {
+				console.warn('Error while run cleanup');
+				console.error(err);
+			}
+		}
+
+		// Close windows
+		if (this.mainWindow) {
+			this.mainWindow.quit();
+			this.mainWindow = null;
+		}
+
+		// Clear context
+		if (this.context) {
+			const { telemetry } = this.context;
+			this.context = null;
+
+			// Track a quit for a non-crash cases
+			if (!force) {
+				// We must ensure the quit will done successfully
+				try {
+					await Promise.race([
+						telemetry.track(TELEMETRY_EVENT_NAME.APP_CLOSED),
+						wait(ms('2s')),
+					]);
+				} catch (error) {
+					// Just report the error and ignore it
+					console.warn(
+						'The error occurs while send the telemetry event while quit the app',
+					);
+					console.error(error);
+				}
+			}
+		}
+
+		if (force) {
+			app.exit();
+		} else {
+			// let windows to shut down gracefully
+			app.quit();
+		}
+	}
+
+	private mainWindow: MainWindowAPI | null = null;
+	private context: {
+		tray: AppTray;
+		telemetry: Telemetry;
+		i18n: I18nContext;
+	} | null = null;
+	private async onReady() {
+		console.log('App ready');
+
+		const i18nState = new StateFile(
+			new FileController('i18n.json', this.userDataFs),
+			z.object({ language: z.string() }),
+			{
+				defaultValue: {
+					language: app.getLocale().split('-')[0],
+				},
+			},
+		);
+		const { language: initLanguage } = await i18nState.get();
+		const i18n = await createNodeI18nContext(initLanguage);
+		i18n.$language.updates.watch((language) => {
+			i18nState.set({ language });
+		});
+
+		// Setup telemetry
+		const telemetry = await this.setupTelemetry();
+
+		telemetry.track(TELEMETRY_EVENT_NAME.APP_OPENED);
+		app.once('window-all-closed', () => this.quit());
+
+		// Init tray
+		const tray = new AppTray({
+			openWindow: () => {
+				this.mainWindow?.openWindow();
+			},
+		});
+		tray.enable();
+		tray.update(
+			Menu.buildFromTemplate([
+				{
+					label: i18n.t('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
+					click: () => this.quit(),
+				},
+			]),
+		);
+
+		this.context = { telemetry, tray, i18n };
+
+		// Install dev tools
+		if (isDevMode()) {
+			console.log('Install dev tools');
+
+			const { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } =
+				await import('electron-devtools-installer');
+
+			await Promise.all(
+				[REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS].map((extension) =>
+					installExtension(extension, {
+						loadExtensionOptions: { allowFileAccess: true },
+					})
+						.then((ext) => console.log(`Added Extension:  ${ext.name}`))
+						.catch((err) => console.log('An error occurred: ', err)),
+				),
+			);
+		}
+
+		// Create main window
+		Menu.setApplicationMenu(createAppMenu({ telemetry, i18n }));
+		this.mainWindow = await openMainWindow({ telemetry, i18n });
+
+		i18n.$language.watch(() => {
+			Menu.setApplicationMenu(createAppMenu({ telemetry, i18n }));
+
+			tray.update(
+				tray.update(
+					Menu.buildFromTemplate([
+						{
+							label: i18n.t('tray.open', { ns: LOCALE_NAMESPACE.menu }),
+							click: () => {
+								this.mainWindow?.openWindow();
+							},
+						},
+						{
+							label: i18n.t('tray.quit', { ns: LOCALE_NAMESPACE.menu }),
+							click: () => this.quit(),
+						},
+					]),
+				),
+			);
+		});
+	}
+
+	private setListeners() {
+		// Handle attempts to open new instance of app
+		app.on(
+			'second-instance',
+			(_event, _commandLine, _workingDirectory, additionalData) => {
+				// Print out data received from the second instance.
+				console.log(
+					'Another app instance just requested a single instance lock',
+					additionalData,
+				);
+
+				// Someone tried to run a second instance, we should focus our window.
+				if (this.mainWindow) {
+					this.mainWindow.openWindow();
+				}
+			},
+		);
+
+		// Open external links in default browser
+		app.on('web-contents-created', (_event, webContents) => {
+			webContents.setWindowOpenHandler(({ url }) => {
+				console.log(
+					'Prevent open new window, and open URL as external link',
+					url,
+				);
+
+				openUrlWithExternalBrowser(url);
+
+				return { action: 'deny' };
+			});
+
+			webContents.on('will-navigate', (event, url) => {
+				if (url !== webContents.getURL()) {
+					console.log(
+						'Prevent navigation in main window, and open URL as external link',
+						url,
+					);
+
+					event.preventDefault();
+					openUrlWithExternalBrowser(url);
+				}
+			});
+		});
+	}
+
+	private async setupTelemetry() {
+		const {
+			telemetry: { enabled: shouldSend, verbose, syncInterval, api },
+		} = getConfig();
+
+		if (verbose) {
+			console.log(chalk.magenta('Telemetry config'), {
+				shouldSend,
+				verbose,
+				syncInterval,
+				api,
+			});
+		}
+
+		const appVersions = new AppVersions(
+			getAbout().version,
+			new FileController('meta/versions.json', this.userDataFs),
+		);
+		const initVersions = await appVersions.getInfo();
+		await appVersions.logVersion();
+
+		const telemetry = new Telemetry(
+			new FileController('meta/telemetry.json', this.userDataFs),
+			new RybbitTracker({
+				apiHost: api.baseURL,
+				siteId: api.appName,
+				filter() {
+					return shouldSend;
+				},
+			}),
+			{
+				contextProps: createTelemetrySession(initVersions),
+				onEventSent(event) {
+					if (verbose) {
+						console.log(chalk.magenta('Telemetry > Event'), event);
+					}
+				},
+			},
+		);
+
+		// Log app installs and updates
+		if (initVersions.isJustInstalled) {
+			telemetry.track(TELEMETRY_EVENT_NAME.APP_INSTALLED);
+		} else if (initVersions.isVersionUpdated) {
+			telemetry.track(TELEMETRY_EVENT_NAME.APP_UPDATED, {
+				previousVersion: initVersions.previousVersion?.version,
+			});
+		}
+
+		serveTelemetry(telemetry);
+
+		// Handle queue in background periodically
+		const runQueueDaemon = async () => {
+			while (true) {
+				const result = await telemetry.handleQueue();
+				if (verbose) {
+					console.log(
+						chalk.magenta(
+							`Telemetry > Handled queued events ${result.processed}/${result.total}`,
+						),
+					);
+				}
+
+				if (result.processed > 0) {
+					await telemetry.track(
+						TELEMETRY_EVENT_NAME.TELEMETRY_QUEUE_PROCESSED,
+						result,
+					);
+				}
+
+				await wait(syncInterval);
+			}
+		};
+
+		runQueueDaemon();
+
+		return telemetry;
+	}
+}

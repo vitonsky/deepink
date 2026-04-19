@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Tạo thẻ",
+					"action": "Tạo"
+				},
+				"edit": {
+					"title": "Chỉnh sửa thẻ",
+					"action": "Lưu"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Tên thẻ",
+					"placeholder": "VD: Ý tưởng"
+				},
+				"parent": {
+					"label": "Thẻ cha",
+					"placeholder": "VD: Công thức/Tráng miệng"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Không thể lưu thay đổi do lỗi không xác định.",
+				"format": "Thẻ không được để trống, không bắt đầu hoặc kết thúc bằng \"/\", và không chứa \"//\".",
+				"duplicate": "Thẻ '{{name}}' đã tồn tại.",
+				"parentTagNotFound": "Không tìm thấy thẻ cha, vui lòng chọn thẻ khác."
+			}
+		},
+		"deletion": {
+			"confirm": "Bạn có chắc muốn xóa thẻ \"{{name}}\" và tất cả thẻ con?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Sổ tay",
+		"creator": {
+			"title": "Tạo không gian mới",
+			"description": "Mỗi không gian là một khu vực riêng biệt cho ghi chú, thẻ và tệp của bạn. Mọi thứ được tách biệt hoàn toàn, nhưng vẫn nằm trong vault được mã hóa — sẵn sàng khi bạn chuyển đổi.",
+			"action": {
+				"add": "Tạo",
+				"cancel": "Hủy"
+			},
+			"field": {
+				"name": {
+					"label": "Tên không gian",
+					"placeholder": "VD: Nhật ký sức khỏe, Ý tưởng kinh doanh",
+					"suggests": {
+						"0": "Tài chính",
+						"1": "Sức khỏe",
+						"2": "Sự nghiệp",
+						"3": "Gia đình",
+						"4": "Nhật ký",
+						"5": "Mục tiêu",
+						"6": "Ý tưởng",
+						"7": "Pháp lý",
+						"8": "Du lịch",
+						"9": "Riêng tư"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+				"format": "Tên không gian không được để trống."
+			}
+		},
+		"error": {
+			"title": "Không thể tải không gian \"{{name}}\"",
+			"description": "Không thể tải không gian này. Dữ liệu có thể đã bị hỏng. Chuyển sang không gian khác hoặc tạo mới để tiếp tục làm việc.",
+			"chooseAnother": "Chọn không gian khác",
+			"dividerText": "hoặc",
+			"createNew": "Tạo không gian mới",
+			"createWorkspace": "Tạo không gian",
+			"closeVault": "Đóng vault hiện tại"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Chưa đặt tên",
+			"defaultTemplate": "Chưa đặt tên - {{date}}",
+			"duplicate": "Bản sao: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Ghi lại ý tưởng, công việc hay suy nghĩ…",
+			"modes": {
+				"plaintext": "Văn bản thuần",
+				"richtext": "Trình soạn thảo",
+				"split-screen": "Chia đôi màn hình"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Thêm vào yêu thích",
+			"removeFromFavorites": "Bỏ khỏi yêu thích",
+			"moveToArchive": "Chuyển vào lưu trữ",
+			"removeFromArchive": "Bỏ khỏi lưu trữ"
+		},
+		"tags": {
+			"addPlaceholder": "Nhập để thêm thẻ…"
+		},
+		"versionPreview": {
+			"versionAt": "Phiên bản lúc {{date}}",
+			"backToEditing": "Quay lại chỉnh sửa"
+		},
+		"menu": {
+			"title": "Tùy chọn ghi chú",
+			"copyReference": "Sao chép liên kết ghi chú",
+			"remindMe": "Nhắc tôi",
+			"history": "Lịch sử",
+			"backLinks": "Liên kết ngược",
+			"readonlyMode": "Chế độ chỉ đọc",
+			"spellcheck": "Kiểm tra chính tả",
+			"export": "Xuất...",
+			"passwordProtection": "Bảo vệ bằng mật khẩu...",
+			"disableSync": "Tắt đồng bộ",
+			"moveToArchive": "Chuyển vào lưu trữ",
+			"removeFromArchive": "Bỏ khỏi lưu trữ",
+			"deleteToBin": "Xóa vào thùng rác",
+			"deletePermanently": "Xóa vĩnh viễn",
+			"restoreFromBin": "Khôi phục từ thùng rác"
+		},
+		"version": {
+			"chars": "{{count}} ký tự",
+			"apply": {
+				"title": "Áp dụng phiên bản",
+				"readonlyTitle": "Không thể áp dụng phiên bản cho ghi chú chỉ đọc"
+			},
+			"open": {
+				"title": "Mở phiên bản"
+			},
+			"delete": {
+				"title": "Xóa phiên bản"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Lưu bản chụp",
+				"title": "Lưu trạng thái hiện tại của ghi chú này thành một phiên bản mới trong lịch sử"
+			},
+			"deleteAll": {
+				"label": "Xóa tất cả",
+				"title": "Xóa vĩnh viễn tất cả phiên bản đã lưu của ghi chú này"
+			},
+			"dontRecord": "Không ghi lịch sử cho ghi chú này",
+			"empty": "Ghi chú này chưa có phiên bản nào",
+			"loading": "Đang tải...",
+			"confirmDeleteAll": {
+				"title": "Xóa tất cả phiên bản",
+				"description": "Thao tác này sẽ xóa vĩnh viễn tất cả phiên bản của ghi chú.",
+				"confirm": "Bạn có chắc chắn không?",
+				"action": "Áp dụng"
+			},
+			"confirmApply": {
+				"title": "Áp dụng phiên bản",
+				"description": "Bạn sắp áp dụng phiên bản {{version}}.",
+				"warning": "Thao tác này sẽ thay thế nội dung ghi chú hiện tại bằng nội dung của bản chụp đã chọn. Bạn có chắc chắn?",
+				"apply": "Áp dụng",
+				"preview": "Xem trước"
+			},
+			"confirmDelete": {
+				"title": "Xóa phiên bản",
+				"description": "Bạn sắp xóa phiên bản {{version}}.",
+				"warning": "Thao tác này sẽ xóa phiên bản ghi chú và không thể hoàn tác. Bạn có chắc chắn?",
+				"delete": "Xóa",
+				"preview": "Xem trước"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Đóng bảng",
+			"tabs": {
+				"history": "Lịch sử phiên bản",
+				"backLinks": "Liên kết ngược",
+				"files": "Tệp đính kèm"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Bạn có muốn chuyển ghi chú này vào thùng rác?",
+			"confirmPermanentDeletion": "Bạn có muốn xóa vĩnh viễn ghi chú này?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Bạn có chắc muốn tải lên {{filesCount}} tệp (tổng cộng {{size}})?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Tìm kiếm..."
+		},
+		"filterBy": "Lọc theo",
+		"empty": "Chưa có ghi chú nào. <create>Tạo ghi chú</create>"
+	},
+	"notesView": {
+		"allNotes": "Tất cả ghi chú",
+		"favorites": "Ghi chú yêu thích",
+		"archived": "Ghi chú lưu trữ",
+		"deleted": "Ghi chú đã xóa"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Chọn một ghi chú để đọc hoặc chỉnh sửa"
+		}
+	},
+	"activityBar": {
+		"newNote": "Ghi chú mới",
+		"files": "Tệp",
+		"reminders": "Nhắc nhở",
+		"extensions": "Tiện ích mở rộng",
+		"inbox": "Hộp thư đến",
+		"publishNotes": "Xuất bản ghi chú",
+		"lockVault": "Khóa vault",
+		"globalSettings": "Cài đặt chung"
+	},
+	"tabBar": {
+		"closeTab": "Đóng tab"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Nhấn để chèn tiêu đề cấp {{level}}. Mở menu ngữ cảnh để chọn tùy chọn khác",
+			"level": "Tiêu đề cấp {{level}}"
+		},
+		"bold": "Bật/tắt chữ đậm",
+		"italic": "Bật/tắt chữ nghiêng",
+		"strikethrough": "Bật/tắt chữ gạch ngang",
+		"unorderedList": "Chèn hoặc bật/tắt danh sách không thứ tự",
+		"checkboxList": "Chèn hoặc bật/tắt danh sách checkbox",
+		"orderedList": "Chèn hoặc bật/tắt danh sách có thứ tự",
+		"codeBlock": "Chèn hoặc bao bọc văn bản bằng khối mã",
+		"quoteBlock": "Chèn hoặc bao bọc văn bản bằng khối trích dẫn",
+		"insertDate": "Chèn ngày",
+		"insertPageBreak": "Chèn ngắt trang",
+		"insertFile": "Chèn tệp",
+		"image": {
+			"buttonTitle": "Chèn hình ảnh",
+			"dialogTitle": "Thêm hình ảnh",
+			"dialogDescription": "Hình ảnh sẽ được chèn tại vị trí con trỏ.",
+			"field": {
+				"url": {
+					"label": "URL hình ảnh",
+					"placeholder": "VD: https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Mô tả hình ảnh (tùy chọn)",
+					"placeholder": "Mô tả ngắn về hình ảnh"
+				}
+			},
+			"actions": {
+				"add": "Thêm",
+				"cancel": "Hủy"
+			}
+		},
+		"link": {
+			"buttonTitle": "Chèn liên kết",
+			"dialogTitle": "Thêm liên kết",
+			"dialogDescription": "Văn bản đã chọn sẽ trở thành liên kết, hoặc liên kết sẽ được thêm tại vị trí con trỏ nếu không có gì được chọn.",
+			"field": {
+				"url": {
+					"label": "URL liên kết",
+					"placeholder": "VD: https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Thêm",
+				"cancel": "Hủy"
+			}
+		}
+	},
+	"image": {
+		"loading": "Đang tải hình ảnh"
+	},
+	"notifications": {
+		"title": "Thông báo"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Cập nhật ứng dụng",
+			"reminderLater": "Lời nhắc sẽ hiển thị lại sau một tuần"
+		},
+		"newVersion": {
+			"title": "Đã có phiên bản mới",
+			"body": "Phiên bản mới đã sẵn sàng. Cập nhật để nhận các cải tiến và bản sửa lỗi mới nhất.",
+			"download": "Tải phiên bản mới",
+			"ignore": "Bỏ qua"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Thuộc tính hình ảnh",
+			"urlLabel": "URL hình ảnh",
+			"altLabel": "Mô tả hình ảnh"
+		},
+		"linkProperties": {
+			"title": "Thuộc tính liên kết",
+			"urlLabel": "URL liên kết"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Nhấn để lưu thay đổi vào ổ đĩa",
+			"saving": "Đang lưu thay đổi..."
+		},
+		"changeVault": "Đổi vault",
+		"history": "Lịch sử",
+		"notifications": "Thông báo"
+	}
+}

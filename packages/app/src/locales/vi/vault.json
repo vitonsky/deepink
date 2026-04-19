@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Chọn vault",
+		"actions": {
+			"createNew": "Tạo vault mới"
+		}
+	},
+	"creator": {
+		"title": "Tạo Vault",
+		"field": {
+			"name": {
+				"label": "Tên vault",
+				"placeholder": "ví dụ: Vault của tôi, Chia sẻ với Alex",
+				"random": "Tạo tên ngẫu nhiên",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Endpaper",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alcove",
+					"6": "Penumbra",
+					"7": "Moonlit Correspondence",
+					"8": "Evening Cartography",
+					"9": "Lantern & Ink",
+					"10": "Candlelit Archive",
+					"11": "Climbing Ivy Manuscripts",
+					"12": "Cedarwood Letters",
+					"13": "Rosewood Scriptorium",
+					"14": "The Unbound Codex",
+					"15": "Marginalia & Murmurs",
+					"16": "Endpaper Confessions",
+					"17": "The Annotated Silence",
+					"18": "Shadow Cartography",
+					"19": "The Remembered Room",
+					"20": "The Unsigned Letters",
+					"21": "Whispered Coordinates",
+					"22": "The Untold Almanac",
+					"23": "Lost Wax Letters",
+					"24": "The Invisible Library",
+					"25": "Uncharted Margins",
+					"26": "The Quiet Conspiracy",
+					"27": "The Undelivered Post",
+					"28": "Evergreen Archive",
+					"29": "Paper Moon",
+					"30": "Paper Bloom",
+					"31": "Night Bloom",
+					"32": "Soft Atlas",
+					"33": "Velour",
+					"34": "Inkstone",
+					"35": "Hush",
+					"36": "Shade",
+					"37": "Calm Drift",
+					"38": "Deep Meadow",
+					"39": "Unwritten Ledger",
+					"40": "Silent Draftbook",
+					"41": "Unspoken Archive",
+					"42": "Drifting Journal",
+					"43": "Solar Wind Chronicle",
+					"44": "Quiet Fjord",
+					"45": "Memory Fragments",
+					"46": "Silent Moment",
+					"47": "Vanished Minutes"
+				}
+			},
+			"password": {
+				"label": "Mật khẩu mã hóa",
+				"recommended": "(khuyên dùng)",
+				"placeholder": "Nhập mật khẩu mạnh"
+			},
+			"algorithm": {
+				"label": "Thuật toán mã hóa"
+			}
+		},
+		"actions": {
+			"create": "Tạo vault",
+			"continueNoPassword": "Tiếp tục không dùng mật khẩu",
+			"cancel": "Hủy"
+		},
+		"noEncryptionDialog": {
+			"title": "Tạo vault không mã hóa",
+			"description": "Ghi chú và dữ liệu sẽ được lưu dưới dạng văn bản thuần. Bất kỳ ứng dụng hoặc người nào có quyền truy cập thư mục vault trên ổ đĩa đều có thể đọc toàn bộ nội dung bên trong.",
+			"actions": {
+				"confirm": "Tiếp tục không mã hóa",
+				"cancel": "Hủy"
+			}
+		},
+		"errors": {
+			"nameRequired": "Nhập tên vault",
+			"passwordRequired": "Nhập mật khẩu"
+		}
+	},
+	"login": {
+		"title": "Mở khóa vault",
+		"field": {
+			"password": {
+				"placeholder": "Nhập mật khẩu"
+			}
+		},
+		"actions": {
+			"unlock": "Mở khóa",
+			"changeVault": "Đổi vault"
+		},
+		"errors": {
+			"cannotOpen": "Không thể mở vault",
+			"invalidPassword": "Mật khẩu không đúng",
+			"passwordRequired": "Nhập mật khẩu"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Không thể mở vault",
+		"corrupted": "\"{{name}}\" có vẻ đã bị hỏng."
+	}
+}

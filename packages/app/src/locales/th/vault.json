@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "เลือก Vault",
+		"actions": {
+			"createNew": "สร้าง Vault ใหม่"
+		}
+	},
+	"creator": {
+		"title": "สร้าง Vault",
+		"field": {
+			"name": {
+				"label": "ชื่อ Vault",
+				"placeholder": "เช่น Vault ของฉัน, แชร์กับ Alex",
+				"random": "สุ่มชื่อ",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Endpaper",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alcove",
+					"6": "Penumbra",
+					"7": "Moonlit Correspondence",
+					"8": "Evening Cartography",
+					"9": "Lantern & Ink",
+					"10": "Candlelit Archive",
+					"11": "Climbing Ivy Manuscripts",
+					"12": "Cedarwood Letters",
+					"13": "Rosewood Scriptorium",
+					"14": "The Unbound Codex",
+					"15": "Marginalia & Murmurs",
+					"16": "Endpaper Confessions",
+					"17": "The Annotated Silence",
+					"18": "Shadow Cartography",
+					"19": "The Remembered Room",
+					"20": "The Unsigned Letters",
+					"21": "Whispered Coordinates",
+					"22": "The Untold Almanac",
+					"23": "Lost Wax Letters",
+					"24": "The Invisible Library",
+					"25": "Uncharted Margins",
+					"26": "The Quiet Conspiracy",
+					"27": "The Undelivered Post",
+					"28": "Evergreen Archive",
+					"29": "Paper Moon",
+					"30": "Paper Bloom",
+					"31": "Night Bloom",
+					"32": "Soft Atlas",
+					"33": "Velour",
+					"34": "Inkstone",
+					"35": "Hush",
+					"36": "Shade",
+					"37": "Calm Drift",
+					"38": "Deep Meadow",
+					"39": "Unwritten Ledger",
+					"40": "Silent Draftbook",
+					"41": "Unspoken Archive",
+					"42": "Drifting Journal",
+					"43": "Solar Wind Chronicle",
+					"44": "Quiet Fjord",
+					"45": "Memory Fragments",
+					"46": "Silent Moment",
+					"47": "Vanished Minutes"
+				}
+			},
+			"password": {
+				"label": "รหัสผ่านเข้ารหัส",
+				"recommended": "(แนะนำ)",
+				"placeholder": "ตั้งรหัสผ่านที่คาดเดายาก"
+			},
+			"algorithm": {
+				"label": "อัลกอริทึมการเข้ารหัส"
+			}
+		},
+		"actions": {
+			"create": "สร้าง Vault",
+			"continueNoPassword": "ดำเนินการต่อโดยไม่ตั้งรหัสผ่าน",
+			"cancel": "ยกเลิก"
+		},
+		"noEncryptionDialog": {
+			"title": "สร้าง Vault โดยไม่เข้ารหัส",
+			"description": "โน้ตและข้อมูลของคุณจะถูกจัดเก็บเป็นข้อความธรรมดา แอปหรือบุคคลใดก็ตามที่เข้าถึงโฟลเดอร์ของ Vault บนดิสก์ได้ จะสามารถอ่านข้อมูลทั้งหมดภายในได้",
+			"actions": {
+				"confirm": "ดำเนินการต่อโดยไม่เข้ารหัส",
+				"cancel": "ยกเลิก"
+			}
+		},
+		"errors": {
+			"nameRequired": "กรุณาตั้งชื่อ Vault",
+			"passwordRequired": "กรุณาใส่รหัสผ่าน"
+		}
+	},
+	"login": {
+		"title": "ปลดล็อก Vault",
+		"field": {
+			"password": {
+				"placeholder": "ใส่รหัสผ่าน"
+			}
+		},
+		"actions": {
+			"unlock": "ปลดล็อก",
+			"changeVault": "เปลี่ยน Vault"
+		},
+		"errors": {
+			"cannotOpen": "ไม่สามารถเปิด Vault ได้",
+			"invalidPassword": "รหัสผ่านไม่ถูกต้อง",
+			"passwordRequired": "กรุณาใส่รหัสผ่าน"
+		}
+	},
+	"errors": {
+		"failedToOpen": "ไม่สามารถเปิด Vault ได้",
+		"corrupted": "\"{{name}}\" อาจเสียหาย"
+	}
+}

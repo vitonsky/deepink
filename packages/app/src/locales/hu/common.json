@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Mégse",
+		"confirm": "Megerősítés",
+		"apply": "Alkalmaz",
+		"save": "Mentés",
+		"saveChanges": "Módosítások mentése",
+		"delete": "Törlés",
+		"reset": "Visszaállítás",
+		"update": "Frissítés",
+		"add": "Hozzáadás",
+		"create": "Létrehozás",
+		"close": "Bezárás"
+	},
+	"form": {
+		"suggestTemplate": "Próbáld ezt: <suggests>"
+	}
+}

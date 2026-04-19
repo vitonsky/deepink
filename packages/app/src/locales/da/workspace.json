@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tags",
+			"empty": "Opret tags for at organisere dine noter. Byg en fleksibel struktur med undertags.",
+			"actions": {
+				"add": "Tilføj tag"
+			}
+		},
+		"workspaces": {
+			"label": "Områder",
+			"actions": {
+				"add": "Tilføj område"
+			}
+		}
+	}
+}

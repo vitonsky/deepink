@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tagit",
+			"empty": "Luo tageja muistiinpanojen järjestämiseen. Rakenna niistä hierarkia tarpeidesi mukaan.",
+			"actions": {
+				"add": "Lisää tagi"
+			}
+		},
+		"workspaces": {
+			"label": "Työtilat",
+			"actions": {
+				"add": "Lisää työtila"
+			}
+		}
+	}
+}

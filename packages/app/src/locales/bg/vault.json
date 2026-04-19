@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Изберете хранилище",
+		"actions": {
+			"createNew": "Създаване на ново хранилище"
+		}
+	},
+	"creator": {
+		"title": "Създаване на хранилище",
+		"field": {
+			"name": {
+				"label": "Име на хранилището",
+				"placeholder": "напр. Моето хранилище, Споделено с Алекс",
+				"random": "Генериране на произволно име",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Endpaper",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Alcove",
+					"6": "Penumbra",
+					"7": "Moonlit Correspondence",
+					"8": "Evening Cartography",
+					"9": "Lantern & Ink",
+					"10": "Candlelit Archive",
+					"11": "Climbing Ivy Manuscripts",
+					"12": "Cedarwood Letters",
+					"13": "Rosewood Scriptorium",
+					"14": "The Unbound Codex",
+					"15": "Marginalia & Murmurs",
+					"16": "Endpaper Confessions",
+					"17": "The Annotated Silence",
+					"18": "Shadow Cartography",
+					"19": "The Remembered Room",
+					"20": "The Unsigned Letters",
+					"21": "Whispered Coordinates",
+					"22": "The Untold Almanac",
+					"23": "Lost Wax Letters",
+					"24": "The Invisible Library",
+					"25": "Uncharted Margins",
+					"26": "The Quiet Conspiracy",
+					"27": "The Undelivered Post",
+					"28": "Evergreen Archive",
+					"29": "Paper Moon",
+					"30": "Paper Bloom",
+					"31": "Night Bloom",
+					"32": "Soft Atlas",
+					"33": "Velour",
+					"34": "Inkstone",
+					"35": "Hush",
+					"36": "Shade",
+					"37": "Calm Drift",
+					"38": "Deep Meadow",
+					"39": "Unwritten Ledger",
+					"40": "Silent Draftbook",
+					"41": "Unspoken Archive",
+					"42": "Drifting Journal",
+					"43": "Solar Wind Chronicle",
+					"44": "Quiet Fjord",
+					"45": "Memory Fragments",
+					"46": "Silent Moment",
+					"47": "Vanished Minutes"
+				}
+			},
+			"password": {
+				"label": "Парола за криптиране",
+				"recommended": "(препоръчително)",
+				"placeholder": "Въведете силна парола"
+			},
+			"algorithm": {
+				"label": "Алгоритъм за криптиране"
+			}
+		},
+		"actions": {
+			"create": "Създаване на хранилище",
+			"continueNoPassword": "Продължаване без парола",
+			"cancel": "Отказ"
+		},
+		"noEncryptionDialog": {
+			"title": "Създаване на хранилище без криптиране",
+			"description": "Бележките и данните ви ще се съхраняват като обикновен текст. Всяко приложение или лице с достъп до папката на хранилището ще може да прочете съдържанието му.",
+			"actions": {
+				"confirm": "Продължаване без криптиране",
+				"cancel": "Отказ"
+			}
+		},
+		"errors": {
+			"nameRequired": "Въведете име на хранилището",
+			"passwordRequired": "Въведете парола"
+		}
+	},
+	"login": {
+		"title": "Отключване на хранилище",
+		"field": {
+			"password": {
+				"placeholder": "Въведете парола"
+			}
+		},
+		"actions": {
+			"unlock": "Отключване",
+			"changeVault": "Смяна на хранилище"
+		},
+		"errors": {
+			"cannotOpen": "Хранилището не може да бъде отворено",
+			"invalidPassword": "Невалидна парола",
+			"passwordRequired": "Въведете парола"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Хранилището не може да бъде отворено",
+		"corrupted": "\"{{name}}\" изглежда повредено."
+	}
+}

@@ -1,0 +1,33 @@
+{
+	"app": {
+		"appMenu": "Aplicação",
+		"quit": "Sair",
+		"edit": "Editar",
+		"undo": "Desfazer",
+		"redo": "Refazer",
+		"cut": "Cortar",
+		"copy": "Copiar",
+		"paste": "Colar",
+		"selectAll": "Selecionar tudo",
+		"help": "Ajuda",
+		"toggleDevTools": "Alternar ferramentas de desenvolvimento",
+		"about": "Sobre a aplicação"
+	},
+	"tray": {
+		"open": "Abrir notas",
+		"quit": "Sair"
+	},
+	"note": {
+		"export": "Exportar...",
+		"duplicate": "Duplicar",
+		"copyMarkdownLink": "Copiar link Markdown",
+		"deletePermanently": "Eliminar permanentemente",
+		"restoreFromBin": "Restaurar do lixo",
+		"deleteToBin": "Mover para o lixo"
+	},
+	"tag": {
+		"addNestedTag": "Criar subtag...",
+		"edit": "Editar...",
+		"delete": "Eliminar"
+	}
+}

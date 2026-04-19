@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Avbryt",
+		"confirm": "Bekräfta",
+		"apply": "Tillämpa",
+		"save": "Spara",
+		"saveChanges": "Spara ändringar",
+		"delete": "Radera",
+		"reset": "Återställ",
+		"update": "Uppdatera",
+		"add": "Lägg till",
+		"create": "Skapa",
+		"close": "Stäng"
+	},
+	"form": {
+		"suggestTemplate": "Prova det här: <suggests>"
+	}
+}

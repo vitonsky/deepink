@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Criar etiqueta",
+					"action": "Criar"
+				},
+				"edit": {
+					"title": "Editar etiqueta",
+					"action": "Guardar"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Nome da etiqueta",
+					"placeholder": "ex.: Ideias"
+				},
+				"parent": {
+					"label": "Etiqueta superior",
+					"placeholder": "ex.: Receitas/Sobremesas"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Não foi possível guardar as alterações devido a um erro desconhecido.",
+				"format": "A etiqueta não pode estar vazia, começar ou terminar com \"/\", nem conter \"//\".",
+				"duplicate": "A etiqueta '{{name}}' já existe.",
+				"parentTagNotFound": "Etiqueta superior não encontrada. Selecione outra etiqueta."
+			}
+		},
+		"deletion": {
+			"confirm": "Tem a certeza de que pretende eliminar a etiqueta \"{{name}}\" e todas as sub-etiquetas?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Caderno",
+		"creator": {
+			"title": "Criar novo espaço",
+			"description": "Cada espaço é um ambiente independente para as suas notas, etiquetas e ficheiros. Tudo permanece separado, mas dentro do seu cofre encriptado — pronto quando precisar.",
+			"action": {
+				"add": "Criar",
+				"cancel": "Cancelar"
+			},
+			"field": {
+				"name": {
+					"label": "Nome do espaço",
+					"placeholder": "ex.: Diário de Saúde, Ideias de Negócio",
+					"suggests": {
+						"0": "Finanças",
+						"1": "Saúde",
+						"2": "Carreira",
+						"3": "Família",
+						"4": "Diário",
+						"5": "Objetivos",
+						"6": "Ideias",
+						"7": "Jurídico",
+						"8": "Viagens",
+						"9": "Privado"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Ocorreu um erro desconhecido. Tente novamente.",
+				"format": "O nome do espaço não pode estar vazio."
+			}
+		},
+		"error": {
+			"title": "Não foi possível carregar o espaço \"{{name}}\"",
+			"description": "Não foi possível carregar este espaço. Os dados podem estar corrompidos. Mude para outro espaço ou crie um novo para continuar a trabalhar.",
+			"chooseAnother": "Escolher outro espaço",
+			"dividerText": "ou",
+			"createNew": "Criar um novo espaço",
+			"createWorkspace": "Criar espaço",
+			"closeVault": "Fechar cofre atual"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Sem título",
+			"defaultTemplate": "Sem título - {{date}}",
+			"duplicate": "Duplicado: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Escreva uma ideia, tarefa ou pensamento…",
+			"modes": {
+				"plaintext": "Modo texto",
+				"richtext": "Editor formatado",
+				"split-screen": "Ecrã dividido"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Adicionar aos favoritos",
+			"removeFromFavorites": "Remover dos favoritos",
+			"moveToArchive": "Mover para o arquivo",
+			"removeFromArchive": "Remover do arquivo"
+		},
+		"tags": {
+			"addPlaceholder": "Escreva para adicionar etiqueta…"
+		},
+		"versionPreview": {
+			"versionAt": "Versão de {{date}}",
+			"backToEditing": "Voltar à edição"
+		},
+		"menu": {
+			"title": "Opções da nota",
+			"copyReference": "Copiar ligação da nota",
+			"remindMe": "Lembrar-me",
+			"history": "Histórico",
+			"backLinks": "Ligações de retorno",
+			"readonlyMode": "Modo de leitura",
+			"spellcheck": "Verificação ortográfica",
+			"export": "Exportar...",
+			"passwordProtection": "Proteção por palavra-passe...",
+			"disableSync": "Desativar sincronização",
+			"moveToArchive": "Mover para o arquivo",
+			"removeFromArchive": "Remover do arquivo",
+			"deleteToBin": "Mover para o lixo",
+			"deletePermanently": "Eliminar permanentemente",
+			"restoreFromBin": "Restaurar do lixo"
+		},
+		"version": {
+			"chars": "{{count}} caracteres",
+			"apply": {
+				"title": "Aplicar versão",
+				"readonlyTitle": "Não é possível aplicar a versão numa nota de leitura"
+			},
+			"open": {
+				"title": "Abrir versão"
+			},
+			"delete": {
+				"title": "Eliminar versão"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Guardar instantâneo",
+				"title": "Guardar o estado atual desta nota como uma nova versão no histórico"
+			},
+			"deleteAll": {
+				"label": "Eliminar tudo",
+				"title": "Eliminar permanentemente todas as versões guardadas desta nota"
+			},
+			"dontRecord": "Não registar histórico para esta nota",
+			"empty": "Esta nota não tem versões registadas",
+			"loading": "A carregar...",
+			"confirmDeleteAll": {
+				"title": "Eliminar todas as versões da nota",
+				"description": "Esta ação irá eliminar permanentemente todas as versões da nota.",
+				"confirm": "Tem a certeza?",
+				"action": "Aplicar"
+			},
+			"confirmApply": {
+				"title": "Aplicar versão da nota",
+				"description": "Está prestes a aplicar a versão {{version}} da nota.",
+				"warning": "Esta ação irá substituir o conteúdo atual da nota pelo texto do instantâneo selecionado. Tem a certeza?",
+				"apply": "Aplicar",
+				"preview": "Pré-visualizar"
+			},
+			"confirmDelete": {
+				"title": "Eliminar versão da nota",
+				"description": "Está prestes a eliminar a versão {{version}} da nota.",
+				"warning": "Esta ação irá eliminar a versão da nota de forma irreversível. Tem a certeza?",
+				"delete": "Eliminar",
+				"preview": "Pré-visualizar"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Fechar painel",
+			"tabs": {
+				"history": "Versões da nota",
+				"backLinks": "Ligações de retorno",
+				"files": "Ficheiros anexados"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Pretende mover esta nota para o lixo?",
+			"confirmPermanentDeletion": "Pretende eliminar permanentemente esta nota?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Tem a certeza de que pretende carregar {{filesCount}} ficheiros ({{size}} no total)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Pesquisar..."
+		},
+		"filterBy": "Filtrar por",
+		"empty": "Ainda não há notas aqui. <create>Criar uma nota</create>"
+	},
+	"notesView": {
+		"allNotes": "Todas as notas",
+		"favorites": "Notas favoritas",
+		"archived": "Notas arquivadas",
+		"deleted": "Notas eliminadas"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Selecione uma nota para ler ou editar"
+		}
+	},
+	"activityBar": {
+		"newNote": "Nova nota",
+		"files": "Ficheiros",
+		"reminders": "Lembretes",
+		"extensions": "Extensões",
+		"inbox": "Caixa de entrada",
+		"publishNotes": "Publicar notas",
+		"lockVault": "Bloquear cofre",
+		"globalSettings": "Definições gerais"
+	},
+	"tabBar": {
+		"closeTab": "Fechar separador"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Clique para inserir cabeçalho de nível {{level}}. Abra o menu de contexto para escolher outra opção",
+			"level": "Cabeçalho nível {{level}}"
+		},
+		"bold": "Alternar estilo negrito",
+		"italic": "Alternar estilo itálico",
+		"strikethrough": "Alternar estilo rasurado",
+		"unorderedList": "Inserir ou alternar lista não ordenada",
+		"checkboxList": "Inserir ou alternar lista de verificação",
+		"orderedList": "Inserir ou alternar lista ordenada",
+		"codeBlock": "Inserir ou envolver texto com bloco de código",
+		"quoteBlock": "Inserir ou envolver texto com bloco de citação",
+		"insertDate": "Inserir data",
+		"insertPageBreak": "Inserir quebra de página",
+		"insertFile": "Inserir ficheiro",
+		"image": {
+			"buttonTitle": "Inserir imagem",
+			"dialogTitle": "Adicionar imagem",
+			"dialogDescription": "A imagem será inserida na posição do cursor.",
+			"field": {
+				"url": {
+					"label": "URL da imagem",
+					"placeholder": "ex.: https://exemplo.com/imagem.png"
+				},
+				"altText": {
+					"label": "Texto alternativo da imagem (opcional)",
+					"placeholder": "Breve descrição da imagem"
+				}
+			},
+			"actions": {
+				"add": "Adicionar",
+				"cancel": "Cancelar"
+			}
+		},
+		"link": {
+			"buttonTitle": "Inserir ligação",
+			"dialogTitle": "Adicionar ligação",
+			"dialogDescription": "O texto selecionado será convertido em ligação, ou a ligação será adicionada na posição do cursor se nada estiver selecionado.",
+			"field": {
+				"url": {
+					"label": "URL da ligação",
+					"placeholder": "ex.: https://exemplo.com"
+				}
+			},
+			"actions": {
+				"add": "Adicionar",
+				"cancel": "Cancelar"
+			}
+		}
+	},
+	"image": {
+		"loading": "A carregar imagem"
+	},
+	"notifications": {
+		"title": "Notificações"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Atualização da aplicação",
+			"reminderLater": "O lembrete será mostrado daqui a uma semana"
+		},
+		"newVersion": {
+			"title": "Nova versão disponível",
+			"body": "Está disponível uma nova versão. Atualize para obter as últimas melhorias e correções.",
+			"download": "Transferir nova versão",
+			"ignore": "Ignorar"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Propriedades da imagem",
+			"urlLabel": "URL da imagem",
+			"altLabel": "Texto alternativo da imagem"
+		},
+		"linkProperties": {
+			"title": "Propriedades da ligação",
+			"urlLabel": "URL da ligação"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Clique para guardar as alterações no disco",
+			"saving": "A guardar alterações..."
+		},
+		"changeVault": "Mudar de cofre",
+		"history": "Histórico",
+		"notifications": "Notificações"
+	}
+}

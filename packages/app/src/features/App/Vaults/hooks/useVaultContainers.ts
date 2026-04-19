@@ -1,0 +1,227 @@
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useUnit } from 'effector-react';
+import { LOCALE_NAMESPACE } from 'src/i18n';
+import { ManagedDatabase } from '@core/database/ManagedDatabase';
+import { SQLiteDB } from '@core/database/sqlite';
+import { openSQLite } from '@core/database/sqlite/openSQLite';
+import { EncryptionController } from '@core/encryption/EncryptionController';
+import { PlaceholderEncryptionController } from '@core/encryption/PlaceholderEncryptionController';
+import { base64ToBytes } from '@core/encryption/utils/encoding';
+import { deriveBitsFromPassword, KEY_SALT_BYTES } from '@core/encryption/utils/keys';
+import { createEncryption } from '@core/features/encryption/createEncryption';
+import { IFilesStorage } from '@core/features/files';
+import { EncryptedFS } from '@core/features/files/EncryptedFS';
+import { FileController } from '@core/features/files/FileController';
+import { RootedFS } from '@core/features/files/RootedFS';
+import { WorkspacesController } from '@core/features/workspaces/WorkspacesController';
+import { VaultObject } from '@core/storage/VaultsManager';
+import { useFilesStorage } from '@features/files';
+import { DisposableBox } from '@utils/disposable';
+
+import { createVaultsApi, VaultEntry } from './vaults';
+
+export type VaultContainer = {
+	vault: VaultEntry;
+	db: ManagedDatabase<SQLiteDB>;
+	encryptionController: EncryptionController;
+	files: IFilesStorage;
+};
+
+const decryptKey = async ({
+	encryptedKey,
+	password,
+	salt,
+	algorithm,
+}: {
+	encryptedKey: ArrayBuffer;
+	password: string;
+	salt: Uint8Array<ArrayBuffer>;
+	algorithm: string;
+}) => {
+	const keyPassword = await deriveBitsFromPassword(password, salt);
+	const encryption = await createEncryption({
+		key: keyPassword,
+		salt: new Uint8Array(encryptedKey).slice(0, KEY_SALT_BYTES),
+		algorithm,
+	});
+
+	return encryption
+		.getContent()
+		.decrypt(encryptedKey.slice(KEY_SALT_BYTES))
+		.finally(() => {
+			encryption.dispose();
+		})
+		.then((buffer) => new Uint8Array(buffer));
+};
+
+export const enum VaultOpenErrorCode {
+	INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
+	KEY_FILE_NOT_FOUND = 'KEY_FILE_NOT_FOUND',
+}
+export class VaultOpenError extends Error {
+	constructor(
+		public readonly code: VaultOpenErrorCode,
+		message: string,
+		options?: ErrorOptions,
+	) {
+		super(message, options);
+		this.name = 'VaultOpenError';
+	}
+}
+
+// TODO: cover with tests to ensure we can decrypt exists vault
+/**
+ * Hook to manage active and opened vaults
+ */
+export const useVaultContainers = () => {
+	const { t } = useTranslation(LOCALE_NAMESPACE.features);
+
+	const [{ $vaults, $activeVault, ...api }] = useState(() =>
+		createVaultsApi<DisposableBox<VaultContainer>>(),
+	);
+
+	const vaults = useUnit($vaults);
+	const activeVault = useUnit($activeVault);
+
+	const files = useFilesStorage();
+
+	const { vaultOpened, activeVaultChanged } = api.events;
+	const openVault = useCallback(
+		async (
+			{ vault, password }: { vault: VaultObject; password?: string },
+			changeActiveVault = false,
+		) => {
+			const cleanups: (() => void)[] = [];
+
+			const runCleanups = async () => {
+				// TODO: remove key of RAM. Set control with callback to remove key
+				// LIFO cleanup: last added cleanup runs first
+				for (const cleanup of [...cleanups].reverse()) {
+					try {
+						// TODO: set deadline for awaiting
+						await cleanup();
+					} catch (error) {
+						console.error(error);
+					}
+				}
+			};
+
+			try {
+				const vaultFilesController = new RootedFS(files, `/vaults/${vault.id}`);
+
+				// Setup encryption
+				let encryptionController: EncryptionController;
+
+				if (vault.encryption === null) {
+					encryptionController = new EncryptionController(
+						new PlaceholderEncryptionController(),
+					);
+				} else {
+					if (password === undefined)
+						throw new VaultOpenError(
+							VaultOpenErrorCode.INCORRECT_PASSWORD,
+							'Empty password for encrypted vault',
+						);
+
+					const encryptedKeyBuffer = await vaultFilesController.get('key');
+					if (!encryptedKeyBuffer) {
+						throw new VaultOpenError(
+							VaultOpenErrorCode.KEY_FILE_NOT_FOUND,
+							'Key file is not found in vault directory',
+						);
+					}
+
+					const salt = new Uint8Array(base64ToBytes(vault.encryption.salt));
+					let key;
+					try {
+						key = await decryptKey({
+							encryptedKey: encryptedKeyBuffer,
+							password,
+							salt,
+							algorithm: vault.encryption.algorithm,
+						});
+					} catch (error) {
+						throw new VaultOpenError(
+							VaultOpenErrorCode.INCORRECT_PASSWORD,
+							'Failed to decrypt the key',
+							{ cause: error },
+						);
+					}
+
+					const encryption = await createEncryption({
+						key,
+						salt: new Uint8Array(encryptedKeyBuffer).slice(KEY_SALT_BYTES),
+						algorithm: vault.encryption.algorithm,
+					});
+
+					cleanups.push(() => encryption.dispose());
+					encryptionController = encryption.getContent();
+				}
+
+				const encryptedVaultFS = new EncryptedFS(
+					vaultFilesController,
+					encryptionController,
+				);
+
+				// Setup DB
+				const db = await openSQLite(
+					new FileController('vault.db', encryptedVaultFS),
+				);
+
+				cleanups.push(() => db.close());
+
+				// Ensure at least one workspace exists
+				const workspaces = new WorkspacesController(db);
+				const isWorkspacesExists = await workspaces
+					.getList()
+					.then((workspaces) => workspaces.length > 0);
+				if (!isWorkspacesExists) {
+					await workspaces.create({ name: t('workspace.defaultName') });
+
+					// Sync to avoid losing the default workspace if the app closes before the automatic sync
+					await db.sync();
+				}
+
+				const vaultEntry: VaultEntry = {
+					id: vault.id,
+					name: vault.name,
+					isEncrypted: vault.encryption !== null,
+				};
+
+				const newVault = new DisposableBox(
+					{
+						db,
+						vault: vaultEntry,
+						encryptionController,
+						files: encryptedVaultFS,
+					} satisfies VaultContainer,
+					runCleanups,
+				);
+
+				vaultOpened(newVault);
+
+				if (changeActiveVault) {
+					activeVaultChanged(newVault);
+				}
+
+				return newVault;
+			} catch (error) {
+				// Close all resources if opening the vault fails
+				await runCleanups();
+
+				throw error;
+			}
+		},
+		[activeVaultChanged, files, vaultOpened, t],
+	);
+
+	return {
+		activeVault,
+		vaults,
+		...api,
+		openVault,
+	};
+};
+
+export type VaultsApi = ReturnType<typeof useVaultContainers>;

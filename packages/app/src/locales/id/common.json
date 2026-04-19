@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Batal",
+		"confirm": "Konfirmasi",
+		"apply": "Terapkan",
+		"save": "Simpan",
+		"saveChanges": "Simpan perubahan",
+		"delete": "Hapus",
+		"reset": "Atur ulang",
+		"update": "Perbarui",
+		"add": "Tambah",
+		"create": "Buat",
+		"close": "Tutup"
+	},
+	"form": {
+		"suggestTemplate": "Coba ini: <suggests>"
+	}
+}

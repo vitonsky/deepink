@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Válasszon egy tárolót",
+		"actions": {
+			"createNew": "Új tároló létrehozása"
+		}
+	},
+	"creator": {
+		"title": "Tároló létrehozása",
+		"field": {
+			"name": {
+				"label": "Tároló neve",
+				"placeholder": "pl., Az én tárolóm, Megosztva Alexszel",
+				"random": "Véletlenszerű név generálása",
+				"suggests": {
+					"0": "Marginalia",
+					"1": "Vellum",
+					"2": "Endpaper",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Fülke",
+					"6": "Penumbra",
+					"7": "Holdfényes Korrespondencia",
+					"8": "Esti Térképészet",
+					"9": "Lámpás & Tinta",
+					"10": "Gyertyafényes Archívum",
+					"11": "Felfelé Mászó Borítékok",
+					"12": "Cédrusfa Levelek",
+					"13": "Rózsafa Írószoba",
+					"14": "A Kötetlen Kódex",
+					"15": "Marginalia & Suttogások",
+					"16": "Endpaper Vallomások",
+					"17": "A Megjegyzett Csend",
+					"18": "Árnyék Térképészet",
+					"19": "A Megemlékezett Szoba",
+					"20": "A Nem Aláírt Levelek",
+					"21": "Suttogott Koordináták",
+					"22": "A Meg nem Írt Almanach",
+					"23": "Elveszett Viasszal Írt Levelek",
+					"24": "A Láthatatlan Könyvtár",
+					"25": "Felfedezetlen Margók",
+					"26": "A Csendes Összeesküvés",
+					"27": "A Meg nem Kézbesített Posta",
+					"28": "Örökzöld Archívum",
+					"29": "Papír Hold",
+					"30": "Papír Virág",
+					"31": "Éjjeli Virág",
+					"32": "Puha Atlasz",
+					"33": "Velúr",
+					"34": "Tinta Kő",
+					"35": "Csend",
+					"36": "Árnyék",
+					"37": "Nyugodt Áramlás",
+					"38": "Mély Rét",
+					"39": "Meg nem Írt Könyvelés",
+					"40": "Csendes Vázlatfüzet",
+					"41": "Meg nem Szólalt Archívum",
+					"42": "Lebegő Napló",
+					"43": "Napfúvás Krónika",
+					"44": "Csendes Fjord",
+					"45": "Emlékezet Törmelékek",
+					"46": "Csendes Pillanat",
+					"47": "Eltűnt Percek"
+				}
+			},
+			"password": {
+				"label": "Titkosítási jelszó",
+				"recommended": "(ajánlott)",
+				"placeholder": "Írjon be egy erős jelszót"
+			},
+			"algorithm": {
+				"label": "Titkosítási algoritmus"
+			}
+		},
+		"actions": {
+			"create": "Tároló létrehozása",
+			"continueNoPassword": "Folytatás jelszó nélkül",
+			"cancel": "Mégse"
+		},
+		"noEncryptionDialog": {
+			"title": "Tároló létrehozása titkosítás nélkül",
+			"description": "A jegyzetei és adatai sima szövegként lesznek tárolva. Bármely alkalmazás vagy személy, aki hozzáfér a tároló könyvtárához a lemezen, olvasni tudja az összes benne lévőt.",
+			"actions": {
+				"confirm": "Folytatás titkosítás nélkül",
+				"cancel": "Mégse"
+			}
+		},
+		"errors": {
+			"nameRequired": "Adja meg a tároló nevét",
+			"passwordRequired": "Adja meg a jelszót"
+		}
+	},
+	"login": {
+		"title": "Tároló feloldása",
+		"field": {
+			"password": {
+				"placeholder": "Adja meg a jelszót"
+			}
+		},
+		"actions": {
+			"unlock": "Feloldás",
+			"changeVault": "Tároló megváltoztatása"
+		},
+		"errors": {
+			"cannotOpen": "Nem lehet megnyitni a tárolót",
+			"invalidPassword": "Érvénytelen jelszó",
+			"passwordRequired": "Adja meg a jelszót"
+		}
+	},
+	"errors": {
+		"failedToOpen": "A tároló megnyitása nem sikerült",
+		"corrupted": "\"{{name}}\" sérültnek tűnik."
+	}
+}

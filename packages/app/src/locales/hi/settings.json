@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "प्राथमिकताएँ"
+	},
+	"tabs": {
+		"general": "सामान्य",
+		"appearance": "दिखावट",
+		"hotkeys": "शॉर्टकट",
+		"vault": "Vault",
+		"workspace": "Workspace",
+		"importExport": "आयात और निर्यात",
+		"vaultSettingsGroup": "Vault सेटिंग्स"
+	},
+	"general": {
+		"title": "सामान्य सेटिंग्स",
+		"subtitle": "ऐप की सामान्य प्राथमिकताएँ प्रबंधित करें।",
+		"version": {
+			"title": "संस्करण",
+			"checkForUpdates": "अपडेट जाँचें",
+			"upToDate": "आप नवीनतम संस्करण पर हैं",
+			"newVersionAvailable": "नया संस्करण <bold>{{version}}</bold> उपलब्ध है।",
+			"downloadLatest": "डाउनलोड करें",
+			"downloadDescription": "नई सुविधाएँ और सुधार पाने के लिए नवीनतम संस्करण डाउनलोड करें।"
+		},
+		"autoCheckUpdates": {
+			"label": "स्वचालित अपडेट जाँच",
+			"description": "ऐप समय-समय पर अपडेट जाँचेगा और नया संस्करण उपलब्ध होने पर सूचित करेगा।"
+		},
+		"language": {
+			"title": "भाषा",
+			"description": "प्रदर्शन भाषा बदलें।"
+		},
+		"notifications": {
+			"title": "सूचनाएँ",
+			"description": "सिस्टम सूचनाएँ केवल रिमाइंडर के लिए उपयोग होंगी। बंद करने पर, रिमाइंडर केवल ऐप की सूचना सूची में दिखेंगे।",
+			"useSystem": "सिस्टम सूचनाएँ उपयोग करें"
+		},
+		"vaultLock": {
+			"groupTitle": "Vault लॉक",
+			"lockOnSystemLock": {
+				"label": "सिस्टम लॉक होने पर Vault लॉक करें",
+				"description": "स्क्रीन सेवर शुरू होने या डिवाइस स्लीप होने पर Vault लॉक हो जाएगा।"
+			},
+			"lockAfterIdle": {
+				"title": "निष्क्रियता के बाद Vault लॉक करें",
+				"description": "चयनित निष्क्रिय समय के बाद Vault लॉक हो जाएगा।",
+				"never": "लॉक न करें",
+				"minutes5": "5 मिनट बाद",
+				"minutes10": "10 मिनट बाद",
+				"minutes15": "15 मिनट बाद",
+				"minutes30": "30 मिनट बाद",
+				"hour1": "1 घंटे बाद",
+				"hours2": "2 घंटे बाद",
+				"hours3": "3 घंटे बाद",
+				"hours5": "5 घंटे बाद"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "थीम",
+			"auto": "स्वचालित",
+			"dark": "डार्क",
+			"light": "लाइट",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "एक्सेंट रंग",
+			"zenNotApplicable": "चयनित थीम पर एक्सेंट रंग लागू नहीं होता।"
+		},
+		"zoomLevel": {
+			"title": "ज़ूम स्तर",
+			"description": "सभी विंडो के लिए डिफ़ॉल्ट ज़ूम स्तर समायोजित करें।\nयदि आपका सिस्टम ऐप्स को स्वचालित रूप से स्केल नहीं करता, तो वास्तविक डिस्प्ले पिक्सेल अनुपात (DPR) के अनुसार ज़ूम बदलें। पहचाना गया DPR {{dpr}} है।",
+			"apply": "लागू करें",
+			"reset": "रीसेट करें",
+			"errors": {
+				"enterNumber": "ज़ूम सेट करने के लिए एक संख्या दर्ज करें",
+				"tooSmall": "ज़ूम {{min}}% से कम नहीं हो सकता",
+				"tooBig": "ज़ूम {{max}}% से अधिक नहीं हो सकता"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "एडिटर",
+		"mode": {
+			"title": "एडिटर मोड"
+		},
+		"fontFamily": {
+			"title": "फ़ॉन्ट फ़ैमिली",
+			"description": "सभी एडिटर में उपयोग के लिए फ़ॉन्ट फ़ैमिली सेट करें, या डिफ़ॉल्ट के लिए खाली छोड़ें।",
+			"placeholder": "फ़ॉन्ट फ़ैमिली का नाम दर्ज करें"
+		},
+		"fontSize": {
+			"title": "फ़ॉन्ट आकार"
+		},
+		"lineHeight": {
+			"title": "लाइन की ऊँचाई"
+		},
+		"dateFormat": {
+			"title": "दिनांक प्रारूप",
+			"description": "दिनांक डालते समय उपयोग होने वाला प्रारूप सेट करें। DD/MM/YYYY HH:mm:ss जैसे मानक टोकन सिंटैक्स समर्थित हैं।",
+			"formatReference": "दिनांक प्रारूप संदर्भ",
+			"example": "उदाहरण"
+		},
+		"plainText": {
+			"groupTitle": "प्लेन टेक्स्ट एडिटर",
+			"lineNumbers": "लाइन नंबर दिखाएँ",
+			"miniMap": "मिनी मैप सक्षम करें"
+		}
+	},
+	"hotkeys": {
+		"blank": "खाली",
+		"shortcuts": {
+			"createNote": "नया नोट बनाएँ",
+			"closeCurrentNote": "सक्रिय नोट बंद करें",
+			"restoreClosedNote": "हाल ही में बंद किया गया नोट पुनर्स्थापित करें",
+			"focusNextNote": "अगले खुले नोट पर जाएँ",
+			"focusPreviousNote": "पिछले खुले नोट पर जाएँ",
+			"toggleArchive": "सक्रिय नोट को आर्काइव में डालें/निकालें",
+			"toggleBookmark": "सक्रिय नोट को बुकमार्क में डालें/निकालें",
+			"deleteNote": "सक्रिय नोट हटाएँ",
+			"restoreFromBin": "सक्रिय नोट को बिन से पुनर्स्थापित करें",
+			"toggleHistory": "सक्रिय नोट का इतिहास दिखाएँ या छिपाएँ",
+			"focusSearch": "नोट खोजें",
+			"syncDatabase": "Vault को डिस्क पर सिंक करें",
+			"lockVault": "Vault लॉक करें",
+			"openSettings": "प्राथमिकताएँ खोलें"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Vault का नाम"
+		},
+		"rememberPasswords": {
+			"label": "Workspace के पासवर्ड याद रखें",
+			"description": "Workspace के पासवर्ड मास्टर कुंजी से एन्क्रिप्ट होकर डेटाबेस में सहेजे जाएँगे, ताकि एन्क्रिप्टेड workspace बिना पासवर्ड दर्ज किए स्वचालित रूप से खुल सकें।"
+		},
+		"filesAndData": {
+			"groupTitle": "फ़ाइलें और डेटा",
+			"imagesCompression": {
+				"title": "इमेज कम्प्रेशन",
+				"compress": "इमेज कम्प्रेस करें",
+				"doNotCompress": "इमेज कम्प्रेस न करें",
+				"alwaysAsk": "हमेशा पूछें"
+			},
+			"deleteOrphaned": {
+				"label": "अप्रयुक्त फ़ाइलें हटाएँ",
+				"description": "वे फ़ाइलें हटाएँ जो अब उपयोग में नहीं हैं।"
+			}
+		},
+		"encryption": {
+			"groupTitle": "एन्क्रिप्शन",
+			"algorithm": {
+				"title": "एन्क्रिप्शन एल्गोरिदम",
+				"none": "कोई नहीं"
+			},
+			"password": {
+				"title": "पासवर्ड",
+				"update": "पासवर्ड बदलें"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "सिंक्रोनाइज़ेशन",
+			"enable": {
+				"label": "सिंक्रोनाइज़ेशन सक्षम करें",
+				"description": "अपने Vault को सभी डिवाइस पर सिंक रखें। सभी डेटा आपके डिवाइस से भेजे जाने से पहले एन्क्रिप्ट किया जाता है।"
+			},
+			"method": {
+				"title": "सिंक्रोनाइज़ेशन विधि",
+				"fileSystem": "फ़ाइल सिस्टम",
+				"server": "सर्वर"
+			},
+			"directory": {
+				"title": "सिंक्रोनाइज़ेशन डायरेक्टरी",
+				"placeholder": "डायरेक्टरी का पथ दर्ज करें"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "स्नैपशॉट",
+			"record": {
+				"label": "नोट स्नैपशॉट रिकॉर्ड करें",
+				"description": "सक्षम होने पर, नोट में बदलाव होने पर उसकी सामग्री का स्नैपशॉट बनाया जाएगा। आप नोट इतिहास पैनल में प्रति नोट स्नैपशॉट रिकॉर्डिंग नियंत्रित कर सकते हैं।"
+			},
+			"delay": {
+				"title": "स्नैपशॉट विलंब",
+				"description": "नोट संपादित होने के बाद नया स्नैपशॉट सहेजने से पहले कितने सेकंड प्रतीक्षा करें। कम अंतराल का अर्थ है अधिक स्नैपशॉट — और बड़ा Vault।"
+			}
+		},
+		"trashBin": {
+			"groupTitle": "ट्रैश बिन",
+			"confirmDeletion": {
+				"label": "हटाने की पुष्टि करें",
+				"description": "नोट हटाने से पहले पूछें।"
+			},
+			"moveToBin": {
+				"label": "नोट बिन में भेजें",
+				"description": "नोट को स्थायी रूप से हटाने के बजाय ट्रैश बिन में भेजें ताकि बाद में पुनर्स्थापित किया जा सके।"
+			},
+			"autoPurge": {
+				"label": "बिन में पुराने नोट स्थायी रूप से हटाएँ",
+				"description": "बिन में भेजे गए नोट कुछ समय बाद स्वचालित रूप से स्थायी रूप से हटा दिए जाएँगे।"
+			},
+			"purgeDelay": {
+				"title": "स्थायी विलोपन अवधि",
+				"description": "बिन में भेजे जाने की तिथि से इतने दिनों बाद नोट स्थायी रूप से हटा दिए जाएँगे।",
+				"unit": "दिन"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Workspace का नाम",
+			"update": "अपडेट करें"
+		},
+		"newNoteTitle": {
+			"title": "नए नोट का शीर्षक",
+			"description": "नए नोट के लिए शीर्षक सेट करें। आप {date} या {date:FORMAT} जैसे {date:DD/MM/YYYY HH:mm} सिंटैक्स से दिनांक जोड़ सकते हैं।",
+			"formatReference": "प्रारूप संदर्भ",
+			"placeholder": "जैसे, नोट {date:DD/MM/YYYY HH:mm}",
+			"example": "उदाहरण"
+		},
+		"tagsForNewNote": {
+			"title": "नए नोट के लिए टैग",
+			"none": "कोई टैग सेट न करें",
+			"selected": "चयनित टैग के समान"
+		},
+		"dangerousZone": {
+			"groupTitle": "संवेदनशील क्षेत्र",
+			"delete": {
+				"label": "Workspace और उससे जुड़ा सारा डेटा हटाएँ, जिसमें नोट, टैग और फ़ाइलें शामिल हैं",
+				"action": "Workspace हटाएँ",
+				"cannotDeleteLast": "Vault में अंतिम workspace को हटाया नहीं जा सकता।",
+				"createAnother": "बनाएँ",
+				"createAnotherSuffix": "पहले एक और workspace बनाएँ।"
+			},
+			"confirmDelete": "आप workspace \"{{name}}\" को हटाने वाले हैं। क्या आप वाकई ऐसा करना चाहते हैं?\n\nयदि आप जारी रखते हैं, तो इस workspace से जुड़ा सारा डेटा हटा दिया जाएगा, जिसमें नोट, टैग और फ़ाइलें शामिल हैं।"
+		}
+	},
+	"importExport": {
+		"importNotes": "नोट आयात करें",
+		"exportNotes": "नोट निर्यात करें",
+		"importFromZip": ".zip आर्काइव से नोट आयात करें",
+		"importFromDirectory": "Markdown फ़ाइलों वाली डायरेक्टरी आयात करें",
+		"dropzone": {
+			"title": "आयात के लिए Markdown फ़ाइलें या .zip आर्काइव यहाँ छोड़ें",
+			"description": "फ़ाइलें यहाँ खींचकर छोड़ें, या चुनने के लिए क्लिक करें"
+		},
+		"progress": "नोट आयात जारी है। चरण: {{stage}} {{processed}}/{{total}}"
+	}
+}

@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Preferensi"
+	},
+	"tabs": {
+		"general": "Umum",
+		"appearance": "Tampilan",
+		"hotkeys": "Pintasan",
+		"vault": "Vault",
+		"workspace": "Workspace",
+		"importExport": "Impor & Ekspor",
+		"vaultSettingsGroup": "Pengaturan Vault"
+	},
+	"general": {
+		"title": "Pengaturan umum",
+		"subtitle": "Kelola preferensi umum aplikasi Anda.",
+		"version": {
+			"title": "Versi",
+			"checkForUpdates": "Periksa pembaruan",
+			"upToDate": "Anda sudah menggunakan versi terbaru",
+			"newVersionAvailable": "Versi baru <bold>{{version}}</bold> tersedia.",
+			"downloadLatest": "Unduh",
+			"downloadDescription": "versi terbaru untuk mendapatkan fitur dan peningkatan baru."
+		},
+		"autoCheckUpdates": {
+			"label": "Periksa pembaruan otomatis",
+			"description": "Aplikasi akan memeriksa pembaruan secara berkala dan memberi tahu jika ada versi baru."
+		},
+		"language": {
+			"title": "Bahasa",
+			"description": "Ubah bahasa tampilan."
+		},
+		"notifications": {
+			"title": "Notifikasi",
+			"description": "Notifikasi sistem hanya digunakan untuk pengingat. Jika dinonaktifkan, pengingat hanya akan muncul di daftar notifikasi aplikasi.",
+			"useSystem": "Gunakan notifikasi sistem"
+		},
+		"vaultLock": {
+			"groupTitle": "Kunci vault",
+			"lockOnSystemLock": {
+				"label": "Kunci vault saat sistem terkunci",
+				"description": "Vault akan dikunci saat screen saver aktif atau perangkat dalam mode tidur."
+			},
+			"lockAfterIdle": {
+				"title": "Kunci vault setelah tidak aktif",
+				"description": "Vault akan dikunci setelah waktu tidak aktif yang dipilih.",
+				"never": "Jangan kunci",
+				"minutes5": "selama 5 menit",
+				"minutes10": "selama 10 menit",
+				"minutes15": "selama 15 menit",
+				"minutes30": "selama 30 menit",
+				"hour1": "selama 1 jam",
+				"hours2": "selama 2 jam",
+				"hours3": "selama 3 jam",
+				"hours5": "selama 5 jam"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Tema",
+			"auto": "Otomatis",
+			"dark": "Gelap",
+			"light": "Terang",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Warna aksen",
+			"zenNotApplicable": "Warna aksen tidak berlaku untuk tema yang dipilih."
+		},
+		"zoomLevel": {
+			"title": "Tingkat zoom",
+			"description": "Sesuaikan tingkat zoom default untuk semua jendela.\nJika sistem Anda tidak menskalakan aplikasi secara otomatis, Anda dapat mengubah zoom agar sesuai dengan rasio piksel layar (DPR). DPR terdeteksi: {{dpr}}.",
+			"apply": "Terapkan",
+			"reset": "Atur ulang",
+			"errors": {
+				"enterNumber": "Masukkan angka untuk mengatur zoom",
+				"tooSmall": "Zoom tidak boleh kurang dari {{min}}%",
+				"tooBig": "Zoom tidak boleh lebih dari {{max}}%"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editor",
+		"mode": {
+			"title": "Mode editor"
+		},
+		"fontFamily": {
+			"title": "Jenis font",
+			"description": "Atur jenis font untuk semua editor, atau kosongkan untuk menggunakan default.",
+			"placeholder": "Masukkan nama jenis font"
+		},
+		"fontSize": {
+			"title": "Ukuran font"
+		},
+		"lineHeight": {
+			"title": "Tinggi baris"
+		},
+		"dateFormat": {
+			"title": "Format tanggal",
+			"description": "Atur format tanggal yang digunakan saat menyisipkan tanggal. Mendukung sintaks token standar seperti DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "referensi format tanggal",
+			"example": "Contoh"
+		},
+		"plainText": {
+			"groupTitle": "Editor teks biasa",
+			"lineNumbers": "Tampilkan nomor baris",
+			"miniMap": "Aktifkan mini map"
+		}
+	},
+	"hotkeys": {
+		"blank": "Kosong",
+		"shortcuts": {
+			"createNote": "Buat catatan baru",
+			"closeCurrentNote": "Tutup catatan aktif",
+			"restoreClosedNote": "Pulihkan catatan yang baru ditutup",
+			"focusNextNote": "Buka catatan berikutnya",
+			"focusPreviousNote": "Buka catatan sebelumnya",
+			"toggleArchive": "Pindahkan catatan aktif ke/dari arsip",
+			"toggleBookmark": "Pindahkan catatan aktif ke/dari bookmark",
+			"deleteNote": "Hapus catatan aktif",
+			"restoreFromBin": "Pulihkan catatan aktif dari tempat sampah",
+			"toggleHistory": "Tampilkan atau sembunyikan riwayat catatan aktif",
+			"focusSearch": "Cari catatan",
+			"syncDatabase": "Sinkronkan vault ke disk",
+			"lockVault": "Kunci vault",
+			"openSettings": "Buka preferensi"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Nama vault"
+		},
+		"rememberPasswords": {
+			"label": "Ingat kata sandi workspace",
+			"description": "Kata sandi workspace akan dienkripsi dengan kunci utama dan disimpan di database, agar workspace terenkripsi dapat dibuka otomatis tanpa memasukkan kata sandi."
+		},
+		"filesAndData": {
+			"groupTitle": "File dan data",
+			"imagesCompression": {
+				"title": "Kompresi gambar",
+				"compress": "Kompres gambar",
+				"doNotCompress": "Jangan kompres gambar",
+				"alwaysAsk": "Selalu tanyakan"
+			},
+			"deleteOrphaned": {
+				"label": "Hapus file yang tidak terpakai",
+				"description": "Hapus file yang sudah tidak digunakan lagi."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Enkripsi",
+			"algorithm": {
+				"title": "Algoritma enkripsi",
+				"none": "Tidak ada"
+			},
+			"password": {
+				"title": "Kata sandi",
+				"update": "Perbarui kata sandi"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Sinkronisasi",
+			"enable": {
+				"label": "Aktifkan sinkronisasi",
+				"description": "Sinkronkan vault Anda di semua perangkat. Semua data dienkripsi sebelum meninggalkan perangkat Anda."
+			},
+			"method": {
+				"title": "Metode sinkronisasi",
+				"fileSystem": "Sistem file",
+				"server": "Server"
+			},
+			"directory": {
+				"title": "Direktori sinkronisasi",
+				"placeholder": "Masukkan path ke direktori"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Snapshot",
+			"record": {
+				"label": "Rekam snapshot catatan",
+				"description": "Jika diaktifkan, snapshot konten catatan akan dibuat saat catatan diubah. Anda dapat mengatur perekaman snapshot per catatan di panel riwayat catatan."
+			},
+			"delay": {
+				"title": "Jeda snapshot",
+				"description": "Berapa lama menunggu setelah catatan diedit sebelum menyimpan snapshot baru, dalam detik. Interval lebih pendek berarti snapshot lebih sering — dan vault lebih besar."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Tempat sampah",
+			"confirmDeletion": {
+				"label": "Konfirmasi penghapusan",
+				"description": "Tanyakan sebelum menghapus catatan."
+			},
+			"moveToBin": {
+				"label": "Pindahkan catatan ke tempat sampah",
+				"description": "Pindahkan catatan ke tempat sampah alih-alih menghapus permanen agar dapat dipulihkan nanti."
+			},
+			"autoPurge": {
+				"label": "Hapus permanen catatan lama di tempat sampah",
+				"description": "Catatan di tempat sampah akan dihapus permanen setelah beberapa waktu."
+			},
+			"purgeDelay": {
+				"title": "Jeda penghapusan permanen",
+				"description": "Catatan di tempat sampah akan dihapus permanen setelah sekian hari, dihitung sejak dipindahkan ke sana.",
+				"unit": "hari"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Nama workspace",
+			"update": "Perbarui"
+		},
+		"newNoteTitle": {
+			"title": "Judul catatan baru",
+			"description": "Atur judul untuk catatan baru. Anda dapat menggunakan tanggal dengan sintaks {date} atau {date:FORMAT} seperti {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "referensi format",
+			"placeholder": "mis., Catatan {date:DD/MM/YYYY HH:mm}",
+			"example": "Contoh"
+		},
+		"tagsForNewNote": {
+			"title": "Tag untuk catatan baru",
+			"none": "Jangan atur tag apa pun",
+			"selected": "Sama dengan tag yang dipilih"
+		},
+		"dangerousZone": {
+			"groupTitle": "Zona berbahaya",
+			"delete": {
+				"label": "Hapus workspace beserta semua data terkait, termasuk catatan, tag, dan file",
+				"action": "Hapus workspace",
+				"cannotDeleteLast": "Tidak dapat menghapus workspace terakhir dalam vault.",
+				"createAnother": "Buat",
+				"createAnotherSuffix": "workspace lain terlebih dahulu."
+			},
+			"confirmDelete": "Anda akan menghapus workspace \"{{name}}\". Apakah Anda yakin?\n\nJika dilanjutkan, semua data terkait workspace ini akan dihapus, termasuk catatan, tag, dan file."
+		}
+	},
+	"importExport": {
+		"importNotes": "Impor catatan",
+		"exportNotes": "Ekspor catatan",
+		"importFromZip": "Impor catatan dari arsip .zip",
+		"importFromDirectory": "Impor direktori berisi file Markdown",
+		"dropzone": {
+			"title": "Letakkan file Markdown atau arsip .zip untuk diimpor",
+			"description": "Seret & letakkan file di sini, atau klik untuk memilih file"
+		},
+		"progress": "Impor catatan sedang berlangsung. Tahap: {{stage}} {{processed}}/{{total}}"
+	}
+}

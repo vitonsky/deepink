@@ -1,0 +1,12 @@
+import React, { FC, PropsWithChildren } from 'react';
+import { Box, Center } from '@chakra-ui/react';
+
+export const CenterBox: FC<PropsWithChildren> = ({ children }) => {
+	return (
+		<Center width="100%" h="100vh" alignItems="start" overflow="auto" padding="3rem">
+			<Box maxW="500px" minW="350px" margin="auto">
+				{children}
+			</Box>
+		</Center>
+	);
+};

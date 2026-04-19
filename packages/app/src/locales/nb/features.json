@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Opprett tagg",
+					"action": "Opprett"
+				},
+				"edit": {
+					"title": "Rediger tagg",
+					"action": "Lagre"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Taggnavn",
+					"placeholder": "f.eks. Ideer"
+				},
+				"parent": {
+					"label": "Overordnet tagg",
+					"placeholder": "f.eks. Oppskrifter/Desserter"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Kan ikke lagre endringer på grunn av en ukjent feil.",
+				"format": "Taggen kan ikke være tom, starte eller slutte med «/», eller inneholde «//».",
+				"duplicate": "Taggen «{{name}}» finnes allerede.",
+				"parentTagNotFound": "Overordnet tagg ble ikke funnet. Velg en annen tagg."
+			}
+		},
+		"deletion": {
+			"confirm": "Er du sikker på at du vil slette taggen «{{name}}» og alle underliggende tagger?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Notatbok",
+		"creator": {
+			"title": "Opprett nytt arbeidsområde",
+			"description": "Hvert arbeidsområde er et eget område for notater, tagger og filer. Alt holdes adskilt, men ligger trygt i det krypterte hvelvet ditt — klart når du bytter.",
+			"action": {
+				"add": "Opprett",
+				"cancel": "Avbryt"
+			},
+			"field": {
+				"name": {
+					"label": "Navn på arbeidsområde",
+					"placeholder": "f.eks. Helsedagbok, Forretningsideer",
+					"suggests": {
+						"0": "Økonomi",
+						"1": "Helse",
+						"2": "Karriere",
+						"3": "Familie",
+						"4": "Dagbok",
+						"5": "Mål",
+						"6": "Ideer",
+						"7": "Juridisk",
+						"8": "Reise",
+						"9": "Privat"
+					}
+				}
+			},
+			"error": {
+				"unknown": "En ukjent feil oppsto. Prøv igjen.",
+				"format": "Navnet på arbeidsområdet kan ikke være tomt."
+			}
+		},
+		"error": {
+			"title": "Arbeidsområdet «{{name}}» kunne ikke lastes",
+			"description": "Kunne ikke laste dette arbeidsområdet. Dataene kan være skadet. Bytt til et annet arbeidsområde eller opprett et nytt for å fortsette.",
+			"chooseAnother": "Velg et annet arbeidsområde",
+			"dividerText": "eller",
+			"createNew": "Opprett et nytt arbeidsområde",
+			"createWorkspace": "Opprett arbeidsområde",
+			"closeVault": "Lukk gjeldende vault"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Uten tittel",
+			"defaultTemplate": "Uten tittel – {{date}}",
+			"duplicate": "Kopi: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Skriv ned en idé, oppgave eller tanke…",
+			"modes": {
+				"plaintext": "Tekstmodus",
+				"richtext": "Riktekst",
+				"split-screen": "Delt visning"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Legg til i favoritter",
+			"removeFromFavorites": "Fjern fra favoritter",
+			"moveToArchive": "Flytt til arkiv",
+			"removeFromArchive": "Fjern fra arkiv"
+		},
+		"tags": {
+			"addPlaceholder": "Skriv for å legge til tagg…"
+		},
+		"versionPreview": {
+			"versionAt": "Versjon fra {{date}}",
+			"backToEditing": "Tilbake til redigering"
+		},
+		"menu": {
+			"title": "Notatvalg",
+			"copyReference": "Kopier notatlenke",
+			"remindMe": "Påminn meg",
+			"history": "Historikk",
+			"backLinks": "Tilbakelenker",
+			"readonlyMode": "Skrivebeskyttet modus",
+			"spellcheck": "Stavekontroll",
+			"export": "Eksporter…",
+			"passwordProtection": "Passordbeskyttelse…",
+			"disableSync": "Deaktiver synkronisering",
+			"moveToArchive": "Flytt til arkiv",
+			"removeFromArchive": "Fjern fra arkiv",
+			"deleteToBin": "Slett til papirkurv",
+			"deletePermanently": "Slett permanent",
+			"restoreFromBin": "Gjenopprett fra papirkurv"
+		},
+		"version": {
+			"chars": "{{count}} tegn",
+			"apply": {
+				"title": "Bruk versjon",
+				"readonlyTitle": "Kan ikke bruke versjon på et skrivebeskyttet notat"
+			},
+			"open": {
+				"title": "Åpne versjon"
+			},
+			"delete": {
+				"title": "Slett versjon"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Lagre øyeblikksbilde",
+				"title": "Lagre gjeldende tilstand av dette notatet som en ny versjon i historikken"
+			},
+			"deleteAll": {
+				"label": "Slett alle",
+				"title": "Slett alle lagrede versjoner av dette notatet permanent"
+			},
+			"dontRecord": "Ikke registrer historikk for dette notatet",
+			"empty": "Dette notatet har ingen lagrede versjoner",
+			"loading": "Laster…",
+			"confirmDeleteAll": {
+				"title": "Slett alle notatversjoner",
+				"description": "Denne handlingen sletter alle notatversjoner permanent.",
+				"confirm": "Er du sikker?",
+				"action": "Utfør"
+			},
+			"confirmApply": {
+				"title": "Bruk notatversjon",
+				"description": "Du er i ferd med å bruke notatversjon {{version}}.",
+				"warning": "Denne handlingen erstatter gjeldende notatinnhold med teksten fra det valgte øyeblikksbildet. Er du sikker?",
+				"apply": "Bruk",
+				"preview": "Forhåndsvis"
+			},
+			"confirmDelete": {
+				"title": "Slett notatversjon",
+				"description": "Du er i ferd med å slette notatversjon {{version}}.",
+				"warning": "Denne handlingen sletter notatversjonen permanent. Er du sikker?",
+				"delete": "Slett",
+				"preview": "Forhåndsvis"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Lukk panel",
+			"tabs": {
+				"history": "Notatversjoner",
+				"backLinks": "Tilbakelenker",
+				"files": "Vedlagte filer"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Vil du flytte dette notatet til papirkurven?",
+			"confirmPermanentDeletion": "Vil du slette dette notatet permanent?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Er du sikker på at du vil laste opp {{filesCount}} filer ({{size}} totalt)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Søk…"
+		},
+		"filterBy": "Filtrer etter",
+		"empty": "Ingen notater her ennå. <create>Opprett et notat</create>"
+	},
+	"notesView": {
+		"allNotes": "Alle notater",
+		"favorites": "Favorittnotater",
+		"archived": "Arkiverte notater",
+		"deleted": "Slettede notater"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Velg et notat for å lese eller redigere"
+		}
+	},
+	"activityBar": {
+		"newNote": "Nytt notat",
+		"files": "Filer",
+		"reminders": "Påminnelser",
+		"extensions": "Utvidelser",
+		"inbox": "Innboks",
+		"publishNotes": "Publiser notater",
+		"lockVault": "Lås vault",
+		"globalSettings": "Globale innstillinger"
+	},
+	"tabBar": {
+		"closeTab": "Lukk fane"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Klikk for å sette inn overskrift med nivå {{level}}. Åpne kontekstmenyen for andre valg",
+			"level": "Overskriftsnivå {{level}}"
+		},
+		"bold": "Slå av/på fet tekst",
+		"italic": "Slå av/på kursiv tekst",
+		"strikethrough": "Slå av/på gjennomstreking",
+		"unorderedList": "Sett inn eller slå av/på punktliste",
+		"checkboxList": "Sett inn eller slå av/på avkrysningsliste",
+		"orderedList": "Sett inn eller slå av/på nummerert liste",
+		"codeBlock": "Sett inn eller pakk tekst i kodeblokk",
+		"quoteBlock": "Sett inn eller pakk tekst i sitatblokk",
+		"insertDate": "Sett inn dato",
+		"insertPageBreak": "Sett inn sideskift",
+		"insertFile": "Sett inn fil",
+		"image": {
+			"buttonTitle": "Sett inn bilde",
+			"dialogTitle": "Legg til bilde",
+			"dialogDescription": "Bildet settes inn ved markørposisjonen.",
+			"field": {
+				"url": {
+					"label": "Bilde-URL",
+					"placeholder": "f.eks. https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Alternativ tekst for bilde (valgfritt)",
+					"placeholder": "Kort beskrivelse av bildet"
+				}
+			},
+			"actions": {
+				"add": "Legg til",
+				"cancel": "Avbryt"
+			}
+		},
+		"link": {
+			"buttonTitle": "Sett inn lenke",
+			"dialogTitle": "Legg til lenke",
+			"dialogDescription": "Markert tekst blir en lenke, eller lenken settes inn ved markørposisjonen hvis ingenting er markert.",
+			"field": {
+				"url": {
+					"label": "Lenke-URL",
+					"placeholder": "f.eks. https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Legg til",
+				"cancel": "Avbryt"
+			}
+		}
+	},
+	"image": {
+		"loading": "Laster bilde"
+	},
+	"notifications": {
+		"title": "Varsler"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Appoppdatering",
+			"reminderLater": "Påminnelsen vises igjen om en uke"
+		},
+		"newVersion": {
+			"title": "Ny versjon tilgjengelig",
+			"body": "En ny versjon er klar. Oppdater for å få de siste forbedringene og rettelsene.",
+			"download": "Last ned ny versjon",
+			"ignore": "Ignorer"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Bildeegenskaper",
+			"urlLabel": "Bilde-URL",
+			"altLabel": "Alternativ tekst for bilde"
+		},
+		"linkProperties": {
+			"title": "Lenkeegenskaper",
+			"urlLabel": "Lenke-URL"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Klikk for å lagre endringer til disk",
+			"saving": "Lagrer endringer…"
+		},
+		"changeVault": "Bytt vault",
+		"history": "Historikk",
+		"notifications": "Varsler"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tag",
+			"empty": "Crea dei tag per organizzare le note. Annidali in una gerarchia flessibile.",
+			"actions": {
+				"add": "Aggiungi tag"
+			}
+		},
+		"workspaces": {
+			"label": "Spazi",
+			"actions": {
+				"add": "Aggiungi spazio"
+			}
+		}
+	}
+}

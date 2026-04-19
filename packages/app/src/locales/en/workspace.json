@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tags",
+			"empty": "Create tags to organize your notes. Nest them to build a flexible hierarchy.",
+			"actions": {
+				"add": "Add tag"
+			}
+		},
+		"workspaces": {
+			"label": "Workspaces",
+			"actions": {
+				"add": "Add workspace"
+			}
+		}
+	}
+}

@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Vytvořit tag",
+					"action": "Vytvořit"
+				},
+				"edit": {
+					"title": "Upravit tag",
+					"action": "Uložit"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Název tagu",
+					"placeholder": "např. Nápady"
+				},
+				"parent": {
+					"label": "Nadřazený tag",
+					"placeholder": "např. Recepty/Desserty"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Nelze uložit změny kvůli neznámé chybě.",
+				"format": "Tag nemůže být prázdný, začínat nebo končit znakem \"/\" nebo obsahovat \"//\".",
+				"duplicate": "Tag '{{name}}' již existuje.",
+				"parentTagNotFound": "Nadřazený tag nebyl nalezen, vyberte prosím jiný tag."
+			}
+		},
+		"deletion": {
+			"confirm": "Opravdu chcete smazat tag \"{{name}}\" a všechny podtagy?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Poznámkový blok",
+		"creator": {
+			"title": "Vytvořit nový pracovní prostor",
+			"description": "Každý pracovní prostor je samostatný prostor pro vaše poznámky, tagy a soubory. Všechno zůstává oddělené, přitom žije uvnitř vašeho šifrovaného trezoru — připraveno, když přepnete.",
+			"action": {
+				"add": "Vytvořit",
+				"cancel": "Zrušit"
+			},
+			"field": {
+				"name": {
+					"label": "Název pracovního prostoru",
+					"placeholder": "např. Zdravotní deník, Obchodní nápady",
+					"suggests": {
+						"0": "Finance",
+						"1": "Zdraví",
+						"2": "Kariéra",
+						"3": "Rodina",
+						"4": "Deník",
+						"5": "Cíle",
+						"6": "Nápady",
+						"7": "Právní",
+						"8": "Cestování",
+						"9": "Soukromé"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Došlo k neznámé chybě. Zkuste to prosím znovu.",
+				"format": "Název pracovního prostoru nemůže být prázdný."
+			}
+		},
+		"error": {
+			"title": "Pracovní prostor \"{{name}}\" se nepodařilo načíst",
+			"description": "Nepodařilo se načíst tento pracovní prostor. Data mohou být poškozena. Přepněte na jiný pracovní prostor nebo vytvořte nový, abyste mohli pokračovat.",
+			"chooseAnother": "Vyberte jiný pracovní prostor",
+			"dividerText": "nebo",
+			"createNew": "Vytvořit nový pracovní prostor",
+			"createWorkspace": "Vytvořit pracovní prostor",
+			"closeVault": "Zavřít aktuální trezor"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Bez názvu",
+			"defaultTemplate": "Bez názvu - {{date}}",
+			"duplicate": "Duplikát: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Zaznamenejte nápad, úkol nebo myšlenku…",
+			"modes": {
+				"plaintext": "Textový režim",
+				"richtext": "Bohatý editor",
+				"split-screen": "Rozdělená obrazovka"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Přidat k oblíbeným",
+			"removeFromFavorites": "Odebrat z oblíbených",
+			"moveToArchive": "Přesunout do archivu",
+			"removeFromArchive": "Odebrat z archivu"
+		},
+		"tags": {
+			"addPlaceholder": "Napište pro přidání tagu…"
+		},
+		"versionPreview": {
+			"versionAt": "Verze k {{date}}",
+			"backToEditing": "Vrátit se k úpravám"
+		},
+		"menu": {
+			"title": "Možnosti poznámky",
+			"copyReference": "Kopírovat odkaz na poznámku",
+			"remindMe": "Připomeňte mi",
+			"history": "Historie",
+			"backLinks": "Zpětné odkazy",
+			"readonlyMode": "Režim pouze pro čtení",
+			"spellcheck": "Kontrola pravopisu",
+			"export": "Exportovat...",
+			"passwordProtection": "Ochrana heslem...",
+			"disableSync": "Deaktivovat synchronizaci",
+			"moveToArchive": "Přesunout do archivu",
+			"removeFromArchive": "Odebrat z archivu",
+			"deleteToBin": "Smazat do koše",
+			"deletePermanently": "Smazat trvale",
+			"restoreFromBin": "Obnovit z koše"
+		},
+		"version": {
+			"chars": "{{count}} znaků",
+			"apply": {
+				"title": "Použít verzi",
+				"readonlyTitle": "Verzi nelze použít pro poznámku pouze pro čtení"
+			},
+			"open": {
+				"title": "Otevřít verzi"
+			},
+			"delete": {
+				"title": "Smazat verzi"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Uložit snímek",
+				"title": "Uložit aktuální stav této poznámky jako novou verzi v historii"
+			},
+			"deleteAll": {
+				"label": "Smazat vše",
+				"title": "Trvale smazat všechny uložené verze této poznámky"
+			},
+			"dontRecord": "Nehledat historii pro tuto poznámku",
+			"empty": "Tato poznámka nemá zaznamenané verze",
+			"loading": "Načítání...",
+			"confirmDeleteAll": {
+				"title": "Smazat všechny verze poznámky",
+				"description": "Tato akce trvale smaže všechny verze poznámky.",
+				"confirm": "Opravdu si tím jste jisti?",
+				"action": "Použít"
+			},
+			"confirmApply": {
+				"title": "Použít verzi poznámky",
+				"description": "Chystáte se použít verzi poznámky {{version}}.",
+				"warning": "Tato akce nahradí aktuální data poznámky textem vybraného snímku. Jste si jisti?",
+				"apply": "Použít",
+				"preview": "Náhled"
+			},
+			"confirmDelete": {
+				"title": "Smazat verzi poznámky",
+				"description": "Chystáte se smazat verzi poznámky {{version}}.",
+				"warning": "Tato akce verzi poznámky nenávratně smaže. Jste si jisti?",
+				"delete": "Smazat",
+				"preview": "Náhled"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Zavřít panel",
+			"tabs": {
+				"history": "Verze poznámky",
+				"backLinks": "Zpětné odkazy",
+				"files": "Připojené soubory"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Chcete přesunout tuto poznámku do koše?",
+			"confirmPermanentDeletion": "Chcete tuto poznámku trvale smazat?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Opravdu chcete nahrát {{filesCount}} souborů ({{size}} celkem)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Hledat..."
+		},
+		"filterBy": "Filtrovat podle",
+		"empty": "Zatím zde nejsou žádné poznámky. <create>Vytvořte poznámku</create>"
+	},
+	"notesView": {
+		"allNotes": "Všechny poznámky",
+		"favorites": "Oblíbené poznámky",
+		"archived": "Archivované poznámky",
+		"deleted": "Smazané poznámky"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Vyberte poznámku, abyste začali číst nebo upravovat"
+		}
+	},
+	"activityBar": {
+		"newNote": "Nová poznámka",
+		"files": "Soubory",
+		"reminders": "Připomínky",
+		"extensions": "Rozšíření",
+		"inbox": "Doručená pošta",
+		"publishNotes": "Publikovat poznámky",
+		"lockVault": "Zamknout trezor",
+		"globalSettings": "Globální nastavení"
+	},
+	"tabBar": {
+		"closeTab": "Zavřít kartu"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Klikněte pro vložení nadpisu úrovně {{level}}. Otevřete kontextové menu pro výběr jiné možnosti",
+			"level": "Úroveň nadpisu {{level}}"
+		},
+		"bold": "Přepnout tučný styl textu",
+		"italic": "Přepnout kurzívový styl textu",
+		"strikethrough": "Přepnout přeškrtnutý styl textu",
+		"unorderedList": "Vložit nebo přepnout nečíslovaný seznam",
+		"checkboxList": "Vložit nebo přepnout seznam s zaškrtávacími políčky",
+		"orderedList": "Vložit nebo přepnout číslovaný seznam",
+		"codeBlock": "Vložit nebo obalit text kódem",
+		"quoteBlock": "Vložit nebo obalit text citací",
+		"insertDate": "Vložit datum",
+		"insertPageBreak": "Vložit stránkový zlom",
+		"insertFile": "Vložit soubor",
+		"image": {
+			"buttonTitle": "Vložit obrázek",
+			"dialogTitle": "Přidat obrázek",
+			"dialogDescription": "Obrázek bude vložen na pozici kurzoru.",
+			"field": {
+				"url": {
+					"label": "URL obrázku",
+					"placeholder": "např., https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Alternativní text obrázku (volitelné)",
+					"placeholder": "Krátký popis obrázku"
+				}
+			},
+			"actions": {
+				"add": "Přidat",
+				"cancel": "Zrušit"
+			}
+		},
+		"link": {
+			"buttonTitle": "Vložit odkaz",
+			"dialogTitle": "Přidat odkaz",
+			"dialogDescription": "Vybraný text se stane odkazem, nebo odkaz bude přidán na pozici kurzoru, pokud není nic vybráno.",
+			"field": {
+				"url": {
+					"label": "URL odkazu",
+					"placeholder": "např., https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Přidat",
+				"cancel": "Zrušit"
+			}
+		}
+	},
+	"image": {
+		"loading": "Načítání obrázku"
+	},
+	"notifications": {
+		"title": "Oznámení"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Aktualizace aplikace",
+			"reminderLater": "Připomínka se zobrazí za týden"
+		},
+		"newVersion": {
+			"title": "Nová verze je k dispozici",
+			"body": "Nová verze je připravena. Aktualizujte, abyste získali nejnovější vylepšení a opravy.",
+			"download": "Stáhnout novou verzi",
+			"ignore": "Ignorovat"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Vlastnosti obrázku",
+			"urlLabel": "URL obrázku",
+			"altLabel": "Alternativní text obrázku"
+		},
+		"linkProperties": {
+			"title": "Vlastnosti odkazu",
+			"urlLabel": "URL odkazu"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Klikněte pro uložení změn na disk",
+			"saving": "Ukládání změn..."
+		},
+		"changeVault": "Změnit trezor",
+		"history": "Historie",
+		"notifications": "Oznámení"
+	}
+}

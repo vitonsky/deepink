@@ -1,0 +1,17 @@
+{
+	"panel": {
+		"tags": {
+			"label": "Tagi",
+			"empty": "Twórz tagi, by porządkować notatki. Buduj z nich hierarchię dopasowaną do siebie.",
+			"actions": {
+				"add": "Dodaj tag"
+			}
+		},
+		"workspaces": {
+			"label": "Przestrzenie",
+			"actions": {
+				"add": "Dodaj przestrzeń"
+			}
+		}
+	}
+}

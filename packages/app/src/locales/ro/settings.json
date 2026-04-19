@@ -1,0 +1,250 @@
+{
+	"window": {
+		"title": "Preferințe"
+	},
+	"tabs": {
+		"general": "General",
+		"appearance": "Aspect",
+		"hotkeys": "Taste rapide",
+		"vault": "Seif",
+		"workspace": "Spațiu de lucru",
+		"importExport": "Import & Export",
+		"vaultSettingsGroup": "Setări seif"
+	},
+	"general": {
+		"title": "Setări generale",
+		"subtitle": "Gestionează preferințele generale în aplicație.",
+		"version": {
+			"title": "Versiune",
+			"checkForUpdates": "Verifică actualizări",
+			"upToDate": "Ești pe cea mai recentă versiune",
+			"newVersionAvailable": "O nouă versiune <bold>{{version}}</bold> este disponibilă.",
+			"downloadLatest": "Descarcă",
+			"downloadDescription": "cea mai recentă versiune pentru a obține noi funcții și îmbunătățiri."
+		},
+		"autoCheckUpdates": {
+			"label": "Verificare automată a actualizărilor",
+			"description": "Aplicația va verifica periodic actualizările și va notifica dacă o nouă versiune este disponibilă."
+		},
+		"language": {
+			"title": "Limba",
+			"description": "Schimbă limba de afișare."
+		},
+		"notifications": {
+			"title": "Notificări",
+			"description": "Notificările sistemului vor fi folosite doar pentru memento-uri. Când sunt dezactivate, memento-urile vor apărea doar în lista de notificări a aplicației.",
+			"useSystem": "Folosește notificări de sistem"
+		},
+		"vaultLock": {
+			"groupTitle": "Blocați seiful",
+			"lockOnSystemLock": {
+				"label": "Blochează seiful când sistemul se blochează",
+				"description": "Seiful va fi blocat când un salvator de ecran pornește sau un dispozitiv intră în modul de repaus."
+			},
+			"lockAfterIdle": {
+				"title": "Blochează seiful după inactivitate",
+				"description": "Seiful va fi blocat după timpul de inactivitate selectat.",
+				"never": "Nu bloca",
+				"minutes5": "pentru 5 minute",
+				"minutes10": "pentru 10 minute",
+				"minutes15": "pentru 15 minute",
+				"minutes30": "pentru 30 minute",
+				"hour1": "pentru 1 oră",
+				"hours2": "pentru 2 ore",
+				"hours3": "pentru 3 ore",
+				"hours5": "pentru 5 ore"
+			}
+		}
+	},
+	"appearance": {
+		"theme": {
+			"title": "Temă",
+			"auto": "Automat",
+			"dark": "Întunecat",
+			"light": "Deschis",
+			"zen": "Zen"
+		},
+		"accentColor": {
+			"title": "Culoare accent",
+			"zenNotApplicable": "Culoarea accent nu se aplică temei selectate."
+		},
+		"zoomLevel": {
+			"title": "Nivel de zoom",
+			"description": "Ajustează nivelul de zoom implicit pentru toate feroneriile.\nÎn cazul în care sistemul tău nu scalează aplicațiile automat, poți schimba zoomul pentru a se potrivi cu raportul de pixeli al ecranului (DPR) actual. DPR detectat este {{dpr}}.",
+			"apply": "Aplică",
+			"reset": "Resetează",
+			"errors": {
+				"enterNumber": "Introdu un număr pentru a seta zoomul",
+				"tooSmall": "Zoomul nu poate fi mai mic de {{min}}%",
+				"tooBig": "Zoomul nu poate fi mai mare de {{max}}%"
+			}
+		}
+	},
+	"editor": {
+		"groupTitle": "Editor",
+		"mode": {
+			"title": "Mod editor"
+		},
+		"fontFamily": {
+			"title": "Familie de fonturi",
+			"description": "Setează o familie de fonturi pentru a fi folosită în toate editorii, sau lasă liber pentru a folosi valorile implicite.",
+			"placeholder": "Introdu numele familiei de fonturi"
+		},
+		"fontSize": {
+			"title": "Dimensiune font"
+		},
+		"lineHeight": {
+			"title": "Înălțime linie"
+		},
+		"dateFormat": {
+			"title": "Format dată",
+			"description": "Setează formatul datei folosit când se introduc date. Suportă sintaxa standard a token-urilor precum DD/MM/YYYY HH:mm:ss.",
+			"formatReference": "referință format dată",
+			"example": "Exemplu"
+		},
+		"plainText": {
+			"groupTitle": "Editor text simplu",
+			"lineNumbers": "Afișează numerele liniilor",
+			"miniMap": "Activează mini hartă"
+		}
+	},
+	"hotkeys": {
+		"blank": "Gol",
+		"shortcuts": {
+			"createNote": "Creează o notă nouă",
+			"closeCurrentNote": "Închide nota activă",
+			"restoreClosedNote": "Restaurare notă recent închisă",
+			"focusNextNote": "Mergi la următoarea notă deschisă",
+			"focusPreviousNote": "Mergi la nota deschisă anterioară",
+			"toggleArchive": "Mută nota activă în/din arhivă",
+			"toggleBookmark": "Mută nota activă în/din marcaj",
+			"deleteNote": "Șterge nota activă",
+			"restoreFromBin": "Restaurare nota activă din coș",
+			"toggleHistory": "Afișează sau ascunde istoricul notei active",
+			"focusSearch": "Caută note",
+			"syncDatabase": "Sincronizează seiful cu discul",
+			"lockVault": "Blochează seiful",
+			"openSettings": "Deschide preferințele"
+		}
+	},
+	"vault": {
+		"name": {
+			"title": "Numele seifului"
+		},
+		"rememberPasswords": {
+			"label": "Amintește-ți parolele spațiilor de lucru",
+			"description": "Parolele spațiilor de lucru vor fi criptate cu cheia principală și salvate în baza de date, pentru a deschide automat spațiile de lucru criptate fără a introduce o parolă."
+		},
+		"filesAndData": {
+			"groupTitle": "Fișiere și date",
+			"imagesCompression": {
+				"title": "Compresie imagini",
+				"compress": "Comprimă imagini",
+				"doNotCompress": "Nu comprima imagini",
+				"alwaysAsk": "Întreabă întotdeauna"
+			},
+			"deleteOrphaned": {
+				"label": "Șterge fișierele orphaned",
+				"description": "Șterge fișierele care nu mai sunt folosite."
+			}
+		},
+		"encryption": {
+			"groupTitle": "Criptare",
+			"algorithm": {
+				"title": "Algoritm de criptare",
+				"none": "Niciunul"
+			},
+			"password": {
+				"title": "Parolă",
+				"update": "Actualizează parola"
+			}
+		},
+		"synchronization": {
+			"groupTitle": "Sincronizare",
+			"enable": {
+				"label": "Activează sincronizarea",
+				"description": "Păstrează-ți seiful sincronizat între dispozitive. Toate datele sunt criptate înainte de a părăsi dispozitivul tău."
+			},
+			"method": {
+				"title": "Metodă de sincronizare",
+				"fileSystem": "Sistem de fișiere",
+				"server": "Server"
+			},
+			"directory": {
+				"title": "Director de sincronizare",
+				"placeholder": "Introdu calea către director"
+			}
+		},
+		"snapshots": {
+			"groupTitle": "Instantanee",
+			"record": {
+				"label": "Înregistrează instantanee note",
+				"description": "Când este activat, instantanee ale conținutului notei vor fi create când o notă este modificată. Poți controla înregistrarea instantaneelor per notă în panoul de istoric al notei."
+			},
+			"delay": {
+				"title": "Întârziere pentru instantanee",
+				"description": "Cât timp să aștepți după ce o notă este editată înainte de a salva o nouă instantanee, în secunde. Intervalele mai scurte înseamnă instantanee mai frecvente — și un seif mai mare."
+			}
+		},
+		"trashBin": {
+			"groupTitle": "Coș de gunoi",
+			"confirmDeletion": {
+				"label": "Confirmă ștergerea",
+				"description": "Întreabă înainte de a șterge o notă."
+			},
+			"moveToBin": {
+				"label": "Mută notele în coș",
+				"description": "Mută notele într-un coș de gunoi în loc de ștergere permanentă, astfel încât să le poți restaura mai târziu."
+			},
+			"autoPurge": {
+				"label": "Șterge permanent notele vechi din coș",
+				"description": "Notelor mutate în coș le va fi ștearsă permanent după un timp."
+			},
+			"purgeDelay": {
+				"title": "Întârziere ștergere permanentă",
+				"description": "Notelor din coș le va fi ștearsă permanent după acest număr de zile, numărate de la momentul în care au fost mutate acolo.",
+				"unit": "zile"
+			}
+		}
+	},
+	"workspace": {
+		"name": {
+			"title": "Numele spațiului de lucru",
+			"update": "Actualizează"
+		},
+		"newNoteTitle": {
+			"title": "Titlu notă nouă",
+			"description": "Setează titlul pentru notele noi. Poți folosi data prin sintaxa {date} sau {date:FORMAT} precum {date:DD/MM/YYYY HH:mm}.",
+			"formatReference": "referință format",
+			"placeholder": "de exemplu, Notă {date:DD/MM/YYYY HH:mm}",
+			"example": "Exemplu"
+		},
+		"tagsForNewNote": {
+			"title": "Etichete pentru nota nouă",
+			"none": "Nu seta nicio etichetă",
+			"selected": "La fel ca eticheta selectată"
+		},
+		"dangerousZone": {
+			"groupTitle": "Zonă periculoasă",
+			"delete": {
+				"label": "Șterge spațiul de lucru și toate datele asociate, inclusiv note, etichete și fișiere",
+				"action": "Șterge spațiul de lucru",
+				"cannotDeleteLast": "Nu se poate șterge ultimul spațiu de lucru dintr-un seif.",
+				"createAnother": "Creează",
+				"createAnotherSuffix": "un alt spațiu de lucru mai întâi."
+			},
+			"confirmDelete": "Ești pe cale să ștergi spațiul de lucru \"{{name}}\". Ești sigur că vrei să faci asta?\n\nDacă continui, toate datele legate de acest spațiu de lucru vor fi șterse, inclusiv note, etichete și fișiere."
+		}
+	},
+	"importExport": {
+		"importNotes": "Importă note",
+		"exportNotes": "Exportă note",
+		"importFromZip": "Importă note din arhiva .zip",
+		"importFromDirectory": "Importă director cu fișiere Markdown",
+		"dropzone": {
+			"title": "Trage fișiere Markdown sau arhiva .zip pentru a importa",
+			"description": "Trage și lasă câteva fișiere aici sau dă clic pentru a selecta fișiere"
+		},
+		"progress": "Importul notelor este în curs de desfășurare. Etapa: {{stage}} {{processed}}/{{total}}"
+	}
+}

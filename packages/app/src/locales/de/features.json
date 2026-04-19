@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Tag erstellen",
+					"action": "Erstellen"
+				},
+				"edit": {
+					"title": "Tag bearbeiten",
+					"action": "Speichern"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Tag-Name",
+					"placeholder": "z.B. Ideen"
+				},
+				"parent": {
+					"label": "Übergeordneter Tag",
+					"placeholder": "z.B. Rezepte/Desserts"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Änderungen können aufgrund eines unbekannten Fehlers nicht gespeichert werden.",
+				"format": "Tag darf nicht leer sein, nicht mit \"/\" beginnen oder enden und keine \"//\" enthalten.",
+				"duplicate": "Tag '{{name}}' existiert bereits.",
+				"parentTagNotFound": "Übergeordneter Tag nicht gefunden, bitte wählen Sie einen anderen Tag."
+			}
+		},
+		"deletion": {
+			"confirm": "Möchten Sie den Tag \"{{name}}\" und alle Untertags wirklich löschen?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Notizbuch",
+		"creator": {
+			"title": "Neuen Arbeitsbereich erstellen",
+			"description": "Jeder Arbeitsbereich ist ein eigenständiger Raum für Ihre Notizen, Tags und Dateien. Alles bleibt getrennt, während es in Ihrem verschlüsselten Tresor lebt – bereit, wenn Sie wechseln.",
+			"action": {
+				"add": "Erstellen",
+				"cancel": "Abbrechen"
+			},
+			"field": {
+				"name": {
+					"label": "Arbeitsbereichsname",
+					"placeholder": "z.B. Gesundheitsjournal, Geschäftsideen",
+					"suggests": {
+						"0": "Finanzen",
+						"1": "Gesundheit",
+						"2": "Karriere",
+						"3": "Familie",
+						"4": "Journal",
+						"5": "Ziele",
+						"6": "Ideen",
+						"7": "Rechtliches",
+						"8": "Reisen",
+						"9": "Privat"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+				"format": "Der Arbeitsbereichsname darf nicht leer sein."
+			}
+		},
+		"error": {
+			"title": "Arbeitsbereich \"{{name}}\" konnte nicht geladen werden",
+			"description": "Der Arbeitsbereich konnte nicht geladen werden. Die Daten könnten beschädigt sein. Wechseln Sie zu einem anderen Arbeitsbereich oder erstellen Sie einen neuen, um weiterzuarbeiten.",
+			"chooseAnother": "Wählen Sie einen anderen Arbeitsbereich",
+			"dividerText": "oder",
+			"createNew": "Neuen Arbeitsbereich erstellen",
+			"createWorkspace": "Arbeitsbereich erstellen",
+			"closeVault": "Aktuellen Tresor schließen"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Ohne Titel",
+			"defaultTemplate": "Ohne Titel - {{date}}",
+			"duplicate": "Duplikat: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Eine Idee, Aufgabe oder einen Gedanken festhalten…",
+			"modes": {
+				"plaintext": "Textmodus",
+				"richtext": "Rich-Editor",
+				"split-screen": "Geteilter Bildschirm"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Zu Favoriten hinzufügen",
+			"removeFromFavorites": "Von Favoriten entfernen",
+			"moveToArchive": "In Archiv verschieben",
+			"removeFromArchive": "Aus Archiv entfernen"
+		},
+		"tags": {
+			"addPlaceholder": "Tippen Sie, um Tag hinzuzufügen…"
+		},
+		"versionPreview": {
+			"versionAt": "Version vom {{date}}",
+			"backToEditing": "Zurück zur Bearbeitung"
+		},
+		"menu": {
+			"title": "Notizoptionen",
+			"copyReference": "Notizlink kopieren",
+			"remindMe": "Erinnere mich",
+			"history": "Verlauf",
+			"backLinks": "Rückverweise",
+			"readonlyMode": "Nur-Lese-Modus",
+			"spellcheck": "Rechtschreibprüfung",
+			"export": "Exportieren...",
+			"passwordProtection": "Passwortschutz...",
+			"disableSync": "Synchronisierung deaktivieren",
+			"moveToArchive": "In Archiv verschieben",
+			"removeFromArchive": "Aus Archiv entfernen",
+			"deleteToBin": "In den Papierkorb löschen",
+			"deletePermanently": "Permanent löschen",
+			"restoreFromBin": "Aus dem Papierkorb wiederherstellen"
+		},
+		"version": {
+			"chars": "{{count}} Zeichen",
+			"apply": {
+				"title": "Version anwenden",
+				"readonlyTitle": "Version kann für eine schreibgeschützte Notiz nicht angewendet werden"
+			},
+			"open": {
+				"title": "Version öffnen"
+			},
+			"delete": {
+				"title": "Version löschen"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Snapshot speichern",
+				"title": "Den aktuellen Zustand dieser Notiz als neue Version im Verlauf speichern"
+			},
+			"deleteAll": {
+				"label": "Alle löschen",
+				"title": "Alle gespeicherten Versionen dieser Notiz dauerhaft löschen"
+			},
+			"dontRecord": "Verlauf für diese Notiz nicht aufzeichnen",
+			"empty": "Diese Notiz hat keine aufgezeichneten Versionen",
+			"loading": "Laden...",
+			"confirmDeleteAll": {
+				"title": "Alle Notizversionen löschen",
+				"description": "Diese Aktion löscht alle Notizversionen dauerhaft.",
+				"confirm": "Sind Sie sich sicher?",
+				"action": "Anwenden"
+			},
+			"confirmApply": {
+				"title": "Notizversion anwenden",
+				"description": "Sie sind dabei, die Notizversion {{version}} anzuwenden.",
+				"warning": "Diese Aktion ersetzt die aktuellen Notizdaten durch den Text eines ausgewählten Snapshots. Sind Sie sicher?",
+				"apply": "Anwenden",
+				"preview": "Vorschau"
+			},
+			"confirmDelete": {
+				"title": "Notizversion löschen",
+				"description": "Sie sind dabei, die Notizversion {{version}} zu löschen.",
+				"warning": "Diese Aktion löscht die Notizversion unwiderruflich. Sind Sie sicher?",
+				"delete": "Löschen",
+				"preview": "Vorschau"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Panel schließen",
+			"tabs": {
+				"history": "Notizversionen",
+				"backLinks": "Rückverweise",
+				"files": "Angehängte Dateien"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Möchten Sie diese Notiz in den Papierkorb verschieben?",
+			"confirmPermanentDeletion": "Möchten Sie diese Notiz dauerhaft löschen?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Sind Sie sicher, dass Sie {{filesCount}} Dateien (insgesamt {{size}}) hochladen möchten?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Suchen..."
+		},
+		"filterBy": "Filtern nach",
+		"empty": "Hier sind noch keine Notizen. <create>Erstellen Sie eine Notiz</create>"
+	},
+	"notesView": {
+		"allNotes": "Alle Notizen",
+		"favorites": "Favorisierte Notizen",
+		"archived": "Archivierte Notizen",
+		"deleted": "Gelöschte Notizen"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Wählen Sie eine Notiz aus, um zu lesen oder zu bearbeiten"
+		}
+	},
+	"activityBar": {
+		"newNote": "Neue Notiz",
+		"files": "Dateien",
+		"reminders": "Erinnerungen",
+		"extensions": "Erweiterungen",
+		"inbox": "Posteingang",
+		"publishNotes": "Notizen veröffentlichen",
+		"lockVault": "Tresor sperren",
+		"globalSettings": "Globale Einstellungen"
+	},
+	"tabBar": {
+		"closeTab": "Tab schließen"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Klicken Sie, um eine Überschrift der Ebene {{level}} einzufügen. Öffnen Sie das Kontextmenü, um eine andere Option auszuwählen",
+			"level": "Überschriftsebene {{level}}"
+		},
+		"bold": "Fettstil umschalten",
+		"italic": "Kursivstil umschalten",
+		"strikethrough": "Durchgestrichen-Stil umschalten",
+		"unorderedList": "Ungeordnete Liste einfügen oder umschalten",
+		"checkboxList": "Checkbox-Liste einfügen oder umschalten",
+		"orderedList": "Geordnete Liste einfügen oder umschalten",
+		"codeBlock": "Text mit Codeblock einfügen oder umschließen",
+		"quoteBlock": "Text mit Zitatblock einfügen oder umschließen",
+		"insertDate": "Datum einfügen",
+		"insertPageBreak": "Seitenumbruch einfügen",
+		"insertFile": "Datei einfügen",
+		"image": {
+			"buttonTitle": "Bild einfügen",
+			"dialogTitle": "Bild hinzufügen",
+			"dialogDescription": "Das Bild wird an der Cursorposition eingefügt.",
+			"field": {
+				"url": {
+					"label": "Bild-URL",
+					"placeholder": "z.B. https://example.com/image.png"
+				},
+				"altText": {
+					"label": "Alternativtext für das Bild (optional)",
+					"placeholder": "Kurze Beschreibung des Bildes"
+				}
+			},
+			"actions": {
+				"add": "Hinzufügen",
+				"cancel": "Abbrechen"
+			}
+		},
+		"link": {
+			"buttonTitle": "Link einfügen",
+			"dialogTitle": "Link hinzufügen",
+			"dialogDescription": "Der ausgewählte Text wird zu einem Link, oder der Link wird an der Cursorposition hinzugefügt, wenn nichts ausgewählt ist.",
+			"field": {
+				"url": {
+					"label": "Link-URL",
+					"placeholder": "z.B. https://example.com"
+				}
+			},
+			"actions": {
+				"add": "Hinzufügen",
+				"cancel": "Abbrechen"
+			}
+		}
+	},
+	"image": {
+		"loading": "Bild wird geladen"
+	},
+	"notifications": {
+		"title": "Benachrichtigungen"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "App-Update",
+			"reminderLater": "Die Erinnerung wird in einer Woche angezeigt"
+		},
+		"newVersion": {
+			"title": "Neue Version verfügbar",
+			"body": "Eine neue Version ist bereit. Aktualisieren Sie, um die neuesten Verbesserungen und Fehlerbehebungen zu erhalten.",
+			"download": "Neue Version herunterladen",
+			"ignore": "Ignorieren"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Bildeigenschaften",
+			"urlLabel": "Bild-URL",
+			"altLabel": "Alternativtext für das Bild"
+		},
+		"linkProperties": {
+			"title": "Linkeigenschaften",
+			"urlLabel": "Link-URL"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Klicken Sie, um Änderungen auf der Festplatte zu speichern",
+			"saving": "Änderungen werden gespeichert..."
+		},
+		"changeVault": "Tresor wechseln",
+		"history": "Verlauf",
+		"notifications": "Benachrichtigungen"
+	}
+}

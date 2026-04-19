@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Prekliči",
+		"confirm": "Potrdi",
+		"apply": "Uporabi",
+		"save": "Shrani",
+		"saveChanges": "Shrani spremembe",
+		"delete": "Izbriši",
+		"reset": "Ponastavi",
+		"update": "Posodobi",
+		"add": "Dodaj",
+		"create": "Ustvari",
+		"close": "Zapri"
+	},
+	"form": {
+		"suggestTemplate": "Poskusi to: <suggests>"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"actions": {
+		"cancel": "Annuleer",
+		"confirm": "Bevestig",
+		"apply": "Toepassen",
+		"save": "Bewaar",
+		"saveChanges": "Wijzigingen bewaren",
+		"delete": "Verwijderen",
+		"reset": "Herstel",
+		"update": "Bijwerken",
+		"add": "Toevoegen",
+		"create": "Aanmaken",
+		"close": "Sluiten"
+	},
+	"form": {
+		"suggestTemplate": "Probeer dit: <suggests>"
+	}
+}

@@ -1,0 +1,36 @@
+import { IFilesStorage } from '../features/files';
+
+type Config = Record<string, any>;
+
+export class ConfigStorage<T extends Record<string, any> = Config> {
+	constructor(
+		private readonly filename: string,
+		private readonly filesController: IFilesStorage,
+	) {}
+
+	public async set(key: keyof T, value: T[keyof T]) {
+		let json = {} as T;
+
+		// Load actual JSON
+		const buffer = await this.filesController.get(this.filename);
+		if (buffer) {
+			const vaultsJson = new TextDecoder().decode(buffer);
+			json = JSON.parse(vaultsJson);
+		}
+
+		json[key] = value;
+
+		const serializedJson = JSON.stringify(json, null, '\t');
+		const serializedBuffer = new TextEncoder().encode(serializedJson).buffer;
+		await this.filesController.write(this.filename, serializedBuffer);
+	}
+
+	public async get(key: string) {
+		const buffer = await this.filesController.get(this.filename);
+		if (!buffer) return null;
+
+		const vaultsJson = new TextDecoder().decode(buffer);
+		const json = JSON.parse(vaultsJson);
+		return key in json ? json[key] : null;
+	}
+}

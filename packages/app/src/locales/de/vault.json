@@ -1,0 +1,114 @@
+{
+	"chooseVault": {
+		"title": "Wählen Sie ein Vault",
+		"actions": {
+			"createNew": "Neues Vault erstellen"
+		}
+	},
+	"creator": {
+		"title": "Vault erstellen",
+		"field": {
+			"name": {
+				"label": "Vault-Name",
+				"placeholder": "z.B. Mein Vault, Mit Alex geteilt",
+				"random": "Zufälligen Namen generieren",
+				"suggests": {
+					"0": "Marginalien",
+					"1": "Vellum",
+					"2": "Endpapier",
+					"3": "Verso",
+					"4": "Memento",
+					"5": "Nische",
+					"6": "Halbschatten",
+					"7": "Mondlicht Korrespondenz",
+					"8": "Abendliche Kartographie",
+					"9": "Laterne & Tinte",
+					"10": "Kerzenlicht Archiv",
+					"11": "Kletternde Efeu Manuskripte",
+					"12": "Zedernholz Briefe",
+					"13": "Rossholz Scriptorium",
+					"14": "Der Ungebundene Kodex",
+					"15": "Marginalien & Murmeln",
+					"16": "Endpapier Geständnisse",
+					"17": "Die Annotationsstille",
+					"18": "Schattenkartographie",
+					"19": "Der Erinnerte Raum",
+					"20": "Die Ununterzeichneten Briefe",
+					"21": "Geflüsterte Koordinaten",
+					"22": "Der Ungesagte Almanach",
+					"23": "Verlorene Wachsbücher",
+					"24": "Die Unsichtbare Bibliothek",
+					"25": "Unkartierte Ränder",
+					"26": "Die Stille Verschwörung",
+					"27": "Die Ungelieferte Post",
+					"28": "Immergrünes Archiv",
+					"29": "Papiermond",
+					"30": "Papierblüte",
+					"31": "Nachtblüte",
+					"32": "Sanfter Atlas",
+					"33": "Velours",
+					"34": "Tintenstein",
+					"35": "Stille",
+					"36": "Schatten",
+					"37": "Ruhiger Drift",
+					"38": "Tiefes Wiesental",
+					"39": "Unbeschriebenes Hauptbuch",
+					"40": "Stilles Entwurfbuch",
+					"41": "Ungesprochenes Archiv",
+					"42": "Driftendes Journal",
+					"43": "Solarwind Chronik",
+					"44": "Ruhiger Fjord",
+					"45": "Erinnerungsfragmente",
+					"46": "Stiller Moment",
+					"47": "Verschwundene Minuten"
+				}
+			},
+			"password": {
+				"label": "Verschlüsselungs-Passwort",
+				"recommended": "(empfohlen)",
+				"placeholder": "Geben Sie hier ein starkes Passwort ein"
+			},
+			"algorithm": {
+				"label": "Verschlüsselungsalgorithmus"
+			}
+		},
+		"actions": {
+			"create": "Vault erstellen",
+			"continueNoPassword": "Fortfahren ohne Passwort",
+			"cancel": "Abbrechen"
+		},
+		"noEncryptionDialog": {
+			"title": "Vault ohne Verschlüsselung erstellen",
+			"description": "Ihre Notizen und Daten werden als Klartext gespeichert. Jede App oder Person mit Zugriff auf das Vault-Verzeichnis auf der Festplatte kann alles darin lesen.",
+			"actions": {
+				"confirm": "Fortfahren ohne Verschlüsselung",
+				"cancel": "Abbrechen"
+			}
+		},
+		"errors": {
+			"nameRequired": "Geben Sie einen Vault-Namen ein",
+			"passwordRequired": "Geben Sie das Passwort ein"
+		}
+	},
+	"login": {
+		"title": "Vault entsperren",
+		"field": {
+			"password": {
+				"placeholder": "Passwort eingeben"
+			}
+		},
+		"actions": {
+			"unlock": "Entsperren",
+			"changeVault": "Vault wechseln"
+		},
+		"errors": {
+			"cannotOpen": "Vault kann nicht geöffnet werden",
+			"invalidPassword": "Ungültiges Passwort",
+			"passwordRequired": "Geben Sie das Passwort ein"
+		}
+	},
+	"errors": {
+		"failedToOpen": "Fehler beim Öffnen des Vaults",
+		"corrupted": "\"{{name}}\" scheint beschädigt zu sein."
+	}
+}

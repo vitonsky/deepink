@@ -1,0 +1,303 @@
+{
+	"tag": {
+		"editor": {
+			"mode": {
+				"add": {
+					"title": "Criar tag",
+					"action": "Criar"
+				},
+				"edit": {
+					"title": "Editar tag",
+					"action": "Salvar"
+				}
+			},
+			"field": {
+				"name": {
+					"label": "Nome da tag",
+					"placeholder": "ex: Ideias"
+				},
+				"parent": {
+					"label": "Tag superior",
+					"placeholder": "ex: Receitas/Sobremesas"
+				}
+			},
+			"messages": {
+				"unknownSubmitError": "Não foi possível salvar as alterações devido a um erro desconhecido.",
+				"format": "A tag não pode estar vazia, começar ou terminar com \"/\", nem conter \"//\".",
+				"duplicate": "A tag '{{name}}' já existe.",
+				"parentTagNotFound": "Tag superior não encontrada. Selecione outra tag."
+			}
+		},
+		"deletion": {
+			"confirm": "Deseja realmente excluir a tag \"{{name}}\" e todas as suas subtags?"
+		}
+	},
+	"workspace": {
+		"defaultName": "Caderno",
+		"creator": {
+			"title": "Criar novo espaço",
+			"description": "Cada espaço é um ambiente independente para suas notas, tags e arquivos. Tudo fica separado, mas dentro do seu cofre criptografado — pronto quando você alternar.",
+			"action": {
+				"add": "Criar",
+				"cancel": "Cancelar"
+			},
+			"field": {
+				"name": {
+					"label": "Nome do espaço",
+					"placeholder": "ex: Diário de Saúde, Ideias de Negócio",
+					"suggests": {
+						"0": "Finanças",
+						"1": "Saúde",
+						"2": "Carreira",
+						"3": "Família",
+						"4": "Diário",
+						"5": "Metas",
+						"6": "Ideias",
+						"7": "Jurídico",
+						"8": "Viagens",
+						"9": "Pessoal"
+					}
+				}
+			},
+			"error": {
+				"unknown": "Ocorreu um erro desconhecido. Tente novamente.",
+				"format": "O nome do espaço não pode estar vazio."
+			}
+		},
+		"error": {
+			"title": "Falha ao carregar o espaço \"{{name}}\"",
+			"description": "Não foi possível carregar este espaço. Os dados podem estar corrompidos. Alterne para outro espaço ou crie um novo para continuar.",
+			"chooseAnother": "Escolher outro espaço",
+			"dividerText": "ou",
+			"createNew": "Criar um novo espaço",
+			"createWorkspace": "Criar espaço",
+			"closeVault": "Fechar vault atual"
+		}
+	},
+	"note": {
+		"title": {
+			"placeholder": "Sem título",
+			"defaultTemplate": "Sem título - {{date}}",
+			"duplicate": "Cópia: {{title}}"
+		},
+		"editor": {
+			"placeholder": "Registre uma ideia, tarefa ou pensamento…",
+			"modes": {
+				"plaintext": "Modo texto",
+				"richtext": "Editor rico",
+				"split-screen": "Tela dividida"
+			}
+		},
+		"actions": {
+			"addToFavorites": "Adicionar aos favoritos",
+			"removeFromFavorites": "Remover dos favoritos",
+			"moveToArchive": "Mover para o arquivo",
+			"removeFromArchive": "Remover do arquivo"
+		},
+		"tags": {
+			"addPlaceholder": "Digite para adicionar tag…"
+		},
+		"versionPreview": {
+			"versionAt": "Versão de {{date}}",
+			"backToEditing": "Voltar à edição"
+		},
+		"menu": {
+			"title": "Opções da nota",
+			"copyReference": "Copiar link da nota",
+			"remindMe": "Lembrete",
+			"history": "Histórico",
+			"backLinks": "Referências",
+			"readonlyMode": "Modo leitura",
+			"spellcheck": "Corretor ortográfico",
+			"export": "Exportar...",
+			"passwordProtection": "Proteção por senha...",
+			"disableSync": "Desativar sincronização",
+			"moveToArchive": "Mover para o arquivo",
+			"removeFromArchive": "Remover do arquivo",
+			"deleteToBin": "Mover para a lixeira",
+			"deletePermanently": "Excluir permanentemente",
+			"restoreFromBin": "Restaurar da lixeira"
+		},
+		"version": {
+			"chars": "{{count}} caracteres",
+			"apply": {
+				"title": "Aplicar versão",
+				"readonlyTitle": "Não é possível aplicar versão em uma nota somente leitura"
+			},
+			"open": {
+				"title": "Abrir versão"
+			},
+			"delete": {
+				"title": "Excluir versão"
+			}
+		},
+		"versions": {
+			"saveVersion": {
+				"label": "Salvar snapshot",
+				"title": "Salvar o estado atual desta nota como uma nova versão no histórico"
+			},
+			"deleteAll": {
+				"label": "Excluir todas",
+				"title": "Excluir permanentemente todas as versões salvas desta nota"
+			},
+			"dontRecord": "Não registrar histórico desta nota",
+			"empty": "Esta nota não possui versões registradas",
+			"loading": "Carregando...",
+			"confirmDeleteAll": {
+				"title": "Excluir todas as versões da nota",
+				"description": "Esta ação excluirá permanentemente todas as versões da nota.",
+				"confirm": "Tem certeza?",
+				"action": "Aplicar"
+			},
+			"confirmApply": {
+				"title": "Aplicar versão da nota",
+				"description": "Você está prestes a aplicar a versão {{version}} da nota.",
+				"warning": "Esta ação substituirá o conteúdo atual da nota pelo texto do snapshot selecionado. Tem certeza?",
+				"apply": "Aplicar",
+				"preview": "Visualizar"
+			},
+			"confirmDelete": {
+				"title": "Excluir versão da nota",
+				"description": "Você está prestes a excluir a versão {{version}} da nota.",
+				"warning": "Esta ação excluirá a versão da nota de forma irreversível. Tem certeza?",
+				"delete": "Excluir",
+				"preview": "Visualizar"
+			}
+		},
+		"sidebar": {
+			"closePanel": "Fechar painel",
+			"tabs": {
+				"history": "Versões da nota",
+				"backLinks": "Referências",
+				"files": "Arquivos anexados"
+			}
+		},
+		"bin": {
+			"confirmMoveToBin": "Deseja mover esta nota para a lixeira?",
+			"confirmPermanentDeletion": "Deseja excluir esta nota permanentemente?"
+		}
+	},
+	"files": {
+		"confirmLargeUpload": "Deseja enviar {{filesCount}} arquivos ({{size}} no total)?"
+	},
+	"notesList": {
+		"search": {
+			"placeholder": "Buscar..."
+		},
+		"filterBy": "Filtrar por",
+		"empty": "Nenhuma nota aqui ainda. <create>Criar uma nota</create>"
+	},
+	"notesView": {
+		"allNotes": "Todas as notas",
+		"favorites": "Notas favoritas",
+		"archived": "Notas arquivadas",
+		"deleted": "Notas excluídas"
+	},
+	"notesContainer": {
+		"empty": {
+			"placeholder": "Selecione uma nota para ler ou editar"
+		}
+	},
+	"activityBar": {
+		"newNote": "Nova nota",
+		"files": "Arquivos",
+		"reminders": "Lembretes",
+		"extensions": "Extensões",
+		"inbox": "Caixa de entrada",
+		"publishNotes": "Publicar notas",
+		"lockVault": "Bloquear vault",
+		"globalSettings": "Configurações gerais"
+	},
+	"tabBar": {
+		"closeTab": "Fechar aba"
+	},
+	"editorPanel": {
+		"header": {
+			"insertTitle": "Clique para inserir cabeçalho nível {{level}}. Abra o menu de contexto para outras opções",
+			"level": "Cabeçalho nível {{level}}"
+		},
+		"bold": "Alternar negrito",
+		"italic": "Alternar itálico",
+		"strikethrough": "Alternar tachado",
+		"unorderedList": "Inserir ou alternar lista não ordenada",
+		"checkboxList": "Inserir ou alternar lista de tarefas",
+		"orderedList": "Inserir ou alternar lista ordenada",
+		"codeBlock": "Inserir ou envolver texto com bloco de código",
+		"quoteBlock": "Inserir ou envolver texto com bloco de citação",
+		"insertDate": "Inserir data",
+		"insertPageBreak": "Inserir quebra de página",
+		"insertFile": "Inserir arquivo",
+		"image": {
+			"buttonTitle": "Inserir imagem",
+			"dialogTitle": "Adicionar imagem",
+			"dialogDescription": "A imagem será inserida na posição do cursor.",
+			"field": {
+				"url": {
+					"label": "URL da imagem",
+					"placeholder": "ex: https://exemplo.com/imagem.png"
+				},
+				"altText": {
+					"label": "Texto alternativo (opcional)",
+					"placeholder": "Breve descrição da imagem"
+				}
+			},
+			"actions": {
+				"add": "Adicionar",
+				"cancel": "Cancelar"
+			}
+		},
+		"link": {
+			"buttonTitle": "Inserir link",
+			"dialogTitle": "Adicionar link",
+			"dialogDescription": "O texto selecionado se tornará um link. Se nada estiver selecionado, o link será adicionado na posição do cursor.",
+			"field": {
+				"url": {
+					"label": "URL do link",
+					"placeholder": "ex: https://exemplo.com"
+				}
+			},
+			"actions": {
+				"add": "Adicionar",
+				"cancel": "Cancelar"
+			}
+		}
+	},
+	"image": {
+		"loading": "Carregando imagem"
+	},
+	"notifications": {
+		"title": "Notificações"
+	},
+	"updates": {
+		"appUpdate": {
+			"title": "Atualização do app",
+			"reminderLater": "O lembrete será exibido novamente em uma semana"
+		},
+		"newVersion": {
+			"title": "Nova versão disponível",
+			"body": "Uma nova versão está pronta. Atualize para obter as últimas melhorias e correções.",
+			"download": "Baixar nova versão",
+			"ignore": "Ignorar"
+		}
+	},
+	"contextMenu": {
+		"imageProperties": {
+			"title": "Propriedades da imagem",
+			"urlLabel": "URL da imagem",
+			"altLabel": "Texto alternativo da imagem"
+		},
+		"linkProperties": {
+			"title": "Propriedades do link",
+			"urlLabel": "URL do link"
+		}
+	},
+	"statusBar": {
+		"sync": {
+			"title": "Clique para salvar alterações no disco",
+			"saving": "Salvando alterações..."
+		},
+		"changeVault": "Trocar vault",
+		"history": "Histórico",
+		"notifications": "Notificações"
+	}
+}
