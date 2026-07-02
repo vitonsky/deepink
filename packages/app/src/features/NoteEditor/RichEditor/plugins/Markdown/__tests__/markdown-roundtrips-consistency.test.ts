@@ -39,11 +39,10 @@ test('Markdown parser round-trips', () => {
 
 describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level', () => {
 	const cases = [
-		// TODO: support
-		// {
-		// 	title: 'Rich formatting',
-		// 	markdown: richFormatting,
-		// },
+		{
+			title: 'Rich formatting',
+			markdown: richFormatting,
+		},
 		{
 			title: 'Plain list',
 			markdown: '- foo\n  - bar\n  - baz',

@@ -8,7 +8,7 @@ import {
 	IS_CODE,
 	LexicalNode,
 } from 'lexical';
-import { Content, Root, RootContent } from 'mdast';
+import { Content, PhrasingContent, Root, RootContent } from 'mdast';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
@@ -91,6 +91,77 @@ const remarkPreserveBlankLines: Plugin<[], Root> = () => {
 		});
 	};
 };
+
+// TODO: refactor code, that is just a draft
+// TODO: lift any formatting, not only emphasis
+// TODO: improve performance
+export default function remarkLiftFormatting() {
+	const formattingNodes = new Set<string>([
+		'emphasis',
+		'delete',
+		'strong',
+	] satisfies PhrasingContent['type'][]);
+
+	return (tree: Root) => {
+		visit(tree, 'paragraph', (node) => {
+			// Analyze inline nodes
+			const nodesFormatting = new Map<PhrasingContent, Set<string>>();
+
+			for (const child of node.children) {
+				visit(child, (deepChild) => {
+					if (!formattingNodes.has(deepChild.type)) return SKIP;
+
+					if (!nodesFormatting.has(child))
+						nodesFormatting.set(child, new Set());
+					nodesFormatting.get(child)!.add(deepChild.type);
+
+					return CONTINUE;
+				});
+			}
+
+			// TODO: group & lift
+			console.log('Formatting');
+			console.dir(nodesFormatting.values(), { depth: null });
+
+			const newChildren: PhrasingContent[] = [];
+			for (const nodeType of ['emphasis'] as const) {
+				let currentGroup: PhrasingContent[] = [];
+				const terminateGroup = () => {
+					console.log('Group', currentGroup);
+
+					if (currentGroup.length > 0) {
+						const groupNode = u(nodeType, { children: currentGroup });
+						visit(groupNode, [nodeType], (node, index, parent) => {
+							if (node === groupNode || !parent || index === undefined)
+								return CONTINUE;
+
+							parent.children.splice(index, 1, ...node.children);
+							return index + node.children.length;
+						});
+						newChildren.push(groupNode);
+					}
+
+					currentGroup = [];
+				};
+
+				for (const child of node.children) {
+					const isMatch = nodesFormatting.get(child)?.has(nodeType) ?? false;
+					if (isMatch) currentGroup.push(child);
+					else {
+						terminateGroup();
+						newChildren.push(child);
+					}
+				}
+
+				terminateGroup();
+			}
+
+			node.children = newChildren;
+
+			return SKIP;
+		});
+	};
+}
 
 export const markdownProcessor = unified()
 	.use(remarkParse)
@@ -286,9 +357,14 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 export const $serializeAsMarkdownAST = () => {
 	const rootNode = $getRoot();
 	const children = rootNode.getChildren();
-	return u('root', {
+
+	const tree = u('root', {
 		children: children.map(convertLexicalNodeToMarkdownNode),
 	}) satisfies Root;
+
+	remarkLiftFormatting()(tree);
+
+	return tree;
 };
 
 export const $convertToMarkdownString = () => {

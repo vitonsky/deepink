@@ -115,7 +115,7 @@ export const convertLexicalNodeToMarkdownNode = (node: LexicalNode): Content => 
 		}) satisfies Text;
 
 		const formatsOrder = (
-			['strikethrough', 'italic', 'bold'] satisfies TextFormatType[]
+			['bold', 'italic', 'strikethrough'] satisfies TextFormatType[]
 		).reverse();
 		const nodesMap = {
 			italic: 'emphasis',
