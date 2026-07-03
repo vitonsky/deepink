@@ -114,6 +114,7 @@ export const convertLexicalNodeToMarkdownNode = (node: LexicalNode): Content => 
 			value: node.getTextContent(),
 		}) satisfies Text;
 
+		// TODO: support all formats like super/sub, etc
 		const formatsOrder = (
 			['bold', 'italic', 'strikethrough'] satisfies TextFormatType[]
 		).reverse();

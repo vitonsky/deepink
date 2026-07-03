@@ -8,7 +8,15 @@ import {
 	IS_CODE,
 	LexicalNode,
 } from 'lexical';
-import { Content, PhrasingContent, Root, RootContent } from 'mdast';
+import {
+	Content,
+	type Delete,
+	type Emphasis,
+	type PhrasingContent,
+	type Root,
+	RootContent,
+	type Strong,
+} from 'mdast';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
@@ -92,72 +100,130 @@ const remarkPreserveBlankLines: Plugin<[], Root> = () => {
 	};
 };
 
-// TODO: refactor code, that is just a draft
-// TODO: lift any formatting, not only emphasis
-// TODO: improve performance
+/**
+ * Formatting node types treated as pure "marks": they wrap exactly one
+ * thing and carry no data of their own (unlike e.g. `link`/`image`), so
+ * they can be freely merged, split and re-nested.
+ *
+ * The ORDER here is significant: it's the canonical outer -> inner nesting
+ * order that lifted formatting gets rebuilt in, regardless of whatever
+ * (possibly inconsistent) order the input used. Add more types here to
+ * support lifting them too - no other code needs to change.
+ */
+const MARK_ORDER = ['emphasis', 'strong', 'delete'] satisfies (
+	| Emphasis['type']
+	| Strong['type']
+	| Delete['type']
+)[];
+
+type Mark = (typeof MARK_ORDER)[number];
+type MarkNode = Emphasis | Strong | Delete;
+
+const MARK_TYPES = new Set<string>(MARK_ORDER);
+
+function isMarkNode(node: PhrasingContent): node is MarkNode {
+	return MARK_TYPES.has(node.type);
+}
+
+function hasChildren(
+	node: PhrasingContent,
+): node is PhrasingContent & { children: PhrasingContent[] } {
+	return (
+		'children' in node &&
+		Array.isArray((node as { children?: unknown }).children) &&
+		(node as { children: unknown[] }).children.length > 0
+	);
+}
+
+/** Flattened leaf: some content plus the set of marks wrapping it. */
+interface Leaf {
+	content: PhrasingContent;
+	marks: Set<Mark>;
+}
+
+/**
+ * Descends through a chain of single-child mark wrappers, collecting every
+ * mark found along the way, stopping at the first node that either isn't a
+ * mark node or doesn't have exactly one child. That stopping node's own
+ * children (if any) are recursively re-lifted, so formatting nested inside
+ * e.g. links, or inside already-multi-child mark nodes, is still
+ * normalized without being lifted past a boundary it shouldn't cross.
+ */
+function flattenToLeaf(node: PhrasingContent, marks: Set<Mark>): Leaf {
+	if (isMarkNode(node) && node.children.length === 1) {
+		marks.add(node.type);
+		return flattenToLeaf(node.children[0], marks);
+	}
+
+	if (hasChildren(node))
+		return {
+			content: {
+				...node,
+				children: liftChildren(node.children),
+			} as PhrasingContent,
+			marks,
+		};
+
+	return { content: node, marks };
+}
+
+/**
+ * Rebuilds a flat list of leaves into a tree: for each position, finds the
+ * highest-priority mark (per `MARK_ORDER`, starting search at `orderIndex`)
+ * present on that leaf, groups the maximal run of subsequent leaves that
+ * also carry it under one new node, and recurses on the remaining marks.
+ * Leaves with no remaining marks are emitted as-is.
+ */
+function rebuildFromLeaves(leaves: Leaf[], orderIndex: number): PhrasingContent[] {
+	const result: PhrasingContent[] = [];
+	let i = 0;
+
+	while (i < leaves.length) {
+		let markIndex = orderIndex;
+		while (
+			markIndex < MARK_ORDER.length &&
+			!leaves[i].marks.has(MARK_ORDER[markIndex])
+		)
+			markIndex++;
+
+		if (markIndex === MARK_ORDER.length) {
+			result.push(leaves[i].content);
+			i++;
+			continue;
+		}
+
+		const mark = MARK_ORDER[markIndex];
+		const group: Leaf[] = [];
+
+		while (i < leaves.length && leaves[i].marks.has(mark)) {
+			leaves[i].marks.delete(mark);
+			group.push(leaves[i]);
+			i++;
+		}
+
+		result.push({
+			type: mark,
+			children: rebuildFromLeaves(group, markIndex + 1),
+		} as PhrasingContent);
+	}
+
+	return result;
+}
+
+/** Lifts/normalizes formatting across one run of sibling phrasing content. */
+function liftChildren(children: PhrasingContent[]): PhrasingContent[] {
+	return rebuildFromLeaves(
+		children.map((child) => flattenToLeaf(child, new Set())),
+		0,
+	);
+}
+
 export default function remarkLiftFormatting() {
-	const formattingNodes = new Set<string>([
-		'emphasis',
-		'delete',
-		'strong',
-	] satisfies PhrasingContent['type'][]);
-
 	return (tree: Root) => {
-		visit(tree, 'paragraph', (node) => {
-			// Analyze inline nodes
-			const nodesFormatting = new Map<PhrasingContent, Set<string>>();
-
-			for (const child of node.children) {
-				visit(child, (deepChild) => {
-					if (!formattingNodes.has(deepChild.type)) return SKIP;
-
-					if (!nodesFormatting.has(child))
-						nodesFormatting.set(child, new Set());
-					nodesFormatting.get(child)!.add(deepChild.type);
-
-					return CONTINUE;
-				});
+		visit(tree, ['paragraph', 'tableCell'], (node) => {
+			if ('children' in node) {
+				node.children = liftChildren(node.children as PhrasingContent[]);
 			}
-
-			// TODO: group & lift
-			console.log('Formatting');
-			console.dir(nodesFormatting.values(), { depth: null });
-
-			const newChildren: PhrasingContent[] = [];
-			for (const nodeType of ['emphasis'] as const) {
-				let currentGroup: PhrasingContent[] = [];
-				const terminateGroup = () => {
-					console.log('Group', currentGroup);
-
-					if (currentGroup.length > 0) {
-						const groupNode = u(nodeType, { children: currentGroup });
-						visit(groupNode, [nodeType], (node, index, parent) => {
-							if (node === groupNode || !parent || index === undefined)
-								return CONTINUE;
-
-							parent.children.splice(index, 1, ...node.children);
-							return index + node.children.length;
-						});
-						newChildren.push(groupNode);
-					}
-
-					currentGroup = [];
-				};
-
-				for (const child of node.children) {
-					const isMatch = nodesFormatting.get(child)?.has(nodeType) ?? false;
-					if (isMatch) currentGroup.push(child);
-					else {
-						terminateGroup();
-						newChildren.push(child);
-					}
-				}
-
-				terminateGroup();
-			}
-
-			node.children = newChildren;
-
 			return SKIP;
 		});
 	};
