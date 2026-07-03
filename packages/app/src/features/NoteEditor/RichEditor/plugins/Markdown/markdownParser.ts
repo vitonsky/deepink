@@ -31,7 +31,7 @@ import { $createImageNode } from '../Image/ImageNode';
 import { convertLexicalNodeToMarkdownNode } from './convertLexicalNodeToMarkdownNode';
 import { createSyncContext } from './createSyncContext';
 import { $createRawNode } from './nodes/RawNode';
-import remarkLiftFormatting from './remark/remarkLiftFormatting';
+import { liftFormattingNodes } from './remark/remarkLiftFormatting';
 import { remarkPreserveBlankLines } from './remark/remarkPreserveBlankLines';
 
 export const markdownProcessor = unified()
@@ -233,7 +233,7 @@ export const $serializeAsMarkdownAST = () => {
 		children: children.map(convertLexicalNodeToMarkdownNode),
 	}) satisfies Root;
 
-	remarkLiftFormatting()(tree);
+	liftFormattingNodes(tree);
 
 	return tree;
 };

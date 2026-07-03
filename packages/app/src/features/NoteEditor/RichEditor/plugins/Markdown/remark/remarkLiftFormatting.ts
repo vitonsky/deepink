@@ -120,13 +120,15 @@ function liftChildren(children: PhrasingContent[]): PhrasingContent[] {
 	);
 }
 
+export const liftFormattingNodes = (tree: Root) => {
+	visit(tree, ['paragraph', 'tableCell'], (node) => {
+		if ('children' in node) {
+			node.children = liftChildren(node.children as PhrasingContent[]);
+		}
+		return SKIP;
+	});
+};
+
 export default function remarkLiftFormatting() {
-	return (tree: Root) => {
-		visit(tree, ['paragraph', 'tableCell'], (node) => {
-			if ('children' in node) {
-				node.children = liftChildren(node.children as PhrasingContent[]);
-			}
-			return SKIP;
-		});
-	};
+	return liftFormattingNodes;
 }
