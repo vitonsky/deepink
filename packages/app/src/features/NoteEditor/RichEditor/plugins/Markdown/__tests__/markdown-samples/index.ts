@@ -6,6 +6,13 @@ export const richFormatting = `
 *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~***
 `.trim();
 
+export const formattingInTable = `
+| foo | bar |
+| ---- | ----- |
+| *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~ |
+| **bold** | *italic* |
+`.trim();
+
 export const mixedList = `
 - level 1-1
   - [x] level 2-1

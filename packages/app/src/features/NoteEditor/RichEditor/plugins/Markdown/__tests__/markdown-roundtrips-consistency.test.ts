@@ -12,6 +12,7 @@ import {
 import {
 	detailsWithSummary,
 	formattedLine,
+	formattingInTable,
 	mixedList,
 	nestedQuote,
 	postWithHeaders,
@@ -50,6 +51,10 @@ describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level'
 		{
 			title: 'Simple formatting',
 			markdown: simpleFormatting,
+		},
+		{
+			title: 'Table with formatting',
+			markdown: formattingInTable,
 		},
 		{
 			title: 'List item with inline elements',

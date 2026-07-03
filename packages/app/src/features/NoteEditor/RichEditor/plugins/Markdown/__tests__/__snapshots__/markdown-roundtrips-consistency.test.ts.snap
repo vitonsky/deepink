@@ -163,6 +163,14 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
+exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Table with formatting 1`] = `
+"| foo                                                                                                                    | bar                        |
+| ---------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~ |
+| **bold**                                                                                                               | *italic*                   |
+"
+`;
+
 exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Text with few empty lines 1`] = `
 "foo
 
