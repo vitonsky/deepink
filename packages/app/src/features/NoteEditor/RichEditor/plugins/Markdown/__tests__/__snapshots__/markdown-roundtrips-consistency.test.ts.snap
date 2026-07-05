@@ -65,6 +65,15 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
+exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > List with formatting 1`] = `
+"- *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~
+- Plain text
+- *Italic*
+- **Bold**
+- ~~Delete~~
+"
+`;
+
 exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Mixed list 1`] = `
 "- level 1-1
   - [x] level 2-1
@@ -103,6 +112,15 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "- foo
   - bar
   - baz
+"
+`;
+
+exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Quote with formatting 1`] = `
+"> *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~
+> Plain text
+> *Italic*
+> **Bold**
+> ~~Delete~~
 "
 `;
 

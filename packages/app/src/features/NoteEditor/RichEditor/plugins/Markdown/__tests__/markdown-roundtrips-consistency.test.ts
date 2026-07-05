@@ -12,6 +12,8 @@ import {
 import {
 	detailsWithSummary,
 	formattedLine,
+	formattingInList,
+	formattingInQuote,
 	formattingInTable,
 	mixedList,
 	nestedQuote,
@@ -51,6 +53,14 @@ describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level'
 		{
 			title: 'Simple formatting',
 			markdown: simpleFormatting,
+		},
+		{
+			title: 'List with formatting',
+			markdown: formattingInList,
+		},
+		{
+			title: 'Quote with formatting',
+			markdown: formattingInQuote,
 		},
 		{
 			title: 'Table with formatting',

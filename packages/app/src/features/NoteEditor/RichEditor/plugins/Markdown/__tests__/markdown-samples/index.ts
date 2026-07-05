@@ -6,6 +6,22 @@ export const richFormatting = `
 *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~***
 `.trim();
 
+export const formattingInList = `
+- *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~
+- Plain text
+- *Italic*
+- **Bold**
+- ~~Delete~~
+`.trim();
+
+export const formattingInQuote = `
+> *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~
+> Plain text
+> *Italic*
+> **Bold**
+> ~~Delete~~
+`.trim();
+
 export const formattingInTable = `
 | foo | bar |
 | ---- | ----- |
