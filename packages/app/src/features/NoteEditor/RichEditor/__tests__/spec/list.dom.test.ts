@@ -101,3 +101,65 @@ test('Pressing Enter on an empty last list item exits the list', async () => {
 	expect(editorChildren[0].children).toHaveLength(1);
 	expect(editorChildren[1]).toHaveRole('paragraph');
 });
+
+describe('Rendering', () => {
+	test('Renders a checklist with checked and unchecked items', async () => {
+		await renderRichEditor({
+			value: `- [x] First item
+  - [ ] Nested item
+	- [x] Deep nested item
+- [ ] Second item`,
+		});
+
+		const checkboxes = within(screen.getByRole('textbox')).getAllByRole('checkbox');
+		const [firstItem, nestedItem, deepNestedItem, secondItem] = checkboxes;
+		expect(checkboxes).toHaveLength(4);
+
+		// First item contains nested list
+		expect(firstItem).toHaveTextContent('First item');
+		expect(firstItem).toBeChecked();
+
+		const [firstItemNestedList] = within(firstItem).getAllByRole('list');
+		expect(firstItemNestedList).toContainElement(nestedItem);
+
+		// Nested item contains deep nested list
+		expect(nestedItem).toHaveTextContent('Nested item');
+		expect(nestedItem).not.toBeChecked();
+
+		const nestedItemList = within(nestedItem).getByRole('list');
+		expect(nestedItemList).toContainElement(deepNestedItem);
+
+		// Deep nested item
+		expect(deepNestedItem).toHaveTextContent('Deep nested item');
+		expect(deepNestedItem).toBeChecked();
+
+		// Second item
+		expect(secondItem).toHaveTextContent('Second item');
+		expect(secondItem).not.toBeChecked();
+	});
+
+	test('Renders a mixed list with regular and checkbox items correctly', async () => {
+		await renderRichEditor({
+			value: `- [x] First item
+  - Nested simple item
+- [ ] Second item`,
+		});
+
+		const checkboxes = screen.getAllByRole('checkbox');
+		expect(checkboxes).toHaveLength(2);
+		const [first, second] = checkboxes;
+
+		expect(first).toHaveTextContent('First item');
+		expect(first).toBeChecked();
+
+		expect(second).toHaveTextContent('Second item');
+		expect(second).not.toBeChecked();
+
+		// Nested item - regular, not checkbox
+		const nestedList = within(first).getByRole('list');
+		const nestedItem = within(nestedList).getByRole('listitem');
+
+		expect(nestedItem).toHaveTextContent('Nested simple item');
+		expect(within(nestedItem).queryByRole('checkbox')).toBeNull();
+	});
+});
