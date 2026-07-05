@@ -127,6 +127,8 @@ export const liftFormattingNodes = (tree: Root) => {
 		}
 		return SKIP;
 	});
+
+	return tree;
 };
 
 export default function remarkLiftFormatting() {
