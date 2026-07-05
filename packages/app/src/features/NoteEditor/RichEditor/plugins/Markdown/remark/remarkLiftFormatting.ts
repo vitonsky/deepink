@@ -70,18 +70,19 @@ function flattenToLeaf(node: PhrasingContent, marks: Set<Mark>): Leaf {
 }
 
 /**
- * Rebuilds a flat list of leaves into a tree: for each position, finds the
- * highest-priority mark (per `MARK_ORDER`, starting search at `orderIndex`)
- * present on that leaf, groups the maximal run of subsequent leaves that
- * also carry it under one new node, and recurses on the remaining marks.
- * Leaves with no remaining marks are emitted as-is.
+ * Rebuilds a flat list of leaves into a tree. Marks already consumed are
+ * removed from each leaf's `Set`, so scanning `MARK_ORDER` from the start
+ * every time is both safe (can't re-select a consumed mark) and necessary:
+ * different leaves inside the same run may carry different subsets of
+ * marks, so the "next" priority mark to lift can legitimately be one that
+ * comes *before* a mark that was just grouped one level up.
  */
-function rebuildFromLeaves(leaves: Leaf[], orderIndex: number): PhrasingContent[] {
+function rebuildFromLeaves(leaves: Leaf[]): PhrasingContent[] {
 	const result: PhrasingContent[] = [];
 	let i = 0;
 
 	while (i < leaves.length) {
-		let markIndex = orderIndex;
+		let markIndex = 0;
 		while (
 			markIndex < MARK_ORDER.length &&
 			!leaves[i].marks.has(MARK_ORDER[markIndex])
@@ -105,19 +106,15 @@ function rebuildFromLeaves(leaves: Leaf[], orderIndex: number): PhrasingContent[
 
 		result.push({
 			type: mark,
-			children: rebuildFromLeaves(group, markIndex + 1),
+			children: rebuildFromLeaves(group),
 		} as PhrasingContent);
 	}
 
 	return result;
 }
 
-/** Lifts/normalizes formatting across one run of sibling phrasing content. */
 function liftChildren(children: PhrasingContent[]): PhrasingContent[] {
-	return rebuildFromLeaves(
-		children.map((child) => flattenToLeaf(child, new Set())),
-		0,
-	);
+	return rebuildFromLeaves(children.map((child) => flattenToLeaf(child, new Set())));
 }
 
 export const liftFormattingNodes = (tree: Root) => {

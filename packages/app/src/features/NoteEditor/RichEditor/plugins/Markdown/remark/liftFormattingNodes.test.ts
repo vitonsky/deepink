@@ -3,6 +3,226 @@ import { u } from 'unist-builder';
 
 import { liftFormattingNodes } from './remarkLiftFormatting';
 
+describe('Normalize Lexical tree', () => {
+	test('Complex formatting', () => {
+		expect(
+			liftFormattingNodes({
+				type: 'root',
+				children: [
+					{
+						type: 'paragraph',
+						children: [
+							{
+								type: 'emphasis',
+								children: [
+									{
+										type: 'text',
+										value: 'All text can be italic, something additionally can be ',
+									},
+								],
+							},
+							{
+								type: 'emphasis',
+								children: [
+									{
+										type: 'strong',
+										children: [{ type: 'text', value: 'bold' }],
+									},
+								],
+							},
+							{
+								type: 'emphasis',
+								children: [{ type: 'text', value: ', ' }],
+							},
+							{
+								type: 'delete',
+								children: [
+									{
+										type: 'emphasis',
+										children: [
+											{ type: 'text', value: 'strikethrough' },
+										],
+									},
+								],
+							},
+							{
+								type: 'emphasis',
+								children: [{ type: 'text', value: ', or ' }],
+							},
+							{
+								type: 'delete',
+								children: [
+									{
+										type: 'emphasis',
+										children: [
+											{
+												type: 'strong',
+												children: [
+													{
+														type: 'text',
+														value: 'bold AND strikethrough',
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				],
+			} satisfies Root),
+		).toEqual({
+			type: 'root',
+			children: [
+				{
+					type: 'paragraph',
+					children: [
+						{
+							type: 'emphasis',
+							children: [
+								{
+									type: 'text',
+									value: 'All text can be italic, something additionally can be ',
+								},
+								{
+									type: 'strong',
+									children: [{ type: 'text', value: 'bold' }],
+								},
+								{ type: 'text', value: ', ' },
+								{
+									type: 'delete',
+									children: [{ type: 'text', value: 'strikethrough' }],
+								},
+								{ type: 'text', value: ', or ' },
+								{
+									type: 'strong',
+									children: [
+										{
+											type: 'delete',
+											children: [
+												{
+													type: 'text',
+													value: 'bold AND strikethrough',
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			],
+		} satisfies Root);
+	});
+
+	test('Grouping siblings', () => {
+		expect(
+			liftFormattingNodes({
+				type: 'root',
+				children: [
+					{
+						type: 'paragraph',
+						children: [
+							{
+								type: 'emphasis',
+								children: [
+									{
+										type: 'text',
+										value: 'All text can be italic, something additionally can be ',
+									},
+								],
+							},
+							{
+								type: 'emphasis',
+								children: [
+									{
+										type: 'strong',
+										children: [{ type: 'text', value: 'bold' }],
+									},
+								],
+							},
+							{
+								type: 'emphasis',
+								children: [{ type: 'text', value: ', ' }],
+							},
+							{
+								type: 'delete',
+								children: [
+									{
+										type: 'emphasis',
+										children: [
+											{ type: 'text', value: 'strikethrough' },
+										],
+									},
+								],
+							},
+							{
+								type: 'delete',
+								children: [
+									{
+										type: 'emphasis',
+										children: [
+											{
+												type: 'strong',
+												children: [
+													{
+														type: 'text',
+														value: 'bold AND strikethrough',
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				],
+			} satisfies Root),
+		).toEqual({
+			type: 'root',
+			children: [
+				{
+					type: 'paragraph',
+					children: [
+						{
+							type: 'emphasis',
+							children: [
+								{
+									type: 'text',
+									value: 'All text can be italic, something additionally can be ',
+								},
+								{
+									type: 'strong',
+									children: [{ type: 'text', value: 'bold' }],
+								},
+								{ type: 'text', value: ', ' },
+								{
+									type: 'delete',
+									children: [
+										{ type: 'text', value: 'strikethrough' },
+										{
+											type: 'strong',
+											children: [
+												{
+													type: 'text',
+													value: 'bold AND strikethrough',
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			],
+		} satisfies Root);
+	});
+});
+
 test('Sibling nodes with exact format must be grouped', () => {
 	expect(
 		liftFormattingNodes(
