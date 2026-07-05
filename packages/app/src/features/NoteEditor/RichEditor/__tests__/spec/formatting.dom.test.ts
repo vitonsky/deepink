@@ -113,10 +113,12 @@ describe('Formatting via keyboard shortcuts', () => {
 			await user.keyboard(shortcut);
 			expect(within(editor).getByText(selectionText)).toHaveClass(formatClass);
 
-			// Cancel formatting
+			// Remove formatting
 			selectText(editor, selectionText);
 			await user.keyboard(shortcut);
-			expect(editor).not.toHaveClass(formatClass);
+			expect(
+				within(editor).getByText(selectionText, { exact: false }),
+			).not.toHaveClass(formatClass);
 		}),
 	);
 });
