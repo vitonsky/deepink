@@ -2,47 +2,121 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { renderRichEditor } from '../utils/renderRichEditor';
+import { textFormatClasses } from '../utils/richEditorFixtures';
 import { selectContent, selectText } from '../utils/utils';
 
-// TODO: Remove `.fails` after fixing the formatting implementation
-// The assertions below describe the expected behavior and should remain unchanged
-test('Applies formatting to a selected part of a text node', async () => {
+test('Text formatting can be toggled', async () => {
+	const content = 'Hello, my dear friends!';
+	const richEditor = await renderRichEditor({ value: content });
+
+	const editor = screen.getByRole('textbox');
+
+	// Apply strikethrough
+	selectContent(editor, content);
+	await richEditor.format('strikethrough');
+	expect(within(editor).getByText(content)).toHaveClass(
+		textFormatClasses.strikethrough,
+	);
+
+	// Remove strikethrough
+	selectContent(editor, content);
+	await richEditor.format('strikethrough');
+	expect(within(editor).getByText(content)).not.toHaveClass(
+		textFormatClasses.strikethrough,
+	);
+
+	// Apply italic
+	selectContent(editor, content);
+	await richEditor.format('italic');
+	expect(within(editor).getByText(content)).toHaveClass(textFormatClasses.italic);
+
+	// Remove italic
+	selectContent(editor, content);
+	await richEditor.format('italic');
+	expect(within(editor).getByText(content)).not.toHaveClass(textFormatClasses.italic);
+});
+
+test('One text node can have different formatting at once', async () => {
+	const content = 'Hello, my dear friends!';
+	const richEditor = await renderRichEditor({ value: content });
+
+	const editor = screen.getByRole('textbox');
+
+	selectContent(editor, content);
+	await richEditor.format('italic');
+	await richEditor.format('bold');
+	await richEditor.format('strikethrough');
+
+	expect(within(editor).getByText(content)).toHaveClass(textFormatClasses.bold);
+	expect(within(editor).getByText(content)).toHaveClass(textFormatClasses.italic);
+	expect(within(editor).getByText(content)).toHaveClass(
+		textFormatClasses.strikethrough,
+	);
+
+	// Removes bold without breaking others formatting
+	selectContent(editor, content);
+	await richEditor.format('bold');
+
+	expect(within(editor).getByText(content)).not.toHaveClass(textFormatClasses.bold);
+	expect(within(editor).getByText(content)).toHaveClass(textFormatClasses.italic);
+	expect(within(editor).getByText(content)).toHaveClass(
+		textFormatClasses.strikethrough,
+	);
+});
+
+test('Formatting can be applied to a part of text', async () => {
 	const user = userEvent.setup();
 	const richEditor = await renderRichEditor({ value: 'Hello, my dear friends!' });
 
 	const editor = screen.getByRole('textbox');
 	await user.click(editor);
-	selectText(editor, 'friends');
 
 	// Apply formatting
+	selectText(editor, 'friends');
 	await richEditor.format('italic');
 
-	// await act(async () => await user.keyboard('{Ctrl>}b{/Ctrl}'));
-	// await user.keyboard('{Control>}i{/Control}');
-
-	// expect(richEditor.container.outerHTML).toBe("")
-	expect(
-		screen.getAllByRole('emphasis').find((el) => within(el).queryByText('friends'))
-			?.textContent,
-	).toBe('friends');
-	// expect(screen.getByRole('emphasis')).toHaveTextContent('Hello, my dear ');
+	expect(within(editor).getByText('friends')).toHaveClass(textFormatClasses.italic);
 });
 
-test.skip('Applies formatting across multiple text blocks', async () => {
-	const richEditor = await renderRichEditor({
-		value: 'Hello, my dear friends! \n\n Nice to see you. \n\n How are you ?',
-	});
+describe('Formatting via keyboard shortcuts', () => {
+	const cases: {
+		title: string;
+		shortcut: string;
+		formatClass: RegExp;
+	}[] = [
+		{
+			title: 'Ctrl+I must toggle Italic format',
+			shortcut: '{Control>}i{/Control}',
+			formatClass: textFormatClasses.italic,
+		},
+		{
+			title: 'Ctrl+B must toggle Bold format',
+			shortcut: '{Control>}b{/Control}',
+			formatClass: textFormatClasses.bold,
+		},
+	];
 
-	const editor = screen.getByRole('textbox');
-	selectContent(editor, 'Hello, my dear friends!', 'How are you ?');
+	cases.forEach(({ title, shortcut, formatClass }) =>
+		test(title, async () => {
+			const user = userEvent.setup();
+			await renderRichEditor({
+				value: 'The quick brown fox jumps over the lazy dog',
+			});
 
-	// Apply formatting
-	await richEditor.format('italic');
+			const editor = screen.getByRole('textbox');
+			await user.click(editor);
 
-	// Each line should be wrapped in emphasis
-	const formattingNodes = within(editor).getAllByRole('emphasis');
-	expect(formattingNodes).toHaveLength(3);
-	expect(formattingNodes[0]).toHaveTextContent('Hello, my dear friends!');
-	expect(formattingNodes[1]).toHaveTextContent('Nice to see you');
-	expect(formattingNodes[2]).toHaveTextContent('How are you ?');
+			const selectionText = 'quick brown fox';
+
+			// Apply formatting
+			selectText(editor, selectionText);
+			await user.keyboard(shortcut);
+			expect(within(editor).getByText(selectionText)).toHaveClass(formatClass);
+
+			// Cancel formatting
+			selectText(editor, selectionText);
+			await user.keyboard(shortcut);
+			expect(editor).not.toHaveClass(formatClass);
+		}),
+	);
 });

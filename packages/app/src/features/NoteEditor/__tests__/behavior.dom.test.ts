@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { renderRichEditor } from './utils/renderRichEditor';
+import { textFormatClasses } from './utils/richEditorFixtures';
 import { selectContent } from './utils/utils';
 
 test('Editor updates when value changes', async () => {
@@ -41,29 +42,38 @@ test('Formatting text in one editor does not affect the other editor', async () 
 	const editorA = await renderRichEditor({ value: 'Big text' });
 	const editorB = await renderRichEditor({ value: 'Small text' });
 
-	const textBoxes = screen.getAllByRole('textbox');
-	expect(textBoxes).toHaveLength(2);
+	const editorContainers = screen.getAllByRole('textbox');
+	expect(editorContainers).toHaveLength(2);
 
 	// initial state
-	expect(within(textBoxes[0]).queryByRole('paragraph')).toHaveTextContent('Big text');
-	expect(within(textBoxes[1]).queryByRole('paragraph')).toHaveTextContent('Small text');
+	expect(editorContainers[0]).toHaveTextContent('Big text');
+	expect(editorContainers[1]).toHaveTextContent('Small text');
 
 	// apply italic in editorA
-	selectContent(textBoxes[0], 'Big text');
+	selectContent(editorContainers[0], 'Big text');
 	await editorA.format('italic');
-
-	expect(within(textBoxes[0]).getByRole('emphasis')).toHaveTextContent('Big text');
-	expect(within(textBoxes[1]).queryByRole('emphasis')).not.toBeInTheDocument();
+	expect(within(editorContainers[0]).getByRole('emphasis')).toHaveTextContent(
+		'Big text',
+	);
+	expect(within(editorContainers[1]).queryByRole('emphasis')).not.toBeInTheDocument();
 
 	// apply strikethrough in editorB
-	selectContent(textBoxes[1], 'Small text');
+	selectContent(editorContainers[1], 'Small text');
 	await editorB.format('strikethrough');
+	expect(within(editorContainers[1]).getByText('Small text')).toHaveClass(
+		textFormatClasses.strikethrough,
+	);
+	expect(within(editorContainers[1]).getByText('Small text')).not.toHaveClass(
+		textFormatClasses.italic,
+	);
 
-	expect(within(textBoxes[1]).getByRole('deletion')).toHaveTextContent('Small text');
-	expect(within(textBoxes[1]).queryByRole('emphasis')).not.toBeInTheDocument();
-
-	expect(within(textBoxes[0]).getByRole('emphasis')).toHaveTextContent('Big text');
-	expect(within(textBoxes[0]).queryByRole('deletion')).not.toBeInTheDocument();
+	// No changes in editorA
+	expect(within(editorContainers[0]).getByText('Big text')).toHaveClass(
+		textFormatClasses.italic,
+	);
+	expect(within(editorContainers[0]).getByText('Big text')).not.toHaveClass(
+		textFormatClasses.strikethrough,
+	);
 });
 
 test('ReadOnly editor is not editable while the other editor remains editable', async () => {

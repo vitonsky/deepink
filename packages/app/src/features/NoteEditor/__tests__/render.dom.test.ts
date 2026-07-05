@@ -3,6 +3,7 @@ import path from 'path';
 import { screen, within } from '@testing-library/react';
 
 import { renderRichEditor } from './utils/renderRichEditor';
+import { textFormatClasses } from './utils/richEditorFixtures';
 
 test('Renders markdown correctly', async () => {
 	const markdown = readFileSync(
@@ -18,10 +19,13 @@ test('Renders markdown correctly', async () => {
 	expect(paragraph).toHaveTextContent(
 		'This is a regular paragraph with bold text, italic text, strikethrough text.',
 	);
-	expect(paragraph.querySelector('b')).toHaveTextContent('bold text');
-	expect(within(paragraph).getByRole('emphasis')).toHaveTextContent('italic text');
-	expect(within(paragraph).getByRole('deletion')).toHaveTextContent(
-		'strikethrough text',
+
+	expect(within(paragraph).getByText('bold text')).toHaveClass(textFormatClasses.bold);
+	expect(within(paragraph).getByText('italic text')).toHaveClass(
+		textFormatClasses.italic,
+	);
+	expect(within(paragraph).getByText('strikethrough text')).toHaveClass(
+		textFormatClasses.strikethrough,
 	);
 
 	// Horizontal rule

@@ -50,23 +50,56 @@ export const selectContent = (
 /**
  * Selects the given text within a provided element
  */
-export const selectText = (element: HTMLElement, text: string) => {
-	const textNode = getFirstTextNode(element);
-	if (!textNode) throw new Error('No text node found in the provided element');
+export function selectText(container: Node, text: string): Range {
+	const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
 
-	const startPosition = textNode.textContent.indexOf(text);
-	if (startPosition === -1)
-		throw new Error(`Text "${text}" not found in the provided element`);
+	const nodes: Text[] = [];
+	let full = '';
+
+	while (walker.nextNode()) {
+		const n = walker.currentNode as Text;
+		nodes.push(n);
+		full += n.data;
+	}
+
+	const start = full.indexOf(text);
+	if (start === -1) throw new Error('Not found');
+
+	const end = start + text.length;
+
+	let pos = 0;
+	let startNode: Text | undefined;
+	let endNode: Text | undefined;
+	let startOffset = 0;
+	let endOffset = 0;
+
+	for (const n of nodes) {
+		const next = pos + n.data.length;
+
+		if (!startNode && start < next) {
+			startNode = n;
+			startOffset = start - pos;
+		}
+
+		if (!endNode && end <= next) {
+			endNode = n;
+			endOffset = end - pos;
+			break;
+		}
+
+		pos = next;
+	}
 
 	const range = document.createRange();
-	range.setStart(textNode, startPosition);
-	range.setEnd(textNode, startPosition + text.length);
+	range.setStart(startNode!, startOffset);
+	range.setEnd(endNode!, endOffset);
 
-	window.getSelection()?.removeAllRanges();
-	window.getSelection()?.addRange(range);
+	const sel = window.getSelection();
+	sel?.removeAllRanges();
+	sel?.addRange(range);
 
-	fireEvent(document, new Event('selectionchange'));
-};
+	return range;
+}
 
 /**
  * Simulates placing the cursor at a given position within a node
