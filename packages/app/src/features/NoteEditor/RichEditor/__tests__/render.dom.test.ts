@@ -5,6 +5,22 @@ import { screen, within } from '@testing-library/react';
 import { renderRichEditor } from './utils/renderRichEditor';
 import { textFormatClasses } from './utils/richEditorFixtures';
 
+test('Editor updates when value changes', async () => {
+	const editor = await renderRichEditor({ value: `# Big text` });
+
+	expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Big text');
+
+	// Run component rerender with new value
+	await editor.rerender({ value: `### Not so big text` });
+
+	expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(
+		'Not so big text',
+	);
+
+	// The old header was removed
+	expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+});
+
 test('Renders markdown correctly', async () => {
 	const markdown = readFileSync(
 		path.resolve(path.dirname(__filename), 'resources/example.md'),
