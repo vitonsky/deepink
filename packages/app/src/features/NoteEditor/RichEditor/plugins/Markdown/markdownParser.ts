@@ -5,8 +5,9 @@ import {
 	$createTextNode,
 	$getRoot,
 	$isTextNode,
-	IS_CODE,
 	LexicalNode,
+	TextFormatType,
+	TextNode,
 } from 'lexical';
 import { Content, type Root } from 'mdast';
 import remarkGfm from 'remark-gfm';
@@ -74,6 +75,9 @@ export const $wrapWithParagraph = (children: LexicalNode[]) => {
 	return p;
 };
 
+const $setTextNodeFormat = (node: TextNode, formats: TextFormatType[]) =>
+	formats.forEach((format) => node.toggleFormat(format));
+
 export const $convertFromMarkdownString = (rawMarkdown: string) => {
 	const mdTree = parseMarkdownToAST(rawMarkdown);
 
@@ -82,7 +86,7 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 		switch (node.type) {
 			case 'text': {
 				const t = $createTextNode(node.value);
-				textFormatContext.get().forEach((format) => t.toggleFormat(format));
+				$setTextNodeFormat(t, textFormatContext.get());
 				return [t];
 			}
 			case 'paragraph': {
@@ -169,7 +173,7 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			}
 			case 'inlineCode': {
 				const text = $createTextNode(node.value);
-				text.setFormat(IS_CODE);
+				$setTextNodeFormat(text, [...textFormatContext.get(), 'code']);
 				return [text];
 			}
 			// TODO: handle sub/super/etc

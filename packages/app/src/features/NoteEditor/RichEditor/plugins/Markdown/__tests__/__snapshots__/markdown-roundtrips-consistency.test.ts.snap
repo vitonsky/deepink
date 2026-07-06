@@ -48,6 +48,16 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
+exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Inline code 1`] = `
+"Text with \`code\`
+"
+`;
+
+exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Inline code with formatting 1`] = `
+"Text with ***~~\`formatted code\`~~***
+"
+`;
+
 exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Links 1`] = `
 "Some [link](https://url "Title") and [another link](proto://url)
 "

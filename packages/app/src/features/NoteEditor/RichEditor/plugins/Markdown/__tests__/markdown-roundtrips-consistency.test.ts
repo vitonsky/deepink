@@ -43,6 +43,14 @@ test('Markdown parser round-trips', () => {
 describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level', () => {
 	const cases = [
 		{
+			title: 'Inline code',
+			markdown: 'Text with `code`',
+		},
+		{
+			title: 'Inline code with formatting',
+			markdown: 'Text with ***~~`formatted code`~~***',
+		},
+		{
 			title: 'Rich formatting',
 			markdown: richFormatting,
 		},

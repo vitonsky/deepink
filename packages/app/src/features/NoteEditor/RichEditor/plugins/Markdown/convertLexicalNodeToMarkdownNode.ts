@@ -100,15 +100,13 @@ export const convertLexicalNodeToMarkdownNode = (node: LexicalNode): Content => 
 	}
 
 	if ($isTextNode(node)) {
-		if (node.hasFormat('code')) {
-			return u('inlineCode', {
-				value: node.getTextContent(),
-			}) satisfies InlineCode;
-		}
-
-		let wrappedNode: PhrasingContent = u('text', {
-			value: node.getTextContent(),
-		}) satisfies Text;
+		let wrappedNode: PhrasingContent = node.hasFormat('code')
+			? (u('inlineCode', {
+					value: node.getTextContent(),
+				}) satisfies InlineCode)
+			: (u('text', {
+					value: node.getTextContent(),
+				}) satisfies Text);
 
 		// TODO: support all formats like super/sub, etc
 		const formatsOrder = (
