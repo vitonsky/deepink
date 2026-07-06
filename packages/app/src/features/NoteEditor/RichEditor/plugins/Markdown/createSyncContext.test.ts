@@ -60,5 +60,5 @@ test('Async code may access context via closure', async () => {
 		})();
 	};
 
-	expect(ctx.use(2, () => getValue())).resolves.toBe(2);
+	await expect(ctx.use(2, () => getValue())).resolves.toBe(2);
 });
