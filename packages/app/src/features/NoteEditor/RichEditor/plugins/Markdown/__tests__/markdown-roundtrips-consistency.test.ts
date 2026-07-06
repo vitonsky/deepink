@@ -68,6 +68,11 @@ describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level'
 			markdown: simpleFormatting,
 		},
 		{
+			title: 'Header with formatting',
+			markdown:
+				'### *All header is italic, **something bold**, ~~strikethrough~~, `inline code`*',
+		},
+		{
 			title: 'List with formatting',
 			markdown: formattingInList,
 		},

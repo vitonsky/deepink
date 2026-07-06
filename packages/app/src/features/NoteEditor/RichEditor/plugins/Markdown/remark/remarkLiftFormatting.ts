@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import type { Delete, Emphasis, PhrasingContent, Root, Strong } from 'mdast';
+import type { Delete, Emphasis, PhrasingContent, Root, RootContent, Strong } from 'mdast';
 import { SKIP, visit } from 'unist-util-visit';
 
 /**
@@ -118,12 +118,16 @@ function liftChildren(children: PhrasingContent[]): PhrasingContent[] {
 }
 
 export const liftFormattingNodes = (tree: Root) => {
-	visit(tree, ['paragraph', 'tableCell'], (node) => {
-		if ('children' in node) {
-			node.children = liftChildren(node.children as PhrasingContent[]);
-		}
-		return SKIP;
-	});
+	visit(
+		tree,
+		['heading', 'paragraph', 'tableCell'] satisfies RootContent['type'][],
+		(node) => {
+			if ('children' in node) {
+				node.children = liftChildren(node.children);
+			}
+			return SKIP;
+		},
+	);
 
 	return tree;
 };

@@ -43,6 +43,11 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
+exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Header with formatting 1`] = `
+"### *All header is italic, **something bold**, ~~strikethrough~~, \`inline code\`*
+"
+`;
+
 exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Image 1`] = `
 "![Alt text](https://url)
 "
