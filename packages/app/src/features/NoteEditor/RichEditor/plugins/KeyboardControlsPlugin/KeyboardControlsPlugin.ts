@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import {
 	$createParagraphNode,
-	$createTextNode,
 	$getSelection,
 	$isParagraphNode,
 	$isTextNode,
@@ -10,14 +9,11 @@ import {
 	createCommand,
 	ElementNode,
 	KEY_ENTER_COMMAND,
-	KEY_SPACE_COMMAND,
 } from 'lexical';
 import { $isCodeNode } from '@lexical/code';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $isQuoteNode } from '@lexical/rich-text';
 import { mergeRegister } from '@lexical/utils';
-
-import { $isFormattingNode, FormattingNode } from '../Markdown/nodes/FormattingNode';
 
 const OUT_OF_BLOCK_NODE_COMMAND = createCommand<ElementNode>();
 
@@ -58,20 +54,15 @@ const $getParentOfTextOnEnd = (selection: BaseSelection | null) => {
 	return null;
 };
 
-export const FormattingPlugin = () => {
+/**
+ * Plugin for nodes management via keyboard
+ */
+export const KeyboardControlsPlugin = () => {
 	const [editor] = useLexicalComposerContext();
 
 	useEffect(
 		() =>
 			mergeRegister(
-				// editor.registerNodeTransform(TextNode, $convertTextNodeFormatting),
-				editor.registerNodeTransform(FormattingNode, (node: FormattingNode) => {
-					// Remove empty formatting nodes
-					const textContent = node.getTextContent();
-					if (textContent.length > 0) return;
-
-					node.remove();
-				}),
 				editor.registerCommand(
 					KEY_ENTER_COMMAND,
 					(event) => {
@@ -98,51 +89,6 @@ export const FormattingPlugin = () => {
 						const newParagraph = $createParagraphNode();
 						blockElement.insertAfter(newParagraph);
 						newParagraph.select();
-
-						return true;
-					},
-					COMMAND_PRIORITY_LOW,
-				),
-				editor.registerCommand(
-					KEY_SPACE_COMMAND,
-					(event) => {
-						// Out of inline nodes by Shift+Space
-						if (!event.shiftKey) return false;
-
-						const selection = $getSelection();
-						if (!selection) return false;
-
-						const points = selection.getStartEndPoints();
-						if (!points) return false;
-
-						const [start, end] = points;
-
-						if (
-							start.getNode() !== end.getNode() ||
-							start.offset !== end.offset
-						)
-							return false;
-
-						const focusedNode = end.getNode();
-						if (!$isTextNode(focusedNode)) return false;
-
-						const parent = focusedNode.getParent();
-						if (
-							!parent ||
-							!$isFormattingNode(parent) ||
-							parent.getLastChild() !== focusedNode
-						)
-							return false;
-
-						if (end.offset !== focusedNode.getTextContentSize()) return false;
-
-						const textNode = $createTextNode(' ');
-						parent.insertAfter(textNode);
-						textNode.select();
-
-						event.stopImmediatePropagation();
-						event.stopPropagation();
-						event.preventDefault();
 
 						return true;
 					},

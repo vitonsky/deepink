@@ -10,8 +10,6 @@ import {
 	Break,
 	Code,
 	Content,
-	Delete,
-	Emphasis,
 	Heading,
 	HTML,
 	Image,
@@ -22,7 +20,6 @@ import {
 	Paragraph,
 	PhrasingContent,
 	RootContent,
-	Strong,
 	Table,
 	TableCell,
 	TableRow,
@@ -38,7 +35,6 @@ import { $isHeadingNode, $isQuoteNode } from '@lexical/rich-text';
 import { $isTableCellNode, $isTableNode, $isTableRowNode } from '@lexical/table';
 
 import { $isImageNode } from '../Image/ImageNode';
-import { $isFormattingNode } from './nodes/FormattingNode';
 
 const inlineTypes = new Set<string>([
 	'text',
@@ -138,33 +134,6 @@ export const convertLexicalNodeToMarkdownNode = (node: LexicalNode): Content => 
 			meta: null,
 			value: node.getTextContent(),
 		}) satisfies Code;
-	}
-
-	if ($isFormattingNode(node)) {
-		const tagName = node.getTagName();
-		switch (tagName) {
-			case 'em': {
-				return u('emphasis', {
-					children: node
-						.getChildren()
-						.map(convertLexicalNodeToMarkdownNode) as Emphasis['children'],
-				}) satisfies Emphasis;
-			}
-			case 'del': {
-				return u('delete', {
-					children: node
-						.getChildren()
-						.map(convertLexicalNodeToMarkdownNode) as Delete['children'],
-				}) satisfies Delete;
-			}
-			case 'b': {
-				return u('strong', {
-					children: node
-						.getChildren()
-						.map(convertLexicalNodeToMarkdownNode) as Strong['children'],
-				}) satisfies Strong;
-			}
-		}
 	}
 
 	if ($isHorizontalRuleNode(node)) {

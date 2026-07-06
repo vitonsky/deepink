@@ -11,7 +11,6 @@ import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
 import { ImageNode } from '../../Image/ImageNode';
 
-import { FormattingNode } from '../nodes/FormattingNode';
 import { RawNode } from '../nodes/RawNode';
 
 /**
@@ -47,7 +46,6 @@ export const createLexicalEditorInstance = () => {
 		nodes: [
 			// App specific nodes
 			RawNode,
-			FormattingNode,
 			ImageNode,
 
 			// Plugins

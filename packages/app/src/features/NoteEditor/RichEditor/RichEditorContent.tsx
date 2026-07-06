@@ -22,9 +22,9 @@ import { ContextMenuPlugin } from './plugins/ContextMenu/ContextMenuPlugin';
 import { EditorPanelPlugin } from './plugins/EditorPanelPlugin/EditorPanelPlugin';
 import { DropFilesPlugin } from './plugins/Files/DropFilesPlugin';
 import { FilesPlugin } from './plugins/Files/FilesPlugin';
-import { FormattingPlugin } from './plugins/Formatting/FormattingPlugin';
 import { HighlightingPlugin } from './plugins/HighlightingPlugin/HighlightingPlugin';
 import ImagesPlugin from './plugins/Image/ImagesPlugin';
+import { KeyboardControlsPlugin } from './plugins/KeyboardControlsPlugin/KeyboardControlsPlugin';
 import { LinkClickHandlerPlugin } from './plugins/LinkClickHandlerPlugin';
 import {
 	MarkdownSerializePlugin,
@@ -113,7 +113,7 @@ export const RichEditorContent = ({
 			<RichTextContainer {...props} placeholder={placeholder} />
 			<MarkdownSerializePlugin value={value} onChanged={onChanged} />
 			<MarkdownShortcutPlugin />
-			<FormattingPlugin />
+			<KeyboardControlsPlugin />
 			<ImagesPlugin />
 			<CodeHighlightPlugin />
 			<LinkPlugin />

@@ -10,7 +10,6 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
 import { ImageNode } from './plugins/Image/ImageNode';
-import { FormattingNode } from './plugins/Markdown/nodes/FormattingNode';
 import { RawNode } from './plugins/Markdown/nodes/RawNode';
 import { RichEditorContent, RichEditorContentProps } from './RichEditorContent';
 import { theme } from './theme/RichEditor';
@@ -29,7 +28,6 @@ export const RichEditor = memo((props: RichEditorContentProps) => {
 				nodes: [
 					// App specific nodes
 					RawNode,
-					FormattingNode,
 					ImageNode,
 
 					// Plugins
