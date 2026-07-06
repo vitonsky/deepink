@@ -533,6 +533,7 @@ ul > li.RichEditor__listItem:not([role='checkbox']) {
 }
 
 .RichEditor__hr {
+	height: 1px;
 	padding: 0;
 	border: none;
 	margin: 1em 0;
@@ -548,6 +549,11 @@ ul > li.RichEditor__listItem:not([role='checkbox']) {
 }
 
 .RichEditor__hr.selected {
+	border-radius: 10px;
 	outline: 2px solid var(--chakra-colors-control-action-background);
 	user-select: none;
+
+	&::after {
+		background-color: var(--chakra-colors-control-action-background);
+	}
 }
