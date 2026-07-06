@@ -115,7 +115,7 @@
 
 .RichEditor__link {
 	display: inline-block;
-	color: var(--chakra-colors-link-base);
+	color: var(--chakra-colors-link);
 	text-decoration: inherit;
 }
 
