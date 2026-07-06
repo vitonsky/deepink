@@ -1,3 +1,5 @@
+import { wait } from '@utils/time';
+
 import { createSyncContext } from './createSyncContext';
 
 test('Default value can be used anywhere', () => {
@@ -44,4 +46,19 @@ test('Context use can return value', () => {
 		ctx.use(2, () => ctx.use(3, () => ctx.use(4, () => ctx.get()))),
 		'Callback may return its context value',
 	).toBe(4);
+});
+
+test('Async code may access context via closure', async () => {
+	const ctx = createSyncContext(1);
+
+	const getValue = () => {
+		const value = ctx.get();
+
+		return (async () => {
+			await wait(10);
+			return value;
+		})();
+	};
+
+	expect(ctx.use(2, () => getValue())).resolves.toBe(2);
 });
