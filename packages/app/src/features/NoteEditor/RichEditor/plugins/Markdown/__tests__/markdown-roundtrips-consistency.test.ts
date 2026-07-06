@@ -43,6 +43,11 @@ test('Markdown parser round-trips', () => {
 describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level', () => {
 	const cases = [
 		{
+			title: 'Bold node inside bold node',
+			markdown: '**foo __bar__ baz**',
+			inconsistentAST: true,
+		},
+		{
 			title: 'Inline code',
 			markdown: 'Text with `code`',
 		},
@@ -154,7 +159,7 @@ describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level'
 		},
 	];
 
-	cases.forEach(({ title, markdown: sourceText }) =>
+	cases.forEach(({ title, markdown: sourceText, inconsistentAST }) =>
 		test(title, async () => {
 			const { editor, destroy } = createLexicalEditorInstance();
 			onTestFinished(destroy);
@@ -163,9 +168,13 @@ describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level'
 				$convertFromMarkdownString(sourceText);
 			});
 
-			expect(
-				editor.read(() => normalizeMarkdownTree($serializeAsMarkdownAST())),
-			).toMatchObject(normalizeMarkdownTree(parseMarkdownToAST(sourceText)));
+			// Skip AST equality check for cases where AST may be optimized
+			// Even in that cases the source and output must be equal visually
+			if (!inconsistentAST) {
+				expect(
+					editor.read(() => normalizeMarkdownTree($serializeAsMarkdownAST())),
+				).toMatchObject(normalizeMarkdownTree(parseMarkdownToAST(sourceText)));
+			}
 
 			const out = editor.read(() => $convertToMarkdownString());
 			expect(out).toMatchSnapshot();

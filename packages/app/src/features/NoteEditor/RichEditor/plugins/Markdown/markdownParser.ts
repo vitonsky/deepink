@@ -75,13 +75,25 @@ export const $wrapWithParagraph = (children: LexicalNode[]) => {
 	return p;
 };
 
-const $setTextNodeFormat = (node: TextNode, formats: TextFormatType[]) =>
-	formats.forEach((format) => node.toggleFormat(format));
+const $setTextNodeFormat = (node: TextNode, formats: Iterable<TextFormatType>) => {
+	for (const format of formats) {
+		node.toggleFormat(format);
+	}
+};
+
+/**
+ * MDAST node type to Lexical text format
+ */
+const textFormattingMap = {
+	emphasis: 'italic',
+	strong: 'bold',
+	delete: 'strikethrough',
+} satisfies Record<string, TextFormat>;
 
 export const $convertFromMarkdownString = (rawMarkdown: string) => {
 	const mdTree = parseMarkdownToAST(rawMarkdown);
 
-	const textFormatContext = createSyncContext<TextFormat[]>([]);
+	const textFormatContext = createSyncContext<Set<TextFormat>>(new Set());
 	function convertToMarkdownNode(node: Content): LexicalNode[] {
 		switch (node.type) {
 			case 'text': {
@@ -181,16 +193,9 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 			case 'strong':
 			case 'delete': {
 				return textFormatContext.use(
-					[
-						...textFormatContext.get(),
-						(
-							{
-								emphasis: 'italic',
-								strong: 'bold',
-								delete: 'strikethrough',
-							} satisfies Record<string, TextFormat>
-						)[node.type],
-					],
+					textFormatContext
+						.get()
+						.union(new Set([textFormattingMap[node.type]])),
 					() => convertToMarkdownNodes(node.children),
 				);
 			}
