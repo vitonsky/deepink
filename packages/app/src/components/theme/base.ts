@@ -14,12 +14,7 @@
  ============================================================
 */
 /* eslint-disable @cspell/spellchecker */
-import {
-	defineConfig,
-	defineRecipe,
-	defineSlotRecipe,
-	SystemStyleObject,
-} from '@chakra-ui/react';
+import { defineConfig, defineRecipe, defineSlotRecipe } from '@chakra-ui/react';
 import {
 	alertAnatomy,
 	dialogAnatomy,
@@ -82,6 +77,13 @@ export const getScrollBarStyles = (): Record<string, any> => {
 
 export default defineConfig({
 	globalCss: {
+		html: {
+			'& *::selection': {
+				color: 'selection.foreground',
+				backgroundColor: 'selection.background',
+			},
+		},
+
 		body: {
 			margin: 0,
 			backgroundColor: 'var(--chakra-colors-surface-background)',
@@ -97,12 +99,6 @@ export default defineConfig({
 			'Segoe UI Emoji'`,
 		},
 
-		':root': {
-			'::selection': {
-				color: 'selection.foreground',
-				backgroundColor: 'selection.background',
-			},
-		} as SystemStyleObject,
 		...getScrollBarStyles(),
 	},
 
