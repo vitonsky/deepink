@@ -447,13 +447,8 @@
 	border-width: 0 2px 2px 0;
 }
 
-.RichEditor__nestedListItem {
-	list-style-type: none;
-}
-
-.RichEditor__nestedListItem::before,
-.RichEditor__nestedListItem::after {
-	display: none;
+ul > li.RichEditor__listItem:not([role='checkbox']) {
+	list-style: disc;
 }
 
 /*
