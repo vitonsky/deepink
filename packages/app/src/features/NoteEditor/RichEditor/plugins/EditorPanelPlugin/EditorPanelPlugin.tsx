@@ -38,10 +38,7 @@ export const EditorPanelPlugin = () => {
 
 	useEffect(() => {
 		const cleanupFormatting = onFormatting.watch((format) => {
-			// TODO: support formatting selected text slices
-			editor.update(() => {
-				editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
-			});
+			editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
 		});
 
 		const cleanupInserting = onInserting.watch((evt) => {
