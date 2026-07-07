@@ -1,6 +1,6 @@
 import { createEditor, LexicalEditor } from 'lexical';
 import { visit } from 'unist-util-visit';
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { CodeHighlightNode, CodeNode } from '@lexical/code-core';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { MarkNode } from '@lexical/mark';

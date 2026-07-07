@@ -10,7 +10,7 @@ import {
 	ElementNode,
 	LexicalNode,
 } from 'lexical';
-import { $isCodeNode } from '@lexical/code';
+import { $isCodeNode } from '@lexical/code-core';
 import { $findMatchingParent } from '@lexical/utils';
 
 export const $canInsertElementsToNode = (node: LexicalNode) => {

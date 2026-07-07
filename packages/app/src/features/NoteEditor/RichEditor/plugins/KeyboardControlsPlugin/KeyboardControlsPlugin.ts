@@ -10,7 +10,7 @@ import {
 	ElementNode,
 	KEY_ENTER_COMMAND,
 } from 'lexical';
-import { $isCodeNode } from '@lexical/code';
+import { $isCodeNode } from '@lexical/code-core';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $isQuoteNode } from '@lexical/rich-text';
 import { mergeRegister } from '@lexical/utils';

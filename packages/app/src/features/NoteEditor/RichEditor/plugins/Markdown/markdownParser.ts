@@ -16,7 +16,7 @@ import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { u } from 'unist-builder';
 import { TextFormat } from '@features/NoteEditor/EditorPanel';
-import { $createCodeNode } from '@lexical/code';
+import { $createCodeNode } from '@lexical/code-core';
 import { $createLinkNode } from '@lexical/link';
 import { $createListItemNode, $createListNode, ListType } from '@lexical/list';
 import { $createHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';

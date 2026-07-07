@@ -27,7 +27,7 @@ import {
 	ThematicBreak,
 } from 'mdast';
 import { u } from 'unist-builder';
-import { $isCodeNode } from '@lexical/code';
+import { $isCodeNode } from '@lexical/code-core';
 import { $isLinkNode } from '@lexical/link';
 import { $isListItemNode, $isListNode } from '@lexical/list';
 import { $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';

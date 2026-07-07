@@ -10,7 +10,7 @@ import {
 	CONTROLLED_TEXT_INSERTION_COMMAND,
 	FORMAT_TEXT_COMMAND,
 } from 'lexical';
-import { $createCodeNode } from '@lexical/code';
+import { $createCodeNode } from '@lexical/code-core';
 import { TOGGLE_LINK_COMMAND } from '@lexical/link';
 import {
 	INSERT_CHECK_LIST_COMMAND,
