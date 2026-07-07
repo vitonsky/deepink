@@ -1,5 +1,11 @@
-import React, { Ref, useEffect, useMemo } from 'react';
-import { $createRangeSelection, $getRoot, $getSelection, $setSelection } from 'lexical';
+import React, { Ref, useEffect, useImperativeHandle, useMemo } from 'react';
+import {
+	$createRangeSelection,
+	$getRoot,
+	$getSelection,
+	$setSelection,
+	LexicalEditor,
+} from 'lexical';
 import { Box, useSlotRecipe } from '@chakra-ui/react';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -43,6 +49,7 @@ export type RichEditorContentProps = RichTextContainerProps &
 		isReadOnly?: boolean;
 		search?: string;
 		apiRef?: Ref<RichEditorAPI>;
+		editorRef?: Ref<LexicalEditor>;
 	};
 
 export const RichEditorContent = ({
@@ -52,6 +59,7 @@ export const RichEditorContent = ({
 	isReadOnly,
 	search,
 	apiRef,
+	editorRef,
 	...props
 }: RichEditorContentProps) => {
 	const recipe = useSlotRecipe({ key: 'richEditor' });
@@ -61,6 +69,8 @@ export const RichEditorContent = ({
 
 	// Expose API
 	const [editor] = useLexicalComposerContext();
+	useImperativeHandle(editorRef, () => editor);
+
 	const api = useMemo(() => {
 		return {
 			focus() {
@@ -99,6 +109,7 @@ export const RichEditorContent = ({
 			width="100%"
 			height="100%"
 			overflow="auto"
+			className="RichEditor"
 			css={{
 				...styles.root,
 

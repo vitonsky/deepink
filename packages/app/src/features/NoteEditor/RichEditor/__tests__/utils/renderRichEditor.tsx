@@ -1,6 +1,9 @@
-import React, { act } from 'react';
+import React, { act, createRef } from 'react';
+import { I18nextProvider, initReactI18next } from 'react-i18next';
 import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
+import i18n from 'i18next';
+import { LexicalEditor } from 'lexical';
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import { FilesController } from '@core/features/files/FilesController';
 import {
@@ -77,19 +80,41 @@ export const renderRichEditor = async (props: RichEditorContentProps) => {
 	const onFormatting = createEvent<TextFormat>();
 	const onInserting = createEvent<InsertingPayload>();
 
+	const editorRef = createRef<LexicalEditor>();
+
+	i18n.use(initReactI18next) // passes i18n down to react-i18next
+		.init({
+			lng: 'en',
+			fallbackLng: 'en',
+
+			ns: [],
+
+			interpolation: {
+				escapeValue: false,
+			},
+
+			react: {
+				useSuspense: false, // important since we manually wait
+			},
+		});
+
 	const renderEditor = (props: RichEditorContentProps) => (
 		<Provider store={store}>
 			<ChakraProvider value={defaultSystem}>
-				<MockWorkspaceProvider>
-					<editorPanelContext.Provider value={{ onInserting, onFormatting }}>
-						<RichEditor {...props} />
-					</editorPanelContext.Provider>
-				</MockWorkspaceProvider>
+				<I18nextProvider i18n={i18n}>
+					<MockWorkspaceProvider>
+						<editorPanelContext.Provider
+							value={{ onInserting, onFormatting }}
+						>
+							<RichEditor placeholder="Enter text" {...props} />
+						</editorPanelContext.Provider>
+					</MockWorkspaceProvider>
+				</I18nextProvider>
 			</ChakraProvider>
 		</Provider>
 	);
 
-	const result = render(renderEditor(props));
+	const result = render(renderEditor({ ...props, editorRef }));
 
 	return {
 		...result,
@@ -112,6 +137,10 @@ export const renderRichEditor = async (props: RichEditorContentProps) => {
 		 */
 		format: async (format: TextFormat) => {
 			await act(async () => onFormatting(format));
+		},
+
+		getEditor() {
+			return editorRef.current;
 		},
 	};
 };

@@ -1,0 +1,98 @@
+import React, { createRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { createEvent } from 'effector';
+import { LexicalEditor } from 'lexical';
+import { FilesController } from '@core/features/files/FilesController';
+import {
+	FilesRegistryContext,
+	NotesContext,
+	NotesRegistryContext,
+} from '@features/App/Workspace/WorkspaceProvider';
+import {
+	editorPanelContext,
+	InsertingPayload,
+	TextFormat,
+} from '@features/NoteEditor/EditorPanel';
+import { RichEditor } from '@features/NoteEditor/RichEditor/RichEditor';
+import { RichEditorContentProps } from '@features/NoteEditor/RichEditor/RichEditorContent';
+import { ThemeProvider } from '@features/ThemeProvider';
+import { createTestStore } from '@tests/utils/redux';
+
+// Mock useUrlOpener to avoid importing monaco-editor-core in tests,
+// which causes Vite module resolution errors during test setup
+vi.mock('@hooks/useUrlOpener', () => ({
+	useUrlOpener: () => vi.fn(),
+}));
+
+export const MockWorkspaceProvider = ({ children }: { children: React.ReactNode }) => {
+	const filesRegistry = {
+		add: vi.fn(),
+		get: vi.fn(),
+		delete: vi.fn(),
+		query: vi.fn(),
+	} as unknown as FilesController;
+
+	const notesControl = {
+		get: vi.fn(),
+		updateBatch: vi.fn(),
+		getById: vi.fn(),
+		getLength: vi.fn(),
+		query: vi.fn(),
+		add: vi.fn(),
+		update: vi.fn(),
+		updateMeta: vi.fn(),
+		delete: vi.fn(),
+	};
+
+	const notesApi = {
+		openNote: vi.fn(),
+		noteUpdated: vi.fn(),
+		noteClosed: vi.fn(),
+	};
+
+	return (
+		<NotesContext.Provider value={notesApi}>
+			<FilesRegistryContext.Provider value={filesRegistry}>
+				<NotesRegistryContext.Provider value={notesControl}>
+					{children}
+				</NotesRegistryContext.Provider>
+			</FilesRegistryContext.Provider>
+		</NotesContext.Provider>
+	);
+};
+
+export const renderRichEditorInDOM = async (props: RichEditorContentProps) => {
+	const { store } = createTestStore();
+	const onFormatting = createEvent<TextFormat>();
+	const onInserting = createEvent<InsertingPayload>();
+
+	const editorRef = createRef<LexicalEditor>();
+
+	const renderEditor = (props: RichEditorContentProps) => (
+		<Provider store={store}>
+			<ThemeProvider>
+				<MockWorkspaceProvider>
+					<editorPanelContext.Provider value={{ onInserting, onFormatting }}>
+						<RichEditor placeholder="Enter text" {...props} />
+					</editorPanelContext.Provider>
+				</MockWorkspaceProvider>
+			</ThemeProvider>
+		</Provider>
+	);
+
+	const container = document.createElement('div');
+	document.body.appendChild(container);
+
+	const root = createRoot(container);
+	root.render(renderEditor({ ...props, editorRef }));
+
+	return {
+		root,
+		container,
+
+		getEditor() {
+			return editorRef.current;
+		},
+	};
+};
