@@ -1,3 +1,11 @@
+export const fewParagraphs = `
+# Why Russian Classics Feel So Different
+
+I've noticed that after finishing a Russian novel I rarely want to start another book immediately.
+
+It's not because the stories are difficult. It's because they seem to leave unfinished conversations in my head. Instead of remembering the plot, I keep thinking about the questions the characters were asking themselves.
+`.trim();
+
 export const simpleFormatting = `
 Text may be **bold**, *italic*, ~~strikethrough~~.
 `.trim();

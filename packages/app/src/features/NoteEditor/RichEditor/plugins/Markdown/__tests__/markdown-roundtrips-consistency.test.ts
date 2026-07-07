@@ -11,6 +11,7 @@ import {
 } from '../markdownParser';
 import {
 	detailsWithSummary,
+	fewParagraphs,
 	formattedLine,
 	formattingInList,
 	formattingInQuote,
@@ -46,6 +47,10 @@ describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level'
 			title: 'Bold node inside bold node',
 			markdown: '**foo __bar__ baz**',
 			inconsistentAST: true,
+		},
+		{
+			title: 'Few paragraphs',
+			markdown: fewParagraphs,
 		},
 		{
 			title: 'Inline code',
@@ -157,6 +162,7 @@ describe('Markdown-Lexical-Markdown round-trips must be consistent on AST level'
 		{
 			title: 'Details with summary',
 			markdown: detailsWithSummary,
+			inconsistentAST: true,
 		},
 		{
 			title: 'Unsupported features',

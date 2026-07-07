@@ -38,6 +38,15 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
+exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Few paragraphs 1`] = `
+"# Why Russian Classics Feel So Different
+
+I've noticed that after finishing a Russian novel I rarely want to start another book immediately.
+
+It's not because the stories are difficult. It's because they seem to leave unfinished conversations in my head. Instead of remembering the plot, I keep thinking about the questions the characters were asking themselves.
+"
+`;
+
 exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Formatted line 1`] = `
 "**That** is a ***formatted*** *line*.
 "
