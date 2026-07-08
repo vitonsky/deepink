@@ -231,7 +231,12 @@ export const $convertFromMarkdownString = (rawMarkdown: string) => {
 
 	const rootNode = $getRoot();
 	rootNode.clear();
-	rootNode.append(...lexicalNodes);
+
+	if (lexicalNodes.length > 0) {
+		rootNode.append(...lexicalNodes);
+	} else {
+		rootNode.append($createParagraphNode());
+	}
 };
 
 export const $serializeAsMarkdownAST = () => {
