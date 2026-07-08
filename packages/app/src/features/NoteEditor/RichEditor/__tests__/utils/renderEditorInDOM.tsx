@@ -1,4 +1,4 @@
-import React, { createRef } from 'react';
+import React, { act, createRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { createEvent } from 'effector';
@@ -85,14 +85,23 @@ export const renderRichEditorInDOM = async (props: RichEditorContentProps) => {
 	document.body.appendChild(container);
 
 	const root = createRoot(container);
-	root.render(renderEditor({ ...props, editorRef }));
+	act(() => root.render(renderEditor({ ...props, editorRef })));
 
 	return {
 		root,
 		container,
 
+		destroy() {
+			act(() => {
+				root.unmount();
+			});
+			container.remove();
+		},
+
 		getEditor() {
-			return editorRef.current;
+			const editor = editorRef.current;
+			if (!editor) throw new Error('Error instance is not set');
+			return editor;
 		},
 	};
 };

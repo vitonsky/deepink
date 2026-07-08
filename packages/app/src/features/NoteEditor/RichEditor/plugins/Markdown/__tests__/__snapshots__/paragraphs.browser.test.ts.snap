@@ -1,7 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Few paragraphs with empty lines 1`] = `
-"Hello
-World
-"
-`;
