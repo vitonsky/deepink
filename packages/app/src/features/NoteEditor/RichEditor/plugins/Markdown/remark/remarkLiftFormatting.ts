@@ -27,8 +27,8 @@ function isMarkNode(node: PhrasingContent): node is MarkNode {
 	return MARK_TYPES.has(node.type);
 }
 
-function hasChildren(
-	node: PhrasingContent,
+export function hasChildren(
+	node: RootContent,
 ): node is PhrasingContent & { children: PhrasingContent[] } {
 	return (
 		'children' in node &&

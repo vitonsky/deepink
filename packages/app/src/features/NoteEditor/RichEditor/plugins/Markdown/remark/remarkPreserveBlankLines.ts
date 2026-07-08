@@ -34,8 +34,7 @@ export const fillGapsWithParagraphs = (tree: Root) => {
 				const lineGap = next.position.start.line - current.position.end.line;
 				// lineGap === 2 means exactly one blank line, 3 means two, etc.
 				const blankLineCount = lineGap - 1;
-				const paragraphsCount =
-					blankLineCount > 0 ? Math.floor(blankLineCount / 2) : 0;
+				const paragraphsCount = blankLineCount > 1 ? blankLineCount : 0;
 
 				for (let b = 0; b < paragraphsCount; b++) {
 					const line = current.position.end.line + 1 + b;
