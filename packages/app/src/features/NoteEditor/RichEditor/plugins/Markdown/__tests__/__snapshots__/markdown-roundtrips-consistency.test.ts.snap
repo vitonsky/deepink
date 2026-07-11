@@ -1,32 +1,32 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Bold node inside bold node 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Bold node inside bold node > Consistent markdown output 1`] = `
 "**foo bar baz**
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Check list with all checked items 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Check list with all checked items > Consistent markdown output 1`] = `
 "- [x] foo
   - [x] bar
   - [x] baz
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Check list with no checked items 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Check list with no checked items > Consistent markdown output 1`] = `
 "- [ ] foo
   - [ ] bar
   - [ ] baz
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Check list with one checked item 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Check list with one checked item > Consistent markdown output 1`] = `
 "- [ ] foo
   - [x] bar
   - [ ] baz
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Details with summary 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Details with summary > Consistent markdown output 1`] = `
 "<details open>
 <summary>Shopping list</summary>
 
@@ -38,7 +38,7 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Few paragraphs 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Few paragraphs > Consistent markdown output 1`] = `
 "# Why Russian Classics Feel So Different
 
 I've noticed that after finishing a Russian novel I rarely want to start another book immediately.
@@ -47,54 +47,54 @@ It's not because the stories are difficult. It's because they seem to leave unfi
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Formatted line 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Formatted line > Consistent markdown output 1`] = `
 "**That** is a ***formatted*** *line*.
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Header with formatting 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Header with formatting > Consistent markdown output 1`] = `
 "### *All header is italic, **something bold**, ~~strikethrough~~, \`inline code\`*
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Image 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Image > Consistent markdown output 1`] = `
 "![Alt text](https://url)
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Image wrapped by link 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Image wrapped by link > Consistent markdown output 1`] = `
 "[![Alt text](https://url)](proto://url2 "Link title")
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Inline code 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Inline code > Consistent markdown output 1`] = `
 "Text with \`code\`
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Inline code with formatting 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Inline code with formatting > Consistent markdown output 1`] = `
 "Text with ***~~\`formatted code\`~~***
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Links 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Links > Consistent markdown output 1`] = `
 "Some [link](https://url "Title") and [another link](proto://url)
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > List item with inline elements 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > List item with inline elements > Consistent markdown output 1`] = `
 "- foo [bar](...) baz
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > List item with inline elements and nested list 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > List item with inline elements and nested list > Consistent markdown output 1`] = `
 "- item 1 [foo](...) bar
   - item 1-2
   - item 2-2
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > List with formatting 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > List with formatting > Consistent markdown output 1`] = `
 "- *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~
 - Plain text
 - *Italic*
@@ -103,7 +103,7 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Mixed list 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Mixed list > Consistent markdown output 1`] = `
 "- level 1-1
   - [x] level 2-1
   - [x] level 2-2
@@ -118,33 +118,32 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Nested quote 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Nested quote > Consistent markdown output 1`] = `
 "> The quote
 >
 >
 >
 > > Quote inside another quote
 > >
-> >
 > > With some spaces
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Numbered list 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Numbered list > Consistent markdown output 1`] = `
 "1. foo
 2. bar
 3. baz
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Plain list 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Plain list > Consistent markdown output 1`] = `
 "- foo
   - bar
   - baz
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Quote with formatting 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Quote with formatting > Consistent markdown output 1`] = `
 "> *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~
 > Plain text
 > *Italic*
@@ -153,12 +152,12 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Rich formatting 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Rich formatting > Consistent markdown output 1`] = `
 "*All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~***
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Simple code 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Simple code > Consistent markdown output 1`] = `
 "\`\`\`js
 const x = 42;
 console.log("Your number is", x ** x);
@@ -166,12 +165,12 @@ console.log("Your number is", x ** x);
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Simple formatting 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Simple formatting > Consistent markdown output 1`] = `
 "Text may be **bold**, *italic*, ~~strikethrough~~.
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Simple post with headers 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Simple post with headers > Consistent markdown output 1`] = `
 "# The title
 
 A few lines
@@ -182,7 +181,9 @@ Another paragraph.
 ## Another section
 
 Introduction
+
 ***
+
 Text after a separator
 
 ## Header with no space
@@ -195,12 +196,12 @@ Section content
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Simple quote 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Simple quote > Consistent markdown output 1`] = `
 "> The quote
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Simple table 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Simple table > Consistent markdown output 1`] = `
 "| Name  | Value |
 | ----- | ----- |
 | One   | 1     |
@@ -209,7 +210,7 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Table with formatting 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Table with formatting > Consistent markdown output 1`] = `
 "| foo                                                                                                                    | bar                        |
 | ---------------------------------------------------------------------------------------------------------------------- | -------------------------- |
 | *All text can be italic, something additionally can be **bold**, ~~strikethrough~~, or **~~bold AND strikethrough~~*** | plain text and ~~deleted~~ |
@@ -217,15 +218,14 @@ exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level >
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Text with few empty lines 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Text with few empty lines > Consistent markdown output 1`] = `
 "foo
-
 
 bar
 "
 `;
 
-exports[`Markdown-Lexical-Markdown round-trips must be consistent on AST level > Unsupported features 1`] = `
+exports[`Normalized Markdown-Lexical-Markdown round-trips must yield consistent markdown text > Unsupported features > Consistent markdown output 1`] = `
 "<button>Some button</button>
 "
 `;

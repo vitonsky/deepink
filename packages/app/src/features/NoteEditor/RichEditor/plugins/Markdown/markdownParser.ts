@@ -33,7 +33,7 @@ import { $createImageNode } from '../Image/ImageNode';
 import { convertLexicalNodeToMarkdownNode } from './convertLexicalNodeToMarkdownNode';
 import { createSyncContext } from './createSyncContext';
 import { $createRawNode } from './nodes/RawNode';
-import { hasChildren, liftFormattingNodes } from './remark/remarkLiftFormatting';
+import { liftFormattingNodes } from './remark/remarkLiftFormatting';
 import { fillGapsWithParagraphs } from './remark/remarkPreserveBlankLines';
 
 export const markdownProcessor = unified()
@@ -57,13 +57,15 @@ export const markdownProcessor = unified()
 		},
 		join: [
 			(left, right) => {
-				if (left.type === 'paragraph' || right.type === 'paragraph') {
-					const isLeftEmpty = !hasChildren(left) || left.children.length === 0;
-					const isRightEmpty =
-						!hasChildren(right) || right.children.length === 0;
+				// Join empty paragraphs with no empty lines between them
+				if (left.type === 'paragraph' && right.type === 'paragraph') {
+					const isLeftEmpty = left.children.length === 0;
+					const isRightEmpty = right.children.length === 0;
 
-					if (isLeftEmpty || isRightEmpty) return 0;
+					// Join only in case both nodes are empty
+					if (isLeftEmpty && isRightEmpty) return 0;
 
+					// Otherwise do not change standard behavior
 					return null;
 				}
 
