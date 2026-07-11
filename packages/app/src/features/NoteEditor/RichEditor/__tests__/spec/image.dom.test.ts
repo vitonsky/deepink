@@ -5,7 +5,7 @@ import { setCursorPosition } from '../utils/utils';
 
 test(`Inserts image between text nodes`, async () => {
 	const richEditor = await renderRichEditor({
-		value: `My favorite image\n\n I love cat`,
+		value: `My favorite image\n\n\n\nI love cat`,
 	});
 
 	const editor = screen.getByRole('textbox');
