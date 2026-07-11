@@ -17,16 +17,16 @@ test('Must not to add paragraphs for one line gap', () => {
 	expect(fillGapsWithParagraphs(tree).children).toHaveLength(2);
 });
 
-test('Must add 1 paragraph for gap in 2 lines', () => {
+test('Must not to add paragraphs for gap in 2 lines', () => {
 	const tree = markdownProcessor.parse('Hello\n\n\nWorld');
 	expect(tree.children).toHaveLength(2);
-	expect(fillGapsWithParagraphs(tree).children).toHaveLength(3);
+	expect(fillGapsWithParagraphs(tree).children).toHaveLength(2);
 });
 
-test('Must add 5 paragraphs for gap in 10 lines', () => {
+test('Must add 8 paragraphs for gap in 10 lines', () => {
 	const tree = markdownProcessor.parse('Hello\n' + '\n'.repeat(10) + 'World');
 	expect(tree.children).toHaveLength(2);
-	expect(fillGapsWithParagraphs(tree).children).toHaveLength(2 + 5);
+	expect(fillGapsWithParagraphs(tree).children).toHaveLength(2 + 8);
 });
 
 // TODO: implement lines preservation

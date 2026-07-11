@@ -17,7 +17,7 @@ describe('AST serialization', () => {
 		).toBe('Hello\n\nWorld\n');
 	});
 
-	test('Empty paragraph is considered as additional empty line', () => {
+	test('Empty paragraph is considered as additional empty line + 2 lines around', () => {
 		expect(
 			serializeMarkdownTree(
 				u('root', {
@@ -28,10 +28,10 @@ describe('AST serialization', () => {
 					] satisfies Paragraph[],
 				}),
 			),
-		).toBe('Hello\n\nWorld\n');
+		).toBe(`Hello${'\n'.repeat(3)}\nWorld\n`);
 	});
 
-	test('3 empty paragraphs is considered as 3 additional empty lines', () => {
+	test('3 empty paragraphs must be serialized as 5 empty lines', () => {
 		expect(
 			serializeMarkdownTree(
 				u('root', {
@@ -44,10 +44,10 @@ describe('AST serialization', () => {
 					] satisfies Paragraph[],
 				}),
 			),
-		).toBe('Hello\n\n\n\nWorld\n');
+		).toBe(`Hello${'\n'.repeat(5)}\nWorld\n`);
 	});
 
-	test('Quote with 3 empty paragraphs must contain 3 empty lines', () => {
+	test('Quote with 3 empty paragraphs must contain 5 empty lines', () => {
 		expect(
 			serializeMarkdownTree({
 				type: 'root',
@@ -80,10 +80,10 @@ describe('AST serialization', () => {
 					},
 				],
 			}),
-		).toBe('> Hello\n>\n>\n>\n> World\n');
+		).toBe(`> Hello${`\n>`.repeat(5)}\n> World\n`);
 	});
 
-	test('Nested quote with 3 empty paragraphs must contain 3 empty lines', () => {
+	test('Nested quote with 3 empty paragraphs must contain 5 empty lines', () => {
 		expect(
 			serializeMarkdownTree({
 				type: 'root',
@@ -133,6 +133,6 @@ describe('AST serialization', () => {
 					},
 				],
 			}),
-		).toBe('> Hello\n>\n>\n>\n> > Hello\n> >\n> >\n> >\n> > World\n');
+		).toBe(`> Hello${`\n>`.repeat(5)}\n> > Hello${'\n> >'.repeat(5)}\n> > World\n`);
 	});
 });
