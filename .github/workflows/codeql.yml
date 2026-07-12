@@ -56,7 +56,7 @@ jobs:
         run: npm test --workspaces --if-present
 
       - name: Build
-        run: npm run build --workspace=deepink
+        run: npm run build --workspace=app
 
   analyze:
     name: Analyze
