@@ -56,7 +56,8 @@ jobs:
         run: npm test --workspaces --if-present
 
       - name: Build
-        run: npm run build --workspace=app
+        # The name from package.json is used as workspace name, not a dir name
+        run: npm run build --workspace deepink
 
   analyze:
     name: Analyze
