@@ -19,6 +19,7 @@ export const RichTextContainer = memo(
 						outline="none"
 						padding="1rem 1rem 5rem"
 						overflow="auto"
+						className="RichEditor"
 						{...props}
 						asChild
 					>

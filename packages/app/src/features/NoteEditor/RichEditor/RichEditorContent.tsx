@@ -109,7 +109,6 @@ export const RichEditorContent = ({
 			width="100%"
 			height="100%"
 			overflow="auto"
-			className="RichEditor"
 			css={{
 				...styles.root,
 

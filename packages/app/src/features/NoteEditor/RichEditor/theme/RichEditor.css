@@ -396,6 +396,9 @@
 	list-style-position: outside;
 }
 
+.RichEditor__ol1 {
+	list-style: auto;
+}
 .RichEditor__ol2 {
 	list-style-type: upper-alpha;
 }
@@ -504,8 +507,24 @@
 	border-width: 0 2px 2px 0;
 }
 
-ul > li.RichEditor__listItem:not([role='checkbox']) {
+/* Set default marker style for usual list items */
+.RichEditor__ul > .RichEditor__listItem:not([role='checkbox']) {
 	list-style: disc;
+}
+
+/* Don't draw marker for list item that nest another list */
+.RichEditor__ul
+	> .RichEditor__listItem.RichEditor__nestedListItem:not(:has(> [data-lexical-text])) {
+	list-style-type: none;
+
+	&::before {
+		display: none;
+	}
+}
+
+/* No start padding for nested list, because li already have the one */
+.RichEditor__nestedListItem > .RichEditor__ul {
+	padding-inline-start: 0;
 }
 
 /* ============================================================
