@@ -1,4 +1,4 @@
-import React, { createContext, FC, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, FC, useMemo, useRef } from 'react';
 import {
 	buildProxiedInstance,
 	FeatureImplementation,
@@ -64,6 +64,24 @@ export type ITagsListProps = {
 	contextMenu: TagContextMenuCallbacks;
 };
 
+/**
+ * Rebuilds the tree synchronously during render whenever the tags change.
+ *
+ * The tree may contain stale data after the tags change.
+ * Rebuild it before rendering child components to ensure they receive an up-to-date tree built from the latest tags
+ */
+const useRebuildTreeOnTagsChange = (
+	tree: { rebuildTree: () => void },
+	tags: Record<string, TagNode>,
+) => {
+	const prevTagsRef = useRef(tags);
+	if (prevTagsRef.current !== tags) {
+		prevTagsRef.current = tags;
+
+		tree.rebuildTree();
+	}
+};
+
 export const TagsTree: FC<ITagsListProps> = ({
 	tags,
 	activeTag,
@@ -118,9 +136,7 @@ export const TagsTree: FC<ITagsListProps> = ({
 	});
 
 	// Rebuild tree by changes
-	useEffect(() => {
-		tree.rebuildTree();
-	}, [tags, tree]);
+	useRebuildTreeOnTagsChange(tree, tags);
 
 	return (
 		<TagsListContext value={context}>
