@@ -9,7 +9,6 @@
 import * as React from 'react';
 import { JSX, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaDownload } from 'react-icons/fa6';
 import {
 	$getNodeByKey,
 	$getSelection,
@@ -22,13 +21,14 @@ import {
 	NodeKey,
 } from 'lexical';
 import { LOCALE_NAMESPACE } from 'src/i18n';
-import { Box, Button, HStack, Spinner, Text } from '@chakra-ui/react';
+import { HStack, Spinner, Text } from '@chakra-ui/react';
 import { getAppResourceDataInUrl } from '@core/features/links';
 import { useFilesRegistry } from '@features/App/Workspace/WorkspaceProvider';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
 
+import { DownloadableContent } from './DownloadableContent';
 import { $isImageNode } from './ImageNode';
 
 const imageCache = new Map<string, string | null>();
@@ -100,40 +100,23 @@ export const LazyImage = React.forwardRef<
 		ref,
 	): JSX.Element => {
 		const url = useSuspenseImage(src);
-		const [isHover, setIsHover] = useState(false);
 
 		return (
-			<Box
-				position="relative"
-				onMouseEnter={() => setIsHover(true)}
-				onMouseLeave={() => setIsHover(false)}
-			>
-				<Button
-					position="absolute"
-					top="15px"
-					right="15px"
-					visibility={isHover ? 'unset' : 'hidden'}
-					size="sm"
-					variant="floating"
-				>
-					<FaDownload />
-				</Button>
-				<img
-					ref={ref}
-					className={className || undefined}
-					src={url}
-					alt={altText}
-					style={{
-						height,
-						maxWidth,
-						width,
-						objectFit: 'contain',
-					}}
-					onError={onError}
-					onLoad={onLoad}
-					draggable="false"
-				/>
-			</Box>
+			<img
+				ref={ref}
+				className={className || undefined}
+				src={url}
+				alt={altText}
+				style={{
+					height,
+					maxWidth,
+					width,
+					objectFit: 'contain',
+				}}
+				onError={onError}
+				onLoad={onLoad}
+				draggable="false"
+			/>
 		);
 	},
 );
@@ -274,15 +257,17 @@ export default function ImageComponent({
 				{isLoadError ? (
 					<BrokenImage />
 				) : (
-					<LazyImage
-						src={src}
-						altText={altText}
-						width={width}
-						height={height}
-						maxWidth={maxWidth}
-						onError={() => setIsLoadError(true)}
-						onLoad={markDirty}
-					/>
+					<DownloadableContent src={src}>
+						<LazyImage
+							src={src}
+							altText={altText}
+							width={width}
+							height={height}
+							maxWidth={maxWidth}
+							onError={() => setIsLoadError(true)}
+							onLoad={markDirty}
+						/>
+					</DownloadableContent>
 				)}
 			</Suspense>
 		</div>
